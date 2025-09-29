@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SExportDataPayment implements SExportData {
     
@@ -81,7 +81,7 @@ public class SExportDataPayment implements SExportData {
     
     public int is_deleted;
     
-    // public int created_by;
+    //public int created_by;
     
     //public int updated_by;
     

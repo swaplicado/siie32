@@ -25,7 +25,7 @@ import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
-import erp.mod.trn.db.swap.SDbSwapDataProcessing;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.form.SDialogDpsFinder;

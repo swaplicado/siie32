@@ -904,26 +904,26 @@ public abstract class SExportUtils {
                     case PARTNER_SUPPLIER:
                     case PARTNER_CUSTOMER:
                         if (syncType == SSyncType.USER) {
-                            // para sincronización de usuarios: exportar antes áreas funcionales:
+                            // exportar antes áreas funcionales:
                             syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }
 
                         if (info == null || info.isResponseOk()) {
-                            // para todas las sincronizaciones: exportar antes puestos laborales:
+                            // para todas las exportaciones: exportar antes puestos laborales:
                             syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
 
                             if (info.isResponseOk()) {
-                                // para todas las sincronizaciones: exportar antes actores:
+                                // para todas las exportaciones: exportar antes actores:
                                 syncTypeInProgress = SSyncType.AUTH_ACTOR;
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                                 
                                 if (info.isResponseOk()) {
-                                    // exportar usuarios o socios de negocio:
+                                    // exportar los datos solicitados:
                                     syncTypeInProgress = syncType;
                                     info = computeRequest(session, syncTypeInProgress);
                                     responses.getInfos().add(info);
@@ -944,14 +944,16 @@ public abstract class SExportUtils {
                         }
 
                         if (info == null || info.isResponseOk()) {
-                            // exportar usuarios o proveedores:
+                            // exportar los datos solicitados:
                             syncTypeInProgress = syncType;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }
                         break;
 
+                    case PUR_ORDER:
                     case PUR_REF_ORDER:
+                    case PUR_PAYMENT:
                         // exportar antes áreas funcionales:
                         syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
                         info = computeRequest(session, syncTypeInProgress);
@@ -964,19 +966,12 @@ public abstract class SExportUtils {
                             responses.getInfos().add(info);
 
                             if (info.isResponseOk()) {
-                                // exportar referencias de pedidos de compras:
+                                // exportar los datos solicitados:
                                 syncTypeInProgress = syncType;
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }
                         }
-                        break;
-                        
-                    case PUR_ORDER:
-                        // exportar antes áreas funcionales:
-                        syncTypeInProgress = SSyncType.PUR_ORDER;
-                        info = computeRequest(session, syncTypeInProgress);
-                        responses.getInfos().add(info);
                         break;
 
                     default:

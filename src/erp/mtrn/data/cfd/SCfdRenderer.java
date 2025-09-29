@@ -54,7 +54,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  * Muestra el CFDI y se permite la validación cuando sea necesaria ante el SAT.
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public final class SCfdRenderer implements java.awt.event.ActionListener {
     
@@ -118,7 +118,6 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
     }
       
     private void processCfd(File cfdiFile) throws Exception {
-        SFormValidation validation = new SFormValidation();
         // obtener CFDI: 
         
         try {
@@ -129,12 +128,16 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
         }
         
         float version = DCfdUtils.getCfdiVersion(msCfdiXml);
+        SFormValidation validation = null;
         
         if (version == DCfdConsts.CFDI_VER_33) {
             validation = validateCfdi33();
         }
         else if (version == DCfdConsts.CFDI_VER_40) {
             validation = validateCfdi40();
+        }
+        else {
+            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nVersión CFD: " + version + ".");
         }
         
         if (validation.getIsError()) {
@@ -477,11 +480,11 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
             mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
             if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
                 createParamsMap40();
-                
             }
             else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
                 createParamsMap33();
             }
+            
             showCfdi();
         }
         catch (Exception e) {
@@ -666,10 +669,8 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 fileTemplate = new File("reps/view_cfdi_33.jasper");
             }
             
-            JasperReport relatoriosJasper =
-            (JasperReport)JRLoader.loadObject(fileTemplate);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(relatoriosJasper, moParamsMap, 
-                    new JRBeanCollectionDataSource(mfCfdiVersion == DCfdConsts.CFDI_VER_40 ? moConceptos40 : moConceptos33));
+            JasperReport relatoriosJasper = (JasperReport)JRLoader.loadObject(fileTemplate);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(relatoriosJasper, moParamsMap, new JRBeanCollectionDataSource(mfCfdiVersion == DCfdConsts.CFDI_VER_40 ? moConceptos40 : moConceptos33));
             JasperViewer jrViewer = new JasperViewer(jasperPrint, true);
             moCfdiViewer.getContentPane().add(jrViewer.getContentPane());
             moCfdiViewer.setVisible(true);

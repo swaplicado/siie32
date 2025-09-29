@@ -15,7 +15,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
-import erp.mod.trn.db.swap.SDbSwapDataProcessing;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.util.Date;
