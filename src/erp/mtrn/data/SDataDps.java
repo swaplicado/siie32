@@ -5043,12 +5043,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDbMmsConfig mmsConfig = null;
         SDataDpsType dpsType = null;
         boolean isEdited = false;
+        boolean isNew = false;
         boolean send = true;        
         SDataDps dps = new SDataDps();;
         dps.read(dpsKey, client.getSession().getStatement());
         dps.getDbmsDpsEntries().get(0).getFkItemId();
         dps.getDbmsDpsEntries().get(0).getFkItemId();
         isEdited = mtUserNewTs.compareTo(mtUserEditTs) != 0;
+        isNew = mtUserNewTs.compareTo(mtUserEditTs) == 0;
+        dpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
         List<SDataDpsEntryQuantityChange> qtyChanges = dps.getDbmsDpsEntries().get(0).getDbmsDpsEntryQuantityChange();
         dps.getDbmsDpsEntries().get(0).getQuantity();
@@ -5064,7 +5067,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             isUnitEdited = (change.getFkUnitNewId() != change.getFkUnitOldId()) &&
                            mtUserEditTs != change.getUserEditTs();
         }
-
+                
         if ((isEdited && (dps.getDbmsDpsEntries().get(0).getFkItemId() != dps.getDbmsDpsEntries().get(0).getAuxFkItemOld()))
         || (isEdited && isQtyEdited) || (isEdited && isUnitEdited) || (isEdited && !dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().isEmpty()
             && (dps.getDbmsDpsEntries().get(0).getDbmsEntryPrices().get(0).getOriginalPriceUnitaryCy() != dps.getDbmsDpsEntries().get(0).getPriceUnitary())
@@ -5206,8 +5209,144 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
             }
         }
+        else if (isNew) {
+                        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                try {
+                    mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+
+                    if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
+                        mmsConfig = new SDbMmsConfig();
+                        mmsConfig.read(client.getSession(), mmsConfigKey);
+
+                        emailsSet.add(mmsConfig.getEmail());
+                    }
+                }
+                catch (java.lang.Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+
+            if (!emailsSet.isEmpty()) {
+                msg = "Se enviará un correo-e de notificación a los siguientes destinatarios:";
+
+                for (String emailList : emailsSet) {
+                    msg += "\n" + emailList;
+                }
+                client.showMsgBoxInformation(msg);
+            }
+            else {
+                send = false;
+            }
+
+            if (send) {
+                for (String emailList : emailsSet) {
+                    try {
+                        String body = STrnUtilities.computeMailHeaderBeginTable(companyName, dpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
+
+                        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+                            if (entry.isAccountable()) {
+                                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, entry.getFkItemId());
+
+                                if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
+                                    mmsConfig = new SDbMmsConfig();
+                                    mmsConfig.read(client.getSession(), mmsConfigKey);
+
+                                    if (emailList.compareTo(mmsConfig.getEmail()) == 0) {
+                                        SDataDps dpsSource = null;
+                                        String dpsSourceDpsNumber = "";
+                                        int dpsSourceYearId = 0;
+                                        int dpsSourceDocId = 0;
+                                        int dpsSourceMonths = 0;
+                                        int dpsContractPriceYear = 0;
+                                        int dpsContractPriceMonth = 0;
+
+                                        if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                            dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
+                                            dpsSourceDpsNumber = dpsSource.getDpsNumber();
+                                            dpsSourceYearId = dpsSource.getPkYearId();
+                                            dpsSourceDocId = dpsSource.getPkDocId();
+                                            dpsSourceMonths = SGuiUtilities.getPeriodMonths(mtDateDocDelivery_n, mtDateDocLapsing_n);
+                                            dpsContractPriceYear = entry.getContractPriceYear();
+                                            dpsContractPriceMonth = entry.getContractPriceMonth();
+                                        }
+
+                                        body += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), 
+                                                dpsSourceDpsNumber.isEmpty() ? "N/D" : dpsSourceDpsNumber, dpsSourceYearId, dpsSourceDocId, dpsSourceMonths, dpsContractPriceYear, dpsContractPriceMonth, 
+                                                msNumberSeries, msNumber, msNumberReference.isEmpty() ? "N/D" : msNumberReference, 
+                                                entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
+                                                getDpsTypeKey(), isEdited, mbIsRebill);
+                                    }
+                                }
+                            }
+                        }
+                        if (isEdited) {
+                            body += STrnUtilities.generateMailFooterWithChanges(isEdited, qtyChanges, dps);
+                        }
+
+                        body += STrnUtilities.computeMailFooterEndTable();
+
+                        toRecipients.add(emailList);
+
+                        SMailSender sender = null;
+                        Object images = null;
+                        Date sentDate = null;
+                        STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                        toRecipients.clear();
+                    }
+                    catch (java.lang.Exception e) {
+                        SLibUtilities.printOutException(this, e);
+                    }
+                }
+            }
+
+            /**
+             * Sección de envío de correo de parámetros de calidad en contratos de venta
+             */
+            if (SLibUtils.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                String qualityBody = "";
+                SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
+                                                                mvDbmsDpsEntries,
+                                                                oSimpleDateFormat.format(this.getDate()),
+                                                                oSimpleDateFormat.format(this.getDateDoc()),
+                                                                this.getNumber(), 
+                                                                this.getNumberReference(), 
+                                                                this.getNumberSeries(), 
+                                                                companyName, bpName);
+
+                if (qualityBody != null) {
+                    try {
+                        String sMailsTo = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_QLT_DPS_ANALYSIS_TO);
+                        String aMailsTo[] = sMailsTo.split(";");
+                        String sMailsCc = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_QLT_DPS_ANALYSIS_CC);
+                        String aMailsCc[] = sMailsCc.split(";");
+
+                        toRecipients = new ArrayList<>();
+                        for (String string : aMailsTo) {
+                            toRecipients.add(string);
+                        }
+
+                        ArrayList<String> toRecipientsCC = new ArrayList<>();
+                        for (String string : aMailsCc) {
+                            toRecipientsCC.add(string);
+                        }
+
+                        SMailSender sender = null;
+                        Object images = null;
+                        Date sentDate = null;
+                        STrnUtilities.sendMail(client, mmsType, qualityBody, 
+                                        (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                        toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                        toRecipients.clear();
+                    }
+                    catch (Exception ex) {
+                        Logger.getLogger(SDataDps.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
     }
-    
+        
     /**
      * Obtener el uso de CDFI para la configuración de ítem vs. asociado de negocios.
      * @param client
