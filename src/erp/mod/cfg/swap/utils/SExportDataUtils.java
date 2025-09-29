@@ -1579,7 +1579,7 @@ public abstract class SExportDataUtils {
                     Date dateExecution = resultSet.getDate("p.dt_exec_n");
                     payment.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
                     payment.currency = resultSet.getString("_pay_cur_key");
-                    payment.amount = sexpresultSet.getDouble("p.pay_cur");
+                    payment.amount = SExportUtils.resultSet.getDouble("p.pay_cur");
                     payment.exchange_rate_app = resultSet.getString("");
                     payment.amount_loc_app = resultSet.getString("");
                     payment.exchange_rate_exec = resultSet.getString("");

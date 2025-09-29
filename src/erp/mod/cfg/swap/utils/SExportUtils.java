@@ -58,15 +58,15 @@ public abstract class SExportUtils {
     public static final DecimalFormat FormatSyncLogId = new DecimalFormat("000000"); // 6 positions
     public static final SimpleDateFormat FormatSyncLogDatetime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
     
-    public final static int DECS_STD_AMOUNT = 2;
-    public final static int DECS_STD_EXC_RATE = 4;
-    public final static int DECS_PAY_EXC_RATE = 6;
-    public final static int DECS_PAY_CONV_RATE = 10;
+    public static final int DECS_STD_AMOUNT = 2;
+    public static final int DECS_STD_EXC_RATE = 4;
+    public static final int DECS_PAY_EXC_RATE = 6;
+    public static final int DECS_PAY_CONV_RATE = 10;
     
-    public final DecimalFormat FormatStdAmount = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_AMOUNT));
-    public final DecimalFormat FormatStdExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_EXC_RATE));
-    public final DecimalFormat FormatPayExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_EXC_RATE));
-    public final DecimalFormat FormatPayConversionRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_CONV_RATE));
+    public static final DecimalFormat FormatStdAmount = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_AMOUNT));
+    public static final DecimalFormat FormatStdExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_EXC_RATE));
+    public static final DecimalFormat FormatPayExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_EXC_RATE));
+    public static final DecimalFormat FormatPayConversionRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_CONV_RATE));
     
     public static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
     
