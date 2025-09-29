@@ -6400,8 +6400,8 @@ public abstract class SCfdUtils implements Serializable {
 
                 }
             }
-            
-            if (client.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().compareTo(receptorXml) != 0) {
+            String receptor = receptorXml.trim();
+            if (client.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().compareTo(receptor) != 0) {
                 throw new Exception("El receptor del comprobante no es la empresa '" + client.getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner() + "'.");
             }
         }
