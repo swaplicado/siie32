@@ -41,16 +41,6 @@ public class SSwapServices {
             responses = SExportUtils.exportData(client.getSession(), SSyncType.USER, true);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
             
-            /* Invoked within SSyncType.PUR_REF_ORDER!
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_SUPPLIER, false);
-            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
-            */
-            
-            /* Not implemented yet!
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PARTNER_CUSTOMER, false);
-            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
-            */
-            
             responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_REF_ORDER, false);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
         }

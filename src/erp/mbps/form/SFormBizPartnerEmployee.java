@@ -6,6 +6,7 @@ package erp.mbps.form;
 
 import cfd.DCfdConsts;
 import erp.SErpConsts;
+import erp.SFileUtilities;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -71,7 +72,6 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -3464,41 +3464,48 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void actionLoadFileImagePhoto() {
         File file = null;
         ByteArrayOutputStream byteArrayOSImagePhoto = null;
-        FileFilter filter = new FileNameExtensionFilter("JPG, PNG, GIF & BMP Images", "jpg", "jpeg", "png", "gif", "bmp");
-        miClient.getFileChooser().repaint();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
-        miClient.getFileChooser().addChoosableFileFilter(filter);
+        
+        try {
+            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_ALL);
+            miClient.getFileChooser().repaint();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+            miClient.getFileChooser().addChoosableFileFilter(filter);
 
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-            
-            if (file.length() > SErpConsts.IMG_MAX_SIZE) {
-                miClient.showMsgBoxWarning("El tamaño de la imagen seleccionada no puede ser mayor a 512 MB.");
-            }
-            else {
-                moFieldFileImagePhoto.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                try {
-                    byteArrayOSImagePhoto = new ByteArrayOutputStream();
-                    ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), "jpg", byteArrayOSImagePhoto);
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
 
-                    moXtaImageIconPhoto_n = new ImageIcon(byteArrayOSImagePhoto.toByteArray());
-                    mbPhotoChange = true;
-                    enableButtonsPhoto(true);
-                    
-                    if (moXtaImageIconPhoto_n.getIconHeight() > 300) {
-                        moXtaImageIconPhoto_n = new ImageIcon(moXtaImageIconPhoto_n.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT));
-                    }
-                    jlImgPhoto.setIcon(moXtaImageIconPhoto_n);
-                    jlImgPhoto.setText("");
+                if (file.length() > SErpConsts.IMG_MAX_SIZE) {
+                    miClient.showMsgBoxWarning("El tamaño de la imagen seleccionada no puede ser mayor a 512 MB.");
                 }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
+                else {
+                    moFieldFileImagePhoto.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
+                    try {
+                        byteArrayOSImagePhoto = new ByteArrayOutputStream();
+                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_JPG, byteArrayOSImagePhoto);
+
+                        moXtaImageIconPhoto_n = new ImageIcon(byteArrayOSImagePhoto.toByteArray());
+                        mbPhotoChange = true;
+                        enableButtonsPhoto(true);
+
+                        if (moXtaImageIconPhoto_n.getIconHeight() > 300) {
+                            moXtaImageIconPhoto_n = new ImageIcon(moXtaImageIconPhoto_n.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT));
+                        }
+                        jlImgPhoto.setIcon(moXtaImageIconPhoto_n);
+                        jlImgPhoto.setText("");
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
                 }
             }
         }
-        
-        miClient.getFileChooser().resetChoosableFileFilters();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        }
     }
 
     private void actionFileImagePhotoRemove() {
@@ -3517,38 +3524,45 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void actionLoadFileImageSignature() {
         File file = null;
         ByteArrayOutputStream byteArrayOSSignatureSignature = null;
-        FileFilter filter = new FileNameExtensionFilter("JPG, PNG, GIF & BMP Images", "jpg", "jpeg", "png", "gif", "bmp");
-        miClient.getFileChooser().repaint();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
-        miClient.getFileChooser().addChoosableFileFilter(filter);
+        
+        try {
+            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_ALL);
+            miClient.getFileChooser().repaint();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+            miClient.getFileChooser().addChoosableFileFilter(filter);
 
-        if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
-            
-            if (file.length() > SErpConsts.IMG_MAX_SIZE) {
-                miClient.showMsgBoxWarning("El tamaño de la imagen seleccionada no puede ser mayor a 512 MB.");
-            }
-            else {
-                moFieldFileImageSignature.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                try {
-                    byteArrayOSSignatureSignature = new ByteArrayOutputStream();
-                    ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), "jpg", byteArrayOSSignatureSignature);
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
 
-                    moXtaImageIconSignature_n = new ImageIcon(byteArrayOSSignatureSignature.toByteArray());
-                    mbSignatureChange = true;
-                    enableButtonsSignature(true);
-                    
-                    jlImgSignature.setIcon(moXtaImageIconSignature_n);
-                    jlImgSignature.setText("");
+                if (file.length() > SErpConsts.IMG_MAX_SIZE) {
+                    miClient.showMsgBoxWarning("El tamaño de la imagen seleccionada no puede ser mayor a 512 MB.");
                 }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
+                else {
+                    moFieldFileImageSignature.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
+                    try {
+                        byteArrayOSSignatureSignature = new ByteArrayOutputStream();
+                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_JPG, byteArrayOSSignatureSignature);
+
+                        moXtaImageIconSignature_n = new ImageIcon(byteArrayOSSignatureSignature.toByteArray());
+                        mbSignatureChange = true;
+                        enableButtonsSignature(true);
+
+                        jlImgSignature.setIcon(moXtaImageIconSignature_n);
+                        jlImgSignature.setText("");
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
                 }
             }
         }
-        
-        miClient.getFileChooser().resetChoosableFileFilters();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+        }
     }
     
     private void actionFileImageSignatureRemove() {

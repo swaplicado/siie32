@@ -2070,7 +2070,9 @@ public abstract class STrnUtilities {
         File pdf = null;
         SDbMms mms;     
         SDataBizPartner bizPartnerUserSend;
-
+        String series = oDps.getNumberSeries() == null ? "" : oDps.getNumberSeries();
+        String fNum = series + (series.isEmpty() ? "" : "-") + oDps.getNumber();    
+        
         try {
             int dpsCategory = oDps.getFkDpsCategoryId();
             if (client.isGui()) {
@@ -2143,13 +2145,27 @@ public abstract class STrnUtilities {
                     canSend = false;
                 }
                 else {
-                    if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                        String body = "Le informamos que la orden de compra adjunta ha sido " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + 
-                                ".<br>Atentamente,<br>" + client.getSessionXXX().getCurrentCompanyName() + "." + "<br>" + composeMailFooter("", mms.getMmsCase());
+                      if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {                                                 
+                            String body = "Le informamos que la orden de compra " + fNum + " adjunta ha sido " 
+                             + (oDps.getIsAuthorized() ? "AUTORIZADA." : "RECHAZADA.");
+                            body += "<p><b>Favor de registrarse en nuestro nuevo portal de proveedores</b><br>"
+                                 + "En el siguiente enlace: "
+                                 + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a></p>";
+                            body += "<p>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, "
+                                 + "facturas, pagos y comprobantes de pago.</p>";
+                            body += "<p>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, "
+                                 + "fuera de esta fecha no se pueden recibir.</p>";
+                            body += "<br><br>Atentamente,<br>"
+                            + client.getSessionXXX().getCurrentCompanyName() + "."
+                            + "<br><br>" + composeMailFooter("", mms.getMmsCase());
+
                         mms.setTextBody(body);
                     }
                 }
-                mail = new SMail(sender, mms.getTextSubject(), mms.getTextBody(), toRecipients, toRecipientsCc);
+                String subjectOriginal = mms.getTextSubject(); // "Orden de compra Aceites Especiales TH"
+                String subjectConcatenado = subjectOriginal.replaceFirst("Orden de compra", "Orden de compra " + fNum);
+                mail = new SMail(sender, subjectConcatenado, mms.getTextBody(), toRecipients, toRecipientsCc);
+
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {

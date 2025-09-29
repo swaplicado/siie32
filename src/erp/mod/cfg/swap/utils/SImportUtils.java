@@ -5,9 +5,45 @@
  */
 package erp.mod.cfg.swap.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.cfg.db.SDbComImportLog;
+import erp.mod.cfg.db.SDbComImportLogEntry;
+import erp.mod.cfg.swap.SHttpConsts;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.form.SDialogDpsFinder;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -15,6 +51,383 @@ import sa.lib.gui.SGuiSession;
  * @author Sergio Flores
  */
 public abstract class SImportUtils {
+    
+    private static final int MODE_DOCS_ALL_FILES_AS_ZIP = 1;
+    private static final int MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 2;
+    
+    private static final String DownloadFilePrefix = "facturas compras "; // keep final blank space!
+    
+    public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+    
+    /**
+     * Get file name without extension.
+     * @param fileName File name.
+     * @param extension Estension.
+     * @return 
+     */
+    private static String getFileNameWithoutExtension(final String fileName, final String extension) {
+        String fileNameWithoutExtension;
+        int extensionIndex = fileName.toLowerCase().lastIndexOf(extension.toLowerCase());
+        
+        if (extensionIndex != -1) {
+            fileNameWithoutExtension = fileName.substring(0, extensionIndex);
+        }
+        else {
+            fileNameWithoutExtension = fileName;
+        }
+        
+        return fileNameWithoutExtension;
+    }
+    
+    /**
+     * Import and create a new invoice.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS Finder dialog.
+     * @param cfdiXml XML CFDI file. Can be <code>null</code>. When it is <code>null</code>, then a file is required in an "open" dialog.
+     * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @throws java.lang.Exception
+     */
+    public static int[] importCfdi(final SGuiClient client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired) throws Exception {
+        return importCfdi((SClientInterface) client, isPurchase, dialogDpsFinder, cfdiXml, cfdiPdf, linkToOrder, orderRequired);
+    }
+    
+    /**
+     * Import and create a new invoice.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS Finder dialog.
+     * @param cfdiXml XML CFDI file. Can be <code>null</code>. When it is <code>null</code>, then a file is required in an "open" dialog.
+     * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @return DPS key as <code>int[]</code> of new invoice created.
+     * @throws java.lang.Exception
+     */
+    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired) throws Exception {
+        SDataDps invoice = null;
+        SDataDps order = null; 
+
+        if (linkToOrder) {
+            if (orderRequired != null) {
+                order = orderRequired;
+            }
+            else {
+                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                
+                dialogDpsFinder.formReset();
+                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
+                dialogDpsFinder.setVisible(true);
+
+                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                }
+            }
+        }
+        
+        boolean chooserUsed = false;
+        Exception exception = null;
+
+        try {
+            if (!linkToOrder || (linkToOrder && order != null)) {
+                File chosenFile = cfdiXml;
+                
+                if (chosenFile == null) {
+                    chooserUsed = true;
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+                    client.getFileChooser().repaint();
+                    client.getFileChooser().setAcceptAllFileFilterUsed(false);
+                    client.getFileChooser().setFileFilter(filter);
+                    
+                    if (client.getFileChooser().showOpenDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                        chosenFile = client.getFileChooser().getSelectedFile();
+                    }
+                }
+
+                if (chosenFile.getName().toLowerCase().contains("." + SFileUtilities.XML)) {
+                    SCfdRenderer renderer = new SCfdRenderer(client);
+                    SDataDps newDps = renderer.renderCfdi(chosenFile, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+
+                    int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                    int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+
+                    if (newDps != null) {
+                        newDps.setAuxFilePdf(cfdiPdf);
+                        
+                        client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey, false }); // document type key, document is NOT imported
+                        client.getGuiModule(module).setAuxRegistry(newDps);
+
+                        if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                            client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                            invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                            SDataUtilities.showDpsRecord(client, invoice);
+                        }
+                    }
+                }
+                else {
+                    client.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
+                            + "(Archivo proporcionado: '" + chosenFile.getName() + "')");
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        finally {
+            if (chooserUsed) {
+                client.getFileChooser().resetChoosableFileFilters();
+                client.getFileChooser().setAcceptAllFileFilterUsed(true);
+            }
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
+    }
+    
+    /**
+     * Download documents files.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param downloadMode Download mode.
+     * @param documents List of external document IDs whose files needs to be downloaded.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documents) throws Exception {
+        File[] files = null;
+        File zipFile = null;
+        Path tempDir = null;
+        Path tempFile = null;
+        Exception exception = null;
+        HttpURLConnection conn = null;
+        String ids = documents.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        
+        try {
+            // open download service connection:
+            
+            URL url = new URL(serviceUrl);
+            String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(SSwapConsts.TIME_180_SEC); // timeout para conectar
+            conn.setReadTimeout(SSwapConsts.TIME_180_SEC); // timeout para leer la respuesta
+            conn.setRequestMethod(SHttpConsts.METHOD_POST);
+            conn.setRequestProperty("Accept-Charset", charset);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+            //conn.setDoInput(true);
+
+            // send JSON body required by API:
+            
+            Date requestDatetime = new Date();
+            String requestBody = "{\"document_ids\": [" + ids + "]}"; // example payload
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+
+            // parse custom header
+            
+            Date responseDatetime = null;
+            String responseBody = "";
+            String summaryHeader = conn.getHeaderField("x-download-summary");
+
+            if (summaryHeader != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode summaryJson = mapper.readTree(summaryHeader);
+
+                responseDatetime = new Date();
+                responseBody = summaryJson.toPrettyString();
+
+                System.out.println("Download summary from header:");
+                System.out.println(responseBody);
+            }
+
+            // choose download ZIP file:
+            
+            String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+            
+            switch (downloadMode) {
+                case MODE_DOCS_ALL_FILES_AS_ZIP:
+                    // ask for desired ZIP file:
+                    
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.ZIP);
+                    JFileChooser fileChooser = session.getClient().getFileChooser();
+                    fileChooser.repaint();
+                    fileChooser.setAcceptAllFileFilterUsed(false);
+                    fileChooser.setFileFilter(filter);
+
+                    fileChooser.setSelectedFile(new File(DownloadFilePrefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.ZIP));
+
+                    if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
+                        zipFile = fileChooser.getSelectedFile();
+
+                        // Ensure file ends with ".zip"
+                        if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.ZIP)) {
+                            zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.ZIP);
+                        }
+                    }
+                    break;
+                    
+                case MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                    // set ZIP file in temporal directory:
+                    tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
+                    System.out.println("Temporary directory created at: " + tempDir);
+                    
+                    tempFile = Files.createFile(tempDir.resolve(DownloadFilePrefix + FormatDatetime.format(new Date()) + "." + SFileUtilities.ZIP));
+                    zipFile = tempFile.toFile();
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+            
+            // download and process chosen file:
+            
+            if (zipFile != null) {
+                // save the ZIP file locally:
+                
+                String zipPath = zipFile.getAbsolutePath();
+                System.out.println("Saving file as: " + zipFile.getAbsolutePath());
+
+                try (InputStream in = conn.getInputStream(); FileOutputStream out = new FileOutputStream(zipPath)) {
+                    int bytesRead;
+                    byte[] buffer = new byte[8192];
+
+                    while ((bytesRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
+                    }
+                }
+                
+                // finish processing:
+
+                switch (downloadMode) {
+                    case MODE_DOCS_ALL_FILES_AS_ZIP:
+                        // log import downloads:
+                        
+                        System.out.println("Loging import downloads...");
+                        
+                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documents);
+                        
+                        files = new File[] { zipFile };
+                        break;
+
+                    case MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                        // decompress files in temporal directory:
+                        
+                        System.out.println("Extracting temporal files...");
+                        
+                        File xmlFile = null;
+                        String xmlFileName = "";
+                        File pdfFile = null;
+                        HashMap<String, File> pdfFilesMap = new HashMap<>();
+                        
+                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                            ZipEntry entry;
+
+                            while ((entry = zis.getNextEntry()) != null) {
+                                System.out.println("Extracting: " + entry.getName());
+
+                                File newFile = new File(tempDir.toString() + "\\output", entry.getName());
+                                newFile.getParentFile().mkdirs();
+
+                                try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                                    int bytesRead;
+                                    byte[] buffer = new byte[8192];
+
+                                    while ((bytesRead = zis.read(buffer)) > 0) {
+                                        fos.write(buffer, 0, bytesRead);
+                                    }
+                                }
+
+                                zis.closeEntry();
+                                
+                                if (newFile.getName().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
+                                    // choose firts available XML:
+                                    xmlFile = newFile;
+                                    xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.XML);
+                                }
+                                else if (newFile.getName().endsWith("." + SFileUtilities.PDF)) {
+                                    // reserve all available PDF's:
+                                    pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.PDF), newFile);
+                                }
+                                
+                                if (!xmlFileName.isEmpty() && !pdfFilesMap.isEmpty() && pdfFile == null) {
+                                    pdfFile = pdfFilesMap.get(xmlFileName); // lookup the right PDF by same name as XML
+                                }
+                                
+                                if (xmlFile != null && pdfFile != null) {
+                                    break; // no more files needed!
+                                }
+                            }
+                            
+                            if (xmlFile != null && pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                // last chance, choose firts available PDF:
+                                pdfFile = (File) pdfFilesMap.values().toArray()[0];
+                            }
+                        }
+                        
+                        files = new File[] { xmlFile, pdfFile };
+                        break;
+
+                    default:
+                        // nothing
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        finally {
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                }
+                catch (Exception e) {
+                    exception = e;
+                }
+            }
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return files;
+    }
+
+    /**
+     * Download documents all files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documents List of external document IDs whose files needs to be downloaded.
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documents) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, MODE_DOCS_ALL_FILES_AS_ZIP, documents);
+    }
+
+    /**
+     * Download document XML & PDF files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param document External document ID whose XML & PDF files needs to be downloaded.
+     * @return File array of 2 elements: the XML (at index 0) & PDF (at index 1) files.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document) throws Exception {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(document);
+        return downloadDocumentsFiles(session, serviceUrl, MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents);
+    }
     
     /**
      * Create prepared statement to count imports:
@@ -24,7 +437,7 @@ public abstract class SImportUtils {
      *      3   User ID.
      *      4   Entry response code.
      *      5   Reference ID.
-     * @param session
+     * @param session GUI session.
      * @return Prepared statement.
      * @throws Exception 
      */
@@ -62,5 +475,131 @@ public abstract class SImportUtils {
         }
         
         return count;
+    }
+    
+    /**
+     * Log import downloads.
+     * @param session GUI session.
+     * @param requestBody Service request body as JSON.
+     * @param requestDatetime Service request datetime.
+     * @param httpResponseStatusCode HTTP response status code.
+     * @param responseBody Service response body as JSON.
+     * @param responseDatetime Service response datetime.
+     * @param documents List of IDs of downloaded documents.
+     * @throws Exception 
+     */
+    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documents) throws Exception {
+        SDbComImportLog log = new SDbComImportLog();
+        
+        //log.setPkSyncLogId(...);
+        log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+        //log.msRequestBodyFileName...
+        log.setRequestTimestamp(requestDatetime);
+        log.setResponseCode("" + httpResponseStatusCode);
+        //log.msResponseBodyFileName...
+        log.setResponseTimestamp(responseDatetime);
+        //log.mnFkUserId...
+        //log.mtTsUser...
+        
+        for (Integer document : documents) {
+            SDbComImportLogEntry entry = new SDbComImportLogEntry();
+            
+            //entry.setPkSyncLogId(...);
+            //entry.setPkEntryId(...);
+            entry.setResponseCode("" + SHttpConsts.RSC_SUCC_OK);
+            entry.setResponseBody("");
+            entry.setReferenceId("" + document);
+            entry.setReferenceUuid("" + document);
+            //entry.setFkDpsYearId_n(...);
+            //entry.setFkDpsDocumentId_n(...);
+            //entry.setTsSync(...);
+            
+            log.getEntries().add(entry);
+        }
+        
+        log.save(session);
+        
+        SExportLogsUtils.safeWriteToLogFile(log.getRequestBodyFileName(), requestBody);
+        SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
+    }
+    
+    /**
+     * Create DPS folio from reference folio for given reference prefix.
+     * @param refFolio Reference folio, e.g., "OC/A-100".
+     * @param refPrefix Reference prefix, e.g., "OC".
+     * @return DPS folio.
+     */
+    public static DpsFolio createDpsFolio(final String refFolio, final String refPrefix) {
+        DpsFolio dpsFolio = null;
+        
+        if (!refFolio.isEmpty() && !refPrefix.isEmpty()) {
+            String prefix = refPrefix + SSwapConsts.SEPARATOR_DOC_REF;
+            String folio = refFolio.substring(prefix.length());
+            String[] folioElements = folio.split("-");
+            String series = folioElements.length == 1 ? "" : folioElements[0];
+            String number = folioElements.length == 1 ? folioElements[0] : folioElements[1];
+            
+            dpsFolio = new DpsFolio(series, number);
+        }
+        
+        return dpsFolio;
+    }
+    
+    /**
+     * Create DPS key from reference key.
+     * @param refKey Reference key, e.g., "2025_1".
+     * @return 
+     */
+    public static DpsKey createDpsKey(final String refKey) {
+        DpsKey dpsKey = null;
+        
+        if (!refKey.isEmpty()) {
+            String[] keyElements = refKey.split("_");
+            
+            if (keyElements.length == 2) {
+                int yearId = SLibUtils.parseInt(keyElements[0]);
+                int docId = SLibUtils.parseInt(keyElements[1]);
+                
+                dpsKey = new DpsKey(yearId, docId);
+            }
+        }
+        
+        return dpsKey;
+    }
+    
+    /**
+     * In memory DPS folio.
+     */
+    public static class DpsFolio {
+        
+        public String Series;
+        public String Number;
+        
+        public DpsFolio(final String series, final String number) {
+            Series = series;
+            Number = number;
+        }
+        
+        public String getFolio() {
+            return Series + (Series.isEmpty() ? "" : "-") + Number;
+        }
+    }
+    
+    /**
+     * In memory DPS key.
+     */
+    public static class DpsKey {
+        
+        public int YearId;
+        public int DocId;
+        
+        public DpsKey(final int yearId, final int docId) {
+            YearId = yearId;
+            DocId = docId;
+        }
+        
+        public int[] asKey() {
+            return YearId != 0 && DocId != 0 ? new int[] { YearId, DocId } : null;
+        }
     }
 }

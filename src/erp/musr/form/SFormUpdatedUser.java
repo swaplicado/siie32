@@ -157,14 +157,14 @@ public class SFormUpdatedUser extends javax.swing.JDialog implements erp.lib.for
     
     private void actionGetUpdated() throws SQLException, Exception{
         String stringJson = newjson();
-        JFileChooser j = new JFileChooser();
-        j.setSelectedFile(new File("UpdateUsers.json"));
-        int aprove_option = j.showSaveDialog(null);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setSelectedFile(new File("UpdateUsers.json"));
+        int aprove_option = fileChooser.showSaveDialog(null);
         
         if (aprove_option == JFileChooser.APPROVE_OPTION) {
             try {
                 //file = new FileWriter(System.getProperty("user.home") + "\\Documents\\" + "UpdateUsers.json");
-                file = new FileWriter(j.getSelectedFile().getAbsolutePath());
+                file = new FileWriter(fileChooser.getSelectedFile().getAbsolutePath());
                 file.write(stringJson);
                 System.out.println("JSON copiado a file exitosamente");
 

@@ -86,7 +86,8 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
         jtfFileGenPath.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel14.add(jtfFileGenPath);
 
-        jbSelectFileGen.setText("jButton1");
+        jbSelectFileGen.setText("...");
+        jbSelectFileGen.setToolTipText("Definir archivo...");
         jbSelectFileGen.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel14.add(jbSelectFileGen);
 
@@ -103,7 +104,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
         jlGenerate2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jlGenerate2);
 
-        jBGenerateFile.setText("Generar Archivo");
+        jBGenerateFile.setText("Generar archivo");
         jBGenerateFile.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel20.add(jBGenerateFile);
 
@@ -137,23 +138,19 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
     private javax.swing.JTextField jtfFileGenPath;
     // End of variables declaration//GEN-END:variables
 
-    
     private void actionSaveFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("");
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        //
-        // disable the "All files" option.
-        //
-        chooser.setAcceptAllFileFilterUsed(false);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("");
+        fileChooser.setAcceptAllFileFilterUsed(false); // disable the "All files" option.
         
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            msCsvGenPath = chooser.getSelectedFile() + "";
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            msCsvGenPath = fileChooser.getSelectedFile() + "";
             jtfFileGenPath.setText(msCsvGenPath);
         }
         else {
-            System.out.println("No Selection ");
+            System.out.println("No file selected!");
             jtfFileGenPath.setText("");
             msCsvGenPath = "";
         }
@@ -161,7 +158,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
     
     private void actionGenerateFile() {
         if (msCsvGenPath == null || msCsvGenPath.equals("")) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un directorio para guardar el archivo");
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un directorio para guardar el archivo.");
             return;
         }
         
@@ -250,7 +247,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
 
         if (validation.isValid()) {
             if (msCsvPath == null || msCsvPath.equals("")) {
-                validation.setMessage("Debe seleccionar un archivo CSV para continuar");
+                validation.setMessage("Debe seleccionar un archivo CSV para continuar.");
             }
         }
         

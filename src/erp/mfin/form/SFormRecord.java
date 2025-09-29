@@ -5,6 +5,7 @@
 
 package erp.mfin.form;
 
+import erp.SFileUtilities;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -1770,10 +1771,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private void actionPerfomedImportFile() {
         if (jbImportFile.isEnabled()) {
             try {
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de Excel (*.xlsx)", "xlsx");
+                FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XLSX);
                 miClient.getFileChooser().setFileFilter(filter);
                 if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(xlsx)$")) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(" + SFileUtilities.XLSX + ")$")) {
                         
                         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                         ArrayList<SDataRecordEntry> entries = SFinRecordUtils.processRecordEntriesFile(miClient, miClient.getFileChooser().getSelectedFile(), moRecord);

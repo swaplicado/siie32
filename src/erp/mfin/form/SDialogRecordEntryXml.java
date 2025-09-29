@@ -4,6 +4,7 @@
  */
 package erp.mfin.form;
 
+import erp.SFileUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormUtilities;
@@ -22,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -157,8 +157,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
     }
     
     private void actionRowAdd () {
-        FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
-        
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
@@ -174,11 +173,13 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
                     }
                 }
             }
-            miClient.getFileChooser().resetChoosableFileFilters();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
         }
     }
     

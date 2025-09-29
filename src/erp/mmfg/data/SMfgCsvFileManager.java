@@ -5,6 +5,7 @@
  */
 package erp.mmfg.data;
 
+import erp.SFileUtilities;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,9 +45,9 @@ public class SMfgCsvFileManager {
         
         try {
             JFileChooser fileChooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Delimitado por comas .csv", "csv");
+            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
             fileChooser.setFileFilter(filter);
-            fileChooser.setSelectedFile(new File("explosion.csv"));
+            fileChooser.setSelectedFile(new File("explosion." + SFileUtilities.CSV));
             
             iSelection = fileChooser.showSaveDialog(fileChooser);
  

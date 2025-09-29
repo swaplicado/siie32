@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.form;
 
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataReadDescriptions;
@@ -37,7 +38,6 @@ import javax.swing.JFileChooser;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -967,7 +967,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         String msXmlPath = "";
         String fileName = "";
         String nameAux = "";
-        FileFilter filter = new FileNameExtensionFilter("EXP file", "exp");
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.EXP);
         
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
@@ -977,7 +977,6 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                 nameAux = msXmlPath.substring(msXmlPath.lastIndexOf("\\")).substring(1);
-                //fileName = nameAux.substring(0, nameAux.length() - 4);
                 fileName = nameAux;
                 
                 maAllDeposits = moImportation.processFile(msXmlPath);

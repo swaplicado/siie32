@@ -5,6 +5,7 @@
 
 package erp.mtrn.view;
 
+import erp.SFileUtilities;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -35,7 +36,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -261,14 +261,14 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
     private void actionUploadXml() {
         if (jbUploadXml.isEnabled()) {
             if (isRowSelected()) {
-                FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
+                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
                 miClient.getFileChooser().repaint();
                 miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
                 miClient.getFileChooser().setFileFilter(filter);
 
                 try {
                     if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                        if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
+                        if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.XML)) {
                             int bpId = 0;
                             String sql = "SELECT fid_bp_r FROM trn_dps WHERE id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + 
                                     " AND id_doc = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1];
@@ -294,10 +294,13 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
                             miClient.showMsgBoxInformation("El archivo sólo puede ser XML.");
                         }
                     }
-                    miClient.getFileChooser().resetChoosableFileFilters();
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
+                }
+                finally {
+                    miClient.getFileChooser().resetChoosableFileFilters();
+                    miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
                 }
             }
         }

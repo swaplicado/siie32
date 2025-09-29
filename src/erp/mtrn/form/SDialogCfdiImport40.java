@@ -90,7 +90,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
     private cfd.ver40.DElementComprobante moComprobante;
     private final SDataDps moPurchaseOrder;
-    private SDataDps moDpsNew;
+    private SDataDps moNewDps;
     private SDataBizPartner moBizPartnerEmisor;
     private SDataBizPartner moBizPartnerReceptor;
     private SFormOptionPickerItems moPickerItems;
@@ -1800,7 +1800,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
         
         if (!validation.getIsError()) {
-            moDpsNew = createNewDps();
+            moNewDps = createNewDps();
             setDpsData();
         }
         else { 
@@ -1881,12 +1881,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
 
     private void setDpsData() {
-        if (moDpsNew.getIsRegistryNew()) {
-            moDpsNew.setPkYearId(SLibTimeUtilities.digestYear(moComprobante.getAttFecha().getDatetime())[0]);
-            moDpsNew.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        if (moNewDps.getIsRegistryNew()) {
+            moNewDps.setPkYearId(SLibTimeUtilities.digestYear(moComprobante.getAttFecha().getDatetime())[0]);
+            moNewDps.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         }
         else {
-            moDpsNew.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+            moNewDps.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
         
         String uuid = "";
@@ -1895,25 +1895,25 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             uuid = tfd.getAttUUID().getString().toUpperCase();
         }
 
-        moDpsNew.setDate(moComprobante.getAttFecha().getDatetime());
-        moDpsNew.setDateDoc(moComprobante.getAttFecha().getDatetime());
-        moDpsNew.setDateStartCredit(moComprobante.getAttFecha().getDatetime());
-        moDpsNew.setDateShipment_n(null);
-        moDpsNew.setDateDelivery_n(null);
-        moDpsNew.setDateDocLapsing_n(null);
-        moDpsNew.setDateDocDelivery_n(null);
-        moDpsNew.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
-        moDpsNew.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? 
+        moNewDps.setDate(moComprobante.getAttFecha().getDatetime());
+        moNewDps.setDateDoc(moComprobante.getAttFecha().getDatetime());
+        moNewDps.setDateStartCredit(moComprobante.getAttFecha().getDatetime());
+        moNewDps.setDateShipment_n(null);
+        moNewDps.setDateDelivery_n(null);
+        moNewDps.setDateDocLapsing_n(null);
+        moNewDps.setDateDocDelivery_n(null);
+        moNewDps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
+        moNewDps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? 
                 moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, UUID_FIRST_SECC_LENGHT) : "");
-        moDpsNew.setNumberReference("");
-        moDpsNew.setCommissionsReference("");
-        moDpsNew.setApprovalYear(0);
-        moDpsNew.setApprovalNumber(0);
-        moDpsNew.setDaysOfCredit(moComprobante.getAttMetodoPago().getString().equals(
+        moNewDps.setNumberReference("");
+        moNewDps.setCommissionsReference("");
+        moNewDps.setApprovalYear(0);
+        moNewDps.setApprovalNumber(0);
+        moNewDps.setDaysOfCredit(moComprobante.getAttMetodoPago().getString().equals(
                 DCfdi40Catalogs.MDP_PUE) ? 0 : moBizPartnerReceptor.getDbmsCategorySettingsSup().getDaysOfCredit());
-        moDpsNew.setIsDiscountDocApplying(moComprobante.getAttDescuento().getDouble() != 0);
-        moDpsNew.setIsDiscountDocPercentage(false);
-        moDpsNew.setDiscountDocPercentage(0);
+        moNewDps.setIsDiscountDocApplying(moComprobante.getAttDescuento().getDouble() != 0);
+        moNewDps.setIsDiscountDocPercentage(false);
+        moNewDps.setDiscountDocPercentage(0);
         
         /*
         moDpsNew.setSubtotalProvisional_r(...);
@@ -1925,120 +1925,120 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         moDpsNew.setCommissions_r(...);
         */
         
-        moDpsNew.setExchangeRate(miClient.getSession().getSessionCustom().isLocalCurrency(
+        moNewDps.setExchangeRate(miClient.getSession().getSessionCustom().isLocalCurrency(
                 new int[] { mnIdCur }) ? 1 : moComprobante.getAttTipoCambio().getDouble());
-        moDpsNew.setExchangeRateSystem(miClient.getSession().getSessionCustom().isLocalCurrency(
+        moNewDps.setExchangeRateSystem(miClient.getSession().getSessionCustom().isLocalCurrency(
                 new int[] { mnIdCur }) ? 1 : moComprobante.getAttTipoCambio().getDouble());
         
-        moDpsNew.setSubtotalProvisionalCy_r(moComprobante.getAttSubTotal().getDouble());
-        moDpsNew.setDiscountDocCy_r(moComprobante.getAttDescuento() == null ? 0 : moComprobante.getAttDescuento().getDouble());
-        moDpsNew.setSubtotalCy_r(moDpsNew.getSubtotalProvisionalCy_r() - moDpsNew.getDiscountDocCy_r());
-        moDpsNew.setTaxChargedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
-        moDpsNew.setTaxRetainedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
-        moDpsNew.setTotalCy_r(moComprobante.getAttTotal().getDouble());
+        moNewDps.setSubtotalProvisionalCy_r(moComprobante.getAttSubTotal().getDouble());
+        moNewDps.setDiscountDocCy_r(moComprobante.getAttDescuento() == null ? 0 : moComprobante.getAttDescuento().getDouble());
+        moNewDps.setSubtotalCy_r(moNewDps.getSubtotalProvisionalCy_r() - moNewDps.getDiscountDocCy_r());
+        moNewDps.setTaxChargedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
+        moNewDps.setTaxRetainedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
+        moNewDps.setTotalCy_r(moComprobante.getAttTotal().getDouble());
         
-        moDpsNew.setCommissionsCy_r(0);
+        moNewDps.setCommissionsCy_r(0);
 
-        moDpsNew.setDriver("");
-        moDpsNew.setPlate("");
-        moDpsNew.setTicket("");
-        moDpsNew.setShipments(0);
-        moDpsNew.setPayments(0);
-        moDpsNew.setPaymentMethod("");
-        moDpsNew.setPaymentAccount("");
-        moDpsNew.setAutomaticAuthorizationRejection(0);
+        moNewDps.setDriver("");
+        moNewDps.setPlate("");
+        moNewDps.setTicket("");
+        moNewDps.setShipments(0);
+        moNewDps.setPayments(0);
+        moNewDps.setPaymentMethod("");
+        moNewDps.setPaymentAccount("");
+        moNewDps.setAutomaticAuthorizationRejection(0);
         
-        moDpsNew.setIsPublic(false);
-        moDpsNew.setIsLinked(false);
-        moDpsNew.setIsClosed(false);
-        moDpsNew.setIsClosedCommissions(false);
-        moDpsNew.setIsShipped(false);
-        moDpsNew.setIsDpsDeliveryAck(false);
-        moDpsNew.setIsRebill(false);
-        moDpsNew.setIsAudited(false);
-        moDpsNew.setIsAuthorized(false);
-        moDpsNew.setIsRecordAutomatic(true);
-        moDpsNew.setIsCopy(false);
-        moDpsNew.setIsCopied(false);
-        moDpsNew.setIsSystem(false);
-        moDpsNew.setIsDeleted(false);  // when document was deleted, user can reactivate it on save
+        moNewDps.setIsPublic(false);
+        moNewDps.setIsLinked(false);
+        moNewDps.setIsClosed(false);
+        moNewDps.setIsClosedCommissions(false);
+        moNewDps.setIsShipped(false);
+        moNewDps.setIsDpsDeliveryAck(false);
+        moNewDps.setIsRebill(false);
+        moNewDps.setIsAudited(false);
+        moNewDps.setIsAuthorized(false);
+        moNewDps.setIsRecordAutomatic(true);
+        moNewDps.setIsCopy(false);
+        moNewDps.setIsCopied(false);
+        moNewDps.setIsSystem(false);
+        moNewDps.setIsDeleted(false);  // when document was deleted, user can reactivate it on save
 
-        moDpsNew.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
-        moDpsNew.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
-        moDpsNew.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
-        moDpsNew.setFkPaymentTypeId(moComprobante.getAttMetodoPago().getString().equals(
+        moNewDps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
+        moNewDps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
+        moNewDps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
+        moNewDps.setFkPaymentTypeId(moComprobante.getAttMetodoPago().getString().equals(
                 DCfdi40Catalogs.MDP_PUE) ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
-        moDpsNew.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);   // XXX remove ASAP (Sergio Flores, 2017-08-09)!
-        moDpsNew.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);   // all saved documents have "emited" status
-        moDpsNew.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
-        moDpsNew.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
-        moDpsNew.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
-        moDpsNew.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);   // all saved documents have "default" nature
+        moNewDps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);   // XXX remove ASAP (Sergio Flores, 2017-08-09)!
+        moNewDps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);   // all saved documents have "emited" status
+        moNewDps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        moNewDps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        moNewDps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+        moNewDps.setFkDpsNatureId(SDataConstantsSys.TRNU_DPS_NAT_DEF);   // all saved documents have "default" nature
         
-        moDpsNew.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
-        moDpsNew.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
-        moDpsNew.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
-        moDpsNew.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
-        moDpsNew.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        moDpsNew.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        moNewDps.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
+        moNewDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+        moNewDps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+        moNewDps.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
+        moNewDps.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        moNewDps.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
         
-        moDpsNew.setFkBizPartnerAltId_r(moBizPartnerEmisor.getPkBizPartnerId()); 
-        moDpsNew.setFkBizPartnerBranchAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        moDpsNew.setFkBizPartnerBranchAddressAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        moNewDps.setFkBizPartnerAltId_r(moBizPartnerEmisor.getPkBizPartnerId()); 
+        moNewDps.setFkBizPartnerBranchAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        moNewDps.setFkBizPartnerBranchAddressAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
         
-        moDpsNew.setFkBizPartnerAddresseeId_n(0);
-        moDpsNew.setFkAddresseeBizPartnerId_nr(0);
-        moDpsNew.setFkAddresseeBizPartnerBranchId_n(0);
-        moDpsNew.setFkAddresseeBizPartnerBranchAddressId_n(0);
-        moDpsNew.setFkContactBizPartnerBranchId_n(0);
-        moDpsNew.setFkContactContactId_n(0);
+        moNewDps.setFkBizPartnerAddresseeId_n(0);
+        moNewDps.setFkAddresseeBizPartnerId_nr(0);
+        moNewDps.setFkAddresseeBizPartnerBranchId_n(0);
+        moNewDps.setFkAddresseeBizPartnerBranchAddressId_n(0);
+        moNewDps.setFkContactBizPartnerBranchId_n(0);
+        moNewDps.setFkContactContactId_n(0);
         
-        moDpsNew.setFkTaxIdentityEmisorTypeId(moBizPartnerEmisor.getFkTaxIdentityId());
-        moDpsNew.setFkTaxIdentityReceptorTypeId(moBizPartnerReceptor.getFkTaxIdentityId());
-        moDpsNew.setFkLanguajeId(moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == SLibConsts.UNDEFINED ? 
+        moNewDps.setFkTaxIdentityEmisorTypeId(moBizPartnerEmisor.getFkTaxIdentityId());
+        moNewDps.setFkTaxIdentityReceptorTypeId(moBizPartnerReceptor.getFkTaxIdentityId());
+        moNewDps.setFkLanguajeId(moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == SLibConsts.UNDEFINED ? 
                 miClient.getSessionXXX().getParamsErp().getFkLanguageId() : moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n());
-        moDpsNew.setFkCurrencyId(mnIdCur);
+        moNewDps.setFkCurrencyId(mnIdCur);
         
-        moDpsNew.setFkSalesAgentId_n(0);
-        moDpsNew.setFkSalesAgentBizPartnerId_n(0);
-        moDpsNew.setFkSalesSupervisorId_n(0);
-        moDpsNew.setFkSalesSupervisorBizPartnerId_n(0);
+        moNewDps.setFkSalesAgentId_n(0);
+        moNewDps.setFkSalesAgentBizPartnerId_n(0);
+        moNewDps.setFkSalesSupervisorId_n(0);
+        moNewDps.setFkSalesSupervisorBizPartnerId_n(0);
         
-        moDpsNew.setFkIncotermId(SModSysConsts.LOGS_INC_NA); //NA
-        moDpsNew.setFkSpotSourceId_n(0);
-        moDpsNew.setFkSpotDestinyId_n(0);
-        moDpsNew.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
-        moDpsNew.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA); //NA
-        moDpsNew.setFkCarrierId_n(0);
-        moDpsNew.setFkVehicleTypeId_n(0);
-        moDpsNew.setFkVehicleId_n(0);
-        moDpsNew.setFkSourceYearId_n(0);
-        moDpsNew.setFkSourceDocId_n(0);
-        moDpsNew.setFkMfgYearId_n(0);
-        moDpsNew.setFkMfgOrderId_n(0);
+        moNewDps.setFkIncotermId(SModSysConsts.LOGS_INC_NA); //NA
+        moNewDps.setFkSpotSourceId_n(0);
+        moNewDps.setFkSpotDestinyId_n(0);
+        moNewDps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        moNewDps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA); //NA
+        moNewDps.setFkCarrierId_n(0);
+        moNewDps.setFkVehicleTypeId_n(0);
+        moNewDps.setFkVehicleId_n(0);
+        moNewDps.setFkSourceYearId_n(0);
+        moNewDps.setFkSourceDocId_n(0);
+        moNewDps.setFkMfgYearId_n(0);
+        moNewDps.setFkMfgOrderId_n(0);
         
-        moDpsNew.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
-        moDpsNew.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        moNewDps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
         
-        moDpsNew.setAuxKeepDpsData(true);
-        moDpsNew.setAuxKeepExchangeRate(true); 
-        moDpsNew.setAuxFileXmlAbsolutePath(moCfdiFile.getAbsolutePath());
-        moDpsNew.setAuxFileXmlName(moCfdiFile.getName());
+        moNewDps.setAuxKeepDpsData(true);
+        moNewDps.setAuxKeepExchangeRate(true); 
+        moNewDps.setAuxFileXmlAbsolutePath(moCfdiFile.getAbsolutePath());
+        moNewDps.setAuxFileXmlName(moCfdiFile.getName());
         
-        moDpsNew.getDbmsDpsEntries().clear();
+        moNewDps.getDbmsDpsEntries().clear();
         for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
             SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
-            moDpsNew.getDbmsDpsEntries().add(row.getDpsEntry());
+            moNewDps.getDbmsDpsEntries().add(row.getDpsEntry());
             saveItemMatchBizPartner(row);
         }
         
         try {
-            moDpsNew.calculateTotal(miClient); 
+            moNewDps.calculateTotal(miClient); 
         }
         catch (Exception e) {
             
@@ -2091,10 +2091,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     /**
-     * Devuelve el dps renderizado.
+     * Devuelve el nuevo DPS renderizado.
      * @return 
      */
-    public SDataDps getDps() { return moDpsNew; }
+    public SDataDps getNewDps() { return moNewDps; }
     
     @Override
     public void valueChanged(ListSelectionEvent e) { 

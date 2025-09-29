@@ -6,6 +6,7 @@
 
 package erp.mmfg.form;
 
+import erp.SFileUtilities;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -552,7 +553,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     
     private void actionSelectFile() {
         JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Delimitado por comas .csv", "csv");
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
         fileChooser.setFileFilter(filter);
         fileChooser.showOpenDialog(this);
         
