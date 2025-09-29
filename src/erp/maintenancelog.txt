@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 290.4/ 2025-09-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Segunda liberación de la funcionalidad de importación de documentos autorizados en Portal de Compras.
+2) Importación de documentos autorizados y creación como facturas de compras (DPS) con archivos XML y PDF incluídos.
+3) Creación automática de la primera solicitud de pago de documentos importados, cuando tienen información de pago requerido.
+4) Refactorización de la funcionalidad de generación de nuevos DPS a partir de CFDI tipo I de compras.
+5) Refactorización general para estandarizar el uso del diálogo JFileChooser del cliente SIIE.
+
+================================================================================
 SIIE 3.2 290.3/ 2025-09-25
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

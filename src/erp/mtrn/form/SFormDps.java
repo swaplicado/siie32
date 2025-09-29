@@ -365,7 +365,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private double mdOldDiscountDocPercentage;
     private boolean mbOldIsDiscountDocApplying;
     private java.lang.String msFileXmlJustLoaded;
-    private File moFilePdfJustLoaded;
+    private java.io.File moFilePdfJustLoaded;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
@@ -13325,6 +13325,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (moDps.getDbmsDataPdf() != null) { // Cuando el DPS posee un archivo PDF asociado.
                 moFieldCfdiPdfFile.setFieldValue(moDps.getDbmsDataPdf().getDocPdfName());
                 moFilePdfJustLoaded = null;
+            }
+            else if (moDps.getAuxFilePdf() != null) {
+                moFieldCfdiPdfFile.setFieldValue(moDps.getAuxFilePdf().getName());
+                moFilePdfJustLoaded = moDps.getAuxFilePdf();
             }
         }
         

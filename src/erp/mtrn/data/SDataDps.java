@@ -287,8 +287,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsProcessingCancellation;
     protected boolean mbAuxKeepDpsData;
     protected boolean mbAuxKeepExchangeRate;
-    protected String msAuxFileXmlAbsolutePath;
-    protected String msAuxFileXmlName;
+    protected java.lang.String msAuxFileXmlAbsolutePath;
+    protected java.lang.String msAuxFileXmlName;
+    protected java.io.File moAuxFilePdf;
     protected int[] manAuxDpsTime;
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
     protected int mnAuxInitiativeId; // case of application of initiative
@@ -2125,6 +2126,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
+    public void setAuxFilePdf(java.io.File o) { moAuxFilePdf = o; }
     public void setAuxDpsTime (int[] o) { manAuxDpsTime = o; } 
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
     public void setAuxInitiativeId(int n) { mnAuxInitiativeId = n; }
@@ -2164,8 +2166,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxIsProcessingCancellation() { return mbAuxIsProcessingCancellation; }
     public boolean getAuxKeepDpsData() { return mbAuxKeepDpsData; }
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
-    public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
-    public String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public java.lang.String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
+    public java.lang.String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public java.io.File getAuxFilePdf() { return moAuxFilePdf; }
     public int[] getAuxDpsTime() { return manAuxDpsTime; }
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
     public int getAuxInitiativeId() { return mnAuxInitiativeId; }
@@ -2444,6 +2447,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
+        moAuxFilePdf = null;
         manAuxDpsTime = null;
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
         mnAuxInitiativeId = 0;

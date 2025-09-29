@@ -11,10 +11,14 @@ package erp.mod.cfg.swap;
  */
 public abstract class SSwapConsts {
 
+    public static int SIIE_EXT_SYS_ID = 1;
+    public static final String SIIE = "SIIE";
     public static final String SWAP_SERVICES = "SWAP Services";
     public static final String PURCHASE_PORTAL = "Portal de Compras";
     
-    public static int SIIE = 1;
+    public static final int TIME_30_SEC = 60 * 1000; // 30 segundos en milisegundos
+    public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
+    public static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
     /*
      * SWAP Services.

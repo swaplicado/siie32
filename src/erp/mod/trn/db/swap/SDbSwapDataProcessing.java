@@ -31,6 +31,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static final String DATA_TYPE_PR = "PR"; // payment receipt
     public static final String DATA_TYPE_RP = "RP"; // receipt of payment
     
+    private static final int LEN_REFS = 100;
+    private static final int LEN_DESCRIP = 100;
+    
     private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
     private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
     
@@ -65,8 +68,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public void setTransactionCategory(int n) { mnTransactionCategory = n; }
     public void setExternalDataId(int n) { mnExternalDataId = n; }
     public void setExternalDataUuid(String s) { msExternalDataUuid = s; }
-    public void setDpsReferences(String s) { msDpsReferences = s; }
-    public void setDpsDescription(String s) { msDpsDescription = s; }
+    public void setDpsReferences(String s) { msDpsReferences = s.length() <= LEN_REFS ? s : s.substring(0, LEN_REFS); }
+    public void setDpsDescription(String s) { msDpsDescription = s.length() <= LEN_DESCRIP ? s : s.substring(0, LEN_DESCRIP); }
     public void setDpsPaymentLocal(boolean b) { mbDpsPaymentLocal = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -341,7 +344,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      * @return A prepared statment with these columns: dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
      * @throws Exception 
      */
-    public static PreparedStatement createPrepStatementToGetProcessedDpsByDocData(final SGuiSession session, final int[] dpsTypeKey) throws Exception {
+    public static PreparedStatement createPrepStatementToGetDpsKeyByDocData(final SGuiSession session, final int[] dpsTypeKey) throws Exception {
         String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
@@ -408,6 +411,10 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             RecRecordTypeId = recRecordTypeId;
             RecNumberId = recNumberId;
             RecCompanyBranchCode = recCompanyBranchCode;
+        }
+        
+        public int[] getDpsKey() {
+            return DpsYearId != 0 && DpsDocId != 0 ? new int[] { DpsYearId, DpsDocId } : null;
         }
         
         public String composeRecord() {

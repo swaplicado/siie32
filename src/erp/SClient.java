@@ -126,7 +126,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 290.3"; // release date: 2025-09-25
+    public static final String APP_RELEASE = "3.2 290.4"; // release date: 2025-09-28
 
     public static final String APP_COPYRIGHT = "2007-2025";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
@@ -2182,7 +2182,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
     @Override
     public JFileChooser getFileChooser() {
         if (moFileChooser == null) {
-            showMsgBoxInformation("Se creará el cuadro de diálogo 'Abrir', espere un momento de favor...");
+            showMsgBoxInformation("Se creará el cuadro de diálogo 'Abrir/Guardar', espere un momento de favor...");
             try {
                 getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 moFileChooser = new JFileChooser();

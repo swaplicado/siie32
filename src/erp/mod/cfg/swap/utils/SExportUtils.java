@@ -61,8 +61,6 @@ public abstract class SExportUtils {
     public static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
     
     private static final int SEC_PSWD_LEN = 10;
-    private static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
-    private static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
     /**
      * Genera una contraseña segura de 10 caracteres aleatorios.
@@ -777,7 +775,7 @@ public abstract class SExportUtils {
 
                 case AUTH_ACTOR:
                     SRequestAuthActorsBody actorsBody = new SRequestAuthActorsBody();
-                    actorsBody.id_external_system = SSwapConsts.SIIE;
+                    actorsBody.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                     actorsBody.actors = (SExportDataAuthActor[]) currentExportDatas.toArray(new SExportDataAuthActor[0]);
                     requestBody = mapper.writeValueAsString(actorsBody);
                     break;
@@ -786,7 +784,7 @@ public abstract class SExportUtils {
                 case AUTH_DEPARTMENT:
                 case AUTH_FUNCTIONAL_AREA:
                     SRequestAuthOrgElementsBody orgElementsBody = new SRequestAuthOrgElementsBody();
-                    orgElementsBody.id_external_system = SSwapConsts.SIIE;
+                    orgElementsBody.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                     orgElementsBody.elements = (SExportDataAuthOrgElement[]) currentExportDatas.toArray(new SExportDataAuthOrgElement[0]);
                     requestBody = mapper.writeValueAsString(orgElementsBody);
                     break;
@@ -819,7 +817,7 @@ public abstract class SExportUtils {
             // Realizar la petición HTTP a SWAP Services:
             
             Date requestDatetime = new Date();
-            String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, TIME_180_SEC);
+            String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
             Date responseDatetime = new Date();
 
             if (firstRequestDatetime == null) {
@@ -858,7 +856,7 @@ public abstract class SExportUtils {
         syncUrl += SSwapConsts.API_WAKE_UP;
         
         System.out.println("Waking-up Services...");
-        String response = requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, TIME_60_SEC);
+        String response = requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, SSwapConsts.TIME_60_SEC);
         System.out.println("Wake-up Services Response:\n" + response);
     }
     
