@@ -7,7 +7,6 @@ package erp.mod.cfg.swap.utils;
 
 import cfd.DCfdConsts;
 import cfd.ver40.DCfdi40Catalogs;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
@@ -1552,7 +1551,7 @@ public abstract class SExportDataUtils {
 
                 while (resultSet.next()) {
                     SExportDataPayment payment = new SExportDataPayment();
-
+/*
                     reference.external_id = resultSet.getInt("t.id_year") + "_" + resultSet.getInt("t.id_doc");
                     reference.external_company_id = companyId;
                     reference.external_functional_area_id = resultSet.getInt("t.fid_func_sub");
@@ -1568,18 +1567,18 @@ public abstract class SExportDataUtils {
                     reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
 
                     payment.company = companyId;
-                    payment.pay_id = resultSet.getInt("");
-                    payment.functional_area = resultSet.getInt("");
-                    payment.benef = resultSet.getInt("");
-                    payment.series = resultSet.getString("");
-                    payment.number = resultSet.getString("");
-                    payment.app_date = resultSet.getString("");
-                    payment.req_date = resultSet.getString("");
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    payment.sched_date_n;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    payment.exec_date_n;
-                    payment.currency = resultSet.getString("");
+                    payment.pay_id = resultSet.getInt("p.id_pay");
+                    payment.functional_area = resultSet.getInt("p.fk_func_sub");
+                    payment.benef = resultSet.getInt("p.fk_ben");
+                    payment.series = resultSet.getString("_pay_ser");
+                    payment.number = resultSet.getString("_pay_num");
+                    payment.app_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_app"));
+                    payment.req_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_req"));
+                    Date dateScheduled = resultSet.getDate("p.dt_sched_n");
+                    payment.sched_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateScheduled);
+                    Date dateExecution = resultSet.getDate("p.dt_exec_n");
+                    payment.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
+                    payment.currency = resultSet.getString("_pay_cur_key");
                     payment.amount = resultSet.getString("");
                     payment.exchange_rate_app = resultSet.getString("");
                     payment.amount_loc_app = resultSet.getString("");
@@ -1588,6 +1587,7 @@ public abstract class SExportDataUtils {
                     payment.payment_way = resultSet.getString("");
                     payment.priority = resultSet.getInt("");
                     payment.notes = resultSet.getString("");
+                    payment.is_receipt_payment_req = ?;
                     payment.payment_status = resultSet.getInt("");
                     payment.authz_authorization_id = resultSet.getInt("");
                     // cuenta pagadora
@@ -1637,7 +1637,7 @@ public abstract class SExportDataUtils {
                     paymentEntry.document_currency_id;
                     @JsonInclude(JsonInclude.Include.NON_NULL)
                     paymentEntry.document_amount;
-                    
+*/
                     payments.add(payment);
                 }
             }
