@@ -53,6 +53,8 @@ public class SExportDataPayment implements SExportData {
     
     public String notes;
     
+    public int is_receipt_payment_req;
+    
     public int payment_status;
     
     public int authz_authorization_id;
@@ -71,9 +73,9 @@ public class SExportDataPayment implements SExportData {
     
     public String benef_account;
     
-    public int sched_user;
+    public Integer sched_user;
     
-    public int exec_user;
+    public Integer exec_user;
     
     public String sched_at;
     
@@ -81,7 +83,7 @@ public class SExportDataPayment implements SExportData {
     
     public int is_deleted;
     
-    // public int created_by;
+    //public int created_by;
     
     //public int updated_by;
     
