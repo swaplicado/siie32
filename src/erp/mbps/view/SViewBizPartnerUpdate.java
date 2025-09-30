@@ -13,10 +13,10 @@ import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import java.awt.Cursor;
@@ -140,7 +140,7 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, true);
                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
             }
             catch (Exception e) {

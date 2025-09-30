@@ -6,12 +6,12 @@
 package erp.mod.cfg.swap.utils;
 
 /**
- * Clase contenedora para exportar datos masivos de pagos en formato JSON.
+ * Clase contenedora para actualizar datos masivos de pagos en formato JSON.
  * Utilizada como estructura principal para enviar múltiples pagos y las instancias de SWAP Services.
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Sergio Flores
  */
-public class SRequestPaymentsBody {
+public class SRequestPaymentUpdatesBody {
     
     /**
      * Arreglo de identificadores de instancias.
@@ -20,17 +20,8 @@ public class SRequestPaymentsBody {
     public String[] work_instance;
     
     /**
-     * Arreglo de pagos a exportar.
-     * Arreglo de objetos con la información completa de cada pago.
+     * Arreglo de pagos a actualizar.
+     * Arreglo de objetos con la información nueva de cada pago.
      */
-    public Payment[] payments;
-    
-    public static class Payment implements SExportData {
-        
-        public SExportDataPayment payment;
-        
-        public SExportDataPaymentEntry[] entries;
-    
-        public SExportDataFile[] files;
-    }
+    public SExportDataPaymentUpdate[] payments;
 }

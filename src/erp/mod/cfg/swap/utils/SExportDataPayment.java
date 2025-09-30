@@ -15,7 +15,7 @@ public class SExportDataPayment implements SExportData {
     
     public int company;
     
-    public int pay_id;
+    public int payment_id;
     
     public int functional_area;
     

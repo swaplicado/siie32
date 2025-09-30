@@ -253,7 +253,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
                 Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
                 
-                validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
+                validation.setMessage("El documento '" + dps.getDpsNumber() + "' ya existe en la siguiente póliza contable:\n" +
                     "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
                     "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
                     "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
@@ -263,14 +263,14 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
                 if (tfd != null) {
                     if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
-                        validation.setMessage("El UUID del documento ya existe en la base de datos.");
+                        validation.setMessage("El UUID del documento ya existe en la base de datos (" + tfd.getAttUUID().getString() + ").");
                     }
                 }
             }
             
             if (!validation.getIsError() && moPurchaseOrder != null) {
                 if (moPurchaseOrder.getDate().after(comprobante.getAttFecha().getDatetime())) {
-                    validation.setMessage("El documento no puede tener una fecha anterior a la de la orden de compra. \n"
+                    validation.setMessage("El documento no puede tener una fecha anterior a la de la orden de compra.\n"
                             + "Fecha OC: " + SLibUtils.DateFormatDate.format(moPurchaseOrder.getDate()) + "\n"
                             + "Fecha CFDI: " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()));
                 }
@@ -415,7 +415,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
                 Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
                 
-                validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
+                validation.setMessage("El documento '" + dps.getDpsNumber() + "' ya existe en la siguiente póliza contable:\n" +
                     "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
                     "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
                     "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
@@ -425,7 +425,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
                 if (tfd != null) {
                     if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
-                        validation.setMessage("El UUID del documento ya existe en la base de datos.");
+                        validation.setMessage("El UUID del documento ya existe en la base de datos (" + tfd.getAttUUID().getString() + ").");
                     }
                 }
             }

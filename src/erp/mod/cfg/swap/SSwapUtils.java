@@ -38,11 +38,17 @@ public abstract class SSwapUtils {
                     case FUNCTIONAL_AREA:
                         translation = "AREA_FUNCIONAL";
                         break;
+                    case PUR_ORDER:
+                        translation = "PEDIDO_COMPRAS";
+                        break;
                     case PUR_REF_ORDER:
                         translation = "REF_PEDIDO_COMPRAS";
                         break;
                     case PUR_REF_SCALE_TICKET:
                         translation = "REF_BOLETO_BÁSCULA";
+                        break;
+                    case PUR_PAYMENT:
+                        translation = "PAGO_COMPRAS";
                         break;
                     default:
                         // nothing

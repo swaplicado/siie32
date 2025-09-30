@@ -350,17 +350,17 @@ public abstract class SImportUtils {
                                 zis.closeEntry();
                                 
                                 if (newFile.getName().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
-                                    // choose firts available XML:
+                                    // choose firt retrieved XML:
                                     xmlFile = newFile;
                                     xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.XML);
                                 }
                                 else if (newFile.getName().endsWith("." + SFileUtilities.PDF)) {
-                                    // reserve all available PDF's:
+                                    // reserve all retrieved PDF's:
                                     pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.PDF), newFile);
                                 }
                                 
                                 if (!xmlFileName.isEmpty() && !pdfFilesMap.isEmpty() && pdfFile == null) {
-                                    pdfFile = pdfFilesMap.get(xmlFileName); // lookup the right PDF by same name as XML
+                                    pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF by matching the same name as irs XML counterpart
                                 }
                                 
                                 if (xmlFile != null && pdfFile != null) {
@@ -369,7 +369,7 @@ public abstract class SImportUtils {
                             }
                             
                             if (xmlFile != null && pdfFile == null && !pdfFilesMap.isEmpty()) {
-                                // last chance, choose firts available PDF:
+                                // last chance, choose firt retrieved PDF:
                                 pdfFile = (File) pdfFilesMap.values().toArray()[0];
                             }
                         }

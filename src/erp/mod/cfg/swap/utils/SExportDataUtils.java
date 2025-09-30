@@ -19,6 +19,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
@@ -68,20 +69,19 @@ public abstract class SExportDataUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_DEPARTMENT:
             case AUTH_FUNCTIONAL_AREA:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
                 
             case FUNCTIONAL_AREA:
-            case PUR_REF_ORDER:
             case PUR_ORDER:
-            case PUR_REF_SCALE_TICKET:
+            case PUR_REF_ORDER:
+            case PUR_PAYMENT:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
                 
             default:
-                throw new IllegalArgumentException(SExportUtils.ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
         
         return table;
@@ -131,7 +131,6 @@ public abstract class SExportDataUtils {
                 syncType == SSyncType.PARTNER_SUPPLIER || 
                 syncType == SSyncType.PARTNER_CUSTOMER || 
                 syncType == SSyncType.AUTH_JOB_TITLE || 
-                syncType == SSyncType.AUTH_DEPARTMENT || 
                 syncType == SSyncType.AUTH_FUNCTIONAL_AREA || 
                 syncType == SSyncType.FUNCTIONAL_AREA;
         
@@ -1482,6 +1481,7 @@ public abstract class SExportDataUtils {
 
         return references;
     }
+    
 
     /**
      * Consulta los pagos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
@@ -1503,19 +1503,19 @@ public abstract class SExportDataUtils {
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONVERT(p.id_pay, CHAR)";
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT, database);
                 
                 String sql = "SELECT "
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
-                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_sys, "
+                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
                         // payment entry:
                         + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
                         + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
                         // bank accounts:
-                        + "ba_ac.acc_num_std, ba_ac.acc_num, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
-                        + "ba_ben.acc_num_std, ba_ben.acc_num, ba_ben_b.bp, ba_ben_b.fiscal_id, ba_ben_b.fiscal_frg_id, "
+                        + "ba_ac.acc_num, ba_ac.acc_num_std, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
+                        + "ba_ben.acc_num, ba_ben.acc_num_std, ba_ben_b.bp, ba_ben_b.fiscal_id, ba_ben_b.fiscal_frg_id, "
                         // SWAP data processing:
                         + "sdp.ext_data_id, sdp.ext_data_uuid, sdp.b_dps_pay_loc, "
                         // DPS:
@@ -1550,24 +1550,12 @@ public abstract class SExportDataUtils {
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 while (resultSet.next()) {
+                    // payment:
+                    
                     SExportDataPayment payment = new SExportDataPayment();
-/*
-                    reference.external_id = resultSet.getInt("t.id_year") + "_" + resultSet.getInt("t.id_doc");
-                    reference.external_company_id = companyId;
-                    reference.external_functional_area_id = resultSet.getInt("t.fid_func_sub");
-                    reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
-                    reference.document_ref_type_id = SSwapConsts.TXN_DOC_TYPE_ORDER;
-                    reference.external_partner_id = resultSet.getInt("t.fid_bp_r");
-                    reference.reference = txnReference;
-                    reference.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
-                    reference.currency_code = resultSet.getString("c.cur_key");
-                    reference.amount = resultSet.getDouble("t.tot_cur_r");
-                    reference.fiscal_use = resultSet.getString("_cfd_use");
-                    reference.payment_method = resultSet.getInt("t.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
 
                     payment.company = companyId;
-                    payment.pay_id = resultSet.getInt("p.id_pay");
+                    payment.payment_id = resultSet.getInt("p.id_pay");
                     payment.functional_area = resultSet.getInt("p.fk_func_sub");
                     payment.benef = resultSet.getInt("p.fk_ben");
                     payment.series = resultSet.getString("_pay_ser");
@@ -1579,66 +1567,100 @@ public abstract class SExportDataUtils {
                     Date dateExecution = resultSet.getDate("p.dt_exec_n");
                     payment.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
                     payment.currency = resultSet.getString("_pay_cur_key");
-                    payment.amount = SExportUtils.resultSet.getDouble("p.pay_cur");
-                    payment.exchange_rate_app = resultSet.getString("");
-                    payment.amount_loc_app = resultSet.getString("");
-                    payment.exchange_rate_exec = resultSet.getString("");
-                    payment.amount_loc_exec = resultSet.getString("");
-                    payment.payment_way = resultSet.getString("");
-                    payment.priority = resultSet.getInt("");
-                    payment.notes = resultSet.getString("");
-                    payment.is_receipt_payment_req = ?;
-                    payment.payment_status = resultSet.getInt("");
-                    payment.authz_authorization_id = resultSet.getInt("");
-                    // cuenta pagadora
-                    payment.paying_bank = resultSet.getString("");
-                    payment.paying_bank_fiscal_id = resultSet.getString("");
-                    payment.paying_account = resultSet.getString("");
-                    // cuenta beneficiaria
-                    payment.benef_bank = resultSet.getString("");
-                    payment.benef_bank_fiscal_id = resultSet.getString("");
-                    payment.benef_account = resultSet.getString("");
-                    payment.sched_user = resultSet.getInt("");
-                    payment.exec_user = resultSet.getInt("");
-                    payment.sched_at = resultSet.getString("");
-                    payment.exec_at = resultSet.getString("");
-                    payment.is_deleted = resultSet.getInt("");
+                    payment.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_cur"));
+                    //payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(resultSet.getDouble("p.pay_exc_rate_app"));
+                    payment.exchange_rate_app = SExportUtils.FormatStdExchangeRate.format(resultSet.getDouble("p.pay_exc_rate_app"));
+                    payment.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_app"));
+                    payment.exchange_rate_exec = payment.exchange_rate_app; // same value "at application"!
+                    payment.amount_loc_exec = payment.amount_loc_app; // same value "at application"!
+                    payment.payment_way = resultSet.getString("p.pay_way");
+                    payment.priority = resultSet.getInt("p.priority");
+                    payment.notes = resultSet.getString("p.nts");
+                    payment.is_receipt_payment_req = resultSet.getBoolean("p.b_rcpt_pay_req") ? 1 : 0;
+                    payment.payment_status = resultSet.getInt("p.fk_st_pay");
+                    payment.authz_authorization_id = SSwapConsts.AUTHZ_STATUS_PENDING;
+
+                    // paying account:
+                    BankAccount payingBankAccount = new BankAccount(resultSet, "ba_ac_b.bp", "ba_ac_b.fiscal_id", "ba_ac_b.fiscal_frg_id", "ba_ac.acc_num", "ba_ac.acc_num_std");
+                    payment.paying_bank = payingBankAccount.BankName;
+                    payment.paying_bank_fiscal_id = payingBankAccount.BankFiscalId;
+                    payment.paying_account = payingBankAccount.BankAccount;
+
+                    // beneficiary bank account:
+                    BankAccount benefBankAccount = new BankAccount(resultSet, "ba_ben_b.bp", "ba_ben_b.fiscal_id", "ba_ben_b.fiscal_frg_id", "ba_ben.acc_num", "ba_ben.acc_num_std");
+                    payment.benef_bank = benefBankAccount.BankName;
+                    payment.benef_bank_fiscal_id = benefBankAccount.BankFiscalId;
+                    payment.benef_account = benefBankAccount.BankAccount;
+
+                    payment.sched_user = null;
+                    payment.exec_user = null;
+                    payment.sched_at = null;
+                    payment.exec_at = null;
+                    payment.is_deleted = 0;
                     //payment.created_by;
                     //payment.updated_by;
                     //payment.deleted_by;
                     //payment.created_at;
                     //payment.updated_at;
                     //payment.deleted_at;
-                    payment.user_id;
+                    payment.user_id = session.getUser().getPkUserId();
 
-                    paymentEntry.entry_type;
-                    paymentEntry.amount;
-                    paymentEntry.amount_loc_app;
-                    paymentEntry.entry_currency;
-                    paymentEntry.conv_rate_app;
-                    paymentEntry.entry_amount_app;
-                    paymentEntry.amount_loc_exec;
-                    paymentEntry.conv_rate_exec;
-                    paymentEntry.entry_amount_exec;
-                    paymentEntry.installment;
-                    paymentEntry.document_bal_prev_app;
-                    paymentEntry.document_bal_unpd_app;
-                    paymentEntry.document_bal_prev_exec;
-                    paymentEntry.document_bal_unpd_exec;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_id_n;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_uuid;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_folio;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_date;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_currency_id;
-                    @JsonInclude(JsonInclude.Include.NON_NULL)
-                    paymentEntry.document_amount;
-*/
-                    payments.add(payment);
+                    // payment entry:
+
+                    SExportDataPaymentEntry paymentEntry = new SExportDataPaymentEntry();
+
+                    paymentEntry.entry_type = resultSet.getString("pe.ety_tp");
+                    paymentEntry.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_cur"));
+                    paymentEntry.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_app"));
+                    paymentEntry.entry_currency = resultSet.getString("_pay_ety_cur_key");
+                    //paymentEntry.conv_rate_app = SExportUtils.FormatPayConversionRate.format(resultSet.getDouble("pe.conv_rate_app"));
+                    paymentEntry.conv_rate_app = SExportUtils.FormatStdExchangeRate.format(resultSet.getDouble("pe.conv_rate_app"));
+                    paymentEntry.entry_amount_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.des_pay_app_ety_cur"));
+                    paymentEntry.amount_loc_exec = paymentEntry.amount_loc_app; // same value "at application"!
+                    paymentEntry.conv_rate_exec = paymentEntry.conv_rate_app; // same value "at application"!
+                    paymentEntry.entry_amount_exec = paymentEntry.entry_amount_app; // same value "at application"!
+                    paymentEntry.installment = resultSet.getInt("pe.install");
+                    paymentEntry.document_bal_prev_app = resultSet.getString("pe.doc_bal_prev_app_cur");
+                    paymentEntry.document_bal_unpd_app = resultSet.getString("pe.doc_bal_unpd_app_cur_r");
+                    paymentEntry.document_bal_prev_exec = paymentEntry.document_bal_prev_app; // same value "at application"!
+                    paymentEntry.document_bal_unpd_exec = paymentEntry.document_bal_unpd_app; // same value "at application"!
+                    
+                    int externalId = resultSet.getInt("sdp.ext_data_id");
+                    
+                    if (resultSet.wasNull() || paymentEntry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_ADVANCE)) {
+                        paymentEntry.document_id_n = null;
+                        paymentEntry.document_uuid = null;
+                        paymentEntry.document_folio = null;
+                        paymentEntry.document_date = null;
+                        paymentEntry.document_currency = null;
+                        paymentEntry.document_amount = null;
+                    }
+                    else {
+                        String uuid = resultSet.getString("_cfd_uuid");
+                        
+                        if (resultSet.wasNull() || uuid.isEmpty()) {
+                            uuid = resultSet.getString("sdp.ext_data_uuid");
+                            
+                            if (resultSet.wasNull()) {
+                                uuid = "";
+                            }
+                        }
+                        
+                        paymentEntry.document_id_n = externalId;
+                        paymentEntry.document_uuid = uuid;
+                        paymentEntry.document_folio = resultSet.getString("_dps_folio");
+                        paymentEntry.document_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("_dps_dt"));
+                        paymentEntry.document_currency = resultSet.getString("_dps_cur_key");
+                        paymentEntry.document_amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("d.tot_cur_r"));
+                    }
+                    
+                    SRequestPaymentsBody.Payment data = new SRequestPaymentsBody.Payment();
+                    
+                    data.payment = payment;
+                    data.entries = new SExportDataPaymentEntry[] { paymentEntry };
+                    data.files = new SExportDataFile[] { };
+
+                    payments.add(data);
                 }
             }
         }
@@ -1682,9 +1704,6 @@ public abstract class SExportDataUtils {
                 data = getListOfAuthJobTitlesToExport(session);
                 break;
                 
-            case AUTH_DEPARTMENT:
-                break;
-                
             case FUNCTIONAL_AREA:
                 data = getListOfFunctionalAreasToExport(session);
                 break;
@@ -1707,7 +1726,7 @@ public abstract class SExportDataUtils {
                 break;
                 
             default:
-                throw new IllegalArgumentException(SExportUtils.ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
         
         return data;
@@ -1793,5 +1812,35 @@ public abstract class SExportDataUtils {
         }
 
         return oResponse;
+    }
+    
+    public static class BankAccount {
+        
+        public String BankName;
+        public String BankFiscalId;
+        public String BankAccount;
+        
+        public BankAccount(final ResultSet resultSet, final String colName, final String colFiscalId, final String colFiscalFrgId, final String colAccount, final String colAccountStd) throws SQLException {
+            BankName = resultSet.getString(colName);
+            BankFiscalId = "";
+            BankAccount = "";
+
+            if (resultSet.wasNull()) {
+                BankName = "";
+            }
+            else {
+                // note that remaining data cannot be null:
+                
+                BankFiscalId = resultSet.getString(colFiscalFrgId); // check first foreign fiscal ID
+                if (BankFiscalId.isEmpty()) {
+                    BankFiscalId = resultSet.getString(colFiscalId);
+                }
+                
+                BankAccount = resultSet.getString(colAccountStd); // check first standard account number (ClaBE)
+                if (BankAccount.isEmpty()) {
+                    BankAccount = resultSet.getString(colAccount);
+                }
+            }
+        }
     }
 }

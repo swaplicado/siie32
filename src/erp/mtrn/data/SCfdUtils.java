@@ -6296,7 +6296,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     /**
-     * Obtiene el ID del CFDI a través del UUID.
+     * Obtiene el ID del CFDI a través del UUID, descartando CFDI de DPS eliminados o anulados.
      * @param client Cliente GUI.
      * @param uuid UUID.
      * @return ID del CFDI si fue encontrado, de lo contrario cero.
@@ -6305,10 +6305,29 @@ public abstract class SCfdUtils implements Serializable {
     public static int getCfdIdByUuid(final SClientInterface client, final String uuid) throws Exception {
         int cfdId = 0;
         
-        String sql = "SELECT id_cfd FROM trn_cfd WHERE uuid = '" + uuid + "';";
+        String sql = "SELECT cfd.id_cfd, d.id_year, d.id_doc, d.b_del, d.fid_st_dps "
+                + "FROM trn_cfd AS cfd "
+                + "LEFT OUTER JOIN trn_dps AS d ON d.id_year = cfd.fid_dps_year_n AND d.id_doc = cfd.fid_dps_doc_n "
+                + "WHERE cfd.uuid = '" + uuid + "';";
+        
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                cfdId = resultSet.getInt(1);
+            while (resultSet.next()) {
+                boolean isDpsDeleted = resultSet.getBoolean("d.b_del");
+                
+                if (resultSet.wasNull()) {
+                    // CFDI encontrado y no está asociado a un DPS:
+                    cfdId = resultSet.getInt("cfd.id_cfd");
+                    break;
+                }
+                else {
+                    int dpsStatusId = resultSet.getInt("d.fid_st_dps");
+                    
+                    if (!isDpsDeleted && dpsStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                        // CFDI encontrado y su DPS no está ni borrado ni anulado:
+                        cfdId = resultSet.getInt("cfd.id_cfd");
+                        break;
+                    }
+                }
             }
         }
         
@@ -6318,7 +6337,9 @@ public abstract class SCfdUtils implements Serializable {
     public static ArrayList<String> getIdDpsByCfd(final SClientInterface client, final int cfd) throws Exception {
         ArrayList<String> idFac = new ArrayList<String>();
         
-        String sql = "SELECT fid_dps_year_n, fid_dps_doc_n FROM trn_cfd WHERE id_cfd = " + cfd + ";";
+        String sql = "SELECT fid_dps_year_n, fid_dps_doc_n "
+                + "FROM trn_cfd "
+                + "WHERE id_cfd = " + cfd + ";";
         ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
 
         while (resultSet.next()) {

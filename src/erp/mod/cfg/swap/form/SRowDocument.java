@@ -18,6 +18,7 @@ import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibTimeUtils;
@@ -389,7 +390,25 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
 
                 payment.getChildEntries().add(paymentEntry);
 
-                payment.save(session);
+                Exception exception = null;
+                
+                try (Statement statement = session.getStatement().getConnection().createStatement()) {
+                    try {
+                        statement.execute("START TRANSACTION");
+                        payment.save(session);
+                    }
+                    catch (Exception e) {
+                        exception = e;
+                        statement.execute("ROLLBACK");
+                    }
+                    finally {
+                        statement.execute("COMMIT");
+                    }
+                }
+                
+                if (exception != null) {
+                    throw exception;
+                }
             }
         }
         

@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
@@ -28,6 +29,8 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
+    public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
+    
     protected int mnPkPaymentId;
     protected String msSeries;
     protected int mnNumber;
@@ -503,6 +506,43 @@ public class SDbPayment extends SDbRegistryUser {
         } 
         
         mbRegistryNew = false;
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
+    @Override
+    public void saveField(final Statement statement, final int[] pk, final int field, final Object value) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        int newStatusPaymentId = 0;
+        String database = "";
+        
+        if (value instanceof Integer) {
+            newStatusPaymentId = (Integer) value;
+        }
+        else if (value instanceof Object[]) {
+            newStatusPaymentId = (Integer) ((Object[]) value)[0];
+            database = (String) ((Object[]) value)[1];
+        }
+        else {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Argumento 'value'.)");
+        }
+
+        msSql = "UPDATE " + (!database.isEmpty() ? "." + database : "") + getSqlTable() + " SET ";
+        
+        switch (field) {
+            case FIELD_STATUS_PAYMENT:
+                msSql += "fk_st_pay = " + newStatusPaymentId + ", ";
+                msSql += "fk_usr_upd = " + mnFkUserUpdateId + ", ";
+                msSql += "ts_usr_upd = NOW() ";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+
+        msSql += getSqlWhere(pk);
+        statement.execute(msSql);
+        
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 

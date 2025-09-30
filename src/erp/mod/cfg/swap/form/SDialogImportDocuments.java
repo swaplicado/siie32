@@ -13,6 +13,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
@@ -22,7 +23,10 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
+import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.trn.db.SDbSwapDataProcessing;
@@ -30,6 +34,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.form.SDialogDpsFinder;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,6 +94,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected PreparedStatement moPrepStatToCountImports;
     protected PreparedStatement moPrepStatToGetProcessedDpsByExternalId;
     protected PreparedStatement moPrepStatToGetDpsKeyByDocData;
+    protected boolean mbExportPaymentRequests;
     
     /**
      * Creates new form SDialogImportDocuments
@@ -1373,6 +1379,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int index = moDocumentsGrid.getTable().getSelectedRow();
                                     moDocumentsGrid.renderGridRows();
                                     moDocumentsGrid.setSelectedGridRow(index);
+                                    
+                                    mbExportPaymentRequests = true;
                                 }
                             }
                         }
@@ -1406,6 +1414,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     int index = moDocumentsGrid.getTable().getSelectedRow();
                     moDocumentsGrid.renderGridRows();
                     moDocumentsGrid.setSelectedGridRow(index);
+                    
+                    mbExportPaymentRequests = true;
                 }
             }
         }
@@ -1424,6 +1434,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         mnFormResult = 0;
         mbFirstActivation = false;
+        
+        mbExportPaymentRequests = false;
         
         moDateStart.setValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
         moDateEnd.setValue(SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
@@ -1483,6 +1495,25 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     @Override
     public SGuiValidation validateForm() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public void windowClosed() {
+        super.windowClosed();
+        
+        if (mbExportPaymentRequests) {
+            try {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, false, true);
+                SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
     }
 
     @Override
