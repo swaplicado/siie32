@@ -51,7 +51,7 @@ public class SSwapClient implements SClientInterface, SGuiClient {
     private int[] manSwapServicesCompanies;
     private int mnSwapServicesInstance;
     
-    public SSwapClient(final String dbHost, final int dbPort, final String dbName, final boolean isDev) throws Exception {
+    public SSwapClient(final String dbHost, final int dbPort, final String dbName, final boolean isDev, final int userId) throws Exception {
         mbIsDev = isDev;
         
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
@@ -60,7 +60,7 @@ public class SSwapClient implements SClientInterface, SGuiClient {
 
         moSession = new SGuiSession(this);
         
-        moSession.setUser(new SSwapUser());
+        moSession.setUser(new SSwapUser(userId));
 
         moSession.setSystemDate(new Date());
         moSession.setCurrentDate(moSession.getSystemDate());

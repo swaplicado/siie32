@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 290.6/ 2025-09-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Tercera liberación de la funcionalidad de importación de documentos autorizados en Portal de Compras.
+2) Generación y publicación en Portal de Compras de solicitudes de pago de documentos autorizados importados a SIIE.
+
+================================================================================
 SIIE 3.2 290.5/ 2025-09-29
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

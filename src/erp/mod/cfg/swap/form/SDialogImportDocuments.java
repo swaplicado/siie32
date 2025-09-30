@@ -862,6 +862,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDateStart.getValue()));
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDateEnd.getValue()));
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                
+                urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
 
                 URL url = new URL(urlQuery);
 

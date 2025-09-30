@@ -8,6 +8,7 @@ package erp.cli.swap;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -36,7 +37,7 @@ public class SSwapServices {
             }
             
             SResponses responses;
-            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false);
+            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SUtilConsts.USR_SUP_ID);
             
             responses = SExportUtils.exportData(client.getSession(), SSyncType.USER, false, true);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);

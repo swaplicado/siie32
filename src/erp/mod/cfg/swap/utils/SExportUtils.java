@@ -219,6 +219,7 @@ public abstract class SExportUtils {
      */
     private static ArrayList<SDbSyncLogEntry> createSyncLogEntries(final SGuiSession session, final SSyncType syncType, final JsonNode responseJson) throws Exception {
         ArrayList<SDbSyncLogEntry> entries = new ArrayList<>();
+        HashMap<Integer, String> databasesMap;
         
         if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
             JsonNode results = responseJson.path("results");
@@ -297,7 +298,6 @@ public abstract class SExportUtils {
                         break;
                         
                     case AUTH_JOB_TITLE:
-                    case AUTH_FUNCTIONAL_AREA:
                         for (JsonNode result : results) {
                             boolean entriesFound = false;
                             
@@ -325,7 +325,7 @@ public abstract class SExportUtils {
 
                     case FUNCTIONAL_AREA:
                     case PUR_REF_ORDER:
-                        HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
+                        databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         for (JsonNode result : results) {
                             boolean entriesFound = false;
@@ -356,9 +356,10 @@ public abstract class SExportUtils {
                     case PUR_ORDER:
                     case PUR_PAYMENT:
                         String attributeId = "";
+                        databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         if (syncType == SSyncType.PUR_ORDER) {
-                            attributeId = "document_id";
+                            attributeId = "document_id"; 
                         }
                         else {
                             attributeId = "payment_id";
@@ -368,7 +369,7 @@ public abstract class SExportUtils {
                             boolean entriesFound = false;
 
                             if (result.has(attributeId)) {
-                                JsonNode documentId = result.path(attributeId);
+                                JsonNode referenceId = result.path(attributeId);
                                 
                                 SDbComSyncLogEntry entry = new SDbComSyncLogEntry();
                                 entry.setResponseCode(result.path("status_code").asText());
@@ -380,7 +381,17 @@ public abstract class SExportUtils {
                                     entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
                                 }
                                 
-                                entry.setReferenceId(documentId.asText());
+                                int companyId;
+                                
+                                if (result.has("company_id")) {
+                                    companyId = result.path("company_id").asInt();
+                                }
+                                else {
+                                    companyId = session.getConfigCompany().getCompanyId();
+                                }
+                                
+                                entry.setAuxDatabase(databasesMap.get(companyId));
+                                entry.setReferenceId(referenceId.asText());
                                 entries.add(entry);
 
                                 entriesFound = true;
@@ -450,7 +461,6 @@ public abstract class SExportUtils {
                         case PARTNER_CUSTOMER:
                         case AUTH_ACTOR:
                         case AUTH_JOB_TITLE:
-                        case AUTH_FUNCTIONAL_AREA:
                             log = new SDbSyncLog();
                             break;
 
@@ -500,7 +510,6 @@ public abstract class SExportUtils {
                             case PARTNER_CUSTOMER:
                             case AUTH_ACTOR:
                             case AUTH_JOB_TITLE:
-                            case AUTH_FUNCTIONAL_AREA:
                                 log = new SDbSyncLog();
                                 break;
 
@@ -519,7 +528,8 @@ public abstract class SExportUtils {
                         ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
                         
                         if (syncType == SSyncType.PUR_PAYMENT) {
-                            complementProcessing(session, syncType, database, entries);
+                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
+                            complementProcessing(session, syncType, entries, value);
                         }
 
                         log.setSyncType(syncType.toString());
@@ -591,7 +601,6 @@ public abstract class SExportUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_FUNCTIONAL_AREA:
                 SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, "");
                 break;
 
@@ -599,6 +608,7 @@ public abstract class SExportUtils {
             case PUR_ORDER:
             case PUR_ORDER_FILE:
             case PUR_REF_ORDER:
+            case PUR_PAYMENT:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -612,22 +622,21 @@ public abstract class SExportUtils {
     }
     
     /**
-     * Completar el procesamiento de las partidas de la bitácora de sincronización, si el tipo de sincronización lo requiere.
+     * Complementar el procesamiento de las partidas de la bitácora de sincronización, si el tipo de sincronización lo requiere.
      * 
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
-     * @param database Nombre de la base de datos de los registros a procesar.
      * @param entries Partidas de la bitácora de sincronización a procesar.
+     * @param value Nuevo valor para complementar el procesamiento de las partidas.
      * @throws SQLException Si ocurre un error en las actualizaciones.
      * @throws Exception 
      */
-    private static void complementProcessing(final SGuiSession session, final SSyncType syncType, final String database, ArrayList<SDbSyncLogEntry> entries) throws SQLException, Exception {
+    public static void complementProcessing(final SGuiSession session, final SSyncType syncType, ArrayList<SDbSyncLogEntry> entries, Object value) throws SQLException, Exception {
         switch (syncType) {
             case PUR_PAYMENT:
                 // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
                 
                 SDbPayment payment = new SDbPayment();
-                Object[] value = new Object[] { SModSysConsts.FINS_ST_PAY_NEW, database };
                 
                 for (SDbSyncLogEntry entry : entries) {
                     payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, value);
@@ -698,7 +707,40 @@ public abstract class SExportUtils {
         String cfgParamKey = "";
         String jsonBaseKey = "";
         String jsonConfigKey = "";
+        String testHost = "";
+        String testApyKey = "";
+        
+        if (((SClientInterface) session.getClient()).isDev()) {
+            // hosts para pruebas:
+            
+            switch (syncType) {
+                case USER:
+                case PARTNER_SUPPLIER:
+                case PARTNER_CUSTOMER:
+                case FUNCTIONAL_AREA:
+                    testHost = "https://api-usuarios-test-515680676790.europe-west1.run.app";
+                    break;
 
+                case PUR_ORDER:
+                case PUR_REF_ORDER:
+                    testHost = "https://transaction-backend-test-515680676790.europe-west1.run.app";
+                    break;
+                    
+                case PUR_PAYMENT:
+                    testHost = "http://192.168.7.43:8003"; // today host in César Orozco's (30/09/2025)
+                    break;
+
+                case AUTH_ACTOR:
+                case AUTH_JOB_TITLE:
+                    testHost = "https://gateway-autorizaciones-test-6kweyks6.uc.gateway.dev";
+                    testApyKey = "AIzaSyCs6HMWX_OE8Pr1M8ycQ3IHwFfNX81ZyIE";
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
+            }
+        }
+        
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
@@ -749,7 +791,6 @@ public abstract class SExportUtils {
                 
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_FUNCTIONAL_AREA:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_AUTH_SRV;
                 
@@ -759,7 +800,6 @@ public abstract class SExportUtils {
                         break;
 
                     case AUTH_JOB_TITLE:
-                    case AUTH_FUNCTIONAL_AREA:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_AUTH_ORG_ELEMENT;
                         break;
 
@@ -783,9 +823,21 @@ public abstract class SExportUtils {
         // Recuperar la configuración base:
         
         if (!jsonBaseKey.isEmpty()) {
-            syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            if (!testHost.isEmpty()) {
+                syncUrl = testHost;
+            }
+            else {
+                syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            }
+            
             syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
-            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+            
+            if (!testApyKey.isEmpty()) {
+                syncApiKey = testApyKey;
+            }
+            else {
+                syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+            }
         }
         
         // Recuperar la configuración del servicio:
@@ -842,7 +894,6 @@ public abstract class SExportUtils {
                     break;
 
                 case AUTH_JOB_TITLE:
-                case AUTH_FUNCTIONAL_AREA:
                     SRequestAuthOrgElementsBody orgElementsBody = new SRequestAuthOrgElementsBody();
                     orgElementsBody.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                     orgElementsBody.elements = (SExportDataAuthOrgElement[]) currentExportDatas.toArray(new SExportDataAuthOrgElement[0]);
@@ -969,55 +1020,6 @@ public abstract class SExportUtils {
             try {
                 switch (syncType) {
                     case USER:
-                    case PARTNER_SUPPLIER:
-                    case PARTNER_CUSTOMER:
-                        if (syncType == SSyncType.USER) {
-                            // exportar antes áreas funcionales:
-                            syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-                        }
-
-                        if (info == null || info.isResponseOk()) {
-                            // para todas las exportaciones: exportar antes puestos laborales:
-                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-
-                            if (info.isResponseOk()) {
-                                // para todas las exportaciones: exportar antes actores:
-                                syncTypeInProgress = SSyncType.AUTH_ACTOR;
-                                info = computeRequest(session, syncTypeInProgress);
-                                responses.getInfos().add(info);
-                                
-                                if (info.isResponseOk()) {
-                                    // exportar los datos solicitados:
-                                    syncTypeInProgress = syncType;
-                                    info = computeRequest(session, syncTypeInProgress);
-                                    responses.getInfos().add(info);
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case AUTH_ACTOR:
-                    case AUTH_JOB_TITLE:
-                    case AUTH_FUNCTIONAL_AREA:
-                        if (syncType == SSyncType.AUTH_ACTOR) {
-                            // exportar antes puestos laborales:
-                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-                        }
-
-                        if (info == null || info.isResponseOk()) {
-                            // exportar los datos solicitados:
-                            syncTypeInProgress = syncType;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-                        }
-                        break;
-
                     case PUR_ORDER:
                     case PUR_REF_ORDER:
                     case PUR_PAYMENT:
@@ -1026,7 +1028,28 @@ public abstract class SExportUtils {
                         info = computeRequest(session, syncTypeInProgress);
                         responses.getInfos().add(info);
 
-                        if (info.isResponseOk()) {
+                        if (syncType == SSyncType.USER || syncType == SSyncType.PUR_PAYMENT) {
+                            // para todas las exportaciones: exportar antes puestos laborales para autorización:
+                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+
+                            if (info.isResponseOk()) {
+                                // para todas las exportaciones: exportar antes actores para autorización:
+                                syncTypeInProgress = SSyncType.AUTH_ACTOR;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                                
+                                if (info.isResponseOk()) {
+                                    // exportar usuarios:
+                                    syncTypeInProgress = SSyncType.USER;
+                                    info = computeRequest(session, syncTypeInProgress);
+                                    responses.getInfos().add(info);
+                                }
+                            }
+                        }
+                        
+                        if (syncType == SSyncType.PUR_ORDER || syncType == SSyncType.PUR_REF_ORDER || syncType == SSyncType.PUR_PAYMENT) {
                             // exportar antes proveedores:
                             syncTypeInProgress = SSyncType.PARTNER_SUPPLIER;
                             info = computeRequest(session, syncTypeInProgress);
@@ -1045,6 +1068,40 @@ public abstract class SExportUtils {
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }
+                        }
+                        break;
+                        
+                    case PARTNER_SUPPLIER:
+                    case PARTNER_CUSTOMER:
+                        // exportar antes actores para autorización:
+                        syncTypeInProgress = SSyncType.AUTH_ACTOR;
+                        info = computeRequest(session, syncTypeInProgress);
+                        responses.getInfos().add(info);
+
+                        if (info.isResponseOk()) {
+                            if (info.isResponseOk()) {
+                                // exportar los datos solicitados:
+                                syncTypeInProgress = syncType;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                            }
+                        }
+                        break;
+                        
+                    case AUTH_ACTOR:
+                    case AUTH_JOB_TITLE:
+                        if (syncType == SSyncType.AUTH_ACTOR) {
+                            // exportar antes puestos laborales:
+                            syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                        }
+
+                        if (info == null || info.isResponseOk()) {
+                            // exportar los datos solicitados:
+                            syncTypeInProgress = syncType;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
                         }
                         break;
 

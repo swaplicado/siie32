@@ -69,7 +69,6 @@ public abstract class SExportDataUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_FUNCTIONAL_AREA:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
                 
@@ -131,7 +130,6 @@ public abstract class SExportDataUtils {
                 syncType == SSyncType.PARTNER_SUPPLIER || 
                 syncType == SSyncType.PARTNER_CUSTOMER || 
                 syncType == SSyncType.AUTH_JOB_TITLE || 
-                syncType == SSyncType.AUTH_FUNCTIONAL_AREA || 
                 syncType == SSyncType.FUNCTIONAL_AREA;
         
         return "SELECT "
@@ -1509,7 +1507,7 @@ public abstract class SExportDataUtils {
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
                         + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_sys, "
-                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
+                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, p.fk_usr_ins, "
                         // payment entry:
                         + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
                         + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
@@ -1603,7 +1601,13 @@ public abstract class SExportDataUtils {
                     //payment.created_at;
                     //payment.updated_at;
                     //payment.deleted_at;
-                    payment.user_id = session.getUser().getPkUserId();
+                    
+                    if (((SClientInterface) session.getClient()).isDev()) {
+                        payment.user_id = 60; // slopez
+                    }
+                    else {
+                        payment.user_id = resultSet.getInt("p.fk_usr_ins"); // el creador del pago
+                    }
 
                     // payment entry:
 
@@ -1620,8 +1624,8 @@ public abstract class SExportDataUtils {
                     paymentEntry.conv_rate_exec = paymentEntry.conv_rate_app; // same value "at application"!
                     paymentEntry.entry_amount_exec = paymentEntry.entry_amount_app; // same value "at application"!
                     paymentEntry.installment = resultSet.getInt("pe.install");
-                    paymentEntry.document_bal_prev_app = resultSet.getString("pe.doc_bal_prev_app_cur");
-                    paymentEntry.document_bal_unpd_app = resultSet.getString("pe.doc_bal_unpd_app_cur_r");
+                    paymentEntry.document_bal_prev_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.doc_bal_prev_app_cur"));
+                    paymentEntry.document_bal_unpd_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.doc_bal_unpd_app_cur_r"));
                     paymentEntry.document_bal_prev_exec = paymentEntry.document_bal_prev_app; // same value "at application"!
                     paymentEntry.document_bal_unpd_exec = paymentEntry.document_bal_unpd_app; // same value "at application"!
                     

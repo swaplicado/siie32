@@ -7,6 +7,7 @@ package erp.mod.fin.db;
 
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -515,27 +516,56 @@ public class SDbPayment extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
         int newStatusPaymentId = 0;
+        int userId = 0;
         String database = "";
+        String fieldDate = "";
+        String fieldUser = "";
+        String fieldTime = "";
         
-        if (value instanceof Integer) {
-            newStatusPaymentId = (Integer) value;
-        }
-        else if (value instanceof Object[]) {
+        if (value instanceof Object[]) {
             newStatusPaymentId = (Integer) ((Object[]) value)[0];
-            database = (String) ((Object[]) value)[1];
+            userId = (Integer) ((Object[]) value)[1];
+            database = (String) ((Object[]) value)[2];
+            
+            switch (newStatusPaymentId) {
+                case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
+                case SModSysConsts.FINS_ST_PAY_REJ:
+                case SModSysConsts.FINS_ST_PAY_NTFD:
+                case SModSysConsts.FINS_ST_PAY_RCPT:
+                case SModSysConsts.FINS_ST_PAY_CAN:
+                    fieldUser = "fk_usr_upd = " + userId;
+                    fieldTime = "ts_usr_upd = NOW()";
+                    break;
+                    
+                case SModSysConsts.FINS_ST_PAY_SCHED:
+                    fieldDate = "dt_sched_n = dt_req";
+                    fieldUser = "fk_usr_sched = " + userId;
+                    fieldTime = "ts_usr_sched = NOW()";
+                    break;
+                    
+                case SModSysConsts.FINS_ST_PAY_EXEC:
+                    fieldUser = "fk_usr_exec = " + userId;
+                    fieldTime = "ts_usr_exec = NOW()";
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Nuevo estatus '" + newStatusPaymentId + "'.)");
+            }
         }
         else {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Argumento 'value'.)");
         }
 
-        msSql = "UPDATE " + (!database.isEmpty() ? "." + database : "") + getSqlTable() + " SET ";
+        msSql = "UPDATE " + (!database.isEmpty() ? database + "." : "") + getSqlTable() + " SET ";
         
         switch (field) {
             case FIELD_STATUS_PAYMENT:
+                msSql += (!fieldDate.isEmpty() ? fieldDate + ", " : "");
                 msSql += "fk_st_pay = " + newStatusPaymentId + ", ";
-                msSql += "fk_usr_upd = " + mnFkUserUpdateId + ", ";
-                msSql += "ts_usr_upd = NOW() ";
+                msSql += fieldUser + ", ";
+                msSql += fieldTime + " ";
                 break;
+                
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
