@@ -265,7 +265,11 @@ public abstract class SFormUtilities {
         }
 
         if (comboBox.getItemCount() > 0) {
-            comboBox.setSelectedIndex(0);
+            if(comboBox.getItemCount() > 1){
+                comboBox.setSelectedIndex(1);
+            } else {
+                comboBox.setSelectedIndex(0);
+            }
         }
     }
 

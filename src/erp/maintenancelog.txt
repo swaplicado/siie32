@@ -1,3 +1,9 @@
+SIIE 3.2 290.8/ 2025-10-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de envió de cotizaciones de requisiciones
+2) Corrección en la forma de captura de listas de precios clientes
+
 ================================================================================
 SIIE 3.2 290.7/ 2025-10-01
 Edwin Omar CARMONA FIGUEROA
