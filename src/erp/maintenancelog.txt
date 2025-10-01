@@ -6,6 +6,20 @@ Edwin Omar CARMONA FIGUEROA
 2) Autorización de recursos desde sistema externo por empresa.
 
 ================================================================================
+SIIE 3.2 290.6/ 2025-09-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Tercera liberación de la funcionalidad de importación de documentos autorizados en Portal de Compras.
+2) Generación y publicación en Portal de Compras de solicitudes de pago de documentos autorizados importados a SIIE.
+
+================================================================================
+SIIE 3.2 290.5/ 2025-09-29
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de envió de contratos cuando son nuevos
+2) Corrección de la validación del XML cuando el receptor tiene espació vacíos 
+
+================================================================================
 SIIE 3.2 290.4/ 2025-09-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

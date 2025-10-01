@@ -45,7 +45,7 @@ import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.db.SDbSupplierFileProcess;
-import erp.mod.trn.db.swap.SDbSwapDataProcessing;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.form.SFormConfEmployeeVsEntity;
 import erp.mod.trn.form.SFormConfMatConsSubentityCCVsCostCenterGroup;
 import erp.mod.trn.form.SFormConfMatConsSubentityVsCostCenter;
@@ -1005,7 +1005,7 @@ public class SModuleTrn extends SGuiModule {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON cob.id_bpb = d.fid_cob "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
-                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fid_dps_year_n = d.id_year AND sdp.fid_dps_doc_n = d.id_doc AND NOT sdp.b_del "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fk_dps_year_n = d.id_year AND sdp.fk_dps_doc_n = d.id_doc AND NOT sdp.b_del "
                         + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
                         + "AND d.fid_ct_dps = " + dpsKey[0] + " AND d.fid_cl_dps = " + dpsKey[1] + " AND d.fid_tp_dps = " + dpsKey[2] + " "
                         + "AND YEAR(d.dt) BETWEEN " + (year - 1) + " AND " + year + " AND d.fid_bp_r = " + bizPartnerId + " "

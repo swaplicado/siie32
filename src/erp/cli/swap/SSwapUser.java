@@ -8,7 +8,6 @@ package erp.cli.swap;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 import sa.lib.gui.SGuiSessionCustom;
@@ -19,10 +18,16 @@ import sa.lib.gui.SGuiUser;
  * @author Sergio Flores
  */
 public class SSwapUser implements SGuiUser {
+    
+    private int mnUserId;
+    
+    public SSwapUser(final int userId) {
+        mnUserId = userId;
+    }
 
     @Override
     public int getPkUserId() {
-        return SUtilConsts.USR_NA_ID;
+        return mnUserId;
     }
 
     @Override

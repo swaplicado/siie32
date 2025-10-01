@@ -19,6 +19,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
@@ -68,20 +69,19 @@ public abstract class SExportDataUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_DEPARTMENT:
-            case AUTH_FUNCTIONAL_AREA:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
                 
             case FUNCTIONAL_AREA:
-            case PUR_REF_ORDER:
             case PUR_ORDER:
-            case PUR_REF_SCALE_TICKET:
+            case PUR_REF_ORDER:
+            case PUR_PAYMENT:
+            case PUR_PAYMENT_AUTH:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
                 
             default:
-                throw new IllegalArgumentException(SExportUtils.ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
         
         return table;
@@ -131,8 +131,6 @@ public abstract class SExportDataUtils {
                 syncType == SSyncType.PARTNER_SUPPLIER || 
                 syncType == SSyncType.PARTNER_CUSTOMER || 
                 syncType == SSyncType.AUTH_JOB_TITLE || 
-                syncType == SSyncType.AUTH_DEPARTMENT || 
-                syncType == SSyncType.AUTH_FUNCTIONAL_AREA || 
                 syncType == SSyncType.FUNCTIONAL_AREA;
         
         return "SELECT "
@@ -516,7 +514,7 @@ public abstract class SExportDataUtils {
                     + "FROM "
                     + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS t "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
-//                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
+                    //+ "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
                     + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS fs ON fs.id_func = t.fid_func "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                     + "WHERE ("
@@ -940,6 +938,187 @@ public abstract class SExportDataUtils {
         
         return functionalAreas;
     }
+    
+    /**
+     * Consulta los pedidos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de pedidos de compras exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> lDps = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        String sBucketName = "";
+        String sProjectID = "";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
+            // XXX Edwin Carmona, 2025-09-17: Mejorar este código. Introducirlo en el constructor del objeto involucrado para que se invoque en automático, y no por fuera de manera manual.
+            SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
+                                    + "dbName\":\"erp\",\""
+                                    + "dbPort\":\"3306\",\""
+                                    + "dbUser\":\"dummy\",\""
+                                    + "dbPass\":\"dummy\",\""
+                                    + "dbMainId\":\"1\"}");
+            STrnDBDocuments oDocCore = new STrnDBDocuments();
+            
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            for (Integer companyId : databasesMap.keySet()) {
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER, database);
+
+                String sql = "SELECT "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
+                        + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
+                        + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
+                        + "WHERE "
+                        + "fid_dps_year = d.id_year AND fid_dps_doc = d.id_doc) AS _rms, "
+                        + "COALESCE((SELECT GROUP_CONCAT(nts, '. ') "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS dn "
+                        + "WHERE "
+                        + "dn.id_year = d.id_year AND dn.id_doc = d.id_doc AND NOT dn.b_del), '') AS _notes "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
+                        + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
+                        + "WHERE "
+                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                        + "AND YEAR(d.ts_authorn) >= " + SSwapConsts.SINCE_YEAR + " "
+                        + "AND ("
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn AND NOT d.b_link) "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR ("
+                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + ")";
+                sql += ";";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    SExportDataDpsContainer oContainer = new SExportDataDpsContainer();
+                    SExportDataDps oDpsExport = new SExportDataDps();
+
+                    oDpsExport.company = companyId;
+                    oDpsExport.id_year = resultSet.getInt("d.id_year");
+                    oDpsExport.id_doc = resultSet.getInt("d.id_doc");
+                    oDpsExport.transaction_class = SSwapConsts.TXN_CAT_PURCHASE;
+                    oDpsExport.partner = resultSet.getInt("d.fid_bp_r");
+                    oDpsExport.series = resultSet.getString("d.num_ser");
+                    oDpsExport.number = resultSet.getInt("d.num");
+                    oDpsExport.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("d.dt")); // yyyy-mm-dd
+                    oDpsExport.currency = resultSet.getString("c.cur_key");
+                    oDpsExport.amount = resultSet.getDouble("d.tot_cur_r");
+                    oDpsExport.exchange_rate = resultSet.getDouble("d.exc_rate");
+                    oDpsExport.notes = resultSet.getString("_notes");
+                    oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
+                    oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
+                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("d.b_authorn") || resultSet.getBoolean("d.b_link");
+                    
+                    // PDF de la OC:
+                    
+                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
+                            session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
+                    
+                    if (oLogEty != null) {
+                        SExportDataDpsFile oFile = new SExportDataDpsFile();
+                        SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                        oFile.filename_storage = oFd.getFileName();
+                        if (oFile.filename_storage.isEmpty()) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        }
+                        else {
+                            oFile.filename_original = oFile.filename_storage;
+                            oFile.title = "PDF de la OC";
+                            oFile.bucket_name = oFd.getBucketName();
+                            oFile.project_id = oFd.getProjectId();
+                            oContainer.file.add(oFile);
+                        }
+
+                        sBucketName = oFile.bucket_name;
+                        sProjectID = oFile.project_id;
+                    }
+                    else {
+                        sBucketName = CloudStorageManager.getBucketName();
+                        sProjectID = CloudStorageManager.getProjectID();
+                    }
+                    
+                    // documentos (archivos de cotizaciones)
+                    
+                    boolean withUrl = false;
+                    ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement());
+                    for (SWebDpsFile oDpsFile : lDpsFiles) {
+                        SExportDataDpsFile oDpsFileExport = new SExportDataDpsFile();
+                        oDpsFileExport.filename_storage = oDpsFile.getoWebFile().getCloudStorageName();
+                        if (oDpsFileExport.filename_storage.isEmpty()) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de COT vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        }
+                        else {
+                            oDpsFileExport.title = "Evidencia de cotización";
+                            oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName() != null && !oDpsFile.getoWebFile().getUserFileName().isEmpty()
+                                                                ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
+                            oDpsFileExport.bucket_name = sBucketName;
+                            oDpsFileExport.project_id = sProjectID;
+
+                            oContainer.file.add(oDpsFileExport);
+                        }
+                    }
+                    
+                    // documentos (archivos de requisiciones)
+                    
+                    String rms = resultSet.getString("_rms");
+                    String fileName;
+                    String[] idsRms;
+                    SExportDataDpsFile oRmFile;
+                    if (rms != null && !rms.isEmpty()) {
+                        idsRms = rms.split(",");
+                        for (String sId : idsRms) {
+                            fileName = database + "-" + "REQ" + "-" + sId + ".pdf";
+                            if (CloudStorageManager.storagedFileExists(fileName)) {
+                                oRmFile = new SExportDataDpsFile();
+                                oRmFile.filename_storage = fileName;
+                                if (oRmFile.filename_storage.isEmpty()) {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de RM vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                                }
+                                else {
+                                    oRmFile.filename_original = oRmFile.filename_storage;
+                                    oRmFile.title = "PDF de la requisición";
+                                    oRmFile.bucket_name = sBucketName;
+                                    oRmFile.project_id = sProjectID;
+
+                                    oContainer.file.add(oRmFile);
+                                }
+                            }
+                        }
+                    }
+                   
+                    oContainer.document = oDpsExport;
+                    
+                    lDps.add(oContainer);
+                }
+            }
+        }
+
+        return lDps;
+    }
 
     /**
      * Consulta las referencias de pedidos de compras de todas las empresas configuradas para SWAP Services, y las prepara para la exportación.
@@ -972,7 +1151,7 @@ public abstract class SExportDataUtils {
                  */
 
                 String database = databasesMap.get(companyId);
-                String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
+                String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))"; // código de tipo de referencia + '/' + referencia
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
 
                 String sql = "SELECT "
@@ -1089,7 +1268,7 @@ public abstract class SExportDataUtils {
                 }
 
                 String database = databasesMap.get(companyId);
-                String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', IF(t.num_ser = '', t.num, CONCAT(t.num_ser, '-', t.num)))"; // código de tipo de referencia + '/' + referencia
+                String referenceId = "CONCAT('" + SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_DOC_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))"; // código de tipo de referencia + '/' + referencia
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
                 
                 String sql = "SELECT "
@@ -1098,7 +1277,7 @@ public abstract class SExportDataUtils {
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS t "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
-//                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
+                        //+ "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS fs ON fs.id_func = t.fid_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "WHERE ("
@@ -1301,21 +1480,16 @@ public abstract class SExportDataUtils {
 
         return references;
     }
-    
+
     /**
-     * Obtiene una lista de ordenes de compra que no se hayan exportado
+     * Consulta los pagos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
      * 
-     * @param session
-     * @return ArrayList<SExportData> 
-     * 
-     * @throws SQLException
-     * @throws Exception 
+     * @param session Sesión de usuario.
+     * @return Lista de pagos de compras exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SExportData> getListOfDpsToExport(final SGuiSession session) throws SQLException, Exception {
-        ArrayList<SExportData> lDps = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        String sBucketName = "";
-        String sProjectID = "";
+    private static ArrayList<SExportData> getListOfPurchasePaymentsToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> payments = new ArrayList<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -1335,154 +1509,306 @@ public abstract class SExportDataUtils {
             
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
-                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // código de tipo de referencia + '/' + referencia
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER, database);
-
+                String referenceId = "CONVERT(p.id_pay, CHAR)";
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT, database);
+                
                 String sql = "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
-                        + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
-                        + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
-                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
-                        + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
-                        + "FROM "
-                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
-                        + "WHERE "
-                        + "fid_dps_year = d.id_year AND fid_dps_doc = d.id_doc) AS _rms, "
-                        + "COALESCE((SELECT GROUP_CONCAT(nts, '. ') "
-                        + "FROM "
-                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS dn "
-                        + "WHERE "
-                        + "dn.id_year = d.id_year AND dn.id_doc = d.id_doc AND NOT dn.b_del), '') AS _notes "
-                        + "FROM "
-                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
-                        + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
-                        + "WHERE "
-                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
-                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                        + "AND YEAR(d.ts_authorn) >= " + SSwapConsts.SINCE_YEAR + " "
-                        + "AND ("
-                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn AND NOT d.b_link) "
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR ("
-                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
-                        + ")";
-                sql += ";";
+                        // payment:
+                        + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
+                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
+                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, p.fk_usr_ins, "
+                        // payment entry:
+                        + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
+                        + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
+                        // bank accounts:
+                        + "ba_ac.acc_num, ba_ac.acc_num_std, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
+                        + "ba_ben.acc_num, ba_ben.acc_num_std, ba_ben_b.bp, ba_ben_b.fiscal_id, ba_ben_b.fiscal_frg_id, "
+                        // SWAP data processing:
+                        + "sdp.ext_data_id, sdp.ext_data_uuid, sdp.b_dps_pay_loc, "
+                        // DPS:
+                        + "d.id_year, d.id_doc, d.num_ser AS _dps_ser, d.num AS _dps_num, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps_folio, d.dt AS _dps_dt, "
+                        + "d.tot_cur_r, d.fid_cur AS _dps_cur_id, cd.cur_key AS _dps_cur_key, "
+                        // CFD:
+                        + "cfd.uuid AS _cfd_uuid, cfd.fid_tp_cfd, cfd.fid_tp_xml, cfd.fid_st_xml "
+                        + "FROM  "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cp ON cp.id_cur = p.fk_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS pe ON pe.id_pay = p.id_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cpe ON cpe.id_cur = pe.fk_ety_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS ac ON ac.id_cob = p.fk_pay_cash_cob_n AND ac.id_acc_cash = p.fk_pay_cash_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ac ON ba_ac.id_bpb = ac.fid_bpb_n AND ba_ac.id_bank_acc = ac.fid_bank_acc_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ac_b ON ba_ac_b.id_bp = ba_ac.fid_bank "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ben ON ba_ben.id_bpb = p.fk_ben_bank_cob_n AND ba_ben.id_bank_acc = p.fk_ben_bank_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ben_b ON ba_ben_b.id_bp = ba_ben.fid_bank "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fk_dps_year_n = pe.fk_doc_year_n AND sdp.fk_dps_doc_n = pe.fk_doc_doc_n AND NOT sdp.b_del "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = pe.fk_doc_year_n AND d.id_doc = pe.fk_doc_doc_n AND NOT d.b_del "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
+                        + "WHERE ("
+                        + "((NOT p.b_del AND p.b_sys AND p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_NEW + ") "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT, database) + ") AND "
+                        + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                        + ") "
+                        + " "
+                        + "ORDER BY "
+                        + "p.ser, p.num, p.id_pay;";
 
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 while (resultSet.next()) {
-                    SExportDataDpsContainer oContainer = new SExportDataDpsContainer();
-                    SExportDataDps oDpsExport = new SExportDataDps();
+                    // payment:
+                    
+                    SExportDataPayment payment = new SExportDataPayment();
 
-                    oDpsExport.company = companyId;
-                    oDpsExport.id_year = resultSet.getInt("d.id_year");
-                    oDpsExport.id_doc = resultSet.getInt("d.id_doc");
-                    oDpsExport.transaction_class = SSwapConsts.TXN_CAT_PURCHASE;
-                    oDpsExport.partner = resultSet.getInt("d.fid_bp_r");
-                    oDpsExport.series = resultSet.getString("d.num_ser");
-                    oDpsExport.number = resultSet.getInt("d.num");
-                    oDpsExport.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("d.dt")); // yyyy-mm-dd
-                    oDpsExport.currency = resultSet.getString("c.cur_key");
-                    oDpsExport.amount = resultSet.getDouble("d.tot_cur_r");
-                    oDpsExport.exchange_rate = resultSet.getDouble("d.exc_rate");
-                    oDpsExport.notes = resultSet.getString("_notes");
-                    oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
-                    oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
-                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("d.b_authorn") || resultSet.getBoolean("d.b_link");
-                    
-                    // PDF de la OC:
-                    
-                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
-                            session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
-                    
-                    if (oLogEty != null) {
-                        SExportDataDpsFile oFile = new SExportDataDpsFile();
-                        SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
-                        oFile.filename_storage = oFd.getFileName();
-                        if (oFile.filename_storage.isEmpty()) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                        }
-                        else {
-                            oFile.filename_original = oFile.filename_storage;
-                            oFile.title = "PDF de la OC";
-                            oFile.bucket_name = oFd.getBucketName();
-                            oFile.project_id = oFd.getProjectId();
-                            oContainer.file.add(oFile);
-                        }
+                    payment.company = companyId;
+                    payment.payment_id = resultSet.getInt("p.id_pay");
+                    payment.functional_area = resultSet.getInt("p.fk_func_sub");
+                    payment.benef = resultSet.getInt("p.fk_ben");
+                    payment.series = resultSet.getString("_pay_ser");
+                    payment.number = resultSet.getString("_pay_num");
+                    payment.app_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_app"));
+                    payment.req_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_req"));
+                    Date dateScheduled = resultSet.getDate("p.dt_sched_n");
+                    payment.sched_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateScheduled);
+                    Date dateExecution = resultSet.getDate("p.dt_exec_n");
+                    payment.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
+                    payment.currency = resultSet.getString("_pay_cur_key");
+                    payment.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_cur"));
+                    //payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(resultSet.getDouble("p.pay_exc_rate_app"));
+                    payment.exchange_rate_app = SExportUtils.FormatStdExchangeRate.format(resultSet.getDouble("p.pay_exc_rate_app"));
+                    payment.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_app"));
+                    payment.exchange_rate_exec = payment.exchange_rate_app; // same value "at application"!
+                    payment.amount_loc_exec = payment.amount_loc_app; // same value "at application"!
+                    payment.payment_way = resultSet.getString("p.pay_way");
+                    payment.priority = resultSet.getInt("p.priority");
+                    payment.notes = resultSet.getString("p.nts");
+                    payment.is_receipt_payment_req = resultSet.getBoolean("p.b_rcpt_pay_req") ? 1 : 0;
+                    payment.payment_status = resultSet.getInt("p.fk_st_pay");
+                    payment.authz_authorization_id = SSwapConsts.AUTHZ_STATUS_PENDING;
 
-                        sBucketName = oFile.bucket_name;
-                        sProjectID = oFile.project_id;
+                    // paying account:
+                    BankAccount payingBankAccount = new BankAccount(resultSet, "ba_ac_b.bp", "ba_ac_b.fiscal_id", "ba_ac_b.fiscal_frg_id", "ba_ac.acc_num", "ba_ac.acc_num_std");
+                    payment.paying_bank = payingBankAccount.BankName;
+                    payment.paying_bank_fiscal_id = payingBankAccount.BankFiscalId;
+                    payment.paying_account = payingBankAccount.BankAccount;
+
+                    // beneficiary bank account:
+                    BankAccount benefBankAccount = new BankAccount(resultSet, "ba_ben_b.bp", "ba_ben_b.fiscal_id", "ba_ben_b.fiscal_frg_id", "ba_ben.acc_num", "ba_ben.acc_num_std");
+                    payment.benef_bank = benefBankAccount.BankName;
+                    payment.benef_bank_fiscal_id = benefBankAccount.BankFiscalId;
+                    payment.benef_account = benefBankAccount.BankAccount;
+
+                    payment.sched_user = null;
+                    payment.exec_user = null;
+                    payment.sched_at = null;
+                    payment.exec_at = null;
+                    payment.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
+                    //payment.created_by;
+                    //payment.updated_by;
+                    //payment.deleted_by;
+                    //payment.created_at;
+                    //payment.updated_at;
+                    //payment.deleted_at;
+                    
+                    if (((SClientInterface) session.getClient()).isDev()) {
+                        payment.user_id = 60; // slopez
                     }
                     else {
-                        sBucketName = CloudStorageManager.getBucketName();
-                        sProjectID = CloudStorageManager.getProjectID();
+                        payment.user_id = resultSet.getInt("p.fk_usr_ins"); // el creador del pago
                     }
-                    
-                    // documentos (archivos de cotizaciones)
-                    
-                    boolean withUrl = false;
-                    ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement());
-                    for (SWebDpsFile oDpsFile : lDpsFiles) {
-                        SExportDataDpsFile oDpsFileExport = new SExportDataDpsFile();
-                        oDpsFileExport.filename_storage = oDpsFile.getoWebFile().getCloudStorageName();
-                        if (oDpsFileExport.filename_storage.isEmpty()) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de COT vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                        }
-                        else {
-                            oDpsFileExport.title = "Evidencia de cotización";
-                            oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName() != null && !oDpsFile.getoWebFile().getUserFileName().isEmpty()
-                                                                ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
-                            oDpsFileExport.bucket_name = sBucketName;
-                            oDpsFileExport.project_id = sProjectID;
 
-                            oContainer.file.add(oDpsFileExport);
-                        }
+                    // payment entry:
+
+                    SExportDataPaymentEntry paymentEntry = new SExportDataPaymentEntry();
+
+                    paymentEntry.entry_type = resultSet.getString("pe.ety_tp");
+                    paymentEntry.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_cur"));
+                    paymentEntry.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_app"));
+                    paymentEntry.entry_currency = resultSet.getString("_pay_ety_cur_key");
+                    //paymentEntry.conv_rate_app = SExportUtils.FormatPayConversionRate.format(resultSet.getDouble("pe.conv_rate_app"));
+                    paymentEntry.conv_rate_app = SExportUtils.FormatStdExchangeRate.format(resultSet.getDouble("pe.conv_rate_app"));
+                    paymentEntry.entry_amount_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.des_pay_app_ety_cur"));
+                    paymentEntry.amount_loc_exec = paymentEntry.amount_loc_app; // same value "at application"!
+                    paymentEntry.conv_rate_exec = paymentEntry.conv_rate_app; // same value "at application"!
+                    paymentEntry.entry_amount_exec = paymentEntry.entry_amount_app; // same value "at application"!
+                    paymentEntry.installment = resultSet.getInt("pe.install");
+                    paymentEntry.document_bal_prev_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.doc_bal_prev_app_cur"));
+                    paymentEntry.document_bal_unpd_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.doc_bal_unpd_app_cur_r"));
+                    paymentEntry.document_bal_prev_exec = paymentEntry.document_bal_prev_app; // same value "at application"!
+                    paymentEntry.document_bal_unpd_exec = paymentEntry.document_bal_unpd_app; // same value "at application"!
+                    
+                    int externalId = resultSet.getInt("sdp.ext_data_id");
+                    
+                    if (resultSet.wasNull() || paymentEntry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_ADVANCE)) {
+                        paymentEntry.document_id_n = null;
+                        paymentEntry.document_uuid = null;
+                        paymentEntry.document_folio = null;
+                        paymentEntry.document_date = null;
+                        paymentEntry.document_currency = null;
+                        paymentEntry.document_amount = null;
                     }
-                    
-                    // documentos (archivos de requisiciones)
-                    
-                    String rms = resultSet.getString("_rms");
-                    String fileName;
-                    String[] idsRms;
-                    SExportDataDpsFile oRmFile;
-                    if (rms != null && !rms.isEmpty()) {
-                        idsRms = rms.split(",");
-                        for (String sId : idsRms) {
-                            fileName = database + "-" + "REQ" + "-" + sId + ".pdf";
-                            if (CloudStorageManager.storagedFileExists(fileName)) {
-                                oRmFile = new SExportDataDpsFile();
-                                oRmFile.filename_storage = fileName;
-                                if (oRmFile.filename_storage.isEmpty()) {
-                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de RM vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                                }
-                                else {
-                                    oRmFile.filename_original = oRmFile.filename_storage;
-                                    oRmFile.title = "PDF de la requisición";
-                                    oRmFile.bucket_name = sBucketName;
-                                    oRmFile.project_id = sProjectID;
-
-                                    oContainer.file.add(oRmFile);
-                                }
+                    else {
+                        String uuid = resultSet.getString("_cfd_uuid");
+                        
+                        if (resultSet.wasNull() || uuid.isEmpty()) {
+                            uuid = resultSet.getString("sdp.ext_data_uuid");
+                            
+                            if (resultSet.wasNull()) {
+                                uuid = "";
                             }
                         }
+                        
+                        paymentEntry.document_id_n = externalId;
+                        paymentEntry.document_uuid = uuid;
+                        paymentEntry.document_folio = resultSet.getString("_dps_folio");
+                        paymentEntry.document_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("_dps_dt"));
+                        paymentEntry.document_currency = resultSet.getString("_dps_cur_key");
+                        paymentEntry.document_amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("d.tot_cur_r"));
                     }
-                   
-                    oContainer.document = oDpsExport;
                     
-                    lDps.add(oContainer);
+                    SRequestPaymentsBody.Payment data = new SRequestPaymentsBody.Payment();
+                    
+                    data.payment = payment;
+                    data.entries = new SExportDataPaymentEntry[] { paymentEntry };
+                    data.files = new SExportDataFile[] { };
+
+                    payments.add(data);
                 }
             }
         }
 
-        return lDps;
+        return payments;
+    }
+
+    /**
+     * Consulta los pagos de compras por actualizar de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de pagos de compras por actualizar exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfPurchasePaymentUpdatesToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> payments = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            for (Integer companyId : databasesMap.keySet()) {
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONVERT(p.id_pay, CHAR)";
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_AUTH, database);
+                
+                String sql = "SELECT "
+                        // payment:
+                        + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
+                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
+                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, p.fk_usr_ins, "
+                        // payment entry:
+                        + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
+                        + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
+                        // bank accounts:
+                        + "ba_ac.acc_num, ba_ac.acc_num_std, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
+                        + "ba_ben.acc_num, ba_ben.acc_num_std, ba_ben_b.bp, ba_ben_b.fiscal_id, ba_ben_b.fiscal_frg_id, "
+                        // SWAP data processing:
+                        + "sdp.ext_data_id, sdp.ext_data_uuid, sdp.b_dps_pay_loc, "
+                        // DPS:
+                        + "d.id_year, d.id_doc, d.num_ser AS _dps_ser, d.num AS _dps_num, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps_folio, d.dt AS _dps_dt, "
+                        + "d.tot_cur_r, d.fid_cur AS _dps_cur_id, cd.cur_key AS _dps_cur_key, "
+                        // CFD:
+                        + "cfd.uuid AS _cfd_uuid, cfd.fid_tp_cfd, cfd.fid_tp_xml, cfd.fid_st_xml "
+                        + "FROM  "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cp ON cp.id_cur = p.fk_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS pe ON pe.id_pay = p.id_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cpe ON cpe.id_cur = pe.fk_ety_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS ac ON ac.id_cob = p.fk_pay_cash_cob_n AND ac.id_acc_cash = p.fk_pay_cash_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ac ON ba_ac.id_bpb = ac.fid_bpb_n AND ba_ac.id_bank_acc = ac.fid_bank_acc_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ac_b ON ba_ac_b.id_bp = ba_ac.fid_bank "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ben ON ba_ben.id_bpb = p.fk_ben_bank_cob_n AND ba_ben.id_bank_acc = p.fk_ben_bank_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ben_b ON ba_ben_b.id_bp = ba_ben.fid_bank "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fk_dps_year_n = pe.fk_doc_year_n AND sdp.fk_dps_doc_n = pe.fk_doc_doc_n AND NOT sdp.b_del "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = pe.fk_doc_year_n AND d.id_doc = pe.fk_doc_doc_n AND NOT d.b_del "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
+                        + "WHERE ("
+                        + "((NOT p.b_del AND p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_REJ_P + ", " + SModSysConsts.FINS_ST_PAY_SCHED_P + ")) "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + ") AND "
+                        + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                        + ") "
+                        + " "
+                        + "ORDER BY "
+                        + "p.ser, p.num, p.id_pay;";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    // payment:
+                    
+                    SExportDataPaymentUpdate paymentUpdate = new SExportDataPaymentUpdate();
+
+                    paymentUpdate.company = companyId;
+                    paymentUpdate.payment_id = resultSet.getInt("p.id_pay");
+                    paymentUpdate.req_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_req"));
+                    /*
+                    Date dateScheduled = resultSet.getDate("p.dt_sched_n");
+                    paymentUpdate.sched_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateScheduled);
+                    Date dateExecution = resultSet.getDate("p.dt_exec_n");
+                    paymentUpdate.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
+                    //paymentUpdate.exchange_rate_exec = ...
+                    //paymentUpdate.amount_loc_exec = ...
+                    //paymentUpdate.payment_way = resultSet.getString("p.pay_way");
+                    //paymentUpdate.notes = resultSet.getString("p.nts");
+                    */
+                    paymentUpdate.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
+                    
+                    int newStatusPaymentId = 0;
+                    
+                    switch (resultSet.getInt("p.fk_st_pay")) {
+                        case SModSysConsts.FINS_ST_PAY_REJ_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_REJ;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SCHED;
+                            break;
+                        default:
+                            // nothing
+                    }
+                    
+                    if (newStatusPaymentId != 0) {
+                        paymentUpdate.payment_status = newStatusPaymentId;
+                    }
+
+                    /*
+                    // paying account:
+                    BankAccount payingBankAccount = new BankAccount(resultSet, "ba_ac_b.bp", "ba_ac_b.fiscal_id", "ba_ac_b.fiscal_frg_id", "ba_ac.acc_num", "ba_ac.acc_num_std");
+                    paymentUpdate.paying_bank = payingBankAccount.BankName;
+                    paymentUpdate.paying_bank_fiscal_id = payingBankAccount.BankFiscalId;
+                    paymentUpdate.paying_account = payingBankAccount.BankAccount;
+
+                    // beneficiary bank account:
+                    BankAccount benefBankAccount = new BankAccount(resultSet, "ba_ben_b.bp", "ba_ben_b.fiscal_id", "ba_ben_b.fiscal_frg_id", "ba_ben.acc_num", "ba_ben.acc_num_std");
+                    paymentUpdate.benef_bank = benefBankAccount.BankName;
+                    paymentUpdate.benef_bank_fiscal_id = benefBankAccount.BankFiscalId;
+                    paymentUpdate.benef_account = benefBankAccount.BankAccount;
+
+                    paymentUpdate.sched_user = null;
+                    paymentUpdate.exec_user = null;
+                    paymentUpdate.sched_at = null;
+                    paymentUpdate.exec_at = null;
+                    */
+                    
+                    payments.add(paymentUpdate);
+                }
+            }
+        }
+
+        return payments;
     }
 
     /**
@@ -1525,6 +1851,10 @@ public abstract class SExportDataUtils {
                 data = getListOfFunctionalAreasToExport(session);
                 break;
                 
+            case PUR_ORDER:
+                data = getListOfPurchaseOrdersToExport(session);
+                break;
+                
             case PUR_REF_ORDER:
                 if (((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfPurchaseOrderRefsToExportAeth(session);
@@ -1534,12 +1864,16 @@ public abstract class SExportDataUtils {
                 }
                 break;
                 
-            case PUR_ORDER:
-                data = getListOfDpsToExport(session);
+            case PUR_PAYMENT:
+                data = getListOfPurchasePaymentsToExport(session);
+                break;
+                
+            case PUR_PAYMENT_AUTH:
+                data = getListOfPurchasePaymentUpdatesToExport(session);
                 break;
                 
             default:
-                throw new IllegalArgumentException(SExportUtils.ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
         
         return data;
@@ -1576,6 +1910,16 @@ public abstract class SExportDataUtils {
         return user;
     }
     
+    /**
+     * 
+     * @param statement
+     * @param companyId
+     * @param resourceType
+     * @param resourceId
+     * @param authStatusId
+     * @param userId
+     * @return 
+     */
     public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, final int userId) {
         SResourceStatusResponse oResponse;
         
@@ -1622,5 +1966,35 @@ public abstract class SExportDataUtils {
         }
 
         return oResponse;
+    }
+    
+    public static class BankAccount {
+        
+        public String BankName;
+        public String BankFiscalId;
+        public String BankAccount;
+        
+        public BankAccount(final ResultSet resultSet, final String colName, final String colFiscalId, final String colFiscalFrgId, final String colAccount, final String colAccountStd) throws SQLException {
+            BankName = resultSet.getString(colName);
+            BankFiscalId = "";
+            BankAccount = "";
+
+            if (resultSet.wasNull()) {
+                BankName = "";
+            }
+            else {
+                // note that remaining data cannot be null:
+                
+                BankFiscalId = resultSet.getString(colFiscalFrgId); // check first foreign fiscal ID
+                if (BankFiscalId.isEmpty()) {
+                    BankFiscalId = resultSet.getString(colFiscalId);
+                }
+                
+                BankAccount = resultSet.getString(colAccountStd); // check first standard account number (ClaBE)
+                if (BankAccount.isEmpty()) {
+                    BankAccount = resultSet.getString(colAccount);
+                }
+            }
+        }
     }
 }

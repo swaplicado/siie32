@@ -7,12 +7,15 @@ package erp.mod.fin.db;
 
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
@@ -28,6 +31,8 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
+    public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
+    
     protected int mnPkPaymentId;
     protected String msSeries;
     protected int mnNumber;
@@ -56,14 +61,14 @@ public class SDbPayment extends SDbRegistryUser {
     protected int mnFkPayerCashAccountingCashId_n;
     protected int mnFkBeneficiaryBankBizParterBranchId_n;
     protected int mnFkBeneficiaryBankAccountCashId_n;
-    protected int mnFkUserScheduledId;
-    protected int mnFkUserExecutedId;
+    protected int mnFkUserScheduleId;
+    protected int mnFkUserExecutiondId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     */
-    protected Date mtTsUserScheduledId;
-    protected Date mtTsUserExecuted;
+    protected Date mtTsUserSchedule;
+    protected Date mtTsUserExecution;
     /*
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
@@ -76,7 +81,14 @@ public class SDbPayment extends SDbRegistryUser {
     protected String msDbmsStatus;
     protected SDataCurrency moDbmsCurrency;
     
+    protected Date mtOldDateSchedule_n;
+    protected Date mtOldDateExecution_n;
+    protected int mnOldFkUserScheduleId;
+    protected int mnOldFkUserExecutiondId;
+    
     protected boolean mbAuxReloadEntries;
+    
+    protected double mnAuxOriginalAmount;
     
     public SDbPayment() {
         super(SModConsts.FIN_PAY);
@@ -92,6 +104,20 @@ public class SDbPayment extends SDbRegistryUser {
                 mnNumber = resultSet.getInt(1);
             }
         }
+    }
+    
+    private boolean hasChangedSchedule() {
+        return mnFkUserScheduleId != mnOldFkUserScheduleId ||
+                (mtDateSchedule_n == null && mtOldDateSchedule_n != null) ||
+                (mtDateSchedule_n != null && mtOldDateSchedule_n == null) ||
+                (mtDateSchedule_n != null && mtOldDateSchedule_n != null && !SLibTimeUtils.isSameDate(mtDateSchedule_n, mtOldDateSchedule_n));
+    }
+    
+    private boolean hasChangedExecution() {
+        return mnFkUserExecutiondId != mnOldFkUserExecutiondId ||
+                (mtDateExecution_n == null && mtOldDateExecution_n != null) ||
+                (mtDateExecution_n != null && mtOldDateExecution_n == null) ||
+                (mtDateExecution_n != null && mtOldDateExecution_n != null && !SLibTimeUtils.isSameDate(mtDateExecution_n, mtOldDateExecution_n));
     }
     
     public void setPkPaymentId(int n) { mnPkPaymentId = n; }
@@ -122,12 +148,12 @@ public class SDbPayment extends SDbRegistryUser {
     public void setFkPayerCashAccountingCashId_n(int n) { mnFkPayerCashAccountingCashId_n = n; }
     public void setFkBeneficiaryBankBizParterBranchId_n(int n) { mnFkBeneficiaryBankBizParterBranchId_n = n; }
     public void setFkBeneficiaryBankAccountCashId_n(int n) { mnFkBeneficiaryBankAccountCashId_n = n; }
-    public void setFkUserScheduledId(int n) { mnFkUserScheduledId = n; }
-    public void setFkUserExecutedId(int n) { mnFkUserExecutedId = n; }
+    public void setFkUserScheduleId(int n) { mnFkUserScheduleId = n; }
+    public void setFkUserExecutiondId(int n) { mnFkUserExecutiondId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
-    public void setTsUserScheduledId(Date t) { mtTsUserScheduledId = t; }
-    public void setTsUserExecuted(Date t) { mtTsUserExecuted = t; }
+    public void setTsUserSchedule(Date t) { mtTsUserSchedule = t; }
+    public void setTsUserExecution(Date t) { mtTsUserExecution = t; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
@@ -159,12 +185,12 @@ public class SDbPayment extends SDbRegistryUser {
     public int getFkPayerCashAccountingCashId_n() { return mnFkPayerCashAccountingCashId_n; }
     public int getFkBeneficiaryBankBizParterBranchId_n() { return mnFkBeneficiaryBankBizParterBranchId_n; }
     public int getFkBeneficiaryBankAccountCashId_n() { return mnFkBeneficiaryBankAccountCashId_n; }
-    public int getFkUserScheduledId() { return mnFkUserScheduledId; }
-    public int getFkUserExecutedId() { return mnFkUserExecutedId; }
+    public int getFkUserScheduleId() { return mnFkUserScheduleId; }
+    public int getFkUserExecutiondId() { return mnFkUserExecutiondId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
-    public Date getTsUserScheduledId() { return mtTsUserScheduledId; }
-    public Date getTsUserExecuted() { return mtTsUserExecuted; }
+    public Date getTsUserSchedule() { return mtTsUserSchedule; }
+    public Date getTsUserExecution() { return mtTsUserExecution; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
@@ -178,9 +204,21 @@ public class SDbPayment extends SDbRegistryUser {
     public String getDbmsStatus() { return msDbmsStatus; }
     public SDataCurrency getDbmsCurrency() { return moDbmsCurrency; }
     
+    public void setOldDateSchedule_n(Date t) { mtOldDateSchedule_n = t; }
+    public void setOldDateExecution_n(Date t) { mtOldDateExecution_n = t; }
+    public void setOldFkUserScheduleId(int n) { mnOldFkUserScheduleId = n; }
+    public void setOldFkUserExecutiondId(int n) { mnOldFkUserExecutiondId = n; }
+    
+    public Date getOldDateSchedule_n() { return mtOldDateSchedule_n; }
+    public Date getOldDateExecution_n() { return mtOldDateExecution_n; }
+    public int getOldFkUserScheduleId() { return mnOldFkUserScheduleId; }
+    public int getOldFkUserExecutiondId() { return mnOldFkUserExecutiondId; }
+    
     public void setAuxReloadEntries(boolean b) { mbAuxReloadEntries = b; }
+    public void setAuxOriginalAmount(double d) { mnAuxOriginalAmount = d; }
     
     public boolean getAuxReloadEntries() { return mbAuxReloadEntries; }
+    public double getAuxOriginalAmount() { return mnAuxOriginalAmount; }
     
     public String getFolio() {
         return msSeries + (msSeries.isEmpty() ? "" : "-") + mnNumber;
@@ -194,7 +232,9 @@ public class SDbPayment extends SDbRegistryUser {
     
     public void updatePaymentStatus(SGuiSession session, int status) throws Exception {
         msSql = "UPDATE " + getSqlTable() + " SET " +
-                "fk_st_pay = " + status + " " + 
+                "fk_st_pay = " + status + ", " + 
+                "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
+                "ts_usr_upd = NOW() ";
                 getSqlWhere();
         session.getStatement().execute(msSql);
     }
@@ -241,22 +281,29 @@ public class SDbPayment extends SDbRegistryUser {
         mnFkPayerCashAccountingCashId_n = 0;
         mnFkBeneficiaryBankBizParterBranchId_n = 0;
         mnFkBeneficiaryBankAccountCashId_n = 0;
-        mnFkUserScheduledId = 0;
-        mnFkUserExecutedId = 0;
+        mnFkUserScheduleId = 0;
+        mnFkUserExecutiondId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
-        mtTsUserScheduledId = null;
-        mtTsUserExecuted = null;
+        mtTsUserSchedule = null;
+        mtTsUserExecution = null;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
         maChildEntries = new ArrayList<>();
         maFiles = new ArrayList<>();
         maFilesDeleted = new ArrayList<>();
+        
         msDbmsStatus = "";
         moDbmsCurrency = null;
         
+        mtOldDateSchedule_n = null;
+        mtOldDateExecution_n = null;
+        mnOldFkUserScheduleId = 0;
+        mnOldFkUserExecutiondId = 0;
+        
         mbAuxReloadEntries = false;
+        mnAuxOriginalAmount = 0;        
     }
 
     @Override
@@ -333,14 +380,19 @@ public class SDbPayment extends SDbRegistryUser {
             mnFkPayerCashAccountingCashId_n = resultSet.getInt("fk_pay_cash_acc_cash_n");
             mnFkBeneficiaryBankBizParterBranchId_n = resultSet.getInt("fk_ben_bank_cob_n");
             mnFkBeneficiaryBankAccountCashId_n = resultSet.getInt("fk_ben_bank_acc_cash_n");
-            mnFkUserScheduledId = resultSet.getInt("fk_usr_sched");
-            mnFkUserExecutedId = resultSet.getInt("fk_usr_exec");
+            mnFkUserScheduleId = resultSet.getInt("fk_usr_sched");
+            mnFkUserExecutiondId = resultSet.getInt("fk_usr_exec");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
-            mtTsUserScheduledId = resultSet.getTimestamp("ts_usr_sched");
-            mtTsUserExecuted = resultSet.getTimestamp("ts_usr_exec");
+            mtTsUserSchedule = resultSet.getTimestamp("ts_usr_sched");
+            mtTsUserExecution = resultSet.getTimestamp("ts_usr_exec");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+            
+            mtOldDateSchedule_n = mtDateSchedule_n;
+            mtOldDateExecution_n = mtDateExecution_n;
+            mnOldFkUserScheduleId = mnFkUserScheduleId;
+            mnOldFkUserExecutiondId = mnFkUserExecutiondId;
             
             // Read aswell document entries:
             
@@ -393,8 +445,8 @@ public class SDbPayment extends SDbRegistryUser {
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
-            mnFkUserScheduledId = SUtilConsts.USR_NA_ID;
-            mnFkUserExecutedId = SUtilConsts.USR_NA_ID;
+            mnFkUserScheduleId = SUtilConsts.USR_NA_ID;
+            mnFkUserExecutiondId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkPaymentId + ", " + 
@@ -425,8 +477,8 @@ public class SDbPayment extends SDbRegistryUser {
                     (mnFkPayerCashAccountingCashId_n == 0 ? "NULL, " : mnFkPayerCashAccountingCashId_n + ", ") + 
                     (mnFkBeneficiaryBankBizParterBranchId_n == 0 ? "NULL, " : mnFkBeneficiaryBankBizParterBranchId_n + ", ") + 
                     (mnFkBeneficiaryBankAccountCashId_n == 0 ? "NULL, " : mnFkBeneficiaryBankAccountCashId_n + ", ") + 
-                    mnFkUserScheduledId + ", " + 
-                    mnFkUserExecutedId + ", " + 
+                    mnFkUserScheduleId + ", " + 
+                    mnFkUserExecutiondId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -467,12 +519,12 @@ public class SDbPayment extends SDbRegistryUser {
                     "fk_pay_cash_acc_cash_n = " + (mnFkPayerCashAccountingCashId_n == 0 ? "NULL, " : mnFkPayerCashAccountingCashId_n + ", ") +
                     "fk_ben_bank_cob_n = " + (mnFkBeneficiaryBankBizParterBranchId_n == 0 ? "NULL, " : mnFkBeneficiaryBankBizParterBranchId_n + ", ") +
                     "fk_ben_bank_acc_cash_n = " + (mnFkBeneficiaryBankAccountCashId_n == 0 ? "NULL, " : mnFkBeneficiaryBankAccountCashId_n + ", ") +
-                    "fk_usr_sched = " + mnFkUserScheduledId + ", " +
-                    "fk_usr_exec = " + mnFkUserExecutedId + ", " +
+                    "fk_usr_sched = " + mnFkUserScheduleId + ", " +
+                    "fk_usr_exec = " + mnFkUserExecutiondId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    "ts_usr_sched = " + "NOW()" + ", " +
-                    "ts_usr_exec = " + "NOW()" + ", " +
+                    (hasChangedSchedule() ? "ts_usr_sched = NOW(), " : "") +
+                    (hasChangedExecution()? "ts_usr_exec = NOW(), " : "") +
                     //"ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
@@ -481,9 +533,9 @@ public class SDbPayment extends SDbRegistryUser {
         session.getStatement().execute(msSql);
         
         if (mbRegistryNew || mbAuxReloadEntries) {
-            msSql = "DELETE " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " " + 
-                    "WHERE id_pay = " + mnPkPaymentId + " ";
+            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " " + 
+                    getSqlWhere();
+            
             session.getStatement().execute(msSql);
             
             for (SDbPaymentEntry entry : maChildEntries) {
@@ -505,7 +557,58 @@ public class SDbPayment extends SDbRegistryUser {
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
+    
+    @Override
+    public void saveField(final Statement statement, final int[] pk, final int field, final Object value) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+        
+        int newStatusPaymentId = 0;
+        int userId = 0;
+        String database = "";
+        
+        if (value instanceof Object[]) {
+            newStatusPaymentId = (Integer) ((Object[]) value)[0];
+            userId = (Integer) ((Object[]) value)[1];
+            database = (String) ((Object[]) value)[2];
+            
+            switch (newStatusPaymentId) {
+                case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
+                case SModSysConsts.FINS_ST_PAY_REJ:
+                //case SModSysConsts.FINS_ST_PAY_SCHED: // change to scheduled with updateStatusToScheduled()
+                //case SModSysConsts.FINS_ST_PAY_EXEC: // change to executed with updateStatusToExecuted()
+                case SModSysConsts.FINS_ST_PAY_SUBR:
+                case SModSysConsts.FINS_ST_PAY_RCPT:
+                case SModSysConsts.FINS_ST_PAY_CAN:
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Nuevo estatus '" + newStatusPaymentId + "'.)");
+            }
+        }
+        else {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Argumento 'value'.)");
+        }
 
+        msSql = "UPDATE " + (!database.isEmpty() ? database + "." : "") + getSqlTable() + " SET ";
+        
+        switch (field) {
+            case FIELD_STATUS_PAYMENT:
+                msSql += "fk_st_pay = " + newStatusPaymentId + ", ";
+                msSql += "fk_usr_upd = " + userId + ", ";
+                msSql += "ts_usr_upd = NOW() ";
+                break;
+                
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Dato a actualizar '" + field + "'.)");
+        }
+
+        msSql += getSqlWhere(pk);
+        statement.execute(msSql);
+        
+        mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
     @Override
     public SDbPayment clone() throws CloneNotSupportedException {
         SDbPayment registry = new SDbPayment();
@@ -538,12 +641,12 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setFkPayerCashAccountingCashId_n(this.getFkPayerCashAccountingCashId_n());
         registry.setFkBeneficiaryBankBizParterBranchId_n(this.getFkBeneficiaryBankBizParterBranchId_n());
         registry.setFkBeneficiaryBankAccountCashId_n(this.getFkBeneficiaryBankAccountCashId_n());
-        registry.setFkUserScheduledId(this.getFkUserScheduledId());
-        registry.setFkUserExecutedId(this.getFkUserExecutedId());
+        registry.setFkUserScheduleId(this.getFkUserScheduleId());
+        registry.setFkUserExecutiondId(this.getFkUserExecutiondId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
-        registry.setTsUserScheduledId(this.getTsUserScheduledId());
-        registry.setTsUserExecuted(this.getTsUserExecuted());
+        registry.setTsUserSchedule(this.getTsUserSchedule());
+        registry.setTsUserExecution(this.getTsUserExecution());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
@@ -562,10 +665,66 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setDbmsStatus(this.getDbmsStatus());
         registry.setDbmsCurrency(this.getDbmsCurrency());
         
+        registry.setOldDateSchedule_n(this.getOldDateSchedule_n());
+        registry.setOldDateExecution_n(this.getOldDateExecution_n());
+        registry.setOldFkUserScheduleId(this.getOldFkUserScheduleId());
+        registry.setOldFkUserExecutiondId(this.getOldFkUserExecutiondId());
+        
         registry.setAuxReloadEntries(this.getAuxReloadEntries());
         
         registry.setRegistryNew(this.isRegistryNew());
 
         return registry;
+    }
+    
+    /**
+     * Check if payment exists.
+     * @param statement DB statement.
+     * @param database DB name. Can be blank for current DB in statement.
+     * @param paymentId Payment ID.
+     * @return
+     * @throws Exception 
+     */
+    public static boolean checkPaymentExists(final Statement statement, final String database, final int paymentId) throws Exception {
+        boolean exists = false;
+        
+        String sql = "SELECT COUNT(*) "
+                + "FROM " + (!database.isEmpty() ? database + "." : "") + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " "
+                + "WHERE id_pay = " + paymentId + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                exists = resultSet.getBoolean(1);
+            }
+        }
+        
+        return exists;
+    }
+    
+    /**
+     * Update status of payment to schedule.
+     * @param statement DB statement.
+     * @param database DB name. Can be blank for current DB in statement.
+     * @param paymentId Payment ID.
+     * @param dateScheduled Date scheduled. Can be <code>null</code> for original required date.
+     * @param userId User ID.
+     * @throws Exception 
+     */
+    public static void updateStatusSchedule(final Statement statement, final String database, final int paymentId, final Date dateScheduled, final int userId) throws Exception {
+        if (!checkPaymentExists(statement, null, paymentId)) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n(Pago ID " + paymentId + (!database.isEmpty() ? "; en BD '" + database + "'" : "") +".)");
+        }
+        else {
+            String sql = "UPDATE " + (!database.isEmpty() ? database + "." : "") + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " SET "
+                    + "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + ", "
+                    + "dt_sched_n = " + (dateScheduled != null ? "'" + SLibUtils.DbmsDateFormatDate.format(dateScheduled) + "'": "dt_req") + ", "
+                    + "fk_usr_sched = " + userId + ", "
+                    + "ts_usr_sched = NOW(), "
+                    + "fk_usr_upd = " + userId + ", "
+                    + "ts_usr_upd = NOW() "
+                    + "WHERE id_pay = " + paymentId + ";";
+
+            statement.execute(sql);
+        }
     }
 }

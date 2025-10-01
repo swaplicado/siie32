@@ -18,9 +18,9 @@ import erp.lib.table.STableSetting;
 import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.hrs.db.SDbEmployee;
@@ -639,7 +639,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, true);
                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
             }
             catch (Exception e) {

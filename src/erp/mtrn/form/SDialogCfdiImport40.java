@@ -69,7 +69,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
     
@@ -116,6 +116,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         moPurchaseOrder = purchaseOrder;
         mbWithPurchaseOrder = moPurchaseOrder != null;
         moCfdiFile = cfdi;
+        
         initComponents();
         initComponentsExtra();
     }

@@ -5,8 +5,6 @@
  */
 package erp.mod.cfg.swap.utils;
 
-import java.util.ArrayList;
-
 /**
  * Clase contenedora para exportar datos masivos de referencias de transacciones en formato JSON.
  * Utilizada como estructura principal para enviar múltiples referencias de transacciones y las instancias de SWAP Services.

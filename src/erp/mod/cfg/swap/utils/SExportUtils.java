@@ -12,6 +12,7 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComSyncLog;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbSyncLog;
@@ -21,6 +22,7 @@ import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.fin.db.SDbPayment;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -58,7 +60,17 @@ public abstract class SExportUtils {
     public static final DecimalFormat FormatSyncLogId = new DecimalFormat("000000"); // 6 positions
     public static final SimpleDateFormat FormatSyncLogDatetime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
     
-    public static final String ERR_UNKNOWN_SYNC_TYPE = "Tipo de sincronización no soportado: ";
+    public static final int DECS_STD_AMOUNT = 2;
+    public static final int DECS_STD_EXC_RATE = 4;
+    public static final int DECS_PAY_EXC_RATE = 4;
+    public static final int DECS_PAY_CONV_RATE = 8;
+    
+    public static final DecimalFormat FormatStdAmount = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_AMOUNT));
+    public static final DecimalFormat FormatStdExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_EXC_RATE));
+    public static final DecimalFormat FormatPayExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_EXC_RATE));
+    public static final DecimalFormat FormatPayConversionRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_CONV_RATE));
+    
+    public static final String ERR_UNSUPPORTED_SYNC_TYPE = "Tipo de sincronización no soportado: ";
     
     private static final int SEC_PSWD_LEN = 10;
     
@@ -90,6 +102,7 @@ public abstract class SExportUtils {
      * @param body Cuerpo de la solicitud (para métodos como POST).
      * @param token Token de autorización (opcional).
      * @param apiKey API Key de autorización (opcional).
+     * @param timeout Timeout en segundos.
      * @return Respuesta del servicio en formato JSON.
      * @throws Exception
      */
@@ -206,6 +219,7 @@ public abstract class SExportUtils {
      */
     private static ArrayList<SDbSyncLogEntry> createSyncLogEntries(final SGuiSession session, final SSyncType syncType, final JsonNode responseJson) throws Exception {
         ArrayList<SDbSyncLogEntry> entries = new ArrayList<>();
+        HashMap<Integer, String> databasesMap;
         
         if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
             JsonNode results = responseJson.path("results");
@@ -284,8 +298,6 @@ public abstract class SExportUtils {
                         break;
                         
                     case AUTH_JOB_TITLE:
-                    case AUTH_DEPARTMENT:
-                    case AUTH_FUNCTIONAL_AREA:
                         for (JsonNode result : results) {
                             boolean entriesFound = false;
                             
@@ -313,7 +325,7 @@ public abstract class SExportUtils {
 
                     case FUNCTIONAL_AREA:
                     case PUR_REF_ORDER:
-                        HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
+                        databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         for (JsonNode result : results) {
                             boolean entriesFound = false;
@@ -342,23 +354,45 @@ public abstract class SExportUtils {
                         break;
                         
                     case PUR_ORDER:
+                    case PUR_PAYMENT:
+                    case PUR_PAYMENT_AUTH:
+                        String attributeId = "";
+                        databasesMap = getSwapCompaniesDatabasesMap(session);
+                        
+                        if (syncType == SSyncType.PUR_ORDER) {
+                            attributeId = "document_id"; 
+                        }
+                        else {
+                            attributeId = "payment_id";
+                        }
+                        
                         for (JsonNode result : results) {
                             boolean entriesFound = false;
 
-                            if (result.has("document_id")) {
-                                JsonNode documentId = result.path("document_id");
+                            if (result.has(attributeId)) {
+                                JsonNode referenceId = result.path(attributeId);
                                 
                                 SDbComSyncLogEntry entry = new SDbComSyncLogEntry();
                                 entry.setResponseCode(result.path("status_code").asText());
-                                if (Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_OK && 
-                                    Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_CREATED) {
-                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()) +
-                                            SJsonUtils.sanitizeJson(result.path("error").toPrettyString()));
+                                
+                                if (Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_OK && Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_CREATED) {
+                                    entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()) + (result.has("error") ? " " + SJsonUtils.sanitizeJson(result.path("error").toPrettyString()) : ""));
                                 }
                                 else {
                                     entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
                                 }
-                                entry.setReferenceId(documentId.asText());
+                                
+                                int companyId;
+                                
+                                if (result.has("company_id")) {
+                                    companyId = result.path("company_id").asInt();
+                                }
+                                else {
+                                    companyId = session.getConfigCompany().getCompanyId();
+                                }
+                                
+                                entry.setAuxDatabase(databasesMap.get(companyId));
+                                entry.setReferenceId(referenceId.asText());
                                 entries.add(entry);
 
                                 entriesFound = true;
@@ -371,7 +405,7 @@ public abstract class SExportUtils {
                         break;
 
                     default:
-                        throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                        throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                 }
             }
         }
@@ -402,6 +436,7 @@ public abstract class SExportUtils {
      * @param responseBody Cuerpo de la respuesta (compactado).
      * @param responseDatetime Fecha-hora de la respuesta en el dispositivo cliente.
      * @param syncLogEntries Lista de entradas de log generadas.
+     * @return Number of entries logged.
      * @throws SQLException Si ocurre un error en las actualizaciones.
      */
     protected static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
@@ -427,20 +462,20 @@ public abstract class SExportUtils {
                         case PARTNER_CUSTOMER:
                         case AUTH_ACTOR:
                         case AUTH_JOB_TITLE:
-                        case AUTH_DEPARTMENT:
-                        case AUTH_FUNCTIONAL_AREA:
                             log = new SDbSyncLog();
                             break;
 
                         case FUNCTIONAL_AREA:
-                        case PUR_REF_ORDER:
-                        case PUR_ORDER_FILE:
                         case PUR_ORDER:
+                        case PUR_ORDER_FILE:
+                        case PUR_REF_ORDER:
+                        case PUR_PAYMENT:
+                        case PUR_PAYMENT_AUTH:
                             log = new SDbComSyncLog();
                             break;
 
                         default:
-                            throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                            throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                     }
 
                     log.setSyncType(syncType.toString());
@@ -467,6 +502,7 @@ public abstract class SExportUtils {
                     }
 
                     boolean fileNamesAlreadySet = false;
+                    
                     for (String database : syncLogEntriesPerDatabaseMap.keySet()) {
                         SDbSyncLog log;
 
@@ -476,27 +512,42 @@ public abstract class SExportUtils {
                             case PARTNER_CUSTOMER:
                             case AUTH_ACTOR:
                             case AUTH_JOB_TITLE:
-                            case AUTH_DEPARTMENT:
-                            case AUTH_FUNCTIONAL_AREA:
                                 log = new SDbSyncLog();
                                 break;
 
                             case FUNCTIONAL_AREA:
-                            case PUR_REF_ORDER:
-                            case PUR_ORDER_FILE:
                             case PUR_ORDER:
+                            case PUR_ORDER_FILE:
+                            case PUR_REF_ORDER:
+                            case PUR_PAYMENT:
+                            case PUR_PAYMENT_AUTH:
                                 log = new SDbComSyncLog();
                                 break;
 
                             default:
-                                throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                                throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
+                        }
+                        
+                        // complete processing before log sync:
+                        
+                        ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
+                        
+                        if (syncType == SSyncType.PUR_PAYMENT) {
+                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
+                            complementProcessing(session, syncType, entries, value);
+                        }
+                        else if (syncType == SSyncType.PUR_PAYMENT_AUTH) {
+                            //Object value = ...
+                            //complementProcessing(session, syncType, entries, value);
                         }
 
+                        // log sync:
+                        
                         log.setSyncType(syncType.toString());
                         log.setRequestTimestamp(requestDatetime);
                         log.setResponseCode("" + httpResponseStatusCode);
                         log.setResponseTimestamp(responseDatetime);
-                        log.getEntries().addAll(syncLogEntriesPerDatabaseMap.get(database));
+                        log.getEntries().addAll(entries);
                         log.setAuxDatabase(database);
                         log.save(session);
                         
@@ -561,14 +612,14 @@ public abstract class SExportUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_DEPARTMENT:
-            case AUTH_FUNCTIONAL_AREA:
                 SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, "");
                 break;
 
             case FUNCTIONAL_AREA:
-            case PUR_REF_ORDER:
             case PUR_ORDER:
+            case PUR_ORDER_FILE:
+            case PUR_REF_ORDER:
+            case PUR_PAYMENT:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -577,7 +628,34 @@ public abstract class SExportUtils {
                 break;
 
             default:
-                throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
+        }
+    }
+    
+    /**
+     * Complementar el procesamiento de las partidas de la bitácora de sincronización, si el tipo de sincronización lo requiere.
+     * 
+     * @param session Sesión de usuario.
+     * @param syncType Tipo de sincronización.
+     * @param entries Partidas de la bitácora de sincronización a procesar.
+     * @param value Nuevo valor para complementar el procesamiento de las partidas.
+     * @throws SQLException Si ocurre un error en las actualizaciones.
+     * @throws Exception 
+     */
+    public static void complementProcessing(final SGuiSession session, final SSyncType syncType, ArrayList<SDbSyncLogEntry> entries, Object value) throws SQLException, Exception {
+        switch (syncType) {
+            case PUR_PAYMENT:
+                // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
+                
+                SDbPayment payment = new SDbPayment();
+                
+                for (SDbSyncLogEntry entry : entries) {
+                    payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, value);
+                }
+                break;
+                
+            default:
+                throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
     }
     
@@ -640,7 +718,40 @@ public abstract class SExportUtils {
         String cfgParamKey = "";
         String jsonBaseKey = "";
         String jsonConfigKey = "";
+        String testHost = "";
+        String testApyKey = "";
+        
+        if (((SClientInterface) session.getClient()).isDev()) {
+            // hosts para pruebas:
+            
+            switch (syncType) {
+                case USER:
+                case PARTNER_SUPPLIER:
+                case PARTNER_CUSTOMER:
+                case FUNCTIONAL_AREA:
+                    testHost = "https://api-usuarios-test-515680676790.europe-west1.run.app";
+                    break;
 
+                case PUR_ORDER:
+                case PUR_REF_ORDER:
+                    testHost = "https://transaction-backend-test-515680676790.europe-west1.run.app";
+                    break;
+                    
+                case PUR_PAYMENT:
+                    testHost = "http://192.168.7.43:8003"; // today host in César Orozco's (30/09/2025)
+                    break;
+
+                case AUTH_ACTOR:
+                case AUTH_JOB_TITLE:
+                    testHost = "https://gateway-autorizaciones-test-6kweyks6.uc.gateway.dev";
+                    testApyKey = "AIzaSyCs6HMWX_OE8Pr1M8ycQ3IHwFfNX81ZyIE";
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
+            }
+        }
+        
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
@@ -665,20 +776,25 @@ public abstract class SExportUtils {
                 }
                 break;
                 
-            case PUR_REF_ORDER:
             case PUR_ORDER:
+            case PUR_REF_ORDER:
+            case PUR_PAYMENT:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
                 
                 switch (syncType) {
-                    case PUR_REF_ORDER:
-                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_REF;
-                        break;
-                        
                     case PUR_ORDER:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_DOC;
                         break;
 
+                    case PUR_REF_ORDER:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_REF;
+                        break;
+                        
+                    case PUR_PAYMENT:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY;
+                        break;
+                        
                     default:
                         // nothing
                 }
@@ -686,8 +802,6 @@ public abstract class SExportUtils {
                 
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
-            case AUTH_DEPARTMENT:
-            case AUTH_FUNCTIONAL_AREA:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_AUTH_SRV;
                 
@@ -697,8 +811,6 @@ public abstract class SExportUtils {
                         break;
 
                     case AUTH_JOB_TITLE:
-                    case AUTH_DEPARTMENT:
-                    case AUTH_FUNCTIONAL_AREA:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_AUTH_ORG_ELEMENT;
                         break;
 
@@ -708,7 +820,7 @@ public abstract class SExportUtils {
                 break;
                 
             default:
-                throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
         
         ObjectMapper mapper = new ObjectMapper();
@@ -722,9 +834,21 @@ public abstract class SExportUtils {
         // Recuperar la configuración base:
         
         if (!jsonBaseKey.isEmpty()) {
-            syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            if (!testHost.isEmpty()) {
+                syncUrl = testHost;
+            }
+            else {
+                syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            }
+            
             syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
-            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+            
+            if (!testApyKey.isEmpty()) {
+                syncApiKey = testApyKey;
+            }
+            else {
+                syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+            }
         }
         
         // Recuperar la configuración del servicio:
@@ -781,8 +905,6 @@ public abstract class SExportUtils {
                     break;
 
                 case AUTH_JOB_TITLE:
-                case AUTH_DEPARTMENT:
-                case AUTH_FUNCTIONAL_AREA:
                     SRequestAuthOrgElementsBody orgElementsBody = new SRequestAuthOrgElementsBody();
                     orgElementsBody.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                     orgElementsBody.elements = (SExportDataAuthOrgElement[]) currentExportDatas.toArray(new SExportDataAuthOrgElement[0]);
@@ -796,13 +918,6 @@ public abstract class SExportUtils {
                     requestBody = mapper.writeValueAsString(functionalAreasBody);
                     break;
 
-                case PUR_REF_ORDER:
-                    SRequestReferencesBody referencesBody = new SRequestReferencesBody();
-                    referencesBody.work_instance = instanceArray;
-                    referencesBody.references = (SExportDataReference[]) currentExportDatas.toArray(new SExportDataReference[0]);
-                    requestBody = mapper.writeValueAsString(referencesBody);
-                    break;
-                    
                 case PUR_ORDER:
                     SRequestDpsBody purchaseOrderBody = new SRequestDpsBody();
                     purchaseOrderBody.work_instance = instanceArray;
@@ -810,6 +925,20 @@ public abstract class SExportUtils {
                     requestBody = mapper.writeValueAsString(purchaseOrderBody);
                     break;
 
+                case PUR_REF_ORDER:
+                    SRequestReferencesBody referencesBody = new SRequestReferencesBody();
+                    referencesBody.work_instance = instanceArray;
+                    referencesBody.references = (SExportDataReference[]) currentExportDatas.toArray(new SExportDataReference[0]);
+                    requestBody = mapper.writeValueAsString(referencesBody);
+                    break;
+                    
+                case PUR_PAYMENT:
+                    SRequestPaymentsBody paymentsBody = new SRequestPaymentsBody();
+                    paymentsBody.work_instance = instanceArray;
+                    paymentsBody.payments = (SRequestPaymentsBody.Payment[]) currentExportDatas.toArray(new SRequestPaymentsBody.Payment[0]);
+                    requestBody = mapper.writeValueAsString(paymentsBody);
+                    break;
+                    
                 default:
                     // nada
             }
@@ -861,32 +990,33 @@ public abstract class SExportUtils {
     }
     
     /**
-     * Ejecuta una consulta para obtener datos y generar un JSON.
-     * Con período para filtrar los datos a exportar.
+     * Ejecuta una consulta para obtener datos, generar un JSON y exportarlos a SWAP Services.
      * 
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
-     * @return <code>SResponses</code> con la información de laS peticiones a SWAP Services.
-     * @throws SQLException Si ocurre un error en la consulta.
-     */
-    public static SResponses exportData(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
-        return exportData(session, syncType, true);
-    }
-    
-    /**
-     * Ejecuta una consulta para obtener datos y generar un JSON.
-     * Con período para filtrar los datos a exportar.
-     * 
-     * @param session Sesión de usuario.
-     * @param syncType Tipo de sincronización.
+     * @param confirmToProceed Si el cliente es gráfico, solicitar confirmación para proceder con la sincronización, si no, solamente informarlo.
      * @param wakeUpServices Indicador para despertar todos los SWAP Services.
      * @return <code>SResponses</code> con la información de laS peticiones a SWAP Services.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static SResponses exportData(final SGuiSession session, final SSyncType syncType, final boolean wakeUpServices) throws SQLException, Exception {
+    public static SResponses exportData(final SGuiSession session, final SSyncType syncType, final boolean confirmToProceed, final boolean wakeUpServices) throws SQLException, Exception {
         SResponses responses = new SResponses(syncType);
+        boolean proceed = true; // si el cliente no fuera gráfico, proceder de inmediato!
+
+        if (((SClientInterface) session.getClient()).isGui()) {
+            // informar al usuario sobre la demora del proceso:
+            
+            String message = "La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.";
+            
+            if (confirmToProceed) {
+                proceed = session.getClient().showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+            }
+            else {
+                session.getClient().showMsgBoxInformation(message);
+            }
+        }
         
-        if (!((SClientInterface) session.getClient()).isGui() || session.getClient().showMsgBoxConfirm("La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+        if (proceed) {
             System.out.println(SLibUtils.textRepeat("=", 80));
             System.out.println("Exporting " + syncType + "...");
             
@@ -901,41 +1031,76 @@ public abstract class SExportUtils {
             try {
                 switch (syncType) {
                     case USER:
-                    case PARTNER_SUPPLIER:
-                    case PARTNER_CUSTOMER:
-                        if (syncType == SSyncType.USER) {
-                            // para sincronización de usuarios: exportar antes áreas funcionales:
-                            syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-                        }
+                    case PUR_ORDER:
+                    case PUR_REF_ORDER:
+                    case PUR_PAYMENT:
+                        // exportar antes áreas funcionales:
+                        syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
+                        info = computeRequest(session, syncTypeInProgress);
+                        responses.getInfos().add(info);
 
-                        if (info == null || info.isResponseOk()) {
-                            // para todas las sincronizaciones: exportar antes puestos laborales:
+                        if (syncType == SSyncType.USER || syncType == SSyncType.PUR_PAYMENT) {
+                            // para todas las exportaciones: exportar antes puestos laborales para autorización:
                             syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
 
                             if (info.isResponseOk()) {
-                                // para todas las sincronizaciones: exportar antes actores:
+                                // para todas las exportaciones: exportar antes actores para autorización:
                                 syncTypeInProgress = SSyncType.AUTH_ACTOR;
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                                 
                                 if (info.isResponseOk()) {
-                                    // exportar usuarios o socios de negocio:
-                                    syncTypeInProgress = syncType;
+                                    // exportar usuarios:
+                                    syncTypeInProgress = SSyncType.USER;
                                     info = computeRequest(session, syncTypeInProgress);
                                     responses.getInfos().add(info);
                                 }
+                            }
+                        }
+                        
+                        if (syncType == SSyncType.PUR_ORDER || syncType == SSyncType.PUR_REF_ORDER || syncType == SSyncType.PUR_PAYMENT) {
+                            // exportar antes proveedores:
+                            syncTypeInProgress = SSyncType.PARTNER_SUPPLIER;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                            
+                            if (syncType == SSyncType.PUR_ORDER) {
+                                // exportar antes referencias de pedidos de compras:
+                                syncTypeInProgress = SSyncType.PUR_REF_ORDER;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                            }
+
+                            if (info.isResponseOk()) {
+                                // exportar los datos solicitados:
+                                syncTypeInProgress = syncType;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                            }
+                        }
+                        break;
+                        
+                    case PARTNER_SUPPLIER:
+                    case PARTNER_CUSTOMER:
+                        // exportar antes actores para autorización:
+                        syncTypeInProgress = SSyncType.AUTH_ACTOR;
+                        info = computeRequest(session, syncTypeInProgress);
+                        responses.getInfos().add(info);
+
+                        if (info.isResponseOk()) {
+                            if (info.isResponseOk()) {
+                                // exportar los datos solicitados:
+                                syncTypeInProgress = syncType;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
                             }
                         }
                         break;
                         
                     case AUTH_ACTOR:
                     case AUTH_JOB_TITLE:
-                    case AUTH_DEPARTMENT:
-                    case AUTH_FUNCTIONAL_AREA:
                         if (syncType == SSyncType.AUTH_ACTOR) {
                             // exportar antes puestos laborales:
                             syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
@@ -944,43 +1109,15 @@ public abstract class SExportUtils {
                         }
 
                         if (info == null || info.isResponseOk()) {
-                            // exportar usuarios o proveedores:
+                            // exportar los datos solicitados:
                             syncTypeInProgress = syncType;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }
                         break;
 
-                    case PUR_REF_ORDER:
-                        // exportar antes áreas funcionales:
-                        syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
-                        info = computeRequest(session, syncTypeInProgress);
-                        responses.getInfos().add(info);
-
-                        if (info.isResponseOk()) {
-                            // exportar antes proveedores:
-                            syncTypeInProgress = SSyncType.PARTNER_SUPPLIER;
-                            info = computeRequest(session, syncTypeInProgress);
-                            responses.getInfos().add(info);
-
-                            if (info.isResponseOk()) {
-                                // exportar referencias de pedidos de compras:
-                                syncTypeInProgress = syncType;
-                                info = computeRequest(session, syncTypeInProgress);
-                                responses.getInfos().add(info);
-                            }
-                        }
-                        break;
-                        
-                    case PUR_ORDER:
-                        // exportar antes áreas funcionales:
-                        syncTypeInProgress = SSyncType.PUR_ORDER;
-                        info = computeRequest(session, syncTypeInProgress);
-                        responses.getInfos().add(info);
-                        break;
-
                     default:
-                        throw new IllegalArgumentException(ERR_UNKNOWN_SYNC_TYPE + "'" + syncType + "'.");
+                        throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                 }
             }
             catch (Exception e) {
@@ -996,12 +1133,12 @@ public abstract class SExportUtils {
     }
     
     /**
-     * Procesa visualmente al usuario del cliente SIIE las respuestas de SWAP Services.
+     * Procesa visualmente al usuario del cliente SIIE o en consola las respuestas de SWAP Services.
      * 
      * @param session Sesión de usuario.
      * @param responses Respuestas de SWAP Services
-     * @param module ID del módulo de la vista.
-     * @param view ID de la vista.
+     * @param module ID del módulo de la vista de los datos exportados.
+     * @param view ID de la vista de los datos exportados.
      * @throws java.lang.Exception
      */
     public static void processResponses(final SGuiSession session, final SResponses responses, final int module, final int view) throws Exception {

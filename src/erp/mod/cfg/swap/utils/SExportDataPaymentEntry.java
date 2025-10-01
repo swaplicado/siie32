@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SExportDataPaymentEntry implements SExportData {
     
@@ -54,7 +54,7 @@ public class SExportDataPaymentEntry implements SExportData {
     public String document_date;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public String document_currency_id;
+    public String document_currency;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_amount;

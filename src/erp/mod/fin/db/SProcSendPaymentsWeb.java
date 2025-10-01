@@ -30,7 +30,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín. Sergio Flores
  */
 public class SProcSendPaymentsWeb extends Thread {
     
@@ -81,13 +81,13 @@ public class SProcSendPaymentsWeb extends Thread {
         try {
             ObjectMapper mapper = new ObjectMapper();
             SRequestPaymentsBody paymentBody = new SRequestPaymentsBody();
-            ArrayList<SRequestPaymentsBody.Payments> arrPayments = new ArrayList<>();
-            SRequestPaymentsBody.Payments payments = new SRequestPaymentsBody.Payments();
+            ArrayList<SRequestPaymentsBody.Payment> arrPayments = new ArrayList<>();
+            SRequestPaymentsBody.Payment payments = new SRequestPaymentsBody.Payment();
             payments.payment = createExportDataPayment();
             payments.entries = createExportDataPaymentEntry();
             payments.files = expDataFiles.toArray(new SExportDataFile[0]);
             arrPayments.add(payments);
-            paymentBody.payments = arrPayments.toArray(new SRequestPaymentsBody.Payments[0]);
+            paymentBody.payments = arrPayments.toArray(new SRequestPaymentsBody.Payment[0]);
             requestBody = mapper.writeValueAsString(paymentBody);
             System.out.println("");
         }
@@ -104,7 +104,7 @@ public class SProcSendPaymentsWeb extends Thread {
                 getBranchBankAcc(new int[] { moPayment.getFkBeneficiaryBankBizParterBranchId_n(), moPayment.getFkBeneficiaryBankAccountCashId_n()});
         
         payment.company = miClient.getSession().getConfigCompany().getCompanyId();
-        payment.pay_id = moPayment.getPkPaymentId();
+        payment.payment_id = moPayment.getPkPaymentId();
         payment.functional_area = moPayment.getFkFunctionalAreaId();
         payment.benef = moPayment.getFkBeneficiaryId();
         payment.series = moPayment.getSeries();
@@ -129,10 +129,10 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.benef_bank = benef.getDbmsBank() == null ? "" : benef.getDbmsBank();
         payment.benef_bank_fiscal_id = benef.getDbmsBankFiscalId() == null ? "" : benef.getDbmsBankFiscalId();
         payment.benef_account = benef.getBankAccountNumber();
-        payment.sched_user = moPayment.getFkUserScheduledId();
-        payment.exec_user = moPayment.getFkUserExecutedId();
-        payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserScheduledId());
-        payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecuted());
+        payment.sched_user = moPayment.getFkUserScheduleId();
+        payment.exec_user = moPayment.getFkUserExecutiondId();
+        payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserSchedule());
+        payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecution());
         payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
         payment.user_id = miClient.getSession().getUser().getPkUserId(); 
         
@@ -169,7 +169,7 @@ public class SProcSendPaymentsWeb extends Thread {
                     entry.document_uuid = dps.getThinCfd() == null ? "" : dps.getThinCfd().getUuid();
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());
-                    entry.document_currency_id = dps.getDbmsCurrencyKey();
+                    entry.document_currency = dps.getDbmsCurrencyKey();
                     entry.document_amount = amountFormat.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
                 }
             }

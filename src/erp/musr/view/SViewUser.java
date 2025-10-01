@@ -14,10 +14,10 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.mcfg.data.SCfgUtils;
-import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.musr.form.SFormExportUser;
@@ -201,7 +201,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, true, true);
                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_USR, mnTabType);
             }
             catch (Exception e) {

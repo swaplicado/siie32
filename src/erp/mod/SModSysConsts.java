@@ -528,19 +528,22 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
     
-    public static final int FINS_ST_PAY_NEW = 1; //Nuevo
-    public static final int FINS_ST_PAY_PRC_AUTH = 2; //En autorización
-    public static final int FINS_ST_PAY_REJ = 3; //Rechazado
-    public static final int FINS_ST_PAY_SCHED = 4; //Programado
-    public static final int FINS_ST_PAY_EXEC = 5; //Ejecutado
-    public static final int FINS_ST_PAY_NTFD = 6; //Notificado
-    public static final int FINS_ST_PAY_RCPT = 7; //Comprobado
-    public static final int FINS_ST_PAY_CAN = 9; //Cancelado
-    public static final int FINS_ST_PAY_REJ_P = 13; //Rechazado en proceso
-    public static final int FINS_ST_PAY_SCHED_P = 14; //Programado en proceso
-    public static final int FINS_ST_PAY_EXEC_P = 15; //Ejecutado en proceso
-    public static final int FINS_ST_PAY_NTFD_P = 16; //Notificado en proceso
-    public static final int FINS_ST_PAY_RCPT_P = 17; //Comprobado en proceso
+    public static final int FINS_ST_PAY_NEW = 1; //nuevo
+    public static final int FINS_ST_PAY_PRC_AUTH = 2; //en autorización
+    public static final int FINS_ST_PAY_REJ = 3; //rechazado
+    public static final int FINS_ST_PAY_SCHED = 4; //programado (autorizado)
+    public static final int FINS_ST_PAY_EXEC = 5; //ejecutado
+    public static final int FINS_ST_PAY_SUBR = 6; //subrrogado
+    public static final int FINS_ST_PAY_RCPT = 7; //comprobado
+    public static final int FINS_ST_PAY_BLOC = 8; //bloqueado
+    public static final int FINS_ST_PAY_CAN = 9; //cancelado
+    public static final int FINS_ST_PAY_REJ_P = 13; //rechazado en proceso
+    public static final int FINS_ST_PAY_SCHED_P = 14; //programado (autorizado) en proceso
+    public static final int FINS_ST_PAY_EXEC_P = 15; //ejecutado en proceso
+    public static final int FINS_ST_PAY_SUBR_P = 16; //subrrogado en proceso
+    public static final int FINS_ST_PAY_RCPT_P = 17; //comprobado en proceso
+    public static final int FINS_ST_PAY_BLOC_P = 18; //bloqueado en proceso
+    public static final int FINS_ST_PAY_CAN_P = 19; //cancelado en proceso
 
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
@@ -708,6 +711,9 @@ public abstract class SModSysConsts {
     public static final int[] TRNS_TP_IOG_OUT_EXP_PUR = {2, 9, 1 };
     public static final int[] TRNS_TP_IOG_OUT_EXP_MFG = {2, 9, 2 };
     public static final int[] TRNS_TP_IOG_OUT_CST_RM = {2, 9, 3 };
+    
+    public static final int TRNS_TP_PAY_CASH = 1;
+    public static final int TRNS_TP_PAY_CREDIT = 2;
 
     public static final int TRNS_TP_LINK_ALL = 1;
     public static final int TRNS_TP_LINK_CT_ITEM = 2;

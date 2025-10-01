@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.db.swap;
+package erp.mod.trn.db;
 
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
@@ -185,8 +185,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             mbDpsPaymentLocal = resultSet.getBoolean("b_dps_pay_loc");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
-            mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
-            mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
+            mnFkDpsYearId_n = resultSet.getInt("fk_dps_year_n");
+            mnFkDpsDocId_n = resultSet.getInt("fk_dps_doc_n");
             mnFkPaymentId_n = resultSet.getInt("fk_pay_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -244,8 +244,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "b_dps_pay_loc = " + (mbDpsPaymentLocal ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "fid_dps_year_n = " + (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " +
-                    "fid_dps_doc_n = " + (mnFkDpsDocId_n == 0 ? "NULL" : mnFkDpsDocId_n) + ", " +
+                    "fk_dps_year_n = " + (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " +
+                    "fk_dps_doc_n = " + (mnFkDpsDocId_n == 0 ? "NULL" : mnFkDpsDocId_n) + ", " +
                     "fk_pay_n = " + (mnFkPaymentId_n == 0 ? "NULL" : mnFkPaymentId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -295,11 +295,11 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      */
     public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final SGuiSession session) throws Exception {
         String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, "
-                + "sdp.fid_dps_year_n AS dps_id_year, sdp.fid_dps_doc_n AS dps_id_doc, "
+                + "sdp.fk_dps_year_n AS dps_id_year, sdp.fk_dps_doc_n AS dps_id_doc, "
                 + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
-                + "d.id_year = sdp.fid_dps_year_n AND d.id_doc = sdp.fid_dps_doc_n "
+                + "d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON "
                 + "dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON "

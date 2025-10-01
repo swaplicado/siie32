@@ -9,24 +9,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín
  */
-public class SExportDataPayment implements SExportData {
+public class SExportDataPaymentUpdate implements SExportData {
     
     public int company;
     
     public int payment_id;
     
-    public int functional_area;
-    
-    public int benef;
-    
-    public String series;
-    
-    public String number;
-    
-    public String app_date;
-    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String req_date;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -35,65 +26,51 @@ public class SExportDataPayment implements SExportData {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String exec_date_n;
     
-    public String currency;
-    
-    public String amount;
-    
-    public String exchange_rate_app;
-    
-    public String amount_loc_app;
-    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String exchange_rate_exec;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String amount_loc_exec;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String payment_way;
     
-    public int priority;
-    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String notes;
     
-    public int is_receipt_payment_req;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer is_deleted;
     
-    public int payment_status;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer payment_status;
     
-    public int authz_authorization_id;
-    
-    // cuenta pagadora
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String paying_bank;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String paying_bank_fiscal_id;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String paying_account;
     
-    // cuenta beneficiaria
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String benef_bank;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String benef_bank_fiscal_id;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String benef_account;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer sched_user;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Integer exec_user;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String sched_at;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public String exec_at;
-    
-    public int is_deleted;
-    
-    //public int created_by;
-    
-    //public int updated_by;
-    
-    //public int deleted_by;
-    
-    //public String created_at;
-    
-    //public String updated_at;
-    
-    //public String deleted_at;
-    
-    public int user_id;
 }
