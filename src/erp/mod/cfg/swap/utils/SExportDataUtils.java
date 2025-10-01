@@ -964,7 +964,7 @@ public abstract class SExportDataUtils {
                                     + "dbUser\":\"dummy\",\""
                                     + "dbPass\":\"dummy\",\""
                                     + "dbMainId\":\"1\"}");
-            STrnDBDocuments oDocCore = new STrnDBDocuments();
+            STrnDBDocuments oDocCore = new STrnDBDocuments(0);
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
