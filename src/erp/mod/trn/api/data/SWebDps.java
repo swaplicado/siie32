@@ -13,6 +13,7 @@ import java.util.ArrayList;
  */
 public class SWebDps {
 
+    int idCompany;
     int idYear;
     int idDoc;
     int idUser;
@@ -22,7 +23,8 @@ public class SWebDps {
     ArrayList<SWebDpsNote> lNotes;
     SWebAuthorization oWebAuthorization;
 
-    public SWebDps(int idYear, int idDoc) {
+    public SWebDps(int idCompany, int idYear, int idDoc) {
+        this.idCompany = idCompany;
         this.idYear = idYear;
         this.idDoc = idDoc;
 
@@ -31,6 +33,14 @@ public class SWebDps {
         this.lNotes = new ArrayList<>();
     }
 
+    public int getIdCompany() {
+        return idCompany;
+    }
+
+    public void setIdCompany(int idCompany) {
+        this.idCompany = idCompany;
+    }
+    
     public int getIdYear() {
         return idYear;
     }

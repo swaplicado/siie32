@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 290.7/ 2025-10-01
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan campos de usuario de envío y fecha hora de acción en autorizaciones de OC
+2) Autorización de recursos desde sistema externo por empresa.
+
+================================================================================
 SIIE 3.2 290.4/ 2025-09-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

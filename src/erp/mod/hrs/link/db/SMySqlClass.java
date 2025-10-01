@@ -153,13 +153,18 @@ public class SMySqlClass {
         return gmaindb;
     }
 
-    public String getMainDatabaseName() throws ClassNotFoundException {
+    public String getMainDatabaseName(final int idCo) throws ClassNotFoundException {
         String query = "SELECT "
                 + "    bd "
                 + "FROM "
                 + "    erp.cfgu_co "
-                + "WHERE "
-                + "    id_co = " + this.getMainBb() + ";";
+                + "WHERE ";
+                if (idCo > 0) {
+                    query += "    id_co = " + idCo + ";";
+                }
+                else {
+                    query += "    id_co = " + this.getMainBb() + ";";
+                }
 
         Statement st;
         try {

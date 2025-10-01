@@ -11,6 +11,7 @@ import erp.mod.cfg.swap.utils.SResourceStatusResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.db.STrnDBCore;
+import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -31,7 +32,7 @@ public class SPublicInterface {
         try {
             SMySqlClass.setJsonConn(sjon);
             this.oDbObj = new SMySqlClass();
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName(0);
         }
         catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,9 +47,16 @@ public class SPublicInterface {
      *
      * @return Objeto {@code Connection} si la conexión es exitosa, de lo contrario {@code null}.
      */
-    private Connection getConnection() {
+    private Connection getConnection(final int idCo) {
         try {
-            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            String db;
+            if (idCo > 0) {
+                db = this.oDbObj.getMainDatabaseName(idCo);
+            }
+            else {
+                db = this.msMainDatabase;
+            }
+            return this.oDbObj.connect("", "", db, "", "");
         }
         catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
@@ -68,7 +76,7 @@ public class SPublicInterface {
      */
     public SExportDataUser getSupplierByFiscalId(final String fiscalId) {
         try {
-            Connection conn = this.getConnection();
+            Connection conn = this.getConnection(0);
 
             if (conn == null) {
                 return null;
@@ -89,10 +97,17 @@ public class SPublicInterface {
                                                             final int authStatusId, 
                                                             final int userId) {
         try {
-            Connection conn = this.getConnection();
+            SResourceStatusResponse oResponse;
+            Connection conn = this.getConnection(companyId);
 
             if (conn == null) {
-                return null;
+                oResponse = new SResourceStatusResponse();
+                oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
+                oResponse.message = "No se pudo establecer conexión con la base de datos de SIIE.";
+                oResponse.error = "No se pudo establecer conexión con la base de datos de SIIE.";
+                oResponse.data = null;
+                
+                return oResponse;
             }
 
             return SExportDataUtils.updateResourceStatus(conn.createStatement(), 

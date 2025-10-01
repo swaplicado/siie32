@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author Edwin Carmona
  */
 public class SWebDpsFile {
+    private int idCompany;
     private int idSupFile;
     private int idYear;
     private int idDoc;
@@ -30,6 +31,7 @@ public class SWebDpsFile {
     private String textEtys;
 
     public SWebDpsFile() {
+        this.idCompany = 0;
         this.idSupFile = 0;
         this.idYear = 0;
         this.idDoc = 0;
@@ -46,6 +48,14 @@ public class SWebDpsFile {
         this.fkQuotCurrency = 0;
         this.oWebFile = new SWebFile();
         this.textEtys = "";
+    }
+
+    public int getIdCompany() {
+        return idCompany;
+    }
+
+    public void setIdCompany(int idCompany) {
+        this.idCompany = idCompany;
     }
 
     public int getIdSupFile() {

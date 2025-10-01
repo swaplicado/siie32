@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mod.SModConsts;
 import erp.mod.cfg.swap.SPublicInterface;
 import erp.mod.cfg.swap.utils.SExportDataUser;
-import erp.mod.cfg.swap.utils.SResourceStatusResponse;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.utils.SCAPResponse;
@@ -296,18 +295,20 @@ public class SShareData {
      * @param idUser
      * @param idSessionUser
      * @param statusFilter
+     * @param idCompany
      * @return 
+     * @throws java.lang.Exception 
      */
-    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter) {
-        STrnDBCore oTrnCore = new STrnDBCore();
+    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
+        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
         ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, idSessionUser, statusFilter);
 
         return lDocs;
     }
     
-    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser) {
-        SWebDps oWebDocument = new SWebDps(idYear, idDoc);
-        STrnDBCore oTrnCore = new STrnDBCore();
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser, Integer idCompany) throws Exception {
+        SWebDps oWebDocument = new SWebDps(idCompany, idYear, idDoc);
+        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
         /**
          * Se obtiene el DPS
          */
@@ -328,7 +329,7 @@ public class SShareData {
         oWebDocument.getlNotes().clear();
         oWebDocument.getlNotes().addAll(lNotes);
         
-        STrnDBDocuments oDocCore = new STrnDBDocuments();
+        STrnDBDocuments oDocCore = new STrnDBDocuments(idCompany);
         /**
          * Documentos
          */
@@ -347,16 +348,16 @@ public class SShareData {
         return oWebDocument;
     }
     
-    public ArrayList<SWebMaterialRequest> getMaterialRequestList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter) {
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest();
+    public ArrayList<SWebMaterialRequest> getMaterialRequestList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(idCompany);
         ArrayList<SWebMaterialRequest> lMRs = oMatReqCore.getMatReqs(startDate, endDate, idUser, idSessionUser, statusFilter);
 
         return lMRs;
     }
 
-    public SWebMaterialRequest getMaterialRequestByPk(Integer idMaterialRequest) {
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest();
-        STrnDBCore oTrnCore = new STrnDBCore();
+    public SWebMaterialRequest getMaterialRequestByPk(Integer idMaterialRequest, Integer idCompany) throws Exception {
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(idCompany);
+        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
         /**
          * Se obtiene el DPS
          */

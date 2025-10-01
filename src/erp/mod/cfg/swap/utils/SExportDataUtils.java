@@ -1329,7 +1329,7 @@ public abstract class SExportDataUtils {
                                     + "dbUser\":\"dummy\",\""
                                     + "dbPass\":\"dummy\",\""
                                     + "dbMainId\":\"1\"}");
-            STrnDBDocuments oDocCore = new STrnDBDocuments();
+            STrnDBDocuments oDocCore = new STrnDBDocuments(0);
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
@@ -1603,8 +1603,15 @@ public abstract class SExportDataUtils {
 
             String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
             int res = statement.executeUpdate(sql);
-            oResponse.status_code = HttpURLConnection.HTTP_OK;
-            oResponse.message = "OK";
+            if (res != 1) {
+                oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
+                oResponse.message = "No se realizó ninguna actualización.";
+                oResponse.error = "No se realizó ninguna actualización.";
+            }
+            else {
+                oResponse.status_code = HttpURLConnection.HTTP_OK;
+                oResponse.message = "OK";
+            }
         }
         catch (SQLException ex) {
             oResponse = new SResourceStatusResponse();

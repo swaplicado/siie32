@@ -41,14 +41,15 @@ public class SAuthsUtils {
                 break;
 
         }
-        String sql = "COALESCE(SELECT  "
-                + " " + sSelect + " "
+        String sql = "(SELECT  "
+                + " COALESCE(" + sSelect + ", 'NA') "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stpsub "
                 + "     INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS stpu ON stpsub.fk_usr_ins = stpu.id_usr "
                 + "WHERE "
-                + "    NOT stpsub.b_del AND stpsub.res_tab_name_n = '" + sTable + "' "
-                + sWhere + "ORDER BY stpsub.ts_usr_ins ASC LIMIT 1, 'NA')";
+//                + "    NOT stpsub.b_del AND "
+                + "stpsub.res_tab_name_n = '" + sTable + "' "
+                + sWhere + "ORDER BY stpsub.ts_usr_ins ASC LIMIT 1)";
 
         return sql;
     }

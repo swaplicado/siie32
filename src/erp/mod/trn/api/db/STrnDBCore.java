@@ -42,11 +42,14 @@ public class STrnDBCore {
 
     SMySqlClass oDbObj;
     String msMainDatabase;
+    int mnIdCompany;
 
-    public STrnDBCore() {
+    public STrnDBCore(int idCompany) throws Exception {
         try {
             this.oDbObj = new SMySqlClass();
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+            this.mnIdCompany = this.oDbObj.getMainBb();
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
         } catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -438,7 +441,8 @@ public class STrnDBCore {
     private SWebDpsRow getDataFromRow(ResultSet res) {
         try {
             SWebDpsRow oDoc = new SWebDpsRow();
-
+            
+            oDoc.setIdCompany(mnIdCompany);
             oDoc.setIdYear(res.getInt("id_year"));
             oDoc.setIdDoc(res.getInt("id_doc"));
             oDoc.setDt(res.getString("dt"));
@@ -470,6 +474,8 @@ public class STrnDBCore {
             oDoc.setIsAuthorized(res.getBoolean("b_authorn"));
             oDoc.setReturned(res.getInt("was_returned") > 0);
             oDoc.setAuthText(res.getString("auth_st_name"));
+            oDoc.setDpsAuthTs(res.getString("_ts_sent_auth"));
+            oDoc.setDpsAuthUser(res.getString("_user_sent_auth"));
             oDoc.setDpsUser(res.getString("dps_user"));
             oDoc.setDpsUserId(res.getInt("dps_user_id"));
             oDoc.setNotesAuth(res.getString("dta_notes"));

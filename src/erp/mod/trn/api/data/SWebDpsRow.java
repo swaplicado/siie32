@@ -11,6 +11,7 @@ package erp.mod.trn.api.data;
  */
 public class SWebDpsRow {
     
+    private int idCompany;
     private int idYear;
     private int idDoc;
     private String dt;
@@ -40,11 +41,21 @@ public class SWebDpsRow {
     private int matReqUserId;
     private String dpsUser;
     private String matReqUser;
+    private String dpsAuthTs;
+    private String dpsAuthUser;
     private String notesAuth;
     private String userInTurn;
     private int authorizationPriority;
     private SWebCfd oCfd;
 
+    public int getIdCompany() {
+        return idCompany;
+    }
+
+    public void setIdCompany(int idCompany) {
+        this.idCompany = idCompany;
+    }
+    
     public int getIdYear() {
         return idYear;
     }
@@ -275,6 +286,22 @@ public class SWebDpsRow {
 
     public void setMatReqUser(String matReqUser) {
         this.matReqUser = matReqUser;
+    }
+
+    public String getDpsAuthTs() {
+        return dpsAuthTs;
+    }
+
+    public void setDpsAuthTs(String dpsAuthTs) {
+        this.dpsAuthTs = dpsAuthTs;
+    }
+
+    public String getDpsAuthUser() {
+        return dpsAuthUser;
+    }
+
+    public void setDpsAuthUser(String dpsAuthUser) {
+        this.dpsAuthUser = dpsAuthUser;
     }
 
     public String getNotesAuth() {

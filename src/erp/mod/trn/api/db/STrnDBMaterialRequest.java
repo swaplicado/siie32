@@ -94,6 +94,7 @@ public class STrnDBMaterialRequest {
 
     SMySqlClass oDbObj;
     String msMainDatabase;
+    int mnIdCompany;
     private final ArrayList<SWebMaterialRequest> lMaterialRequests;
 
     public STrnDBMaterialRequest(SMySqlClass oDbObj, String mainDatabase) {
@@ -102,16 +103,19 @@ public class STrnDBMaterialRequest {
         this.lMaterialRequests = new ArrayList<>();
     }
     
-    public STrnDBMaterialRequest() {
-        this.lMaterialRequests = new ArrayList<>();
+    public STrnDBMaterialRequest(int idCompany) throws Exception {
         try {
             this.oDbObj = new SMySqlClass();
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+            this.mnIdCompany = this.oDbObj.getMainBb();
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
         } catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.lMaterialRequests = new ArrayList<>();
     }
     
     private Connection getConnection() {

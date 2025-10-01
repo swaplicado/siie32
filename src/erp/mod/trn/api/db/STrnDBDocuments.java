@@ -29,11 +29,14 @@ public class STrnDBDocuments {
     
     SMySqlClass oDbObj;
     String msMainDatabase;
+    int mnIdCompany;
     
-    public STrnDBDocuments() {
+    public STrnDBDocuments(int idCompany) throws Exception {
         try {
             this.oDbObj = new SMySqlClass();
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName();
+            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+            this.mnIdCompany = this.oDbObj.getMainBb();
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
         } catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -129,6 +132,7 @@ public class STrnDBDocuments {
             String sqlEty = "";
             while (res.next()) {
                 SWebDpsFile oWebDpsFile = new SWebDpsFile();
+                oWebDpsFile.setIdCompany(mnIdCompany);
                 oWebDpsFile.setIdSupFile(res.getInt("id_sup_file"));
                 oWebDpsFile.setIdYear(res.getInt("id_year"));
                 oWebDpsFile.setIdDoc(res.getInt("id_doc"));
