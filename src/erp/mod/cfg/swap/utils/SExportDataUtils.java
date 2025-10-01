@@ -1933,9 +1933,10 @@ public abstract class SExportDataUtils {
      * @param resourceId
      * @param authStatusId
      * @param userId
+     * @param notes
      * @return 
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, final int userId) {
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, final int userId, final String notes) {
         SResourceStatusResponse oResponse;
         
         try {
@@ -1971,7 +1972,7 @@ public abstract class SExportDataUtils {
                             return oResponse;
                     }
                     
-                    sUpdate += "nts_auth = '', " // XXX TO DO: agregar aquí las notas de autorización!
+                    sUpdate += "nts_auth = '" + SLibUtils.textToSql(notes) + "', "
                             + "fk_usr_upd = " + userId + ", "
                             + "ts_usr_upd = NOW() ";
                     
