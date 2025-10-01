@@ -1776,6 +1776,21 @@ public abstract class SExportDataUtils {
                         case SModSysConsts.FINS_ST_PAY_SCHED_P:
                             newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SCHED;
                             break;
+                        case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_EXEC;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_SUBR_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SUBR;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_RCPT_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_RCPT;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_BLOC_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_BLOC;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_CAN_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_CAN;
+                            break;
                         default:
                             // nothing
                     }
@@ -1928,19 +1943,45 @@ public abstract class SExportDataUtils {
             String sTable = "";
             String sWhere = "";
             String sUpdate = "";
+            
             switch (resourceType) {
                 case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
                     sTable = SModConsts.TablesMap.get(SModConsts.FIN_PAY);
-                    sUpdate = "fk_st_pay = " + (authStatusId == SSwapConsts.AUTHZ_STATUS_REJECTED ? SModSysConsts.FINS_ST_PAY_REJ_P : SModSysConsts.FINS_ST_PAY_SCHED_P) + ", "
+                    
+                    switch (authStatusId) {
+                        case SSwapConsts.AUTHZ_STATUS_OK:
+                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
+                                    + "dt_sched_n = dt_req, " // XXX TO DO: si hay nueva fecha programada, agregarla aquí!
+                                    + "fk_usr_sched = " + userId + ", "
+                                    + "ts_usr_sched = NOW(), ";
+                            break;
+                            
+                        case SSwapConsts.AUTHZ_STATUS_REJECTED:
+                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_REJ_P  + ", "
+                                    + "dt_sched_n = NULL, "
+                                    + "fk_usr_sched = " + SUtilConsts.USR_NA_ID + ", "
+                                    + "ts_usr_sched = NOW(), "; // XXX se puede actualizar este TS o no en el rechazo, por lo pronto se deja
+                            break;
+                            
+                        default:
+                            oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
+                            oResponse.message = "El tipo de estatus de autorización es desconocido (" + authStatusId + ").";
+                            oResponse.error = "Tipo de estatus de autorización desconocido.";
+
+                            return oResponse;
+                    }
+                    
+                    sUpdate += "nts_auth = '', " // XXX TO DO: agregar aquí las notas de autorización!
                             + "fk_usr_upd = " + userId + ", "
                             + "ts_usr_upd = NOW() ";
+                    
                     sWhere = "WHERE id_pay = " + resourceId;
                     break;
 
                 default:
                     oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
-                    oResponse.message = "No se encontró tipo de recurso";
-                    oResponse.error = "No se encontró tipo de recurso";
+                    oResponse.message = "No se encontró tipo de recurso.";
+                    oResponse.error = "No se encontró tipo de recurso.";
 
                     return oResponse;
             }
@@ -1960,7 +2001,7 @@ public abstract class SExportDataUtils {
         catch (SQLException ex) {
             oResponse = new SResourceStatusResponse();
             oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
-            oResponse.message = "Error al actualizar el estatus del recurso";
+            oResponse.message = "Error al actualizar el estatus del recurso.";
             oResponse.error = ex.getMessage();
             Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
