@@ -654,7 +654,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 23
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 20
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID documento externo"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID documento externo"));
@@ -1391,7 +1391,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     moDocumentsGrid.renderGridRows();
                                     moDocumentsGrid.setSelectedGridRow(index);
                                     
-                                    mbExportPaymentRequests = true;
+                                    if (document.isPaymentRequested()) {
+                                        mbExportPaymentRequests = true;
+                                    }
                                 }
                             }
                         }
