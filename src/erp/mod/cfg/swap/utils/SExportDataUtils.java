@@ -76,6 +76,7 @@ public abstract class SExportDataUtils {
             case PUR_ORDER:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
+            case PUR_PAYMENT_AUTH:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
                 
@@ -1479,7 +1480,6 @@ public abstract class SExportDataUtils {
 
         return references;
     }
-    
 
     /**
      * Consulta los pagos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
@@ -1506,7 +1506,7 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT "
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
-                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_sys, "
+                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, p.fk_usr_ins, "
                         // payment entry:
                         + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
@@ -1594,7 +1594,7 @@ public abstract class SExportDataUtils {
                     payment.exec_user = null;
                     payment.sched_at = null;
                     payment.exec_at = null;
-                    payment.is_deleted = 0;
+                    payment.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
                     //payment.created_by;
                     //payment.updated_by;
                     //payment.deleted_by;
@@ -1671,7 +1671,137 @@ public abstract class SExportDataUtils {
 
         return payments;
     }
-    
+
+    /**
+     * Consulta los pagos de compras por actualizar de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @return Lista de pagos de compras por actualizar exportables.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    private static ArrayList<SExportData> getListOfPurchasePaymentUpdatesToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> payments = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            
+            for (Integer companyId : databasesMap.keySet()) {
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONVERT(p.id_pay, CHAR)";
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_AUTH, database);
+                
+                String sql = "SELECT "
+                        // payment:
+                        + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
+                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
+                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, p.fk_usr_ins, "
+                        // payment entry:
+                        + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
+                        + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
+                        // bank accounts:
+                        + "ba_ac.acc_num, ba_ac.acc_num_std, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
+                        + "ba_ben.acc_num, ba_ben.acc_num_std, ba_ben_b.bp, ba_ben_b.fiscal_id, ba_ben_b.fiscal_frg_id, "
+                        // SWAP data processing:
+                        + "sdp.ext_data_id, sdp.ext_data_uuid, sdp.b_dps_pay_loc, "
+                        // DPS:
+                        + "d.id_year, d.id_doc, d.num_ser AS _dps_ser, d.num AS _dps_num, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps_folio, d.dt AS _dps_dt, "
+                        + "d.tot_cur_r, d.fid_cur AS _dps_cur_id, cd.cur_key AS _dps_cur_key, "
+                        // CFD:
+                        + "cfd.uuid AS _cfd_uuid, cfd.fid_tp_cfd, cfd.fid_tp_xml, cfd.fid_st_xml "
+                        + "FROM  "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cp ON cp.id_cur = p.fk_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS pe ON pe.id_pay = p.id_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cpe ON cpe.id_cur = pe.fk_ety_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS ac ON ac.id_cob = p.fk_pay_cash_cob_n AND ac.id_acc_cash = p.fk_pay_cash_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ac ON ba_ac.id_bpb = ac.fid_bpb_n AND ba_ac.id_bank_acc = ac.fid_bank_acc_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ac_b ON ba_ac_b.id_bp = ba_ac.fid_bank "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS ba_ben ON ba_ben.id_bpb = p.fk_ben_bank_cob_n AND ba_ben.id_bank_acc = p.fk_ben_bank_acc_cash_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ben_b ON ba_ben_b.id_bp = ba_ben.fid_bank "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fk_dps_year_n = pe.fk_doc_year_n AND sdp.fk_dps_doc_n = pe.fk_doc_doc_n AND NOT sdp.b_del "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = pe.fk_doc_year_n AND d.id_doc = pe.fk_doc_doc_n AND NOT d.b_del "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
+                        + "WHERE ("
+                        + "((NOT p.b_del AND p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_REJ_P + ", " + SModSysConsts.FINS_ST_PAY_SCHED_P + ")) "
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + ") AND "
+                        + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                        + ") "
+                        + " "
+                        + "ORDER BY "
+                        + "p.ser, p.num, p.id_pay;";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    // payment:
+                    
+                    SExportDataPaymentUpdate paymentUpdate = new SExportDataPaymentUpdate();
+
+                    paymentUpdate.company = companyId;
+                    paymentUpdate.payment_id = resultSet.getInt("p.id_pay");
+                    paymentUpdate.req_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("p.dt_req"));
+                    /*
+                    Date dateScheduled = resultSet.getDate("p.dt_sched_n");
+                    paymentUpdate.sched_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateScheduled);
+                    Date dateExecution = resultSet.getDate("p.dt_exec_n");
+                    paymentUpdate.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
+                    //paymentUpdate.exchange_rate_exec = ...
+                    //paymentUpdate.amount_loc_exec = ...
+                    //paymentUpdate.payment_way = resultSet.getString("p.pay_way");
+                    //paymentUpdate.notes = resultSet.getString("p.nts");
+                    */
+                    paymentUpdate.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
+                    
+                    int newStatusPaymentId = 0;
+                    
+                    switch (resultSet.getInt("p.fk_st_pay")) {
+                        case SModSysConsts.FINS_ST_PAY_REJ_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_REJ;
+                            break;
+                        case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SCHED;
+                            break;
+                        default:
+                            // nothing
+                    }
+                    
+                    if (newStatusPaymentId != 0) {
+                        paymentUpdate.payment_status = newStatusPaymentId;
+                    }
+
+                    /*
+                    // paying account:
+                    BankAccount payingBankAccount = new BankAccount(resultSet, "ba_ac_b.bp", "ba_ac_b.fiscal_id", "ba_ac_b.fiscal_frg_id", "ba_ac.acc_num", "ba_ac.acc_num_std");
+                    paymentUpdate.paying_bank = payingBankAccount.BankName;
+                    paymentUpdate.paying_bank_fiscal_id = payingBankAccount.BankFiscalId;
+                    paymentUpdate.paying_account = payingBankAccount.BankAccount;
+
+                    // beneficiary bank account:
+                    BankAccount benefBankAccount = new BankAccount(resultSet, "ba_ben_b.bp", "ba_ben_b.fiscal_id", "ba_ben_b.fiscal_frg_id", "ba_ben.acc_num", "ba_ben.acc_num_std");
+                    paymentUpdate.benef_bank = benefBankAccount.BankName;
+                    paymentUpdate.benef_bank_fiscal_id = benefBankAccount.BankFiscalId;
+                    paymentUpdate.benef_account = benefBankAccount.BankAccount;
+
+                    paymentUpdate.sched_user = null;
+                    paymentUpdate.exec_user = null;
+                    paymentUpdate.sched_at = null;
+                    paymentUpdate.exec_at = null;
+                    */
+                    
+                    payments.add(paymentUpdate);
+                }
+            }
+        }
+
+        return payments;
+    }
+
     /**
      * Obtiene la lista de usuarios o proveedores a exportar según el tipo de sincronización.
      *
@@ -1727,6 +1857,10 @@ public abstract class SExportDataUtils {
                 
             case PUR_PAYMENT:
                 data = getListOfPurchasePaymentsToExport(session);
+                break;
+                
+            case PUR_PAYMENT_AUTH:
+                data = getListOfPurchasePaymentUpdatesToExport(session);
                 break;
                 
             default:

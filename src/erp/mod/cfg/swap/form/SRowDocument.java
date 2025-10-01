@@ -25,6 +25,8 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDatePicker;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -354,8 +356,8 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
                 payment.setFkPayerCashAccountingCashId_n(0);
                 payment.setFkBeneficiaryBankBizParterBranchId_n(0);
                 payment.setFkBeneficiaryBankAccountCashId_n(0);
-                payment.setFkUserScheduledId(SUtilConsts.USR_NA_ID);
-                payment.setFkUserExecutedId(SUtilConsts.USR_NA_ID);
+                payment.setFkUserScheduleId(SUtilConsts.USR_NA_ID);
+                payment.setFkUserExecutiondId(SUtilConsts.USR_NA_ID);
                 //payment.setFkUserInsertId(...);
                 //payment.setFkUserUpdateId(...);
                 //payment.setTsUserScheduledId(...);
@@ -621,6 +623,54 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
         }
         
         return requested;
+    }
+    
+    /**
+     * Validate if a new payment request can be created.
+     * @return
+     * @throws Exception 
+     */
+    private boolean validateRequiredPaymentDateChanging() throws Exception {
+        if (!isRecorded()) {
+            throw new Exception("Este documento no tiene una factura vinculada.");
+        }
+        else if (!isProcessed()) {
+            throw new Exception("Este documento no ha sido procesado (importado o capturado).");
+        }
+        else if (!isPaymentRequested()) {
+            throw new Exception("Este documento no tiene una solicitud de pago.");
+        }
+        else if (Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
+            throw new Exception("No se puede cambiar la fecha requerida de pago; el estatus de la solicitud de pago es diferente de 'nuevo'.");
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Request payment of document.
+     * @param session GUI session.
+     * @return
+     * @throws Exception 
+     */
+    public boolean changeRequiredPaymentDate(final SGuiSession session) throws Exception {
+        boolean changed = false;
+        
+        if (validateRequiredPaymentDateChanging()) {
+            SGuiDatePicker picker = session.getClient().getDatePicker();
+            picker.resetPicker();
+            picker.setOption(Payment.getDateRequired());
+            picker.setPickerVisible(true);
+
+            if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                Payment.setDateRequired(picker.getOption());
+                Payment.save(session);
+                
+                changed = true;
+            }
+        }
+        
+        return changed;
     }
     
     @Override

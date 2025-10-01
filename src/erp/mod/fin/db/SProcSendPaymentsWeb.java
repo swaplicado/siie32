@@ -129,10 +129,10 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.benef_bank = benef.getDbmsBank() == null ? "" : benef.getDbmsBank();
         payment.benef_bank_fiscal_id = benef.getDbmsBankFiscalId() == null ? "" : benef.getDbmsBankFiscalId();
         payment.benef_account = benef.getBankAccountNumber();
-        payment.sched_user = moPayment.getFkUserScheduledId();
-        payment.exec_user = moPayment.getFkUserExecutedId();
-        payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserScheduledId());
-        payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecuted());
+        payment.sched_user = moPayment.getFkUserScheduleId();
+        payment.exec_user = moPayment.getFkUserExecutiondId();
+        payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserSchedule());
+        payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecution());
         payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
         payment.user_id = miClient.getSession().getUser().getPkUserId(); 
         

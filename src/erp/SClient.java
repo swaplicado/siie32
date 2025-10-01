@@ -995,10 +995,11 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         if (!mbLoggedIn) {
             msCompany = "";
             setTitle(APP_NAME);
-            destroyCfdSignatures();
+            
             moGuiDatePicker = null;
             moGuiDatePeriodPicker = null;
             moGuiDateRangePicker = null;
+            destroyCfdSignatures();
 
             jtfSystemDate.setText("");
             jtfCurrentDate.setText("");
@@ -1047,9 +1048,6 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
             moGuiDatePeriodPicker = new SGuiDatePicker(this, SLibConstants.GUI_DATE_PICKER_DATE_PERIOD);
             moGuiDateRangePicker = new SGuiDateRangePicker(this);
             createCfdSignatures();
-            moGuiDatePicker = new SGuiDatePicker(this, SLibConstants.GUI_DATE_PICKER_DATE);
-            moGuiDatePeriodPicker = new SGuiDatePicker(this, SLibConstants.GUI_DATE_PICKER_DATE_PERIOD);
-            moGuiDateRangePicker = new SGuiDateRangePicker(this);
 
             jtfSystemDate.setText(moSessionXXX.getFormatters().getDateFormat().format(moSessionXXX.getSystemDate()));
             jtfCurrentDate.setText(moSessionXXX.getFormatters().getDateFormat().format(moSessionXXX.getWorkingDate()));

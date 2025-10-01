@@ -165,10 +165,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN9 = new javax.swing.JPanel();
         jlPayRec = new javax.swing.JLabel();
         jpProcessingN10 = new javax.swing.JPanel();
-        jtfPayRecAmount = new javax.swing.JTextField();
-        jtfPayRecAmountPct = new javax.swing.JTextField();
+        jtfPayReqAmount = new javax.swing.JTextField();
+        jtfPayReqAmountPct = new javax.swing.JTextField();
         jpProcessingN11 = new javax.swing.JPanel();
-        jtfPayRecDate = new javax.swing.JTextField();
+        jtfPayReqDate = new javax.swing.JTextField();
+        jbChangeRequiredDate = new javax.swing.JButton();
         jpProcessingN19 = new javax.swing.JPanel();
         jbRequestPayment = new javax.swing.JButton();
         jpProcessingN12 = new javax.swing.JPanel();
@@ -391,33 +392,38 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfPayRecAmount.setEditable(false);
-        jtfPayRecAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayRecAmount.setText("000,000,000.00 MXN");
-        jtfPayRecAmount.setToolTipText("Pago requerido");
-        jtfPayRecAmount.setFocusable(false);
-        jtfPayRecAmount.setPreferredSize(new java.awt.Dimension(110, 23));
-        jpProcessingN10.add(jtfPayRecAmount);
+        jtfPayReqAmount.setEditable(false);
+        jtfPayReqAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayReqAmount.setText("000,000,000.00 MXN");
+        jtfPayReqAmount.setToolTipText("Pago requerido");
+        jtfPayReqAmount.setFocusable(false);
+        jtfPayReqAmount.setPreferredSize(new java.awt.Dimension(110, 23));
+        jpProcessingN10.add(jtfPayReqAmount);
 
-        jtfPayRecAmountPct.setEditable(false);
-        jtfPayRecAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayRecAmountPct.setText("100%");
-        jtfPayRecAmountPct.setToolTipText("Porcentaje de pago requerido");
-        jtfPayRecAmountPct.setFocusable(false);
-        jtfPayRecAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpProcessingN10.add(jtfPayRecAmountPct);
+        jtfPayReqAmountPct.setEditable(false);
+        jtfPayReqAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayReqAmountPct.setText("100%");
+        jtfPayReqAmountPct.setToolTipText("Porcentaje de pago requerido");
+        jtfPayReqAmountPct.setFocusable(false);
+        jtfPayReqAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
+        jpProcessingN10.add(jtfPayReqAmountPct);
 
         jpProcessingN.add(jpProcessingN10);
 
         jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfPayRecDate.setEditable(false);
-        jtfPayRecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayRecDate.setText("01/01/2001");
-        jtfPayRecDate.setToolTipText("Fecha requerida de pago");
-        jtfPayRecDate.setFocusable(false);
-        jtfPayRecDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpProcessingN11.add(jtfPayRecDate);
+        jtfPayReqDate.setEditable(false);
+        jtfPayReqDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayReqDate.setText("dow 01/mon/2001");
+        jtfPayReqDate.setToolTipText("Fecha requerida de pago");
+        jtfPayReqDate.setFocusable(false);
+        jtfPayReqDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpProcessingN11.add(jtfPayReqDate);
+
+        jbChangeRequiredDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbChangeRequiredDate.setToolTipText("Cambiar fecha requerida de pago...");
+        jbChangeRequiredDate.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN11.add(jbChangeRequiredDate);
 
         jpProcessingN.add(jpProcessingN11);
 
@@ -480,10 +486,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jtfPaySchedDate.setEditable(false);
         jtfPaySchedDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPaySchedDate.setText("01/01/2001");
+        jtfPaySchedDate.setText("dow 01/mon/2001");
         jtfPaySchedDate.setToolTipText("Fecha de programación");
         jtfPaySchedDate.setFocusable(false);
-        jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jpProcessingN16.add(jtfPaySchedDate);
 
         jpProcessingN.add(jpProcessingN16);
@@ -500,10 +506,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jtfPayExecDate.setEditable(false);
         jtfPayExecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayExecDate.setText("01/01/2001");
+        jtfPayExecDate.setText("dow 01/mon/2001");
         jtfPayExecDate.setToolTipText("Fecha de operación");
         jtfPayExecDate.setFocusable(false);
-        jtfPayExecDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPayExecDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jpProcessingN18.add(jtfPayExecDate);
 
         jpProcessingN.add(jpProcessingN18);
@@ -528,6 +534,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JButton jbChangeRequiredDate;
     private javax.swing.JButton jbClear;
     private javax.swing.JButton jbDeselectAll;
     private javax.swing.JButton jbDownloadSelected;
@@ -582,9 +589,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JTextField jtfPayDate;
     private javax.swing.JTextField jtfPayExecDate;
     private javax.swing.JTextField jtfPayFolio;
-    private javax.swing.JTextField jtfPayRecAmount;
-    private javax.swing.JTextField jtfPayRecAmountPct;
-    private javax.swing.JTextField jtfPayRecDate;
+    private javax.swing.JTextField jtfPayReqAmount;
+    private javax.swing.JTextField jtfPayReqAmountPct;
+    private javax.swing.JTextField jtfPayReqDate;
     private javax.swing.JTextField jtfPaySchedDate;
     private javax.swing.JTextField jtfPayStatus;
     private javax.swing.JTextField jtfRecord;
@@ -774,13 +781,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbUnlink.setEnabled(false);
             jbImport.setEnabled(false);
             jbRecord.setEnabled(false);
+            jbChangeRequiredDate.setEnabled(false);
             jbRequestPayment.setEnabled(false);
             
             jtfRecord.setText("");
             
-            jtfPayRecAmount.setText("");
-            jtfPayRecAmountPct.setText("");
-            jtfPayRecDate.setText("");
+            jtfPayReqAmount.setText("");
+            jtfPayReqAmountPct.setText("");
+            jtfPayReqDate.setText("");
             
             jtfPayFolio.setText("");
             jtfPayDate.setText("");
@@ -795,6 +803,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbUnlink.setEnabled(true);
             jbImport.setEnabled(true);
             jbRecord.setEnabled(false);
+            jbChangeRequiredDate.setEnabled(true);
             jbRequestPayment.setEnabled(true);
             
             if (!document.isRecorded()) {
@@ -807,18 +816,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             
             if (document.RequiredPaymentPct == 0 || document.RequiredPaymentDate == null) {
-                jtfPayRecAmount.setText("");
-                jtfPayRecAmountPct.setText("");
-                jtfPayRecDate.setText("");
+                jtfPayReqAmount.setText("");
+                jtfPayReqAmountPct.setText("");
+                jtfPayReqDate.setText("");
             }
             else {
-                jtfPayRecAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
-                jtfPayRecAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
-                jtfPayRecDate.setText(SLibUtils.DateFormatDate.format(document.RequiredPaymentDate));
+                jtfPayReqAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
+                jtfPayReqAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
+                jtfPayReqDate.setText(SLibUtils.GuiDateFormat.format(document.RequiredPaymentDate));
                 
-                jtfPayRecAmount.setCaretPosition(0);
-                jtfPayRecAmountPct.setCaretPosition(0);
-                jtfPayRecDate.setCaretPosition(0);
+                jtfPayReqAmount.setCaretPosition(0);
+                jtfPayReqAmountPct.setCaretPosition(0);
+                jtfPayReqDate.setCaretPosition(0);
             }
             
             if (document.Payment == null) {
@@ -832,8 +841,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 jtfPayFolio.setText(document.Payment.getFolio());
                 jtfPayDate.setText(SLibUtils.DateFormatDate.format(document.Payment.getDateApplication()));
                 jtfPayStatus.setText(document.Payment.getDbmsStatus());
-                jtfPaySchedDate.setText(document.Payment.getDateSchedule_n() == null ? "" : SLibUtils.DateFormatDate.format(document.Payment.getDateSchedule_n()));
-                jtfPayExecDate.setText(document.Payment.getDateExecution_n() == null ? "" : SLibUtils.DateFormatDate.format(document.Payment.getDateExecution_n()));
+                jtfPaySchedDate.setText(document.Payment.getDateSchedule_n() == null ? "" : SLibUtils.GuiDateFormat.format(document.Payment.getDateSchedule_n()));
+                jtfPayExecDate.setText(document.Payment.getDateExecution_n() == null ? "" : SLibUtils.GuiDateFormat.format(document.Payment.getDateExecution_n()));
                 
                 jtfPayFolio.setCaretPosition(0);
                 jtfPayDate.setCaretPosition(0);
@@ -1402,6 +1411,32 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         miClient.showMsgBoxInformation("Esta funcionalidad no está aún disponible.");
     }
     
+    private void actionPerformedChangeDateRequested() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SRowDocument document = (SRowDocument) row;
+                
+                if (document.changeRequiredPaymentDate(miClient.getSession())) {
+                    document.RequiredPaymentDate = document.Payment.getDateRequired();
+                    
+                    int index = moDocumentsGrid.getTable().getSelectedRow();
+                    moDocumentsGrid.renderGridRows();
+                    moDocumentsGrid.setSelectedGridRow(index);
+                    
+                    mbExportPaymentRequests = true;
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     private void actionPerformedRequestPayment() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
@@ -1460,6 +1495,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbUnlink.addActionListener(this);
         jbImport.addActionListener(this);
         jbRecord.addActionListener(this);
+        jbChangeRequiredDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
     }
 
@@ -1476,6 +1512,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbUnlink.removeActionListener(this);
         jbImport.removeActionListener(this);
         jbRecord.removeActionListener(this);
+        jbChangeRequiredDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
     }
 
@@ -1502,6 +1539,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     @Override
     public void windowClosed() {
         super.windowClosed();
+        
+        if (!mbExportPaymentRequests) {
+            for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                SRowDocument document = (SRowDocument) row;
+                if (document.Payment != null && document.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) {
+                    mbExportPaymentRequests = true;
+                    break;
+                }
+            }
+        }
         
         if (mbExportPaymentRequests) {
             try {
@@ -1555,6 +1602,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else if (button == jbRecord) {
                 actionPerformedRecord();
+            }
+            else if (button == jbChangeRequiredDate) {
+                actionPerformedChangeDateRequested();
             }
             else if (button == jbRequestPayment) {
                 actionPerformedRequestPayment();

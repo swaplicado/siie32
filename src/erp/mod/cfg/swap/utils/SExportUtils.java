@@ -355,6 +355,7 @@ public abstract class SExportUtils {
                         
                     case PUR_ORDER:
                     case PUR_PAYMENT:
+                    case PUR_PAYMENT_AUTH:
                         String attributeId = "";
                         databasesMap = getSwapCompaniesDatabasesMap(session);
                         
@@ -469,6 +470,7 @@ public abstract class SExportUtils {
                         case PUR_ORDER_FILE:
                         case PUR_REF_ORDER:
                         case PUR_PAYMENT:
+                        case PUR_PAYMENT_AUTH:
                             log = new SDbComSyncLog();
                             break;
 
@@ -518,6 +520,7 @@ public abstract class SExportUtils {
                             case PUR_ORDER_FILE:
                             case PUR_REF_ORDER:
                             case PUR_PAYMENT:
+                            case PUR_PAYMENT_AUTH:
                                 log = new SDbComSyncLog();
                                 break;
 
@@ -525,13 +528,21 @@ public abstract class SExportUtils {
                                 throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                         }
                         
+                        // complete processing before log sync:
+                        
                         ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
                         
                         if (syncType == SSyncType.PUR_PAYMENT) {
                             Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
                             complementProcessing(session, syncType, entries, value);
                         }
+                        else if (syncType == SSyncType.PUR_PAYMENT_AUTH) {
+                            //Object value = ...
+                            //complementProcessing(session, syncType, entries, value);
+                        }
 
+                        // log sync:
+                        
                         log.setSyncType(syncType.toString());
                         log.setRequestTimestamp(requestDatetime);
                         log.setResponseCode("" + httpResponseStatusCode);
