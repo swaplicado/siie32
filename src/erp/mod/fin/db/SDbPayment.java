@@ -88,6 +88,8 @@ public class SDbPayment extends SDbRegistryUser {
     
     protected boolean mbAuxReloadEntries;
     
+    protected double mnAuxOriginalAmount;
+    
     public SDbPayment() {
         super(SModConsts.FIN_PAY);
     }
@@ -213,8 +215,10 @@ public class SDbPayment extends SDbRegistryUser {
     public int getOldFkUserExecutiondId() { return mnOldFkUserExecutiondId; }
     
     public void setAuxReloadEntries(boolean b) { mbAuxReloadEntries = b; }
+    public void setAuxOriginalAmount(double d) { mnAuxOriginalAmount = d; }
     
     public boolean getAuxReloadEntries() { return mbAuxReloadEntries; }
+    public double getAuxOriginalAmount() { return mnAuxOriginalAmount; }
     
     public String getFolio() {
         return msSeries + (msSeries.isEmpty() ? "" : "-") + mnNumber;
@@ -228,7 +232,9 @@ public class SDbPayment extends SDbRegistryUser {
     
     public void updatePaymentStatus(SGuiSession session, int status) throws Exception {
         msSql = "UPDATE " + getSqlTable() + " SET " +
-                "fk_st_pay = " + status + " " + 
+                "fk_st_pay = " + status + ", " + 
+                "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
+                "ts_usr_upd = NOW() ";
                 getSqlWhere();
         session.getStatement().execute(msSql);
     }
@@ -297,6 +303,7 @@ public class SDbPayment extends SDbRegistryUser {
         mnOldFkUserExecutiondId = 0;
         
         mbAuxReloadEntries = false;
+        mnAuxOriginalAmount = 0;        
     }
 
     @Override
@@ -570,7 +577,7 @@ public class SDbPayment extends SDbRegistryUser {
                 case SModSysConsts.FINS_ST_PAY_REJ:
                 //case SModSysConsts.FINS_ST_PAY_SCHED: // change to scheduled with updateStatusToScheduled()
                 //case SModSysConsts.FINS_ST_PAY_EXEC: // change to executed with updateStatusToExecuted()
-                case SModSysConsts.FINS_ST_PAY_NTFD:
+                case SModSysConsts.FINS_ST_PAY_SUBR:
                 case SModSysConsts.FINS_ST_PAY_RCPT:
                 case SModSysConsts.FINS_ST_PAY_CAN:
                     break;
