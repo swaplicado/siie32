@@ -343,7 +343,7 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
     }
 
     private void itemStateChangedPkReferenceId() {
-        if (jcbPkReferenceId.getSelectedIndex() <= 0 || mnParamBizPartnerLinkType != SModSysConsts.BPSS_LINK_BPB) {
+        if (jcbPkReferenceId.getSelectedIndex() <= 0 && mnParamBizPartnerLinkType != SModSysConsts.BPSS_LINK_BPB) {
             jcbPkBizPartnerBranchId.setEnabled(false);
             jbPkBizPartnerBranchId.setEnabled(false);
             
@@ -352,7 +352,7 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
         else {
             jcbPkBizPartnerBranchId.setEnabled(true);
             jbPkBizPartnerBranchId.setEnabled(true);
-            
+
             SFormUtilities.populateComboBox(miClient, jcbPkBizPartnerBranchId, SDataConstants.BPSU_BPB, moFieldPkReferenceId.getKey());
         }
     }
@@ -562,6 +562,7 @@ public class SFormPriceListBizPartnerLink extends javax.swing.JDialog implements
         moFieldFkDiscountApplicationTypeId.setKey(new int[] { moPriceListBizPartnerLink.getFkDiscountApplicationTypeId() });
         moFieldPercentage.setDouble(moPriceListBizPartnerLink.getDiscountPercentage());
         moFieldIsDeleted.setBoolean(moPriceListBizPartnerLink.getIsDeleted());
+        moFieldPkReferenceId.setKey(new int[] { moPriceListBizPartnerLink.getPkReference1Id() });
 
         jcbPkReferenceId.setEnabled(false);
         jbPkReferenceId.setEnabled(false);

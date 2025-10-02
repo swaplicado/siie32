@@ -95,7 +95,8 @@ public class SPublicInterface {
                                                             final int resourceType, 
                                                             final String resourceId, 
                                                             final int authStatusId, 
-                                                            final int userId) {
+                                                            final int userId,
+                                                            final String notes) {
         try {
             SResourceStatusResponse oResponse;
             Connection conn = this.getConnection(companyId);
@@ -115,7 +116,8 @@ public class SPublicInterface {
                                                         resourceType, 
                                                         resourceId, 
                                                         authStatusId,
-                                                        userId);
+                                                        userId,
+                                                        notes);
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
