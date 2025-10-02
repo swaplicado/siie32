@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 290.12/ 2025-10-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Correcciones la forma de captura de importación de CFDI tipo "I" de proveedores para crear DPS:
+- Validación prematura de existencia del ítem de referencia prematura, antes de validar la existencia del ítem.
+- Omisión de preservación el ítem de referencia de la partida del pedido vinculado con el concepto del CFDI, dependiendo además solo de la configuración del ítem de manera insegura.
+- Omisión de preservación el centro de costo de la partida del pedido vinculado con el concepto del CFDI, dependiendo además solo de la configuración del ítem de manera insegura.
+
+================================================================================
 SIIE 3.2 290.11/ 2025-10-02
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
