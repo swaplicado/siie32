@@ -19,22 +19,25 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     
-    private final cfd.ver40.DElementConcepto moConcepto;
     private final SClientInterface miClient;
+    private final cfd.ver40.DElementConcepto moConcepto;
+    private final int mnRow;
+    
+    private SDataDpsEntry moDpsEntry;
     private SDataItem moItem;
-    private SDataItem moReferenceItem;
+    private SDataItem moItemReference;
     private SDataUnit moUnit;
     private SDataTaxRegion moTaxRegion;
     private SDataCostCenter moCostCenter;
-    private SDataDpsEntry moDpsEntry;
     private SDataEntryDpsDpsLink moEntryDpsDpsLink;
     private int mnOperationTypePk;
+    
     private double mdConvFactor;
-    private final int mnRowCount;
+    
     private String msClaveUnidadSiie; 
     
     private HashSet<cfd.ver40.DElementConceptoImpuestoTraslado> moTaxChargedMatched;
@@ -47,20 +50,32 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
      * @param row
      */
     public SRowCfdiImport40(SClientInterface client, cfd.ver40.DElementConcepto concepto, int row){
-        moConcepto = concepto;
         miClient = client;
-        mnRowCount = row;
+        moConcepto = concepto;
+        mnRow = row;
+        
         resetMatchingSettings();
         prepareTableRow();
     }
 
     public void setItem(final SDataItem o) { moItem = o; }
-    public void setReferenceItem(final SDataItem o) { moReferenceItem = o; }
+    public void setItemReference(final SDataItem o) { moItemReference = o; }
     public void setUnit(final SDataUnit o) { moUnit = o; }
     public void setTaxRegion(final SDataTaxRegion o) { moTaxRegion = o; }
     public void setCostCenter(final SDataCostCenter o) { moCostCenter = o; }
     public void setEntryDpsDpsLink(final SDataEntryDpsDpsLink o) { moEntryDpsDpsLink = o; }
     public void setOperationTypePk(final int i) { mnOperationTypePk = i; }
+    
+    public SDataDpsEntry getDpsEntry() { return moDpsEntry; } 
+    public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
+    public SDataItem getItem() { return moItem; }
+    public SDataItem getItemReference() { return moItemReference; }
+    public SDataUnit getUnit() { return moUnit; }
+    public SDataTaxRegion getTaxRegion() { return moTaxRegion; }
+    public SDataCostCenter getCostCenter() { return moCostCenter; }
+    public SDataEntryDpsDpsLink getEntryDpsDpsLink() { return moEntryDpsDpsLink; }
+    public int getOperationTypePk() { return mnOperationTypePk; }
+    
     public void setConvFactor(final double d) { 
         mdConvFactor = d; 
         if (moDpsEntry != null) {
@@ -70,16 +85,9 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         }
     }
     
-    public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
-    public SDataItem getItem() { return moItem; }
-    public SDataItem getReferenceItem() { return moReferenceItem; }
-    public SDataUnit getUnit() { return moUnit; }
-    public SDataTaxRegion getTaxRegion() { return moTaxRegion; }
-    public SDataCostCenter getCostCenter() { return moCostCenter; }
-    public SDataDpsEntry getDpsEntry() { return moDpsEntry; } 
-    public SDataEntryDpsDpsLink getEntryDpsDpsLink() { return moEntryDpsDpsLink; }
-    public int getOperationTypePk() { return mnOperationTypePk; }
-    public double getConvFactor() { return mdConvFactor; }
+    public double getConvFactor() {
+        return mdConvFactor;
+    }
     
     public String getClaveUnidadSiie() { return msClaveUnidadSiie; }
     public String getClaveUnidadCfdi() { return moConcepto.getAttClaveUnidad().getString(); } 
@@ -107,29 +115,31 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
      * @param reference
      */
     public void setMatchingSettings(final SDataItem item, final SDataUnit unit, final SDataTaxRegion taxRegion, final SDataCostCenter costCenter, final SDataItem reference) {
+        moDpsEntry = new SDataDpsEntry();
         moItem = item;
-        moReferenceItem = reference;
+        moItemReference = reference;
         moUnit = unit;
         moTaxRegion = taxRegion;
         moCostCenter = costCenter;
-        moDpsEntry = new SDataDpsEntry();
         moEntryDpsDpsLink = null;
-        mdConvFactor = 1;
         mnOperationTypePk = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
+        mdConvFactor = 1;
     }
     
     /**
      * Borra todos los componentes de la clase
      */
     public void resetMatchingSettings() {
+        moDpsEntry = new SDataDpsEntry();
         moItem = null;
-        moReferenceItem = null;
+        moItemReference = null;
         moUnit = null;
         moTaxRegion = null;
         moCostCenter = null;
-        moDpsEntry = new SDataDpsEntry();
+        moEntryDpsDpsLink = null;
         mnOperationTypePk = 0;
-        mdConvFactor = 1.0;
+        mdConvFactor = 1;
+        
         moTaxChargedMatched = new HashSet<>();
         moTaxRetainedMatched = new HashSet<>();
     }
@@ -137,7 +147,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     /**
      * Crea un nuevo DpsEntry a partir de los componentes ya asignados.
      */
-    public void setDpsEntry(){
+    public void setDpsEntry() {
         moDpsEntry.reset();
         /*
         moDpsEntry.setPkYearId(...);
@@ -218,7 +228,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moDpsEntry.setVgm("");
         moDpsEntry.setOperationsType(mnOperationTypePk); 
         moDpsEntry.setUserId(0);
-        moDpsEntry.setSortingPosition(mnRowCount); 
+        moDpsEntry.setSortingPosition(mnRow); 
         moDpsEntry.setIsPrepayment(false);
         moDpsEntry.setIsDiscountRetailChain(false);
         moDpsEntry.setIsTaxesAutomaticApplying(true);
@@ -246,12 +256,12 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moDpsEntry.setFkCashAccountId_n(...);
         */
         moDpsEntry.setFkCostCenterId_n(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX());
-        moDpsEntry.setFkItemRefId_n(moReferenceItem == null ? 0 : moReferenceItem.getPkItemId());
+        moDpsEntry.setFkItemRefId_n(moItemReference == null ? 0 : moItemReference.getPkItemId());
         moDpsEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         
         moDpsEntry.setDbmsOriginalUnitSymbol(moUnit == null ? "" : moUnit.getSymbol());
         moDpsEntry.setDbmsTaxRegion(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion());
-        moDpsEntry.setDbmsItemRef_n(moReferenceItem == null ? "" : moReferenceItem.getItem()); 
+        moDpsEntry.setDbmsItemRef_n(moItemReference == null ? "" : moItemReference.getItem()); 
         moDpsEntry.setDbmsCostCenterCode(moCostCenter == null ? "" : moCostCenter.getCode());
         moDpsEntry.setDbmsCostCenter_n(moCostCenter == null ? "" : moCostCenter.getCostCenter());
         
@@ -292,7 +302,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         
         // CFDI:
         
-        mvValues.add(mnRowCount); //#
+        mvValues.add(mnRow); //#
         mvValues.add(moConcepto.getAttNoIdentificacion().getString());
         mvValues.add(moConcepto.getAttDescripcion().getString());
         mvValues.add(moConcepto.getAttClaveProdServ().getString());
@@ -327,8 +337,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         mvValues.add(mnOperationTypePk == 0 ? "" : SDataConstantsSys.OperationsTypesOpsMap.get(mnOperationTypePk)); //Tipo de operación
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX());//Clave centro costo
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getCostCenter()); //Centro costo
-        mvValues.add(moReferenceItem == null ? "" : moReferenceItem.getKey());  //Clave ítem de referencia
-        mvValues.add(moReferenceItem == null ? "" : moReferenceItem.getItem()); //ítem de referencia
+        mvValues.add(moItemReference == null ? "" : moItemReference.getKey());  //Clave ítem de referencia
+        mvValues.add(moItemReference == null ? "" : moItemReference.getItem()); //ítem de referencia
         
         // CFDI (complemento):
         

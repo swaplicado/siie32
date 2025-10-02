@@ -46,6 +46,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataRecordType;
 import erp.mfin.data.SDataTax;
+import erp.mfin.data.SDataTaxRegion;
 import erp.mfin.data.SProcAccountBizPartnerBpTypeVal;
 import erp.mfin.data.SProcAccountBizPartnerBpVal;
 import erp.mfin.data.SProcAccountBizPartnerGet;
@@ -699,6 +700,9 @@ public abstract class SDataUtilities {
 
             case SDataConstants.FINU_TP_REC:
                 registry = new SDataRecordType();
+                break;
+            case SDataConstants.FINU_TAX_REG:
+                registry = new SDataTaxRegion();
                 break;
             case SDataConstants.FINU_TAX:
                 registry = new SDataTax();
@@ -1559,7 +1563,7 @@ public abstract class SDataUtilities {
 
     /**
      * @param client ERP Client interface.
-     * @param keyDps Purchases-Sales Document key.
+     * @param dpsKey Purchases-Sales Document key.
      * @param year Fiscal year.
      * @returns Returns an array of double, where:
      * index 0: balance in domestic currency.
@@ -1572,7 +1576,7 @@ public abstract class SDataUtilities {
 
     /**
      * @param client ERP Client interface.
-     * @param keyDps Purchases-Sales Document key.
+     * @param dpsKey Purchases-Sales Document key.
      * @param year Fiscal year.
      * @param dateCutOff_n If needed, cut-off date.
      * @returns Returns an array of double, where:

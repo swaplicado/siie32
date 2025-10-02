@@ -32,7 +32,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     protected int mnFkItemId;
     protected int mnFkUnitId;
     protected int mnFkTaxRegionId;
-    protected int mnFkItemRefId_n;
+    protected int mnFkItemReferenceId_n;
     protected java.lang.String msFkCostCenterId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -60,7 +60,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkTaxRegionId(int n) { mnFkTaxRegionId = n; }
-    public void setFkItemRefId_n(int n) { mnFkItemRefId_n = n; }
+    public void setFkItemReferenceId_n(int n) { mnFkItemReferenceId_n = n; }
     public void setFkCostCenterId_n(java.lang.String s) { msFkCostCenterId_n = s; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -81,7 +81,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkTaxRegionId() { return mnFkTaxRegionId; }
-    public int getFkItemRefId_n() { return mnFkItemRefId_n; }
+    public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     public java.lang.String getFkCostCenterId_n() { return msFkCostCenterId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -117,7 +117,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
         mnFkItemId = 0;
         mnFkUnitId = 0;
         mnFkTaxRegionId = 0;
-        mnFkItemRefId_n = 0;
+        mnFkItemReferenceId_n = 0;
         msFkCostCenterId_n = "";
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -158,7 +158,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
                 mnFkItemId = resultSet.getInt("fid_item");
                 mnFkUnitId = resultSet.getInt("fid_unit");
                 mnFkTaxRegionId = resultSet.getInt("fid_tax_reg");
-                mnFkItemRefId_n = resultSet.getInt("fid_item_ref_n");
+                mnFkItemReferenceId_n = resultSet.getInt("fid_item_ref_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
@@ -217,7 +217,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
             callableStatement.setInt(nParam++, mnFkItemId);
             callableStatement.setInt(nParam++, mnFkUnitId);
             callableStatement.setInt(nParam++, mnFkTaxRegionId);
-            callableStatement.setInt(nParam++, mnFkItemRefId_n);
+            callableStatement.setInt(nParam++, mnFkItemReferenceId_n);
             callableStatement.setInt(nParam++, mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

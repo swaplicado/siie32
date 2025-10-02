@@ -986,7 +986,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
             SDataTaxRegion taxRegion = new SDataTaxRegion();
             taxRegion.read(new int [] { match.getFkTaxRegionId() }, miClient.getSession().getStatement());
             SDataItem refItem = (SDataItem) SDataUtilities.readRegistry(miClient,
-                SDataConstants.ITMU_ITEM, new int[] { match.getFkItemRefId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                SDataConstants.ITMU_ITEM, new int[] { match.getFkItemReferenceId_n() }, SLibConstants.EXEC_MODE_SILENT);
             SDataCostCenter cc = (SDataCostCenter) SDataUtilities.readRegistry(miClient,
                 SDataConstants.FIN_CC, new String[] { match.getFkCostCenterId_n() }, SLibConstants.EXEC_MODE_SILENT);
            
@@ -2068,7 +2068,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 match.setFkItemId(rowCfdiImport.getItem().getPkItemId());
                 match.setFkUnitId(rowCfdiImport.getUnit().getPkUnitId());
                 match.setFkTaxRegionId(rowCfdiImport.getTaxRegion().getPkTaxRegionId());
-                match.setFkItemRefId_n(rowCfdiImport.getReferenceItem() == null ? 0 : rowCfdiImport.getReferenceItem().getPkItemId());
+                match.setFkItemReferenceId_n(rowCfdiImport.getReferenceItem() == null ? 0 : rowCfdiImport.getReferenceItem().getPkItemId());
                 match.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
                 match.setFkCostCenterId_n(rowCfdiImport.getCostCenter() == null ? "" : rowCfdiImport.getCostCenter().getPkCostCenterIdXXX());
             }
@@ -2079,7 +2079,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 match.setUseLast(miClient.getSession().getSystemDate());
                 match.setFkUnitId(rowCfdiImport.getUnit().getPkUnitId());
                 match.setFkTaxRegionId(rowCfdiImport.getTaxRegion().getPkTaxRegionId());
-                match.setFkItemRefId_n(rowCfdiImport.getReferenceItem() == null ? 0 : rowCfdiImport.getReferenceItem().getPkItemId());
+                match.setFkItemReferenceId_n(rowCfdiImport.getReferenceItem() == null ? 0 : rowCfdiImport.getReferenceItem().getPkItemId());
                 match.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
                 match.setFkCostCenterId_n(rowCfdiImport.getCostCenter() == null ? "" : rowCfdiImport.getCostCenter().getPkCostCenterIdXXX());
             }
