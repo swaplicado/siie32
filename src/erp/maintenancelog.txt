@@ -1,15 +1,23 @@
 ================================================================================
+SIIE 3.2 290.10/ 2025-10-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cuarta liberación de la funcionalidad de importación de documentos autorizados desde Portal de Compras.
+2) Captura asistida de facturas de proveedores extranjeros.
+3) Estandarización general de parámetros de la invocación de la forma de captura de documentos.
+
+================================================================================
 SIIE 3.2 290.9/ 2025-10-01
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Notas de aceptación o rechazo en pagos desde servicios externos
+1) Notas de aceptación o rechazo en pagos desde servicios externos.
 
 ================================================================================
 SIIE 3.2 290.8/ 2025-10-01
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Corrección de envió de cotizaciones de requisiciones
-2) Corrección en la forma de captura de listas de precios clientes
+2) Corrección en la forma de captura de listas de precios clientes.
 
 ================================================================================
 SIIE 3.2 290.7/ 2025-10-01
@@ -22,7 +30,7 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 290.6/ 2025-09-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Tercera liberación de la funcionalidad de importación de documentos autorizados en Portal de Compras.
+1) Tercera liberación de la funcionalidad de importación de documentos autorizados desde Portal de Compras.
 2) Generación y publicación en Portal de Compras de solicitudes de pago de documentos autorizados importados a SIIE.
 
 ================================================================================
