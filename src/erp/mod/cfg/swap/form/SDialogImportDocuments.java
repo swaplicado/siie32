@@ -348,7 +348,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbImport.setText("Importar factura");
+        jbImport.setText("Importar factura nac.");
         jbImport.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbImport.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN5.add(jbImport);
@@ -357,7 +357,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbRecord.setText("Capturar factura");
+        jbRecord.setText("Capturar factura int.");
         jbRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbRecord.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN6.add(jbRecord);

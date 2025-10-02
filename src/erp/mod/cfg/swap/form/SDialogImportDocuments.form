@@ -403,7 +403,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbImport">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Importar factura"/>
+                        <Property name="text" type="java.lang.String" value="Importar factura nac."/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -423,7 +423,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbRecord">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Capturar factura"/>
+                        <Property name="text" type="java.lang.String" value="Capturar factura int."/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
