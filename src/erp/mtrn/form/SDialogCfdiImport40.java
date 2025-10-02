@@ -888,6 +888,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfRfcEmisor.setCaretPosition(0); 
         jtfNameEmisor.setCaretPosition(0);
         jtfInvoiceCfdi.setCaretPosition(0);
+        jtfPaymentType.setCaretPosition(0);
         jtfDateCfdi.setCaretPosition(0);
         jtfCurrency.setCaretPosition(0);
         jtfExchangeRate.setCaretPosition(0);
@@ -1672,7 +1673,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
     }
     
-    private void formValidate() { 
+    private void formValidate() {
         int selectRow = 0;
         SFormValidation validation = new SFormValidation();
         
@@ -1684,7 +1685,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
                     concepto.getAttDescripcion().getString();
             String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
-            boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
             
             if (mbWithPurchaseOrder && row.getEntryDpsDpsLink() == null) {
                 validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
@@ -1694,62 +1694,66 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 validation.setMessage(rowMsg + "no tiene asignado un ítem.");
                 break;
             }
-            else if (isItemRefReq && row.getReferenceItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
-                break;
-            }
-            else if (isItemRefReq && row.getReferenceItem().getPkItemId() == row.getItem().getPkItemId()) {
-                validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
-                break;
-            }
-            else if (row.getUnit() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una unidad.");
-                break;
-            }
-            else if (row.getTaxRegion() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
-                break;
-            }
-            else if (row.getOperationTypePk() == 0) {
-                validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
-                break;
-            }
-            else if (row.getCostCenter() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
-                break;
-            }
-            else if (row.getConvFactor() == 0.0) {
-                validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
-                break;
-            }
             else {
-                if (concepto.getEltOpcConceptoImpuestos() != null) {
-                    if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
-                        ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
-                        TAXES:
-                        for (DElementConceptoImpuestoTraslado traslado : traslados) {
-                            if (!row.getTaxChargedMatched().contains(traslado)) {
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
-                                        + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
-                                        + "Tipo: trasladado. \n"
-                                        + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
-                                        + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".");
-                                break ROWS;
+                boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
+                
+                if (isItemRefReq && row.getReferenceItem() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
+                    break;
+                }
+                else if (isItemRefReq && row.getReferenceItem().getPkItemId() == row.getItem().getPkItemId()) {
+                    validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                    break;
+                }
+                else if (row.getUnit() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una unidad.");
+                    break;
+                }
+                else if (row.getTaxRegion() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
+                    break;
+                }
+                else if (row.getOperationTypePk() == 0) {
+                    validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
+                    break;
+                }
+                else if (row.getCostCenter() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
+                    break;
+                }
+                else if (row.getConvFactor() == 0.0) {
+                    validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
+                    break;
+                }
+                else {
+                    if (concepto.getEltOpcConceptoImpuestos() != null) {
+                        if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
+                            ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                            TAXES:
+                            for (DElementConceptoImpuestoTraslado traslado : traslados) {
+                                if (!row.getTaxChargedMatched().contains(traslado)) {
+                                    validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
+                                            + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
+                                            + "Tipo: trasladado. \n"
+                                            + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
+                                            + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".");
+                                    break ROWS;
+                                }
                             }
                         }
-                    }
-                    
-                    if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
-                        ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
-                        TAXES:
-                        for (DElementConceptoImpuestoRetencion retencion : retenciones) {
-                            if (!row.getTaxRetainedMatched().contains(retencion)) { 
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
-                                        + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
-                                        + "Tipo: retenido. \n"
-                                        + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
-                                        + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".");
-                                break ROWS;
+
+                        if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                            ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                            TAXES:
+                            for (DElementConceptoImpuestoRetencion retencion : retenciones) {
+                                if (!row.getTaxRetainedMatched().contains(retencion)) { 
+                                    validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
+                                            + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
+                                            + "Tipo: retenido. \n"
+                                            + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
+                                            + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".");
+                                    break ROWS;
+                                }
                             }
                         }
                     }

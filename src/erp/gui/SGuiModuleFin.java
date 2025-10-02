@@ -118,8 +118,8 @@ import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
-import erp.mtrn.data.SDataCtr;
 import erp.mtrn.data.SConfigurationItemDps;
+import erp.mtrn.data.SDataCtr;
 import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
@@ -1636,12 +1636,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
             switch (formType) {
                 case SDataConstants.FIN_REC:
-                    ((SFormRecord) miForm).setValue(SLibConstants.VALUE_STATUS, mbIsFormReadOnly);
+                    ((SFormRecord) miForm).setValue(SLibConstants.VALUE_READ_ONLY, mbIsFormReadOnly);
                     break;
                 case SDataConstants.FINX_REC_RO:
-                    ((SFormRecord) miForm).setValue(SLibConstants.VALUE_STATUS, true);
+                    ((SFormRecord) miForm).setValue(SLibConstants.VALUE_READ_ONLY, true);
                     break;
                 default:
+                    // nothing
             }
 
             result = processForm(pk, isCopy);

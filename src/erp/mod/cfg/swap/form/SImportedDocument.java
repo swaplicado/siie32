@@ -7,15 +7,20 @@ package erp.mod.cfg.swap.form;
 
 import cfd.ver40.DCfdi40Catalogs;
 import erp.client.SClientInterface;
+import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -33,7 +38,7 @@ import sa.lib.gui.SGuiSession;
  * In memory document received from SWAP Services.
  * @author Sergio Flores
  */
-public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
+public class SImportedDocument implements SGridRow, Comparable<SImportedDocument> {
     
     public static final int PAYMENT_DEFN_NOT_REQ = 0; // pago no requerido
     public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
@@ -72,7 +77,7 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
     
     public Reference[] References;
     
-    public SRowDocument() {
+    public SImportedDocument() {
         ExternalDocumentId = 0;
         ExternalDocumentUuid = "";
         BizPartnerId = 0;
@@ -140,7 +145,7 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
         
         if (References != null) {
             for (Reference reference : References) {
-                references += (references.isEmpty() ? "" : ";") + reference;
+                references += (references.isEmpty() ? "" : ";") + reference.Reference;
             }
         }
         
@@ -673,6 +678,140 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
         return changed;
     }
     
+    /**
+     * Create a new DPS from this document.
+     * @param session GUI session.
+     * @return 
+     */
+    public SDataDps createDps(final SGuiSession session) throws Exception {
+        int year = SLibTimeUtils.digestYear(Date)[0];
+        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
+        SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
+        
+        SDataDps dps = new SDataDps();
+        
+        dps.setPkYearId(year);
+        //dps.setPkDocId(...
+        dps.setDate(Date);
+        dps.setDateDoc(Date);
+        dps.setDateStartCredit(Date);
+        //dps.setDateShipment_n(
+        //dps.setDateDelivery_n(
+        //dps.setDateDocLapsing_n(
+        //dps.setDateDocDelivery_n(
+        dps.setNumberSeries(NumberSeries);
+        dps.setNumber(Number);
+        //dps.setNumberReference(
+        //dps.setCommissionsReference(
+        //dps.setConditionsPayment(
+        //dps.setApprovalYear(
+        //dps.setApprovalNumber(
+        //dps.setDaysOfCredit(
+        //dps.setIsDiscountDocApplying(
+        //dps.setIsDiscountDocPercentage(
+        //dps.setDiscountDocPercentage(
+        //dps.setSubtotalProvisional_r(
+        //dps.setDiscountDoc_r(
+        //dps.setSubtotal_r(
+        //dps.setTaxCharged_r(
+        //dps.setTaxRetained_r(
+        //dps.setTotal_r(
+        //dps.setCommissions_r(
+        //dps.setExchangeRate(
+        //dps.setExchangeRateSystem(
+        //dps.setSubtotalProvisionalCy_r(
+        //dps.setDiscountDocCy_r(
+        //dps.setSubtotalCy_r(
+        //dps.setTaxChargedCy_r(
+        //dps.setTaxRetainedCy_r(
+        //dps.setTotalCy_r(
+        //dps.setCommissionsCy_r(
+        //dps.setDriver(
+        //dps.setPlate(
+        //dps.setTicket(
+        //dps.setShipments(
+        //dps.setPayments(
+        //dps.setPaymentMethod(
+        //dps.setPaymentAccount(
+        //dps.setAccountingTag(
+        //dps.setAutomaticAuthorizationRejection(
+        //dps.setIsPublic(
+        //dps.setIsLinked(
+        //dps.setIsClosed(
+        //dps.setIsClosedCommissions(
+        //dps.setIsShipped(
+        //dps.setIsDpsDeliveryAck(
+        //dps.setIsRebill(
+        //dps.setIsAudited(
+        //dps.setIsAuthorized(
+        //dps.setIsRecordAutomatic(
+        //dps.setIsCopy(
+        //dps.setIsCopied(
+        //dps.setIsSystem(
+        //dps.setIsDeleted(
+        dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
+        dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
+        dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
+        //dps.setFkPaymentTypeId(
+        //dps.setFkPaymentSystemTypeId(
+        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+        //dps.setFkDpsValidityStatusId(
+        //dps.setFkDpsAuthorizationStatusId(
+        //dps.setFkDpsAnnulationTypeId(
+        //dps.setFkDpsNatureId(
+        dps.setFkCompanyBranchId(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranchId());
+        dps.setFkFunctionalAreaId(functionalSubArea.getFkFunctionalAreaId());
+        dps.setFkFunctionalSubAreaId(functionalSubArea.getPkFunctionalSubAreaId());
+        dps.setFkBizPartnerId_r(bizPartner.getPkBizPartnerId());
+        dps.setFkBizPartnerBranchId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressId(bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
+        //dps.setFkBizPartnerAltId_r(
+        //dps.setFkBizPartnerBranchAltId(
+        //dps.setFkBizPartnerBranchAddressAltId(
+        //dps.setFkBizPartnerAddresseeId_n(
+        //dps.setFkAddresseeBizPartnerId_nr(
+        //dps.setFkAddresseeBizPartnerBranchId_n(
+        //dps.setFkAddresseeBizPartnerBranchAddressId_n(
+        //dps.setFkContactBizPartnerBranchId_n(
+        //dps.setFkContactContactId_n(
+        //dps.setFkTaxIdentityEmisorTypeId(
+        //dps.setFkTaxIdentityReceptorTypeId(
+        dps.setFkLanguajeId(bizPartner.getDbmsCategorySettingsSup().getFkLanguageId_n());
+        dps.setFkCurrencyId(CurrencyId);
+        //dps.setFkSalesAgentId_n(
+        //dps.setFkSalesAgentBizPartnerId_n(
+        //dps.setFkSalesSupervisorId_n(
+        //dps.setFkSalesSupervisorBizPartnerId_n(
+        //dps.setFkIncotermId(
+        //dps.setFkSpotSourceId_n(
+        //dps.setFkSpotDestinyId_n(
+        //dps.setFkModeOfTransportationTypeId(
+        //dps.setFkCarrierTypeId(
+        //dps.setFkCarrierId_n(
+        //dps.setFkVehicleTypeId_n(
+        //dps.setFkVehicleId_n(
+        //dps.setFkBillOfLading_n(
+        //dps.setFkSourceYearId_n(
+        //dps.setFkSourceDocId_n(
+        //dps.setFkMfgYearId_n(
+        //dps.setFkMfgOrderId_n(
+        //dps.setFkUserLinkedId(
+        //dps.setFkUserClosedId(
+        //dps.setFkUserClosedCommissionsId(
+        //dps.setFkUserShippedId(
+        //dps.setFkUserDpsDeliveryAckId(
+        //dps.setFkUserAuditedId(
+        //dps.setFkUserAuthorizedId(
+        //dps.setFkUserNewId(
+        //dps.setFkUserEditId(
+        //dps.setFkUserDeleteId(
+        
+        dps.setAuxKeepDpsData(true);
+        dps.setAuxImportedDocument(this);
+        
+        return dps;
+    }
+    
     @Override
     public Object getRowValueAt(int col) {
         Object value = null;
@@ -770,11 +909,16 @@ public class SRowDocument implements SGridRow, Comparable<SRowDocument> {
     
     @Override
     public String toString() {
-        return BizPartner + "; " + getFolio() + "; $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + "; ID " + ExternalDocumentId;
+        return BizPartner + "; "
+                + getFolio() + "; "
+                + SLibUtils.DateFormatDate.format(Date) + "; "
+                + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + "; "
+                + FunctionalSubArea + "; "
+                + "ID " + ExternalDocumentId;
     }
 
     @Override
-    public int compareTo(SRowDocument o) {
+    public int compareTo(SImportedDocument o) {
         return this.toString().compareTo(o.toString());
     }
 

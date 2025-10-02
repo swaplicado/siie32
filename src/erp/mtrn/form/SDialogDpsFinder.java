@@ -338,7 +338,7 @@ public class SDialogDpsFinder extends javax.swing.JDialog implements erp.lib.for
                 break;
 
             case SLibConstants.VALUE_CURRENCY_LOCAL:
-                value = moPanelDpsFinder.getIsLocalCurrency();
+                value = moPanelDpsFinder.getConvertToLocalCurrency();
                 break;
 
             default:

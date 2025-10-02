@@ -62,6 +62,7 @@ import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
@@ -294,6 +295,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
     protected int mnAuxInitiativeId; // case of application of initiative
     protected double mdAuxAppPrepayCurCrossPayExchangeRate; // case of an application of prepayment with currency crossing: payment's exchange rate
+    protected SImportedDocument moAuxImportedDocument;
     protected boolean mbXtaTestLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
@@ -2131,6 +2133,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
     public void setAuxInitiativeId(int n) { mnAuxInitiativeId = n; }
     public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
+    public void setAuxImportedDocument(SImportedDocument o) { moAuxImportedDocument = o; }
     public void setAuxTestLinks(boolean b) { mbXtaTestLinks = b; }
     public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
     public void setXtaHasAuthWeb(boolean b) { mbXtaHasAuthWeb = b;}
@@ -2173,6 +2176,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
     public int getAuxInitiativeId() { return mnAuxInitiativeId; }
     public double getAuxAppPrepayCurCrossPayExchangeRate() { return mdAuxAppPrepayCurCrossPayExchangeRate; }
+    public SImportedDocument getAuxImportedDocument() { return moAuxImportedDocument; }
     public boolean getXtaTestLinks() { return mbXtaTestLinks; }
     public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
     public boolean getXtaHasAuthWeb() { return mbXtaHasAuthWeb; }
@@ -2452,6 +2456,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
         mnAuxInitiativeId = 0;
         mdAuxAppPrepayCurCrossPayExchangeRate = 0;
+        moAuxImportedDocument = null;
         mbXtaTestLinks = true;
         mbXtaHasSuppFiles = false;
         mbXtaHasAuthWeb = false;

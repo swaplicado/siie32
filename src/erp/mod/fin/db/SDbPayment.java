@@ -570,15 +570,19 @@ public class SDbPayment extends SDbRegistryUser {
         if (value instanceof Object[]) {
             newStatusPaymentId = (Integer) ((Object[]) value)[0];
             userId = (Integer) ((Object[]) value)[1];
-            database = (String) ((Object[]) value)[2];
+            
+            if (((Object[]) value).length > 2) {
+                database = (String) ((Object[]) value)[2];
+            }
             
             switch (newStatusPaymentId) {
                 case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
                 case SModSysConsts.FINS_ST_PAY_REJ:
-                //case SModSysConsts.FINS_ST_PAY_SCHED: // change to scheduled with updateStatusToScheduled()
-                //case SModSysConsts.FINS_ST_PAY_EXEC: // change to executed with updateStatusToExecuted()
+                case SModSysConsts.FINS_ST_PAY_SCHED:
+                case SModSysConsts.FINS_ST_PAY_EXEC:
                 case SModSysConsts.FINS_ST_PAY_SUBR:
                 case SModSysConsts.FINS_ST_PAY_RCPT:
+                case SModSysConsts.FINS_ST_PAY_BLOC:
                 case SModSysConsts.FINS_ST_PAY_CAN:
                     break;
                     
@@ -675,6 +679,63 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
 
         return registry;
+    }
+    
+    /**
+     * Get settled status for the given one.
+     * @param statusPaymentInProcessId Status of payment.
+     * @return 
+     */
+    public static int getSettledStatusPayment(final int statusPaymentInProcessId) {
+        int settledStatusPayment = 0;
+        
+        switch (statusPaymentInProcessId) {
+            case SModSysConsts.FINS_ST_PAY_REJ_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_REJ;
+                break;
+            case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_SCHED;
+                break;
+            case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_EXEC;
+                break;
+            case SModSysConsts.FINS_ST_PAY_SUBR_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_SUBR;
+                break;
+            case SModSysConsts.FINS_ST_PAY_RCPT_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_RCPT;
+                break;
+            case SModSysConsts.FINS_ST_PAY_BLOC_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_BLOC;
+                break;
+            case SModSysConsts.FINS_ST_PAY_CAN_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_CAN;
+                break;
+            default:
+                // nothing
+        }
+        
+        return settledStatusPayment;
+    }
+    
+    /**
+     * Check if payment of given status should be exported as deleted.
+     * @param statusPaymentInProcessId Status of payment.
+     * @return 
+     */
+    public static boolean exportStatusPaymentAsDeleted(final int statusPaymentInProcessId) {
+        boolean exportAsDeleted = false;
+        
+        switch (statusPaymentInProcessId) {
+            case SModSysConsts.FINS_ST_PAY_SUBR_P:
+            case SModSysConsts.FINS_ST_PAY_CAN_P:
+                exportAsDeleted = true;
+                break;
+            default:
+                // nothing
+        }
+        
+        return exportAsDeleted;
     }
     
     /**

@@ -946,7 +946,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
-            miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
+            miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey() });
             if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                 miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                 SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -958,7 +958,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     public void actionEdit() {
        if (jbEdit.isEnabled()) {
            if (isRowSelected()) {
-                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
+                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey() });
                 miClient.getGuiModule(mnModule).setCurrentUserPrivilegeLevel(mbHasRightEdit ? SUtilConsts.LEV_AUTHOR : SUtilConsts.LEV_READ);
 
                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
@@ -1069,28 +1069,31 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 int[] adjustmentSubtypeKey = (int[]) moDialogDpsFinder.getValue(SDataConstants.TRNS_STP_DPS_ADJ);
                 Object complement = null;
                 boolean isMatReqImport = false;
-                if (adjustmentSubtypeKey == null) {
-                    complement = new Object[] { 
-                                                getDpsTypeKey(), 
-                                                false, 
-                                                moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), 
-                                                null, 
-                                                moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL),
-                                                isMatReqImport
-                                            };
+                
+                if (adjustmentSubtypeKey != null) {
+                    // complemento para crear un documento de ajuste:
+                    complement = new Object[] {
+                        getDpsTypeKey(),
+                        false, // parámetro sin uso!!!
+                        moDialogDpsFinder.getValue(SDataConstants.TRN_DPS),
+                        adjustmentSubtypeKey,
+                        moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL), // convertir a moneda local!
+                        isMatReqImport // solo se usa si la categoría del documento es "compras"
+                    };
                 }
-                else { 
-                    complement = new Object[] { 
-                                                getDpsTypeKey(), 
-                                                true, 
-                                                moDialogDpsFinder.getValue(SDataConstants.TRN_DPS), 
-                                                adjustmentSubtypeKey, 
-                                                moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL),
-                                                isMatReqImport
-                                            };
+                else {
+                    // complemento para crear un documento:
+                    complement = new Object[] {
+                        getDpsTypeKey(),
+                        false, // parámetro sin uso!!!
+                        moDialogDpsFinder.getValue(SDataConstants.TRN_DPS),
+                        null,
+                        moDialogDpsFinder.getValue(SLibConstants.VALUE_CURRENCY_LOCAL), // convertir a moneda local!
+                        isMatReqImport // solo se usa si la categoría del documento es "compras"
+                    };
                 }
                 
-                miClient.getGuiModule(mnModule).setFormComplement(complement);   // document type key, reference document and adjustment type (optional)
+                miClient.getGuiModule(mnModule).setFormComplement(complement);
                 if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                     SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -1102,7 +1105,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionCopy() {
         if (jbCopy.isEnabled()) {
             if (isRowSelected()) {
-                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false });  // document type key, is imported
+                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey() });  // document type key
                 if (miClient.getGuiModule(mnModule).showFormForCopy(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                     SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
@@ -1177,13 +1180,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         oDialog.setValue(SDataConstants.TRN_DPS, null);
         oDialog.setFormVisible(true);
         if (oDialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            Object complement = new Object[] { getDpsTypeKey(), 
-                                                false, 
-                                                oDialog.getValue(SDataConstants.TRN_DPS), 
-                                                null, 
-                                                true,
-                                                true
-                                            };
+            Object complement = new Object[] {
+                getDpsTypeKey(),
+                false, // parámetro sin uso!!!
+                oDialog.getValue(SDataConstants.TRN_DPS),
+                null,
+                true, // XXX (Sergio Flores, 2025-10-01: Validar si este parámetro es correcto, es para forzar la conversión del documento de origen a moneda local
+                true
+            };
             
             miClient.getGuiModule(mnModule).setFormComplement(complement);
             if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {

@@ -4489,7 +4489,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     @Override
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
-            case SLibConstants.VALUE_STATUS:
+            case SLibConstants.VALUE_READ_ONLY:
                 mbIsFormReadOnly = (Boolean) value;
                 break;
             default:

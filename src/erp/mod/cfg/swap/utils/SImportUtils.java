@@ -19,6 +19,7 @@ import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbComImportLogEntry;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
@@ -43,7 +44,6 @@ import java.util.zip.ZipInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import sa.lib.SLibUtils;
-import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -57,6 +57,9 @@ public abstract class SImportUtils {
     
     private static final String DownloadFilePrefix = "facturas compras "; // keep final blank space!
     
+    public static final int FILES_ZIP = 0;
+    public static final int CFDI_XML = 0;
+    public static final int CFDI_PDF = 1;
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
     
     /**
@@ -83,22 +86,7 @@ public abstract class SImportUtils {
      * Import and create a new invoice.
      * @param client GUI client.
      * @param isPurchase Is-purchase flag.
-     * @param dialogDpsFinder DPS Finder dialog.
-     * @param cfdiXml XML CFDI file. Can be <code>null</code>. When it is <code>null</code>, then a file is required in an "open" dialog.
-     * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
-     * @param linkToOrder Link-to-order flag.
-     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
-     * @throws java.lang.Exception
-     */
-    public static int[] importCfdi(final SGuiClient client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired) throws Exception {
-        return importCfdi((SClientInterface) client, isPurchase, dialogDpsFinder, cfdiXml, cfdiPdf, linkToOrder, orderRequired);
-    }
-    
-    /**
-     * Import and create a new invoice.
-     * @param client GUI client.
-     * @param isPurchase Is-purchase flag.
-     * @param dialogDpsFinder DPS Finder dialog.
+     * @param dialogDpsFinder DPS finder dialog.
      * @param cfdiXml XML CFDI file. Can be <code>null</code>. When it is <code>null</code>, then a file is required in an "open" dialog.
      * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
      * @param linkToOrder Link-to-order flag.
@@ -156,7 +144,7 @@ public abstract class SImportUtils {
                     if (newDps != null) {
                         newDps.setAuxFilePdf(cfdiPdf);
                         
-                        client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey, false }); // document type key, document is NOT imported
+                        client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
                         client.getGuiModule(module).setAuxRegistry(newDps);
 
                         if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
@@ -181,6 +169,84 @@ public abstract class SImportUtils {
                 client.getFileChooser().resetChoosableFileFilters();
                 client.getFileChooser().setAcceptAllFileFilterUsed(true);
             }
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
+    }
+    
+    /**
+     * Create a new invoice.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS finder dialog.
+     * @param dpsPdf PDF DPS file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @param importedDocument Documento importado.
+     * @return DPS key as <code>int[]</code> of new invoice created.
+     * @throws java.lang.Exception
+     */
+    public static int[] createDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+        SDataDps invoice = null;
+        SDataDps order = null; 
+
+        if (linkToOrder) {
+            if (orderRequired != null) {
+                order = orderRequired;
+            }
+            else {
+                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                
+                dialogDpsFinder.formReset();
+                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
+                dialogDpsFinder.setVisible(true);
+
+                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                }
+            }
+        }
+        
+        Exception exception = null;
+
+        try {
+            if (!linkToOrder || (linkToOrder && order != null)) {
+                int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                
+                Object complement;
+                
+                if (order != null) {
+                    complement = new Object[] { invoiceTypeKey, false, order };
+                }
+                else {
+                    complement = new Object[] { invoiceTypeKey };
+                }
+                
+                SDataDps newDps = null;
+                
+                if (importedDocument != null) {
+                    newDps = importedDocument.createDps(client.getSession());
+                    newDps.setAuxFilePdf(dpsPdf);
+                }
+
+                client.getGuiModule(module).setFormComplement(complement);
+                client.getGuiModule(module).setAuxRegistry(newDps);
+
+                if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                    invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                    SDataUtilities.showDpsRecord(client, invoice);
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
         }
         
         if (exception != null) {

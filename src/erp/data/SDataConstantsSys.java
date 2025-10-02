@@ -191,6 +191,7 @@ public abstract class SDataConstantsSys {
     
     public static final int USRX_USER_NA = 1;
     public static final int USRX_USER_SUPER = 2;
+    public static final int USRX_USER_ADMIN = 3;
 
     public static final int USRX_PREF_SESSION = 1;
     public static final int USRX_PREF_VIEW = 2;

@@ -2858,7 +2858,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     @Override
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
-            case SLibConstants.VALUE_STATUS:
+            case SLibConstants.VALUE_READ_ONLY:
                 mbParamReadOnly = (Boolean) value;
                 break;
             default:

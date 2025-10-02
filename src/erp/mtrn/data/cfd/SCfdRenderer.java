@@ -150,21 +150,24 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
         
         cfd.ver40.DElementComprobante comprobante = DCfdUtils.getCfdi40(msCfdiXml);
         
-        if (!miClient.isDev()) {
-            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
-            
-            if (!cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
-                validation.setMessage("No se puede importar el CFDI porque su estatus SAT es: " + cfdiStatus + ".");
-            }
+        // validar CFDI:
+        
+        String tipoDeComprobante = comprobante.getAttTipoDeComprobante().getString();
+
+        if (!tipoDeComprobante.toUpperCase().equals(DCfdi40Catalogs.CFD_TP_I)) {
+            validation.setMessage("No se puede importar el CFDI porque su tipo debe ser '" + DCfdi40Catalogs.CFD_TP_I + "', pero es '" + tipoDeComprobante + "'.");
         }
         
         if (!validation.getIsError()) {
-            String tipoDeComprobante = comprobante.getAttTipoDeComprobante().getString();
-            if (!tipoDeComprobante.toUpperCase().equals(DCfdi40Catalogs.CFD_TP_I)) {
-                validation.setMessage("No se puede importar el CFDI porque su tipo debe ser '" + DCfdi40Catalogs.CFD_TP_I + "', pero es '" + tipoDeComprobante + "'.");
+            if (!miClient.isDev()) {
+                String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
+
+                if (!cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
+                    validation.setMessage("No se puede importar el CFDI porque su estatus SAT es: " + cfdiStatus + ".");
+                }
             }
         }
-
+        
         // validar receptor del CFDI:
         
         int idEmisor = 0;
@@ -195,49 +198,46 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
                 }
 
                 idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
-                        comprobante.getEltEmisor().getAttRfc().getString(), "", 0);
+                        comprobante.getEltEmisor().getAttRfc().getString(), "", SDataConstantsSys.BPSS_CT_BP_SUP);
+                
+                if (idEmisor == 0) {
+                    idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
+                            comprobante.getEltEmisor().getAttRfc().getString(), "", 0);
+                }
 
                 if (idEmisor == 0) {
                     validation.setMessage("¡El emisor '" + emisor + "' no existe en los catálogos de proveedores ni de asociados de negocios!");
                 }
                 else {
-                    idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
-                            comprobante.getEltEmisor().getAttRfc().getString(), "", SDataConstantsSys.BPSS_CT_BP_SUP);
+                    SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
+                            SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerCategory bizPartnerCategory = bizPartner.getDbmsCategorySettingsSup(); // variable de conveniencia
 
-                    if (idEmisor == 0) {
-                        validation.setMessage("¡El emisor '" + emisor + "' no existe en el catálogo de proveedores!");
+                    if (bizPartner.getIsDeleted()) {
+                        validation.setMessage("¡El emisor '" + emisor + "' está eliminado como asociado de negocios!");
+                    }
+                    else if (bizPartnerCategory == null) {
+                        validation.setMessage("¡El emisor '" + emisor + "' no es proveedor!");
+                    }
+                    else if (bizPartnerCategory.getIsDeleted()) {
+                        validation.setMessage("¡El emisor '" + emisor + "' está eliminado como proveedor!");
+                    }
+                    else if (SDataUtilities.obtainIsBizPartnerBlocked(miClient, bizPartner.getPkBizPartnerId(), mnBizCategory)) {
+                        validation.setMessage("!El emisor '" + emisor + "' está bloqueado!");
                     }
                     else {
-                        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
-                                SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
-                        SDataBizPartnerCategory bizPartnerCategory = bizPartner.getDbmsCategorySettingsSup(); // variable de conveniencia
+                        if (miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice()) { // aplicar política de crédito, si está activa
+                            int risk = bizPartnerCategory.getEffectiveRiskTypeId();
 
-                        if (bizPartner.getIsDeleted()) {
-                            validation.setMessage("¡El emisor '" + emisor + "' está eliminado como asociado de negocios!");
-                        }
-                        else if (bizPartnerCategory == null) {
-                            validation.setMessage("¡El emisor '" + emisor + "' no es proveedor!");
-                        }
-                        else if (bizPartnerCategory.getIsDeleted()) {
-                            validation.setMessage("¡El emisor '" + emisor + "' está eliminado como proveedor!");
-                        }
-                        else if (SDataUtilities.obtainIsBizPartnerBlocked(miClient, bizPartner.getPkBizPartnerId(), mnBizCategory)) {
-                            validation.setMessage("!El emisor '" + emisor + "' está bloqueado!");
-                        }
-                        else {
-                            if (miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice()) {
-                                int risk = bizPartnerCategory.getEffectiveRiskTypeId();
-
-                                if (risk == SModSysConsts.BPSS_RISK_D_BLOCKED) {
-                                    validation.setMessage(SLibConstants.MSG_INF_BP_BLOCKED);
-                                }
-                                else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_WO_OPS) {
-                                    validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
-                                }
-                                else if (risk == SModSysConsts.BPSS_RISK_F_TRIAL_W_OPS) {
-                                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                        validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_W_OPS);
-                                    }
+                            if (risk == SModSysConsts.BPSS_RISK_D_BLOCKED) {
+                                validation.setMessage(SLibConstants.MSG_INF_BP_BLOCKED);
+                            }
+                            else if (risk == SModSysConsts.BPSS_RISK_E_TRIAL_WO_OPS) {
+                                validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_WO_OPS);
+                            }
+                            else if (risk == SModSysConsts.BPSS_RISK_F_TRIAL_W_OPS) {
+                                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_BP_TRIAL_W_OPS + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL_W_OPS);
                                 }
                             }
                         }
@@ -296,8 +296,9 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
             
             if (!validation.getIsError()) {
                 moCfdiViewer.setVisible(false);
+                
                 SDialogCfdiImport40 dialog = new SDialogCfdiImport40(miClient, moPurchaseOrder, moCfdiFile);
-                dialog.setComprobante(comprobante); 
+                dialog.setComprobante(comprobante);
                 dialog.setFormVisible(true);
                 moDpsRendered = dialog.getNewDps();
             }

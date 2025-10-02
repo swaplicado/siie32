@@ -142,7 +142,7 @@ public abstract class SLibConstants {
     public static final int VALUE_PRIMARY_KEY = 1;
     public static final int VALUE_FILTER_KEY = 2;
     public static final int VALUE_YEAR = 3;
-    public static final int VALUE_STATUS = 4;
+    public static final int VALUE_READ_ONLY = 4;
     public static final int VALUE_TEXT = 5;
     public static final int VALUE_TYPE = 6;
     public static final int VALUE_EXC_RATE = 7;
@@ -153,6 +153,7 @@ public abstract class SLibConstants {
     public static final int VALUE_INV_NOT = 11;
     public static final int VALUE_INV_ONLY = 12;
     public static final int VALUE_IS_COPY = 13;
+    @Deprecated
     public static final int VALUE_IS_IMPORTED = 14;
     public static final int VALUE_POST_EMIT_EDIT = 21;
     

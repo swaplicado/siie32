@@ -1178,6 +1178,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         return viewTitle;
     }
 
+    @SuppressWarnings("deprecation")
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {
         int result = SLibConstants.UNDEFINED;
 
@@ -1269,9 +1270,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             // form complement contains: document type as int[]:
 
                             type = (int[]) moFormComplement;
-                            miForm.setValue(SLibConstants.VALUE_TYPE, type);            // document type as int[]
-                            miForm.setValue(SLibConstants.VALUE_STATUS, false);         // editable status
-                            miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, false); // convert local currency DPS
+                            miForm.setValue(SLibConstants.VALUE_TYPE, type); // document type as int[]
+                            miForm.setValue(SLibConstants.VALUE_READ_ONLY, false); // editable status
+                            miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, false); // convert DPS to local currency
                         }
                         else if (moFormComplement instanceof Object[]) {
                             // form complement contains: document type and a source document to import entries:
@@ -1280,15 +1281,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             miForm.setValue(SLibConstants.VALUE_TYPE, type); // document type as int[]
 
                             if (((Object[]) moFormComplement).length >= 2) {
-                                miForm.setValue(SLibConstants.VALUE_IS_IMPORTED, ((Object[]) moFormComplement)[1]);
+                                miForm.setValue(SLibConstants.VALUE_IS_IMPORTED, ((Object[]) moFormComplement)[1]); // useles parameter!
                             }
                             
-                            if (((Object[]) moFormComplement).length >= 3) {
+                            if (((Object[]) moFormComplement).length >= 3 && ((Object[]) moFormComplement)[2] != null) {
                                 if (((Object[]) moFormComplement)[2] instanceof Boolean) {
-                                    miForm.setValue(SLibConstants.VALUE_STATUS, ((Object[]) moFormComplement)[2]);
+                                    // is read only?
+                                    miForm.setValue(SLibConstants.VALUE_READ_ONLY, ((Object[]) moFormComplement)[2]);
                                 }
                                 else if (((Object[]) moFormComplement)[2] instanceof SDataDps) {
-                                    // DUDA !
+                                    // source document:
                                     if (SLibUtils.belongsTo(type, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_EST, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_PUR_CN })) {
                                         miForm.setValue(SDataConstants.TRN_DPS, ((Object[]) moFormComplement)[2]);
                                     }
@@ -1296,11 +1298,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             }
 
                             if (((Object[]) moFormComplement).length >= 4 && ((Object[]) moFormComplement)[3] != null) {
-                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[3]);
+                                miForm.setValue(SDataConstants.TRNS_STP_DPS_ADJ, ((Object[]) moFormComplement)[3]); // DPS adjustment subtype, if provided
                             }
 
                             if (((Object[]) moFormComplement).length >= 5) {
-                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]);
+                                miForm.setValue(SLibConstants.VALUE_CURRENCY_LOCAL, ((Object[]) moFormComplement)[4]); // convert DPS to local currency
                             }
                             
                             if (((Object[]) moFormComplement).length >= 6) {
@@ -1311,8 +1313,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     break;
 
                 case SDataConstants.TRNX_DPS_RO:
-                    miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement);    // int[] document type
-                    miForm.setValue(SLibConstants.VALUE_STATUS, true);              // editable status
+                    miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement); // int[] document type
+                    miForm.setValue(SLibConstants.VALUE_READ_ONLY, true); // editable status
                     break;
 
                 default:

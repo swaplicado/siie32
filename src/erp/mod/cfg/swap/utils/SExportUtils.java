@@ -355,7 +355,7 @@ public abstract class SExportUtils {
                         
                     case PUR_ORDER:
                     case PUR_PAYMENT:
-                    case PUR_PAYMENT_AUTH:
+                    case PUR_PAYMENT_UPD:
                         String attributeId = "";
                         databasesMap = getSwapCompaniesDatabasesMap(session);
                         
@@ -470,7 +470,7 @@ public abstract class SExportUtils {
                         case PUR_ORDER_FILE:
                         case PUR_REF_ORDER:
                         case PUR_PAYMENT:
-                        case PUR_PAYMENT_AUTH:
+                        case PUR_PAYMENT_UPD:
                             log = new SDbComSyncLog();
                             break;
 
@@ -520,7 +520,7 @@ public abstract class SExportUtils {
                             case PUR_ORDER_FILE:
                             case PUR_REF_ORDER:
                             case PUR_PAYMENT:
-                            case PUR_PAYMENT_AUTH:
+                            case PUR_PAYMENT_UPD:
                                 log = new SDbComSyncLog();
                                 break;
 
@@ -536,9 +536,8 @@ public abstract class SExportUtils {
                             Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
                             complementProcessing(session, syncType, entries, value);
                         }
-                        else if (syncType == SSyncType.PUR_PAYMENT_AUTH) {
-                            //Object value = ...
-                            //complementProcessing(session, syncType, entries, value);
+                        else if (syncType == SSyncType.PUR_PAYMENT_UPD) {
+                            complementProcessing(session, syncType, entries, null); // el argumento 'value' se definirá individualmente para cada partida de sincronización
                         }
 
                         // log sync:
@@ -638,7 +637,7 @@ public abstract class SExportUtils {
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
      * @param entries Partidas de la bitácora de sincronización a procesar.
-     * @param value Nuevo valor para complementar el procesamiento de las partidas.
+     * @param value Nuevo valor para complementar el procesamiento de las partidas. Puede ser nulo.
      * @throws SQLException Si ocurre un error en las actualizaciones.
      * @throws Exception 
      */
@@ -651,6 +650,19 @@ public abstract class SExportUtils {
                 
                 for (SDbSyncLogEntry entry : entries) {
                     payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, value);
+                }
+                break;
+                
+            case PUR_PAYMENT_UPD:
+                // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
+                
+                for (SDbSyncLogEntry entry : entries) {
+                    int paymentId = SLibUtils.parseInt(entry.getReferenceId());
+                    SDbPayment paymentToUpdate = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
+                    int newStatusPayment = SDbPayment.getSettledStatusPayment(paymentToUpdate.getFkStatusPaymentId());
+                    Object valueToUpdate = new Object[] { newStatusPayment, paymentToUpdate.getFkUserUpdateId(), entry.getAuxDatabase() };
+                    
+                    paymentToUpdate.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
                 }
                 break;
                 
@@ -1034,12 +1046,13 @@ public abstract class SExportUtils {
                     case PUR_ORDER:
                     case PUR_REF_ORDER:
                     case PUR_PAYMENT:
+                    case PUR_PAYMENT_UPD:
                         // exportar antes áreas funcionales:
                         syncTypeInProgress = SSyncType.FUNCTIONAL_AREA;
                         info = computeRequest(session, syncTypeInProgress);
                         responses.getInfos().add(info);
 
-                        if (syncType == SSyncType.USER || syncType == SSyncType.PUR_PAYMENT) {
+                        if (syncType == SSyncType.USER || syncType == SSyncType.PUR_PAYMENT || syncType == SSyncType.PUR_PAYMENT_UPD) {
                             // para todas las exportaciones: exportar antes puestos laborales para autorización:
                             syncTypeInProgress = SSyncType.AUTH_JOB_TITLE;
                             info = computeRequest(session, syncTypeInProgress);
@@ -1060,7 +1073,7 @@ public abstract class SExportUtils {
                             }
                         }
                         
-                        if (syncType == SSyncType.PUR_ORDER || syncType == SSyncType.PUR_REF_ORDER || syncType == SSyncType.PUR_PAYMENT) {
+                        if (syncType == SSyncType.PUR_ORDER || syncType == SSyncType.PUR_REF_ORDER || syncType == SSyncType.PUR_PAYMENT || syncType == SSyncType.PUR_PAYMENT_UPD) {
                             // exportar antes proveedores:
                             syncTypeInProgress = SSyncType.PARTNER_SUPPLIER;
                             info = computeRequest(session, syncTypeInProgress);

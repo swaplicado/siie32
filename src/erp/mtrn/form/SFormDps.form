@@ -108,7 +108,18 @@
                             <Property name="text" type="java.lang.String" value="DOCUMENT TYPE"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[270, 23]"/>
+                              <Dimension value="[242, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jbViewImportedDocument">
+                          <Properties>
+                            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                              <Image iconType="3" name="/erp/img/icon_std_custom_acc_on.gif"/>
+                            </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="Ver documento importado..."/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
                             </Property>
                           </Properties>
                         </Component>

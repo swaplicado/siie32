@@ -808,12 +808,7 @@ public class SWizardExchangeDifference extends javax.swing.JDialog implements er
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        switch (type) {
-            case SLibConstants.VALUE_STATUS:
-                //mbParamIsReadOnly = (Boolean) value;
-                break;
-            default:
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

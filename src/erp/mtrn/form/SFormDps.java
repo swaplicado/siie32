@@ -60,6 +60,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.trn.db.SDbInitiative;
@@ -399,6 +400,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
+    private SImportedDocument moImportedDocument;
     private erp.mitm.data.SDataItem moAccEntryItem;
     private SConfigurationDpsOrderFiscalData moCfgFiscalDataPurchasesOrder;
     private SConfigurationPurposeDpsNature moCfgPurposeDpsNature;
@@ -445,6 +447,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel6 = new javax.swing.JPanel();
         jlDpsType = new javax.swing.JLabel();
         jtfDpsTypeRo = new javax.swing.JTextField();
+        jbViewImportedDocument = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         jtfCompanyBranchRo = new javax.swing.JTextField();
@@ -1064,8 +1067,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfDpsTypeRo.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfDpsTypeRo.setText("DOCUMENT TYPE");
         jtfDpsTypeRo.setFocusable(false);
-        jtfDpsTypeRo.setPreferredSize(new java.awt.Dimension(270, 23));
+        jtfDpsTypeRo.setPreferredSize(new java.awt.Dimension(242, 23));
         jPanel6.add(jtfDpsTypeRo);
+
+        jbViewImportedDocument.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_custom_acc_on.gif"))); // NOI18N
+        jbViewImportedDocument.setToolTipText("Ver documento importado...");
+        jbViewImportedDocument.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel6.add(jbViewImportedDocument);
 
         jPanel57.add(jPanel6);
 
@@ -4283,6 +4291,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDateDoc.addActionListener(this);
         jbDateStartCredit.addActionListener(this);
         jbDateMaturity.addActionListener(this);
+        jbViewImportedDocument.addActionListener(this);
         jbBizPartnerBalance.addActionListener(this);
         jbRecordManualSelect.addActionListener(this);
         jbRecordManualView.addActionListener(this);
@@ -7860,6 +7869,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfDaysOfCredit.setText(SLibTimeUtilities.getDaysDiff(date, moFieldDateStartCredit.getDate())+ "");
         renderDateMaturity();
     }
+    
+    private void actionViewImportedDocument() {
+        if (moImportedDocument != null) {
+            miClient.showMsgBoxInformation("Documento importado:\n" + moImportedDocument.toString().replaceAll(";", "\n"));
+        }
+    }
 
     private void actionBizPartnerBalance() {
         double limit = 0;
@@ -11389,6 +11404,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbSalesSupervisor;
     private javax.swing.JButton jbSetTime;
     private javax.swing.JButton jbTaxRegionId;
+    private javax.swing.JButton jbViewImportedDocument;
     private javax.swing.JComboBox jcbAccEntryItem;
     private javax.swing.JComboBox jcbAccEntryItemRef_n;
     private javax.swing.JComboBox jcbAccEntryUnit;
@@ -11874,6 +11890,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moComprobante33 = null;
         moComprobante40 = null;
         msXmlUuid = "";
+        moImportedDocument = null;
+        jbViewImportedDocument.setEnabled(false);
         
         moPaneGridEntries.createTable();
         moPaneGridEntries.clearTableRows();
@@ -12413,6 +12431,27 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     default:
                                 }
                             }
+                        }
+                    }
+                    
+                    if (!validation.getIsError() && moImportedDocument != null) {
+                        if (moImportedDocument.BizPartnerId != moBizPartner.getPkBizPartnerId()) {
+                            validation.setMessage("El asociado de negocios (ID " + moBizPartner.getPkBizPartnerId() + ") es distinto al del documento importado (" + moImportedDocument.BizPartner + ", ID " + moImportedDocument.BizPartnerId + ").");
+                        }
+                        else if (!moImportedDocument.NumberSeries.equals(moFieldNumberSeries.getString())) {
+                            validation.setMessage("La serie es distinta a la del documento importado (" + moImportedDocument.NumberSeries + ").");
+                        }
+                        else if (!moImportedDocument.Number.equals(moFieldNumber.getString())) {
+                            validation.setMessage("El folio es distinto al del documento importado (" + moImportedDocument.Number + ").");
+                        }
+                        else if (!SLibTimeUtils.isSameDate(moImportedDocument.Date, moFieldDate.getDate())) {
+                            validation.setMessage("La fecha es distinta a la del documento importado (" + SLibUtils.DateFormatDate.format(moImportedDocument.Date) + ").");
+                        }
+                        else if (!SLibUtils.compareAmount(moImportedDocument.Total, moDps.getTotalCy_r())) {
+                            validation.setMessage("El total es distinto al del documento importado (" + SLibUtils.getDecimalFormatAmount().format(moImportedDocument.Total) + " " + moImportedDocument.CurrencyCode + ").");
+                        }
+                        else if (moImportedDocument.CurrencyId != moFieldFkCurrencyId.getKeyAsIntArray()[0]) {
+                            validation.setMessage("La moneda es distinta a la del documento importado (" + moImportedDocument.CurrencyCode + ").");
                         }
                     }
                     
@@ -13060,6 +13099,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkDpsNatureId.setFieldValue(new int[] { moDps.getFkDpsNatureId() });
         moFieldFkFunctionalSubAreaId.setFieldValue(new int[] { moDps.getFkFunctionalSubAreaId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
+        
+        moImportedDocument = moDps.getAuxImportedDocument();
+        jbViewImportedDocument.setEnabled(moImportedDocument != null);
         
         // set business partner, set aswell business partner default preferences when document is new:
 
@@ -13815,6 +13857,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
             case SLibConstants.VALUE_TYPE:
@@ -13829,7 +13872,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             case SDataConstants.TRNS_STP_DPS_ADJ:
                 manParamAdjustmentSubtypeKey = (int[]) value;
                 break;
-            case SLibConstants.VALUE_STATUS:
+            case SLibConstants.VALUE_READ_ONLY:
                 mbParamIsReadOnly = (Boolean) value;
                 break;
             case SDataConstants.USRS_TP_LEV:
@@ -13887,6 +13930,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbDateMaturity) {
                     actionDateMaturity();
+                }
+                else if (button == jbViewImportedDocument) {
+                    actionViewImportedDocument();
                 }
                 else if (button == jbBizPartnerBalance) {
                     actionBizPartnerBalance();

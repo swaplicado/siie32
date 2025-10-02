@@ -563,7 +563,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         updateFormBizPartnerStatus();
     }
     
-    public boolean getIsLocalCurrency() {
+    public boolean getConvertToLocalCurrency() {
         return jckConvertToLocalCurrency.isSelected();
     }
 

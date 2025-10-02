@@ -19,6 +19,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebDpsFile;
@@ -76,7 +77,7 @@ public abstract class SExportDataUtils {
             case PUR_ORDER:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
-            case PUR_PAYMENT_AUTH:
+            case PUR_PAYMENT_UPD:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
                 
@@ -433,6 +434,7 @@ public abstract class SExportDataUtils {
         user.attributes = attributes;
 
         SExportDataUser.Partner partner = new SExportDataUser.Partner();
+        
         partner.is_vendor = true;
         partner.fiscal_id = fiscalId;
         partner.foreign_fiscal_id = foreignFiscalId;
@@ -452,6 +454,27 @@ public abstract class SExportDataUtils {
     }
 
     /**
+     * Verifica si el socio de negocios es compañía en SWAP Services.
+     * 
+     * @param session Sesión de usuario.
+     * @param bizPartnerId ID del socio de negocios.
+     * @return 
+     */
+    public static boolean isCompany(final SGuiSession session, final int bizPartnerId) {
+        boolean isCompany = false;
+        int[] companies = (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES);
+        
+        for (int id : companies) {
+            if (id == bizPartnerId) {
+                isCompany = true;
+                break;
+            }
+        }
+        
+        return isCompany;
+    }
+
+    /**
      * Consulta los socios de negocios proveedores, y los prepara para la exportación.
      * 
      * @param session Sesión de usuario.
@@ -465,8 +488,10 @@ public abstract class SExportDataUtils {
             String referenceId = "CONVERT(b.id_bp, CHAR)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PARTNER_SUPPLIER, "");
             
+            String companiesToExclude = SExportUtils.getSwapCompaniesForSqlQuery(session); // excluir los socios que son las empresas en SWAP Services
+            
             String sql = getSqlQueryBasePartnerSuppliers()
-                    + "WHERE ("
+                    + "WHERE (b.id_bp NOT IN (" + companiesToExclude + ") AND "
                     + "((NOT b.b_del AND NOT bc.b_del) "
                     + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PARTNER_SUPPLIER, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
@@ -1695,13 +1720,22 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
             
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            String statesToUpdateAllways = SModSysConsts.FINS_ST_PAY_REJ_P + ", "
+                    + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
+                    + SModSysConsts.FINS_ST_PAY_EXEC_P + ", "
+                    + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " // ¡exportar como "eliminado"!
+                    + SModSysConsts.FINS_ST_PAY_RCPT_P + ", "
+                    //+ SModSysConsts.FINS_ST_PAY_BLOC_P + ", " // ¡NO SE REQUIERE exportar este estatus!
+                    + SModSysConsts.FINS_ST_PAY_CAN_P; // ¡exportar como "eliminado"!
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
+                /* ¡conservar este bloque por consistencia con las demás consultas, pero en esta funcionalidad NO se necesita!
                 String referenceId = "CONVERT(p.id_pay, CHAR)";
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_AUTH, database);
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_UPD, database);
+                */
                 
                 String sql = "SELECT "
                         // payment:
@@ -1736,10 +1770,12 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
                         + "WHERE ("
-                        + "((NOT p.b_del AND p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_REJ_P + ", " + SModSysConsts.FINS_ST_PAY_SCHED_P + ")) "
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_AUTH, database) + ") AND "
+                        + "((/*NOT p.b_del AND */p.fk_st_pay IN (" + statesToUpdateAllways + ")) " // exportar todos los pagos actualizables, incluso los eliminados
+                        /* ¡conservar este bloque por consistencia con las demás consultas, pero en esta funcionalidad NO se necesita!
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + ") AND "
                         + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                        */
                         + ") "
                         + " "
                         + "ORDER BY "
@@ -1765,39 +1801,15 @@ public abstract class SExportDataUtils {
                     //paymentUpdate.payment_way = resultSet.getString("p.pay_way");
                     //paymentUpdate.notes = resultSet.getString("p.nts");
                     */
-                    paymentUpdate.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
                     
-                    int newStatusPaymentId = 0;
-                    
-                    switch (resultSet.getInt("p.fk_st_pay")) {
-                        case SModSysConsts.FINS_ST_PAY_REJ_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_REJ;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SCHED;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_EXEC_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_EXEC;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_SUBR_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_SUBR;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_RCPT_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_RCPT;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_BLOC_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_BLOC;
-                            break;
-                        case SModSysConsts.FINS_ST_PAY_CAN_P:
-                            newStatusPaymentId = SModSysConsts.FINS_ST_PAY_CAN;
-                            break;
-                        default:
-                            // nothing
-                    }
+                    int newStatusPaymentId = SDbPayment.getSettledStatusPayment(resultSet.getInt("p.fk_st_pay"));
+                    boolean exportAsDeleted = SDbPayment.exportStatusPaymentAsDeleted(resultSet.getInt("p.fk_st_pay"));
                     
                     if (newStatusPaymentId != 0) {
                         paymentUpdate.payment_status = newStatusPaymentId;
                     }
+                    
+                    paymentUpdate.is_deleted = exportAsDeleted || resultSet.getBoolean("p.b_del") ? 1 : 0;
 
                     /*
                     // paying account:
@@ -1883,7 +1895,7 @@ public abstract class SExportDataUtils {
                 data = getListOfPurchasePaymentsToExport(session);
                 break;
                 
-            case PUR_PAYMENT_AUTH:
+            case PUR_PAYMENT_UPD:
                 data = getListOfPurchasePaymentUpdatesToExport(session);
                 break;
                 

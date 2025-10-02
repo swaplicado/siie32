@@ -5,10 +5,10 @@
  */
 package erp.cli.swap;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
-import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -37,15 +37,15 @@ public class SSwapServices {
             }
             
             SResponses responses;
-            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SUtilConsts.USR_SUP_ID);
+            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN);
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.USER, false, true);
-            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
-            
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_ORDER, false, false);
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_ORDER, false, true);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
             
             responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_PAYMENT, false, false);
+            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
+            
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_PAYMENT_UPD, false, false);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
         }
         catch (Exception e) {
