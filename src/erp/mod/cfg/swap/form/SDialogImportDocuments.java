@@ -156,9 +156,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbUnlink = new javax.swing.JButton();
         jpProcessingN4 = new javax.swing.JPanel();
         jpProcessingN5 = new javax.swing.JPanel();
-        jbImport = new javax.swing.JButton();
+        jbImportDomestic = new javax.swing.JButton();
         jpProcessingN6 = new javax.swing.JPanel();
-        jbRecord = new javax.swing.JButton();
+        jbRecordForeign = new javax.swing.JButton();
         jpProcessingN7 = new javax.swing.JPanel();
         jlRecord = new javax.swing.JLabel();
         jpProcessingN8 = new javax.swing.JPanel();
@@ -348,19 +348,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbImport.setText("Importar factura nac.");
-        jbImport.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbImport.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN5.add(jbImport);
+        jbImportDomestic.setText("Importar factura nac.");
+        jbImportDomestic.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbImportDomestic.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN5.add(jbImportDomestic);
 
         jpProcessingN.add(jpProcessingN5);
 
         jpProcessingN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbRecord.setText("Capturar factura int.");
-        jbRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbRecord.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN6.add(jbRecord);
+        jbRecordForeign.setText("Capturar factura int.");
+        jbRecordForeign.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRecordForeign.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN6.add(jbRecordForeign);
 
         jpProcessingN.add(jpProcessingN6);
 
@@ -539,10 +539,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbClear;
     private javax.swing.JButton jbDeselectAll;
     private javax.swing.JButton jbDownloadSelected;
-    private javax.swing.JButton jbImport;
+    private javax.swing.JButton jbImportDomestic;
     private javax.swing.JButton jbLink;
     private javax.swing.JButton jbLinkAll;
-    private javax.swing.JButton jbRecord;
+    private javax.swing.JButton jbRecordForeign;
     private javax.swing.JButton jbRequestPayment;
     private javax.swing.JButton jbSelectAll;
     private javax.swing.JButton jbSelectRemaining;
@@ -653,6 +653,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido")); // col 15
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 20
@@ -780,8 +781,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         if (row == null) {
             jbLink.setEnabled(false);
             jbUnlink.setEnabled(false);
-            jbImport.setEnabled(false);
-            jbRecord.setEnabled(false);
+            jbImportDomestic.setEnabled(false);
+            jbRecordForeign.setEnabled(false);
             jbChangeRequiredDate.setEnabled(false);
             jbRequestPayment.setEnabled(false);
             
@@ -802,8 +803,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             jbLink.setEnabled(true);
             jbUnlink.setEnabled(true);
-            jbImport.setEnabled(true);
-            jbRecord.setEnabled(true);
+            jbImportDomestic.setEnabled(true);
+            jbRecordForeign.setEnabled(true);
             jbChangeRequiredDate.setEnabled(true);
             jbRequestPayment.setEnabled(true);
             
@@ -816,7 +817,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 jtfRecord.setCaretPosition(0);
             }
             
-            if (document.RequiredPaymentPct == 0 || document.RequiredPaymentDate == null) {
+            if (document.RequiredPaymentPct == 0 || document.getRequiredPaymentDateEffective() == null) {
                 jtfPayReqAmount.setText("");
                 jtfPayReqAmountPct.setText("");
                 jtfPayReqDate.setText("");
@@ -824,7 +825,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 jtfPayReqAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
                 jtfPayReqAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
-                jtfPayReqDate.setText(SLibUtils.GuiDateFormat.format(document.RequiredPaymentDate));
+                jtfPayReqDate.setText(SLibUtils.GuiDateFormat.format(document.getRequiredPaymentDateEffective()));
                 
                 jtfPayReqAmount.setCaretPosition(0);
                 jtfPayReqAmountPct.setCaretPosition(0);
@@ -1324,7 +1325,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void actionPerformedImport() {
+    private void actionPerformedImportDomestic() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
             
@@ -1394,7 +1395,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     // import CFDI:
 
-                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order);
+                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
 
                                     if (dpsKey != null) {
                                         SThinDps dps = new SThinDps();
@@ -1422,7 +1423,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void actionPerformedRecord() {
+    private void actionPerformedRecordForeign() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
             
@@ -1523,12 +1524,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SImportedDocument document = (SImportedDocument) row;
                 
                 if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                    document.RequiredPaymentDate = document.Payment.getDateRequired();
-                    
                     int index = moDocumentsGrid.getTable().getSelectedRow();
                     moDocumentsGrid.renderGridRows();
                     moDocumentsGrid.setSelectedGridRow(index);
-                    
+
                     mbExportPaymentRequests = true;
                 }
             }
@@ -1594,8 +1593,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAll.addActionListener(this);
         jbLink.addActionListener(this);
         jbUnlink.addActionListener(this);
-        jbImport.addActionListener(this);
-        jbRecord.addActionListener(this);
+        jbImportDomestic.addActionListener(this);
+        jbRecordForeign.addActionListener(this);
         jbChangeRequiredDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
     }
@@ -1611,8 +1610,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAll.removeActionListener(this);
         jbLink.removeActionListener(this);
         jbUnlink.removeActionListener(this);
-        jbImport.removeActionListener(this);
-        jbRecord.removeActionListener(this);
+        jbImportDomestic.removeActionListener(this);
+        jbRecordForeign.removeActionListener(this);
         jbChangeRequiredDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
     }
@@ -1698,11 +1697,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbUnlink) {
                 actionPerformedUnlink();
             }
-            else if (button == jbImport) {
-                actionPerformedImport();
+            else if (button == jbImportDomestic) {
+                actionPerformedImportDomestic();
             }
-            else if (button == jbRecord) {
-                actionPerformedRecord();
+            else if (button == jbRecordForeign) {
+                actionPerformedRecordForeign();
             }
             else if (button == jbChangeRequiredDate) {
                 actionPerformedChangeDateRequested();

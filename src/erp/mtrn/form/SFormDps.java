@@ -5455,7 +5455,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 String useCfdi = SDataDps.getUseCfdi(miClient, moDps.getDbmsDpsEntries().get(i).getFkItemId(), moBizPartnerCategory.getPkBizPartnerId());
                 if (!useCfdi.isEmpty()) {
                     moFieldCfdiCfdiUsage.setFieldValue(useCfdi);
-                    i =  moDps.getDbmsDpsEntries().size();
+                    i = moDps.getDbmsDpsEntries().size();
                 }
             }
         }
@@ -5706,7 +5706,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             
-            if (!exists){
+            if (!exists) {
                 moPaneGridNotes.addTableRow(dpsNotesRow);
             }
         }
@@ -5830,7 +5830,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             rlock = SRedisLockUtils.gainLock(miClient, SDataConstants.FIN_REC, pk, timeout / 1000);
         }
         catch (Exception e) {
-            rlock =  null;
+            rlock = null;
             miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo al registro '" + jckRecordUser.getText() + "'.\n" + e);
             throw new Exception(e);
         }
@@ -6428,8 +6428,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void updateAgentBizPartnerLabels(){
-        
+    private void updateAgentBizPartnerLabels() {
         jlSalesAgentBizPartner.setText("Agente de compras del asociado de negocios:");
         jlSalesAgent.setText("Agente de compras del documento:");
         jlSalesSupervisorBizPartner.setText("Supervisor de compras del asociado de negocios:");
@@ -7073,7 +7072,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private String getCfdiUsageByPurpose() {
         for (int groupId : maUserGroupsIds) {
-            for(SConfigurationPurposeConfUserGroupDetail confPurpDet : moCfgUsersGroupsDpsNatureCfdUse.getcfg()){
+            for(SConfigurationPurposeConfUserGroupDetail confPurpDet : moCfgUsersGroupsDpsNatureCfdUse.getcfg()) {
                 if (confPurpDet.getusrGrp().contains(groupId) && confPurpDet.getdpsNat().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0])) {
                     return confPurpDet.getcfdUse();
                 }
@@ -8587,11 +8586,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             miClient.showMsgBoxWarning("El documento origen debe estar emitido.");
                         }
                         else {
-                            //BizParther is internacional
-                            if (moBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)){
+                            //BizParther is internacional:
+                            
+                            if (moBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)) {
                                 // document sales
                                 if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                            // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
+                                    // B.2. Remove from just picked source DPS all adjustment registries linked to current DPS:
+                                    
                                     if (oDpsSource.getDbmsDataCfd().getUuid().isEmpty()) {
                                         miClient.showMsgBoxWarning("El documento origen no tiene UUID, por lo cual al emitir el XML de ajuste no tendrá la relación correspondiente.");
                                     }
@@ -8670,14 +8671,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                                 entry.setOriginalDiscountUnitaryCy(0);
                                                 entry.setOriginalDiscountUnitarySystemCy(0);
                                                 
-                                                if (dpsSourceEntry.getFkUnitId() != dpsSourceEntry.getFkOriginalUnitId()){
+                                                if (dpsSourceEntry.getFkUnitId() != dpsSourceEntry.getFkOriginalUnitId()) {
                                                     SDataUnit origUnit = null;
                                                     SDataUnit sysUnit = null;
                                                     
                                                     sysUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
                                                     origUnit  = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { dpsSourceEntry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_VERBOSE);
                                                     
-                                                    if (origUnit.getFkUnitTypeId() != sysUnit.getFkUnitTypeId()){
+                                                    if (origUnit.getFkUnitTypeId() != sysUnit.getFkUnitTypeId()) {
                                                         oItem = null;
                                                         
                                                         oItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { dpsSourceEntry.getFkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
@@ -10572,7 +10573,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             String usage = getCfdiUsageByPurpose();
             if (usage.isEmpty()) {
                 if (!mbFisDataCfdiUsageUserChange) {
-                    if (!moCfgFiscalDataPurchasesOrder.getUsoCFDI().isEmpty()){
+                    if (!moCfgFiscalDataPurchasesOrder.getUsoCFDI().isEmpty()) {
                         moFieldFisDataCfdiUsage.setFieldValue(moCfgFiscalDataPurchasesOrder.getUsoCFDI());
                     }
                     else {
@@ -11007,7 +11008,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return validation;
     }
     
-    private SFormValidation validateCfdi40(){
+    private SFormValidation validateCfdi40() {
         SFormValidation validation = new SFormValidation();
         
         try {
@@ -12495,7 +12496,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         ArrayList<Integer> taxReg = new ArrayList<>();
                         for (STableRow row : moPaneGridEntries.getGridRows()) {
                             SDataDpsEntry entry = (SDataDpsEntry) row.getData();
-                            if (!taxReg.contains(entry.getFkTaxRegionId())){
+                            if (!taxReg.contains(entry.getFkTaxRegionId())) {
                                 taxReg.add(entry.getFkTaxRegionId());
                             }
                         }
@@ -12510,7 +12511,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
                             SDataDpsEntry entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(i).getData();
                             try {
-                                if(entry.hasDpsLinksAsDestiny()){
+                                if(entry.hasDpsLinksAsDestiny()) {
                                     if (STrnUtilities.getTaxRegionDpsEty(miClient, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()) != entry.getFkTaxRegionId()) {
                                         if (miClient.showMsgBoxConfirm("La región de impuestos de la partida #" + (i + 1) + " es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
                                             validation.setMessage("Seleccionar la región de impuestos de la partida #" + (i + 1) + " del documento de origen.");
@@ -12858,8 +12859,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             
                             // validate export type:
                             
-                            if (jcbExportation.getSelectedIndex() > 0){
-                                if (isCfdIntCommerceRequired() && jckCfdCceApplies.isSelected()){
+                            if (jcbExportation.getSelectedIndex() > 0) {
+                                if (isCfdIntCommerceRequired() && jckCfdCceApplies.isSelected()) {
                                     if (moFieldCfdCceExportation.getFieldValue().toString().equals(DCfdi40Catalogs.ClaveExportacionNoAplica)) {
                                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'Tipo de exportación':\n"
                                                         + "El tipo de exportación solo puede ser 02, 03 o 04");
@@ -13821,10 +13822,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 SDataPdf pdf;
 
                 if (moDps.getDbmsDataPdf() != null) {
-                    pdf =  moDps.getDbmsDataPdf();
+                    pdf = moDps.getDbmsDataPdf();
                 }
                 else {
                     pdf = new SDataPdf();
+                    pdf.setPkYearId(moDps.getPkYearId());
                     moDps.setDbmsDataPdf(pdf);
                 }
                 
@@ -13836,6 +13838,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
 
                 pdf.setAuxXmlBaseDirectory(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+                
+                try {
+                    pdf.savePdfFile(); // IMPORTANT: move this PDF file to the host where SIIE Server is running!
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
             }
             
             if (!jtfBillOfLading.getText().isEmpty()) {

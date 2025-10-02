@@ -146,6 +146,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                             + "SET doc_pdf_name = ? "
                             + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";"; 
                 }
+                
                 msDocPdfName = composePdfName(mnPkYearId, mnPkDocId);
 
                 preparedStatement = connection.prepareStatement(sql);
@@ -170,9 +171,11 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            
             if (msDbmsError.isEmpty()) {
                 msDbmsError = SLibConstants.MSG_ERR_DB_REG_SAVE;
             }
+            
             msDbmsError += "\n" + e.toString();
             SLibUtilities.printOutException(this, e);
         }
@@ -180,17 +183,19 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         return mnLastDbActionResult;
     }
     
-    
-    private void savePdfFile() throws Exception {
+    public void savePdfFile() throws Exception {
         File destiny = new File(composePdfDirectory(msAuxXmlBaseDirectory, mnPkYearId));
-        if (!destiny.exists()){
+        
+        if (!destiny.exists()) {
             destiny.mkdirs();
         }
+        
         Files.copy(Paths.get(moAuxDocPdfFile.getAbsolutePath()), Paths.get(destiny.getAbsolutePath() + "/" + msDocPdfName), StandardCopyOption.REPLACE_EXISTING);
     }
     
-    private void deletePdfFile() throws Exception {
+    public void deletePdfFile() throws Exception {
         File delete = new File (composePdfDirectory(msAuxXmlBaseDirectory, mnPkYearId) + "/" + msDocPdfName);
+        
         if (delete.exists()) {
             delete.delete();
         }

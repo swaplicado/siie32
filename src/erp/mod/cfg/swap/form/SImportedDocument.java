@@ -64,6 +64,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public double RequiredPaymentAmount;
     public double RequiredPaymentPct;
     public Date RequiredPaymentDate;
+    public Date RequiredPaymentDateNew;
     public boolean IsRequiredPaymentLoc;
     public String RequiredPaymentNotes;
     public int StatusId;
@@ -98,6 +99,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
         RequiredPaymentDate = null;
+        RequiredPaymentDateNew = null;
         IsRequiredPaymentLoc = false;
         RequiredPaymentNotes = "";
         StatusId = 0;
@@ -119,6 +121,26 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public String getFolio() {
         return NumberSeries + (NumberSeries.isEmpty() ? "" : "-") + Number;
     }
+
+    /**
+     * Pick a date.
+     * @param session GUI session.
+     * @return 
+     */
+    private Date pickDate(final SGuiSession session) {
+        Date date = null;
+        
+        SGuiDatePicker picker = session.getClient().getDatePicker();
+        picker.resetPicker();
+        picker.setOption(getRequiredPaymentDateEffective());
+        picker.setPickerVisible(true);
+
+        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            date = picker.getOption();
+        }
+        
+        return date;
+    }
     
     /**
      * Ger required payment percentage of document as a double between 0 and 1.
@@ -134,6 +156,14 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      */
     public double getRequiredPaymentAmount() {
         return RequiredPaymentDefinition == PAYMENT_DEFN_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
+    }
+    
+    /**
+     * Get effective required payment date.
+     * @return 
+     */
+    public Date getRequiredPaymentDateEffective() {
+        return RequiredPaymentDateNew != null ? RequiredPaymentDateNew : RequiredPaymentDate;
     }
     
     /**
@@ -189,7 +219,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      * @return 
      */
     public boolean isPaymentRequestable() {
-        return RequiredPaymentDate != null && (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1) || getRequiredPaymentAmount() > 0;
+        return getRequiredPaymentDateEffective() != null && (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1) || getRequiredPaymentAmount() > 0;
     }
     
     /**
@@ -238,7 +268,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         else if (RequiredPaymentPct > 100) {
             throw new Exception("Este documento tiene un porcentaje requerido de pago mayor a 100%.");
         }
-        else if (RequiredPaymentDate == null) {
+        else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
         }
         else if (!isRecorded()) {
@@ -281,7 +311,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 payment.setSeries("");
                 payment.setNumber(0);
                 payment.setDateApplication(date);
-                payment.setDateRequired(RequiredPaymentDate);
+                payment.setDateRequired(getRequiredPaymentDateEffective());
                 payment.setDateSchedule_n(null);
                 payment.setDateExecution_n(null);
 
@@ -660,19 +690,41 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      */
     public boolean changeRequiredPaymentDate(final SGuiSession session) throws Exception {
         boolean changed = false;
+        Date dateNew = null;
         
-        if (validateRequiredPaymentDateChanging()) {
-            SGuiDatePicker picker = session.getClient().getDatePicker();
-            picker.resetPicker();
-            picker.setOption(Payment.getDateRequired());
-            picker.setPickerVisible(true);
+        if (!isPaymentRequested()) {
+            // payment request not yet created:
 
-            if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-                Payment.setDateRequired(picker.getOption());
-                Payment.save(session);
-                
-                changed = true;
+            if (!isPaymentRequestable()) {
+                throw new Exception("Este documento no tiene información para solicitar su pago.");
             }
+            else {
+                dateNew = pickDate(session);
+                
+                if (dateNew.before(Date)) {
+                    throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dateNew) + ") no puede ser anterior a la fecha del documento '" + getFolio() + "' (" + SLibUtils.DateFormatDate.format(Date) + ").");
+                }
+            }
+        }
+        else {
+            // payment request already created:
+
+            if (validateRequiredPaymentDateChanging()) {
+                dateNew = pickDate(session);
+
+                if (dateNew != null) {
+                    SImportUtils.updateDpsDaysOfCreditByDueDate(session, ProcessedDps.getDpsKey(), dateNew);
+                    
+                    Payment.setDateRequired(dateNew);
+                    Payment.save(session);
+                }
+            }
+        }
+        
+        if (dateNew != null) {
+            RequiredPaymentDateNew = SLibTimeUtils.isSameDate(RequiredPaymentDate, dateNew) ? null : dateNew;
+            
+            changed = true;
         }
         
         return changed;
@@ -687,6 +739,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         int year = SLibTimeUtils.digestYear(Date)[0];
         SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
         SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
+        Date dueDate = getRequiredPaymentDateEffective();
         
         SDataDps dps = new SDataDps();
         
@@ -752,7 +805,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
         dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
         dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
-        //dps.setFkPaymentTypeId(
+        dps.setFkPaymentTypeId(dueDate != null ? SDataConstantsSys.TRNS_TP_PAY_CREDIT : SDataConstantsSys.TRNS_TP_PAY_CASH);
         //dps.setFkPaymentSystemTypeId(
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
         //dps.setFkDpsValidityStatusId(
@@ -805,6 +858,10 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         //dps.setFkUserNewId(
         //dps.setFkUserEditId(
         //dps.setFkUserDeleteId(
+        
+        if (dueDate != null) {
+            dps.setDaysOfCreditByDueDate(dueDate);
+        }
         
         dps.setAuxKeepDpsData(true);
         dps.setAuxImportedDocument(this);
@@ -872,21 +929,24 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 value = RequiredPaymentDate;
                 break;
             case 18:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 19:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 20:
-                value = isPaymentRequested() ? Payment.getFolio() : null;
+                value = RequiredPaymentNotes;
                 break;
             case 21:
-                value = isPaymentRequested() ? Payment.getDateApplication() : null;
+                value = isPaymentRequested() ? Payment.getFolio() : null;
                 break;
             case 22:
-                value = ExternalDocumentId;
+                value = isPaymentRequested() ? Payment.getDateApplication() : null;
                 break;
             case 23:
+                value = ExternalDocumentId;
+                break;
+            case 24:
                 value = ExternalDocumentUuid;
                 break;
             default:

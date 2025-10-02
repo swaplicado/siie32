@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  * Versión "delgada" del registro SDataDps (tabla trn_dps).
@@ -20,6 +21,8 @@ public class SThinDps implements Serializable, SThinData {
     protected String msNumberSeries;
     protected String msNumber;
     protected Date mtDate;
+    protected Date mtDateStartOfCredit;
+    protected int mnDaysOfCredit;
     protected double mdTotalCy_r;
     protected double mdTotal_r;
     protected int mnFkDpsCategoryId;
@@ -51,6 +54,8 @@ public class SThinDps implements Serializable, SThinData {
         msNumberSeries = "";
         msNumber = "";
         mtDate = null;
+        mtDateStartOfCredit = null;
+        mnDaysOfCredit = 0;
         mdTotalCy_r = 0;
         mdTotal_r = 0;
         mnFkDpsCategoryId = 0;
@@ -90,6 +95,14 @@ public class SThinDps implements Serializable, SThinData {
 
     public Date getDate() {
         return mtDate;
+    }
+    
+    public Date getDateStartOfCredit() {
+        return mtDateStartOfCredit;
+    }
+    
+    public int getDaysOfCredit() {
+        return mnDaysOfCredit;
     }
     
     public double getTotalCy_r() {
@@ -181,7 +194,7 @@ public class SThinDps implements Serializable, SThinData {
         reset();
         
         int[] key = (int[]) primaryKey;
-        String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.tot_r, "
+        String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.dt_start_cred, d.days_cred, d.tot_cur_r, d.tot_r, "
                 + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.fid_tp_pay, "
                 + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, "
                 + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num "
@@ -192,7 +205,7 @@ public class SThinDps implements Serializable, SThinData {
         
         try (ResultSet resultSetDps = statement.executeQuery(sql)) {
             if (!resultSetDps.next()) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento.");
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento (ID " + SLibUtils.textKey(key) + ").");
             }
             else {
                 mnPkYearId = resultSetDps.getInt("d.id_year");
@@ -200,6 +213,8 @@ public class SThinDps implements Serializable, SThinData {
                 msNumberSeries = resultSetDps.getString("d.num_ser");
                 msNumber = resultSetDps.getString("d.num");
                 mtDate = resultSetDps.getDate("d.dt");
+                mtDateStartOfCredit = resultSetDps.getDate("d.dt_start_cred");
+                mnDaysOfCredit = resultSetDps.getInt("d.days_cred");
                 mdTotalCy_r = resultSetDps.getDouble("d.tot_cur_r");
                 mdTotal_r = resultSetDps.getDouble("d.tot_r");
                 mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");

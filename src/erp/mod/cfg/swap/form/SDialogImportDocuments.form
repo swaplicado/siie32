@@ -401,7 +401,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbImport">
+                    <Component class="javax.swing.JButton" name="jbImportDomestic">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Importar factura nac."/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
@@ -421,7 +421,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbRecord">
+                    <Component class="javax.swing.JButton" name="jbRecordForeign">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Capturar factura int."/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
