@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 290.13/ 2025-10-03
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización del manejo de archivos PDF de facturas de compras, para corregir el problema de guardado en el servidor por inaccesibilidad al los directorios del host del SIIE Client.
+
+================================================================================
 SIIE 3.2 290.12/ 2025-10-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

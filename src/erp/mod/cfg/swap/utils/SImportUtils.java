@@ -467,6 +467,12 @@ public abstract class SImportUtils {
                     exception = e;
                 }
             }
+            
+            if (downloadMode == MODE_DOCS_ALL_FILES_AS_ZIP) {
+                JFileChooser fileChooser = session.getClient().getFileChooser();
+                fileChooser.resetChoosableFileFilters();
+                fileChooser.setAcceptAllFileFilterUsed(true);
+            }
         }
         
         if (exception != null) {

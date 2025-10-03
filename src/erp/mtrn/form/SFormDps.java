@@ -3941,9 +3941,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         //moFieldAddAmc71ShipToPostalCode.setLengthMax(?); // unlimited length
         
         moFieldCfdiXmlFile = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFileXml, jlFileXml);
+        moFieldCfdiXmlFile.setAutoCaseType(0);
         moFieldCfdiXmlFile.setPickerButton(jbLoadFileXml); // maybe this is unnecessary, text field is read-only
         moFieldCfdiXmlFile.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiPdfFile = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFilePdf, jlFilePdf);
+        moFieldCfdiPdfFile.setAutoCaseType(0);
         moFieldCfdiPdfFile.setPickerButton(jbLoadFilePdf); // maybe this is unnecessary, text field is read-only
         moFieldCfdiPdfFile.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiTaxRegimeIss = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiTaxRegimeIssuing, jlCfdiTaxRegimeIssuing);
@@ -9440,10 +9442,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     miClient.showMsgBoxInformation("El archivo sólo puede ser PDF.");
                 }
             }
-            miClient.getFileChooser().resetChoosableFileFilters();
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().resetChoosableFileFilters();
         }
     }
     
@@ -13366,12 +13370,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             
             if (moDps.getDbmsDataPdf() != null) { // Cuando el DPS posee un archivo PDF asociado.
-                moFieldCfdiPdfFile.setFieldValue(moDps.getDbmsDataPdf().getDocPdfName());
                 moFilePdfJustLoaded = null;
+                moFieldCfdiPdfFile.setFieldValue(moDps.getDbmsDataPdf().getDocPdfName());
             }
             else if (moDps.getAuxFilePdf() != null) {
-                moFieldCfdiPdfFile.setFieldValue(moDps.getAuxFilePdf().getName());
                 moFilePdfJustLoaded = moDps.getAuxFilePdf();
+                moFieldCfdiPdfFile.setFieldValue(moFilePdfJustLoaded.getName());
             }
         }
         
@@ -13831,19 +13835,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 
                 if (moFilePdfJustLoaded != null) {
-                    pdf.setAuxDocPdfFile(moFilePdfJustLoaded);
+                    try {
+                        pdf.uploadPdfFile(moFilePdfJustLoaded, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
                 }
                 else {
-                    pdf.setAuxToBeDeleted(true);
-                }
-
-                pdf.setAuxXmlBaseDirectory(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
-                
-                try {
-                    pdf.savePdfFile(); // IMPORTANT: move this PDF file to the host where SIIE Server is running!
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
+                    pdf.setAuxAboutToBeDeleted(true);
                 }
             }
             
