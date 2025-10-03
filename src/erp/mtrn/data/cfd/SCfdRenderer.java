@@ -22,6 +22,7 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mtrn.data.SCfdUtils;
@@ -159,7 +160,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener {
         }
         
         if (!validation.getIsError()) {
-            if (!miClient.isDev()) {
+            if (!miClient.isDev() && ((SDataParamsCompany) miClient.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
                 String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
 
                 if (!cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {

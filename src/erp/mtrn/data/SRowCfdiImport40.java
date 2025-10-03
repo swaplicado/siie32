@@ -148,9 +148,9 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     }
     
     /**
-     * Crea un nuevo DpsEntry a partir de los componentes ya asignados.
+     * Refresca el registro DpsEntry a partir de los datos y componentes ya asignados.
      */
-    public void setDpsEntry() {
+    public void refreshDpsEntry() {
         moNewDpsEntry.reset();
         
         /*

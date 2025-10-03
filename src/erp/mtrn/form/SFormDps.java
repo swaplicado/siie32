@@ -13822,28 +13822,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moDps.setDbmsDataCfd(cfd);
             }
 
-            if ((moFilePdfJustLoaded != null) || (moFieldCfdiPdfFile.getString().isEmpty() && moDps.getDbmsDataPdf() != null)) {
+            if (moFilePdfJustLoaded != null) {
                 SDataPdf pdf;
 
                 if (moDps.getDbmsDataPdf() != null) {
-                    pdf = moDps.getDbmsDataPdf();
+                    pdf = moDps.getDbmsDataPdf(); // reuse existing registry
                 }
                 else {
-                    pdf = new SDataPdf();
+                    pdf = new SDataPdf(); // create new registry
                     pdf.setPkYearId(moDps.getPkYearId());
                     moDps.setDbmsDataPdf(pdf);
                 }
                 
-                if (moFilePdfJustLoaded != null) {
-                    try {
-                        pdf.uploadPdfFile(moFilePdfJustLoaded, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
-                    }
-                    catch (Exception e) {
-                        SLibUtilities.renderException(this, e);
-                    }
+                try {
+                    pdf.uploadPdfFile(moFilePdfJustLoaded, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+            else if (moDps.getDbmsDataPdf() != null) {
+                if (moFieldCfdiPdfFile.getString().isEmpty()) {
+                    moDps.getDbmsDataPdf().setAuxDeleted(true); // PDF was removed
                 }
                 else {
-                    pdf.setAuxAboutToBeDeleted(true);
+                    moDps.getDbmsDataPdf().setAuxSkipSave(true); // PDF remains the same
                 }
             }
             

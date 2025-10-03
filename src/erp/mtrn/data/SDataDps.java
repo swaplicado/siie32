@@ -4501,7 +4501,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Save PDF of purchases when provided:
                 
-                if (moDbmsDataPdf != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                if (moDbmsDataPdf != null && !moDbmsDataPdf.getAuxSkipSave() && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                     moDbmsDataPdf.setPkYearId(mnPkYearId);
                     moDbmsDataPdf.setPkDocId(mnPkDocId);
                     

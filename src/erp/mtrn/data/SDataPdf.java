@@ -35,7 +35,8 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msPdfDirectory;
     protected java.lang.String msPdfAsBase64;
     
-    protected boolean mbAuxAboutToBeDeleted;
+    protected boolean mbAuxSkipSave;
+    protected boolean mbAuxDelete;
     
     public SDataPdf() {
         super(SDataConstants.TRN_PDF);
@@ -50,7 +51,11 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     public int getPkDocId() { return mnPkDocId; }
     public java.lang.String getDocPdfName() { return msDocPdfName; }
     
-    public void setAuxAboutToBeDeleted(boolean b) { mbAuxAboutToBeDeleted = b; }
+    public void setAuxSkipSave(boolean b) { mbAuxSkipSave = b; }
+    public void setAuxDeleted(boolean b) { mbAuxDelete = b; }
+    
+    public boolean getAuxSkipSave() { return mbAuxSkipSave; }
+    public boolean getAuxDeleted() { return mbAuxDelete; }
     
     /*
      * Implementation of erp.lib.data.SDataRegistry
@@ -78,7 +83,8 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         msPdfDirectory = "";
         msPdfAsBase64 = "";
         
-        mbAuxAboutToBeDeleted = false;
+        mbAuxSkipSave = false;
+        mbAuxDelete = false;
     }
 
     @Override
@@ -114,6 +120,8 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                 
                 readPdfFile();
 
+                mbAuxSkipSave = true; // prevent from saving, unless it is explicitly commanded
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -137,9 +145,13 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         
         try {
+            if (mbAuxSkipSave) {
+                return mnLastDbActionResult;
+            }
+            
             String sql;
             
-            if (!mbAuxAboutToBeDeleted) {
+            if (!mbAuxDelete) {
                 if (msDocPdfName.isEmpty()) {
                     throw new Exception("No se ha proporcionado el archivo " + SFileUtilities.PDF.toUpperCase() + ".");
                 }
@@ -223,7 +235,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     }
     
     /**
-     * Upoad original PDF file from user's system file.
+     * Upoad original PDF file from user's file system.
      * @param pdfFile PDF file.
      * @param pdfDirectory PDF base directory for storage.
      * @throws Exception 
@@ -243,7 +255,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     }
     
     /**
-     * Download original PDF file to user's system file.
+     * Download original PDF file to user's file system.
      * @param client GUI client.
      * @throws Exception 
      */
@@ -298,8 +310,12 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     }
     
     private void readPdfFile() throws Exception {
-        byte[] pdfBytes = Files.readAllBytes(createPdfFile().toPath());
-        msPdfAsBase64 = Base64.getEncoder().encodeToString(pdfBytes);
+        File file = createPdfFile();
+        
+        if (file.exists()) {
+            byte[] pdfBytes = Files.readAllBytes(file.toPath());
+            msPdfAsBase64 = Base64.getEncoder().encodeToString(pdfBytes);
+        }
     }
     
     private void savePdfFile() throws Exception {
