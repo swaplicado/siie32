@@ -4,6 +4,7 @@
  */
 package erp.lib.form;
 
+import erp.data.SDataConstants;
 import erp.lib.SLibUtilities;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -15,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import javax.swing.text.html.parser.DTDConstants;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -263,9 +265,16 @@ public abstract class SFormUtilities {
                 comboBox.addItem(items.get(i));
             }
         }
-
-        if (comboBox.getItemCount() > 0) {
+        if (dataType == SDataConstants.BPSU_BPB) {
+            if(comboBox.getItemCount() > 1) {
+                comboBox.setSelectedIndex(1);
+            } else {
                 comboBox.setSelectedIndex(0);
+            }
+        } else {
+            if (comboBox.getItemCount() > 0) {
+                comboBox.setSelectedIndex(0);
+            }
         }
     }
 
