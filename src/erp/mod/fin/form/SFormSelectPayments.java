@@ -6,6 +6,7 @@
 package erp.mod.fin.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SRowPayments;
 import java.sql.ResultSet;
@@ -41,9 +42,10 @@ public class SFormSelectPayments extends SBeanFormDialog {
      * Creates new form SFormConfMatConsSubentityVsCostCenter
      * @param client
      * @param title
+     * @param subType
      */
-    public SFormSelectPayments(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY_LAY_BANK, 0, title);
+    public SFormSelectPayments(SGuiClient client, int subType, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY_LAY_BANK, subType, title);
         initComponents();
         initComponentsCustom();
     }
@@ -119,6 +121,13 @@ public class SFormSelectPayments extends SBeanFormDialog {
     
     private void readPayments() {
         try {
+            String entryTp;
+            if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
+                entryTp = SDbPaymentEntry.ENTRY_TYPE_PAYMENT;
+            }
+            else {
+                entryTp = SDbPaymentEntry.ENTRY_TYPE_ADVANCE;
+            }
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
             String sql = "SELECT d.id_year, d.id_doc, p.id_pay, " +
                     "b.bp, " +
@@ -127,14 +136,15 @@ public class SFormSelectPayments extends SBeanFormDialog {
                     "pe.des_pay_app_ety_cur, " +
                     "c.cur_key, " +
                     "b_rcpt_pay_req, " +
-                    "p.fk_func, p.fk_func_sub " +
+                    "p.fk_func, p.fk_func_sub, " +
+                    "p.fk_ben " +
                     "FROM fin_pay AS p " +
                     "INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                     "INNER JOIN erp.bpsu_bp AS b ON p.fk_ben = b.id_bp " +
-                    "INNER JOIN trn_dps AS d ON pe.fk_doc_year_n = d.id_year AND pe.fk_doc_doc_n = d.id_doc " +
                     "INNER JOIN erp.cfgu_cur AS c ON pe.fk_ety_cur = c.id_cur " +
+                    "LEFT JOIN trn_dps AS d ON pe.fk_doc_year_n = d.id_year AND pe.fk_doc_doc_n = d.id_doc " +
                     "WHERE p.fk_st_pay = 4 AND p.fk_cur = " + mnCurPayment + " AND pe.fk_ety_cur = " + mnCurDoc + " " + 
-                    "AND pe.ety_tp = '" + SDbPaymentEntry.ENTRY_TYPE_PAYMENT + "'";
+                    "AND pe.ety_tp = '" + entryTp + "'";
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     SRowPayments row = new SRowPayments();
@@ -149,6 +159,7 @@ public class SFormSelectPayments extends SBeanFormDialog {
                     row.setReceptionPayReq(resultSet.getBoolean(9));
                     row.setFuncArea(resultSet.getInt(10));
                     row.setFuncSubarea(resultSet.getInt(11));
+                    row.setIdBeneficiary(resultSet.getInt(12));
                     row.setSelected(false);
                     maPayments.add(row);
                 }

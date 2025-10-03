@@ -160,7 +160,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SLock> maSLocks;
     private boolean mbShowConfirmCloseDialog;
     
-    private SFormSelectPayments formPayments;
+    private SFormSelectPayments moFormPayments;
     private boolean isForPayments;
     
     /**
@@ -442,7 +442,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         buttonGroup1.add(moRadDoc);
         moRadDoc.setSelected(true);
         moRadDoc.setText("Captura de documentos");
-        moRadDoc.setPreferredSize(new java.awt.Dimension(200, 23));
+        moRadDoc.setPreferredSize(new java.awt.Dimension(280, 23));
         jPanel22.add(moRadDoc);
 
         buttonGroup1.add(moRadPay);
@@ -676,7 +676,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                 jbGridRowsShow.setText("Mostrar documentos");
                 jbGridRowsClear.setText("Limpiar documentos");
-                moRadDoc.setText("Captura de documentos");
+                moRadDoc.setText("Captura manual de documentos");
                 moRadDoc.setValue(true);
                 moRadDoc.setEnabled(true);
                 moRadPay.setEnabled(true);
@@ -685,7 +685,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 jbGridRowsShow.setText("Mostrar beneficiarios");
                 jbGridRowsClear.setText("Limpiar beneficiarios");
-                moRadDoc.setText("Captura de beneficiarios");
+                moRadDoc.setText("Captura manual de beneficiarios");
                 moRadDoc.setValue(true);
                 moRadDoc.setEnabled(false);
                 moRadPay.setEnabled(false);
@@ -857,7 +857,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moCellEditorOptions = new STableCellEditorOptions((SClientInterface) miClient);
         moCellEditorOptionsAgreementReference = new STableCellEditorOptions((SClientInterface) miClient, true);
         
-        formPayments = new SFormSelectPayments(miClient, "Seleccionar pagos");
+        moFormPayments = new SFormSelectPayments(miClient, mnFormSubtype, "Seleccionar pagos");
     }
     
     private boolean isModeForAccounting() {
@@ -1333,9 +1333,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             
             if (moKeyBankLayoutCurrency.getSelectedIndex() > 0 && moKeyDpsCurrency.getSelectedIndex() > 0) {
-                formPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
+                moFormPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
             }
-            formPayments.reloadCatalogues();
+            moFormPayments.reloadCatalogues();
             isForPayments = false;
         }
         catch (Exception e) {
@@ -1351,45 +1351,76 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
     
     private void actionPerformedGridRowsPays() {
-        formPayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
-        formPayments.setVisible(true);
+        moFormPayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
+        moFormPayments.setVisible(true);
         SDialogShowImportErrors errors;
-        if (formPayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+        if (moFormPayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             isForPayments = true;
             String warn = "";
             int cantWarn = 0;
-            ArrayList<SRowPayments> paymentRows = formPayments.getSelectedPayments();
+            ArrayList<SRowPayments> paymentRows = moFormPayments.getSelectedPayments();
             ArrayList<SRowPayments> notVinculed = new ArrayList<>();
-            for (SRowPayments pay : paymentRows) {
-                boolean found = false;
-                
-                for (SGridRow row : moGridPayments.getModel().getGridRows()) {
-                    SLayoutBankRow layout = (SLayoutBankRow) row;
-                    if (layout.getDpsYearId() == pay.getIdYear() && layout.getDpsDocId() == pay.getIdDoc()) {
-                        found = true;
-                        double balance = layout.getMoneyDpsBalance().getOriginalAmount();
-                        double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
-                        if (payment <= balance) {
-                            layout.setForPayment(true);
-                            layout.getMoneyPayment().setOriginalAmount(payment);
-                            layout.setIsForExtPayment(true);
-                            layout.setReceptionPayReq(pay.getReceptionPayReq());
-                            layout.setFuncArea(pay.getFuncArea());
-                            layout.setFuncSubarea(pay.getFuncSubarea());
-                            layout.getPayments().add(pay);
-                        }
-                        else {
-                            warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el monto autorizado es mayor al saldo del documento " + pay.getDocNum()+ ".\n" ;
-                            cantWarn++;
-                            notVinculed.add(pay);
+            if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
+                for (SRowPayments pay : paymentRows) {
+                    boolean found = false;
+
+                    for (SGridRow row : moGridPayments.getModel().getGridRows()) {
+                        SLayoutBankRow layout = (SLayoutBankRow) row;
+                        if (layout.getDpsYearId() == pay.getIdYear() && layout.getDpsDocId() == pay.getIdDoc()) {
+                            found = true;
+                            double balance = layout.getMoneyDpsBalance().getOriginalAmount();
+                            double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
+                            if (payment <= balance) {
+                                layout.setForPayment(true);
+                                layout.getMoneyPayment().setOriginalAmount(payment);
+                                layout.setIsForExtPayment(true);
+                                layout.setReceptionPayReq(pay.getReceptionPayReq());
+                                layout.setFuncArea(pay.getFuncArea());
+                                layout.setFuncSubarea(pay.getFuncSubarea());
+                                layout.getPayments().add(pay);
+                            }
+                            else {
+                                warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el monto autorizado es mayor al saldo del documento " + pay.getDocNum()+ ".\n" ;
+                                cantWarn++;
+                                notVinculed.add(pay);
+                            }
                         }
                     }
+
+                    if (!found) {
+                        warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el documento " + pay.getDocNum()+ " no está listado.\n" ;
+                        cantWarn++;
+                        notVinculed.add(pay);
+                    }
                 }
-                
-                if (!found) {
-                    warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el documento " + pay.getDocNum()+ " no está listado.\n" ;
-                    cantWarn++;
-                    notVinculed.add(pay);
+            }
+            else if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) {
+                for (SRowPayments pay : paymentRows) {
+                    boolean found = false;
+
+                    for (SGridRow row : moGridPayments.getModel().getGridRows()) {
+                        SLayoutBankRow layout = (SLayoutBankRow) row;
+                        if (layout.getBizPartnerId() == pay.getIdBeneficiary()) {
+                            found = true;
+                            double balance = layout.getMoneyDpsBalance().getOriginalAmount();
+                            double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
+                            if (payment <= balance) {
+                                layout.setForPayment(true);
+                                layout.getMoneyPayment().setOriginalAmount(payment);
+                                layout.setIsForExtPayment(true);
+                                layout.setReceptionPayReq(pay.getReceptionPayReq());
+                                layout.setFuncArea(pay.getFuncArea());
+                                layout.setFuncSubarea(pay.getFuncSubarea());
+                                layout.getPayments().add(pay);
+                            }
+                        }
+                    }
+                    
+                    if (!found) {
+                        warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el asociado de negocios " + pay.getBeneficiary()+ " no está listado.\n" ;
+                        cantWarn++;
+                        notVinculed.add(pay);
+                    }
                 }
             }
             
@@ -1401,14 +1432,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(0);
             
-            formPayments.addPayments(notVinculed);
+            moFormPayments.addPayments(notVinculed);
         }
     }
     
     private void actionPerformedGridRowsPaysDelete() {
         if (moGridPayments.getTable().getSelectedRow() >= 0) {
             SLayoutBankRow layout = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
-            formPayments.addPayments(layout.getPayments());
+            moFormPayments.addPayments(layout.getPayments());
             layout.setForPayment(false);
             layout.getMoneyPayment().setOriginalAmount(0);
             layout.setIsForExtPayment(false);
@@ -2117,6 +2148,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 moDateDateLayout.setEditable(true);
                 moKeyLayoutBank.setEnabled(enable);
                 moKeyBankLayoutType.setEnabled(enable && moKeyLayoutBank.getSelectedIndex() > 0);
@@ -2138,29 +2170,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbGridRowsPays.setEnabled(!enable && moRadPay.getValue());
                 jbGridRowsPaysDelete.setEnabled(!enable && moRadPay.getValue());
                 break;
-            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                moDateDateLayout.setEditable(true);
-                moKeyLayoutBank.setEnabled(enable);
-                moKeyBankLayoutType.setEnabled(enable && moKeyLayoutBank.getSelectedIndex() > 0);
-                moKeyBankLayoutCurrency.setEnabled(enable && moKeyBankLayoutType.getSelectedIndex() > 0);
-                moKeyBankAccountCash.setEnabled(enable && moKeyBankLayoutCurrency.getSelectedIndex() > 0);
-                jbPickRecord.setEnabled(false);
-                
-                moIntConsecutive.setEditable(enable && isEditableConsecutive());
-                moTextConcept.setEditable(enable && isEditableConcept());
-                moKeyDpsCurrency.setEnabled(enable && moKeyBankLayoutType.getSelectedIndex() > 0);
-                moDecExchangeRate.setEnabled(enable && !isExchangeRateNotRequired());
-                jbPickExchangeRate.setEnabled(enable && !isExchangeRateNotRequired());
-                moDateDateDue.setEditable(enable);
-                
-                moRadDoc.setEnabled(false);
-                moRadPay.setEnabled(false);
-                jbGridRowsShow.setEnabled(enable);
-                jbGridRowsClear.setEnabled(!enable);
-                jbGridRowsPays.setEnabled(!enable && moRadPay.getValue());
-                jbGridRowsPaysDelete.setEnabled(!enable && moRadPay.getValue());
-                break;
-                
             default:
         }
     }

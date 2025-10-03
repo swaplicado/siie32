@@ -764,7 +764,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         moPanelDps.setDps(moDps, null);
         
-        if (moRegistry.isRegistryNew() || moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) { 
+        if ((moRegistry.isRegistryNew() || moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) && !moRegistry.isSystem() ) { 
             mbCanCapture = true;
             enablePayComponets(true);
             jbSave.setEnabled(true);

@@ -619,6 +619,7 @@ public abstract class SExportUtils {
             case PUR_ORDER_FILE:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
+            case PUR_PAYMENT_UPD:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -750,6 +751,7 @@ public abstract class SExportUtils {
                     break;
                     
                 case PUR_PAYMENT:
+                case PUR_PAYMENT_UPD:
                     testHost = "http://192.168.7.43:8003"; // today host in César Orozco's (30/09/2025)
                     break;
 
@@ -791,6 +793,7 @@ public abstract class SExportUtils {
             case PUR_ORDER:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
+            case PUR_PAYMENT_UPD:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
                 
@@ -805,6 +808,10 @@ public abstract class SExportUtils {
                         
                     case PUR_PAYMENT:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY;
+                        break;
+                    
+                    case PUR_PAYMENT_UPD:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY_UPD;
                         break;
                         
                     default:
@@ -949,6 +956,13 @@ public abstract class SExportUtils {
                     paymentsBody.work_instance = instanceArray;
                     paymentsBody.payments = (SRequestPaymentsBody.Payment[]) currentExportDatas.toArray(new SRequestPaymentsBody.Payment[0]);
                     requestBody = mapper.writeValueAsString(paymentsBody);
+                    break;
+                
+                case PUR_PAYMENT_UPD:
+                    SRequestPaymentsUpdateBody paymentUpdatesBody = new SRequestPaymentsUpdateBody();
+                    paymentUpdatesBody.work_instance = instanceArray;
+                    paymentUpdatesBody.payments = (SExportDataPaymentUpdate[]) currentExportDatas.toArray(new SExportDataPaymentUpdate[0]);
+                    requestBody = mapper.writeValueAsString(paymentUpdatesBody);
                     break;
                     
                 default:

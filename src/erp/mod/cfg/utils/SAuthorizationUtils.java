@@ -2169,6 +2169,7 @@ public abstract class SAuthorizationUtils {
                     if (result.has("status_code")) {
                         if (result.path("status_code").asInt() == 200){
                             sent = true; 
+                            System.out.println("Enviado a autorización con éxito.");
                         }
                         else System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
                     }

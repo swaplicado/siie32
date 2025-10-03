@@ -16,6 +16,7 @@ public class SRowPayments implements SGridRow, Serializable {
     
     protected int idYear;
     protected int idDoc;
+    protected int idBeneficiary;
     protected int idPayment;
     protected String msBeneficiary;
     protected String msPayNum;
@@ -29,6 +30,7 @@ public class SRowPayments implements SGridRow, Serializable {
 
     public void setIdYear(int d) { idYear = d; };
     public void setIdDoc(int d) { idDoc = d; };
+    public void setIdBeneficiary(int d) { idBeneficiary = d; };
     public void setIdPayment(int d) { idPayment = d; };
     public void setBeneficiary(String s) { msBeneficiary = s; };
     public void setPayNum(String s) { msPayNum = s; };
@@ -43,6 +45,7 @@ public class SRowPayments implements SGridRow, Serializable {
     public int getIdYear() { return idYear; }
     public int getIdDoc() { return idDoc; }
     public int getIdPayment() { return idPayment; }
+    public int getIdBeneficiary() { return idBeneficiary; }
     public String getBeneficiary() { return msBeneficiary; }
     public String getPayNum() { return msPayNum; }
     public String getDocNum() { return msDocNum; }

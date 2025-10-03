@@ -184,8 +184,8 @@ public class SExportPayments extends Thread {
         int docId = 0;
         try {
             String sql = "SELECT ext_data_id FROM trn_swap_data_prc "
-                    + "WHERE fid_dps_year_n = " + paymentEty.getFkDocYearId_n() + " "
-                    + "AND fid_dps_doc_n = " + paymentEty.getFkDocDocId_n() + " ";
+                    + "WHERE fk_dps_year_n = " + paymentEty.getFkDocYearId_n() + " "
+                    + "AND fk_dps_doc_n = " + paymentEty.getFkDocDocId_n() + " ";
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {
                 docId = resultSet.getInt(1);
