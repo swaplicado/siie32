@@ -424,6 +424,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 paymentEntry.setFkDocYearId_n(dps.getPkYearId());
                 paymentEntry.setFkDocDocId_n(dps.getPkDocId());
                 paymentEntry.setFkEntryCurrencyId(CurrencyId);
+                paymentEntry.setFkPaymentRequestId_n(0);
 
                 payment.getChildEntries().add(paymentEntry);
 
@@ -552,6 +553,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
                 swapDataProcessing.setExternalDataId(ExternalDocumentId);
                 swapDataProcessing.setExternalDataUuid(ExternalDocumentUuid);
+                swapDataProcessing.setExternalDataAuthorizationHistory("");
                 swapDataProcessing.setDpsReferences(composeReferences());
                 swapDataProcessing.setDpsDescription(Description);
                 swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
