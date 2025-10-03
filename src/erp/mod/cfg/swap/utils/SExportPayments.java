@@ -3,27 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.fin.db;
+package erp.mod.cfg.swap.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.data.SDataConstantsSys;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
-import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.utils.SExportDataFile;
-import erp.mod.cfg.swap.utils.SExportDataPayment;
-import erp.mod.cfg.swap.utils.SExportDataPaymentEntry;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SRequestPaymentsBody;
-import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
@@ -32,19 +23,14 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Isabel Servín. Sergio Flores
  */
-public class SProcSendPaymentsWeb extends Thread {
-    
-    private final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
-    private final DecimalFormat amountFormat = new DecimalFormat("#0.00");
-    private final DecimalFormat excRateFormat = new DecimalFormat("#0.0000");
-    private final int excRateDecimals = 4;
+public class SExportPayments extends Thread {
     
     private final SGuiClient miClient;
     private final SDbPayment moPayment;
     
     private String msError;
     
-    public SProcSendPaymentsWeb(SGuiClient client, SDbPayment payment) {
+    public SExportPayments(SGuiClient client, SDbPayment payment) {
         miClient = client;
         moPayment = payment;
         
@@ -63,8 +49,11 @@ public class SProcSendPaymentsWeb extends Thread {
                 
                 String requestBody = createJSONrequestBody(expDataFiles); // creación del JSON que se envía a la app web 
                 
-                if (computeRequest(requestBody)) {
+                if (SAuthorizationUtils.computePaymentRequest(miClient.getSession(), SSwapConsts.CFG_OBJ_TXN_PUR_PAY, requestBody)) {
                     moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_PRC_AUTH);
+                }
+                else {
+                    miClient.showMsgBoxInformation("No se puedo comenzar el proceso de autorización, intente nuevamente.");
                 }
             }
             else {
@@ -89,7 +78,6 @@ public class SProcSendPaymentsWeb extends Thread {
             arrPayments.add(payments);
             paymentBody.payments = arrPayments.toArray(new SRequestPaymentsBody.Payment[0]);
             requestBody = mapper.writeValueAsString(paymentBody);
-            System.out.println("");
         }
         catch (Exception e) {
             throw new Exception("Ocurrio un error al crear el JSON requestBody. " + e.getMessage());
@@ -106,6 +94,7 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.company = miClient.getSession().getConfigCompany().getCompanyId();
         payment.payment_id = moPayment.getPkPaymentId();
         payment.functional_area = moPayment.getFkFunctionalAreaId();
+        payment.functional_area = moPayment.getFkFunctionalSubareaId();
         payment.benef = moPayment.getFkBeneficiaryId();
         payment.series = moPayment.getSeries();
         payment.number = moPayment.getNumber() + "";
@@ -114,13 +103,14 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.sched_date_n = moPayment.getDateSchedule_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateSchedule_n());
         payment.exec_date_n = moPayment.getDateExecution_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateExecution_n());
         payment.currency = moPayment.getDbmsCurrency().getKey();
-        payment.amount = amountFormat.format(SLibUtils.roundAmount(moPayment.getPaymentCy()));
-        payment.exchange_rate_app = excRateFormat.format(SLibUtils.round(moPayment.getPaymentExchangeRateApplication(), excRateDecimals));
-        payment.amount_loc_app = amountFormat.format(SLibUtils.roundAmount(moPayment.getPaymentApplication()));
-        payment.exchange_rate_exec = excRateFormat.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), excRateDecimals));
-        payment.amount_loc_exec = amountFormat.format(SLibUtils.roundAmount(moPayment.getPayment()));
+        payment.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentCy()));
+        payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRateApplication(), SExportUtils.DECS_PAY_EXC_RATE));
+        payment.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentApplication()));
+        payment.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), SExportUtils.DECS_PAY_EXC_RATE));
+        payment.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPayment()));
         payment.payment_way = moPayment.getPaymentWay();
         payment.notes = moPayment.getNotes();
+        payment.is_receipt_payment_req = moPayment.isReceiptPaymentRequired() ? 1 : 0;
         payment.payment_status = moPayment.getFkStatusPaymentId();
         payment.authz_authorization_id = SModSysConsts.TRNS_ST_DPS_AUTHORN_NA;
         payment.paying_bank = "";
@@ -129,10 +119,10 @@ public class SProcSendPaymentsWeb extends Thread {
         payment.benef_bank = benef.getDbmsBank() == null ? "" : benef.getDbmsBank();
         payment.benef_bank_fiscal_id = benef.getDbmsBankFiscalId() == null ? "" : benef.getDbmsBankFiscalId();
         payment.benef_account = benef.getBankAccountNumber();
-        payment.sched_user = moPayment.getFkUserScheduleId();
-        payment.exec_user = moPayment.getFkUserExecutiondId();
-        payment.sched_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserSchedule());
-        payment.exec_at = SLibUtils.DbmsDateFormatDate.format(moPayment.getTsUserExecution());
+        payment.sched_user = null;
+        payment.exec_user = null;
+        payment.sched_at = null;
+        payment.exec_at = null;
         payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
         payment.user_id = miClient.getSession().getUser().getPkUserId(); 
         
@@ -144,19 +134,19 @@ public class SProcSendPaymentsWeb extends Thread {
         for (SDbPaymentEntry paymentEty : moPayment.getChildEntries()) {
             SExportDataPaymentEntry entry = new SExportDataPaymentEntry();
             entry.entry_type = paymentEty.getEntryType();
-            entry.amount = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentCy()));
-            entry.amount_loc_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentApplication()));
-            entry.entry_currency = paymentEty.moEntryCurrency.getKey();
-            entry.conv_rate_app = excRateFormat.format(SLibUtils.round(paymentEty.getConversionRateApplication(), excRateDecimals));
-            entry.entry_amount_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDestinyPaymentApplicationEntryCy()));
-            entry.amount_loc_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getEntryPayment()));
-            entry.conv_rate_exec = excRateFormat.format(SLibUtils.round(paymentEty.getConversionRate(), excRateDecimals));
-            entry.entry_amount_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDestinyPaymentEntryCy()));
+            entry.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentCy()));
+            entry.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentApplication()));
+            entry.entry_currency = paymentEty.getEntryCurrency().getKey();
+            entry.conv_rate_app = SExportUtils.FormatPayConversionRate.format(SLibUtils.round(paymentEty.getConversionRateApplication(), SExportUtils.DECS_PAY_CONV_RATE));
+            entry.entry_amount_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDestinyPaymentApplicationEntryCy()));
+            entry.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPayment()));
+            entry.conv_rate_exec = SExportUtils.FormatPayConversionRate.format(SLibUtils.round(paymentEty.getConversionRate(), SExportUtils.DECS_PAY_CONV_RATE));
+            entry.entry_amount_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDestinyPaymentEntryCy()));
             entry.installment = paymentEty.getInstallment();
-            entry.document_bal_prev_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousApplicationCy()));
-            entry.document_bal_unpd_app = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidApplicationCy_r()));
-            entry.document_bal_prev_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousCy()));
-            entry.document_bal_unpd_exec = amountFormat.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidCy_r()));
+            entry.document_bal_prev_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousApplicationCy()));
+            entry.document_bal_unpd_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidApplicationCy_r()));
+            entry.document_bal_prev_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousCy()));
+            entry.document_bal_unpd_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidCy_r()));
             if (entry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
                 int docId = getDocumentId(paymentEty);
                 if (docId != 0) {
@@ -169,8 +159,9 @@ public class SProcSendPaymentsWeb extends Thread {
                     entry.document_uuid = dps.getThinCfd() == null ? "" : dps.getThinCfd().getUuid();
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());
+
                     entry.document_currency = dps.getDbmsCurrencyKey();
-                    entry.document_amount = amountFormat.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
+                    entry.document_amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
                 }
             }
             entries.add(entry);
@@ -204,41 +195,5 @@ public class SProcSendPaymentsWeb extends Thread {
             miClient.showMsgBoxError(e.getMessage());
         }
         return docId;
-    }
-    
-    private boolean computeRequest(String requestBody) throws Exception {
-        boolean sent = false;
-        String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
-        String jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
-        String jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY;
-        
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), cfgParamKey));
-        
-        String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
-        String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
-        String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
-        
-        // Recuperar la configuración del servicio:
-        
-        syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
-        
-        String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, TIME_180_SEC);
-       
-        JsonNode responseJson = new ObjectMapper().readTree(responseBody);
-        
-        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
-            JsonNode results = responseJson.path("results");
-            if (results.isArray()) {
-                for (JsonNode result : results) {
-                    if (result.has("status_code")) {
-                        if (result.path("status_code").asInt() == 200){
-                            sent = true; 
-                        }
-                    }
-                }
-            }
-        }
-        return sent;
     }
 }

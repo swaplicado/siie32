@@ -124,6 +124,9 @@ public class SViewFilter extends JPanel implements SGridFilter {
             case SModConsts.USRU_USR:
                 msFilterName = "Usuario";
                 break;
+            case SModConsts.CFGU_CUR:
+                msFilterName = "Moneda";
+                break;
             default:
                 msFilterName = "?";
         }
@@ -177,6 +180,15 @@ public class SViewFilter extends JPanel implements SGridFilter {
                 }
                 break;
                 
+            case SModConsts.CFGU_CUR:
+                sql = "SELECT id_cur AS " + SDbConsts.FIELD_ID + "1, "
+                        + "cur_key AS " + SDbConsts.FIELD_PICK + "1, "
+                        + "cur AS " + SDbConsts.FIELD_PICK + "2 "
+                        + "FROM erp.cfgu_cur " 
+                        + "WHERE NOT b_del "
+                        + "ORDER BY cur_key, cur, id_cur";
+                break;
+                
             default:
                 // nothing
         }
@@ -212,6 +224,10 @@ public class SViewFilter extends JPanel implements SGridFilter {
                     texts = getTextFilterOfUsers(((int[]) moPicker.getOption())[0]);
                     break;
                     
+                case SModConsts.CFGU_CUR:
+                    texts = getTextFilterOfCurrencies(((int[]) moPicker.getOption())[0]);
+                    break;
+                    
                 default:
                     // nothing
             }
@@ -240,6 +256,16 @@ public class SViewFilter extends JPanel implements SGridFilter {
                 ids = texts[0].split(",");
                 
                 if (!texts[1].equals("(TODOS)") && ids.length <= 1) {
+                    jbPickOption.setEnabled(false);
+                    jbDeleteFilter.setEnabled(false);
+                }
+                break;
+                
+            case SModConsts.CFGU_CUR:
+                texts = getTextFilterOfCurrencies(0);
+                ids = texts[0].split(",");
+                
+                if (!texts[1].equals("(TODAS)") && ids.length <= 1) {
                     jbPickOption.setEnabled(false);
                     jbDeleteFilter.setEnabled(false);
                 }
@@ -316,6 +342,32 @@ public class SViewFilter extends JPanel implements SGridFilter {
         
         return new String[] {ids, names};
     }
+    
+    private String[] getTextFilterOfCurrencies(int id) {
+        String ids = "";
+        String names = "";
+        String sql;
+        ResultSet resultSet;
+        
+        try {
+            sql = "SELECT id_cur, cur_key "
+                    + "FROM erp.cfgu_cur " 
+                    + (id == 0 ? "" : "WHERE id_cur = " + id + ";");
+            resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                ids += (ids.isEmpty() ? "" : ", ") + resultSet.getInt(1);
+                names += (names.isEmpty() ? "" : ", ") + resultSet.getString(2);
+            }
+            if (id == 0) {
+                names = "(TODAS)";
+            }
+        }
+        catch (SQLException e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+        
+        return new String[] {ids, names};
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jbDeleteFilter;
@@ -324,9 +376,8 @@ public class SViewFilter extends JPanel implements SGridFilter {
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Recibe un int[], 
-     * en primera posición se recibe el tipo de filtro (SModConsts.CFGU_FUNC, SModConsts.USRU_USR)
-     * en segunda pocición subtipo de filtro, (SViewFilter.FILTER_STP_ALL_USER, etc...)
+     * Recibe un int, 
+     * se recibe el tipo de filtro (SModConsts.CFGU_FUNC, SModConsts.USRU_USR, SModConsts.CFGU_CUR)
      * @param value 
      */
     @Override

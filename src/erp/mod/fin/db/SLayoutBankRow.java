@@ -100,6 +100,12 @@ public class SLayoutBankRow implements SGridRow {
     protected double mdXmlTotal;
     protected int mnXmlType;
     
+    protected boolean mbIsForExtPayment;
+    protected boolean mbReceptionPayReq;
+    protected ArrayList<SRowPayments> maPayments;
+    protected int mnFuncArea;
+    protected int mnFuncSubarea;
+    
     /**
      * Create a new bank layout row.
      * @param client GUI client.
@@ -178,6 +184,12 @@ public class SLayoutBankRow implements SGridRow {
         msXmlRfcRec = "";
         mdXmlTotal = 0;
         mnXmlType = 0;
+        
+        mbIsForExtPayment = false;
+        mbReceptionPayReq = false;
+        maPayments = new ArrayList<>();
+        mnFuncArea = 0;
+        mnFuncSubarea = 0;
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -248,6 +260,11 @@ public class SLayoutBankRow implements SGridRow {
     public void setXmlTotal(double d) { mdXmlTotal = d; }
     public void setXmlType(int i) { mnXmlType = i; }
     
+    public void setIsForExtPayment(boolean b) { mbIsForExtPayment = b; }
+    public void setReceptionPayReq(boolean b) { mbReceptionPayReq = b; }
+    public void setFuncArea(int n) { mnFuncArea = n; }
+    public void setFuncSubarea(int n) { mnFuncSubarea = n; }
+    
     public int getRowMode() { return mnRowMode; }
     public int getTransactionType() { return mnTransactionType; }
     public int getPaymentType() { return mnPaymentType; }
@@ -317,6 +334,12 @@ public class SLayoutBankRow implements SGridRow {
     public String getXmlRfcRec() { return msXmlRfcRec; }
     public double getXmlTotal() { return mdXmlTotal; }
     public int getXmlType() { return mnXmlType; }
+    
+    public boolean getIsForExtPayment() { return mbIsForExtPayment; }
+    public boolean getReceptionPayReq() { return mbReceptionPayReq; }
+    public int getFuncArea() { return mnFuncArea; }
+    public int getFuncSubarea() { return mnFuncSubarea; }
+    public ArrayList<SRowPayments> getPayments() { return maPayments; }
 
     public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
         String account = "";

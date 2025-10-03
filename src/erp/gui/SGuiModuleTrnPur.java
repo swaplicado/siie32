@@ -189,7 +189,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmAccPend;
     private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenuItem jmiAccPendPay;
-    private javax.swing.JMenuItem jmiAccPendPayEty;
+    private javax.swing.JMenuItem jmiAccPendPayStPendAuth;
+    private javax.swing.JMenuItem jmiAccPendPayStPendExec;
+    private javax.swing.JMenuItem jmiAccPendPayStPendComp;
+    private javax.swing.JMenuItem jmiAccPendPayStRej;
+    private javax.swing.JMenuItem jmiAccPendPayStExc;
+    private javax.swing.JMenuItem jmiAccPendPayStExcDet;
+    private javax.swing.JMenuItem jmiAccPendPayStComp;
+    private javax.swing.JMenuItem jmiAccPendPayStCompDet;
+    private javax.swing.JMenuItem jmiAccPendPayStBloc;
+    private javax.swing.JMenuItem jmiAccPendPayStCancel;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepQueries;
@@ -576,11 +585,33 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend = new JMenu("CXP");
         jmiAccPend = new JMenuItem("Cuentas por pagar");
         jmiAccPendPay = new JMenuItem("Solicitudes de pago");
-        jmiAccPendPayEty = new JMenuItem("Solicitudes de pago a detalle");
+        jmiAccPendPayStPendAuth = new JMenuItem("Pagos por autorizar");
+        jmiAccPendPayStPendExec = new JMenuItem("Pagos por ejecutar");
+        jmiAccPendPayStPendComp = new JMenuItem("Pagos por comprobar");
+        jmiAccPendPayStExc = new JMenuItem("Pagos ejecutados ");
+        jmiAccPendPayStExcDet = new JMenuItem("Pagos ejecutados a detalle");
+        jmiAccPendPayStComp = new JMenuItem("Pagos comprobados");
+        jmiAccPendPayStCompDet = new JMenuItem("Pagos comprobados a detalle");
+        jmiAccPendPayStRej = new JMenuItem("Pagos rechazados");
+        jmiAccPendPayStBloc = new JMenuItem("Pagos bloqueados");
+        jmiAccPendPayStCancel = new JMenuItem("Pagos cancelados");
         jmAccPend.add(jmiAccPend);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPendPay);
-        jmAccPend.add(jmiAccPendPayEty);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPendPayStPendAuth);
+        jmAccPend.add(jmiAccPendPayStPendExec);
+        jmAccPend.add(jmiAccPendPayStPendComp);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPendPayStExc);
+        jmAccPend.add(jmiAccPendPayStExcDet);
+        jmAccPend.add(jmiAccPendPayStComp);
+        jmAccPend.add(jmiAccPendPayStCompDet);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPendPayStRej);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPendPayStBloc);
+        jmAccPend.add(jmiAccPendPayStCancel);
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
@@ -824,7 +855,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiScaItDetMap.addActionListener(this);
         jmiAccPend.addActionListener(this);
         jmiAccPendPay.addActionListener(this);
-        jmiAccPendPayEty.addActionListener(this);
+        jmiAccPendPayStPendAuth.addActionListener(this);
+        jmiAccPendPayStPendExec.addActionListener(this);
+        jmiAccPendPayStPendComp.addActionListener(this);
+        jmiAccPendPayStExc.addActionListener(this);
+        jmiAccPendPayStExcDet.addActionListener(this);
+        jmiAccPendPayStComp.addActionListener(this);
+        jmiAccPendPayStCompDet.addActionListener(this);
+        jmiAccPendPayStRej.addActionListener(this);
+        jmiAccPendPayStBloc.addActionListener(this);
+        jmiAccPendPayStCancel.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -2024,8 +2064,35 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiAccPendPay) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiAccPendPayEty) {
-                miClient.getSession().showView(SModConsts.FIN_PAY, SModConsts.FIN_PAY_ETY, null);
+            else if (item == jmiAccPendPayStPendAuth) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_PRC_AUTH, null);
+            }
+            else if (item == jmiAccPendPayStPendExec) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_EXEC_P, null);
+            }
+            else if (item == jmiAccPendPayStPendComp) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT_P, null);
+            }
+            else if (item == jmiAccPendPayStExc) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_EXEC, null);
+            }
+            else if (item == jmiAccPendPayStExcDet) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINX_ST_PAY_EXEC_DET, null);
+            }
+            else if (item == jmiAccPendPayStComp) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, null);
+            }
+            else if (item == jmiAccPendPayStCompDet) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINX_ST_PAY_RCPT_DET, null);
+            }
+            else if (item == jmiAccPendPayStRej) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_REJ, null);
+            }
+            else if (item == jmiAccPendPayStBloc) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_BLOC, null);
+            }
+            else if (item == jmiAccPendPayStCancel) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_CAN, null);
             }
             else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT);

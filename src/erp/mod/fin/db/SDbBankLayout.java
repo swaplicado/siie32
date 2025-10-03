@@ -128,6 +128,9 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected ArrayList<SLayoutBankXmlRow> maAuxLayoutBankXmlRows;
     protected ArrayList<SLayoutBankRecord> maAuxLayoutBankRecords;
     
+    protected ArrayList<Integer> maAuxOldPaymentsIds;
+    protected ArrayList<SDbPayment> maAuxNewPayments;
+    
     /*
      * Private methods
      */
@@ -1087,6 +1090,9 @@ public class SDbBankLayout extends SDbRegistryUser {
     public ArrayList<SLayoutBankXmlRow> getAuxLayoutBankXmlRows() { return maAuxLayoutBankXmlRows; }
     public ArrayList<SLayoutBankRecord> getAuxLayoutBankRecords() { return maAuxLayoutBankRecords; }
     
+    public ArrayList<Integer> getAuxOldPaymentsIds() { return maAuxOldPaymentsIds; }
+    public ArrayList<SDbPayment> getAuxNewPayments() { return maAuxNewPayments; }
+    
     public String getBankLayoutNumber(boolean virtuallyIncrementRequests) { return "" + mnPkBankLayoutId + "-" + (mnAuthorizationRequests + (virtuallyIncrementRequests ? 1 : 0)); }
     
     public String getTransactionTypeName() {
@@ -1659,6 +1665,9 @@ public class SDbBankLayout extends SDbRegistryUser {
         maAuxLayoutBankPaymentRows = new ArrayList<>();
         maAuxLayoutBankXmlRows = new ArrayList<>();
         maAuxLayoutBankRecords = new ArrayList<>();
+        
+        maAuxOldPaymentsIds = new ArrayList<>();
+        maAuxNewPayments = new ArrayList<>();
     }
 
     @Override
@@ -1877,6 +1886,22 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+        
+        // Guardar pagos en caso de existir
+        
+        for (int paymentId : maAuxOldPaymentsIds) {
+            msSql = "UPDATE fin_pay SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR_P + " "
+                    + "WHERE id_pay = " + paymentId;
+            session.getStatement().execute(msSql);
+        }
+        
+        for (SDbPayment pay : maAuxNewPayments) {
+            pay.save(session);
+            
+            msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + pay.getPkPaymentId() + ", " + mnPkBankLayoutId + ")";
+            session.getStatement().execute(msSql);
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }

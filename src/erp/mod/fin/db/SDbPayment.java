@@ -79,6 +79,7 @@ public class SDbPayment extends SDbRegistryUser {
     protected ArrayList<SDbPaymentFile> maFilesDeleted;
     
     protected String msDbmsStatus;
+    protected String msXtaBeneficiary;
     protected SDataCurrency moDbmsCurrency;
     
     protected Date mtOldDateSchedule_n;
@@ -202,6 +203,7 @@ public class SDbPayment extends SDbRegistryUser {
     public void setDbmsCurrency(SDataCurrency o) { moDbmsCurrency = o; }
     
     public String getDbmsStatus() { return msDbmsStatus; }
+    public String getXtaBeneficiary() { return msXtaBeneficiary; }
     public SDataCurrency getDbmsCurrency() { return moDbmsCurrency; }
     
     public void setOldDateSchedule_n(Date t) { mtOldDateSchedule_n = t; }
@@ -234,7 +236,7 @@ public class SDbPayment extends SDbRegistryUser {
         msSql = "UPDATE " + getSqlTable() + " SET " +
                 "fk_st_pay = " + status + ", " + 
                 "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
-                "ts_usr_upd = NOW() ";
+                "ts_usr_upd = NOW() " +
                 getSqlWhere();
         session.getStatement().execute(msSql);
     }
@@ -295,6 +297,7 @@ public class SDbPayment extends SDbRegistryUser {
         maFilesDeleted = new ArrayList<>();
         
         msDbmsStatus = "";
+        msXtaBeneficiary = "";
         moDbmsCurrency = null;
         
         mtOldDateSchedule_n = null;
@@ -397,6 +400,7 @@ public class SDbPayment extends SDbRegistryUser {
             // Read aswell document entries:
             
             msDbmsStatus = (String) session.readField(SModConsts.FINS_ST_PAY, new int[] { mnFkStatusPaymentId }, SDbRegistry.FIELD_NAME);
+            msXtaBeneficiary = (String) session.readField(SModConsts.BPSU_BP, new int[] { mnFkBeneficiaryId }, SDbRegistry.FIELD_NAME);
             
             statement = session.getStatement().getConnection().createStatement();
             

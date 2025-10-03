@@ -26,7 +26,6 @@ import erp.mod.fin.db.SDbCheckWallet;
 import erp.mod.fin.db.SDbCostCenter;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
-import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.db.SDbTaxItemLink;
 import erp.mod.fin.form.SFormAbpBizPartner;
 import erp.mod.fin.form.SFormAbpBizPartnerLink;
@@ -59,6 +58,7 @@ import erp.mod.fin.view.SViewCustomReportsExpenses;
 import erp.mod.fin.view.SViewDpsPayment;
 import erp.mod.fin.view.SViewImportFile;
 import erp.mod.fin.view.SViewPayment;
+import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.fin.view.SViewReportAccountingCustomizableReport;
 import erp.mod.fin.view.SViewTaxItemLink;
 import java.sql.ResultSet;
@@ -87,7 +87,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Sergio Flores
  */
 public class SModuleFin extends SGuiModule {
 
@@ -299,13 +299,11 @@ public class SModuleFin extends SGuiModule {
                 registry = new SDbAccountingCustomizableReportUser();
                 break;
             case SModConsts.FIN_PAY:
+            case SModConsts.FIN_PAY_FILE:
                 registry = new SDbPayment();
                 break;
             case SModConsts.FIN_PAY_ETY:
                 registry = new SDbPaymentEntry();
-                break;
-            case SModConsts.FIN_PAY_FILE:
-                registry = new SDbPaymentFile();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -504,6 +502,7 @@ public class SModuleFin extends SGuiModule {
     @Override
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
+        String title = "";
 
         switch (type) {
             case SModConsts.FIN_ACC_ITEM_LINK:
@@ -600,14 +599,51 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewAccoutingCustomizableReport(miClient, "Config. consultas personalizadas aux. contables");
                 break;
             case SModConsts.FIN_PAY:
+                
                 switch(subtype) {
-                    case SModConsts.FIN_PAY_ETY:
-                        view = new SViewPayment(miClient, subtype, "Solicitudes de pago (detalle)");
-                        break;
                     case SLibConsts.UNDEFINED:
-                        view = new SViewPayment(miClient, subtype, "Solicitudes de pago");
+                        title = "Solicitudes pago";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
+                        title = "Pagos x autorizar";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                        title = "Pagos x ejecutar";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_REJ:
+                        title = "Pagos rechazados";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_SCHED:
+                        title = "Pagos programados";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_BLOC:
+                        title = "Pagos bloqueados";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_CAN:
+                        title = "Pagos cancelados";
                         break;
                 }
+                view = new SViewPayment(miClient, subtype, title);
+                break;
+            case SModConsts.FINX_PAY_ST:
+                switch(subtype) {
+                    case SModSysConsts.FINS_ST_PAY_RCPT_P:
+                        title = "Pagos x comprobar";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_EXEC:
+                        title = "Pagos ejecutados";
+                        break;
+                    case SModSysConsts.FINX_ST_PAY_EXEC_DET:
+                        title = "Pagos ejecutados (detalle)";
+                        break;
+                    case SModSysConsts.FINS_ST_PAY_RCPT:
+                        title = "Pagos comprobados";
+                        break;
+                    case SModSysConsts.FINX_ST_PAY_RCPT_DET:
+                        title = "Pagos comprobados (detalle)";
+                        break;
+                }
+                view = new SViewPaymentStatus(miClient, subtype, title);
                 break;
             case SModConsts.FINX_REP_CUS_ACC:
                 view = new SViewReportAccountingCustomizableReport(miClient, subtype, "Aux. contables: " + (String) params.getParamsMap().get(subtype));
@@ -804,11 +840,11 @@ public class SModuleFin extends SGuiModule {
                 form = moFormAccountingCustomizableReportCostCenter;
                 break;
             case SModConsts.FIN_PAY:
-                if (moFormPayment == null) moFormPayment = new SFormPayment(miClient, "Solicitud de pago");
+                if (moFormPayment == null) moFormPayment = new SFormPayment(miClient, "Pago");
                 form = moFormPayment;
                 break;
             case SModConsts.FIN_PAY_FILE:
-                if (moFormPaymentFile == null) moFormPaymentFile = new SFormPaymentFile(miClient, "Archivos de la solicitud de pago");
+                if (moFormPaymentFile == null) moFormPaymentFile = new SFormPaymentFile(miClient, "Archivos del pago");
                 form = moFormPaymentFile;
                 break;
             default:
