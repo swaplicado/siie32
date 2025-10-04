@@ -2027,7 +2027,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     pay.setPaymentWay(DCfdi40Catalogs.FDP_TRANSFERENCIA);
                     pay.setReceiptPaymentRequired(row.getReceptionPayReq());
                     pay.setSystem(true);
-                    pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                    pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_LAY_BANK);
                     pay.setFkCurrencyId(moKeyBankLayoutCurrency.getValue()[0]); 
                     pay.setFkBeneficiaryId(row.getBizPartnerId()); 
                     pay.setFkFunctionalAreaId(row.getFuncArea()); 
@@ -3091,6 +3091,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             registry.setPostSaveMethodArgs(new Object[] { miClient });
         }
         else if (isModeForAccounting()) {
+            registry.setIsForAcc(true);
             registry.getAuxLayoutBankPaymentRows().clear();
             
             for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
