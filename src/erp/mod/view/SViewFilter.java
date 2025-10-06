@@ -97,7 +97,7 @@ public class SViewFilter extends JPanel implements SGridFilter {
         });
         add(jbPickOption);
 
-        jbDeleteFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbDeleteFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_erase.gif"))); // NOI18N
         jbDeleteFilter.setToolTipText("Quitar filtro");
         jbDeleteFilter.setPreferredSize(new java.awt.Dimension(23, 23));
         jbDeleteFilter.addActionListener(new java.awt.event.ActionListener() {

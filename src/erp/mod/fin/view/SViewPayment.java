@@ -476,6 +476,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, true);
                 SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+                miClient.getSession().notifySuscriptors(SModConsts.FIN_PAY);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
@@ -670,9 +671,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.FIN_PAY_ETY);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
-        moSuscriptionsSet.add(SModConsts.CFGU_CUR);
         moSuscriptionsSet.add(SModConsts.CFGU_FUNC);
-        moSuscriptionsSet.add(SModConsts.FINS_ST_PAY);
         moSuscriptionsSet.add(SModConsts.USRU_USR);     
     }
 
