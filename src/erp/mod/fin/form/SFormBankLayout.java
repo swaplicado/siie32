@@ -1429,6 +1429,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 errors.setVisible(true);
             }
             
+            computeBalance();
+            
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(0);
             
@@ -1446,6 +1448,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             layout.setReceptionPayReq(false);
             layout.getPayments().clear();
             
+            computeBalance();
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(0);
         }
