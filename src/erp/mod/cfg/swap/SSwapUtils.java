@@ -24,31 +24,34 @@ public abstract class SSwapUtils {
                         translation = "USUARIO";
                         break;
                     case PARTNER_SUPPLIER:
-                        translation = "SOCIO_PROVEEDOR";
+                        translation = "SOCIO PROVEEDOR";
                         break;
                     case PARTNER_CUSTOMER:
-                        translation = "SOCIO_CLIENTE";
+                        translation = "SOCIO CLIENTE";
                         break;
                     case AUTH_ACTOR:
-                        translation = "AUTH_ACTOR";
+                        translation = "AUTH ACTOR";
                         break;
                     case AUTH_JOB_TITLE:
-                        translation = "AUTH_PUESTO_LABORAL";
+                        translation = "AUTH PUESTO LABORAL";
                         break;
                     case FUNCTIONAL_AREA:
-                        translation = "AREA_FUNCIONAL";
+                        translation = "AREA FUNCIONAL";
                         break;
                     case PUR_ORDER:
-                        translation = "PEDIDO_COMPRAS";
+                        translation = "PEDIDO COMPRAS";
                         break;
                     case PUR_REF_ORDER:
-                        translation = "REF_PEDIDO_COMPRAS";
+                        translation = "REF PEDIDO COMPRAS";
                         break;
                     case PUR_REF_SCALE_TICKET:
-                        translation = "REF_BOLETO_BÁSCULA";
+                        translation = "REF BOLETO BÁSCULA";
                         break;
                     case PUR_PAYMENT:
-                        translation = "PAGO_COMPRAS";
+                        translation = "PAGO COMPRAS";
+                        break;
+                    case PUR_PAYMENT_UPD:
+                        translation = "PAGO COMPRAS ACTUALIZACIÓN";
                         break;
                     default:
                         // nothing

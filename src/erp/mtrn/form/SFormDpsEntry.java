@@ -98,6 +98,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
@@ -264,6 +265,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbRightMktPriceListSales;
     private boolean mbRightPurPriceChange;
     private boolean mbRightSalPriceChange;
+    private boolean mbRightFinAccountant;
     private boolean mbRightTrnOmitSourceDoc;
     private boolean mbAllowDiscount;
     private double mdQuantitySrcOrig;
@@ -2544,6 +2546,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbRightMktPriceListSales = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MKT_PLIST_SAL).HasRight;
         mbRightPurPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_PRICE_CHG).HasRight;
         mbRightSalPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_PRICE_CHG).HasRight;
+        mbRightFinAccountant = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REC).Level >= SUtilConsts.LEV_EDITOR;
 
         mvFields = new Vector<>();
         moFieldFkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
@@ -4606,6 +4609,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfTankCar.setFocusable(false);
             
             jcbOperationsType.setEnabled(true);
+            
+            moCostCenterPanel.setPanelEditable(true);
 
             jcbFkTaxRegionId.setEnabled(false);
             jbFkTaxRegionId.setEnabled(false);
@@ -6060,8 +6065,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtConceptfKey.setEditable(false);
         jtConceptfKey.setFocusable(false);
         jbConceptKey.setEnabled(false);
-        jtfConcept.setEditable(false);
-        jtfConcept.setFocusable(false);
+        jtfConcept.setEditable(mbRightFinAccountant);
+        jtfConcept.setFocusable(mbRightFinAccountant);
         jbConcept.setEnabled(false);
         
         jcbFkOriginalUnitId.setEnabled(false);

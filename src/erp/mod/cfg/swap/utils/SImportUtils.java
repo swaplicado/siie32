@@ -21,6 +21,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
 import java.io.File;
@@ -43,6 +44,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -91,10 +93,11 @@ public abstract class SImportUtils {
      * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
      * @param linkToOrder Link-to-order flag.
      * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @param dueDateRequired Due date required. Can be <code>null</code>.
      * @return DPS key as <code>int[]</code> of new invoice created.
      * @throws java.lang.Exception
      */
-    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired) throws Exception {
+    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final Date dueDateRequired) throws Exception {
         SDataDps invoice = null;
         SDataDps order = null; 
 
@@ -143,6 +146,10 @@ public abstract class SImportUtils {
 
                     if (newDps != null) {
                         newDps.setAuxFilePdf(cfdiPdf);
+                        
+                        if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && dueDateRequired != null) {
+                            newDps.setDaysOfCreditByDueDate(dueDateRequired);
+                        }
                         
                         client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
                         client.getGuiModule(module).setAuxRegistry(newDps);
@@ -460,6 +467,12 @@ public abstract class SImportUtils {
                     exception = e;
                 }
             }
+            
+            if (downloadMode == MODE_DOCS_ALL_FILES_AS_ZIP) {
+                JFileChooser fileChooser = session.getClient().getFileChooser();
+                fileChooser.resetChoosableFileFilters();
+                fileChooser.setAcceptAllFileFilterUsed(true);
+            }
         }
         
         if (exception != null) {
@@ -587,6 +600,44 @@ public abstract class SImportUtils {
         
         SExportLogsUtils.safeWriteToLogFile(log.getRequestBodyFileName(), requestBody);
         SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
+    }
+    
+    /**
+     * Update DPS days of credit by required due date.
+     * @param session GUI session.
+     * @param dpsKey DPS primary key.
+     * @param dueDate Required due date.
+     * @return 
+     */
+    public static boolean updateDpsDaysOfCreditByDueDate(final SGuiSession session, final int[] dpsKey, final Date dueDate) throws Exception {
+        boolean updated = false;
+        
+        SThinDps dps = new SThinDps();
+        dps.read(dpsKey, session.getStatement());
+        
+        if (dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
+            throw new Exception("El documento '" + dps.getDpsNumber() + "' debe tener tipo de pago 'crédito'.");
+        }
+        else if (dueDate.before(dps.getDate())) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha del documento '" + dps.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dps.getDate()) + ").");
+        }
+        else if (dueDate.before(dps.getDateStartOfCredit())) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha base de crédito del documento '" + dps.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dps.getDateStartOfCredit()) + ").");
+        }
+        else {
+            long daysOfCredit = SLibTimeUtils.getDaysDiff(dueDate, dps.getDateStartOfCredit());
+            
+            if (dps.getDaysOfCredit() != (int) daysOfCredit) {
+                String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) +  " SET "
+                        + "days_cred = " + (int) daysOfCredit + " "
+                        + "WHERE id_year = " + dps.getPkYearId() + " AND id_doc = " + dps.getPkDocId() + ";";
+                
+                session.getStatement().execute(sql);
+                updated = true;
+            }
+        }
+        
+        return updated;
     }
     
     /**

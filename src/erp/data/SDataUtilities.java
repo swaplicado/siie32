@@ -156,6 +156,7 @@ import erp.mtrn.data.SDataDpsDocumentNumberSeries;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsType;
 import erp.mtrn.data.SDataPac;
+import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SDataStockLot;
 import erp.mtrn.data.SDataSystemNotes;
 import erp.mtrn.data.SProcBizPartnerLastPayment;
@@ -758,6 +759,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstants.TRN_CFD:
                 registry = new SDataCfd();
+                break;
+            case SDataConstants.TRN_PDF:
+                registry = new SDataPdf();
                 break;
             case SDataConstants.TRN_CFD_SIGN_LOG:
                 registry = new SDataCfdSignLog();

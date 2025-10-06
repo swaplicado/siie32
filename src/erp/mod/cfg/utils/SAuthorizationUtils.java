@@ -17,7 +17,10 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.cfg.swap.SHttpConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportDataFile;
+import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.hrs.utils.SDocUtils;
@@ -59,6 +62,8 @@ import sa.lib.mail.SMailSender;
  * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SAuthorizationUtils {
+    
+    private static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
     /**
      * Query base para la obtención de la ruta de autorización
@@ -2135,6 +2140,43 @@ public abstract class SAuthorizationUtils {
             result = false;
         }
         return result;
+    }
+    
+    public static boolean computePaymentRequest(SGuiSession session, String jsonConfigKey, String requestBody) throws Exception {
+        boolean sent = false;
+        String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
+        String jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
+        
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
+        
+        String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+        String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
+        String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+        
+        // Recuperar la configuración del servicio:
+        
+        syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
+        
+        String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, TIME_180_SEC);
+       
+        JsonNode responseJson = new ObjectMapper().readTree(responseBody);
+        
+        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
+            JsonNode results = responseJson.path("results");
+            if (results.isArray()) {
+                for (JsonNode result : results) {
+                    if (result.has("status_code")) {
+                        if (result.path("status_code").asInt() == 200){
+                            sent = true; 
+                            System.out.println("Enviado a autorización con éxito.");
+                        }
+                        else System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                    }
+                }
+            }
+        }
+        return sent;
     }
     
     /**

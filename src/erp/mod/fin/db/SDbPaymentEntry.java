@@ -7,7 +7,7 @@ package erp.mod.fin.db;
 
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
-import erp.mtrn.data.SThinDps;
+import erp.mtrn.data.SDataDps;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,8 +45,9 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     protected int mnFkDocYearId_n;
     protected int mnFkDocDocId_n;
     protected int mnFkEntryCurrencyId;
+    protected int mnFkPaymentRequestId_n;
     
-    protected SThinDps moDpsRelated;
+    protected SDataDps moDpsRelated;
     protected SDataCurrency moPayCurrency;
     protected SDataCurrency moEntryCurrency;
     
@@ -72,6 +73,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public void setFkDocYearId_n(int n) { mnFkDocYearId_n = n; }
     public void setFkDocDocId_n(int n) { mnFkDocDocId_n = n; }
     public void setFkEntryCurrencyId(int n) { mnFkEntryCurrencyId = n; }
+    public void setFkPaymentRequestId_n(int n) { mnFkPaymentRequestId_n = n; }
 
     public int getPkPaymentId() { return mnPkPaymentId; }
     public int getPkEntryId() { return mnPkEntryId; }
@@ -91,13 +93,13 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public int getFkDocYearId_n() { return mnFkDocYearId_n; }
     public int getFkDocDocId_n() { return mnFkDocDocId_n; }
     public int getFkEntryCurrencyId() { return mnFkEntryCurrencyId; }
-
+    public int getFkPaymentRequestId_n() { return mnFkPaymentRequestId_n; }
     
-    public void setDpsRelated(SThinDps o) { moDpsRelated = o; }
+    public void setDpsRelated(SDataDps o) { moDpsRelated = o; }
     public void setPayCurrency(SDataCurrency o) { moPayCurrency = o; }
     public void setEntryCurrency(SDataCurrency o) { moEntryCurrency = o; }
     
-    public SThinDps getDpsRelated() { return moDpsRelated; }
+    public SDataDps getDpsRelated() { return moDpsRelated; }
     public SDataCurrency getPayCurrency() { return moPayCurrency; }
     public SDataCurrency getEntryCurrency() { return moEntryCurrency; }
 
@@ -134,6 +136,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         mnFkDocYearId_n = 0;
         mnFkDocDocId_n = 0;
         mnFkEntryCurrencyId = 0;
+        mnFkPaymentRequestId_n = 0;
         
         moDpsRelated = null;
         moPayCurrency = null;
@@ -203,6 +206,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
             mnFkDocYearId_n = resultSet.getInt("fk_doc_year_n");
             mnFkDocDocId_n = resultSet.getInt("fk_doc_doc_n");
             mnFkEntryCurrencyId = resultSet.getInt("fk_ety_cur");
+            mnFkPaymentRequestId_n = resultSet.getInt("fk_pay_req_n");
             
             statement = session.getStatement().getConnection().createStatement();
             
@@ -210,7 +214,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
             moEntryCurrency.read(new int[] { mnFkEntryCurrencyId }, statement);
             
             if (mnFkDocYearId_n != 0 && mnFkDocDocId_n != 0) {
-                moDpsRelated = new SThinDps();
+                moDpsRelated = new SDataDps();
                 moDpsRelated.read(new int[] { mnFkDocYearId_n, mnFkDocDocId_n }, statement);
             }
 
@@ -249,7 +253,8 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
                     mdDocBalanceUnpaidCy_r + ", " + 
                     (mnFkDocYearId_n == 0 ? "NULL, " : mnFkDocYearId_n + ", ") + 
                     (mnFkDocDocId_n == 0 ? "NULL, " : mnFkDocDocId_n + ", ") + 
-                    mnFkEntryCurrencyId + " " + 
+                    mnFkEntryCurrencyId + ", " +
+                    (mnFkPaymentRequestId_n == 0 ? "NULL " : mnFkPaymentRequestId_n + " ") + 
                     ")";
 
         }
@@ -274,7 +279,8 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
                     "doc_bal_unpd_cur_r = " + mdDocBalanceUnpaidCy_r + ", " +
                     "fk_doc_year_n = " + (mnFkDocYearId_n == 0 ? "NULL, " : mnFkDocYearId_n + ", ") +
                     "fk_doc_doc_n = " + (mnFkDocDocId_n == 0 ? "NULL, " : mnFkDocDocId_n + ", ") +
-                    "fk_ety_cur = " + mnFkEntryCurrencyId + " " +
+                    "fk_ety_cur = " + mnFkEntryCurrencyId + ", " +
+                    "fk_pay_req_n = " + (mnFkPaymentRequestId_n == 0 ? "NULL " : mnFkPaymentRequestId_n + " ") +
                     getSqlWhere();
         }
         
@@ -306,6 +312,7 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         registry.setFkDocYearId_n(this.getFkDocYearId_n());
         registry.setFkDocDocId_n(this.getFkDocDocId_n());
         registry.setFkEntryCurrencyId(this.getFkEntryCurrencyId());
+        registry.setFkPaymentRequestId_n(this.getFkPaymentRequestId_n());
         
         registry.setRegistryNew(true);
         

@@ -923,6 +923,13 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
                     "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + "))) AS comp_doc, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "(SELECT "
+                +   "item FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
+                +   "WHERE id_item = "
+                +       "(SELECT fk_item FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " "
+                +       "WHERE id_mat_req = v.id_mat_req and id_ety = "
+                +           "(SELECT min(id_ety) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " "
+                +           "WHERE id_mat_req = v.id_mat_req AND NOT b_del))) AS item, "
                 + "v.fk_usr_clo_prov, "
                 + "v.fk_usr_clo_pur, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -993,6 +1000,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_delivery_n", "Fecha entrega estimada"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_pty", "Prioridad"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "req_status", "Estatus"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "item", "Concepto"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "auth_status", "Autorización"));
         if (mnGridMode == SModSysConsts.TRNX_MAT_REQ_AUTHO) {
             columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "autorizo", "Autorizó"));

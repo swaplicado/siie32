@@ -487,12 +487,15 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
         
         SDataMaterialRequestEntryLinkRow oTableRow;
         boolean bConceptTruncated;
+        
         for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
             oTableRow = (SDataMaterialRequestEntryLinkRow) moTablePane.getTableRow(i);
+            
             if (oTableRow.getQuantityToLinkV() > 0d) {
                 SDataDpsEntry oEntry = new SDataDpsEntry();
                 // truncar conceptKey a 35 caracteres
                 String conceptKey = oTableRow.getItem().getKey();
+                
                 if (conceptKey.length() > 35) {
                     conceptKey = conceptKey.substring(0, 35);
                 }
@@ -500,10 +503,12 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 // truncar concept a 130 caracteres
                 bConceptTruncated = false;
                 String concept = oTableRow.getItem().getName();
+                
                 if (concept.length() > 130) {
                     concept = concept.substring(0, 130);
                     bConceptTruncated = true;
                 }
+                
                 oEntry.setConcept(concept);
                 oEntry.setOriginalQuantity(oTableRow.getQuantityToLinkV());
                 oEntry.setFkItemId(oTableRow.getMaterialRequestEntry().getFkItemId());
@@ -531,7 +536,9 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 oEntry.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY);
                 oEntry.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
                 oEntry.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
+                
                 int idCc = 0;
+                
                 if (oTableRow.getMaterialRequestEntry().getCcConfigs().size() > 0) {
                     idCc = oTableRow.getMaterialRequestEntry().getCcConfigs().get(0).getFkCostCenterId();
                 }

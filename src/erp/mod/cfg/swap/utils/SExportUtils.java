@@ -533,7 +533,7 @@ public abstract class SExportUtils {
                         ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
                         
                         if (syncType == SSyncType.PUR_PAYMENT) {
-                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
+                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_IN_AUTH, session.getUser().getPkUserId(), database };
                             complementProcessing(session, syncType, entries, value);
                         }
                         else if (syncType == SSyncType.PUR_PAYMENT_UPD) {
@@ -619,6 +619,7 @@ public abstract class SExportUtils {
             case PUR_ORDER_FILE:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
+            case PUR_PAYMENT_UPD:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
                 for (Integer companyId : databasesMap.keySet()) {
                     String database = databasesMap.get(companyId);
@@ -659,7 +660,7 @@ public abstract class SExportUtils {
                 for (SDbSyncLogEntry entry : entries) {
                     int paymentId = SLibUtils.parseInt(entry.getReferenceId());
                     SDbPayment paymentToUpdate = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
-                    int newStatusPayment = SDbPayment.getSettledStatusPayment(paymentToUpdate.getFkStatusPaymentId());
+                    int newStatusPayment = SDbPayment.getSettledStatusPaymentId(paymentToUpdate.getFkStatusPaymentId());
                     Object valueToUpdate = new Object[] { newStatusPayment, paymentToUpdate.getFkUserUpdateId(), entry.getAuxDatabase() };
                     
                     paymentToUpdate.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
@@ -750,6 +751,7 @@ public abstract class SExportUtils {
                     break;
                     
                 case PUR_PAYMENT:
+                case PUR_PAYMENT_UPD:
                     testHost = "http://192.168.7.43:8003"; // today host in César Orozco's (30/09/2025)
                     break;
 
@@ -791,6 +793,7 @@ public abstract class SExportUtils {
             case PUR_ORDER:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
+            case PUR_PAYMENT_UPD:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
                 jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
                 
@@ -805,6 +808,10 @@ public abstract class SExportUtils {
                         
                     case PUR_PAYMENT:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY;
+                        break;
+                    
+                    case PUR_PAYMENT_UPD:
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_PAY_UPD;
                         break;
                         
                     default:
@@ -950,6 +957,13 @@ public abstract class SExportUtils {
                     paymentsBody.payments = (SRequestPaymentsBody.Payment[]) currentExportDatas.toArray(new SRequestPaymentsBody.Payment[0]);
                     requestBody = mapper.writeValueAsString(paymentsBody);
                     break;
+                
+                case PUR_PAYMENT_UPD:
+                    SRequestPaymentsUpdateBody paymentUpdatesBody = new SRequestPaymentsUpdateBody();
+                    paymentUpdatesBody.work_instance = instanceArray;
+                    paymentUpdatesBody.payments = (SExportDataPaymentUpdate[]) currentExportDatas.toArray(new SExportDataPaymentUpdate[0]);
+                    requestBody = mapper.writeValueAsString(paymentUpdatesBody);
+                    break;
                     
                 default:
                     // nada
@@ -1080,8 +1094,15 @@ public abstract class SExportUtils {
                             responses.getInfos().add(info);
                             
                             if (syncType == SSyncType.PUR_ORDER) {
-                                // exportar antes referencias de pedidos de compras:
+                                // exportar también referencias de pedidos de compras:
                                 syncTypeInProgress = SSyncType.PUR_REF_ORDER;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                            }
+
+                            if (syncType == SSyncType.PUR_PAYMENT) {
+                                // exportar también actualizaciones de pagos de compras:
+                                syncTypeInProgress = SSyncType.PUR_PAYMENT_UPD;
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }

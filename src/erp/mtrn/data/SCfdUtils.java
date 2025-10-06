@@ -46,7 +46,6 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCertificate;
-import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataTax;
 import erp.mfin.data.diot.SDiotConsts;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
@@ -79,9 +78,6 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -5768,20 +5764,8 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static void downloadXmlPdf(final SClientInterface client, final int[] pk) throws Exception {
-        String name = SDataPdf.composePdfName(pk[0], pk[1]);
-        File origin = new File(SDataPdf.composePdfDirectory(((SDataParamsCompany)client.getSession().getConfigCompany()).getXmlBaseDirectory(), pk[0]) + "/" + name);
-        if (!origin.exists()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\n"
-                    + "No se encontró el archivo PDF del comprobante.");
-        }
-        else {
-            client.getFileChooser().setSelectedFile(new File(name));
-            if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                File destiny = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
-                Files.copy(Paths.get(origin.getAbsolutePath()), Paths.get(destiny.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                client.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + destiny.getAbsolutePath());
-            }
-        }
+        SDataPdf pdf = (SDataPdf) SDataUtilities.readRegistry(client, SDataConstants.TRN_PDF, pk, SLibConstants.EXEC_MODE_SILENT);
+        pdf.downloadPdfFile(client);
     }
     
     public static void getXmlCfds(final SClientInterface client, final HashSet<SDataCfd> cfds) throws Exception {

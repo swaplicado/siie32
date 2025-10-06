@@ -42,6 +42,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     protected int mnTransactionCategory;
     protected int mnExternalDataId;
     protected String msExternalDataUuid;
+    protected String msExternalDataAuthorizationHistory;
     protected String msDpsReferences;
     protected String msDpsDescription;
     protected boolean mbDpsPaymentLocal;
@@ -68,6 +69,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public void setTransactionCategory(int n) { mnTransactionCategory = n; }
     public void setExternalDataId(int n) { mnExternalDataId = n; }
     public void setExternalDataUuid(String s) { msExternalDataUuid = s; }
+    public void setExternalDataAuthorizationHistory(String s) { msExternalDataAuthorizationHistory = s; }
     public void setDpsReferences(String s) { msDpsReferences = s.length() <= LEN_REFS ? s : s.substring(0, LEN_REFS); }
     public void setDpsDescription(String s) { msDpsDescription = s.length() <= LEN_DESCRIP ? s : s.substring(0, LEN_DESCRIP); }
     public void setDpsPaymentLocal(boolean b) { mbDpsPaymentLocal = b; }
@@ -86,6 +88,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public int getTransactionCategory() { return mnTransactionCategory; }
     public int getExternalDataId() { return mnExternalDataId; }
     public String getExternalDataUuid() { return msExternalDataUuid; }
+    public String getExternalDataAuthorizationHistory() { return msExternalDataAuthorizationHistory; }
     public String getDpsReferences() { return msDpsReferences; }
     public String getDpsDescription() { return msDpsDescription; }
     public boolean isDpsPaymentLocal() { return mbDpsPaymentLocal; }
@@ -118,6 +121,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         mnTransactionCategory = 0;
         mnExternalDataId = 0;
         msExternalDataUuid = "";
+        msExternalDataAuthorizationHistory = "";
         msDpsReferences = "";
         msDpsDescription = "";
         mbDpsPaymentLocal = false;
@@ -180,6 +184,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             mnTransactionCategory = resultSet.getInt("txn_cat");
             mnExternalDataId = resultSet.getInt("ext_data_id");
             msExternalDataUuid = resultSet.getString("ext_data_uuid");
+            msExternalDataAuthorizationHistory = resultSet.getString("ext_authorn_hist");
             msDpsReferences = resultSet.getString("dps_refs");
             msDpsDescription = resultSet.getString("dps_descrip");
             mbDpsPaymentLocal = resultSet.getBoolean("b_dps_pay_loc");
@@ -216,6 +221,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     mnTransactionCategory + ", " + 
                     mnExternalDataId + ", " + 
                     "'" + msExternalDataUuid + "', " + 
+                    "'" + msExternalDataAuthorizationHistory + "', " + 
                     "'" + msDpsReferences + "', " + 
                     "'" + msDpsDescription + "', " + 
                     (mbDpsPaymentLocal ? 1 : 0) + ", " + 
@@ -239,6 +245,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "txn_cat = " + mnTransactionCategory + ", " +
                     "ext_data_id = " + mnExternalDataId + ", " +
                     "ext_data_uuid = '" + msExternalDataUuid + "', " +
+                    "ext_authorn_hist = '" + msExternalDataAuthorizationHistory + "', " +
                     "dps_refs = '" + msDpsReferences + "', " +
                     "dps_descrip = '" + msDpsDescription + "', " +
                     "b_dps_pay_loc = " + (mbDpsPaymentLocal ? 1 : 0) + ", " +
@@ -269,6 +276,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         registry.setTransactionCategory(this.getTransactionCategory());
         registry.setExternalDataId(this.getExternalDataId());
         registry.setExternalDataUuid(this.getExternalDataUuid());
+        registry.setExternalDataAuthorizationHistory(this.getExternalDataAuthorizationHistory());
         registry.setDpsReferences(this.getDpsReferences());
         registry.setDpsDescription(this.getDpsDescription());
         registry.setDpsPaymentLocal(this.isDpsPaymentLocal());
@@ -414,7 +422,23 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         }
         
         public int[] getDpsKey() {
-            return DpsYearId != 0 && DpsDocId != 0 ? new int[] { DpsYearId, DpsDocId } : null;
+            int[] key = null;
+            
+            if (DpsYearId != 0 && DpsDocId != 0) {
+                key = new int[] { DpsYearId, DpsDocId };
+            }
+            
+            return key;
+        }
+        
+        public Object[] getRecordKey() {
+            Object[] key = null;
+            
+            if (RecYearId != 0 && RecPeriodId != 0 && RecBookkeepingCenterId != 0 && !RecRecordTypeId.isEmpty() && RecNumberId != 0) {
+                key = new Object[] { RecYearId, RecPeriodId, RecBookkeepingCenterId, RecRecordTypeId, RecNumberId };
+            }
+            
+            return key;
         }
         
         public String composeRecord() {

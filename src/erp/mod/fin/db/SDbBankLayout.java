@@ -128,6 +128,10 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected ArrayList<SLayoutBankXmlRow> maAuxLayoutBankXmlRows;
     protected ArrayList<SLayoutBankRecord> maAuxLayoutBankRecords;
     
+    protected ArrayList<Integer> maAuxOldPaymentsIds;
+    protected ArrayList<SDbPayment> maAuxNewPayments;
+    protected boolean mbIsForAcc;
+    
     /*
      * Private methods
      */
@@ -1043,6 +1047,8 @@ public class SDbBankLayout extends SDbRegistryUser {
     
     public void setAuxLayoutPath(String s) { msAuxLayoutPath = s; }
     
+    public void setIsForAcc(boolean b) { mbIsForAcc = b; }
+    
     public int getPkBankLayoutId() { return mnPkBankLayoutId; }
     public Date getDateLayout() { return mtDateLayout; }
     public Date getDateDue() { return mtDateDue; }
@@ -1086,6 +1092,9 @@ public class SDbBankLayout extends SDbRegistryUser {
     public ArrayList<SLayoutBankPaymentRow> getAuxLayoutBankPaymentRows() { return maAuxLayoutBankPaymentRows; }
     public ArrayList<SLayoutBankXmlRow> getAuxLayoutBankXmlRows() { return maAuxLayoutBankXmlRows; }
     public ArrayList<SLayoutBankRecord> getAuxLayoutBankRecords() { return maAuxLayoutBankRecords; }
+    
+    public ArrayList<Integer> getAuxOldPaymentsIds() { return maAuxOldPaymentsIds; }
+    public ArrayList<SDbPayment> getAuxNewPayments() { return maAuxNewPayments; }
     
     public String getBankLayoutNumber(boolean virtuallyIncrementRequests) { return "" + mnPkBankLayoutId + "-" + (mnAuthorizationRequests + (virtuallyIncrementRequests ? 1 : 0)); }
     
@@ -1659,6 +1668,10 @@ public class SDbBankLayout extends SDbRegistryUser {
         maAuxLayoutBankPaymentRows = new ArrayList<>();
         maAuxLayoutBankXmlRows = new ArrayList<>();
         maAuxLayoutBankRecords = new ArrayList<>();
+        
+        maAuxOldPaymentsIds = new ArrayList<>();
+        maAuxNewPayments = new ArrayList<>();
+        mbIsForAcc = false;
     }
 
     @Override
@@ -1693,6 +1706,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet = null;
+        Statement statement;
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
@@ -1753,6 +1767,19 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             else {
                 mnXtaBankCurrencyId = resultSet.getInt(1);
+            }
+            
+            statement = session.getDatabase().getConnection().createStatement();
+            
+            maAuxNewPayments = new ArrayList<>();
+            msSql = "SELECT p.id_pay FROM fin_pay AS p "
+                    + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
+                    + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
+            resultSet = statement.executeQuery(msSql);
+            while (resultSet.next()) {
+                SDbPayment pay = new SDbPayment();
+                pay.read(session, new int[] { resultSet.getInt(1) } );
+                maAuxNewPayments.add(pay);
             }
             
             // finish registry reading:
@@ -1877,6 +1904,32 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+        
+        // Guardar pagos en caso de existir
+        
+        for (int paymentId : maAuxOldPaymentsIds) {
+            msSql = "UPDATE fin_pay SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR_P + " "
+                    + "WHERE id_pay = " + paymentId;
+            session.getStatement().execute(msSql);
+            msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + paymentId + ", " + mnPkBankLayoutId + ")";
+            session.getStatement().execute(msSql);
+        }
+        
+        if (mbIsForAcc) {
+            for (SDbPayment pay : maAuxNewPayments) {
+                pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                pay.save(session);
+            }
+        }
+        else {
+            for (SDbPayment pay : maAuxNewPayments) {
+                pay.save(session);
+
+                msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + pay.getPkPaymentId() + ", " + mnPkBankLayoutId + ")";
+                session.getStatement().execute(msSql);
+            }
+        }
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -1959,6 +2012,10 @@ public class SDbBankLayout extends SDbRegistryUser {
         
         for (SLayoutBankRecord child : maAuxLayoutBankRecords) {
             registry.getAuxLayoutBankRecords().add(child.clone());
+        }
+        
+        for (SDbPayment pay : maAuxNewPayments) {
+            registry.getAuxNewPayments().add(pay);
         }
         
         registry.setRegistryNew(this.isRegistryNew());

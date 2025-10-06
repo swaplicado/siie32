@@ -79,6 +79,7 @@ public class SDbPayment extends SDbRegistryUser {
     protected ArrayList<SDbPaymentFile> maFilesDeleted;
     
     protected String msDbmsStatus;
+    protected String msXtaBeneficiary;
     protected SDataCurrency moDbmsCurrency;
     
     protected Date mtOldDateSchedule_n;
@@ -202,6 +203,7 @@ public class SDbPayment extends SDbRegistryUser {
     public void setDbmsCurrency(SDataCurrency o) { moDbmsCurrency = o; }
     
     public String getDbmsStatus() { return msDbmsStatus; }
+    public String getXtaBeneficiary() { return msXtaBeneficiary; }
     public SDataCurrency getDbmsCurrency() { return moDbmsCurrency; }
     
     public void setOldDateSchedule_n(Date t) { mtOldDateSchedule_n = t; }
@@ -234,7 +236,7 @@ public class SDbPayment extends SDbRegistryUser {
         msSql = "UPDATE " + getSqlTable() + " SET " +
                 "fk_st_pay = " + status + ", " + 
                 "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
-                "ts_usr_upd = NOW() ";
+                "ts_usr_upd = NOW() " +
                 getSqlWhere();
         session.getStatement().execute(msSql);
     }
@@ -295,6 +297,7 @@ public class SDbPayment extends SDbRegistryUser {
         maFilesDeleted = new ArrayList<>();
         
         msDbmsStatus = "";
+        msXtaBeneficiary = "";
         moDbmsCurrency = null;
         
         mtOldDateSchedule_n = null;
@@ -397,6 +400,7 @@ public class SDbPayment extends SDbRegistryUser {
             // Read aswell document entries:
             
             msDbmsStatus = (String) session.readField(SModConsts.FINS_ST_PAY, new int[] { mnFkStatusPaymentId }, SDbRegistry.FIELD_NAME);
+            msXtaBeneficiary = (String) session.readField(SModConsts.BPSU_BP, new int[] { mnFkBeneficiaryId }, SDbRegistry.FIELD_NAME);
             
             statement = session.getStatement().getConnection().createStatement();
             
@@ -576,14 +580,14 @@ public class SDbPayment extends SDbRegistryUser {
             }
             
             switch (newStatusPaymentId) {
-                case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
-                case SModSysConsts.FINS_ST_PAY_REJ:
+                case SModSysConsts.FINS_ST_PAY_IN_AUTH:
+                case SModSysConsts.FINS_ST_PAY_REJC:
                 case SModSysConsts.FINS_ST_PAY_SCHED:
                 case SModSysConsts.FINS_ST_PAY_EXEC:
                 case SModSysConsts.FINS_ST_PAY_SUBR:
                 case SModSysConsts.FINS_ST_PAY_RCPT:
                 case SModSysConsts.FINS_ST_PAY_BLOC:
-                case SModSysConsts.FINS_ST_PAY_CAN:
+                case SModSysConsts.FINS_ST_PAY_CANC:
                     break;
                     
                 default:
@@ -611,6 +615,31 @@ public class SDbPayment extends SDbRegistryUser {
         statement.execute(msSql);
         
         mnQueryResultId = SDbConsts.SAVE_OK;
+    }
+    
+    @Override
+    public boolean canDelete(final SGuiSession session) throws SQLException, Exception {
+        boolean can = true;
+        initQueryMembers();
+        
+        if (mbSystem) {
+            can = false;
+            msQueryResult = "Este pago es de sistema.";
+        }
+        else if (!mbDeletable) {
+            can = false;
+            msQueryResult = "Este pago no es eliminable.";
+        }
+        else if (mbDeleted) {
+            can = false;
+            msQueryResult = "Este pago ya está eliminado.";
+        }
+        else if (mnFkStatusPaymentId != SModSysConsts.FINS_ST_PAY_NEW && mnFkStatusPaymentId != SModSysConsts.FINS_ST_PAY_CANC) {
+            can = false;
+            msQueryResult = "Este pago debe tener estatus 'nuevo' o 'cancelado' para poder ser eliminado.";
+        }
+        
+        return can;
     }
     
     @Override
@@ -683,15 +712,18 @@ public class SDbPayment extends SDbRegistryUser {
     
     /**
      * Get settled status for the given one.
-     * @param statusPaymentInProcessId Status of payment.
+     * @param processStatusPaymentId Status of payment.
      * @return 
      */
-    public static int getSettledStatusPayment(final int statusPaymentInProcessId) {
+    public static int getSettledStatusPaymentId(final int processStatusPaymentId) {
         int settledStatusPayment = 0;
         
-        switch (statusPaymentInProcessId) {
-            case SModSysConsts.FINS_ST_PAY_REJ_P:
-                settledStatusPayment = SModSysConsts.FINS_ST_PAY_REJ;
+        switch (processStatusPaymentId) {
+            case SModSysConsts.FINS_ST_PAY_NEW:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_IN_AUTH;
+                break;
+            case SModSysConsts.FINS_ST_PAY_REJC_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_REJC;
                 break;
             case SModSysConsts.FINS_ST_PAY_SCHED_P:
                 settledStatusPayment = SModSysConsts.FINS_ST_PAY_SCHED;
@@ -708,8 +740,8 @@ public class SDbPayment extends SDbRegistryUser {
             case SModSysConsts.FINS_ST_PAY_BLOC_P:
                 settledStatusPayment = SModSysConsts.FINS_ST_PAY_BLOC;
                 break;
-            case SModSysConsts.FINS_ST_PAY_CAN_P:
-                settledStatusPayment = SModSysConsts.FINS_ST_PAY_CAN;
+            case SModSysConsts.FINS_ST_PAY_CANC_P:
+                settledStatusPayment = SModSysConsts.FINS_ST_PAY_CANC;
                 break;
             default:
                 // nothing
@@ -728,7 +760,7 @@ public class SDbPayment extends SDbRegistryUser {
         
         switch (statusPaymentInProcessId) {
             case SModSysConsts.FINS_ST_PAY_SUBR_P:
-            case SModSysConsts.FINS_ST_PAY_CAN_P:
+            case SModSysConsts.FINS_ST_PAY_CANC_P:
                 exportAsDeleted = true;
                 break;
             default:

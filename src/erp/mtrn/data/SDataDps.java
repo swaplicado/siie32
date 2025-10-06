@@ -89,6 +89,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
@@ -102,7 +103,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -312,16 +313,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
     protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
-    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;	
+    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;
     protected erp.mtrn.data.SDataCfd moDbmsDataCfdBol;
-    
+
     protected java.util.Date mtOldDate; // read-only member
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
-    
+
     protected int mnPrcAssetDpsNat; // internal-processing member
     protected double mdPrcCfdIvaPorcentaje; // internal-processing member
-    
+
     public SDataDps() {
         super(SDataConstants.TRN_DPS);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
@@ -742,6 +743,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         sql = "DELETE FROM mkt_comms WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
         statement.execute(sql);
         
+        sql = "UPDATE fin_pay, fin_pay_ety SET fin_pay.b_del = 1 WHERE fin_pay.id_pay = fin_pay_ety.id_pay AND fin_pay_ety.fk_doc_year_n = " + mnPkYearId + " AND fin_pay_ety.fk_doc_doc_n = " + mnPkDocId + ";";
+        statement.execute(sql);
+        sql = "UPDATE trn_swap_data_prc SET b_del = 1 WHERE fk_dps_year_n = " + mnPkYearId + " AND fk_dps_doc_n = " + mnPkDocId + ";";
+        statement.execute(sql);
+        
         // recalculate rows in DPS vs DPS Supply when a credit note is deleted.
         for(SDataDpsEntry entry : mvDbmsDpsEntries) {
             if (entry.getFkDpsAdjustmentTypeId() == SDataConstantsSys.TRNS_TP_DPS_ADJ_RET) {
@@ -958,7 +964,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return amountPrepayment;
     }
 
-    private boolean testDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+    private boolean checkDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         int i = 0;
         int[] anPeriodKey = null;
         String sSql = "";
@@ -1053,7 +1059,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
             oStatement = poConnection.createStatement();
 
-            for (i = 201; i <= 224; i++) {
+            for (i = 201; i <= 225; i++) { // simulated error codes
                 switch (i) {
                     case 201:
                         sSql = "SELECT COUNT(*) AS f_count FROM trn_dps_dps_supply WHERE id_src_year = " + mnPkYearId + " AND id_src_doc = " + mnPkDocId + " ";
@@ -1192,15 +1198,29 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     case 223:
                         sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM log_ship " +
-                                "WHERE b_del = 0 AND fk_ord_year_n = " + mnPkYearId + " AND fk_ord_doc_n = " + mnPkDocId + " ";
+                                "WHERE NOT b_del AND fk_ord_year_n = " + mnPkYearId + " AND fk_ord_doc_n = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado a un documento de embarques!";
                         break;
                     case 224:
                         sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM log_ship AS d " +
                                 "INNER JOIN log_ship_dest_ety AS de ON d.id_ship = de.id_ship " +
-                                "WHERE d.b_del = 0 AND de.fk_dps_year_n = " + mnPkYearId + " AND de.fk_dps_doc_n = " + mnPkDocId + " ";
+                                "WHERE NOT d.b_del AND de.fk_dps_year_n = " + mnPkYearId + " AND de.fk_dps_doc_n = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado a una partida de un destino de un documento de embarques!";
+                        break;
+                    case 225:
+                        sSql = "SELECT COUNT(*) AS f_count " +
+                                "FROM fin_pay AS p " +
+                                "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
+                                "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " " +
+                                "AND p.fk_st_pay IN (" + 
+                                SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
+                                SModSysConsts.FINS_ST_PAY_EXEC + ", " + SModSysConsts.FINS_ST_PAY_EXEC_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_IN_TREAS + ") ";
+                        sMsgAux = "¡El documento está asociado al menos a un pago que está en autorización o que ya fue operado!";
                         break;
                     default:
                         sSql = "";
@@ -1221,7 +1241,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return true;    // if this line is reached, no errors were found
     }
 
-    private boolean testRevertDeletion(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+    private boolean checkRevertDeletion(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         if (pnAction == SDbConsts.ACTION_DELETE && !mbIsDeleted) {
             mnDbmsErrorId = 2;
             msDbmsError = psMsg + "El documento ya está desmarcado como eliminado.";
@@ -2149,7 +2169,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
-    public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }																		   
+    public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }
     public void setDbmsDataCfdBol(erp.mtrn.data.SDataCfd o) { moDbmsDataCfdBol = o; }
     
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
@@ -2214,6 +2234,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public java.lang.String getDpsNumber() {
         return STrnUtils.formatDocNumber(msNumberSeries, msNumber);
+    }
+    
+    /**
+     * Set days of credit by required due date.
+     * @param dueDate Required due date.
+     * @throws java.lang.Exception
+     */
+    public void setDaysOfCreditByDueDate(final Date dueDate) throws Exception {
+        if (mnFkPaymentTypeId != SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
+            throw new Exception("El documento '" + getDpsNumber() + "' debe tener tipo de pago 'crédito'.");
+        }
+        else if (dueDate.before(mtDate)) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha del documento '" + getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(mtDate) + ").");
+        }
+        else if (dueDate.before(mtDateStartCredit)) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha base de crédito del documento '" + getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(mtDateStartCredit) + ").");
+        }
+        else {
+            long daysOfCredit = SLibTimeUtils.getDaysDiff(dueDate, mtDateStartCredit);
+            
+            if (mnDaysOfCredit != (int) daysOfCredit) {
+                mnDaysOfCredit = (int) daysOfCredit;
+            }
+        }
     }
 
     public void checkIsReferable() throws Exception {
@@ -4460,7 +4504,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Save PDF of purchases when provided:
                 
-                if (moDbmsDataPdf != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                if (moDbmsDataPdf != null && !moDbmsDataPdf.getAuxSkipSave() && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                     moDbmsDataPdf.setPkYearId(mnPkYearId);
                     moDbmsDataPdf.setPkDocId(mnPkDocId);
                     
@@ -4787,7 +4831,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede anular el documento:\n", SDbConsts.ACTION_ANNUL)) {
+            if (checkDeletion(connection, "No se puede anular el documento:\n", SDbConsts.ACTION_ANNUL)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
             }
         }
@@ -4807,7 +4851,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede eliminar el documento:\n", SDbConsts.ACTION_DELETE)) {
+            if (checkDeletion(connection, "No se puede eliminar el documento:\n", SDbConsts.ACTION_DELETE)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_YES;
             }
         }
@@ -4838,7 +4882,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (mbIsRegistryRequestAnnul) {
                 // Set DPS as annuled:
 
-                if (testDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
+                if (checkDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
                     sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + "fid_tp_dps_ann = " + mnFkDpsAnnulationTypeId + ", " +
@@ -4867,7 +4911,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 // Revert DPS annulation:
 
-                if (testRevertDeletion(sMsg, SDbConsts.ACTION_ANNUL)) {
+                if (checkRevertDeletion(sMsg, SDbConsts.ACTION_ANNUL)) {
                     // 1. Set DPS fields:
 
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_EMITED;
@@ -4919,7 +4963,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (mbIsRegistryRequestDelete) {
                 // Set DPS as deleted:
 
-                if (testDeletion(connection, sMsg, SDbConsts.ACTION_DELETE)) {
+                if (checkDeletion(connection, sMsg, SDbConsts.ACTION_DELETE)) {
                     mbIsDeleted = true;
 
                     sSql = "UPDATE trn_dps SET b_del = 1, fid_usr_del = " + mnFkUserDeleteId + ", ts_del = NOW() " +
@@ -4941,7 +4985,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 // Revert DPS deletion:
 
-                if (testRevertDeletion(sMsg, SDbConsts.ACTION_DELETE)) {
+                if (checkRevertDeletion(sMsg, SDbConsts.ACTION_DELETE)) {
                     // 1. Set DPS fields:
 
                     mbIsDeleted = false;
