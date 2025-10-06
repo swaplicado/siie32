@@ -1401,18 +1401,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     for (SGridRow row : moGridPayments.getModel().getGridRows()) {
                         SLayoutBankRow layout = (SLayoutBankRow) row;
                         if (layout.getBizPartnerId() == pay.getIdBeneficiary()) {
-                            found = true;
-                            double balance = layout.getMoneyDpsBalance().getOriginalAmount();
                             double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
-                            if (payment <= balance) {
-                                layout.setForPayment(true);
-                                layout.getMoneyPayment().setOriginalAmount(payment);
-                                layout.setIsForExtPayment(true);
-                                layout.setReceptionPayReq(pay.getReceptionPayReq());
-                                layout.setFuncArea(pay.getFuncArea());
-                                layout.setFuncSubarea(pay.getFuncSubarea());
-                                layout.getPayments().add(pay);
-                            }
+                            found = true;
+                            layout.setForPayment(true);
+                            layout.getMoneyPayment().setOriginalAmount(payment);
+                            layout.setIsForExtPayment(true);
+                            layout.setReceptionPayReq(pay.getReceptionPayReq());
+                            layout.setFuncArea(pay.getFuncArea());
+                            layout.setFuncSubarea(pay.getFuncSubarea());
+                            layout.getPayments().add(pay);
                         }
                     }
                     
@@ -1559,6 +1556,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moCellEditorOptions.setElements(mltAccountCredits);
                 moCellEditorOptionsAgreementReference.setElements(mltAgreementsReferences);
             }
+            
+            moFormPayments.reloadCatalogues();
+            isForPayments = false;
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);

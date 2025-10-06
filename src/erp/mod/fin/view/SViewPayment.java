@@ -344,9 +344,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
             if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
             else if (!gridRow.isUpdatable()) {
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
@@ -416,9 +413,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
             if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
             else if (!gridRow.isUpdatable()) {
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
@@ -447,9 +441,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
 
             if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
             }
             else if (!gridRow.isUpdatable()) {
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
