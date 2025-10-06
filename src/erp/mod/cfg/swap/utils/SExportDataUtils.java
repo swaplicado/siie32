@@ -981,15 +981,7 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
             
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
-            // XXX Edwin Carmona, 2025-09-17: Mejorar este código. Introducirlo en el constructor del objeto involucrado para que se invoque en automático, y no por fuera de manera manual.
-            SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
-                                    + "dbName\":\"erp\",\""
-                                    + "dbPort\":\"3306\",\""
-                                    + "dbUser\":\"dummy\",\""
-                                    + "dbPass\":\"dummy\",\""
-                                    + "dbMainId\":\"1\"}");
-            STrnDBDocuments oDocCore = new STrnDBDocuments(0);
+            STrnDBDocuments oDocCore = new STrnDBDocuments();
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
@@ -1520,16 +1512,6 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
             
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            // Se inicia con JSON dummy, no afecta al funcionamiento pero es necesario
-            // XXX Edwin Carmona, 2025-09-17: Mejorar este código. Introducirlo en el constructor del objeto involucrado para que se invoque en automático, y no por fuera de manera manual.
-            SMySqlClass.setJsonConn("{\"dbHost\":\"\",\""
-                                    + "dbName\":\"erp\",\""
-                                    + "dbPort\":\"3306\",\""
-                                    + "dbUser\":\"dummy\",\""
-                                    + "dbPass\":\"dummy\",\""
-                                    + "dbMainId\":\"1\"}");
-            STrnDBDocuments oDocCore = new STrnDBDocuments(0);
-            
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
             for (Integer companyId : databasesMap.keySet()) {

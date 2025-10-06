@@ -15,6 +15,7 @@ import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SDataEmployee;
 import erp.mod.hrs.link.db.SEarningResponse;
 import erp.mod.hrs.link.db.SIncidentResponse;
+import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,6 +43,14 @@ public class SUtilsJSON {
     
     public static final int VOUCHER = 1;
     public static final int PREPAYROLL = 2;
+
+    private SMySqlClass oMysql;
+    private SShareDB oSharedDb;
+    
+    public SUtilsJSON(SMySqlClass oMysql) throws Exception {
+        this.oMysql = oMysql;
+        oSharedDb = new SShareDB(this.oMysql);
+    }
     
     /**
      * Consulta los elementos en la base de datos y los transforma a un 
@@ -57,36 +66,32 @@ public class SUtilsJSON {
      * @throws com.fasterxml.jackson.core.JsonProcessingException
      * @throws erp.mod.hrs.link.db.SConfigException
      */
-    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-            
-            SShareDB sDb = new SShareDB();
             
             SRootJSON objResponse = new SRootJSON();
             
             objResponse.last_sync_date = lastSyncDate;
-            objResponse.departments = sDb.getDepartments(lastSyncDate);
-            objResponse.positions = sDb.getPositions(lastSyncDate);
-            objResponse.employees = sDb.getEmployees(lastSyncDate);
-            objResponse.holidays = sDb.getAllHolidays(lastSyncDate);
-            objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
-            objResponse.absences = sDb.getAllAbsences(lastSyncDate);
-            objResponse.cuts = sDb.getAllCutsCalendar(lastSyncDate);
+            objResponse.departments = oSharedDb.getDepartments(lastSyncDate);
+            objResponse.positions = oSharedDb.getPositions(lastSyncDate);
+            objResponse.employees = oSharedDb.getEmployees(lastSyncDate);
+            objResponse.holidays = oSharedDb.getAllHolidays(lastSyncDate);
+            objResponse.fdys = oSharedDb.getAllFirstDayOfYear(lastSyncDate);
+            objResponse.absences = oSharedDb.getAllAbsences(lastSyncDate);
+            objResponse.cuts = oSharedDb.getAllCutsCalendar(lastSyncDate);
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
             return jsonInString2;
     }
     
-    public static String getDataPGH(String sJson) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+    public String getDataPGH(String sJson) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
-            SShareDB sDb = new SShareDB();
-            
             SRootJSON objResponse = new SRootJSON();
-            objResponse.vacations = sDb.getEmployeeVacations(sJson);
+            objResponse.vacations = oSharedDb.getEmployeeVacations(sJson);
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
@@ -109,17 +114,16 @@ public class SUtilsJSON {
      * @throws UnsupportedEncodingException
      * @throws IOException 
      */
-    public static String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
+    public String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         
         SPhotosResponse response = new SPhotosResponse();
-        SShareDB sDb = new SShareDB();
         
-        SEmployeesUtils utils = new SEmployeesUtils();
+        SEmployeesUtils utils = new SEmployeesUtils(this.oMysql);
         
         ArrayList<Integer> ids = utils.getEmployeesOfHead(head);
-        response.photos = sDb.getPhotosOfEmployees(ids);
+        response.photos = oSharedDb.getPhotosOfEmployees(ids);
         
         // Java objects to JSON string - pretty-print
         String jsonPhotosString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
@@ -217,15 +221,13 @@ public class SUtilsJSON {
      * @param sJsonInc
      */
     
-    public static String insertData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String insertData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
             ObjectMapper mapper = new ObjectMapper();
             boolean setinIncidents = false;
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
             SIncidentsJSON objResponse = new SIncidentsJSON();
             SIncidentResponse AvailableResponse = new SIncidentResponse();
-            SShareDB sDb = new SShareDB();
-            
             // objeto para leer el JSON
             JSONParser parser = new JSONParser();
             JSONObject root;
@@ -234,10 +236,10 @@ public class SUtilsJSON {
             root = (JSONObject) parser.parse(sJsonInc);
             toInsert = Boolean.parseBoolean(root.get("to_insert").toString());
              // revisar si hay incidencias para esas fechas
-            AvailableResponse = sDb.cheakIncidents(sJsonInc);
+            AvailableResponse = oSharedDb.cheakIncidents(sJsonInc);
             
             if (toInsert == true && AvailableResponse.getCode() == 200 ) {
-                AvailableResponse = sDb.setinIncidents(sJsonInc);
+                AvailableResponse = oSharedDb.setinIncidents(sJsonInc);
             }
             
             objResponse.response = AvailableResponse;
@@ -252,13 +254,12 @@ public class SUtilsJSON {
         }       
     }
     
-    public static String cancelData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String cancelData(String sJsonInc) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         
         SCancelJSON objResponse = new SCancelJSON();
         SCancelResponse CancelResponse = new SCancelResponse();
-        SShareDB sDb = new SShareDB();
         
         // objeto para leer el JSON
         JSONParser parser = new JSONParser();
@@ -267,8 +268,7 @@ public class SUtilsJSON {
         try {
             root = (JSONObject) parser.parse(sJsonInc);
              // revisar si hay incidencias para esas fechas
-            CancelResponse = sDb.checkCancel(sJsonInc);
-           
+            CancelResponse = oSharedDb.checkCancel(sJsonInc);
             
             objResponse.response = CancelResponse;
             
@@ -282,17 +282,16 @@ public class SUtilsJSON {
         }   
     }
     
-    public static String earningData(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
+    public String earningData(String sJsonInc) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         
         SEarningJSON objResponse = new SEarningJSON();
         SEarningResponse EarningResponse = new SEarningResponse();
-        SShareDB sDb = new SShareDB();
         
         try {
              // revisar si hay incidencias para esas fechas
-            EarningResponse = sDb.getEarnings(sJsonInc);
+            EarningResponse = oSharedDb.getEarnings(sJsonInc);
            
             
             objResponse.response = EarningResponse;
@@ -314,12 +313,11 @@ public class SUtilsJSON {
      * @throws erp.mod.hrs.link.db.SConfigException
      */
     
-    public static String missingPhotos(String employees) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
+    public String missingPhotos(String employees) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, UnsupportedEncodingException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         
         SPhotosResponse response = new SPhotosResponse();
-        SShareDB sDb = new SShareDB();
         ArrayList<Integer> ids = new ArrayList<>();
         JSONParser parser = new JSONParser();
         try {
@@ -333,7 +331,7 @@ public class SUtilsJSON {
             return "";
         }
         
-        response.photos = sDb.getPhotosOfEmployees(ids);
+        response.photos = oSharedDb.getPhotosOfEmployees(ids);
         
         // Java objects to JSON string - pretty-print
         String jsonPhotosString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
@@ -341,13 +339,12 @@ public class SUtilsJSON {
         return jsonPhotosString;
     }
     
-    public static String personalData(String idEmp) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
+    public String personalData(String idEmp) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         
         SDataEmployee dataEmployee = new SDataEmployee();
-        SShareDB sDb = new SShareDB();
         
-        dataEmployee = sDb.getDataEmployee(idEmp);
+        dataEmployee = oSharedDb.getDataEmployee(idEmp);
         String jsonInStringDataEmploye = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dataEmployee);
         return jsonInStringDataEmploye; 
       

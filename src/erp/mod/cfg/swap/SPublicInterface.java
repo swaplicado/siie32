@@ -28,14 +28,14 @@ public class SPublicInterface {
     SMySqlClass oDbObj;
     String msMainDatabase;
 
-    public SPublicInterface(String sjon) {
+    public SPublicInterface(String sjon) throws Exception {
         try {
-            SMySqlClass.setJsonConn(sjon);
-            this.oDbObj = new SMySqlClass();
+            this.oDbObj = new SMySqlClass(sjon);
             this.msMainDatabase = this.oDbObj.getMainDatabaseName(0);
         }
         catch (SConfigException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Exception(ex.getMessage());
         }
         catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);

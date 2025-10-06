@@ -147,9 +147,8 @@ public class SFormUpdatedUser extends javax.swing.JDialog implements erp.lib.for
         jbCancel.addActionListener(this);
     }
     
-    public static String newjson() throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException{
-        SShareData sd = new SShareData();
-        sd.setJsonConn("{\"dbHost\":\"192.168.1.233\",\"dbName\":\"erp\",\"dbPort\":\"3306\",\"dbUser\":\"root\",\"dbPass\":\"msroot\",\"dbMainId\":\"2852\"}");
+    public static String newjson() throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception{
+        SShareData sd = new SShareData("{\"dbHost\":\"192.168.1.233\",\"dbName\":\"erp\",\"dbPort\":\"3306\",\"dbUser\":\"root\",\"dbPass\":\"msroot\",\"dbMainId\":\"2852\"}");
         String res = null;
         res = sd.getSiieData("2010-01-01 00:00:00");
         return res;

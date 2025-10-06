@@ -21,6 +21,12 @@ import java.util.logging.Logger;
  */
 public class SEmployeesUtils {
     
+    private SMySqlClass oMysql;
+
+    public SEmployeesUtils(SMySqlClass oMysql) {
+        this.oMysql = oMysql;
+    }
+    
     /**
      * Obtiene los empleados subordinados que correspondan al id del empleado recibido
      * 
@@ -33,8 +39,7 @@ public class SEmployeesUtils {
      * @throws SQLException 
      */
     public ArrayList<Integer> getEmployeesOfHead(int head) throws SConfigException, ClassNotFoundException, SQLException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = this.oMysql.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -94,8 +99,7 @@ public class SEmployeesUtils {
      * @throws SQLException 
      */
     private ArrayList<Integer> getDeptsOfHead(int head) throws SConfigException, ClassNotFoundException, SQLException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = this.oMysql.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -143,8 +147,7 @@ public class SEmployeesUtils {
      * @throws SQLException 
      */
     private ArrayList<Integer> getDeptsOfDept(int dept) throws SConfigException, ClassNotFoundException, SQLException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = this.oMysql.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;

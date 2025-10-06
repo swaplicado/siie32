@@ -30,15 +30,17 @@ public class STrnDBDocuments {
     SMySqlClass oDbObj;
     String msMainDatabase;
     int mnIdCompany;
+
+    public STrnDBDocuments() {
+        // Constructor vacío para invocar desde las utilerías de exportación
+    }
     
-    public STrnDBDocuments(int idCompany) throws Exception {
+    public STrnDBDocuments(SMySqlClass oDbObj, int idCompany) throws Exception {
         try {
-            this.oDbObj = new SMySqlClass();
+            this.oDbObj = oDbObj;
             this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
             this.mnIdCompany = this.oDbObj.getMainBb();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }

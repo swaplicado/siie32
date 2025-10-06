@@ -56,10 +56,15 @@ public class SShareData {
     public static String PATH_CSV_DESP_DIR = "vales/";
     
     private String msJsonConfig;
-    
-    public void setJsonConn(String sjon) {
-        this.msJsonConfig = sjon;
-        SMySqlClass.setJsonConn(sjon);
+    private SMySqlClass oMysql;
+
+    public SShareData() {
+        this.oMysql = null;
+    }
+
+    public SShareData(String msJsonConfig) throws SConfigException {
+        this.msJsonConfig = msJsonConfig;
+        this.oMysql = new SMySqlClass(this.msJsonConfig);
     }
     
     /**
@@ -113,21 +118,21 @@ public class SShareData {
      * @throws erp.mod.hrs.link.db.SConfigException
 
      */
-    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
         SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         formatterd.parse(sLastSyncDate);
-
-        return SUtilsJSON.getData(sLastSyncDate);
+        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+        return oUtils.getData(sLastSyncDate);
     }
     
-    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException {
+    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException, Exception {
         try {
             //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //formatterd.parse(sLastSyncDate);
-
-            return SUtilsJSON.getDataPGH(sJSon);
+            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+            return oUtils.getDataPGH(sJSon);
         } catch (org.json.simple.parser.ParseException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return ex.getMessage();
@@ -165,8 +170,9 @@ public class SShareData {
      * @throws JsonProcessingException
      * @throws IOException 
      */
-    public String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, IOException {
-        return SUtilsJSON.getPhotos(head);
+    public String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, IOException, Exception {
+        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+        return oUtils.getPhotos(head);
     }
     
     /**
@@ -245,14 +251,14 @@ public class SShareData {
      * @param sJsonInc
      * @return 
      */
-    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
-        
-        return SUtilsJSON.insertData(sJsonInc);
+    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
+        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+        return oUtils.insertData(sJsonInc);
     }
     
-    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
-        
-        return SUtilsJSON.cancelData(sJsonInc);
+    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
+        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+        return oUtils.cancelData(sJsonInc);
     }
     
     /**
@@ -260,28 +266,30 @@ public class SShareData {
      * @param employees
      * @return 
      */
-    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
-        
+    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
         try {
-            return SUtilsJSON.missingPhotos(employees);
+            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+            return oUtils.missingPhotos(employees);
         } catch (IOException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
     
-    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
         try {
-            return SUtilsJSON.earningData(sJsonInc);
+            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+            return oUtils.earningData(sJsonInc);
         } catch (IOException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
     
-    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
       try {
-            return SUtilsJSON.personalData(idEmp);
+            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
+            return oUtils.personalData(idEmp);
         } catch (IOException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -300,15 +308,23 @@ public class SShareData {
      * @throws java.lang.Exception 
      */
     public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
-        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
+        if (this.oMysql == null) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener los DPS");
+            throw new Exception("No existe la conexión a la base de datos al obtener los DPS");
+        }
+        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
         ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, idSessionUser, statusFilter);
 
         return lDocs;
     }
     
     public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser, Integer idCompany) throws Exception {
+        if (this.oMysql == null) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener un DPS");
+            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
+        }
         SWebDps oWebDocument = new SWebDps(idCompany, idYear, idDoc);
-        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
+        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
         /**
          * Se obtiene el DPS
          */
@@ -329,7 +345,7 @@ public class SShareData {
         oWebDocument.getlNotes().clear();
         oWebDocument.getlNotes().addAll(lNotes);
         
-        STrnDBDocuments oDocCore = new STrnDBDocuments(idCompany);
+        STrnDBDocuments oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
         /**
          * Documentos
          */
@@ -349,15 +365,23 @@ public class SShareData {
     }
     
     public ArrayList<SWebMaterialRequest> getMaterialRequestList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(idCompany);
+        if (this.oMysql == null) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener una lista de requisiciones");
+            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
+        }
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(this.oMysql, idCompany);
         ArrayList<SWebMaterialRequest> lMRs = oMatReqCore.getMatReqs(startDate, endDate, idUser, idSessionUser, statusFilter);
 
         return lMRs;
     }
 
     public SWebMaterialRequest getMaterialRequestByPk(Integer idMaterialRequest, Integer idCompany) throws Exception {
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(idCompany);
-        STrnDBCore oTrnCore = new STrnDBCore(idCompany);
+        if (this.oMysql == null) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener una Requisición");
+            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
+        }
+        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(this.oMysql, idCompany);
+        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
         /**
          * Se obtiene el DPS
          */
@@ -374,7 +398,7 @@ public class SShareData {
         return oMatReq;
     }
     
-    public SExportDataUser getSupplierByFiscalId(String fiscalId) {
+    public SExportDataUser getSupplierByFiscalId(String fiscalId) throws Exception {
         SPublicInterface oInterface = new SPublicInterface(this.msJsonConfig);
         
         return oInterface.getSupplierByFiscalId(fiscalId);

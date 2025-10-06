@@ -21,29 +21,7 @@ import java.sql.Statement;
  */
 public class SMySqlClass {
 
-    public static String jsonConn;
-
-    public SMySqlClass() throws SConfigException {
-        if (jsonConn == null || jsonConn.isEmpty()) {
-            throw new SConfigException("No se recibió archivo JSON de configuración");
-        }
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-
-            SDbConnection conn = mapper.readValue(jsonConn, SDbConnection.class);
-
-            this.gserverHost = conn.getDbHost();
-            this.gdbPort = conn.getDbPort();
-            this.gdb = conn.getDbName();
-            this.guser = conn.getDbUser();
-            this.gpass = conn.getDbPass();
-            this.gmaindb = conn.getDbMainId();
-        }
-        catch (IOException ex) {
-            Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    private static String jsonConn;
     
     public SMySqlClass(String json) throws SConfigException {
         if (json == null || json.isEmpty()) {
@@ -143,10 +121,6 @@ public class SMySqlClass {
 
     public static String getJsonConn() {
         return jsonConn;
-    }
-
-    public static void setJsonConn(String jsonConn) {
-        SMySqlClass.jsonConn = jsonConn;
     }
 
     public int getMainBb() {

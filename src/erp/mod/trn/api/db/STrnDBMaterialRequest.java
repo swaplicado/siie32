@@ -103,14 +103,12 @@ public class STrnDBMaterialRequest {
         this.lMaterialRequests = new ArrayList<>();
     }
     
-    public STrnDBMaterialRequest(int idCompany) throws Exception {
+    public STrnDBMaterialRequest(SMySqlClass oDbObj, int idCompany) throws Exception {
         try {
-            this.oDbObj = new SMySqlClass();
+            this.oDbObj = oDbObj;
             this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
             this.mnIdCompany = this.oDbObj.getMainBb();
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
-        } catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }

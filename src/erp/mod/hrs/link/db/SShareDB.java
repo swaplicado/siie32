@@ -63,6 +63,25 @@ import sa.lib.gui.SGuiYearPicker;
  * @author Edwin Carmona, César Orozco
  */
 public class SShareDB {
+    
+    private SMySqlClass oMysqlClass;
+
+    public SShareDB(String jsonConfig) throws Exception {
+       try {
+            this.oMysqlClass = new SMySqlClass(jsonConfig);
+        }
+        catch (SConfigException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+            throw new Exception(ex.getMessage());
+        }
+    }
+
+    public SShareDB(SMySqlClass oMysqlClass) throws Exception {
+        if (oMysqlClass == null) {
+            throw new Exception("Se recibió conexión nula en ShareDB");
+        }
+        this.oMysqlClass = oMysqlClass;
+    }
 
     /**
      * Retorna las empresas de SIIE que tienen activa el módulo de nóminas
@@ -75,8 +94,7 @@ public class SShareDB {
     
     @SuppressWarnings("unchecked")
     private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         if (conn == null) {
             return null;
         }
@@ -128,17 +146,16 @@ public class SShareDB {
      * @throws SConfigException
      */
     private String getMainDatabase() throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         if (conn == null) {
             return "";
         }
 
-        if (mdb.getMainBb() == 0) {
+        if (oMysqlClass.getMainBb() == 0) {
             throw new SConfigException("No hay configuración de base de datos principal");
         }
 
-        int idDataBase = mdb.getMainBb();
+        int idDataBase = oMysqlClass.getMainBb();
 
         String query = "SELECT "
                 + "    bd "
@@ -175,8 +192,7 @@ public class SShareDB {
      */
     @SuppressWarnings("unchecked")
     public ArrayList<SDepartment> getDepartments(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -225,8 +241,7 @@ public class SShareDB {
      * @throws SConfigException
      */
     public ArrayList<SPosition> getPositions(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -275,8 +290,7 @@ public class SShareDB {
      * @throws java.lang.ClassNotFoundException
      */
     public ArrayList<SEmployee> getEmployees(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -428,8 +442,7 @@ public class SShareDB {
      * @throws SConfigException
      */
     private HashMap<Integer, Integer> getEmployeesFromCompany(SCompany company) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", company.getDatabase_nm(), "", "");
+        Connection conn = oMysqlClass.connect("", "", company.getDatabase_nm(), "", "");
 
         if (conn == null) {
             return null;
@@ -477,8 +490,7 @@ public class SShareDB {
     }
 
     private ArrayList<SHoliday> getHolidays(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", dbName, "", "");
+        Connection conn = oMysqlClass.connect("", "", dbName, "", "");
 
         if (conn == null) {
             return null;
@@ -545,8 +557,7 @@ public class SShareDB {
     }
 
     private ArrayList<SFirstDayYear> getFirstDayOfYear(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", dbName, "", "");
+        Connection conn = oMysqlClass.connect("", "", dbName, "", "");
 
         if (conn == null) {
             return null;
@@ -628,8 +639,7 @@ public class SShareDB {
      * @throws SConfigException
      */
     private ArrayList<SAbsence> getAbsences(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", dbName, "", "");
+        Connection conn = oMysqlClass.connect("", "", dbName, "", "");
 
         if (conn == null) {
             return null;
@@ -728,8 +738,7 @@ public class SShareDB {
      * @throws SConfigException
      */
     private ArrayList<SPrepayCutCalendar> getPrepayCutCalendar(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", dbName, "", "");
+        Connection conn = oMysqlClass.connect("", "", dbName, "", "");
 
         if (conn == null) {
             return null;
@@ -794,8 +803,7 @@ public class SShareDB {
      * @throws IOException 
      */
     public ArrayList<SPhoto> getPhotosOfEmployees(ArrayList<Integer> ids) throws SConfigException, ClassNotFoundException, SQLException, UnsupportedEncodingException, IOException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -898,7 +906,6 @@ public class SShareDB {
     }
     
     public ArrayList<SEmployeeVacations> getEmployeeVacations(String strDate) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
-        SMySqlClass mdb = new SMySqlClass();
         String empresas[]= new String[5];
         empresas[0] = "erp_aeth";
         empresas[1] = "erp_amesa";
@@ -919,7 +926,7 @@ public class SShareDB {
          
         for(int num_empresas = 0 ; num_empresas < root.size() ; num_empresas ++){
             JSONObject row = (JSONObject) root.get(num_empresas);
-            Connection conn = mdb.connect("", "", row.get("company_db_name").toString(), "", "");
+            Connection conn = oMysqlClass.connect("", "", row.get("company_db_name").toString(), "", "");
 
             if (conn == null) {
                 return null;
@@ -1263,8 +1270,7 @@ public class SShareDB {
         ResultSet resultSet;
         int company = 0;
         //conexión a bd
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         
         //Creación de arraylist de incidencias si hay en las fechas que se envian.
         ArrayList<SIncident> lIncidents = null;
@@ -1298,7 +1304,7 @@ public class SShareDB {
                 return objResponse;
             } 
             
-            conn = mdb.connect("", "", resultSet.getString("bd"), "", "");
+            conn = oMysqlClass.connect("", "", resultSet.getString("bd"), "", "");
 
             if (conn == null) {
                 objResponse.setCode(RESPONSE_ERROR );
@@ -1347,8 +1353,7 @@ public class SShareDB {
         ResultSet resultSet;
         int company = 0;
         //conexión a bd
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         
         //Creación del objeto respuesta.
         SCancelResponse objResponse = new SCancelResponse();
@@ -1378,7 +1383,7 @@ public class SShareDB {
                 return objResponse;
             } 
             
-            conn = mdb.connect("", "", resultSet.getString("bd"), "", "");
+            conn = oMysqlClass.connect("", "", resultSet.getString("bd"), "", "");
 
             if (conn == null) {
                 objResponse.setCode(RESPONSE_ERROR );
@@ -1437,8 +1442,7 @@ public class SShareDB {
 //        empresas[2] = "erp_otsa";
 //        empresas[3] = "erp_th";
 
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         SIncidentResponse objResponse = new SIncidentResponse();
         
         if (conn == null) {
@@ -1718,8 +1722,7 @@ public class SShareDB {
         lPlanVac = new ArrayList<>();
         SPlanVacations planVac = null;
          
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", mainDataBase, "", "");
+        Connection conn = oMysqlClass.connect("", "", mainDataBase, "", "");
             
             String query = "";
             query = "SELECT name AS nombre, dt_sta AS start,  id_ben AS id, fk_tp_pay_n AS pay "
@@ -1767,8 +1770,7 @@ public class SShareDB {
         String dt_ini = "";
         String dt_fin = "";
 
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
         SEarningResponse objResponse = new SEarningResponse();
         
         if (conn == null) {
@@ -1804,8 +1806,7 @@ public class SShareDB {
                 return objResponse;
             } 
             // query percepciones de empresa del empleado
-            SMySqlClass empresa = new SMySqlClass();
-            Connection conn_empresa = empresa.connect("", "", resultSet.getString("bd"), "", "");
+            Connection conn_empresa = oMysqlClass.connect("", "", resultSet.getString("bd"), "", "");
             
             String payroll = "SELECT payroll.dt_sta, payroll.dt_end "
                                 + " FROM hrs_pay AS payroll"
@@ -1895,7 +1896,7 @@ public class SShareDB {
             //termina la query para saber de bonos
             // query percepciones de empresa pruebas y
             conn_empresa.close();
-            conn_empresa = empresa.connect("", "", "erp_pbas_y", "", "");
+            conn_empresa = oMysqlClass.connect("", "", "erp_pbas_y", "", "");
             
             earnings = "SELECT payroll.fis_year, payroll.num, payroll.dt_sta, payroll.dt_end,"
                                 + " receipt.id_emp, earnings.fk_ear, earnings.unt"
@@ -1957,8 +1958,7 @@ public class SShareDB {
      * @throws ParseException
      */
     public SDataEmployee getDataEmployee(String idEmp) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
@@ -2037,8 +2037,7 @@ public class SShareDB {
     }
     
     public SDataCompany assignDataCompany(int idComp) throws SQLException, ClassNotFoundException, SConfigException {
-        SMySqlClass mdb = new SMySqlClass();
-        Connection conn = mdb.connect("", "", "", "", "");
+        Connection conn = oMysqlClass.connect("", "", "", "", "");
 
         if (conn == null) {
             return null;
