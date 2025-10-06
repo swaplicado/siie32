@@ -422,7 +422,23 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         }
         
         public int[] getDpsKey() {
-            return DpsYearId != 0 && DpsDocId != 0 ? new int[] { DpsYearId, DpsDocId } : null;
+            int[] key = null;
+            
+            if (DpsYearId != 0 && DpsDocId != 0) {
+                key = new int[] { DpsYearId, DpsDocId };
+            }
+            
+            return key;
+        }
+        
+        public Object[] getRecordKey() {
+            Object[] key = null;
+            
+            if (RecYearId != 0 && RecPeriodId != 0 && RecBookkeepingCenterId != 0 && !RecRecordTypeId.isEmpty() && RecNumberId != 0) {
+                key = new Object[] { RecYearId, RecPeriodId, RecBookkeepingCenterId, RecRecordTypeId, RecNumberId };
+            }
+            
+            return key;
         }
         
         public String composeRecord() {

@@ -599,18 +599,17 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewAccoutingCustomizableReport(miClient, "Config. consultas personalizadas aux. contables");
                 break;
             case SModConsts.FIN_PAY:
-                
-                switch(subtype) {
+                switch (subtype) {
                     case SLibConsts.UNDEFINED:
                         title = "Solicitudes pago";
                         break;
-                    case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
+                    case SModSysConsts.FINS_ST_PAY_IN_AUTH:
                         title = "Pagos x autorizar";
                         break;
                     case SModSysConsts.FINS_ST_PAY_EXEC_P:
                         title = "Pagos x ejecutar";
                         break;
-                    case SModSysConsts.FINS_ST_PAY_REJ:
+                    case SModSysConsts.FINS_ST_PAY_REJC:
                         title = "Pagos rechazados";
                         break;
                     case SModSysConsts.FINS_ST_PAY_SCHED:
@@ -619,7 +618,7 @@ public class SModuleFin extends SGuiModule {
                     case SModSysConsts.FINS_ST_PAY_BLOC:
                         title = "Pagos bloqueados";
                         break;
-                    case SModSysConsts.FINS_ST_PAY_CAN:
+                    case SModSysConsts.FINS_ST_PAY_CANC:
                         title = "Pagos cancelados";
                         break;
                 }

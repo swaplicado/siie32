@@ -922,7 +922,12 @@ public class SBeanPanelAccount extends JPanel implements ActionListener, FocusLi
     }
 
     public void setPanelEditable(boolean enabled) {
-        moTextCodeLevel1.setEditable(enabled);
+        for (SBeanFieldText fieldText : maoTextCodeLevelStds) {
+            if (fieldText.isVisible()) {
+                fieldText.setEditable(enabled);
+            }
+        }
+        
         jbPick.setEnabled(enabled);
         jbClear.setEnabled(enabled);
     }

@@ -533,7 +533,7 @@ public abstract class SExportUtils {
                         ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
                         
                         if (syncType == SSyncType.PUR_PAYMENT) {
-                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_PRC_AUTH, session.getUser().getPkUserId(), database };
+                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_IN_AUTH, session.getUser().getPkUserId(), database };
                             complementProcessing(session, syncType, entries, value);
                         }
                         else if (syncType == SSyncType.PUR_PAYMENT_UPD) {
@@ -660,7 +660,7 @@ public abstract class SExportUtils {
                 for (SDbSyncLogEntry entry : entries) {
                     int paymentId = SLibUtils.parseInt(entry.getReferenceId());
                     SDbPayment paymentToUpdate = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
-                    int newStatusPayment = SDbPayment.getSettledStatusPayment(paymentToUpdate.getFkStatusPaymentId());
+                    int newStatusPayment = SDbPayment.getSettledStatusPaymentId(paymentToUpdate.getFkStatusPaymentId());
                     Object valueToUpdate = new Object[] { newStatusPayment, paymentToUpdate.getFkUserUpdateId(), entry.getAuxDatabase() };
                     
                     paymentToUpdate.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
@@ -1094,8 +1094,15 @@ public abstract class SExportUtils {
                             responses.getInfos().add(info);
                             
                             if (syncType == SSyncType.PUR_ORDER) {
-                                // exportar antes referencias de pedidos de compras:
+                                // exportar también referencias de pedidos de compras:
                                 syncTypeInProgress = SSyncType.PUR_REF_ORDER;
+                                info = computeRequest(session, syncTypeInProgress);
+                                responses.getInfos().add(info);
+                            }
+
+                            if (syncType == SSyncType.PUR_PAYMENT) {
+                                // exportar también actualizaciones de pagos de compras:
+                                syncTypeInProgress = SSyncType.PUR_PAYMENT_UPD;
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }

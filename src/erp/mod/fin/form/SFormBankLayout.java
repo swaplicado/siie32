@@ -2027,7 +2027,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     pay.setPaymentWay(DCfdi40Catalogs.FDP_TRANSFERENCIA);
                     pay.setReceiptPaymentRequired(row.getReceptionPayReq());
                     pay.setSystem(true);
-                    pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_LAY_BANK);
+                    pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_IN_TREAS);
                     pay.setFkCurrencyId(moKeyBankLayoutCurrency.getValue()[0]); 
                     pay.setFkBeneficiaryId(row.getBizPartnerId()); 
                     pay.setFkFunctionalAreaId(row.getFuncArea()); 

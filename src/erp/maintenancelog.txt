@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 290.15/ 2025-10-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión de contabilización de facturas de comrpas para que corresponda con el pedido correspondiente.
+2) Mejoramiento a la visualización de documentos de solo lectura (panel del centro de costo.)
+3) Mejoramiento a la interfaz de importación de documentos para visualizar facturas, pedidos y pólizas contables.
+4) Habilitación de captura de conceptos de facturas de compras para contadores editores o superiores.
+5) Revisión de opciones y filtros de vistas de pagos.
+
+================================================================================
 SIIE 3.2 290.14/ 2025-10-03
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

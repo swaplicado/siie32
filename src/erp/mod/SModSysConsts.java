@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public abstract class SModSysConsts {
 
@@ -528,23 +528,23 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
     
-    public static final int FINS_ST_PAY_NEW = 1; //nuevo
-    public static final int FINS_ST_PAY_PRC_AUTH = 2; //en autorización
-    public static final int FINS_ST_PAY_REJ = 3; //rechazado
-    public static final int FINS_ST_PAY_SCHED = 4; //programado (autorizado)
-    public static final int FINS_ST_PAY_EXEC = 5; //ejecutado
-    public static final int FINS_ST_PAY_SUBR = 6; //subrrogado
-    public static final int FINS_ST_PAY_RCPT = 7; //comprobado
-    public static final int FINS_ST_PAY_BLOC = 8; //bloqueado
-    public static final int FINS_ST_PAY_CAN = 9; //cancelado
-    public static final int FINS_ST_PAY_LAY_BANK = 10; //layout
-    public static final int FINS_ST_PAY_REJ_P = 13; //rechazado en proceso
-    public static final int FINS_ST_PAY_SCHED_P = 14; //programado (autorizado) en proceso
-    public static final int FINS_ST_PAY_EXEC_P = 15; //ejecutado en proceso
-    public static final int FINS_ST_PAY_SUBR_P = 16; //subrrogado en proceso
-    public static final int FINS_ST_PAY_RCPT_P = 17; //comprobado en proceso
-    public static final int FINS_ST_PAY_BLOC_P = 18; //bloqueado en proceso
-    public static final int FINS_ST_PAY_CAN_P = 19; //cancelado en proceso
+    public static final int FINS_ST_PAY_NEW = 1; // nuevo
+    public static final int FINS_ST_PAY_IN_AUTH = 2; // en autorización
+    public static final int FINS_ST_PAY_REJC = 3; // rechazado
+    public static final int FINS_ST_PAY_SCHED = 4; // programado
+    public static final int FINS_ST_PAY_EXEC = 5; // operado
+    public static final int FINS_ST_PAY_SUBR = 6; // subrrogado
+    public static final int FINS_ST_PAY_RCPT = 7; // comprobado
+    public static final int FINS_ST_PAY_BLOC = 8; // bloqueado
+    public static final int FINS_ST_PAY_CANC = 9; // cancelado
+    public static final int FINS_ST_PAY_IN_TREAS = 10; // en tesorería
+    public static final int FINS_ST_PAY_REJC_P = 13; // rechazado en proceso
+    public static final int FINS_ST_PAY_SCHED_P = 14; // programado en proceso
+    public static final int FINS_ST_PAY_EXEC_P = 15; // operado en proceso
+    public static final int FINS_ST_PAY_SUBR_P = 16; // subrrogado en proceso
+    public static final int FINS_ST_PAY_RCPT_P = 17; // comprobado en proceso
+    public static final int FINS_ST_PAY_BLOC_P = 18; // bloqueado en proceso
+    public static final int FINS_ST_PAY_CANC_P = 19; // cancelado en proceso
     
     public static final int FINX_ST_PAY_EXEC_DET = 105; //ejecutados a detalle
     public static final int FINX_ST_PAY_RCPT_DET = 107; //comprobados a detalle

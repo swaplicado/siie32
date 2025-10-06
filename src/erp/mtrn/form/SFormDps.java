@@ -157,7 +157,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
@@ -4534,13 +4534,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         try {
                             SDataDps dpsModel;
                             
-                            if (! mbMatRequestImport) {
+                            if (!mbMatRequestImport) {
                                 dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
                             }
                             else {
                                 dpsModel = moParamDpsSource;
+                                
                                 if (dpsModel.getFkBizPartnerId_r() == 0) {
                                     pickBizPartner();
+                                    
                                     if (moPickerBizPartner.getFormResult() != SLibConstants.FORM_RESULT_OK) {
                                         releaseRecordUserSLock();
                                         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
@@ -4558,7 +4560,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 mbDocBeingImported = true;
                                 
                                 SDataDps dps = createNewDps(dpsModel);
-                                if (! mbMatRequestImport) {
+                                if (!mbMatRequestImport) {
                                     dps.getDbmsDpsEntries().clear();
                                 }
 
@@ -4574,7 +4576,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     SFormUtilities.locateComboBoxItem(jcbAdjustmentSubtypeId, manParamAdjustmentSubtypeKey);
                                 }
                                 
-                                if (! mbMatRequestImport) {
+                                if (!mbMatRequestImport) {
                                     actionEntryImportFromDps(moParamDpsSource);
                                 }
                             }
@@ -7080,6 +7082,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
         }
+        
         return "";
     }
 
@@ -10575,6 +10578,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void itemStateChangedFkDpsNatureId() {
         if (isApplingFiscalData()) {
             String usage = getCfdiUsageByPurpose();
+            
             if (usage.isEmpty()) {
                 if (!mbFisDataCfdiUsageUserChange) {
                     if (!moCfgFiscalDataPurchasesOrder.getUsoCFDI().isEmpty()) {
@@ -12119,8 +12123,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         if (jtbLinkTicket.isSelected() && mvScaleTicDps.isEmpty()) {
-            miClient.showMsgBoxInformation("Se seleccionó la opcion de vincular boletos desde báscula pero no se vinculó ninguno\n"
-                    + "Se tendra que volver a elegir la opción si se quiere vincular boletos de esta forma.");
+            miClient.showMsgBoxInformation("Se seleccionó la opcion de vincular boletos desde báscula pero no se vinculó ninguno.\n"
+                    + "Se tendrá que volver a elegir la opción si se quiere vincular boletos de esta forma.");
         }
 
         if (!mbPostEmissionEdition) {
@@ -13110,7 +13114,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         // set business partner, set aswell business partner default preferences when document is new:
 
-        if (! mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
+        if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
             setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
         }
         else if (moBizPartner != null) {
@@ -13535,7 +13539,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             //moDps.setFkTaxIdentityReceptorTypeId(...
             //moDps.setFkSalesAgentBizPartnerId_n(...
 
-            moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
+            moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
+            
             if (!isApplingFunctionalAreas() || jcbFkFunctionalSubAreaId.getSelectedIndex() <= 0) {
                 moDps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
                 moDps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
@@ -13545,7 +13550,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moDps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
                 moDps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
             }
-            moDps.setFkDpsNatureId(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
+            
+            moDps.setFkLanguajeId(moFieldFkLanguajeId.getKeyAsIntArray()[0]);
             moDps.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
             moDps.setFkSalesAgentId_n(mnSalesAgentId_n);
             moDps.setFkSalesSupervisorId_n(mnSalesSupervisorId_n);

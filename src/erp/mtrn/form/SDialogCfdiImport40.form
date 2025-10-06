@@ -198,7 +198,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlTaxesRegion">
+                    <Component class="javax.swing.JLabel" name="jlTaxRegion">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Regi&#xf3;n impuestos:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -206,17 +206,17 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JComboBox" name="jcbTaxesRegion">
+                    <Component class="javax.swing.JComboBox" name="jcbTaxRegion">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbTaxesRegion">
+                    <Component class="javax.swing.JButton" name="jbPickTaxRegion">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="..."/>
-                        <Property name="toolTipText" type="java.lang.String" value="Seleccionar regi&#xf3;n de impuestos"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Seleccionar regi&#xf3;n de impuestos..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -342,7 +342,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JLabel" name="jlTaxesRegion1">
+                    <Component class="javax.swing.JLabel" name="jlDpsNature">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="Naturaleza doc.:*"/>
@@ -351,7 +351,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JComboBox" name="jcbTaxesRegion1">
+                    <Component class="javax.swing.JComboBox" name="jcbDpsNature">
                       <Properties>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -359,7 +359,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JLabel" name="jlTaxesRegion2">
+                    <Component class="javax.swing.JLabel" name="jlFunctionalSubArea">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="&#xc1;rea funcional:*"/>
@@ -368,7 +368,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JComboBox" name="jcbTaxesRegion2">
+                    <Component class="javax.swing.JComboBox" name="jcbFunctionalSubArea">
                       <Properties>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -441,7 +441,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbOpsType">
+                            <Component class="javax.swing.JButton" name="jbSelectOpsType">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir tipo operaci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -458,7 +458,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbChangeUnit">
+                            <Component class="javax.swing.JButton" name="jbSelectUnit">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir unidad"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -466,7 +466,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbCostCenter">
+                            <Component class="javax.swing.JButton" name="jbSelectCostCenter">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir centro costo"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -483,7 +483,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbChangeTaxesRegion">
+                            <Component class="javax.swing.JButton" name="jbSelectTaxRegion">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir regi&#xf3;n impuestos"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">

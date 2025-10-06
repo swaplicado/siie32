@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -47,7 +48,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewPayment extends SGridPaneView implements ActionListener {
     
@@ -59,10 +60,12 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
     private JButton jbAuthWebStartAuth;
     private JButton jbAuthWebDownloadFiles;
     private JButton jbAuthWebClearFiles;
-    private JButton jbPaymentSched;
-    private JButton jbPaymentBloc;
-    private JButton jbPaymentUnbloc;
+    
+    private JButton jbPaymentReschedule;
+    private JButton jbPaymentBlock;
+    private JButton jbPaymentUnblock;
     private JButton jbPaymentCancel;
+    
     private JButton jbExportDataToSwapServices;
     
     private JFileChooser moAuthWebFileChooser;
@@ -108,20 +111,20 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         jbAuthWebClearFiles.addActionListener(this);
         jbAuthWebClearFiles.setToolTipText("Eliminar archivos de soporte de la solicitud");
 
-        jbPaymentSched = new JButton(new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif")));
-        jbPaymentSched.setPreferredSize(new Dimension(23, 23));
-        jbPaymentSched.addActionListener(this);
-        jbPaymentSched.setToolTipText("Cambiar fecha programada");
+        jbPaymentReschedule = new JButton(new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif")));
+        jbPaymentReschedule.setPreferredSize(new Dimension(23, 23));
+        jbPaymentReschedule.addActionListener(this);
+        jbPaymentReschedule.setToolTipText("Cambiar fecha programada");
         
-        jbPaymentBloc = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")));
-        jbPaymentBloc.setPreferredSize(new Dimension(23, 23));
-        jbPaymentBloc.addActionListener(this);
-        jbPaymentBloc.setToolTipText("Bloquear solicitud");
+        jbPaymentBlock = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")));
+        jbPaymentBlock.setPreferredSize(new Dimension(23, 23));
+        jbPaymentBlock.addActionListener(this);
+        jbPaymentBlock.setToolTipText("Bloquear solicitud");
         
-        jbPaymentUnbloc = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_unlock.gif")));
-        jbPaymentUnbloc.setPreferredSize(new Dimension(23, 23));
-        jbPaymentUnbloc.addActionListener(this);
-        jbPaymentUnbloc.setToolTipText("Desbloquear solicitud");
+        jbPaymentUnblock = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_unlock.gif")));
+        jbPaymentUnblock.setPreferredSize(new Dimension(23, 23));
+        jbPaymentUnblock.addActionListener(this);
+        jbPaymentUnblock.setToolTipText("Desbloquear solicitud");
         
         jbPaymentCancel = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_annul.gif")));
         jbPaymentCancel.setPreferredSize(new Dimension(23, 23));
@@ -131,11 +134,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
             "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
         
-        if (mnGridSubtype != SModSysConsts.FINS_ST_PAY_PRC_AUTH &&
-                mnGridSubtype != SModSysConsts.FINS_ST_PAY_RCPT_P &&
-                mnGridSubtype != SModSysConsts.FINS_ST_PAY_EXEC_P) {
+        if (SLibUtils.belongsTo(mnGridSubtype, new int[] { SLibConsts.UNDEFINED, SModSysConsts.FINS_ST_PAY_REJC, SModSysConsts.FINS_ST_PAY_CANC })) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
+        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunc);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterCur);
         
@@ -145,21 +147,26 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebStartAuth);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebDownloadFiles);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebClearFiles);
-            break;
+                break;
+            case SModSysConsts.FINS_ST_PAY_IN_AUTH:
+                break;
             case SModSysConsts.FINS_ST_PAY_EXEC_P:
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentSched);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentBloc);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentBlock);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
+                break;
+            case SModSysConsts.FINS_ST_PAY_REJC:
                 break;
             case SModSysConsts.FINS_ST_PAY_BLOC:
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentUnbloc);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentUnblock);
+                break;
+            case SModSysConsts.FINS_ST_PAY_CANC:
                 break;
             default:
-                break;
+                // nothing
         }
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
     }
     
     private void actionAuthWebLoadFile() {
@@ -348,7 +355,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                     if (miClient.showMsgBoxConfirm("El pagó será cancelado, esta acción no se puede deshacer ¿Desea continuar?") == JOptionPane.OK_OPTION) {
                         SDbPayment moPayment = new SDbPayment();
                         moPayment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
-                        moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_CAN_P);
+                        moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_CANC_P);
                         miClient.getSession().notifySuscriptors(mnGridType);
                     }
                 }
@@ -359,7 +366,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionPatmentSched() {
+    private void actionPatmentRescheddule() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -399,7 +406,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionPatmentBloc() {
+    private void actionPatmentBlock() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -431,7 +438,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionPatmentUnbloc() {
+    private void actionPatmentUnblock() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -464,10 +471,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
     }
     
     private void actionExportDataToSwapServices() {
-        if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
+        if (jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT_UPD, true, true);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, true);
                 SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
             }
             catch (Exception e) {
@@ -487,7 +494,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         moPaneSettings = new SGridPaneSettings(1);
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
-        moPaneSettings.setSystemApplying(false);
+        moPaneSettings.setSystemApplying(true);
         
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
@@ -518,30 +525,32 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + SModSysConsts.FINS_ST_PAY_SUBR + ", " 
                 + SModSysConsts.FINS_ST_PAY_SUBR_P + ") ";
                 break;
-            case SModSysConsts.FINS_ST_PAY_PRC_AUTH:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" + SModSysConsts.FINS_ST_PAY_NEW + ", "
-                        + SModSysConsts.FINS_ST_PAY_PRC_AUTH + ", " + SModSysConsts.FINS_ST_PAY_REJ_P + ", " 
-                        + SModSysConsts.FINS_ST_PAY_SCHED_P + ")";
+            case SModSysConsts.FINS_ST_PAY_IN_AUTH:
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_IN_AUTH + ") ";
                 break;
             case SModSysConsts.FINS_ST_PAY_EXEC_P:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" 
-                        + SModSysConsts.FINS_ST_PAY_SCHED + ", " + SModSysConsts.FINS_ST_PAY_SCHED_P + ")";
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_SCHED + ", "
+                        + SModSysConsts.FINS_ST_PAY_IN_TREAS + ") ";
                 break;
-            case SModSysConsts.FINS_ST_PAY_REJ:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" 
-                        + SModSysConsts.FINS_ST_PAY_REJ + ", " + SModSysConsts.FINS_ST_PAY_REJ_P + ")";
+            case SModSysConsts.FINS_ST_PAY_REJC:
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_REJC + ", "
+                        + SModSysConsts.FINS_ST_PAY_REJC_P + ") ";
                 break;
             case SModSysConsts.FINS_ST_PAY_BLOC:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN("
-                        + SModSysConsts.FINS_ST_PAY_BLOC + ", " + SModSysConsts.FINS_ST_PAY_BLOC_P + ")";
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_BLOC + ", "
+                        + SModSysConsts.FINS_ST_PAY_BLOC_P + ") ";
                 break;
-            case SModSysConsts.FINS_ST_PAY_CAN:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN("
-                        + SModSysConsts.FINS_ST_PAY_CAN + ", " + SModSysConsts.FINS_ST_PAY_CAN_P + ")";
+            case SModSysConsts.FINS_ST_PAY_CANC:
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_CANC + ", "
+                        + SModSysConsts.FINS_ST_PAY_CANC_P + ") ";
                 break;
             default:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" + mnGridSubtype + ")";
-                break;
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay = " + mnGridSubtype + " "; // just in case!
         }
         
         msSql = "SELECT "
@@ -560,6 +569,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + "fs.name AS func_s, "
                 + "sp.name AS status, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
+                + "v.b_sys AS " + SDbConsts.FIELD_IS_SYS + ", " 
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -567,7 +577,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + "IF((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_FILE) + " AS f "
                 + " WHERE v.id_pay = f.id_pay) = 0, " + SGridConsts.ICON_NULL + ", " + SGridConsts.ICON_FOLDER + ")"
                 + " AS doc, "
-                + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJ_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ")"
+                + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJC_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ")"
                 + " AS proc, "
                 + "IF(ve.ety_tp = '" + SDbPaymentEntry.ENTRY_TYPE_ADVANCE + "' , 'PAGO ANTICIPO', 'PAGO A DOCUMENTO') AS ety_tp, "
                 + "IF(v.priority = 0 , 'NORMAL', 'URGENTE') AS pty, "
@@ -641,11 +651,12 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "doc", "Archivos"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "status", "Estatus"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "proc", "En proceso"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, "Eliminado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_sched", "Usr aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_sched", "Usr TS aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_exec", "Usr oper pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_exec", "Usr TS oper pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));
@@ -685,14 +696,14 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
             else if (button == jbPaymentCancel) {
                 actionPaymentCancel();
             }
-            else if (button == jbPaymentSched) {
-                actionPatmentSched();
+            else if (button == jbPaymentReschedule) {
+                actionPatmentRescheddule();
             }
-            else if (button == jbPaymentBloc) {
-                actionPatmentBloc();
+            else if (button == jbPaymentBlock) {
+                actionPatmentBlock();
             }
-            else if (button == jbPaymentUnbloc) {
-                actionPatmentUnbloc();
+            else if (button == jbPaymentUnblock) {
+                actionPatmentUnblock();
             }
             else if (button == jbExportDataToSwapServices) {
                 actionExportDataToSwapServices();

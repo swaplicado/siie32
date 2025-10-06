@@ -50,7 +50,7 @@ public class SExportPayments extends Thread {
                 String requestBody = createJSONrequestBody(expDataFiles); // creación del JSON que se envía a la app web 
                 
                 if (SAuthorizationUtils.computePaymentRequest(miClient.getSession(), SSwapConsts.CFG_OBJ_TXN_PUR_PAY, requestBody)) {
-                    moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_PRC_AUTH);
+                    moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_IN_AUTH);
                 }
                 else {
                     miClient.showMsgBoxInformation("No se puedo comenzar el proceso de autorización, intente nuevamente.");

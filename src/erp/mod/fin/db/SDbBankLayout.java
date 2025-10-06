@@ -1774,7 +1774,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             maAuxNewPayments = new ArrayList<>();
             msSql = "SELECT p.id_pay FROM fin_pay AS p "
                     + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                    + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_LAY_BANK;
+                    + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 SDbPayment pay = new SDbPayment();

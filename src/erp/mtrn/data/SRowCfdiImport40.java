@@ -269,6 +269,10 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moNewDpsEntry.setDbmsCostCenterCode(moCostCenter == null ? "" : moCostCenter.getCode());
         moNewDpsEntry.setDbmsCostCenter_n(moCostCenter == null ? "" : moCostCenter.getCostCenter());
         
+        if (moImportedDpsEntry != null) {
+            moNewDpsEntry.setDbmsDpsEntryMatRequest(moImportedDpsEntry.getDbmsDpsEntryMatRequestLink());
+        }
+        
         updateDpsDpsLinkAsDestiny();
     } 
     

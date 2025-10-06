@@ -16,20 +16,24 @@ import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridRow;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiDatePicker;
 import sa.lib.gui.SGuiSession;
@@ -43,6 +47,14 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public static final int PAYMENT_DEFN_NOT_REQ = 0; // pago no requerido
     public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
     public static final int PAYMENT_DEFN_BY_PCT = 2; // pago definido por porcentaje
+    
+    public static final String EXC_DOC_NOT_PROCESSED = "Este documento no ha sido procesado, no tiene aún una factura en el sistema.";
+    public static final String EXC_DOC_ALREADY_RECORDED_ = "Este documento ya fue procesado, tiene una factura en la póliza contable: ";
+
+    public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
+    public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene una solicitud de pago.";
+    public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene una solicitud de pago: ";
+
     
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
@@ -183,27 +195,11 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     }
     
     /**
-     * Check if document is recorded.
-     * @return 
-     */
-    public boolean isRecorded() {
-        return ProcessedDps != null;
-    }
-    
-    /**
      * Check if document is processed.
      * @return 
      */
     public boolean isProcessed() {
-        return isRecorded() && ProcessedDps.SwapDataProcessingId != 0 && SwapDataProcessing != null;
-    }
-    
-    /**
-     * Check if processing of document is with payment request.
-     * @return 
-     */
-    public boolean isProcessedWithPaymentRequest() {
-        return isProcessed() && SwapDataProcessing.getFkPaymentId_n() != 0;
+        return ProcessedDps != null && ProcessedDps.getDpsKey() != null && ProcessedDps.SwapDataProcessingId != 0 && SwapDataProcessing != null;
     }
     
     /**
@@ -218,8 +214,54 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      * Check if payment is requestable.
      * @return 
      */
-    public boolean isPaymentRequestable() {
-        return getRequiredPaymentDateEffective() != null && (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1) || getRequiredPaymentAmount() > 0;
+    public boolean isPaymentRequestDataAvailable() {
+        return getRequiredPaymentDateEffective() != null && (getRequiredPaymentAmount() > 0 || (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1));
+    }
+    
+    /**
+     * Check if document has references and if they are of the given reference document type.
+     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
+     * @return 
+     */
+    public boolean hasReferences(final int refDocType) {
+        return References != null && References.length > 0 && ReferencesType == refDocType;
+    }
+    
+    /**
+     * Get key of first reference if it matches the given document type.
+     * @param client GUI client.
+     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public int[] getFirstReferenceKey(final SGuiClient client, final int refDocType) throws Exception {
+        int[] orderKey = null;
+        String refPrefix = "";
+        
+        switch (refDocType) {
+            case SSwapConsts.TXN_DOC_TYPE_ORDER:
+                refPrefix = SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo de documento de la referencia: " + refDocType + ")");
+        }
+        
+        if (hasReferences(refDocType)) {
+            SImportUtils.DpsKey orderDpsKey = References[0].createDpsKey();
+
+            if (orderDpsKey != null) {
+                orderKey = orderDpsKey.asKey();
+            }
+            else {
+                SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
+
+                if (orderDpsFolio != null) {
+                    orderKey = SDataUtilities.obtainDpsKey((SClientInterface) client, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+                }
+            }
+        }
+        
+        return orderKey;
     }
     
     /**
@@ -250,35 +292,33 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      * Create and save payment request.
      * @param session GUI session.
      * @param dps Linked DPS.
+     * @param validateIsProcessed Validate if document is already processed.
      * @return
      * @throws Exception 
      */
-    private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps) throws Exception {
+    private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
         SDbPayment payment = null;
         
         if (RequiredPaymentDefinition == PAYMENT_DEFN_NOT_REQ) {
-            throw new Exception("Este documento no requiere pago.");
+            throw new Exception("Este documento carece de la indicación de requerir un pago.");
         }
-        else if (getRequiredPaymentAmount() == 0) {
-            throw new Exception("Este documento no tiene monto requerido de pago.");
-        }
-        else if (RequiredPaymentPct == 0) {
-            throw new Exception("Este documento no tiene porcentaje requerido de pago.");
-        }
-        else if (RequiredPaymentPct > 100) {
-            throw new Exception("Este documento tiene un porcentaje requerido de pago mayor a 100%.");
+        else if (validateIsProcessed && !isProcessed()) {
+            throw new Exception(EXC_DOC_NOT_PROCESSED);
         }
         else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
         }
-        else if (!isRecorded()) {
-            throw new Exception("Este documento no tiene una factura vinculada.");
+        else if (getRequiredPaymentAmount() == 0) {
+            throw new Exception("Este documento no tiene monto requerido de pago.");
+        }
+        else if (getRequiredPaymentPct() == 0) {
+            throw new Exception("Este documento no tiene porcentaje requerido de pago.");
+        }
+        else if (getRequiredPaymentPct() > 1) {
+            throw new Exception("Este documento tiene un porcentaje requerido de pago mayor a 100%.");
         }
         else if (dps == null) {
             throw new Exception("No se proporcionó ninguna factura para generar el pago.");
-        }
-        else if (ProcessedDps.getDpsKey() == null) {
-            throw new Exception("La factura vinculada a este documento no está registrada.");
         }
         else if (!SLibUtils.compareKeys(ProcessedDps.getDpsKey(), (int[]) dps.getPrimaryKey())) {
             throw new Exception("La factura vinculada a este documento (PK = " + SLibUtils.textKey(ProcessedDps.getDpsKey()) + ") es distinta a la factura proporcionada para generar el pago (PK = " + SLibUtils.textKey((int[]) dps.getPrimaryKey()) + ").");
@@ -291,17 +331,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             // create and save payment request:
             
             if (payment == null) {
-                boolean isLocalCurrency = session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId });
                 Date date = session.getCurrentDate();
-                double exchangeRate = 0;
-
-                if (!isLocalCurrency) {
-                    exchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) session.getClient(), CurrencyId, date);
-
-                    if (exchangeRate == 0) {
-                        throw new Exception("No se ha capturado el tipo de cambio " + session.getSessionCustom().getLocalCurrencyCode() + "/" + CurrencyCode + " para el día " + SLibUtils.DateFormatDate.format(date) + ".");
-                    }
-                }
+                double exchangeRate = getExchangeRate(session, this, date);
 
                 // create payment:
 
@@ -343,6 +374,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                         exchange rate: applicable exchange rate
                 */
 
+                boolean isLocalCurrency = session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }); // convenience variable
+                
                 if (isLocalCurrency) {
                     // payment case 1:
                     paymentAmount = getRequiredPaymentAmount();
@@ -464,11 +497,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public boolean link(final SGuiSession session, final SThinDps dps, final boolean createPaymentRequest) throws Exception {
         boolean linked = false;
         
-        if (isRecorded()) {
-            throw new Exception("Este documento ya tiene una factura vinculada (" + ProcessedDps.composeRecord() + ").");
-        }
-        else if (isProcessed()) {
-            throw new Exception("Este documento ya está procesado (importado o capturado).");
+        if (isProcessed()) {
+            throw new Exception(EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
         }
         else if (dps == null) {
             throw new Exception("No se proporcionó ninguna factura para vincular a este documento.");
@@ -540,8 +570,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
 
                 SDbPayment payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
                 
-                if (createPaymentRequest && isPaymentRequestable() && payment == null) {
-                    payment = createAndSavePaymentRequest(session, dps);
+                if (createPaymentRequest && isPaymentRequestDataAvailable() && payment == null) {
+                    payment = createAndSavePaymentRequest(session, dps, false);
                 }
                 
                 // create DPS processing:
@@ -589,16 +619,38 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public boolean unlink(final SGuiSession session) throws Exception {
         boolean unlinked = false;
         
-        if (!isRecorded()) {
-            throw new Exception("Este documento no tiene una factura vinculada.");
-        }
-        else if (!isProcessed()) {
-            throw new Exception("Este documento no ha sido procesado (importado o capturado).");
+        if (!isProcessed()) {
+            throw new Exception(EXC_DOC_NOT_PROCESSED);
         }
         else {
+            // check if payment can be deleted:
+            
+            if (isPaymentRequested()) {
+                // treat payment as a non-system registry to check if it can be deleted!:
+                
+                boolean isSystem = Payment.isSystem(); // preserve original system condition
+                
+                Payment.setSystem(false); // reset system condition
+                
+                boolean canDelete = Payment.canDelete(session);
+                
+                Payment.setSystem(isSystem); // restore original system condition
+                
+                if (!canDelete) {
+                    throw new Exception(Payment.getQueryResult());
+                }
+            }
+            
+            // unlink document:
+            
             if (!SwapDataProcessing.isDeleted()) {
                 SwapDataProcessing.setDeleted(true);
                 SwapDataProcessing.save(session);
+            }
+            
+            if (isPaymentRequested()) {
+                Payment.setDeleted(true);
+                Payment.save(session);
             }
 
             ProcessedDps = null;
@@ -612,25 +664,40 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     }
     
     /**
+     * Retrieve document existing provessiog.
+     * @param session GUI session.
+     * @param preparedStatement Prepared statement.
+     * @param dataType Constants DATA_TYPE...: INV = invoice; DB = debit note; CN = credit note.
+     * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
+     * @param externalId External ID.
+     * @throws Exception 
+     */
+    public void retrieveProcessing(final SGuiSession session, final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+        ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByByExternalId(preparedStatement, dataType, txnCategory, externalId);
+
+        if (ProcessedDps != null) {
+            SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
+
+            if (SwapDataProcessing.getFkPaymentId_n() != 0) {
+                Payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { SwapDataProcessing.getFkPaymentId_n() });
+            }
+        }
+    }
+    
+    /**
      * Validate if a new payment request can be created.
      * @return
      * @throws Exception 
      */
     private boolean validatePaymentRequestCreation() throws Exception {
-        if (!isRecorded()) {
-            throw new Exception("Este documento no tiene una factura vinculada.");
-        }
-        else if (!isProcessed()) {
-            throw new Exception("Este documento no ha sido procesado (importado o capturado).");
-        }
-        else if (isProcessedWithPaymentRequest() && !isPaymentRequested()) {
-            throw new Exception("El procesamiento de este documento ya tiene una solicitud de pago (ID = " + SwapDataProcessing.getFkPaymentId_n() + ").");
+        if (!isProcessed()) {
+            throw new Exception(EXC_DOC_NOT_PROCESSED);
         }
         else if (isPaymentRequested()) {
-            throw new Exception("Este documento ya tiene una solicitud de pago ('" + Payment.getFolio() + "').");
+            throw new Exception(EXC_PAY_ALREADY_REGISTERED_ + Payment.getFolio() + ".");
         }
-        else if (!isPaymentRequestable()) {
-            throw new Exception("Este documento no tiene información para solicitar su pago.");
+        else if (!isPaymentRequestDataAvailable()) {
+            throw new Exception(EXC_PAY_NOT_REQUESTABLE);
         }
         
         return true;
@@ -649,7 +716,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             SThinDps dps = new SThinDps();
             dps.read(ProcessedDps.getDpsKey(), session.getStatement());
             
-            SDbPayment payment = createAndSavePaymentRequest(session, dps);
+            SDbPayment payment = createAndSavePaymentRequest(session, dps, true);
 
             SwapDataProcessing.setFkPaymentId_n(payment.getPkPaymentId());
             SwapDataProcessing.save(session);
@@ -668,14 +735,11 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      * @throws Exception 
      */
     private boolean validateRequiredPaymentDateChanging() throws Exception {
-        if (!isRecorded()) {
-            throw new Exception("Este documento no tiene una factura vinculada.");
-        }
-        else if (!isProcessed()) {
-            throw new Exception("Este documento no ha sido procesado (importado o capturado).");
+        if (!isProcessed()) {
+            throw new Exception(EXC_DOC_NOT_PROCESSED);
         }
         else if (!isPaymentRequested()) {
-            throw new Exception("Este documento no tiene una solicitud de pago.");
+            throw new Exception(EXC_PAY_NOT_REGISTERED);
         }
         else if (Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
             throw new Exception("No se puede cambiar la fecha requerida de pago; el estatus de la solicitud de pago es diferente de 'nuevo'.");
@@ -697,8 +761,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         if (!isPaymentRequested()) {
             // payment request not yet created:
 
-            if (!isPaymentRequestable()) {
-                throw new Exception("Este documento no tiene información para solicitar su pago.");
+            if (!isPaymentRequestDataAvailable()) {
+                throw new Exception(EXC_PAY_NOT_REQUESTABLE);
             }
             else {
                 dateNew = pickDate(session);
@@ -904,10 +968,10 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 value = AlreadyDownloaded;
                 break;
             case 9:
-                value = isRecorded();
+                value = isProcessed();
                 break;
             case 10:
-                value = !isRecorded() ? "" : ProcessedDps.composeRecord();
+                value = !isProcessed() ? "" : ProcessedDps.composeRecord();
                 break;
             case 11:
                 value = Status;
@@ -1017,6 +1081,31 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     @Override
     public void setRowEdited(boolean edited) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    /**
+     * Get exchange rate in desired date, if available.
+     * @param session GUI session.
+     * @param importedDocument Imported document.
+     * @param date Desired date.
+     * @return
+     * @throws Exception
+     */
+    public static double getExchangeRate(final SGuiSession session, final SImportedDocument importedDocument, final Date date) throws Exception {
+        double exchangeRate = 0;
+
+        if (session.getSessionCustom().isLocalCurrency(new int[] { importedDocument.CurrencyId })) {
+            exchangeRate = 1;
+        }
+        else {
+            exchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) session.getClient(), importedDocument.CurrencyId, date);
+
+            if (exchangeRate == 0) {
+                throw new Exception("No se ha capturado el tipo de cambio " + session.getSessionCustom().getLocalCurrencyCode() + "/" + importedDocument.CurrencyCode + " para el día " + SLibUtils.DateFormatDate.format(date) + ".");
+            }
+        }
+        
+        return exchangeRate;
     }
     
     public static class Reference {

@@ -964,7 +964,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return amountPrepayment;
     }
 
-    private boolean testDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+    private boolean checkDeletion(java.sql.Connection poConnection, java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         int i = 0;
         int[] anPeriodKey = null;
         String sSql = "";
@@ -1214,10 +1214,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
                                 "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " " +
                                 "AND p.fk_st_pay IN (" + 
+                                SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
                                 SModSysConsts.FINS_ST_PAY_EXEC + ", " + SModSysConsts.FINS_ST_PAY_EXEC_P + ", " +
                                 SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
-                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ") ";
-                        sMsgAux = "¡El documento está asociado al menos a un pago que ya fue ejecutado!";
+                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
+                                SModSysConsts.FINS_ST_PAY_IN_TREAS + ") ";
+                        sMsgAux = "¡El documento está asociado al menos a un pago que está en autorización o que ya fue operado!";
                         break;
                     default:
                         sSql = "";
@@ -1238,7 +1241,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return true;    // if this line is reached, no errors were found
     }
 
-    private boolean testRevertDeletion(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
+    private boolean checkRevertDeletion(java.lang.String psMsg, int pnAction) throws java.sql.SQLException, java.lang.Exception {
         if (pnAction == SDbConsts.ACTION_DELETE && !mbIsDeleted) {
             mnDbmsErrorId = 2;
             msDbmsError = psMsg + "El documento ya está desmarcado como eliminado.";
@@ -4828,7 +4831,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede anular el documento:\n", SDbConsts.ACTION_ANNUL)) {
+            if (checkDeletion(connection, "No se puede anular el documento:\n", SDbConsts.ACTION_ANNUL)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
             }
         }
@@ -4848,7 +4851,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede eliminar el documento:\n", SDbConsts.ACTION_DELETE)) {
+            if (checkDeletion(connection, "No se puede eliminar el documento:\n", SDbConsts.ACTION_DELETE)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_YES;
             }
         }
@@ -4879,7 +4882,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (mbIsRegistryRequestAnnul) {
                 // Set DPS as annuled:
 
-                if (testDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
+                if (checkDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
                     sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + "fid_tp_dps_ann = " + mnFkDpsAnnulationTypeId + ", " +
@@ -4908,7 +4911,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 // Revert DPS annulation:
 
-                if (testRevertDeletion(sMsg, SDbConsts.ACTION_ANNUL)) {
+                if (checkRevertDeletion(sMsg, SDbConsts.ACTION_ANNUL)) {
                     // 1. Set DPS fields:
 
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_EMITED;
@@ -4960,7 +4963,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (mbIsRegistryRequestDelete) {
                 // Set DPS as deleted:
 
-                if (testDeletion(connection, sMsg, SDbConsts.ACTION_DELETE)) {
+                if (checkDeletion(connection, sMsg, SDbConsts.ACTION_DELETE)) {
                     mbIsDeleted = true;
 
                     sSql = "UPDATE trn_dps SET b_del = 1, fid_usr_del = " + mnFkUserDeleteId + ", ts_del = NOW() " +
@@ -4982,7 +4985,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 // Revert DPS deletion:
 
-                if (testRevertDeletion(sMsg, SDbConsts.ACTION_DELETE)) {
+                if (checkRevertDeletion(sMsg, SDbConsts.ACTION_DELETE)) {
                     // 1. Set DPS fields:
 
                     mbIsDeleted = false;

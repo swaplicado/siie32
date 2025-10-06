@@ -5,14 +5,23 @@
  */
 package erp.mod.fin.view;
 
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSwapUtils;
+import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.view.SViewFilter;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -27,15 +36,16 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewPaymentStatus extends SGridPaneView implements ActionListener {
     
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFunc;
     private SViewFilter moFilterCur;
+    private JButton jbExportDataToSwapServices;
     
-    private boolean isDetail;
+    private boolean mbIsDetail;
     
     public SViewPaymentStatus(SGuiClient client, int subType, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FINX_PAY_ST, subType, title);
@@ -52,17 +62,36 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
         moFilterCur = new SViewFilter(miClient, this, SModConsts.CFGU_CUR);
         moFilterCur.initFilter(null);
         
-        if (mnGridSubtype != SModSysConsts.FINS_ST_PAY_RCPT_P &&
-                mnGridSubtype != SModSysConsts.FINS_ST_PAY_EXEC_P) {
+        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
+            "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
+        
+        if (mnGridSubtype != SModSysConsts.FINS_ST_PAY_RCPT_P) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
+        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunc);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterCur);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
         
-        isDetail = mnGridSubtype == SModSysConsts.FINX_ST_PAY_EXEC_DET ||
-                mnGridSubtype == SModSysConsts.FINX_ST_PAY_RCPT_DET;
+        mbIsDetail = mnGridSubtype == SModSysConsts.FINX_ST_PAY_EXEC_DET || mnGridSubtype == SModSysConsts.FINX_ST_PAY_RCPT_DET;
     }
     
+    private void actionExportDataToSwapServices() {
+        if (jbExportDataToSwapServices.isEnabled()) {
+            try {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, true);
+                SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
+    }
+
     @Override
     public void prepareSqlQuery() {
         String sql = "";
@@ -96,21 +125,25 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
         
         switch (mnGridSubtype) {
             case SModSysConsts.FINS_ST_PAY_RCPT_P:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" + SModSysConsts.FINS_ST_PAY_EXEC + ") AND b_rcpt_pay_req ";
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_EXEC + ", "
+                        + SModSysConsts.FINS_ST_PAY_EXEC_P + ") /*AND b_rcpt_pay_req */";
                 break;
             case SModSysConsts.FINS_ST_PAY_EXEC:
             case SModSysConsts.FINX_ST_PAY_EXEC_DET:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN("
-                        + SModSysConsts.FINS_ST_PAY_EXEC + ", " + SModSysConsts.FINS_ST_PAY_EXEC_P + ")";
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_EXEC + ", "
+                        + SModSysConsts.FINS_ST_PAY_EXEC_P + ")"
+                        + "";
                 break;
             case SModSysConsts.FINS_ST_PAY_RCPT:
             case SModSysConsts.FINX_ST_PAY_RCPT_DET:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN("
-                        + SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ")";
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
+                        + SModSysConsts.FINS_ST_PAY_RCPT + ", "
+                        + SModSysConsts.FINS_ST_PAY_RCPT_P + ") ";
                 break;
             default:
-                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN(" + mnGridSubtype + ")";
-                break;
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay = " + mnGridSubtype + " "; // just in case!
         }
         
         msSql = "SELECT "
@@ -129,7 +162,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
                 + "f.name AS func, "
                 + "fs.name AS func_s, "
                 + "sp.name AS status, "
-                + (isDetail 
+                + (mbIsDetail 
                 ? "ve.ety_pay_cur, "
                 + "ve.ety_pay, "
                 + "ve.conv_rate, "
@@ -147,7 +180,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
-                + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJ_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ")"
+                + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJC_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ")"
                 + " AS proc, "
                 + "v.ts_usr_sched, "
                 + "v.ts_usr_exec, "
@@ -174,7 +207,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
                 + "v.fk_usr_sched = us.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ue ON " 
                 + "v.fk_usr_exec = ue.id_usr "
-                + (isDetail 
+                + (mbIsDetail 
                 ? "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS ve ON "
                 + "v.id_pay = ve.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS ce ON " 
@@ -201,7 +234,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "cur_key", "Moneda"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_EXC_RATE, "pay_exc_rate", "Tipo cambio"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pay", "Monto pago local $"));
-        if (isDetail) {
+        if (mbIsDetail) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "ety_tp", "Tipo pago"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "des_pay_ety_cur", "Monto a pagar $"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "ety_cur", "Moneda a pagar"));
@@ -240,6 +273,9 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
+            if (button == jbExportDataToSwapServices) {
+                actionExportDataToSwapServices();
+            }
         }
     }
 }
