@@ -1988,6 +1988,7 @@ public abstract class SExportDataUtils {
             }
 
             String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
+            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY{1}", new Object[]{companyId, sql});
             int res = statement.executeUpdate(sql);
             if (res != 1) {
                 oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
