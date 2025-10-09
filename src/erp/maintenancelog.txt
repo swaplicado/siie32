@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 290.16/ 2025-10-09
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Sincronización de Ordenes de Compra con cloud portal de compras BD.
+2) Subida de archivos pdf de Ordenes de Compra a Google Cloud Storage.
+
+================================================================================
 SIIE 3.2 290.15/ 2025-10-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

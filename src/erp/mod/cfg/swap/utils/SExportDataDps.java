@@ -14,6 +14,10 @@ package erp.mod.cfg.swap.utils;
  * @author Edwin Carmona
  */
 public class SExportDataDps implements SExportData {
+
+    public SExportDataDps() {
+        this.oFileDocData = null;
+    }
     
     /**
      * ID de la empresa del documento en el sistema externo.
@@ -94,4 +98,9 @@ public class SExportDataDps implements SExportData {
      * Indicador de borrada del documento.
      */
     public boolean is_deleted;
+
+    /**
+     * Datos del archivo PDF asociado al documento.
+     */
+    public SFileData oFileDocData;
 }

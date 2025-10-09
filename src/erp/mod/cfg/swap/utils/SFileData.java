@@ -28,7 +28,7 @@ public class SFileData {
         this.idDoc = idDoc;
         this.lastUpdate = lastUpdate;
         this.dbName = companyName;
-        this.fileName = fileName = "OC_" + companyName + "_" + idYear + "_" + idDoc + ".pdf";
+        this.fileName = "OC_" + companyName + "_" + idYear + "_" + idDoc + ".pdf";
     }
 
     public int getIdYear() {

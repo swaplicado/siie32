@@ -13,6 +13,7 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.swap.SHttpConsts;
@@ -976,6 +977,7 @@ public abstract class SExportDataUtils {
         ObjectMapper mapper = new ObjectMapper();
         String sBucketName = "";
         String sProjectID = "";
+        ArrayList<SFileData> lFileData = new ArrayList<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -1051,10 +1053,8 @@ public abstract class SExportDataUtils {
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("d.b_authorn") || resultSet.getBoolean("d.b_link");
                     
                     // PDF de la OC:
-                    
-                    SDbSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
+                    SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
                             session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
-                    
                     if (oLogEty != null) {
                         SExportDataDpsFile oFile = new SExportDataDpsFile();
                         SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
@@ -1073,9 +1073,44 @@ public abstract class SExportDataUtils {
                         sBucketName = oFile.bucket_name;
                         sProjectID = oFile.project_id;
                     }
+                    // Si no existe en el bucket, se sube
                     else {
-                        sBucketName = CloudStorageManager.getBucketName();
-                        sProjectID = CloudStorageManager.getProjectID();
+                        try {
+                            sBucketName = CloudStorageManager.getBucketName();
+                            sProjectID = CloudStorageManager.getProjectID();
+
+                            SFileData oFileData = new SFileData(oDpsExport.id_year, 
+                                                            oDpsExport.id_doc, 
+                                                            database, 
+                                                            resultSet.getTimestamp("d.ts_edit"));
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData);
+                            if (oLogEty != null) {
+                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200 
+                                    || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
+                                    SExportDataDpsFile oFileToExport = new SExportDataDpsFile();
+                                    SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                                    oFileToExport.filename_storage = oFd.getFileName();
+                                    if (oFileToExport.filename_storage.isEmpty()) {
+                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                                    }
+                                    else {
+                                        oFileToExport.filename_original = oFileToExport.filename_storage;
+                                        oFileToExport.title = "PDF de la OC";
+                                        oFileToExport.bucket_name = oFd.getBucketName();
+                                        oFileToExport.project_id = oFd.getProjectId();
+                                        oContainer.file.add(oFileToExport);
+                                    }
+                                }
+                                else {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. " + 
+                                    oDpsExport.id_year + "_" + oDpsExport.id_doc + ". " +
+                                            oLogEty.getResponseBody());
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. " + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                        }
                     }
                     
                     // documentos (archivos de cotizaciones)
@@ -1126,14 +1161,14 @@ public abstract class SExportDataUtils {
                             }
                         }
                     }
-                   
+                    
                     oContainer.document = oDpsExport;
                     
                     lDps.add(oContainer);
                 }
             }
         }
-
+        
         return lDps;
     }
 

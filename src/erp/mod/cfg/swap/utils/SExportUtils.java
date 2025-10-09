@@ -799,7 +799,7 @@ public abstract class SExportUtils {
                 
                 switch (syncType) {
                     case PUR_ORDER:
-                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_DOC;
+                        jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_ORD;
                         break;
 
                     case PUR_REF_ORDER:
