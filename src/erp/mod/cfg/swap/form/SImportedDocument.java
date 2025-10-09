@@ -5,6 +5,7 @@
  */
 package erp.mod.cfg.swap.form;
 
+import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -27,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -497,6 +499,8 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public boolean link(final SGuiSession session, final SThinDps dps, final boolean createPaymentRequest) throws Exception {
         boolean linked = false;
         
+        // Validate linkage:
+        
         if (isProcessed()) {
             throw new Exception(EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
         }
@@ -505,55 +509,138 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         }
         else {
             if (dps.getDbmsRecordKey() == null) {
-                throw new Exception("La factura a vincular a este documento (" + dps.getDpsNumber() + ") no está contabilizada.");
+                throw new Exception("La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
             }
             else if (BizPartnerId != dps.getFkBizPartnerId_r()) {
-                throw new Exception("El asociado de negocios de este documento "
-                        + "(" + BizPartner + ", ID = " + BizPartnerId + ") "
+                // match required:
+                throw new Exception("El asociado de negocios de este documento, "
+                        + "'" + BizPartner + "' (ID = " + BizPartnerId + "), "
                         + "es distinto al de la factura a vincular "
-                        + "(" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + ", ID = " + dps.getFkBizPartnerId_r() + " ).");
+                        + "'" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
+            }
+            else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) || CurrencyId != dps.getFkCurrencyId()) {
+                // match required:
+                throw new Exception("El total o la moneda de este documento, "
+                        + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
+                        + "son distintos a los de la factura a vincular, "
+                        + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyKey() + ".");
             }
             else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {
-                throw new Exception("El fecha de este documento "
-                        + "(" + SLibUtils.DateFormatDate.format(Date) + ") "
-                        + "es distinta a la de la factura a vincular "
-                        + "(" + SLibUtils.DateFormatDate.format(dps.getDate()) + ").");
-            }
-            else if (NumberSeries.isEmpty() && !dps.getNumberSeries().isEmpty()) {
-                throw new Exception("Este documento no tiene serie del folio, "
-                        + "pero la factura a vincular sí lo tiene "
-                        + "('" + dps.getNumberSeries() + "').");
-            }
-            else if (!NumberSeries.isEmpty() && dps.getNumberSeries().isEmpty()) {
-                throw new Exception("Este documento sí tiene serie del folio "
-                        + "('" + NumberSeries + "'), "
-                        + "pero la factura a vincular no lo tiene.");
-            }
-            else if (!NumberSeries.equals(dps.getNumberSeries())) {
-                throw new Exception("El serie del folio de este documento "
-                        + "('" + NumberSeries + "') "
-                        + "es distinto al de la factura a vincular "
-                        + "('" + dps.getNumberSeries() + "').");
-            }
-            else if (!Number.equals(dps.getNumber())) {
-                throw new Exception("El número del folio de este documento "
-                        + "('" + Number + "') "
-                        + "es distinto al de la factura a vincular "
-                        + "('" + dps.getNumber() + "').");
-            }
-            else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r())) {
-                throw new Exception("El total de este documento "
-                        + "($ " + SLibUtils.getDecimalFormatAmount().format(Total) + ") "
-                        + "es distinto al de la factura a vincular "
-                        + "($ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + ").");
-            }
-            else if (CurrencyId != dps.getFkCurrencyId()) {
-                throw new Exception("El moneda de este documento "
-                        + "('" + CurrencyCode + "', ID = " + CurrencyId + ") "
-                        + "es distinto a la de la factura a vincular "
-                        + "('" + dps.getDbmsCurrencyKey() + "', ID = " + dps.getFkCurrencyId() + ").");
+                // match required:
+                throw new Exception("El fecha de este documento, "
+                        + SLibUtils.DateFormatDate.format(Date) + ", "
+                        + "es distinta a la de la factura a vincular, "
+                        + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
+                String msgChooseOtherInvoice = "Favor de elegir otra factura para vincularla a este documento.";
+                
+                // check folio number: it must match its counterpart in document, in DPS it is allways available:
+                
+                String msgTopic = "";
+                String msgError = "";
+                String msgConfirm = "";
+                
+                if (!Number.isEmpty()) {
+                    // document has folio number:
+                    
+                    msgTopic = "El número del folio de este documento, '" + Number + "', ";
+                    
+                    if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase().isEmpty())) {
+                        // match required:
+                        msgError = msgTopic + "es distinto al de la factura a vincular, '" + dps.getNumber() + "'.";
+                    }
+                }
+                else {
+                    // document does not have folio number:
+                    
+                    msgTopic = "Este documento no tiene número de folio";
+                    
+                    if (ExternalDocumentUuid.isEmpty()) {
+                        // no UUID available to attempt to find similitudes:
+                        
+                        // match required:
+                        msgError = " ni UUID,\n"
+                                + "y el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
+                    }
+                    else {
+                        // UUID available, attempt to find similitudes:
+                        
+                        if (ExternalDocumentUuid.toUpperCase().equals(dps.getNumber().toUpperCase())) {
+                            msgConfirm = msgTopic + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
+                                    + "es igual al número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                        }
+                        else if (dps.getNumber().length() >= DCfdVer4Consts.LEN_UUID_1ST_SEGMENT && dps.getNumber().length() < ExternalDocumentUuid.length() && ExternalDocumentUuid.toUpperCase().startsWith(dps.getNumber().toUpperCase())) {
+                            msgConfirm = msgTopic + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
+                                    + "inicia como el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                        }
+                        else {
+                            // match required:
+                            msgError = msgConfirm + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
+                                    + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                        }
+                    }
+                    
+                }
+                
+                // processs folio number validation:
+                
+                if (!msgError.isEmpty()) {
+                    throw new Exception(msgError);
+                }
+                else if (!msgConfirm.isEmpty()) {
+                    if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
+                            + "Aún así es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        throw new Exception(msgChooseOtherInvoice);
+                    }
+                }
+
+                // check folio series: it must match its counterpart in document, in DPS it is not allways available:
+                
+                msgTopic = "";
+                msgError = "";
+                msgConfirm = "";
+                
+                if (!NumberSeries.isEmpty()) {
+                    // document has folio series:
+                    
+                    msgTopic = "La serie del folio de este documento, '" + NumberSeries + "', ";
+                    
+                    if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase().isEmpty())) {
+                        // match required:
+                        msgError = msgTopic + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
+                    }
+                    else if (dps.getNumberSeries().isEmpty()) {
+                        // match required:
+                        msgConfirm = msgTopic + "no corresponde a la de la factura a vincular porque esta carece de serie.";
+                    }
+                }
+                else {
+                    // document does not have folio series:
+                    
+                    msgTopic = "Este documento no tiene serie de folio";
+                    
+                    if (!dps.getNumberSeries().isEmpty()) {
+                        msgConfirm = msgTopic + ", y no corresponde a la de la factura a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
+                    }
+                }
+                
+                // processs folio series validation:
+                
+                if (!msgError.isEmpty()) {
+                    throw new Exception(msgError);
+                }
+                else if (!msgConfirm.isEmpty()) {
+                    if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
+                            + "De cualquier manera es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                        throw new Exception(msgChooseOtherInvoice);
+                    }
+                }
+                
+                // link document to invoice:
+                
                 Object[] recKey = (Object[]) dps.getDbmsRecordKey();
                 
                 int recYearId = (Integer) recKey[0];
@@ -742,7 +829,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             throw new Exception(EXC_PAY_NOT_REGISTERED);
         }
         else if (Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
-            throw new Exception("No se puede cambiar la fecha requerida de pago; el estatus de la solicitud de pago es diferente de 'nuevo'.");
+            throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago es diferente de 'nuevo'.");
         }
         
         return true;
@@ -768,7 +855,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 dateNew = pickDate(session);
                 
                 if (dateNew.before(Date)) {
-                    throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dateNew) + ") no puede ser anterior a la fecha del documento '" + getFolio() + "' (" + SLibUtils.DateFormatDate.format(Date) + ").");
+                    throw new Exception("La fecha requerida de vencimiento, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
                 }
             }
         }

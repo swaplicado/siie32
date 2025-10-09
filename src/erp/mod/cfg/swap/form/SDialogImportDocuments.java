@@ -330,6 +330,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbImportInvoiceFromCfdi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"))); // NOI18N
         jbImportInvoiceFromCfdi.setText("Importar CFDI");
         jbImportInvoiceFromCfdi.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbImportInvoiceFromCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -339,6 +340,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbCreateInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
         jbCreateInvoice.setText("Crear factura");
         jbCreateInvoice.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbCreateInvoice.setPreferredSize(new java.awt.Dimension(150, 23));

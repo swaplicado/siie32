@@ -347,6 +347,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbImportInvoiceFromCfdi">
                       <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/erp/img/icon_std_doc_import_cfd.gif"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Importar CFDI"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
@@ -367,6 +370,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbCreateInvoice">
                       <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/erp/img/icon_std_new.gif"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Crear factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>

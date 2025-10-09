@@ -11,6 +11,7 @@
 
 package erp.mtrn.form;
 
+import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DElementConcepto;
 import cfd.ver40.DElementConceptoImpuestoRetencion;
@@ -82,8 +83,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     private static final int COL_ITEM_NAME = 8;
     private static final int COL_FACT_CONV = 11;
-    
-    private static final int UUID_FIRST_SECC_LENGHT = 8;
     
     private final erp.client.SClientInterface miClient;
     private int mnFormResult;
@@ -1979,51 +1978,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         return validation;
     }
 
-    private SDataDps createAndRefreshDps() {
-        SDataDps dps = new SDataDps();
-        Date date = SLibTimeUtils.convertToDateOnly(miClient.getSessionXXX().getWorkingDate());
-
-        dps.setPkYearId(miClient.getSessionXXX().getWorkingYear());
-        dps.setPkDocId(0);
-        
-        dps.setDate(date);
-        dps.setDateDoc(date);
-        dps.setDateStartCredit(date);
-        
-        dps.resetRecord();
-        dps.setIsRecordAutomatic(true);
-
-        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
-        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
-        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
-        dps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
-
-        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
-        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
-        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
-        
-        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
-        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
-        
-        SDataDpsCfd dpsCfd = dps.getDbmsDataDpsCfd();
-
-        if (dpsCfd == null) {
-            dpsCfd = new SDataDpsCfd();
-            dps.setDbmsDataDpsCfd(dpsCfd);
-        }
-
-        dpsCfd.setIsRegistryNew(true); // force entries to be treated as new
-        
-        refreshDps(dps);
-
-        return dps;
-    }
-
     private void refreshDps(final SDataDps dps) {
         if (dps.getIsRegistryNew()) {
             dps.setPkYearId(SLibTimeUtilities.digestYear(moComprobante.getAttFecha().getDatetime())[0]);
@@ -2048,7 +2002,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         dps.setDateStartCredit(date);
         
         dps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
-        dps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, UUID_FIRST_SECC_LENGHT) : "");
+        dps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) : "");
         dps.setNumberReference(isWithPurchaseOrder() ? moPurchaseOrder.getNumberReference() : "");
         
         dps.setDaysOfCredit(isCash ? 0 : isWithPurchaseOrder() ? moPurchaseOrder.getDaysOfCredit() : moBizPartnerReceptor.getDbmsCategorySettingsSup().getDaysOfCredit());
@@ -2128,6 +2082,51 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         setFormVisible(false);
     }
     
+    private SDataDps createAndRefreshDps() {
+        SDataDps dps = new SDataDps();
+        Date date = SLibTimeUtils.convertToDateOnly(miClient.getSessionXXX().getWorkingDate());
+
+        dps.setPkYearId(miClient.getSessionXXX().getWorkingYear());
+        dps.setPkDocId(0);
+        
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.resetRecord();
+        dps.setIsRecordAutomatic(true);
+
+        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+
+        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
+        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
+        
+        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
+        
+        SDataDpsCfd dpsCfd = dps.getDbmsDataDpsCfd();
+
+        if (dpsCfd == null) {
+            dpsCfd = new SDataDpsCfd();
+            dps.setDbmsDataDpsCfd(dpsCfd);
+        }
+
+        dpsCfd.setIsRegistryNew(true); // force entries to be treated as new
+        
+        refreshDps(dps);
+
+        return dps;
+    }
+
     private void saveItemMatchBizPartner(SRowCfdiImport40 rowCfdiImport) {
         try {
             SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();

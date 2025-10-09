@@ -16,6 +16,7 @@ import cfd.ver33.DElementConcepto;
 import cfd.ver33.DElementConceptoImpuestoRetencion;
 import cfd.ver33.DElementConceptoImpuestoTraslado;
 import cfd.ver33.DElementConceptoImpuestos;
+import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -76,9 +77,9 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     
     private static final int ITEM_MAIN = 1;
     private static final int ITEM_REF = 2;
+    
     private static final int COL_ITEM_NAME = 8;
     private static final int COL_FACT_CONV = 11;
-    private static final int UUID_FIRST_SECC_LENGHT = 8;
     
     private final erp.client.SClientInterface miClient;
     private int mnIdCur;
@@ -1902,7 +1903,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         moNewDps.setDateDocDelivery_n(null);
         moNewDps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
         moNewDps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? 
-                moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, UUID_FIRST_SECC_LENGHT) : "");
+                moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) : "");
         moNewDps.setNumberReference("");
         moNewDps.setCommissionsReference("");
         moNewDps.setApprovalYear(0);
