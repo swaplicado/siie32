@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 290.17/ 2025-10-09
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de vinculación de documentos autorizados carentes de serie y folio con facturas contabilizadas que satisfagan requisitos mínimos de correspondencia.
+
+================================================================================
 SIIE 3.2 290.16/ 2025-10-09
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
