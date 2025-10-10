@@ -27,6 +27,7 @@ import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
 import java.net.HttpURLConnection;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -1971,7 +1972,15 @@ public abstract class SExportDataUtils {
      * @param notes
      * @return 
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, final int userId, final String notes) {
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, 
+                                                            final int companyId, 
+                                                            final int resourceType, 
+                                                            final String resourceId, 
+                                                            final int authStatusId, 
+                                                            final int userId, 
+                                                            final String notes,
+                                                            final double newAmount,
+                                                            final String newDate) {
         SResourceStatusResponse oResponse;
         
         try {
@@ -1979,6 +1988,7 @@ public abstract class SExportDataUtils {
             String sTable = "";
             String sWhere = "";
             String sUpdate = "";
+            String sSecondQuery = "";
             
             switch (resourceType) {
                 case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
@@ -1987,9 +1997,20 @@ public abstract class SExportDataUtils {
                     switch (authStatusId) {
                         case SSwapConsts.AUTHZ_STATUS_OK:
                             sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
-                                    + "dt_sched_n = dt_req, " // XXX TO DO: si hay nueva fecha programada, agregarla aquí!
                                     + "fk_usr_sched = " + userId + ", "
                                     + "ts_usr_sched = NOW(), ";
+                            if (newAmount > 0) {
+                                // en partida: des_pay_app_ety_cur
+                                sSecondQuery = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " "
+                                        + "SET des_pay_app_ety_cur = " + newAmount + " "
+                                        + "WHERE (id_pay = " + resourceId + ") and (id_ety = 1);";
+                            }
+                            if (newDate != null && !newDate.isEmpty()) {
+                                sUpdate += "dt_sched_n = '" + newDate + "', ";
+                            }
+                            else {
+                                sUpdate += "dt_sched_n = dt_req, ";
+                            }
                             break;
                             
                         case SSwapConsts.AUTHZ_STATUS_REJECTED:
@@ -2023,16 +2044,38 @@ public abstract class SExportDataUtils {
             }
 
             String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
-            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY{1}", new Object[]{companyId, sql});
-            int res = statement.executeUpdate(sql);
-            if (res != 1) {
-                oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
-                oResponse.message = "No se realizó ninguna actualización.";
-                oResponse.error = "No se realizó ninguna actualización.";
+            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY{1} ", new Object[]{companyId, sql});
+
+            // Iniciar transacción
+            Connection conn = statement.getConnection();
+            boolean autoCommit = conn.getAutoCommit();
+            try {
+                conn.setAutoCommit(false);
+
+                int res = statement.executeUpdate(sql);
+                if (sSecondQuery != null && !sSecondQuery.isEmpty()) {
+                    Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PARTIDA PAGO, company: {0}. QUERY{1} ", new Object[]{companyId, sSecondQuery});
+                    res = statement.getConnection().createStatement().executeUpdate(sSecondQuery);
+                }
+                if (res != 1) {
+                    conn.rollback();
+                    oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
+                    oResponse.message = "No se realizó ninguna actualización.";
+                    oResponse.error = "No se realizó ninguna actualización.";
+                }
+                else {
+                    conn.commit();
+                    oResponse.status_code = HttpURLConnection.HTTP_OK;
+                    oResponse.message = "OK";
+                }
             }
-            else {
-                oResponse.status_code = HttpURLConnection.HTTP_OK;
-                oResponse.message = "OK";
+            catch (SQLException ex) {
+                conn.rollback();
+                Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
+                throw ex;
+            }
+            finally {
+                conn.setAutoCommit(autoCommit);
             }
         }
         catch (SQLException ex) {
