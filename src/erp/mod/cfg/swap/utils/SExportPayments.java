@@ -27,12 +27,18 @@ public class SExportPayments extends Thread {
     
     private final SGuiClient miClient;
     private final SDbPayment moPayment;
+    private final int mnFlowModel;
+    private final int mnPriority;
+    private final String msAuthNotes;
     
     private String msError;
     
-    public SExportPayments(SGuiClient client, SDbPayment payment) {
+    public SExportPayments(SGuiClient client, SDbPayment payment, int flowModel, int priority, String notes) {
         miClient = client;
         moPayment = payment;
+        mnFlowModel = flowModel;
+        mnPriority = priority;
+        msAuthNotes = notes;
         
         setDaemon(true);
     }
@@ -41,6 +47,7 @@ public class SExportPayments extends Thread {
     @SuppressWarnings("unchecked")
     public void run() {
         try {
+            updatePaymentAuthData();
             Object[] sendRequest = SAuthorizationUtils.sendPaymentFilesToCloud(miClient, moPayment);
             boolean sendPaymentFilesOk = (boolean) sendRequest[0];
             ArrayList<SExportDataFile> expDataFiles = (ArrayList<SExportDataFile>) sendRequest[1];
@@ -63,6 +70,12 @@ public class SExportPayments extends Thread {
         catch (Exception e) {
             miClient.showMsgBoxError(e.getMessage());
         }
+    }
+    
+    private void updatePaymentAuthData() throws Exception {
+        moPayment.setPriority(mnPriority);
+        moPayment.setNotesAuthorization(msAuthNotes);
+        moPayment.updateAuthorizationData(miClient.getSession());
     }
     
     private String createJSONrequestBody(ArrayList<SExportDataFile> expDataFiles) throws Exception {
@@ -109,6 +122,7 @@ public class SExportPayments extends Thread {
         payment.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), SExportUtils.DECS_PAY_EXC_RATE));
         payment.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPayment()));
         payment.payment_way = moPayment.getPaymentWay();
+        payment.priority = moPayment.getPriority();
         payment.notes = moPayment.getNotes();
         payment.is_receipt_payment_req = moPayment.isReceiptPaymentRequired() ? 1 : 0;
         payment.payment_status = moPayment.getFkStatusPaymentId();
@@ -125,6 +139,7 @@ public class SExportPayments extends Thread {
         payment.exec_at = null;
         payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
         payment.user_id = miClient.getSession().getUser().getPkUserId(); 
+        payment.flow = mnFlowModel;
         
         return payment;
     }

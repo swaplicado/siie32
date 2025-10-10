@@ -105,6 +105,8 @@ public class SLayoutBankRow implements SGridRow {
     protected ArrayList<SRowPayments> maPayments;
     protected int mnFuncArea;
     protected int mnFuncSubarea;
+    protected double mdAuxBeforeCant;
+    protected boolean mdAuxBeforeSelecPay;
     
     /**
      * Create a new bank layout row.
@@ -190,6 +192,8 @@ public class SLayoutBankRow implements SGridRow {
         maPayments = new ArrayList<>();
         mnFuncArea = 0;
         mnFuncSubarea = 0;
+        mdAuxBeforeCant = 0;
+        mdAuxBeforeSelecPay = false;
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -264,6 +268,8 @@ public class SLayoutBankRow implements SGridRow {
     public void setReceptionPayReq(boolean b) { mbReceptionPayReq = b; }
     public void setFuncArea(int n) { mnFuncArea = n; }
     public void setFuncSubarea(int n) { mnFuncSubarea = n; }
+    public void setAuxBeforeCant(double d) { mdAuxBeforeCant = d; }
+    public void setAuxBeforeSelecPay(boolean b) { mdAuxBeforeSelecPay = b; }
     
     public int getRowMode() { return mnRowMode; }
     public int getTransactionType() { return mnTransactionType; }
@@ -339,6 +345,8 @@ public class SLayoutBankRow implements SGridRow {
     public boolean getReceptionPayReq() { return mbReceptionPayReq; }
     public int getFuncArea() { return mnFuncArea; }
     public int getFuncSubarea() { return mnFuncSubarea; }
+    public double getAuxBeforeCant() { return mdAuxBeforeCant; }
+    public boolean getAuxBeforeSelecPay() { return mdAuxBeforeSelecPay; }
     public ArrayList<SRowPayments> getPayments() { return maPayments; }
 
     public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
@@ -639,6 +647,8 @@ public class SLayoutBankRow implements SGridRow {
     public void setRowValueAt(Object value, int col) {
         switch (mnRowMode) {
             case MODE_FORM_EDITION:
+                mdAuxBeforeSelecPay = mbForPayment;
+                mdAuxBeforeCant = moMoneyPayment.getOriginalAmount();
                 switch (mnTransactionType) {
                     case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                         switch (col) {
@@ -735,7 +745,7 @@ public class SLayoutBankRow implements SGridRow {
                             case 1:
                                 break;
                             case 2:
-                                 moMoneyPayment.setOriginalAmount((double) value);
+                                moMoneyPayment.setOriginalAmount((double) value);
                                 break;
                             case 3:
                                 break;

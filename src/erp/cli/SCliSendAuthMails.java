@@ -85,7 +85,6 @@ public class SCliSendAuthMails {
                 File oPdf = SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { idYear, idDoc });
                 SFileData oFileData = new SFileData(idYear, idDoc, dbCompany.getDbName(), resultSet.getTimestamp("d.ts_edit"));
                 mFiles.put(oFileData, oPdf);
-                oPdf.delete();
             }
             catch (Exception ex) {
                 Logger.getLogger(SCliSendAuthMails.class.getName()).log(Level.SEVERE, null, ex);
