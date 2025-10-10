@@ -37,6 +37,8 @@ import javax.swing.JTextField;
  * @author Sergio Flores, Edwin Carmona, Sergio Flores, Isabel Servín
  */
 public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
+    
+    public static final int COL_INS_VALUE = 12;
 
     private erp.client.SClientInterface miClient;
     private int mnOptionType;
@@ -240,6 +242,25 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo mon $", STableConstants.WIDTH_VALUE);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
                 break;
+            
+            case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
+                tableColumns = new STableColumnForm[14];
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Asociado negocios", 200);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE);
+                tableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "T. cambio", STableConstants.WIDTH_EXCHANGE_RATE);
+                tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererExchangeRate());
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total mon $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo mon $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Pagos en proceso $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo insoluto $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+                break;
 
             case SDataConstants.TRNX_DPS_PEND_LINK:
                 tableColumns = new STableColumnForm[12];
@@ -406,7 +427,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
     public void actionRefresh() {
         formRefreshOptionPane();
     }
-
+    
     @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
@@ -488,6 +509,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
 
         switch (mnOptionType) {
             case SDataConstants.TRNX_DPS_PAY_PEND:
+            case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
             case SDataConstants.TRNX_DPS_SHIP_PEND_LINK:    
                 switch (((Object[]) moFilterKey).length) {
                     case 2:
@@ -591,6 +613,12 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         }
 
         return pk;
+    }
+    
+    public Object getValue(int opc) {
+        Object value;
+        value = moPaneOptions.getSelectedTableRow().getValues().get(opc);
+        return value;
     }
 
     @Override

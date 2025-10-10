@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 290.18/ 2025-10-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Mostrar el el monto de pagos pendientes y el saldo insoluto en el picker de documentos para solicitudes de pago.
+2) Elección del flujo de autorización al enviar a autorizar las solicitudes de pago.
+3) Impedir la modificación de la selección de documentos y la cantidad en el grid de layouts bancarios cuando se capturan a partir de solicitudes de pago.
+4) Permitir la modificación de OC cuando estas están rechazadas.
+5) Adición de indicador visual en la vista de OC, amarillo cuando su estatus sea "En envío" o rojo cuando su estatus sea "Fallo de envío".
+
+================================================================================
 SIIE 3.2 290.17/ 2025-10-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

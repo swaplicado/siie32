@@ -204,7 +204,7 @@ public class SDbSupplierFileProcess extends SDbRegistryUser {
         }
         
         if (miClient != null) {
-            SAuthorizationUtils.sendAuthornAppWeb((SClientInterface) miClient, getPrimaryKey());
+            SAuthorizationUtils.sendAuthornOrderAppWeb((SClientInterface) miClient, getPrimaryKey());
         }
         
         mbRegistryNew = false;

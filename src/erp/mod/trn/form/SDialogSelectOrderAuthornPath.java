@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiValidation;
  *
  * @author Isabel Servín
  */
-public class SDialogSelectAuthornPath extends JDialog implements ActionListener {
+public class SDialogSelectOrderAuthornPath extends JDialog implements ActionListener {
 
     private final SGuiClient miClient;
     private ArrayList<SDbAuthorizationPath> maAllAuthPaths;
@@ -40,7 +40,7 @@ public class SDialogSelectAuthornPath extends JDialog implements ActionListener 
      * Creates new form SDialogSelectAuthornPath
      * @param client
      */
-    public SDialogSelectAuthornPath(SGuiClient client) {
+    public SDialogSelectOrderAuthornPath(SGuiClient client) {
         miClient = client;
         initComponents();
         initComponentsCustom();

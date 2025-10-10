@@ -567,6 +567,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_PAYED = 207526;
     public static final int TRNX_DPS_PAYS = 207527;
     public static final int TRNX_DPS_SHIP_PEND_LINK = 207528;
+    public static final int TRNX_DPS_PAY_PEND_PAY = 207529;
 
     public static final int TRNX_DPS_LINK_PEND = 207531;
     public static final int TRNX_DPS_LINK_PEND_ETY = 207532;

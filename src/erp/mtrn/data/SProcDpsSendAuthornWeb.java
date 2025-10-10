@@ -40,6 +40,8 @@ import sa.lib.gui.SGuiReport;
  * @author Isabel Servín, Edwin Carmona
  */
 public class SProcDpsSendAuthornWeb extends Thread {
+    
+    public static int ERROR_LEN = 511;
 
     private final SClientInterface miClient;
     private final SDbSupplierFileProcess moSuppFileProc;
@@ -81,8 +83,8 @@ public class SProcDpsSendAuthornWeb extends Thread {
                 }
                 else {
                     auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SNDF); 
-                    if (msError.length() > 511) {
-                        auth.setException(SLibUtilities.textLeft(msError, 511));
+                    if (msError.length() > ERROR_LEN) {
+                        auth.setException(SLibUtilities.textLeft(msError, ERROR_LEN));
                     }
                     else {
                         auth.setException(msError);
@@ -95,8 +97,17 @@ public class SProcDpsSendAuthornWeb extends Thread {
             }
         }
         catch (Exception e) {
+            msError = e.getMessage();
+            auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SNDF); 
+            if (msError.length() > ERROR_LEN) {
+                auth.setException(SLibUtilities.textLeft(msError, ERROR_LEN));
+            }
+            else {
+                auth.setException(msError);
+            }
+            auth.save(connection);
             miClient.showMsgBoxWarning(e.getMessage());
-        }
+        }        
     }
 
     private boolean sendAuthorn() throws Exception {
@@ -106,7 +117,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
         if (moSuppFileProc != null && moSuppFileProc.getSuppFiles().size() > 0) {
             sResult = this.sendFilesToCloud();
         }
-        
+
         if (!sResult.isEmpty()) {
             miClient.showMsgBoxWarning(sResult);
             return false;

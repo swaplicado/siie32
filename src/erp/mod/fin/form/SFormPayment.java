@@ -60,6 +60,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     
     private SDialogPickerDps moDialogDpsPicker;
     
+    private double mdIns;
+    
     /**
      * Creates new form SFormPayment2
      * @param client
@@ -105,6 +107,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayWestRow6 = new javax.swing.JPanel();
         jlFunctionalArea = new javax.swing.JLabel();
         moKeyFunctionalArea = new sa.lib.gui.bean.SBeanFieldKey();
+        jpPayWestRow7 = new javax.swing.JPanel();
         jpPayCenter = new javax.swing.JPanel();
         jpPayCenterRow7 = new javax.swing.JPanel();
         jlEntryCurrency = new javax.swing.JLabel();
@@ -112,6 +115,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow2 = new javax.swing.JPanel();
         jlPaymentCy = new javax.swing.JLabel();
         moCurAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jbIns = new javax.swing.JButton();
         jpPayCenterRow3 = new javax.swing.JPanel();
         jlPaymentExcRateApp = new javax.swing.JLabel();
         moDecExcRate = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -233,6 +237,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayWest.add(jpPayWestRow6);
 
+        jpPayWestRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpPayWest.add(jpPayWestRow7);
+
         jpPayment.add(jpPayWest, java.awt.BorderLayout.WEST);
 
         jpPayCenter.setLayout(new java.awt.GridLayout(7, 0, 0, 5));
@@ -254,6 +261,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlPaymentCy.setPreferredSize(new java.awt.Dimension(160, 23));
         jpPayCenterRow2.add(jlPaymentCy);
         jpPayCenterRow2.add(moCurAmount);
+
+        jbIns.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbIns.setToolTipText("Agregar saldo insoluto");
+        jbIns.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPayCenterRow2.add(jbIns);
 
         jpPayCenter.add(jpPayCenterRow2);
 
@@ -361,6 +373,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jbDpsPicker;
+    private javax.swing.JButton jbIns;
     private javax.swing.JLabel jlBeneficiary;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDateApplication;
@@ -396,6 +409,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jpPayWestRow4;
     private javax.swing.JPanel jpPayWestRow5;
     private javax.swing.JPanel jpPayWestRow6;
+    private javax.swing.JPanel jpPayWestRow7;
     private javax.swing.JPanel jpPayment;
     private javax.swing.JPanel jpRegistry;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmount;
@@ -456,7 +470,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moTextNotes);
         moFields.addField(moTextNotesAuth);
         
-        moDialogDpsPicker = new SDialogPickerDps((SClientInterface) miClient, SDataConstants.TRNX_DPS_PAY_PEND);
+        moDialogDpsPicker = new SDialogPickerDps((SClientInterface) miClient, SDataConstants.TRNX_DPS_PAY_PEND_PAY);
         
         moPanelDps = new SPanelDps((SClientInterface) miClient);
         jpDocument.remove(jlPanelDps); 
@@ -519,6 +533,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
 
         return rate;
+    }
+    
+    private void focusLostCurAmount() {
+        if (moDps != null && moCurAmount.getField().getValue() > mdIns) {
+            miClient.showMsgBoxInformation("No se puede pagar una cantidad mayor al saldo insoluto (" + SLibUtils.DecimalFormatValue2D.format(mdIns) + ")");
+            moCurAmount.getField().setValue(0d);
+        }
+        calculateAmountLocal();
     }
     
     private void calculateAmountLocal() {
@@ -604,6 +626,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 try {
                     moDps = new SDataDps();
                     moDps.read(pickerDps.getSelectedPrimaryKey(), miClient.getSession().getStatement());
+                    mdIns = (double) pickerDps.getValue(SDialogPickerDps.COL_INS_VALUE) * -1;
                 
                     moKeyEntryCurrency.setValue(new int[] { moDps.getFkCurrencyId() });
                     moKeyFunctionalArea.setValue(new int[] { moDps.getFkFunctionalAreaId(), moDps.getFkFunctionalSubAreaId() });
@@ -612,7 +635,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                     moPanelDps.setDps(moDps, null);
 
                     String sql = "SELECT b_dps_pay_loc FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " "
-                            + "WHERE fid_dps_year_n = " + moDps.getPkYearId() + " AND fid_dps_doc_n = " + moDps.getPkDocId();
+                            + "WHERE fk_dps_year_n = " + moDps.getPkYearId() + " AND fk_dps_doc_n = " + moDps.getPkDocId();
                     ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
                     if (resultSet.next()) {
                         if (resultSet.getBoolean(1)){
@@ -627,10 +650,24 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
+    private void actionIns() {
+        if (jbIns.isEnabled()) {
+            moCurAmount.getField().setValue(mdIns);
+            calculateAmountLocal();
+        }
+    }
+    
     private void stateChangeBeneficiary() {
         moDps = null;
         moPanelDps.setDps(moDps, null);
         moTextDps.setText("");
+        if (moKeyBeneficiary.getSelectedIndex() > 0) {
+            SDataBizPartner bp = new SDataBizPartner();
+            bp.read(moKeyBeneficiary.getValue(), miClient.getSession().getStatement());
+            if (bp.isDomestic((SClientInterface) miClient)) {
+                moKeyCurrency.setValue(new int[] { 1 });
+            }
+        }
     }
     
     private void stateChangeEntryCurrency() {
@@ -654,8 +691,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jbDpsPicker.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
         moKeyEntryCurrency.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
         moKeyFunctionalArea.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
+        jbIns.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
         if (!moRadDocPayment.isSelected()) {
             moDps = null;
+            mdIns = 0d;
             moPanelDps.setDps(moDps, null);
             moTextDps.setText("");
         }
@@ -664,6 +703,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     public void addAllListeners() {
         jbDpsPicker.addActionListener(this);
+        jbIns.addActionListener(this);
         
         moKeyBeneficiary.addItemListener(this);
         moKeyEntryCurrency.addItemListener(this);
@@ -678,6 +718,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     public void removeAllListeners() {
         jbDpsPicker.removeActionListener(this);
+        jbIns.removeActionListener(this);
         
         moKeyBeneficiary.removeItemListener(this);
         moKeyEntryCurrency.removeItemListener(this);
@@ -837,6 +878,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             if (button == jbDpsPicker) {
                 actionDpsPicker();
             }
+            else if (button == jbIns) {
+                actionIns();
+            }
         }
     }
 
@@ -874,7 +918,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             JTextField textField = (JTextField) e.getSource();
             
             if (textField == ((SBeanFieldDecimal) moCurAmount.getField())) {
-                calculateAmountLocal();
+                focusLostCurAmount();
             }
         }
     }
