@@ -60,7 +60,6 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.trn.db.SDbInitiative;
@@ -400,7 +399,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
-    private SImportedDocument moImportedDocument;
+    private erp.mod.cfg.swap.form.SImportedDocument moImportedDocument;
     private erp.mitm.data.SDataItem moAccEntryItem;
     private SConfigurationDpsOrderFiscalData moCfgFiscalDataPurchasesOrder;
     private SConfigurationPurposeDpsNature moCfgPurposeDpsNature;
@@ -12445,22 +12444,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                     if (!validation.getIsError() && moImportedDocument != null) {
                         if (moImportedDocument.BizPartnerId != moBizPartner.getPkBizPartnerId()) {
-                            validation.setMessage("El asociado de negocios (ID " + moBizPartner.getPkBizPartnerId() + ") es distinto al del documento importado (" + moImportedDocument.BizPartner + ", ID " + moImportedDocument.BizPartnerId + ").");
-                        }
-                        else if (!moImportedDocument.NumberSeries.equals(moFieldNumberSeries.getString())) {
-                            validation.setMessage("La serie es distinta a la del documento importado (" + moImportedDocument.NumberSeries + ").");
-                        }
-                        else if (!moImportedDocument.Number.equals(moFieldNumber.getString())) {
-                            validation.setMessage("El folio es distinto al del documento importado (" + moImportedDocument.Number + ").");
-                        }
-                        else if (!SLibTimeUtils.isSameDate(moImportedDocument.Date, moFieldDate.getDate())) {
-                            validation.setMessage("La fecha es distinta a la del documento importado (" + SLibUtils.DateFormatDate.format(moImportedDocument.Date) + ").");
+                            validation.setMessage("El asociado de negocios (ID " + moBizPartner.getPkBizPartnerId() + ") es distinto al del documento importado, " + moImportedDocument.BizPartner + " (ID " + moImportedDocument.BizPartnerId + ").");
                         }
                         else if (!SLibUtils.compareAmount(moImportedDocument.Total, moDps.getTotalCy_r())) {
-                            validation.setMessage("El total es distinto al del documento importado (" + SLibUtils.getDecimalFormatAmount().format(moImportedDocument.Total) + " " + moImportedDocument.CurrencyCode + ").");
+                            validation.setMessage("El total es distinto al del documento importado, $ " + SLibUtils.getDecimalFormatAmount().format(moImportedDocument.Total) + " " + moImportedDocument.CurrencyCode + ".");
                         }
                         else if (moImportedDocument.CurrencyId != moFieldFkCurrencyId.getKeyAsIntArray()[0]) {
-                            validation.setMessage("La moneda es distinta a la del documento importado (" + moImportedDocument.CurrencyCode + ").");
+                            validation.setMessage("La moneda es distinta a la del documento importado, '" + moImportedDocument.CurrencyCode + "'.");
+                        }
+                        else if (!SLibTimeUtils.isSameDate(moImportedDocument.Date, moFieldDate.getDate())) {
+                            validation.setMessage("La fecha es distinta a la del documento importado, " + SLibUtils.DateFormatDate.format(moImportedDocument.Date) + ".");
+                        }
+                        else if (!moImportedDocument.Number.isEmpty() && !moImportedDocument.Number.equals(moFieldNumber.getString())) {
+                            validation.setMessage("El número del folio es distinto al del documento importado, '" + moImportedDocument.Number + "'.");
+                        }
+                        else if (!moImportedDocument.NumberSeries.isEmpty() && !moImportedDocument.NumberSeries.equals(moFieldNumberSeries.getString())) {
+                            validation.setMessage("La serie del folio es distinta a la del documento importado, '" + moImportedDocument.NumberSeries + "'.");
                         }
                     }
                     
@@ -13109,7 +13108,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkFunctionalSubAreaId.setFieldValue(new int[] { moDps.getFkFunctionalSubAreaId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
         
-        moImportedDocument = moDps.getAuxImportedDocument();
+        moImportedDocument = moDps.getXtaImportedDocument();
         jbViewImportedDocument.setEnabled(moImportedDocument != null);
         
         // set business partner, set aswell business partner default preferences when document is new:

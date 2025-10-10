@@ -10,6 +10,7 @@ import erp.mod.SModConsts;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
@@ -302,6 +303,16 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      * @throws Exception 
      */
     public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final SGuiSession session) throws Exception {
+        return createPrepStatementToGetProcessedDpsByExternalId(session.getStatement());
+    }
+    
+    /**
+     * Create prepared statement to get Processed DPS from SWAP processed data by its external ID.
+     * @param statement DB statement.
+     * @return A prepared statment with these columns: id_swap_data_prc, dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @throws Exception 
+     */
+    public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final Statement statement) throws Exception {
         String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, "
                 + "sdp.fk_dps_year_n AS dps_id_year, sdp.fk_dps_doc_n AS dps_id_doc, "
                 + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code "
@@ -316,7 +327,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                 + "cob.id_bpb = r.fid_cob "
                 + "WHERE NOT sdp.b_del AND sdp.data_type = ? AND sdp.txn_cat = ? AND sdp.ext_data_id = ?;";
         
-        return session.getStatement().getConnection().prepareStatement(sql);
+        return statement.getConnection().prepareStatement(sql);
     }
     
     /**

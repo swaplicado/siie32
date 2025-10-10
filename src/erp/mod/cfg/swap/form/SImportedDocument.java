@@ -56,7 +56,6 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
     public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene una solicitud de pago.";
     public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene una solicitud de pago: ";
-
     
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
@@ -1017,7 +1016,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         }
         
         dps.setAuxKeepDpsData(true);
-        dps.setAuxImportedDocument(this);
+        dps.setXtaImportedDocument(this);
         
         return dps;
     }

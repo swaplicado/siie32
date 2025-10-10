@@ -296,10 +296,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
     protected int mnAuxInitiativeId; // case of application of initiative
     protected double mdAuxAppPrepayCurCrossPayExchangeRate; // case of an application of prepayment with currency crossing: payment's exchange rate
-    protected SImportedDocument moAuxImportedDocument;
-    protected boolean mbXtaTestLinks;
+    protected boolean mbAuxCheckDpsLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
+    protected SImportedDocument moXtaImportedDocument;
     
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     protected sa.lib.srv.SSrvLock moAuxUserLock;
@@ -1082,13 +1082,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         break;
                     */
                     case 205:
-                        if (mbXtaTestLinks) {
+                        if (mbAuxCheckDpsLinks) {
                             sSql = "SELECT COUNT(*) AS f_count FROM trn_diog WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + " AND b_del = 0 ";
                             sMsgAux = "¡El documento está asociado con un documento de entradas y salidas de mercancías!";
                         }
                         break;
                     case 206:
-                        if (mbXtaTestLinks) {
+                        if (mbAuxCheckDpsLinks) {
                             sSql = "SELECT COUNT(*) AS f_count " +
                                     "FROM trn_diog AS d " +
                                     "INNER JOIN trn_diog_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
@@ -2153,10 +2153,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
     public void setAuxInitiativeId(int n) { mnAuxInitiativeId = n; }
     public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
-    public void setAuxImportedDocument(SImportedDocument o) { moAuxImportedDocument = o; }
-    public void setAuxTestLinks(boolean b) { mbXtaTestLinks = b; }
+    public void setAuxCheckDpsLinks(boolean b) { mbAuxCheckDpsLinks = b; }
     public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
     public void setXtaHasAuthWeb(boolean b) { mbXtaHasAuthWeb = b;}
+    public void setXtaImportedDocument(SImportedDocument o) { moXtaImportedDocument = o; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
     */
@@ -2196,10 +2196,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
     public int getAuxInitiativeId() { return mnAuxInitiativeId; }
     public double getAuxAppPrepayCurCrossPayExchangeRate() { return mdAuxAppPrepayCurCrossPayExchangeRate; }
-    public SImportedDocument getAuxImportedDocument() { return moAuxImportedDocument; }
-    public boolean getXtaTestLinks() { return mbXtaTestLinks; }
+    public boolean getAuxCheckDpsLinks() { return mbAuxCheckDpsLinks; }
     public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
     public boolean getXtaHasAuthWeb() { return mbXtaHasAuthWeb; }
+    public SImportedDocument getXtaImportedDocument() { return moXtaImportedDocument; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
     */
@@ -2500,10 +2500,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
         mnAuxInitiativeId = 0;
         mdAuxAppPrepayCurCrossPayExchangeRate = 0;
-        moAuxImportedDocument = null;
-        mbXtaTestLinks = true;
+        mbAuxCheckDpsLinks = true; // 'true', yes!, 'true' by default!
         mbXtaHasSuppFiles = false;
         mbXtaHasAuthWeb = false;
+        moXtaImportedDocument = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
         */
@@ -2900,7 +2900,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 if (mnFkBillOfLading_n != 0) {
-                    sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_bol_n = " + mnFkBillOfLading_n + " ";
+                    sSql = "SELECT id_cfd FROM trn_cfd WHERE fid_bol_n = " + mnFkBillOfLading_n + ";";
                     oResultSet = statement.executeQuery(sSql);
                     if (oResultSet.next()) {
                         moDbmsDataCfdBol = new SDataCfd();
@@ -2910,17 +2910,28 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
-                sSql = "SELECT * FROM trn_sup_file_dps WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId;
+                sSql = "SELECT * FROM trn_sup_file_dps WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     mbXtaHasSuppFiles = true;
                 }
                 
-                sSql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND NOT b_del";
+                sSql = "SELECT * FROM trn_dps_authorn WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND NOT b_del;";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     mbXtaHasAuthWeb = true;
                 }
+                
+                /*
+                sSql = "SELECT id_swap_data_prc FROM trn_swap_data_prc WHERE data_type = '" + SDbSwapDataProcessing.DATA_TYPE_INV + "' AND fk_dps_year_n = " + mnPkYearId + " AND fk_dps_doc_n = " + mnPkDocId + " AND NOT b_del;";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    PreparedStatement preparedStatement = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(statement);
+                    
+                    moXtaImportedDocument = new SImportedDocument();
+                    
+                }
+                */
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
