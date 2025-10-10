@@ -11,6 +11,7 @@ import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.form.SDialogAuthornPathPicker;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -20,12 +21,13 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportDataFile;
+import erp.mod.cfg.swap.utils.SExportPayments;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFileProcess;
-import erp.mod.trn.form.SDialogSelectAuthornPath;
+import erp.mod.trn.form.SDialogSelectOrderAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
@@ -62,8 +64,6 @@ import sa.lib.mail.SMailSender;
  * @author Edwin Carmona, Isabel Servín
  */
 public abstract class SAuthorizationUtils {
-    
-    private static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
     /**
      * Query base para la obtención de la ruta de autorización
@@ -1695,14 +1695,14 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static boolean sendAuthornAppWeb(SClientInterface client, int[] pk) {
+    public static boolean sendAuthornOrderAppWeb(SClientInterface client, int[] pk) {
         try {
             SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
             fileProcess.read(client.getSession(), pk);
             if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
                     fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
-                if (canSendAuthornAppWeb(client, fileProcess)) {
-                    SDialogSelectAuthornPath dialog = new SDialogSelectAuthornPath((SGuiClient) client);
+                if (canSendAuthornOrderAppWeb(client, fileProcess)) {
+                    SDialogSelectOrderAuthornPath dialog = new SDialogSelectOrderAuthornPath((SGuiClient) client);
                     dialog.setVisible(true);
                     if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                         new SProcDpsSendAuthornWeb(client, fileProcess, dialog.getSelectedAuthPaths(), dialog.getSelectedPriority(), dialog.getAuthornNotes()).start();
@@ -1723,6 +1723,46 @@ public abstract class SAuthorizationUtils {
         }
         catch (Exception e) {
             client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
+            return false;
+        }
+    }
+    
+    public static boolean sendAuthornPaymentsAppWeb(SClientInterface client, int[] pk) {
+        try {
+            SDbPayment payment = new SDbPayment();
+            payment.read(client.getSession(), pk);
+            if (payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) {
+                if (client.showMsgBoxConfirm("Se enviará la solicitud de pago a un proceso de autorización.\n¿Desea continuar?")== JOptionPane.OK_OPTION) {
+                    SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SModConsts.FIN_PAY);
+                    picker.setNotes(payment.getNotesAuthorization());
+                    picker.setPriority(payment.getPriority());
+                    if (picker.hasAuthornPaths()) {
+                        picker.setVisible(true);
+                        if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            new SExportPayments((SGuiClient) client, payment, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        client.showMsgBoxInformation("El usuario '" + client.getSession().getUser().getName() + "' no tiene configuradas rutas de autorización para este recurso.\n"
+                                + "Contacte al administrador del sistema.");
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                client.showMsgBoxInformation("No se puede enviar la solicitud a autorizar debido a que su estatus es " + payment.getDbmsStatus() + ".");
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e) {
+            client.showMsgBoxWarning("No se puede enviar la solicitud a autorizar, intente más tarde.");
             return false;
         }
     }
@@ -1804,7 +1844,7 @@ public abstract class SAuthorizationUtils {
         return new Object[] { true, expFiles };
     }
     
-    public static boolean canSendAuthornAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {
+    public static boolean canSendAuthornOrderAppWeb (SClientInterface client, SDbSupplierFileProcess fileProcess) throws Exception {
         boolean send = true;
         fileProcess.readMaterialRequests(client.getSession());
         if (fileProcess.getSuppFiles().isEmpty()) {
@@ -2151,6 +2191,7 @@ public abstract class SAuthorizationUtils {
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
         
         String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+        //String syncUrl = "http://192.168.7.56:8003";
         String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
         String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
         
@@ -2158,7 +2199,7 @@ public abstract class SAuthorizationUtils {
         
         syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
         
-        String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, TIME_180_SEC);
+        String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
        
         JsonNode responseJson = new ObjectMapper().readTree(responseBody);
         

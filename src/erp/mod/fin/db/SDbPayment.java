@@ -241,6 +241,14 @@ public class SDbPayment extends SDbRegistryUser {
         session.getStatement().execute(msSql);
     }
     
+    public void updateAuthorizationData(SGuiSession session) throws Exception {
+        msSql = "UPDATE " + getSqlTable() + " SET " + 
+                "priority = " + mnPriority + ", " + 
+                "nts_auth = '" + msNotesAuthorization + "' " + 
+                getSqlWhere();
+        session.getStatement().execute(msSql);
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkPaymentId = pk[0];

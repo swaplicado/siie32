@@ -231,8 +231,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlDateDue = new javax.swing.JLabel();
         moDateDateDue = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel22 = new javax.swing.JPanel();
-        moRadDoc = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadPay = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadModeManual = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadModePayment = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel21 = new javax.swing.JPanel();
         jbGridRowsShow = new javax.swing.JButton();
         jbGridRowsClear = new javax.swing.JButton();
@@ -439,16 +439,16 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        buttonGroup1.add(moRadDoc);
-        moRadDoc.setSelected(true);
-        moRadDoc.setText("Captura de documentos");
-        moRadDoc.setPreferredSize(new java.awt.Dimension(280, 23));
-        jPanel22.add(moRadDoc);
+        buttonGroup1.add(moRadModeManual);
+        moRadModeManual.setSelected(true);
+        moRadModeManual.setText("Captura de documentos");
+        moRadModeManual.setPreferredSize(new java.awt.Dimension(280, 23));
+        jPanel22.add(moRadModeManual);
 
-        buttonGroup1.add(moRadPay);
-        moRadPay.setText("Captura a partir de pagos");
-        moRadPay.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel22.add(moRadPay);
+        buttonGroup1.add(moRadModePayment);
+        moRadModePayment.setText("Captura a partir de pagos");
+        moRadModePayment.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel22.add(moRadModePayment);
 
         jPanel14.add(jPanel22);
 
@@ -615,8 +615,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private sa.lib.gui.bean.SBeanFieldKey moKeyBankLayoutType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDpsCurrency;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLayoutBank;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadDoc;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadPay;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadModeManual;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadModePayment;
     private sa.lib.gui.bean.SBeanFieldText moTextConcept;
     // End of variables declaration//GEN-END:variables
 
@@ -649,8 +649,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moDecBalanceTotal.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecBalanceTotalPayed.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotalPayed), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
-        moRadDoc.setBooleanSettings(moRadDoc.getText(), true);
-        moRadPay.setBooleanSettings(moRadPay.getText(), false);
+        moRadModeManual.setBooleanSettings(moRadModeManual.getText(), true);
+        moRadModePayment.setBooleanSettings(moRadModePayment.getText(), false);
         
         moFields.addField(moDateDateLayout);
         moFields.addField(moKeyLayoutBank);
@@ -668,27 +668,27 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_ACC:
                 jbGridRowsShow.setText("Mostrar renglones");
                 jbGridRowsClear.setText("Limpiar renglones");
-                moRadDoc.setValue(true);
-                moRadDoc.setEnabled(false);
-                moRadPay.setEnabled(false);
+                moRadModeManual.setValue(true);
+                moRadModeManual.setEnabled(false);
+                moRadModePayment.setEnabled(false);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                 jbGridRowsShow.setText("Mostrar documentos");
                 jbGridRowsClear.setText("Limpiar documentos");
-                moRadDoc.setText("Captura manual de documentos");
-                moRadDoc.setValue(true);
-                moRadDoc.setEnabled(true);
-                moRadPay.setEnabled(true);
+                moRadModeManual.setText("Captura manual de documentos");
+                moRadModeManual.setValue(true);
+                moRadModeManual.setEnabled(true);
+                moRadModePayment.setEnabled(true);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 jbGridRowsShow.setText("Mostrar beneficiarios");
                 jbGridRowsClear.setText("Limpiar beneficiarios");
-                moRadDoc.setText("Captura manual de beneficiarios");
-                moRadDoc.setValue(true);
-                moRadDoc.setEnabled(false);
-                moRadPay.setEnabled(false);
+                moRadModeManual.setText("Captura manual de beneficiarios");
+                moRadModeManual.setValue(true);
+                moRadModeManual.setEnabled(false);
+                moRadModePayment.setEnabled(false);
                 break;
 
             default:
@@ -851,7 +851,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExchangeRateRefresh);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGridRowsCheckAll);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGridRowsUncheckAll);
-
+        
         jpSettings.add(moGridPayments, BorderLayout.CENTER);
         
         moCellEditorOptions = new STableCellEditorOptions((SClientInterface) miClient);
@@ -2146,8 +2146,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbGridRowsClear.setEnabled(false);
                 jbGridRowsPays.setEnabled(false);
                 jbGridRowsPaysDelete.setEnabled(false);
-                moRadDoc.setEnabled(false);
-                moRadPay.setEnabled(false);
+                moRadModeManual.setEnabled(false);
+                moRadModePayment.setEnabled(false);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
@@ -2166,12 +2166,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbPickExchangeRate.setEnabled(enable && !isExchangeRateNotRequired());
                 moDateDateDue.setEditable(enable);
                 
-                moRadDoc.setEnabled(enable);
-                moRadPay.setEnabled(enable);
+                moRadModeManual.setEnabled(enable);
+                moRadModePayment.setEnabled(enable);
                 jbGridRowsShow.setEnabled(enable);
                 jbGridRowsClear.setEnabled(!enable);
-                jbGridRowsPays.setEnabled(!enable && moRadPay.getValue());
-                jbGridRowsPaysDelete.setEnabled(!enable && moRadPay.getValue());
+                jbGridRowsPays.setEnabled(!enable && moRadModePayment.getValue());
+                jbGridRowsPaysDelete.setEnabled(!enable && moRadModePayment.getValue());
                 break;
             default:
         }
@@ -2188,8 +2188,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && 
                             !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue())));
         }
-        jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
-        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
+        jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadModeManual.getValue());
+        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadModeManual.getValue());
         
         jbPickLayoutPath.setEnabled(enableFields && isModeForTransfers());
     }
@@ -2367,10 +2367,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             
             enableFieldsForm(false);
             enableFieldsGrid(true);
-            
-            ((SGridColumnForm) moGridPayments.getModel().getGridColumns().get(COL_TRN_TP_PAY_CHECK)).setEditable(!moRadPay.getValue());
-            ((SGridColumnForm) moGridPayments.getModel().getGridColumns().get(COL_TRN_TP_PAY_PAY)).setEditable(!moRadPay.getValue());
-            moGridPayments.renderGrid();
             
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
@@ -2712,6 +2708,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moGridPayments.renderGridRows();
     }
     
+    private void editingStoppedModePayment() {
+        int index = moGridPayments.getTable().getSelectedRow();
+        SLayoutBankRow layoutBankRow = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
+        layoutBankRow.setForPayment(layoutBankRow.getAuxBeforeSelecPay());
+        layoutBankRow.getMoneyPayment().setOriginalAmount(layoutBankRow.getAuxBeforeCant());
+        moGridPayments.renderGridRows();
+        moGridPayments.setSelectedGridRow(index);
+    }
+    
     /*
      * Protected overriden methods:
      */
@@ -2962,7 +2967,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_ACC:
                 populateGridWithPaymentsFromXml();
                 break;
-                
+
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 if (isModeForTransfersOfPayments()) {
@@ -2977,10 +2982,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     refreshGridRows();
                 }
                 break;
-                
+
             default:
         }
-
+        
         jtfLayoutPath.setText(""); // clear path
         jtfLayoutPath.setToolTipText(null); // clear path
 
@@ -2991,6 +2996,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (moRegistry.isRegistryNew()) {
             // registry is being created:
 
+            moRadModeManual.setValue(true);
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     break;
@@ -3005,6 +3011,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else {
             // registry is being modified:
 
+            moRadModeManual.setValue(moRegistry.getAuxNewPayments().isEmpty());
+            moRadModePayment.setValue(!moRegistry.getAuxNewPayments().isEmpty());
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     enableFieldsForm(true);
@@ -3034,7 +3042,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
         }
 
-        moRadDoc.setValue(true);
         addAllListeners();
     }
 
@@ -3359,36 +3366,46 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     break;
 
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
-                    switch (moGridPayments.getTable().getSelectedColumn()) {
-                        case COL_TRN_TP_PAY_CHECK:
-                            editingStoppedPaymentChecked();
-                            break;
-                        case COL_TRN_TP_PAY_PAY:
-                        case COL_TRN_TP_PAY_EXR:
-                            editingStoppedPaymentEntered();
-                            break;
-                        case COL_TRN_TP_PAY_AGREE:
-                        case COL_TRN_TP_PAY_AGREE_REF:
-                            if (mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                                editingStoppedAgreement();
-                            }
-                            break;
-                        default:
+                    if (moRadModeManual.getValue()) {
+                        switch (moGridPayments.getTable().getSelectedColumn()) {
+                            case COL_TRN_TP_PAY_CHECK:
+                                editingStoppedPaymentChecked();
+                                break;
+                            case COL_TRN_TP_PAY_PAY:
+                            case COL_TRN_TP_PAY_EXR:
+                                editingStoppedPaymentEntered();
+                                break;
+                            case COL_TRN_TP_PAY_AGREE:
+                            case COL_TRN_TP_PAY_AGREE_REF:
+                                if (mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                                    editingStoppedAgreement();
+                                }
+                                break;
+                            default:
+                        }
+                    }
+                    else {
+                        editingStoppedModePayment();
                     }
                     break;
 
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                    switch (moGridPayments.getTable().getSelectedColumn()) {
-                        case COL_TRN_TP_PREPAY_PREPAY:
-                            editingStoppedPaymentEntered();
-                            break;
-                        case COL_TRN_TP_PREPAY_AGREE:
-                        case COL_TRN_TP_PREPAY_AGREE_REF:
-                            if (mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                                editingStoppedAgreement();
-                            }
-                            break;
-                        default:
+                    if (moRadModeManual.getValue()) {
+                        switch (moGridPayments.getTable().getSelectedColumn()) {
+                            case COL_TRN_TP_PREPAY_PREPAY:
+                                editingStoppedPaymentEntered();
+                                break;
+                            case COL_TRN_TP_PREPAY_AGREE:
+                            case COL_TRN_TP_PREPAY_AGREE_REF:
+                                if (mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                                    editingStoppedAgreement();
+                                }
+                                break;
+                            default:
+                        }
+                    }
+                    else {
+                        editingStoppedModePayment();
                     }
                     break;
 

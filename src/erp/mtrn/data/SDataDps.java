@@ -2231,6 +2231,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         return entryFound;
     }
+    
+    public boolean getIsNotEditableByStatusAuth() {
+        if (mnFkDpsAuthorizationStatusId == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+            return false;
+        }
+        else {
+            return mbXtaHasAuthWeb;
+        }
+    }
 
     public java.lang.String getDpsNumber() {
         return STrnUtils.formatDocNumber(msNumberSeries, msNumber);

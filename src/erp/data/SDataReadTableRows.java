@@ -2266,7 +2266,8 @@ public abstract class SDataReadTableRows {
                         "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                         "d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code, " +
                         "SUM(re.debit - re.credit) AS f_bal, SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) AS f_bal_cur " +
-                        "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
+                        "FROM fin_rec AS r " +
+                        "INNER JOIN fin_rec_ety AS re ON " +
                         "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                         "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + ((Object[]) filterKey)[0] + " AND " +
                         "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND " +
@@ -2285,6 +2286,68 @@ public abstract class SDataReadTableRows {
                             "SUM(credit - debit) > 0 OR SUM(credit_cur - debit_cur) > 0 " :
                             "SUM(debit - credit) > 0 OR SUM(debit_cur - credit_cur) > 0 ") +
                         "ORDER BY d.dt DESC, dt.code, f_num, cob.code, d.id_year, d.id_doc ";
+                break;
+            
+            case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
+                aoPkFields = new STableField[2];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_doc");
+
+                i = 0;
+                aoQueryFields = new STableField[14];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "d.dt");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "dt.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "f_num");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.bp");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_r");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.exc_rate");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "c.cur_key");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cob.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_bal");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_bal_cur");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "sum_");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "ins");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "c.cur_key");
+                
+                sSql = "SELECT b.id_bp, b.bp, d.id_year, d.id_doc, d.dt, dt.code, " +
+                        "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                        "d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code, " +
+                        "SUM(re.debit - re.credit) AS f_bal, SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) AS f_bal_cur, " +
+                        "IFNULL(ps.sum_pay_cur, 0) AS sum_, " +
+                        "(SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) + IFNULL(ps.sum_pay_cur, 0)) AS ins " +
+                        "FROM fin_rec AS r " +
+                        "INNER JOIN fin_rec_ety AS re ON " +
+                        "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
+                        "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + ((Object[]) filterKey)[0] + " AND " +
+                        "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND " +
+                        "re.fid_tp_sys_mov_xxx = " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ?
+                            SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " " +
+                        (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") + 
+                        "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
+                        "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
+                        (((Object[]) filterKey).length != 5 ? "" : "AND d.fid_func = " + ((int[]) ((Object[]) filterKey)[4])[0] + " AND d.fid_func_sub = " + ((int[]) ((Object[]) filterKey)[4])[1] + " ") +
+                        "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                        "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
+                        "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
+                        "LEFT JOIN (" +
+                        "  SELECT " +
+                        "    pe.fk_doc_year_n AS id_year, " +
+                        "    pe.fk_doc_doc_n AS id_doc, " +
+                        "    SUM(pe.des_pay_app_ety_cur) AS sum_pay_cur " +
+                        "  FROM fin_pay AS p " +
+                        "  INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
+                        "  WHERE NOT p.b_del " +
+                        "    AND p.fk_st_pay IN (1, 2, 4, 14) " +
+                        "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
+                        ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc " +
+                        "GROUP BY " +
+                        "  b.id_bp, b.bp, d.id_year, d.id_doc, d.dt, dt.code, " +
+                        "  d.num_ser, d.num, d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code " +
+                        "HAVING " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ?
+                            "SUM(credit - debit) > 0 OR SUM(credit_cur - debit_cur) > 0 " :
+                            "SUM(debit - credit) > 0 OR SUM(debit_cur - credit_cur) > 0 ") +
+                        "ORDER BY d.dt DESC, dt.code, f_num, cob.code, d.id_year, d.id_doc;";
                 break;
 
             case SDataConstants.TRNX_DPS_PEND_LINK:

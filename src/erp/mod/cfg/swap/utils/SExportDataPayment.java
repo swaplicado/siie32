@@ -96,4 +96,6 @@ public class SExportDataPayment implements SExportData {
     //public String deleted_at;
     
     public int user_id;
+    
+    public int flow;
 }

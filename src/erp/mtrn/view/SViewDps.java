@@ -692,7 +692,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         else if (mbIsOrd) {
             if (mbIsAuthWebAvailable) {
-                aoTableColumns = new STableColumn[48];
+                aoTableColumns = new STableColumn[49];
             }
             else {
                 aoTableColumns = new STableColumn[44];
@@ -792,6 +792,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "send", "Enviado aut. app web", STableConstants.WIDTH_ICON);
                     aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "stat_auth", "Autorización app web.", STableConstants.WIDTH_ITEM);
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "ico_send_warn", "Estatus de envío", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_in_turn", "Usr. turno", STableConstants.WIDTH_USER);
                 }
                 
@@ -3265,7 +3267,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         try {
             if (jbAuthWebStartAuth.isEnabled()) {
                 if (isRowSelected()) {
-                    if (SAuthorizationUtils.sendAuthornAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
+                    if (SAuthorizationUtils.sendAuthornOrderAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
                     }
@@ -3396,7 +3398,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " +
-                "ELSE sah.name END, sah.name) AS stat_auth, " : "");
+                "ELSE sah.name END, sah.name) AS stat_auth, " +
+                "IF(sah.id_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_SND + ", " + STableConstants.ICON_VIEW_LIG_YEL + ", " +
+                "IF(sah.id_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_SNDF + ", " + STableConstants.ICON_VIEW_LIG_RED + ", " +
+                STableConstants.ICON_NULL + ")) AS ico_send_warn, "
+                : "");
         if (mbIsAuthWebAvailable) {
             msSql += "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
                     + "    COALESCE((SELECT GROUP_CONCAT(usr SEPARATOR ',') "

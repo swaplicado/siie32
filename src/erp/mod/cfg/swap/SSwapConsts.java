@@ -95,6 +95,9 @@ public abstract class SSwapConsts {
     
     public static final int RESOURCE_TYPE_PUR_INVOICE = 4;
     public static final int RESOURCE_TYPE_PUR_PAYMENT = 11;
+    
+    public static final int FLOW_MODEL_TYPE = 1;
+    public static final int FLOW_TYPE = 2;
 
     /**
      * Separator for foreign fiscal ID separator from country code.

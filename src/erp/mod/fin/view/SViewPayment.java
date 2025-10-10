@@ -5,6 +5,7 @@
  */
 package erp.mod.fin.view;
 
+import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
@@ -12,9 +13,9 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.utils.SExportPayments;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
@@ -218,15 +219,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                     }
                     else {
-                        SDbPayment payment = new SDbPayment();
-                        payment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
-                        if (payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
-                            miClient.showMsgBoxInformation("No se puede enviar la solicitud de pago porque ya fue enviado anteriormente.");
-                        }
-                        else {
-                            if (miClient.showMsgBoxConfirm("Se enviará la solicitud de pago a un proceso de autorización.\n¿Desea continuar?")== JOptionPane.OK_OPTION) {
-                                new SExportPayments(miClient, payment).start();
-                            }
+                        if (SAuthorizationUtils.sendAuthornPaymentsAppWeb((SClientInterface) miClient, gridRow.getRowPrimaryKey())) {
+                            miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }
                 }
