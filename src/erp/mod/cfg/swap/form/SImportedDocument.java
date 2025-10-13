@@ -759,7 +759,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
      * @throws Exception 
      */
     public void retrieveProcessing(final SGuiSession session, final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
-        ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByByExternalId(preparedStatement, dataType, txnCategory, externalId);
+        ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
 
         if (ProcessedDps != null) {
             SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
@@ -1121,12 +1121,13 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     
     @Override
     public String toString() {
-        return BizPartner + "; "
-                + getFolio() + "; "
-                + SLibUtils.DateFormatDate.format(Date) + "; "
-                + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + "; "
-                + FunctionalSubArea + "; "
-                + "ID " + ExternalDocumentId;
+        return BizPartner + "; " // allways available
+                + getFolio() + "; " // allways available
+                + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
+                + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
+                + (!FunctionalSubArea.isEmpty() ? "; " + FunctionalSubArea : "") // may not be available
+                + (ExternalDocumentId != 0 ? "; ID " + ExternalDocumentId : "") // may not be available
+                + ".";
     }
 
     @Override
@@ -1192,6 +1193,73 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         }
         
         return exchangeRate;
+    }
+    
+    /**
+     * Create a basic and elemental version of an imported document from SWAP data processed DPS to be used in SFormDps.
+     * @param statement DB statement.
+     * @param dpsKey DPS key.
+     * @return 
+     */
+    public static SImportedDocument createBasicImportedDocumentFromProcessedDps(final Statement statement, final int[] dpsKey) throws Exception {
+        SImportedDocument importedDocument = null;
+        
+        String sql = "SELECT sdp.ext_data_id, sdp.ext_data_uuid, sdp.dps_refs, sdp.dps_descrip, "
+                + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.fid_func, d.fid_func_sub, "
+                + "CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS _func_sub, "
+                + "b.id_bp, b.bp, c.id_cur, c.cur_key, dc.cfd_use "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = d.fid_func "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS f ON f.id_func_sub = d.fid_func_sub "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dc ON dc.id_year = d.id_year AND dc.id_doc = d.id_doc "
+                + "WHERE NOT sdp.b_del AND sdp.data_type = '" + SDbSwapDataProcessing.DATA_TYPE_INV + "' "
+                + "AND sdp.fk_dps_year_n = " + dpsKey[0] + " AND sdp.fk_dps_doc_n = " + dpsKey[1] + ";";
+
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                importedDocument = new SImportedDocument();
+                importedDocument.ExternalDocumentId = resultSet.getInt("sdp.ext_data_id");
+                importedDocument.ExternalDocumentUuid = resultSet.getString("sdp.ext_data_uuid");
+                importedDocument.BizPartnerId = resultSet.getInt("b.id_bp");
+                importedDocument.BizPartner = resultSet.getString("b.bp");
+                importedDocument.NumberSeries = resultSet.getString("d.num_ser");
+                importedDocument.Number = resultSet.getString("d.num");
+                importedDocument.Date = resultSet.getDate("d.dt");
+                String referencesAsText = resultSet.getString("sdp.dps_refs");
+                importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_DOC_TYPE_ORDER;
+                importedDocument.ReferencesAsText = referencesAsText;
+                importedDocument.Description = resultSet.getString("sdp.dps_descrip");
+                importedDocument.FunctionalSubAreaId = resultSet.getInt("d.fid_func_sub");
+                importedDocument.FunctionalSubArea = resultSet.getString("_func_sub");
+                String fiscalUseCode = resultSet.getString("dc.cfd_use"); // can be null
+                importedDocument.FiscalUseCode = resultSet.wasNull() ? "" : fiscalUseCode;
+                importedDocument.Total = resultSet.getDouble("d.tot_cur_r");
+                importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
+                importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
+                importedDocument.RequiredPaymentDefinition = PAYMENT_DEFN_NOT_REQ;
+                importedDocument.RequiredPaymentAmount = 0;
+                importedDocument.RequiredPaymentPct = 0;
+                importedDocument.RequiredPaymentDate = null;
+                importedDocument.RequiredPaymentDateNew = null;
+                importedDocument.IsRequiredPaymentLoc = false;
+                importedDocument.RequiredPaymentNotes = "";
+                importedDocument.StatusId = 0;
+                importedDocument.Status = "";
+                importedDocument.Download = false;
+                importedDocument.AlreadyDownloaded = false;
+
+                importedDocument.ProcessedDps = null;
+                importedDocument.SwapDataProcessing = null;
+                importedDocument.Payment = null;
+
+                importedDocument.References = null;
+            }
+        }
+        
+        return importedDocument;
     }
     
     public static class Reference {

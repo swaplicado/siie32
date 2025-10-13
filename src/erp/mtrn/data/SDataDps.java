@@ -2931,16 +2931,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     mbXtaHasAuthWeb = true;
                 }
                 
-                /*
-                sSql = "SELECT id_swap_data_prc FROM trn_swap_data_prc WHERE data_type = '" + SDbSwapDataProcessing.DATA_TYPE_INV + "' AND fk_dps_year_n = " + mnPkYearId + " AND fk_dps_doc_n = " + mnPkDocId + " AND NOT b_del;";
-                oResultSet = statement.executeQuery(sSql);
-                if (oResultSet.next()) {
-                    PreparedStatement preparedStatement = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(statement);
-                    
-                    moXtaImportedDocument = new SImportedDocument();
-                    
+                if (isDocumentOrAdjustmentPur()) {
+                    moXtaImportedDocument = SImportedDocument.createBasicImportedDocumentFromProcessedDps(statement, anKey);
                 }
-                */
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

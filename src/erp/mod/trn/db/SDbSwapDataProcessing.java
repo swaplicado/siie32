@@ -339,7 +339,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
      * @return A Processed DPS if found, otherwise <code>null</code>.
      * @throws Exception 
      */
-    public static ProcessedDps getProcessedDpsByByExternalId(final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+    public static ProcessedDps getProcessedDpsByExternalId(final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
         ProcessedDps processedDps = null;
         
         preparedStatement.setString(1, dataType);
