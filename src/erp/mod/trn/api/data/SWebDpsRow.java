@@ -20,6 +20,7 @@ public class SWebDpsRow {
     private String dpsNumRef;
     private String provider;
     private String providerFiscalId;
+    private String refItems;
     private String costCenters;
     private double subTotal;
     private double taxCharged;
@@ -118,6 +119,14 @@ public class SWebDpsRow {
 
     public void setProviderFiscalId(String providerFiscalId) {
         this.providerFiscalId = providerFiscalId;
+    }
+
+    public String getRefItems() {
+        return refItems;
+    }
+
+    public void setRefItems(String refItems) {
+        this.refItems = refItems;
     }
 
     public String getCostCenters() {

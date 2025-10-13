@@ -86,6 +86,18 @@ public class STrnDBCore {
             + "    bp.bp_comm, "
             + "    bp.fiscal_id, "
             + "    COALESCE((SELECT  "
+            + "                    GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
+            + "                            SEPARATOR '/ ') AS ref_items "
+            + "                FROM "
+            + "                    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " etys "
+            + "                        LEFT JOIN "
+            + "                    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " r_itm ON etys.fid_item_ref_n = r_itm.id_item "
+            + "                WHERE "
+            + "                    etys.id_year = dps.id_year "
+            + "                        AND etys.id_doc = dps.id_doc "
+            + "                        AND NOT etys.b_del), "
+            + "            '') AS ref_items, "
+            + "    COALESCE((SELECT  "
             + "                    GROUP_CONCAT(DISTINCT CONCAT(f_cc.id_cc, ' - ', f_cc.cc) "
             + "                            SEPARATOR '/ ') AS cecos "
             + "                FROM "
@@ -450,6 +462,7 @@ public class STrnDBCore {
             oDoc.setProvider(res.getString("bp_comm"));
             oDoc.setProviderFiscalId(res.getString("fiscal_id"));
             oDoc.setCostCenters(res.getString("cecos"));
+            oDoc.setRefItems(res.getString("ref_items"));
             oDoc.setSubTotal(res.getDouble("stot_r"));
 //            oDoc.setDiscount(res.getDouble("disc_doc_r"));
             oDoc.setTaxCharged(res.getDouble("tax_charged_r"));
