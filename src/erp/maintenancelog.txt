@@ -1,5 +1,9 @@
 ================================================================================
 SIIE 3.2 290.20/ 2025-10-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de restricción de cambio de datos básicos en DPS que provienen de documentos importados.
+
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agregan ítems de referencia a obtención de DPS para servicios externos (AppLink)
