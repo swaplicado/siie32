@@ -104,6 +104,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlDps = new javax.swing.JLabel();
         moTextDps = new sa.lib.gui.bean.SBeanFieldText();
         jbDpsPicker = new javax.swing.JButton();
+        jbDpsFinder = new javax.swing.JButton();
         jpPayWestRow6 = new javax.swing.JPanel();
         jlFunctionalArea = new javax.swing.JLabel();
         moKeyFunctionalArea = new sa.lib.gui.bean.SBeanFieldKey();
@@ -216,13 +217,18 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlDps.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPayWestRow5.add(jlDps);
 
-        moTextDps.setEnabled(false);
         moTextDps.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayWestRow5.add(moTextDps);
 
         jbDpsPicker.setText("...");
+        jbDpsPicker.setToolTipText("Seleccionar documento...");
         jbDpsPicker.setPreferredSize(new java.awt.Dimension(23, 23));
         jpPayWestRow5.add(jbDpsPicker);
+
+        jbDpsFinder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbDpsFinder.setToolTipText("Buscar documento por serie y folio");
+        jbDpsFinder.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPayWestRow5.add(jbDpsFinder);
 
         jpPayWest.add(jpPayWestRow5);
 
@@ -232,7 +238,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPayWestRow6.add(jlFunctionalArea);
 
-        moKeyFunctionalArea.setPreferredSize(new java.awt.Dimension(150, 23));
+        moKeyFunctionalArea.setPreferredSize(new java.awt.Dimension(250, 23));
         jpPayWestRow6.add(moKeyFunctionalArea);
 
         jpPayWest.add(jpPayWestRow6);
@@ -372,6 +378,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jbDpsFinder;
     private javax.swing.JButton jbDpsPicker;
     private javax.swing.JButton jbIns;
     private javax.swing.JLabel jlBeneficiary;
@@ -440,6 +447,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moRadDocPayment.setBooleanSettings(SGuiUtils.getLabelName(moRadDocPayment.getText()), true);
         moRadSimplePayment.setBooleanSettings(SGuiUtils.getLabelName(moRadSimplePayment.getText()), false);
         moKeyBeneficiary.setKeySettings(miClient, SGuiUtils.getLabelName(jlBeneficiary), true);
+        moTextDps.setTextSettings(SGuiUtils.getLabelName(jlDps), 50);
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
         moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency), true);
         moKeyEntryCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlEntryCurrency), true);
@@ -608,6 +616,60 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         return excRate;
     }
     
+    private double calculateIns() throws Exception {
+        double ins = 0;
+        String sql = "SELECT " +
+                "(SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) + IFNULL(ps.sum_pay_cur, 0)) AS ins " +
+                "FROM fin_rec AS r " +
+                "INNER JOIN fin_rec_ety AS re ON " +
+                "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
+                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + moDps.getPkYearId() + " AND " +
+                "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND " +
+                "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " " +
+                "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
+                "LEFT JOIN (" +
+                "  SELECT " +
+                "    pe.fk_doc_year_n AS id_year, " +
+                "    pe.fk_doc_doc_n AS id_doc, " +
+                "    SUM(pe.des_pay_app_ety_cur) AS sum_pay_cur " +
+                "  FROM fin_pay AS p " +
+                "  INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
+                "  WHERE NOT p.b_del " +
+                "    AND p.fk_st_pay IN (" +
+                "   " + SModSysConsts.FINS_ST_PAY_NEW + ", " +
+                "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
+                "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
+                "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ") " +
+                "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
+                ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc " + 
+                "WHERE d.fid_bp_r = " + moDps.getFkBizPartnerId_r() + " " + 
+                "AND d.id_year = " + moDps.getPkYearId() + " AND d.id_doc = " + moDps.getPkDocId();
+
+        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            ins = resultSet.getDouble("ins") * -1;
+        }
+        
+        return ins;
+    }
+    
+    private void setDpsValues() throws Exception {
+        moKeyEntryCurrency.setValue(new int[] { moDps.getFkCurrencyId() });
+        moKeyFunctionalArea.setValue(new int[] { moDps.getFkFunctionalAreaId(), moDps.getFkFunctionalSubAreaId() });
+        moTextDps.setValue(moDps.getDpsNumber());
+
+        moPanelDps.setDps(moDps, null);
+
+        String sql = "SELECT b_dps_pay_loc FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " "
+                + "WHERE fk_dps_year_n = " + moDps.getPkYearId() + " AND fk_dps_doc_n = " + moDps.getPkDocId();
+        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            if (resultSet.getBoolean(1)){
+                moKeyCurrency.setValue(new int[] { 1 });
+            }
+        }
+    }
+    
     private void actionDpsPicker() {
         if (jbDpsPicker.isEnabled()) {
             SDialogPickerDps pickerDps;
@@ -615,7 +677,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             int year = SLibTimeUtils.digestYear(moDateApplication.getValue())[0];
             
             pickerDps = moDialogDpsPicker;
-            filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, moKeyBeneficiary.getValue(), 0 };
+            filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, moKeyBeneficiary.getValue(), 0, miClient.getSession().getUser().getPkUserId() };
                 
             pickerDps.formReset();
             pickerDps.setFilterKey(filterKey);
@@ -627,27 +689,54 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                     moDps = new SDataDps();
                     moDps.read(pickerDps.getSelectedPrimaryKey(), miClient.getSession().getStatement());
                     mdIns = (double) pickerDps.getValue(SDialogPickerDps.COL_INS_VALUE) * -1;
-                
-                    moKeyEntryCurrency.setValue(new int[] { moDps.getFkCurrencyId() });
-                    moKeyFunctionalArea.setValue(new int[] { moDps.getFkFunctionalAreaId(), moDps.getFkFunctionalSubAreaId() });
-                    moTextDps.setValue(moDps.getDpsNumber());
-
-                    moPanelDps.setDps(moDps, null);
-
-                    String sql = "SELECT b_dps_pay_loc FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " "
-                            + "WHERE fk_dps_year_n = " + moDps.getPkYearId() + " AND fk_dps_doc_n = " + moDps.getPkDocId();
-                    ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        if (resultSet.getBoolean(1)){
-                            moKeyCurrency.setValue(new int[] { 1 });
-                        }
-                    }
+                    
+                    setDpsValues();
                 }
-                catch (SQLException e) {
+                catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             }
         }
+    }
+    
+    private void actionDpsFinder() {
+        try {
+            if (moKeyBeneficiary.getSelectedIndex() > 0) {
+                String sNumberSeries = "";
+                String sNumber;
+                String[] asNumberDps = SLibUtilities.textExplode(moTextDps.getValue(), "-");
+
+                if (asNumberDps.length > 1) {
+                    sNumberSeries = asNumberDps[0];
+                    sNumber = asNumberDps[1];
+                }
+                else {
+                    sNumber = asNumberDps[0];
+                }
+
+                int[] key = SDataUtilities.obtainDpsKeyForBizPartner((SClientInterface) miClient, sNumberSeries, sNumber, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, moKeyBeneficiary.getValue());
+
+                if (key != null) {
+                    moDps = new SDataDps();
+                    moDps.read(key, miClient.getSession().getStatement());
+                    mdIns = calculateIns();
+                    if (mdIns != 0) {
+                        setDpsValues();
+                    }
+                    else {
+                        moDps = null;
+                        miClient.showMsgBoxInformation("El documento no tiene saldo.");
+                    }
+                }
+                else {
+                    miClient.showMsgBoxInformation("No se encontro el documento.");
+                }
+            }
+            else {
+                miClient.showMsgBoxInformation("Seleccione un beneficiario.");
+            }
+        }
+        catch (Exception e) {}
     }
     
     private void actionIns() {
@@ -691,18 +780,31 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jbDpsPicker.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
         moKeyEntryCurrency.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
         moKeyFunctionalArea.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
+        moTextDps.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
+        jbDpsFinder.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
         jbIns.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
         if (!moRadDocPayment.isSelected()) {
             moDps = null;
             mdIns = 0d;
             moPanelDps.setDps(moDps, null);
             moTextDps.setText("");
+            
+            if (!isApplingFunctionalAreas()) {
+                miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, null);
+            }
+            else {
+                miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, miClient.getSession().getUser().getPkUserId(), null);
+            }
+        }
+        else {
+            miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, null);
         }
     }
     
     @Override
     public void addAllListeners() {
         jbDpsPicker.addActionListener(this);
+        jbDpsFinder.addActionListener(this);
         jbIns.addActionListener(this);
         
         moKeyBeneficiary.addItemListener(this);
@@ -718,6 +820,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     public void removeAllListeners() {
         jbDpsPicker.removeActionListener(this);
+        jbDpsFinder.removeActionListener(this);
         jbIns.removeActionListener(this);
         
         moKeyBeneficiary.removeItemListener(this);
@@ -735,13 +838,6 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         miClient.getSession().populateCatalogue(moKeyBeneficiary, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEntryCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
-        
-        if (!isApplingFunctionalAreas()) {
-            miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, null);
-        }
-        else {
-            miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, miClient.getSession().getUser().getPkUserId(), null);
-        }
         
         moKeyPriority.removeAllItems();
         moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_NORMAL }, "NORMAL"));
@@ -867,6 +963,12 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid() && moRadDocPayment.getValue() && moDps == null) {
+            validation.setMessage("Debe seleccionarse un documento para la solicitud del pago.");
+            validation.setComponent(moTextDps);
+        }
+        
         return validation;
     }
 
@@ -877,6 +979,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             
             if (button == jbDpsPicker) {
                 actionDpsPicker();
+            }
+            else if (button == jbDpsFinder) {
+                actionDpsFinder();
             }
             else if (button == jbIns) {
                 actionIns();
