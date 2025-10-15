@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     
@@ -23,6 +23,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     protected double mdQuantityToLink;
     protected java.lang.String msUnitSymbol;
     protected double mdSurplusPercentage;
+    protected int mnItemId;
     
     protected boolean mbAuxEntryPriceNeeded;
     protected SGuiDpsEntryPrice moAuxSGuiDpsEntryPrice;
@@ -44,6 +45,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public void setQuantityToLink(double d) { mdQuantityToLink = d; }
     public void setUnitSymbol(java.lang.String s) { msUnitSymbol = s; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
+    public void setItemId(int n) { mnItemId = n; }
    
     public void setAuxIsEntryPriceNeeded(boolean b) { mbAuxEntryPriceNeeded = b; }
     public void setAuxSGuiDpsEntryPrice(SGuiDpsEntryPrice d) { moAuxSGuiDpsEntryPrice = d; }
@@ -60,6 +62,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public double getQuantityToLink() { return mdQuantityToLink; }
     public java.lang.String getUnitSymbol() { return msUnitSymbol; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
+    public int getItemId() { return mnItemId; }
     
     public boolean getAuxIsEntryPriceNeeded() { return mbAuxEntryPriceNeeded; }
     public SGuiDpsEntryPrice getAuxSGuiDpsEntryPrice() { return moAuxSGuiDpsEntryPrice; }
@@ -80,6 +83,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mdQuantityToLink = 0;
         msUnitSymbol = "";
         mdSurplusPercentage = 0;
+        mnItemId = 0;
         moAuxSGuiDpsEntryPrice = null;
     }
 

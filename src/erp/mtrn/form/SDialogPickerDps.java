@@ -509,7 +509,6 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
 
         switch (mnOptionType) {
             case SDataConstants.TRNX_DPS_PAY_PEND:
-            case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
             case SDataConstants.TRNX_DPS_SHIP_PEND_LINK:    
                 switch (((Object[]) moFilterKey).length) {
                     case 2:
@@ -528,6 +527,25 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                         manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
                         manBizPartnerPk = (int[]) ((Object[]) moFilterKey)[2];
                         manFunc = (int[]) ((Object[]) moFilterKey)[4];
+                        break;
+                    default:
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                }
+                break;
+            
+            case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
+                switch (((Object[]) moFilterKey).length) {
+                    case 2:
+                        mnYear = (Integer) ((Object[]) moFilterKey)[0];
+                        manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
+                        manBizPartnerPk = null;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        mnYear = (Integer) ((Object[]) moFilterKey)[0];
+                        manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
+                        manBizPartnerPk = (int[]) ((Object[]) moFilterKey)[2];
                         break;
                     default:
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
