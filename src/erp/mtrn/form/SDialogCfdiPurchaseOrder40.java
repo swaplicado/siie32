@@ -27,7 +27,6 @@ import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport40;
-import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -614,7 +613,8 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                     }
 
                     // The source is order and has supplied quantities
-
+                    
+                    /* // Isabel Servín 16/10/2025: se comenta está validación al pasarla a nivel de factura para que se permita vincular partidas de la OC con diferentes partidas de la factura
                     if (!validation.getIsError() && moParamPurchaseOrder.isOrder()) {
                         try {
                             double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
@@ -628,6 +628,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                             SLibUtils.showException(this, e);
                         }
                     }
+                    */
 
                     if (!validation.getIsError()) {
                         if (entryDpsDpsLink.getSurplusPercentage() == 0) {

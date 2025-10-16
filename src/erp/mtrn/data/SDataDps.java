@@ -4665,7 +4665,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                 tAccDpsDate, accItemTypeId, isDebitForOperations(), statement);
                                         }
                                         catch (Exception e) {
-                                            System.out.println("No se encontró configuración para la partida.");
+                                            msDbmsError = MSG_ERR_ACC_UNK_ + "ítem de la partida:\n" + name + ".\n[" + e + "]";
+                                            throw new Exception(msDbmsError);
                                         }
                                     }
                                 }
@@ -4828,7 +4829,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             if (msDbmsError.isEmpty()) {
                 msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_SAVE;
             }
-            msDbmsError += "\n" + exception.toString();
+            
+            if (!exception.toString().endsWith(msDbmsError)) {
+                msDbmsError += "\n" + exception.toString();
+            }
+            
             SLibUtilities.printOutException(this, exception);
         }
 
