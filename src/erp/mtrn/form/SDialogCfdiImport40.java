@@ -51,6 +51,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport40;
 import erp.mtrn.data.SRowCfdiTaxImport40;
+import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -1865,6 +1866,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private SFormValidation validateForm() {
         SFormValidation validation = new SFormValidation();
         int rowValidating = 0;
+        ArrayList<LinkedQuantity> arrLinkedQuantity = new ArrayList<>();
         
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
@@ -1884,6 +1886,24 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFunctionalSubArea) + "'.");
                     validation.setComponent(jcbFunctionalSubArea); // useless but for consistence: component is disabled!
                 }
+                
+                for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                    SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+                    if (row.getImportedEntryDpsDpsLink() != null) {
+                        int[] dpsKey = row.getImportedEntryDpsDpsLink().getDpsEntryKey();
+                        boolean find = false;
+                        for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                            if (SLibUtils.compareKeys(linkedQ.dpsKey, dpsKey)) {
+                                find = true;
+                                linkedQ.quantity += row.getImportedEntryDpsDpsLink().getQuantityToLink();
+                            }
+                        }
+                        if (!find) {
+                            LinkedQuantity linkedQ = new LinkedQuantity(dpsKey, row.getImportedEntryDpsDpsLink().getQuantityToLink());
+                            arrLinkedQuantity.add(linkedQ);
+                        }
+                    }
+                }
             }
         }
         
@@ -1896,11 +1916,34 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") + concepto.getAttDescripcion().getString();
             String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
             
-            if (isWithPurchaseOrder() && row.getImportedEntryDpsDpsLink() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
-                break;
+            if (isWithPurchaseOrder()) {
+                if (row.getImportedEntryDpsDpsLink() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+                    break;
+                }
+                else {
+                    SDataEntryDpsDpsLink entryDpsDpsLink = row.getImportedEntryDpsDpsLink();
+                    try {
+                        double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                        for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                            if (SLibUtils.compareKeys(linkedQ.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
+                                if (totalsupplied > linkedQ.quantity) {
+                                    validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                            "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQ.quantity ? "mayor o " : "") + "igual a " + 
+                                            SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene sutidos previos.");
+                                    break ROWS;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
             }
-            else if (row.getItem() == null) {
+            
+            if (row.getItem() == null) {
                 validation.setMessage(rowMsg + "no tiene asignado un ítem.");
                 break;
             }
@@ -2312,5 +2355,15 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     @Override
     public void editingCanceled(ChangeEvent e) {
         // nothing
+    }
+    
+    public static class LinkedQuantity {
+        int[] dpsKey;
+        double quantity;
+
+        public LinkedQuantity(int[] dpsKey, double quantity) {
+            this.dpsKey = dpsKey;
+            this.quantity = quantity;
+        }
     }
 }
