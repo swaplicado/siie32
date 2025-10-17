@@ -13,6 +13,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.server.SQueryRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -2326,7 +2327,14 @@ public abstract class SDataReadTableRows {
                         (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") + 
                         "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                         "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
-                        (((Object[]) filterKey).length != 5 ? "" : "AND d.fid_func = " + ((int[]) ((Object[]) filterKey)[4])[0] + " AND d.fid_func_sub = " + ((int[]) ((Object[]) filterKey)[4])[1] + " ") +
+                        (((Object[]) filterKey).length != 5 ? "" : 
+                        " AND d.fid_func_sub IN (" +
+                        "SELECT GROUP_CONCAT(fs.id_func_sub) " +
+                        "FROM cfgu_func_sub AS fs " +
+                        "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func " +
+                        "INNER JOIN usr_usr_func_sub AS ufs ON ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + ((int) ((Object[]) filterKey)[4]) + " " +
+                        "WHERE NOT fs.b_del AND NOT f.b_del" +
+                        ") ") +
                         "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                         "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                         "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
@@ -2338,7 +2346,11 @@ public abstract class SDataReadTableRows {
                         "  FROM fin_pay AS p " +
                         "  INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                         "  WHERE NOT p.b_del " +
-                        "    AND p.fk_st_pay IN (1, 2, 4, 14) " +
+                        "    AND p.fk_st_pay IN (" +
+                        "   " + SModSysConsts.FINS_ST_PAY_NEW + ", " +
+                        "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
+                        "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
+                        "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ") " +
                         "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
                         ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc " +
                         "GROUP BY " +

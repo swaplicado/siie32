@@ -51,6 +51,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport40;
 import erp.mtrn.data.SRowCfdiTaxImport40;
+import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -709,7 +710,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(1040, 708));
+        setSize(new java.awt.Dimension(1136, 739));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1054,6 +1055,55 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             
             rowCfdiImport.prepareTableRow();
             setSiieTaxes(rowCfdiImport);
+            
+            // Buscar partida de la OC si es que esta existe 
+            if (moPurchaseOrder != null) {
+                if (moDialogCfdiPurchaseOrder == null) {
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
+                }
+                setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
+                
+                int linkIndex = 0;
+                int cantSameItem = 0;
+                ArrayList<SDataEntryDpsDpsLink> arrDpsLink = (ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK_ALL);
+                // se hace un barrido a las parttidas de la orden de compra y se cuentan cuantas tienen el mismo ítem
+                for (int i = 0; i < arrDpsLink.size(); i++) {
+                    SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(i);
+                    if (dpsLink.getItemId() == item.getPkItemId()) {
+                        cantSameItem++;
+                        linkIndex = i;
+                    }
+                }
+                // se procede hacer el proceso de vinculación sólo si hay una sola partida con el ítem de la factura
+                if (cantSameItem == 1) {
+                    boolean link = false;
+                    double cantConcepto = rowCfdiImport.getConcepto().getAttCantidad().getDouble();
+                    SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(linkIndex);
+                    SDataDpsEntry dpsEty = moPurchaseOrder.getDbmsDpsEntry(arrDpsLink.get(linkIndex).getDpsEntryKey());
+                    double cantAVincular;
+                    
+                    // si la cantidad del concepto de la factura es menor o igual a la cantidad de la OC
+                    if (cantConcepto <= dpsEty.getOriginalQuantity()) {
+                        cantAVincular = cantConcepto;
+                    }
+                    else {
+                        cantAVincular = dpsEty.getOriginalQuantity();
+                    }
+                    
+                    // la cantidad a vincular debe ser menor de la cantidad pendiente de vincular
+                    if (cantAVincular <= dpsLink.getQuantityToBeLinked()) { 
+                        dpsLink.setQuantityToLink(cantAVincular);
+                        link = true;
+                    }
+                    
+                    if (link) {
+                        rowCfdiImport.setImportedEntryDpsDpsLink(dpsLink);
+                        setMatchDataByPurchaseOrder(rowCfdiImport, dpsEty);
+                        setSiieTaxes(rowCfdiImport);
+                    }
+                }
+                rowCfdiImport.prepareTableRow();
+            }
         }
     }
 
@@ -1076,6 +1126,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         setCfdiTaxesTableValues(0);
         setSiieTaxesTableValues((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow());
+        setPurchaseOrderPanelValues();
     }
        
     private void actionOk() {
@@ -1386,31 +1437,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 if (moDialogCfdiPurchaseOrder == null) {
                     moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
                 }
-                
-                moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
-                
-                HashMap<String, Double> purchaseOrderEntries = new HashMap<>(); // key: PK of entry of purchase order as a String; value: total quantity already assigned from entry
-                
-                for (SGridRow row : moConceptTablePane.getTableModel().getTableRows()) {
-                    SRowCfdiImport40 rci = (SRowCfdiImport40) row; // variable de conveniencia
-                    
-                    if (rci != rowCfdiImport && rci.getImportedEntryDpsDpsLink() != null) {
-                        String key = SLibUtils.textKey(rci.getImportedEntryDpsDpsLink().getDpsEntryKey());
-                        Double quantityToLink = purchaseOrderEntries.get(key);
-                        
-                        if (quantityToLink == null) {
-                            quantityToLink = rci.getImportedEntryDpsDpsLink().getQuantityToLink();
-                        }
-                        else {
-                            quantityToLink += rci.getImportedEntryDpsDpsLink().getQuantityToLink();
-                        }
-                        
-                        purchaseOrderEntries.put(key, quantityToLink);
-                    }
-                }
-                
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
+                setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
                 
                 moDialogCfdiPurchaseOrder.setFormVisible(true);
                 
@@ -1427,6 +1454,35 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 }
             }
         }
+    }
+    
+    private void setDialogCfdiPurchaseOrderCfdiRow(SRowCfdiImport40 rowCfdiImport) {
+        moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
+        
+        moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
+                
+        HashMap<String, Double> purchaseOrderEntries = new HashMap<>(); // key: PK of entry of purchase order as a String; value: total quantity already assigned from entry
+
+        for (SGridRow row : moConceptTablePane.getTableModel().getTableRows()) {
+            SRowCfdiImport40 rci = (SRowCfdiImport40) row; // variable de conveniencia
+
+            if (rci != rowCfdiImport && rci.getImportedEntryDpsDpsLink() != null) {
+                String key = SLibUtils.textKey(rci.getImportedEntryDpsDpsLink().getDpsEntryKey());
+                Double quantityToLink = purchaseOrderEntries.get(key);
+
+                if (quantityToLink == null) {
+                    quantityToLink = rci.getImportedEntryDpsDpsLink().getQuantityToLink();
+                }
+                else {
+                    quantityToLink += rci.getImportedEntryDpsDpsLink().getQuantityToLink();
+                }
+
+                purchaseOrderEntries.put(key, quantityToLink);
+            }
+        }
+
+        moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
+        moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
     }
 
     private void updateNameItem() {
@@ -1810,6 +1866,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private SFormValidation validateForm() {
         SFormValidation validation = new SFormValidation();
         int rowValidating = 0;
+        ArrayList<LinkedQuantity> arrLinkedQuantity = new ArrayList<>();
         
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
@@ -1829,6 +1886,24 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFunctionalSubArea) + "'.");
                     validation.setComponent(jcbFunctionalSubArea); // useless but for consistence: component is disabled!
                 }
+                
+                for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                    SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+                    if (row.getImportedEntryDpsDpsLink() != null) {
+                        int[] dpsKey = row.getImportedEntryDpsDpsLink().getDpsEntryKey();
+                        boolean find = false;
+                        for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                            if (SLibUtils.compareKeys(linkedQ.dpsKey, dpsKey)) {
+                                find = true;
+                                linkedQ.quantity += row.getImportedEntryDpsDpsLink().getQuantityToLink();
+                            }
+                        }
+                        if (!find) {
+                            LinkedQuantity linkedQ = new LinkedQuantity(dpsKey, row.getImportedEntryDpsDpsLink().getQuantityToLink());
+                            arrLinkedQuantity.add(linkedQ);
+                        }
+                    }
+                }
             }
         }
         
@@ -1841,11 +1916,34 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") + concepto.getAttDescripcion().getString();
             String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
             
-            if (isWithPurchaseOrder() && row.getImportedEntryDpsDpsLink() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
-                break;
+            if (isWithPurchaseOrder()) {
+                if (row.getImportedEntryDpsDpsLink() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+                    break;
+                }
+                else {
+                    SDataEntryDpsDpsLink entryDpsDpsLink = row.getImportedEntryDpsDpsLink();
+                    try {
+                        double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                        for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                            if (SLibUtils.compareKeys(linkedQ.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
+                                if (totalsupplied > linkedQ.quantity) {
+                                    validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                            "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQ.quantity ? "mayor o " : "") + "igual a " + 
+                                            SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene sutidos previos.");
+                                    break ROWS;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
             }
-            else if (row.getItem() == null) {
+            
+            if (row.getItem() == null) {
                 validation.setMessage(rowMsg + "no tiene asignado un ítem.");
                 break;
             }
@@ -2257,5 +2355,15 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     @Override
     public void editingCanceled(ChangeEvent e) {
         // nothing
+    }
+    
+    public static class LinkedQuantity {
+        int[] dpsKey;
+        double quantity;
+
+        public LinkedQuantity(int[] dpsKey, double quantity) {
+            this.dpsKey = dpsKey;
+            this.quantity = quantity;
+        }
     }
 }

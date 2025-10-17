@@ -27,11 +27,11 @@ import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport40;
-import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -49,6 +49,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
     public static final int VALUE_TYPE_ROW_CFDI = 2;
     public static final int VALUE_TYPE_ENTRY_DPS_DPS_LINK = 3;
     public static final int VALUE_TYPE_FACTOR_CONV = 4;
+    public static final int VALUE_TYPE_ENTRY_DPS_DPS_LINK_ALL = 5;
     
     private static final int COL_QTY_TO_BE_LINKED = 7;
     private static final int COL_QTY_TO_LINK = 8;
@@ -300,7 +301,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(900, 678));
+        setSize(new java.awt.Dimension(976, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -417,6 +418,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                     entryDpsDpsLink.setQuantityLinkedActual(linkedActual);
                     entryDpsDpsLink.setQuantityToLink(0);
                     entryDpsDpsLink.setSurplusPercentage(entry.getSurplusPercentage());
+                    entryDpsDpsLink.setItemId(entry.getFkItemId());
                     entryDpsDpsLink.prepareTableRow();
                     entryDpsDpsLink.setAuxIsEntryPriceNeeded(!entry.getDbmsEntryPrices().isEmpty());
 
@@ -576,7 +578,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                 break;
             }
         }
-        
+         
         if (!validation.getIsError()) {
             if (moFieldConvFact.getDouble() != 1){
                 if (miClient.showMsgBoxConfirm("El factor de conversión del concepto es diferente de 1.0,\n"
@@ -611,7 +613,8 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                     }
 
                     // The source is order and has supplied quantities
-
+                    
+                    /* // Isabel Servín 16/10/2025: se comenta está validación al pasarla a nivel de factura para que se permita vincular partidas de la OC con diferentes partidas de la factura
                     if (!validation.getIsError() && moParamPurchaseOrder.isOrder()) {
                         try {
                             double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
@@ -625,6 +628,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                             SLibUtils.showException(this, e);
                         }
                     }
+                    */
 
                     if (!validation.getIsError()) {
                         if (entryDpsDpsLink.getSurplusPercentage() == 0) {
@@ -761,6 +765,14 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                 
             case SDataConstants.TRN_DPS_ETY:
                 value = moParamPurchaseOrder.getDbmsDpsEntry(((SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow()).getDpsEntryKey());
+                break;
+                
+            case VALUE_TYPE_ENTRY_DPS_DPS_LINK_ALL:
+                ArrayList<SDataEntryDpsDpsLink> arr = new ArrayList<>();
+                moTablePane.getTableModel().getTableRows().forEach((row) -> {
+                    arr.add((SDataEntryDpsDpsLink) row);
+                });
+                value = arr;
                 break;
                 
             default:

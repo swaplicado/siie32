@@ -1,4 +1,20 @@
 ================================================================================
+SIIE 3.2 290.22/ 2025-10-16
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la validación de cuentas contables de ítems cuando la naturaleza de un documento es activo fijo.
+2) Cambio de nivel en la validación de cantidades de partidas suministradas en la vinculación de partidas de OC con facturas 
+    para hacerse a nivel de documento y así comparar la cantidad vinculada total con la cantidad suministrada.
+
+================================================================================
+SIIE 3.2 290.21/ 2025-10-15
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de la búsqueda manual de documentos en la forma de captura de solicitudes de pago.
+2) Modificación al picker de documentos para mostrar únicamente los del área funcional del usuario.
+3) Adición de la vinculación de partidas de OC con conceptos de un XML de manera automática en la importación de facturas con una OC.
+
+================================================================================
 SIIE 3.2 290.20/ 2025-10-13
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
