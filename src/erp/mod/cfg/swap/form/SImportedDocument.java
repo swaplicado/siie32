@@ -13,6 +13,7 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -22,8 +23,11 @@ import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SThinDps;
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -411,7 +415,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 payment.setPayment(payment.getPaymentApplication()); // same value "at application"!
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
                 payment.setPriority(SDbPayment.PRIORITY_NORMAL);
-                payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "(Solicitud de pago generada en base a lo indicado por el comprador.)");
+                payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "-"); // "-" means no comments
                 payment.setNotesAuthorization("");
                 payment.setReceiptPaymentRequired(dps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT);
                 payment.setDeleted(false);
@@ -490,12 +494,13 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
     /**
      * Link document to given DPS, and optionally create its payment request.
      * @param session GUI session.
-     * @param dps DPS to link.
+     * @param dpsKey DPS primary key.
      * @param createPaymentRequest Create-payment-request flag.
+     * @param docFilesDownloadSrvUrl URL of document files download service.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final SThinDps dps, final boolean createPaymentRequest) throws Exception {
+    public boolean link(final SGuiSession session, final int[] dpsKey, final boolean createPaymentRequest, final String docFilesDownloadSrvUrl) throws Exception {
         boolean linked = false;
         
         // Validate linkage:
@@ -503,10 +508,14 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
         if (isProcessed()) {
             throw new Exception(EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
         }
-        else if (dps == null) {
-            throw new Exception("No se proporcionó ninguna factura para vincular a este documento.");
-        }
         else {
+            // Read DPS in its "thin" version:
+            
+            SThinDps dps = new SThinDps();
+            dps.read(dpsKey, session.getStatement());
+            
+            // Validate DPS:
+            
             if (dps.getDbmsRecordKey() == null) {
                 throw new Exception("La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
             }
@@ -526,45 +535,45 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             }
             else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {
                 // match required:
-                throw new Exception("El fecha de este documento, "
+                throw new Exception("La fecha de este documento, "
                         + SLibUtils.DateFormatDate.format(Date) + ", "
                         + "es distinta a la de la factura a vincular, "
                         + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
                 String msgChooseOtherInvoice = "Favor de elegir otra factura para vincularla a este documento.";
-                
+
                 // check folio number: it must match its counterpart in document, in DPS it is allways available:
-                
+
                 String msgTopic = "";
                 String msgError = "";
                 String msgConfirm = "";
-                
+
                 if (!Number.isEmpty()) {
                     // document has folio number:
-                    
+
                     msgTopic = "El número del folio de este documento, '" + Number + "', ";
-                    
-                    if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase().isEmpty())) {
+
+                    if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase())) {
                         // match required:
                         msgError = msgTopic + "es distinto al de la factura a vincular, '" + dps.getNumber() + "'.";
                     }
                 }
                 else {
                     // document does not have folio number:
-                    
+
                     msgTopic = "Este documento no tiene número de folio";
-                    
+
                     if (ExternalDocumentUuid.isEmpty()) {
                         // no UUID available to attempt to find similitudes:
-                        
+
                         // match required:
                         msgError = " ni UUID,\n"
                                 + "y el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
                     }
                     else {
                         // UUID available, attempt to find similitudes:
-                        
+
                         if (ExternalDocumentUuid.toUpperCase().equals(dps.getNumber().toUpperCase())) {
                             msgConfirm = msgTopic + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
                                     + "es igual al número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
@@ -579,11 +588,10 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                                     + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
                         }
                     }
-                    
                 }
-                
+
                 // processs folio number validation:
-                
+
                 if (!msgError.isEmpty()) {
                     throw new Exception(msgError);
                 }
@@ -596,16 +604,16 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 }
 
                 // check folio series: it must match its counterpart in document, in DPS it is not allways available:
-                
+
                 msgTopic = "";
                 msgError = "";
                 msgConfirm = "";
-                
+
                 if (!NumberSeries.isEmpty()) {
                     // document has folio series:
-                    
+
                     msgTopic = "La serie del folio de este documento, '" + NumberSeries + "', ";
-                    
+
                     if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase().isEmpty())) {
                         // match required:
                         msgError = msgTopic + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
@@ -617,16 +625,16 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 }
                 else {
                     // document does not have folio series:
-                    
+
                     msgTopic = "Este documento no tiene serie de folio";
-                    
+
                     if (!dps.getNumberSeries().isEmpty()) {
                         msgConfirm = msgTopic + ", y no corresponde a la de la factura a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
                     }
                 }
-                
+
                 // processs folio series validation:
-                
+
                 if (!msgError.isEmpty()) {
                     throw new Exception(msgError);
                 }
@@ -637,33 +645,34 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                         throw new Exception(msgChooseOtherInvoice);
                     }
                 }
-                
+
                 // link document to invoice:
-                
+
                 Object[] recKey = (Object[]) dps.getDbmsRecordKey();
-                
+
                 int recYearId = (Integer) recKey[0];
                 int recPeriodId = (Integer) recKey[1];
                 int recBokkeepingCenterId = (Integer) recKey[2];
                 String recRecordTypeId = (String) recKey[3];
                 int recNumberId = (Integer) recKey[4];
                 String recCompanyBranchCode = SDataRecord.getCompanyBranchCode(dps.getDbmsRecordKey(), session.getStatement());
-                
+
                 ProcessedDps = new SDbSwapDataProcessing.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), 
-                        recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode);
-                
+                        recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode, 
+                        dps.getThinCfd() != null, dps.getThinPdf() != null);
+
                 // check if first payment request already exists:
 
                 SDbPayment payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
-                
+
                 if (createPaymentRequest && isPaymentRequestDataAvailable() && payment == null) {
                     payment = createAndSavePaymentRequest(session, dps, false);
                 }
-                
+
                 // create DPS processing:
-                
+
                 SDbSwapDataProcessing swapDataProcessing = new SDbSwapDataProcessing();
-                
+
                 //swapDataProcessing.setPkSwapDataProcessingId(...);
                 swapDataProcessing.setDataType(SDbSwapDataProcessing.DATA_TYPE_INV);
                 swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
@@ -682,14 +691,64 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 //swapDataProcessing.setFkUserUpdateId(...);
                 //swapDataProcessing.setTsUserInsert(...);
                 //swapDataProcessing.setTsUserUpdate(...);
-                
+
                 swapDataProcessing.save(session);
-                
+
                 ProcessedDps.SwapDataProcessingId = swapDataProcessing.getPkSwapDataProcessingId();
                 SwapDataProcessing = swapDataProcessing;
                 Payment = payment;
-                
+
                 linked = true;
+                
+                // Attach XML and/or PDF, if needed:
+                
+                boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(BizPartnerId, (SClientInterface) session.getClient());
+                boolean attachXml = isBizPartnerDomestic && dps.getThinCfd() == null;
+                boolean attachPdf = dps.getThinPdf() == null;
+                
+                if (attachXml || attachPdf) {
+                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId);
+                    
+                    if (files != null && files.length == 2) {
+                        if (attachXml && files[SImportUtils.CFDI_XML] != null) {
+                            // attach CFD:
+                            
+                            SDataCfd cfd = SDataCfd.prepareCfd(
+                                    null, 
+                                    files[SImportUtils.CFDI_XML], 
+                                    session.getUser().getPkUserId());
+                            
+                            cfd.setFkDpsYearId_n(dps.getPkYearId());
+                            cfd.setFkDpsDocId_n(dps.getPkDocId());
+                            cfd.setTimestamp(dps.getDate());
+
+                            if (cfd.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
+                            }
+                            
+                            ProcessedDps.HasCfd = true;
+                        }
+                        
+                        if (attachPdf && files[SImportUtils.CFDI_PDF] != null) {
+                            // attach PDF:
+                            
+                            SDataPdf pdf = SDataPdf.preparePdf(
+                                    null, 
+                                    files[SImportUtils.CFDI_PDF], 
+                                    dps.getPkYearId(), 
+                                    ((SDataParamsCompany) session.getConfigCompany()).getXmlBaseDirectory());
+                            
+                            pdf.setPkYearId(dps.getPkYearId());
+                            pdf.setPkDocId(dps.getPkDocId());
+
+                            if (pdf.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
+                            }
+                            
+                            ProcessedDps.HasPdf = true;
+                        }
+                    }
+                }
             }
         }
         
@@ -780,7 +839,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             throw new Exception(EXC_DOC_NOT_PROCESSED);
         }
         else if (isPaymentRequested()) {
-            throw new Exception(EXC_PAY_ALREADY_REGISTERED_ + Payment.getFolio() + ".");
+            throw new Exception(EXC_PAY_ALREADY_REGISTERED_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
         }
         else if (!isPaymentRequestDataAvailable()) {
             throw new Exception(EXC_PAY_NOT_REQUESTABLE);
@@ -1060,45 +1119,54 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 value = !isProcessed() ? "" : ProcessedDps.composeRecord();
                 break;
             case 11:
-                value = Status;
+                value = !isProcessed() ? false : ProcessedDps.HasCfd;
                 break;
             case 12:
-                value = FunctionalSubArea;
+                value = !isProcessed() ? false : ProcessedDps.HasPdf;
                 break;
             case 13:
-                value = FiscalUseCode;
+                value = Status;
                 break;
             case 14:
-                value = getRequiredPaymentAmount();
+                value = FunctionalSubArea;
                 break;
             case 15:
-                value = CurrencyCode;
+                value = FiscalUseCode;
                 break;
             case 16:
-                value = getRequiredPaymentPct();
+                value = getRequiredPaymentAmount();
                 break;
             case 17:
-                value = RequiredPaymentDate;
+                value = CurrencyCode;
                 break;
             case 18:
-                value = RequiredPaymentDateNew;
+                value = getRequiredPaymentPct();
                 break;
             case 19:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDate;
                 break;
             case 20:
-                value = RequiredPaymentNotes;
+                value = RequiredPaymentDateNew;
                 break;
             case 21:
-                value = isPaymentRequested() ? Payment.getFolio() : null;
+                value = IsRequiredPaymentLoc;
                 break;
             case 22:
-                value = isPaymentRequested() ? Payment.getDateApplication() : null;
+                value = RequiredPaymentNotes;
                 break;
             case 23:
-                value = ExternalDocumentId;
+                value = isPaymentRequested() ? Payment.getFolio() : null;
                 break;
             case 24:
+                value = isPaymentRequested() ? Payment.getDateApplication() : null;
+                break;
+            case 25:
+                value = ExternalDocumentId;
+                break;
+            case 26:
+                value = ExternalDocumentId;
+                break;
+            case 27:
                 value = ExternalDocumentUuid;
                 break;
             default:
@@ -1213,7 +1281,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = d.fid_func "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS f ON f.id_func_sub = d.fid_func_sub "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dc ON dc.id_year = d.id_year AND dc.id_doc = d.id_doc "
                 + "WHERE NOT sdp.b_del AND sdp.data_type = '" + SDbSwapDataProcessing.DATA_TYPE_INV + "' "
                 + "AND sdp.fk_dps_year_n = " + dpsKey[0] + " AND sdp.fk_dps_doc_n = " + dpsKey[1] + ";";

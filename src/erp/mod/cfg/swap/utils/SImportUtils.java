@@ -141,10 +141,10 @@ public abstract class SImportUtils {
                     SCfdRenderer renderer = new SCfdRenderer(client);
                     SDataDps newDps = renderer.renderCfdi(chosenFile, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
-                    int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
-                    int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
-
                     if (newDps != null) {
+                        int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                        int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+
                         newDps.setAuxFilePdf(cfdiPdf);
                         
                         if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && dueDateRequired != null) {
@@ -190,6 +190,7 @@ public abstract class SImportUtils {
      * @param client GUI client.
      * @param isPurchase Is-purchase flag.
      * @param dialogDpsFinder DPS finder dialog.
+     * @param dpsXml XML DPS file. Can be <code>null</code>.
      * @param dpsPdf PDF DPS file. Can be <code>null</code>.
      * @param linkToOrder Link-to-order flag.
      * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
@@ -197,7 +198,7 @@ public abstract class SImportUtils {
      * @return DPS key as <code>int[]</code> of new invoice created.
      * @throws java.lang.Exception
      */
-    public static int[] createDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+    public static int[] createDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsXml, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
         SDataDps invoice = null;
         SDataDps order = null; 
 
@@ -238,6 +239,7 @@ public abstract class SImportUtils {
                 
                 if (importedDocument != null) {
                     newDps = importedDocument.createDps(client.getSession());
+                    newDps.setAuxFileXml(dpsXml);
                     newDps.setAuxFilePdf(dpsPdf);
                 }
 
@@ -422,12 +424,12 @@ public abstract class SImportUtils {
 
                                 zis.closeEntry();
                                 
-                                if (newFile.getName().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
+                                if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
                                     // choose firt retrieved XML:
                                     xmlFile = newFile;
                                     xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.XML);
                                 }
-                                else if (newFile.getName().endsWith("." + SFileUtilities.PDF)) {
+                                else if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.PDF)) {
                                     // reserve all retrieved PDF's:
                                     pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.PDF), newFile);
                                 }

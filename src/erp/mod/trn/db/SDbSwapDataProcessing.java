@@ -5,6 +5,7 @@
  */
 package erp.mod.trn.db;
 
+import erp.SClientUtils;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import java.sql.PreparedStatement;
@@ -315,7 +316,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final Statement statement) throws Exception {
         String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, "
                 + "sdp.fk_dps_year_n AS dps_id_year, sdp.fk_dps_doc_n AS dps_id_doc, "
-                + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code "
+                + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code, "
+                + "cfd.id_cfd, pdf.doc_pdf_name "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
@@ -325,6 +327,10 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                 + "r.id_year = dr.fid_rec_year AND r.id_per = dr.fid_rec_per AND r.id_bkc = dr.fid_rec_bkc AND r.id_tp_rec = dr.fid_rec_tp_rec AND r.id_num = dr.fid_rec_num "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON "
                 + "cob.id_bpb = r.fid_cob "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON "
+                + "cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
+                + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(statement.getConnection()) + "." + SModConsts.TablesMap.get(SModConsts.TRN_PDF) + " AS pdf ON "
+                + "pdf.id_year = d.id_year AND pdf.id_doc = d.id_doc "
                 + "WHERE NOT sdp.b_del AND sdp.data_type = ? AND sdp.txn_cat = ? AND sdp.ext_data_id = ?;";
         
         return statement.getConnection().prepareStatement(sql);
@@ -349,7 +355,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
             if (resultSet.next()) {
                 processedDps = new ProcessedDps(resultSet.getInt("id_swap_data_prc"), resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), 
-                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"));
+                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"), 
+                        resultSet.getInt("id_cfd") != 0, resultSet.getString("doc_pdf_name") != null);
             }
         }
         
@@ -418,9 +425,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         public String RecRecordTypeId;
         public int RecNumberId;
         public String RecCompanyBranchCode;
+        public boolean HasCfd;
+        public boolean HasPdf;
         
         public ProcessedDps(final int swapDataProcessingId, final int dpsYearId, final int dpsDocId, 
-                final int recYearId, final int recPeriodId, final int recBookkeepingCenterId, final String recRecordTypeId, final int recNumberId, final String recCompanyBranchCode) {
+                final int recYearId, final int recPeriodId, final int recBookkeepingCenterId, final String recRecordTypeId, final int recNumberId, final String recCompanyBranchCode, 
+                final boolean hasCfd, final boolean hasPdf) {
             SwapDataProcessingId = swapDataProcessingId;
             DpsYearId = dpsYearId;
             DpsDocId = dpsDocId;
@@ -430,6 +440,8 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             RecRecordTypeId = recRecordTypeId;
             RecNumberId = recNumberId;
             RecCompanyBranchCode = recCompanyBranchCode;
+            HasCfd = hasCfd;
+            HasPdf = hasPdf;
         }
         
         public int[] getDpsKey() {

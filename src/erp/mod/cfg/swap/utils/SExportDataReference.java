@@ -76,6 +76,21 @@ public class SExportDataReference implements SExportData {
     public String payment_method;
     
     /**
+     * Método de pago de la referencia.
+     */
+    public String concepts;
+    
+    /**
+     * Método de pago de la referencia.
+     */
+    public String cost_profit_centers;
+    
+    /**
+     * Método de pago de la referencia.
+     */
+    public int owner_id;
+    
+    /**
      * Indicador de borrada de la referencia.
      */
     public boolean is_deleted;

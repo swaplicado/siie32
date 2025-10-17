@@ -73,4 +73,13 @@ public class SExportDataPaymentUpdate implements SExportData {
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String exec_at;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer authorized_by;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String authorized_at;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Integer deleted_by;
 }

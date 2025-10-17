@@ -357,7 +357,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionPatmentRescheddule() {
+    private void actionPatmentReschedule() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -681,7 +681,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 actionPaymentCancel();
             }
             else if (button == jbPaymentReschedule) {
-                actionPatmentRescheddule();
+                actionPatmentReschedule();
             }
             else if (button == jbPaymentBlock) {
                 actionPatmentBlock();

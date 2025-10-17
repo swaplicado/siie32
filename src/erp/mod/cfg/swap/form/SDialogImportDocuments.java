@@ -154,7 +154,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN1 = new javax.swing.JPanel();
         jbImportInvoiceFromCfdi = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
-        jbCreateInvoice = new javax.swing.JButton();
+        jbCreateInvoiceFromScratch = new javax.swing.JButton();
         jpProcessingN3 = new javax.swing.JPanel();
         jbLinkInvoice = new javax.swing.JButton();
         jpProcessingN4 = new javax.swing.JPanel();
@@ -340,11 +340,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbCreateInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
-        jbCreateInvoice.setText("Crear factura");
-        jbCreateInvoice.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbCreateInvoice.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN2.add(jbCreateInvoice);
+        jbCreateInvoiceFromScratch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_new.gif"))); // NOI18N
+        jbCreateInvoiceFromScratch.setText("Crear factura");
+        jbCreateInvoiceFromScratch.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbCreateInvoiceFromScratch.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN2.add(jbCreateInvoiceFromScratch);
 
         jpProcessingN.add(jpProcessingN2);
 
@@ -573,7 +573,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel32;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
     private javax.swing.JButton jbClearDocs;
-    private javax.swing.JButton jbCreateInvoice;
+    private javax.swing.JButton jbCreateInvoiceFromScratch;
     private javax.swing.JButton jbDeselectAllDocs;
     private javax.swing.JButton jbDownloadSelectedDocs;
     private javax.swing.JButton jbImportInvoiceFromCfdi;
@@ -686,7 +686,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(column);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargado (documento)"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizado (documento)"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable", 150)); // col 10
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable ", 150)); // col 10
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "XML disponible documento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "PDF disponible documento"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus documento"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional documento"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI documento"));
@@ -859,11 +861,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             if (dpsKey != null) {
                 isRegistered = true;
 
-                SThinDps dps = new SThinDps();
-                dps.read(dpsKey, miClient.getSession().getStatement());
+                String dpsNumber = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
 
-                if (miClient.showMsgBoxConfirm("Se encontró la factura '" + dps.getDpsNumber() + "', ¿desea vincularla a este documento?") == JOptionPane.YES_OPTION) {
-                    if (document.link(miClient.getSession(), dps, false)) {
+                if (miClient.showMsgBoxConfirm("Se encontró la factura '" + dpsNumber + "', ¿desea vincularla a este documento?") == JOptionPane.YES_OPTION) {
+                    if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
                         int row = moDocumentsGrid.getTable().getSelectedRow();
                         moDocumentsGrid.renderGridRows();
                         moDocumentsGrid.setSelectedGridRow(row);
@@ -880,7 +881,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         if (row == null) {
             jbImportInvoiceFromCfdi.setEnabled(false);
-            jbCreateInvoice.setEnabled(false);
+            jbCreateInvoiceFromScratch.setEnabled(false);
             jbLinkInvoice.setEnabled(false);
             jbUnlinkInvoice.setEnabled(false);
             jbViewInvoice.setEnabled(false);
@@ -908,7 +909,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             SImportedDocument document = (SImportedDocument) row;
             
             jbImportInvoiceFromCfdi.setEnabled(true);
-            jbCreateInvoice.setEnabled(true);
+            jbCreateInvoiceFromScratch.setEnabled(true);
             jbLinkInvoice.setEnabled(true);
             jbUnlinkInvoice.setEnabled(true);
             jbViewInvoice.setEnabled(true);
@@ -1278,10 +1279,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
-                            SThinDps dps = new SThinDps();
-                            dps.read(dpsKey, miClient.getSession().getStatement());
-                            
-                            if (document.link(miClient.getSession(), dps, false)) {
+                            if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
                                 newlyLinked++;
                             }
                         }
@@ -1358,10 +1356,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                             int[] dpsKey = (int[]) picker.getOption();
-                            SThinDps dps = new SThinDps();
-                            dps.read(dpsKey, miClient.getSession().getStatement());
 
-                            if (document.link(miClient.getSession(), dps, false)) {
+                            if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
                                 int index = moDocumentsGrid.getTable().getSelectedRow();
                                 moDocumentsGrid.renderGridRows();
                                 moDocumentsGrid.setSelectedGridRow(index);
@@ -1424,18 +1420,20 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no se ha seleccionado una sucursal de la empresa en la sesión de usuario
                         }
                         else {
-                            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { document.BizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
+                            // validate availability of exchange rate, if needed:
+
+                            if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
+                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                            }
                             
-                            if (!bizPartner.isDomestic((SClientInterface) miClient)) {
-                                throw new Exception("El proveedor '" + bizPartner.getBizPartner() + "' debe ser nacional para importar su factura desde el archivo XML del CFDI de este documento.");
+                            // validate business partner:
+                            
+                            boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
+                            
+                            if (!isBizPartnerDomestic) {
+                                throw new Exception("El proveedor de este documento debe ser nacional para importar su factura desde el archivo XML del CFDI.");
                             }
                             else {
-                                // validate availability of required exchange rate, if needed:
-                                
-                                if (miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                    SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
-                                }
-
                                 // retrieve CFDI files:
 
                                 File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
@@ -1477,7 +1475,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     // prepare DPS finder dialog:
 
-                                    if (linkToOrder && moDialogDpsFinder == null) {
+                                    if (linkToOrder && order == null && moDialogDpsFinder == null) {
                                         moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
                                     }
 
@@ -1486,10 +1484,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
 
                                     if (dpsKey != null) {
-                                        SThinDps dps = new SThinDps();
-                                        dps.read(dpsKey, miClient.getSession().getStatement());
-
-                                        if (document.link(miClient.getSession(), dps, true)) {
+                                        if (document.link(miClient.getSession(), dpsKey, true, msSyncUrlDownload)) {
                                             int index = moDocumentsGrid.getTable().getSelectedRow();
                                             moDocumentsGrid.renderGridRows();
                                             moDocumentsGrid.setSelectedGridRow(index);
@@ -1511,7 +1506,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void actionPerformedCreateInvoice() {
+    private void actionPerformedCreateInvoiceFromScratch() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
             
@@ -1530,16 +1525,27 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no se ha seleccionado una sucursal de la empresa en la sesión de usuario
                         }
                         else {
-                            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { document.BizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
+                            // validate availability of exchange rate, if needed:
+
+                            if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
+                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                            }
                             
-                            if (bizPartner.isDomestic((SClientInterface) miClient)) {
-                                throw new Exception("El proveedor '" + bizPartner.getBizPartner() + "' debe ser del extranjero para capturar su factura de este documento.");
+                            // validate business partner:
+                            
+                            boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
+                            
+                            // retrieve CFDI files:
+
+                            File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
+
+                            if (files == null || files.length != 2) {
+                                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de este documento.");
+                            }
+                            else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML] == null) {
+                                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de este documento.");
                             }
                             else {
-                                // retrieve CFDI files:
-
-                                File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
-
                                 // retrieve order, if available:
 
                                 SDataDps order = null;
@@ -1556,19 +1562,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                 // prepare DPS finder dialog:
 
-                                if (linkToOrder && moDialogDpsFinder == null) {
+                                if (linkToOrder && order == null && moDialogDpsFinder == null) {
                                     moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
                                 }
 
-                                // import CFDI:
+                                // create CFDI:
 
-                                int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
+                                int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
 
                                 if (dpsKey != null) {
-                                    SThinDps dps = new SThinDps();
-                                    dps.read(dpsKey, miClient.getSession().getStatement());
-
-                                    if (document.link(miClient.getSession(), dps, true)) {
+                                    if (document.link(miClient.getSession(), dpsKey, true, msSyncUrlDownload)) {
                                         int index = moDocumentsGrid.getTable().getSelectedRow();
                                         moDocumentsGrid.renderGridRows();
                                         moDocumentsGrid.setSelectedGridRow(index);
@@ -1748,7 +1751,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAllDocs.addActionListener(this);
         
         jbImportInvoiceFromCfdi.addActionListener(this);
-        jbCreateInvoice.addActionListener(this);
+        jbCreateInvoiceFromScratch.addActionListener(this);
         jbLinkInvoice.addActionListener(this);
         jbUnlinkInvoice.addActionListener(this);
         jbViewInvoice.addActionListener(this);
@@ -1769,7 +1772,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAllDocs.removeActionListener(this);
         
         jbImportInvoiceFromCfdi.removeActionListener(this);
-        jbCreateInvoice.removeActionListener(this);
+        jbCreateInvoiceFromScratch.removeActionListener(this);
         jbLinkInvoice.removeActionListener(this);
         jbUnlinkInvoice.removeActionListener(this);
         jbViewInvoice.removeActionListener(this);
@@ -1835,8 +1838,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbImportInvoiceFromCfdi) {
                 actionPerformedImportInvoiceFromCfdi();
             }
-            else if (button == jbCreateInvoice) {
-                actionPerformedCreateInvoice();
+            else if (button == jbCreateInvoiceFromScratch) {
+                actionPerformedCreateInvoiceFromScratch();
             }
             else if (button == jbLinkInvoice) {
                 actionPerformedLinkInvoice();

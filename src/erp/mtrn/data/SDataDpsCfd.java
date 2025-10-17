@@ -41,7 +41,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     protected String msZipIssue;
     protected String msConfirmation;
     protected String msTaxRegimeIssuing;
-    protected java.lang.String msTaxRegimeReceptor;
+    protected String msTaxRegimeReceiver;
     protected String msCfdiUsage;
     protected String msRelationType; // tipo de relación de CFDI
     protected String msRelatedUuid; // UUID del primero de los CFDI relacionados
@@ -86,7 +86,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public void setZipIssue(String s) { msZipIssue = s; }
     public void setConfirmation(String s) { msConfirmation = s; }
     public void setTaxRegimeIssuing(String s) { msTaxRegimeIssuing = s; }
-    public void setTaxRegimeReceptor(String s) { msTaxRegimeReceptor = s; }
+    public void setTaxRegimeReceiver(String s) { msTaxRegimeReceiver = s; }
     public void setCfdiUsage(String s) { msCfdiUsage = s; }
     public void setRelationType(java.lang.String s) { msRelationType = s; }
     public void setXml(java.lang.String s) { msXml = s; }
@@ -121,7 +121,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public String getZipIssue() { return msZipIssue; }
     public String getConfirmation() { return msConfirmation; }
     public String getTaxRegimeIssuing() { return msTaxRegimeIssuing; }
-    public String getTaxRegimeReceptor() { return msTaxRegimeReceptor; }
+    public String getTaxRegimeReceiver() { return msTaxRegimeReceiver; }
     public String getCfdiUsage() { return msCfdiUsage; }
     public String getRelationType() { return msRelationType; }
     public String getRelatedUuid() { return msRelatedUuid; }
@@ -309,7 +309,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
         msZipIssue = "";
         msConfirmation = "";
         msTaxRegimeIssuing = "";
-        msTaxRegimeReceptor = "";
+        msTaxRegimeReceiver = "";
         msCfdiUsage = "";
         msRelationType = "";
         msRelatedUuid = "";
@@ -365,7 +365,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                 msZipIssue = resultSet.getString("zip_iss");
                 msConfirmation = resultSet.getString("conf");
                 msTaxRegimeIssuing = resultSet.getString("tax_regime_iss");
-                msTaxRegimeReceptor = resultSet.getString("tax_regime_rec");
+                msTaxRegimeReceiver = resultSet.getString("tax_regime_rec");
                 msCfdiUsage = resultSet.getString("cfd_use");
                 msRelationType = resultSet.getString("relation_tp");
                 msRelatedUuid = resultSet.getString("related_uuid");
@@ -426,7 +426,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "'" + msZipIssue + "', " +
                         "'" + msConfirmation + "', " +
                         "'" + msTaxRegimeIssuing + "', " +
-                        "'" + msTaxRegimeReceptor + "', " + 
+                        "'" + msTaxRegimeReceiver + "', " + 
                         "'" + msCfdiUsage + "', " +
                         "'" + msRelationType + "', " +
                         "'" + msRelatedUuid + "', " + 
@@ -451,7 +451,7 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
                         "zip_iss = '" + msZipIssue + "', " +
                         "conf = '" + msConfirmation + "', " +
                         "tax_regime_rec ='" + msTaxRegimeIssuing + "', " +
-                        "tax_regime_iss ='" + msTaxRegimeReceptor + "', " +
+                        "tax_regime_iss ='" + msTaxRegimeReceiver + "', " +
                         "cfd_use = '" + msCfdiUsage + "', " +
                         "relation_tp = '" + msRelationType + "', " +
                         "related_uuid = '" + msRelatedUuid + "', " +
@@ -481,5 +481,16 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     @Override
     public java.util.Date getLastDbUpdate() {
         return new Date();  // XXX check this! (Sergio Flores, 2017-08-08)
+    }
+    
+    public static SDataDpsCfd createDpsCfd(final String paymentMethod, final String taxRegimeIssuing, final String taxRegimeReceiver, final String cfdiUsage) {
+        SDataDpsCfd newDpsCfd = new SDataDpsCfd();
+
+        newDpsCfd.setPaymentMethod(paymentMethod);
+        newDpsCfd.setTaxRegimeIssuing(taxRegimeIssuing);
+        newDpsCfd.setTaxRegimeReceiver(taxRegimeReceiver);
+        newDpsCfd.setCfdiUsage(cfdiUsage);
+        
+        return newDpsCfd;
     }
 }

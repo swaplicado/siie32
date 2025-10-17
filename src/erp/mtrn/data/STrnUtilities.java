@@ -2935,7 +2935,7 @@ public abstract class STrnUtilities {
                 }
                 payMet = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, dps.getDbmsDataDpsCfd().getPaymentMethod());
                 taxRegimeIss = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
-                taxRegimeRec = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+                taxRegimeRec = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, dps.getDbmsDataDpsCfd().getTaxRegimeReceiver());
                 cfdiUsage = xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE, dps.getDbmsDataDpsCfd().getCfdiUsage());
             }
             

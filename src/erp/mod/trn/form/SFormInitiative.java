@@ -640,7 +640,7 @@ public class SFormInitiative extends SBeanForm implements ItemListener, FocusLis
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (moKeyPeriodicityType.isEnabled() && moKeyPeriodicityType.getValue()[0] == SModSysConsts.TRNS_TP_PERIOD_NA) {
+        if (moKeyPeriodicityType.isEnabled() && moKeyPeriodicityType.getSelectedIndex() > 0 && moKeyPeriodicityType.getValue()[0] == SModSysConsts.TRNS_TP_PERIOD_NA) {
             validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + moKeyPeriodicityType.getFieldName());
             validation.setComponent(moKeyPeriodicityType);
         }

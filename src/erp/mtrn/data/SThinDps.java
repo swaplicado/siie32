@@ -1,5 +1,6 @@
 package erp.mtrn.data;
 
+import erp.SClientUtils;
 import erp.lib.SLibConstants;
 import erp.lib.data.SThinData;
 import erp.mod.trn.db.STrnUtils;
@@ -11,7 +12,8 @@ import sa.lib.SLibUtils;
 
 /**
  * Versión "delgada" del registro SDataDps (tabla trn_dps).
- * Se usa para agilizar el procesamiento de CFDI de recepción de pagos.
+ * Se usa para agilizar la lectura de datos de DPS,
+ * p. ej., en el procesamiento de CFDI de recepción de pagos o la importación de documentos desde SWAP Services.
  * @author Sergio Flores
  */
 public class SThinDps implements Serializable, SThinData {
@@ -38,43 +40,14 @@ public class SThinDps implements Serializable, SThinData {
     protected String msDbmsCurrency;
     protected String msDbmsCurrencyKey;
     protected Object moDbmsRecordKey;
-    protected int mnDbmsCfdId;
     
+    protected int mnDbmsCfdId;
     protected SThinDpsCfd moThinDpsCfd;
     protected SThinCfd moThinCfd;
+    protected SThinPdf moThinPdf;
     
     public SThinDps() {
         reset();
-    }
-    
-    @Override
-    public void reset() {
-        mnPkYearId = 0;
-        mnPkDocId = 0;
-        msNumberSeries = "";
-        msNumber = "";
-        mtDate = null;
-        mtDateStartOfCredit = null;
-        mnDaysOfCredit = 0;
-        mdTotalCy_r = 0;
-        mdTotal_r = 0;
-        mnFkDpsCategoryId = 0;
-        mnFkDpsClassId = 0;
-        mnFkDpsTypeId = 0;
-        mnFkPaymentTypeId = 0;
-        mnFkBizPartnerId_r = 0;
-        mnFkBizPartnerBranchId = 0;
-        mnFkFunctionalAreaId = 0;
-        mnFkFunctionalSubAreaId = 0;
-        mnFkCurrencyId = 0;
-        
-        msDbmsCurrency = "";
-        msDbmsCurrencyKey = "";
-        moDbmsRecordKey = null;
-        mnDbmsCfdId = 0;
-        
-        moThinDpsCfd = null;
-        moThinCfd = null;
     }
 
     public int getPkYearId() {
@@ -173,6 +146,10 @@ public class SThinDps implements Serializable, SThinData {
         return moThinCfd;
     }
     
+    public SThinPdf getThinPdf() {
+        return moThinPdf;
+    }
+    
     public String getDpsNumber() {
         return STrnUtils.formatDocNumber(msNumberSeries, msNumber);
     }
@@ -190,99 +167,113 @@ public class SThinDps implements Serializable, SThinData {
     }
     
     @Override
+    public void reset() {
+        mnPkYearId = 0;
+        mnPkDocId = 0;
+        msNumberSeries = "";
+        msNumber = "";
+        mtDate = null;
+        mtDateStartOfCredit = null;
+        mnDaysOfCredit = 0;
+        mdTotalCy_r = 0;
+        mdTotal_r = 0;
+        mnFkDpsCategoryId = 0;
+        mnFkDpsClassId = 0;
+        mnFkDpsTypeId = 0;
+        mnFkPaymentTypeId = 0;
+        mnFkBizPartnerId_r = 0;
+        mnFkBizPartnerBranchId = 0;
+        mnFkFunctionalAreaId = 0;
+        mnFkFunctionalSubAreaId = 0;
+        mnFkCurrencyId = 0;
+        
+        msDbmsCurrency = "";
+        msDbmsCurrencyKey = "";
+        moDbmsRecordKey = null;
+        mnDbmsCfdId = 0;
+        
+        moThinDpsCfd = null;
+        moThinCfd = null;
+        moThinPdf = null;
+    }
+    
+    @Override
     public void read(Object primaryKey, Statement statement) throws Exception {
         reset();
-        
+
         int[] key = (int[]) primaryKey;
         String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.dt_start_cred, d.days_cred, d.tot_cur_r, d.tot_r, "
                 + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.fid_tp_pay, "
                 + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, "
-                + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num "
+                + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num, "
+                + "dcfd.id_year, dcfd.id_doc, cfd.id_cfd, pdf.doc_pdf_name "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
                 + "LEFT OUTER JOIN trn_dps_rec AS dr ON dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
+                + "LEFT OUTER JOIN trn_dps_cfd AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
+                + "LEFT OUTER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
+                + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(statement.getConnection()) + ".trn_pdf AS pdf ON pdf.id_year = d.id_year AND pdf.id_doc = d.id_doc "
                 + "WHERE d.id_year = " + key[0] + " AND d.id_doc = " + key[1] + ";";
         
-        try (ResultSet resultSetDps = statement.executeQuery(sql)) {
-            if (!resultSetDps.next()) {
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento (ID " + SLibUtils.textKey(key) + ").");
             }
             else {
-                mnPkYearId = resultSetDps.getInt("d.id_year");
-                mnPkDocId = resultSetDps.getInt("d.id_doc");
-                msNumberSeries = resultSetDps.getString("d.num_ser");
-                msNumber = resultSetDps.getString("d.num");
-                mtDate = resultSetDps.getDate("d.dt");
-                mtDateStartOfCredit = resultSetDps.getDate("d.dt_start_cred");
-                mnDaysOfCredit = resultSetDps.getInt("d.days_cred");
-                mdTotalCy_r = resultSetDps.getDouble("d.tot_cur_r");
-                mdTotal_r = resultSetDps.getDouble("d.tot_r");
-                mnFkDpsCategoryId = resultSetDps.getInt("d.fid_ct_dps");
-                mnFkDpsClassId = resultSetDps.getInt("d.fid_cl_dps");
-                mnFkDpsTypeId = resultSetDps.getInt("d.fid_tp_dps");
-                mnFkPaymentTypeId = resultSetDps.getInt("d.fid_tp_pay");
-                mnFkBizPartnerId_r = resultSetDps.getInt("d.fid_bp_r");
-                mnFkBizPartnerBranchId = resultSetDps.getInt("d.fid_bpb");
-                mnFkFunctionalAreaId = resultSetDps.getInt("d.fid_func");
-                mnFkFunctionalSubAreaId = resultSetDps.getInt("d.fid_func_sub");
-                mnFkCurrencyId = resultSetDps.getInt("d.fid_cur");
+                mnPkYearId = resultSet.getInt("d.id_year");
+                mnPkDocId = resultSet.getInt("d.id_doc");
+                msNumberSeries = resultSet.getString("d.num_ser");
+                msNumber = resultSet.getString("d.num");
+                mtDate = resultSet.getDate("d.dt");
+                mtDateStartOfCredit = resultSet.getDate("d.dt_start_cred");
+                mnDaysOfCredit = resultSet.getInt("d.days_cred");
+                mdTotalCy_r = resultSet.getDouble("d.tot_cur_r");
+                mdTotal_r = resultSet.getDouble("d.tot_r");
+                mnFkDpsCategoryId = resultSet.getInt("d.fid_ct_dps");
+                mnFkDpsClassId = resultSet.getInt("d.fid_cl_dps");
+                mnFkDpsTypeId = resultSet.getInt("d.fid_tp_dps");
+                mnFkPaymentTypeId = resultSet.getInt("d.fid_tp_pay");
+                mnFkBizPartnerId_r = resultSet.getInt("d.fid_bp_r");
+                mnFkBizPartnerBranchId = resultSet.getInt("d.fid_bpb");
+                mnFkFunctionalAreaId = resultSet.getInt("d.fid_func");
+                mnFkFunctionalSubAreaId = resultSet.getInt("d.fid_func_sub");
+                mnFkCurrencyId = resultSet.getInt("d.fid_cur");
                 
-                msDbmsCurrency = resultSetDps.getString("c.cur");
-                msDbmsCurrencyKey = resultSetDps.getString("c.cur_key");
+                msDbmsCurrency = resultSet.getString("c.cur");
+                msDbmsCurrencyKey = resultSet.getString("c.cur_key");
                 
-                int recYearId = resultSetDps.getInt("dr.fid_rec_year");
-                int recPeriodId = resultSetDps.getInt("dr.fid_rec_per");
-                int recBokkeepingCenterId = resultSetDps.getInt("dr.fid_rec_bkc");
-                String recRecordTypeId = resultSetDps.getString("dr.fid_rec_tp_rec");
-                int recNumberId = resultSetDps.getInt("dr.fid_rec_num");
+                int recYearId = resultSet.getInt("dr.fid_rec_year");
+                int recPeriodId = resultSet.getInt("dr.fid_rec_per");
+                int recBokkeepingCenterId = resultSet.getInt("dr.fid_rec_bkc");
+                String recRecordTypeId = resultSet.getString("dr.fid_rec_tp_rec");
+                int recNumberId = resultSet.getInt("dr.fid_rec_num");
                 
                 if (recYearId != 0 && recPeriodId != 0) {
                     moDbmsRecordKey = new Object[] { recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId };
                 }
                 
-                sql = "SELECT id_cfd "
-                        + "FROM trn_cfd "
-                        + "WHERE fid_dps_year_n = " + mnPkYearId + " AND fid_dps_doc_n = " + mnPkDocId + ";";
-                try (ResultSet resultSetCfd = statement.executeQuery(sql)) {
-                    if (resultSetCfd.next()) {
-                        mnDbmsCfdId = resultSetCfd.getInt("id_cfd");
-                    }
+                // Recover all related CFD data:
+                
+                mnDbmsCfdId = resultSet.getInt("cfd.id_cfd"); // means "has CFD"
+                boolean hasPdfCfd = resultSet.getInt("dcfd.id_year") != 0 && resultSet.getInt("dcfd.id_doc") != 0;
+                boolean hasPdf = resultSet.getString("pdf.doc_pdf_name") != null;
+
+                if (mnDbmsCfdId != 0) {
+                    // read CFD:
+                    moThinCfd = new SThinCfd();
+                    moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
                 }
                 
-                if (mnDbmsCfdId != 0) {
-                    boolean exists = false;
-                    
-                    // read document CFD, if exists:
-                    
-                    sql = "SELECT COUNT(*) "
-                            + "FROM trn_dps_cfd "
-                            + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
-                    try (ResultSet resultSet = statement.executeQuery(sql)) {
-                        if (resultSet.next() && resultSet.getInt(1) > 0) {
-                            exists = true;
-                        }
-                    }
-                    
-                    if (exists) {
-                        moThinDpsCfd = new SThinDpsCfd();
-                        moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
-                    }
+                if (hasPdfCfd) {
+                    // read CFD data:
+                    moThinDpsCfd = new SThinDpsCfd();
+                    moThinDpsCfd.read(new int[] { mnPkYearId, mnPkDocId}, statement);
+                }
 
-                    // read CFD, if exists:
-                    
-                    sql = "SELECT COUNT(*) "
-                            + "FROM trn_cfd "
-                            + "WHERE id_cfd = " + mnDbmsCfdId + ";";
-                    try (ResultSet resultSet = statement.executeQuery(sql)) {
-                        if (resultSet.next() && resultSet.getInt(1) > 0) {
-                            exists = true;
-                        }
-                    }
-
-                    if (exists) {
-                        moThinCfd = new SThinCfd();
-                        moThinCfd.read(new int[] { mnDbmsCfdId }, statement);
-                    }
+                if (hasPdf) {
+                    // read PDF:
+                    moThinPdf = new SThinPdf();
+                    moThinPdf.read(new int[] { mnPkYearId, mnPkDocId}, statement);
                 }
             }
         }
@@ -291,5 +282,31 @@ public class SThinDps implements Serializable, SThinData {
     @Override
     public Object getPrimaryKey() {
         return new int[] { mnPkYearId, mnPkDocId };
+    }
+    
+    /**
+     * Read dps folio number in format series-number.
+     * @param primaryKey DPS primary key.
+     * @param statement DB statement.
+     * @return
+     * @throws Exception 
+     */
+    public static String readDpsNumber(Object primaryKey, Statement statement) throws Exception {
+        String dpsNumber = "";
+        int[] key = (int[]) primaryKey;
+        String sql = "SELECT CONCAT(num_ser, IF(num_ser = '', '', '-'), num) AS _dps_num "
+                + "FROM trn_dps "
+                + "WHERE id_year = " + key[0] + " AND id_doc = " + key[1] + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (!resultSet.next()) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento (ID " + SLibUtils.textKey(key) + ").");
+            }
+            else {
+                dpsNumber = resultSet.getString("_dps_num");
+            }
+        }
+        
+        return dpsNumber;
     }
 }

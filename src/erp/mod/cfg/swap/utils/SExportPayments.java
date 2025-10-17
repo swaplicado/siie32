@@ -165,12 +165,12 @@ public class SExportPayments extends Thread {
             if (entry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
                 int docId = getDocumentId(paymentEty);
                 if (docId != 0) {
-                    entry.document_id_n = docId;
+                    entry.document_n_id = docId;
                 }
                 else {
                     SThinDps dps = new SThinDps();
                     dps.read(new int[] { paymentEty.getFkDocYearId_n(), paymentEty.getFkDocDocId_n() }, miClient.getSession().getStatement());
-                    entry.document_id_n = null;
+                    entry.document_n_id = null;
                     entry.document_uuid = dps.getThinCfd() == null ? "" : dps.getThinCfd().getUuid();
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());

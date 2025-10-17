@@ -166,6 +166,11 @@ public class SExportDataUser implements SExportData {
         public String tax_regime_code;
         
         /**
+         * ID del socio de negocios en el sistema externo.
+         */
+        public int credit_days;
+        
+        /**
          * Correo electrónico del socio de negocios.
          */
         public String partner_mail;

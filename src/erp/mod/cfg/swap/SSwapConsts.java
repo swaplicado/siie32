@@ -173,9 +173,4 @@ public abstract class SSwapConsts {
      * Tipo de entidad organización (persona moral).
      */
     public static final String PURCHASER_AGENT = "PURCHASER_AGENT";
-    
-    /**
-     * Año a partir del cual se exportan OCs
-     */
-    public static final int SINCE_YEAR = 2025;
 }

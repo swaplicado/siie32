@@ -9,16 +9,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SConfigurationDpsOrderFiscalData {
+    
     Integer applyFiscalData;
+    
     @JsonProperty("UsoCFDI")
     String usoCFDI;
+    
     @JsonProperty("MetodoPago")
     String metodoPago;
     
-    public Integer getapplyFiscalData() {
+    public Integer getApplyFiscalData() {
         return applyFiscalData;
     }
     
@@ -30,7 +33,7 @@ public class SConfigurationDpsOrderFiscalData {
         return metodoPago;
     }
     
-    public void setapplyFiscalData(Integer applyFiscalData) {
+    public void setApplyFiscalData(Integer applyFiscalData) {
         this.applyFiscalData = applyFiscalData;
     }
     

@@ -14,7 +14,9 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1159,5 +1161,34 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             keys.add(pk);
         }
         return keys;
+    }
+    
+    /**
+     * Prepares and, if required, creates a CFD. Can be based on an originnal CFD, optionally provided, otherwise a new one is created.
+     * @param originalCfd Original CFD, can be <code>null</code>.
+     * @param xmlFile XML file.
+     * @param userId User ID.
+     * @return
+     * @throws Exception 
+     */
+    public static SDataCfd prepareCfd(final SDataCfd originalCfd, final File xmlFile, final int userId) throws Exception {
+        String xml = SXmlUtils.readXml(xmlFile.getAbsolutePath());
+        SDataCfd cfd = originalCfd != null ? originalCfd : new SDataCfd();
+
+        cfd.setCertNumber("");
+        cfd.setStringSigned("");
+        cfd.setSignature("");
+        cfd.setDocXml(xml);
+        cfd.setDocXmlName(xmlFile.getName());
+        cfd.setIsConsistent(true);
+        cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
+        cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
+        cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+        cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
+        cfd.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+        cfd.setFkUserProcessingId(userId); // verify if user ID is really needed here!
+        cfd.setFkUserDeliveryId(userId); // verify if user ID is really needed here!
+        
+        return cfd;
     }
 }

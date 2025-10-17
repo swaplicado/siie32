@@ -42,7 +42,7 @@ public class SExportDataPaymentEntry implements SExportData {
     public String document_bal_unpd_exec;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public Integer document_id_n;
+    public Integer document_n_id;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_uuid;

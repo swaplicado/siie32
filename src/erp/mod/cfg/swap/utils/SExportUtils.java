@@ -659,11 +659,14 @@ public abstract class SExportUtils {
                 
                 for (SDbSyncLogEntry entry : entries) {
                     int paymentId = SLibUtils.parseInt(entry.getReferenceId());
-                    SDbPayment paymentToUpdate = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
-                    int newStatusPayment = SDbPayment.getSettledStatusPaymentId(paymentToUpdate.getFkStatusPaymentId());
-                    Object valueToUpdate = new Object[] { newStatusPayment, paymentToUpdate.getFkUserUpdateId(), entry.getAuxDatabase() };
+                    SDbPayment paymentBeingUpdated = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
+                    int newStatusPayment = SDbPayment.getSettledStatusPaymentId(paymentBeingUpdated.getFkStatusPaymentId());
                     
-                    paymentToUpdate.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
+                    if (newStatusPayment != 0) {
+                        Object valueToUpdate = new Object[] { newStatusPayment, paymentBeingUpdated.getFkUserUpdateId(), entry.getAuxDatabase() };
+                        
+                        paymentBeingUpdated.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
+                    }
                 }
                 break;
                 
@@ -1043,7 +1046,7 @@ public abstract class SExportUtils {
         }
         
         if (proceed) {
-            System.out.println(SLibUtils.textRepeat("=", 80));
+            System.out.println(SLibUtils.textRepeat("=", 80)); // 80: "standard" text-based screen width
             System.out.println("Exporting " + syncType + "...");
             
             if (wakeUpServices) {

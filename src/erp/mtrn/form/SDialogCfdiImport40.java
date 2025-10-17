@@ -2061,8 +2061,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         dps.setAuxKeepDpsData(true);
         dps.setAuxKeepExchangeRate(true); 
-        dps.setAuxFileXmlAbsolutePath(moCfdiFile.getAbsolutePath());
-        dps.setAuxFileXmlName(moCfdiFile.getName());
+        dps.setAuxFileXml(moCfdiFile);
         
         dps.getDbmsDpsEntries().clear();
         

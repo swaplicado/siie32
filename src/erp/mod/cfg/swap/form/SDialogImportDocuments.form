@@ -368,7 +368,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbCreateInvoice">
+                    <Component class="javax.swing.JButton" name="jbCreateInvoiceFromScratch">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_new.gif"/>

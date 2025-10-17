@@ -289,8 +289,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsProcessingCancellation;
     protected boolean mbAuxKeepDpsData;
     protected boolean mbAuxKeepExchangeRate;
-    protected java.lang.String msAuxFileXmlAbsolutePath;
-    protected java.lang.String msAuxFileXmlName;
+    protected java.io.File moAuxFileXml;
     protected java.io.File moAuxFilePdf;
     protected int[] manAuxDpsTime;
     protected int mnAuxAppPrepayCurCrossPayCurrencyId; // case of an application of prepayment with currency crossing: payment's currency ID
@@ -2146,10 +2145,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsProcessingCancellation(boolean b) { mbAuxIsProcessingCancellation = b; }
     public void setAuxKeepDpsData(boolean b) { mbAuxKeepDpsData = b; }
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
-    public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
-    public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
+    public void setAuxFileXml(java.io.File o) { moAuxFileXml = o; }
     public void setAuxFilePdf(java.io.File o) { moAuxFilePdf = o; }
-    public void setAuxDpsTime (int[] o) { manAuxDpsTime = o; } 
+    public void setAuxDpsTime(int[] o) { manAuxDpsTime = o; } 
     public void setAuxAppPrepayCurCrossPayCurrencyId(int n) { mnAuxAppPrepayCurCrossPayCurrencyId = n; }
     public void setAuxInitiativeId(int n) { mnAuxInitiativeId = n; }
     public void setAuxAppPrepayCurCrossPayExchangeRate(double d) { mdAuxAppPrepayCurCrossPayExchangeRate = d; }
@@ -2189,8 +2187,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxIsProcessingCancellation() { return mbAuxIsProcessingCancellation; }
     public boolean getAuxKeepDpsData() { return mbAuxKeepDpsData; }
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
-    public java.lang.String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
-    public java.lang.String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public java.io.File getAuxFileXml() { return moAuxFileXml; }
     public java.io.File getAuxFilePdf() { return moAuxFilePdf; }
     public int[] getAuxDpsTime() { return manAuxDpsTime; }
     public int getAuxAppPrepayCurCrossPayCurrencyId() { return mnAuxAppPrepayCurCrossPayCurrencyId; }
@@ -2502,8 +2499,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxIsProcessingCancellation = false;
         mbAuxKeepDpsData = false;
         mbAuxKeepExchangeRate = false;
-        msAuxFileXmlAbsolutePath = "";
-        msAuxFileXmlName = "";
+        moAuxFileXml = null;
         moAuxFilePdf = null;
         manAuxDpsTime = null;
         mnAuxAppPrepayCurCrossPayCurrencyId = 0;
@@ -4503,26 +4499,26 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
 
-                // Save XML of purchases when provided:
+                // Save XML & PDF of purchases when provided:
                 
-                if (moDbmsDataCfd != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                    moDbmsDataCfd.setFkDpsYearId_n(mnPkYearId);
-                    moDbmsDataCfd.setFkDpsDocId_n(mnPkDocId);
-                    moDbmsDataCfd.setTimestamp(mtDate);
+                if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                    if (moDbmsDataCfd != null) {
+                        moDbmsDataCfd.setFkDpsYearId_n(mnPkYearId);
+                        moDbmsDataCfd.setFkDpsDocId_n(mnPkDocId);
+                        moDbmsDataCfd.setTimestamp(mtDate);
 
-                    if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                        if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
+                        }
                     }
-                }
-                
-                // Save PDF of purchases when provided:
-                
-                if (moDbmsDataPdf != null && !moDbmsDataPdf.getAuxSkipSave() && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                    moDbmsDataPdf.setPkYearId(mnPkYearId);
-                    moDbmsDataPdf.setPkDocId(mnPkDocId);
-                    
-                    if (moDbmsDataPdf.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+
+                    if (moDbmsDataPdf != null && !moDbmsDataPdf.getAuxSkipSave()) {
+                        moDbmsDataPdf.setPkYearId(mnPkYearId);
+                        moDbmsDataPdf.setPkDocId(mnPkDocId);
+
+                        if (moDbmsDataPdf.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
+                        }
                     }
                 }
                 
@@ -6865,7 +6861,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public String getReceptorRegimenFiscal() { // CFDI 4.0
-        return moDbmsDataDpsCfd.getTaxRegimeReceptor();
+        return moDbmsDataDpsCfd.getTaxRegimeReceiver();
     }
 
     @Override

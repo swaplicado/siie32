@@ -362,4 +362,25 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         return mnLastDbActionResult;
     }
     */
+    
+    /**
+     * Prepares and, if required, creates a PDF. Can be based on an originnal PDF, optionally provided, otherwise a new one is created.
+     * @param originalPdf Original PDF, can be <code>null</code>.
+     * @param pdfFile PDF file.
+     * @param year Year.
+     * @param pdfDirectory PDF base directory in SIIE Server.
+     * @return
+     * @throws Exception 
+     */
+    public static SDataPdf preparePdf(final SDataPdf originalPdf, final File pdfFile, final int year, final String pdfDirectory) throws Exception {
+        SDataPdf pdf = originalPdf != null ? originalPdf : new SDataPdf();
+        
+        if (originalPdf == null) {
+            pdf.setPkYearId(year);
+        }
+
+        pdf.uploadPdfFile(pdfFile, pdfDirectory);
+        
+        return pdf;
+    }
 }

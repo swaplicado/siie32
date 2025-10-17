@@ -4656,7 +4656,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         jTabbedPane.setEnabledAt(TAB_CFD_INT_COM, isCfdIntCommerceRequired());
         jTabbedPane.setEnabledAt(TAB_CFD_ADD, isCfdAddendaRequired());
-        jTabbedPane.setEnabledAt(TAB_CFD_XML, isCfdEmissionRequired || isCfdXmlFilePermitted());   // enable aswell XML file for expenses documents
+        jTabbedPane.setEnabledAt(TAB_CFD_XML, isCfdEmissionRequired || isCfdXmlFileAllowed()); // enable aswell XML file for expenses documents
         jcbCfdiPaymentWay.setEnabled(enable && isCfdEmissionRequired);
         jcbCfdiPaymentMethod.setEnabled(enable && isCfdEmissionRequired);
         
@@ -4671,7 +4671,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      */
     private void enableCfdXmlFields(boolean enable) {
         boolean enableFields = enable && isCfdEmissionRequired();
-        boolean enableXmlFields = enable && isCfdXmlFilePermitted();
+        boolean enableXmlFields = enable && isCfdXmlFileAllowed();
         boolean isCfdi33or40 = mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33 || mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_40;
         
         jlFileXml.setEnabled(enableXmlFields);
@@ -5163,7 +5163,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         return isCfdEmissionRequired() && moBizPartner != null && moBizPartner.getIsCustomer() && moBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA;
     }
     
-    private boolean isCfdXmlFilePermitted() {
+    private boolean isCfdXmlFileAllowed() {
         return !mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment);
     }
     
@@ -5262,7 +5262,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private boolean isApplingFiscalData() {
-        return moCfgFiscalDataPurchasesOrder != null && moCfgFiscalDataPurchasesOrder.getapplyFiscalData() == 1 && mbIsDpsOrder && !mbIsSales && !isBizPartnerInt();
+        return moCfgFiscalDataPurchasesOrder != null && moCfgFiscalDataPurchasesOrder.getApplyFiscalData() == 1 && mbIsDpsOrder && !mbIsSales && !isBizPartnerInt();
     }
     
     private boolean isApplingInitiatives() {
@@ -5401,7 +5401,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdiTaxRegimeIss.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
                 }
                 
-                if (moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
+                if (moDps.getDbmsDataDpsCfd().getTaxRegimeReceiver().isEmpty()) {
                     moFieldCfdiTaxRegimeRec.setFieldValue(moBizPartnerCategory.getTaxRegime()); 
                 }
                 
@@ -13251,8 +13251,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 moFieldFisDataTaxRegimeIss.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
             }
             
-            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
-                moFieldFisDataTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+            if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceiver().isEmpty()) {
+                moFieldFisDataTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceiver());
             }
             
             if (!moDps.getDbmsDataDpsCfd().getCfdiUsage().isEmpty()) {
@@ -13269,8 +13269,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdiTaxRegimeIss.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeIssuing());
                 }
                 
-                if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor().isEmpty()) {
-                    moFieldCfdiTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceptor());
+                if (!moDps.getDbmsDataDpsCfd().getTaxRegimeReceiver().isEmpty()) {
+                    moFieldCfdiTaxRegimeRec.setFieldValue(moDps.getDbmsDataDpsCfd().getTaxRegimeReceiver());
                 }
                 else {
                     moFieldCfdiTaxRegimeRec.setFieldValue(moBizPartnerCategory.getTaxRegime());
@@ -13362,14 +13362,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
         
-        if (isCfdXmlFilePermitted()) {
-            if (moDps.getDbmsDataCfd() != null) { // Cuando se modifica un DPS existente desde la vista de facturas.
+        if (isCfdXmlFileAllowed()) {
+            if (moDps.getDbmsDataCfd() != null) { // cuando se modifica un DPS existente desde la vista de facturas
                 moFieldCfdiXmlFile.setFieldValue(moDps.getDbmsDataCfd().getDocXmlName());
                 msFileXmlJustLoaded = "";
             }
-            else if (!moDps.getAuxFileXmlAbsolutePath().isEmpty()) { // Cuando se crea un DPS a partir de un archivo XML.
-                moFieldCfdiXmlFile.setFieldValue(moDps.getAuxFileXmlName());
-                msFileXmlJustLoaded = moDps.getAuxFileXmlAbsolutePath();
+            else if (moDps.getAuxFileXml() != null) { // cuando se crea un DPS a partir de un archivo XML
+                moFieldCfdiXmlFile.setFieldValue(moDps.getAuxFileXml().getName());
+                msFileXmlJustLoaded = moDps.getAuxFileXml().getAbsolutePath();
             }
             
             if (moDps.getDbmsDataPdf() != null) { // Cuando el DPS posee un archivo PDF asociado.
@@ -13637,21 +13637,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setAuxAppPrepayCurCrossPayCurrencyId(0);
             moDps.setAuxAppPrepayCurCrossPayExchangeRate(0.0);
 
+            boolean isApplingFiscalData = isApplingFiscalData(); // convenience variable, applies for purchase invoices or credit notes
             boolean isCfdEmissionRequired = isCfdEmissionRequired(); // convenience variable
             
-            if (isApplingFiscalData()) {
-                SDataDpsCfd dpsCfd = new SDataDpsCfd();
-                dpsCfd.setPaymentMethod(moFieldFisDataPaymentMethod.getFieldValue().toString());
-                dpsCfd.setTaxRegimeIssuing(jcbFisDataTaxRegimeIssuing.getSelectedIndex() <= 0 ? "" : moFieldFisDataTaxRegimeIss.getFieldValue().toString());
-                dpsCfd.setTaxRegimeReceptor(moFieldFisDataTaxRegimeRec.getFieldValue().toString());
-                dpsCfd.setCfdiUsage(moFieldFisDataCfdiUsage.getFieldValue().toString());
+            if (isApplingFiscalData) {
+                SDataDpsCfd dpsCfd = SDataDpsCfd.createDpsCfd(
+                        moFieldFisDataPaymentMethod.getFieldValue().toString(), 
+                        jcbFisDataTaxRegimeIssuing.getSelectedIndex() <= 0 ? "" : moFieldFisDataTaxRegimeIss.getFieldValue().toString(), 
+                        moFieldFisDataTaxRegimeRec.getFieldValue().toString(), 
+                        moFieldFisDataCfdiUsage.getFieldValue().toString());
+                
                 moDps.setDbmsDataDpsCfd(dpsCfd);
             }
-            else {
-                moDps.setDbmsDataDpsCfd(null);
-            }
-
-            if (isCfdEmissionRequired) {
+            else if (isCfdEmissionRequired) {
                 SDataDpsCfd dpsCfd = new SDataDpsCfd();
 
                 //dpsCfd.setPkDpsYearId(...    // set when DPS saved!
@@ -13669,7 +13667,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd.setZipIssue(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { moDps.getFkCompanyBranchId() }).getDbmsBizPartnerBranchAddressOfficial().getZipCode());
                 dpsCfd.setConfirmation(moFieldCfdiConfirmation.getFieldValue().toString());
                 dpsCfd.setTaxRegimeIssuing(moFieldCfdiTaxRegimeIss.getFieldValue().toString());
-                dpsCfd.setTaxRegimeReceptor(moFieldCfdiTaxRegimeRec.getFieldValue().toString());
+                dpsCfd.setTaxRegimeReceiver(moFieldCfdiTaxRegimeRec.getFieldValue().toString());
                 dpsCfd.setCfdiUsage(moFieldCfdiCfdiUsage.getFieldValue().toString());
 
                 if (isCfdCfdiRelatedRequired() || (moCfdRelatedDocs != null && !moCfdRelatedDocs.getRowCfdRelatedDocs().isEmpty())) {
@@ -13769,45 +13767,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 
                 moDps.setDbmsDataDpsCfd(dpsCfd);
             }
+            
+            if (!isApplingFiscalData && !isCfdEmissionRequired) {
+                moDps.setDbmsDataDpsCfd(null);
+            }
 
             // Set params for CFD:
 
-            if (!isCfdEmissionRequired) {
-                moDps.setAuxIsNeedCfd(false);
-                moDps.setAuxIsNeedCfdCce(false);
-                moDps.setApprovalYear(0);
-                moDps.setApprovalNumber(0);
-                moDps.setAuxCfdParams(null);
-            }
-            else {
+            if (isCfdEmissionRequired) {
                 moDps.setAuxIsNeedCfd(true);
                 moDps.setAuxIsNeedCfdCce(jckCfdCceApplies.isSelected());
                 moDps.setApprovalYear(mnNumbersApprovalYear);
                 moDps.setApprovalNumber(mnNumbersApprovalNumber);
                 moDps.setAuxCfdParams(createCfdParams());
             }
+            else {
+                moDps.setAuxIsNeedCfd(false);
+                moDps.setAuxIsNeedCfdCce(false);
+                moDps.setApprovalYear(0);
+                moDps.setApprovalNumber(0);
+                moDps.setAuxCfdParams(null);
+            }
 
             // process added XML file of CFDI:
 
             if (!msFileXmlJustLoaded.isEmpty()) {
                 // an XML has just been provided to be attached to current registry:
+                
                 try {
-                    String xml = SXmlUtils.readXml(msFileXmlJustLoaded);
-                    SDataCfd cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
-
-                    cfd.setCertNumber("");
-                    cfd.setStringSigned("");
-                    cfd.setSignature("");
-                    cfd.setDocXml(xml);
-                    cfd.setDocXmlName(moFieldCfdiXmlFile.getString());
-                    cfd.setIsConsistent(true);
-                    cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
-                    cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
-                    cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
-                    cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
-                    cfd.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
-                    cfd.setFkUserProcessingId(miClient.getSession().getUser().getPkUserId());
-                    cfd.setFkUserDeliveryId(miClient.getSession().getUser().getPkUserId());
+                    SDataCfd cfd = SDataCfd.prepareCfd(
+                            moDps.getDbmsDataCfd(), 
+                            new File(msFileXmlJustLoaded), 
+                            miClient.getSession().getUser().getPkUserId());
 
                     moDps.setDbmsDataCfd(cfd);
                 }
@@ -13817,10 +13808,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (moFieldCfdiXmlFile.getString().isEmpty() && moDps.getDbmsDataCfd() != null) {
                 // XXX NOTE: 2018-05-24, Sergio Flores: Check if this code is correct. It seems it does not, because when XML file is deleted, it is preserved... why?!
+                
                 SDataCfd cfd = moDps.getDbmsDataCfd();
 
-                cfd.setDocXml("");
-                cfd.setDocXmlName("");
+                cfd.setDocXml(""); // resets CFD
+                cfd.setDocXmlName(""); // resets CFD
                 cfd.setIsConsistent(true);
                 cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
 
@@ -13828,27 +13820,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
 
             if (moFilePdfJustLoaded != null) {
-                SDataPdf pdf;
-
-                if (moDps.getDbmsDataPdf() != null) {
-                    pdf = moDps.getDbmsDataPdf(); // reuse existing registry
-                }
-                else {
-                    pdf = new SDataPdf(); // create new registry
-                    pdf.setPkYearId(moDps.getPkYearId());
-                    moDps.setDbmsDataPdf(pdf);
-                }
+                // a PDF has just been provided to be attached to current registry:
                 
                 try {
-                    pdf.uploadPdfFile(moFilePdfJustLoaded, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+                    SDataPdf pdf = SDataPdf.preparePdf(
+                            moDps.getDbmsDataPdf(), 
+                            moFilePdfJustLoaded, 
+                            moDps.getPkYearId(), 
+                            ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+
+                    moDps.setDbmsDataPdf(pdf);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
+                
             }
             else if (moDps.getDbmsDataPdf() != null) {
                 if (moFieldCfdiPdfFile.getString().isEmpty()) {
-                    moDps.getDbmsDataPdf().setAuxDeleted(true); // PDF was removed
+                    moDps.getDbmsDataPdf().setAuxDeleted(true); // PDF was removed!
                 }
                 else {
                     moDps.getDbmsDataPdf().setAuxSkipSave(true); // PDF remains the same

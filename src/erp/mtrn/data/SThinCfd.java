@@ -8,7 +8,8 @@ import java.sql.Statement;
 
 /**
  * Versión "delgada" del registro SDataDps (tabla trn_cfd).
- * Se usa para agilizar el procesamiento de CFDI de recepción de pagos.
+ * Se usa para agilizar la lectura de datos de DPS,
+ * p. ej., en el procesamiento de CFDI de recepción de pagos o la importación de documentos desde SWAP Services.
  * @author Sergio Flores
  */
 public class SThinCfd implements Serializable, SThinData {
