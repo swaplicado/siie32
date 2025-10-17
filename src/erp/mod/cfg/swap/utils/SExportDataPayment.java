@@ -53,6 +53,8 @@ public class SExportDataPayment implements SExportData {
     
     public String notes;
     
+    public String notes_authz;
+    
     public int is_receipt_payment_req;
     
     public int payment_status;
