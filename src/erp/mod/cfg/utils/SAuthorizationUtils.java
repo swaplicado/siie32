@@ -1041,7 +1041,7 @@ public abstract class SAuthorizationUtils {
                 + "WHERE NOT b_del AND fk_tp_authorn = 2 "
                 + "AND (('" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' BETWEEN dt_sta AND dt_end_n) OR "
                 + "(dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(session.getCurrentDate()) + "' AND dt_end_n IS NULL)) "
-                + "ORDER BY sort, name, lev;";
+                + "ORDER BY name, lev;";
         
         try {
             ResultSet res = session.getDatabase().getConnection().createStatement().executeQuery(sql);
