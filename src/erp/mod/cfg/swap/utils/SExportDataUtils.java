@@ -1128,6 +1128,7 @@ public abstract class SExportDataUtils {
                                         oFileToExport.project_id = oFd.getProjectId();
                                         oContainer.file.add(oFileToExport);
                                     }
+                                    oLogEty.setAuxDatabase(database);
                                     lLogFiles.add(oLogEty);
                                 }
                                 else {
