@@ -16,6 +16,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
@@ -1017,6 +1018,7 @@ public abstract class SExportDataUtils {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER, database);
+                ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
 
                 String sql = "SELECT "
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
@@ -1099,7 +1101,7 @@ public abstract class SExportDataUtils {
                         sBucketName = oFile.bucket_name;
                         sProjectID = oFile.project_id;
                     }
-                    // Si no existe en el bucket, se sube
+                    // Si no existe en la bitácora de siie, se sube
                     else {
                         try {
                             sBucketName = CloudStorageManager.getBucketName();
@@ -1126,6 +1128,7 @@ public abstract class SExportDataUtils {
                                         oFileToExport.project_id = oFd.getProjectId();
                                         oContainer.file.add(oFileToExport);
                                     }
+                                    lLogFiles.add(oLogEty);
                                 }
                                 else {
                                     Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. " + 
@@ -1192,6 +1195,9 @@ public abstract class SExportDataUtils {
                     
                     lDps.add(oContainer);
                 }
+                
+                // guardar encabezado de log de archivos:
+                SDpsGoogleCloudUtils.saveSyncLogs(session, lLogFiles, false);
             }
         }
         
@@ -2133,7 +2139,7 @@ public abstract class SExportDataUtils {
             }
 
             String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
-            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY{1} ", new Object[]{companyId, sql});
+            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY {1} ", new Object[]{companyId, sql});
 
             // Iniciar transacción
             Connection conn = statement.getConnection();
@@ -2159,8 +2165,8 @@ public abstract class SExportDataUtils {
                 }
             }
             catch (SQLException ex) {
-                conn.rollback();
                 Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
+                conn.rollback();
                 throw ex;
             }
             finally {

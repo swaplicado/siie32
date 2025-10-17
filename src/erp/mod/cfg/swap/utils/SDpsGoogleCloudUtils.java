@@ -271,7 +271,7 @@ public class SDpsGoogleCloudUtils {
     /**
      * Guarda los logs de sincronización en la base de datos
      */
-    private static void saveSyncLogs(final SGuiSession session, final ArrayList<SDbSyncLogEntry> logs, final boolean hasErrors) throws Exception {
+    public static void saveSyncLogs(final SGuiSession session, final ArrayList<SDbSyncLogEntry> logs, final boolean hasErrors) throws Exception {
         // Código de respuesta general: 206 si hubo errores, 200 si todo OK
         int overallStatus = hasErrors ? HttpURLConnection.HTTP_PARTIAL : HttpURLConnection.HTTP_OK;
 
