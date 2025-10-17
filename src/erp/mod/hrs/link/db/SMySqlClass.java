@@ -5,23 +5,21 @@
  */
 package erp.mod.hrs.link.db;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 /**
  *
  * @author Edwin Carmona
  */
 public class SMySqlClass {
-
-    private static String jsonConn;
     
     public SMySqlClass(String json) throws SConfigException {
         if (json == null || json.isEmpty()) {
@@ -31,17 +29,24 @@ public class SMySqlClass {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            SDbConnection conn = mapper.readValue(json, SDbConnection.class);
+            SDbConnection oDbConn = mapper.readValue(json, SDbConnection.class);
 
-            this.gserverHost = conn.getDbHost();
-            this.gdbPort = conn.getDbPort();
-            this.gdb = conn.getDbName();
-            this.guser = conn.getDbUser();
-            this.gpass = conn.getDbPass();
-            this.gmaindb = conn.getDbMainId();
+            this.gserverHost = oDbConn.getDbHost();
+            this.gdbPort = oDbConn.getDbPort();
+            this.gdb = oDbConn.getDbName();
+            this.guser = oDbConn.getDbUser();
+            this.gpass = oDbConn.getDbPass();
+            this.gmaindb = oDbConn.getDbMainId();
         }
         catch (IOException ex) {
+            ex.printStackTrace();
             Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if (this.gmaindb <= 0) {
+            // Imprimir stack trace
+            Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, "No existe la base de datos principal en la configuración recibida.");
+            throw new SConfigException("No existe la base de datos principal en la configuración recibida.");
         }
     }
 
@@ -119,10 +124,6 @@ public class SMySqlClass {
         return conn;
     }
 
-    public static String getJsonConn() {
-        return jsonConn;
-    }
-
     public int getMainBb() {
         return gmaindb;
     }
@@ -136,8 +137,12 @@ public class SMySqlClass {
                 if (idCo > 0) {
                     query += "    id_co = " + idCo + ";";
                 }
-                else {
+                else if (this.getMainBb() > 0) {
                     query += "    id_co = " + this.getMainBb() + ";";
+                }
+                else {
+                    query += "    id_co = " + 2852 + ";";
+                    Logger.getLogger(SMySqlClass.class.getName()).log(Level.WARNING, "id_co = " + 2852 + " por defecto.");
                 }
 
         Statement st;
@@ -151,6 +156,7 @@ public class SMySqlClass {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(ruta + servidor + this.gdb, this.guser, this.gpass);
             st = conn.createStatement();
+            Logger.getLogger(SMySqlClass.class.getName()).log(Level.INFO, "getMainDatabaseName({0}) : {1}", new Object[]{idCo, query});
             ResultSet res = st.executeQuery(query);
 
             String name = "";
@@ -164,6 +170,7 @@ public class SMySqlClass {
 
             return name;
         } catch (SQLException ex) {
+            ex.printStackTrace();
             Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
         }
 

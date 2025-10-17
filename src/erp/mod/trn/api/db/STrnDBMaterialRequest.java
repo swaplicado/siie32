@@ -9,7 +9,6 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
-import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebCostCenter;
 import erp.mod.trn.api.data.SWebMatReqEtyNote;
@@ -33,6 +32,40 @@ import java.util.logging.Logger;
  * vinculadas a entradas específicas de documentos (DPS).
  */
 public class STrnDBMaterialRequest {
+    
+    private static final String BASE_QUERY_ALL = 
+        "SELECT " +
+        "    mr.id_mat_req, mr.cl_req AS _mr_class, mr.tp_req AS _mr_type, mr.num AS _mr_folio, " +
+        "    mr.dt AS _mr_dt, mr.dt_req_n, mr.tot_r AS _mr_total, pe.name AS _mr_prov_ent, " +
+        "    pty.name AS _mr_priority, st.name AS _mr_status, nat.dps_nat AS _mr_nat, " +
+        "    usr.usr AS _mr_usr, itm.item AS _mr_item_ref, "
+            + "CASE "
+            + "        WHEN auth.auth_status_id = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
+            + "        WHEN auth.auth_status_id = " + SAuthorizationUtils.AUTH_STATUS_REJECTED + " THEN 'RECHAZADO' "
+            + "        WHEN auth.auth_status_id = " + SAuthorizationUtils.AUTH_STATUS_PENDING + " THEN 'PENDIENTE' "
+            + "        WHEN auth.auth_status_id = " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + " THEN 'EN PROCESO' "
+            + "        ELSE '(NO APLICA)' "
+            + "    END AS auth_status, " +
+        "   auth.auth_status_id, " +
+        "    COALESCE(( " +
+        "        SELECT GROUP_CONCAT(u.usr SEPARATOR ', ') " +
+        "        FROM cfgu_authorn_step AS steps1 " +
+        "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr " +
+        "        WHERE NOT steps1.b_del " +
+        "            AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
+        "            AND steps1.res_pk_n1_n = mr.id_mat_req " +
+        "            AND NOT steps1.b_authorn " +
+        "            AND NOT steps1.b_reject " +
+        "            AND steps1.lev = auth.min_lev " +
+        "    ), 'NA') AS user_in_turn " +
+        "FROM " +
+        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr " +
+        "INNER JOIN trn_mat_prov_ent AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
+        "INNER JOIN erp.trnu_mat_req_pty AS pty ON mr.fk_mat_req_pty = pty.id_mat_req_pty " +
+        "INNER JOIN erp.trns_st_mat_req AS st ON st.id_st_mat_req = mr.fk_st_mat_req " +
+        "INNER JOIN erp.trnu_dps_nat AS nat ON nat.id_dps_nat = mr.fk_dps_nat " +
+        "INNER JOIN erp.usru_usr AS usr ON usr.id_usr = mr.fk_usr_req " +
+        "LEFT JOIN erp.itmu_item AS itm ON itm.id_item = mr.fk_item_ref_n ";
 
     private static final String BASE_QUERY = 
         "SELECT " +
@@ -306,7 +339,7 @@ public class STrnDBMaterialRequest {
      */
     public ArrayList<SWebMaterialRequest> getMatReqs(String startDate, String endDate, int idUser, int idSessionUser, int statusFilter) {
         ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
-        StringBuilder query = new StringBuilder(BASE_QUERY).append(WHERE_NOT_DELETED);
+        StringBuilder query = new StringBuilder(BASE_QUERY_ALL);
 
         try (Connection conn = this.getConnection()) {
             if (conn == null) {
@@ -364,13 +397,30 @@ public class STrnDBMaterialRequest {
      */
     private void appendStatusFilter(StringBuilder query, int statusFilter, String startDate, String endDate, int idUser, String whereUsers) {
         String dateFilter = "mr.dt BETWEEN '" + startDate + "' AND '" + endDate + "' ";
-        String userStepSubquery = idUser + " IN (SELECT steps1.fk_usr_step FROM " +
-                SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 " +
-                "WHERE NOT steps1.b_del AND steps1.res_tab_name_n = '" +
-                SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' AND steps1.res_pk_n1_n = mr.id_mat_req) ";
-
+        
+        String authInnerJoin = "INNER JOIN ( "
+                + "        SELECT  "
+                + "            res_pk_n1_n AS id_mat_req, "
+                + "            CFG_GET_ST_AUTHORN(1, 'trn_mat_req', res_pk_n1_n, NULL, NULL, NULL, NULL) AS auth_status_id, "
+                + "            (SELECT MIN(lev) "
+                + "             FROM cfgu_authorn_step AS step2 "
+                + "             WHERE NOT step2.b_del "
+                + "               AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
+                + "               AND step2.res_pk_n1_n = res_pk_n1_n "
+                + "               AND NOT step2.b_authorn "
+                + "               AND NOT step2.b_reject "
+                + "            ) AS min_lev "
+                + "        FROM cfgu_authorn_step "
+                + "        WHERE NOT b_del "
+                + "        AND res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' ";
+        if ((statusFilter == -1 || statusFilter == 0) && whereUsers.isEmpty()) {
+            authInnerJoin += "AND fk_usr_step = " + idUser + " ";
+        }
+        authInnerJoin += "GROUP BY res_pk_n1_n) AS auth ON mr.id_mat_req = auth.id_mat_req ";
+        query.append(authInnerJoin);
         switch (statusFilter) {
             case -2: // TODAS MIS requisiciones
+                query.append(WHERE_NOT_DELETED);
                 if (whereUsers.isEmpty()) {
                     query.append("AND mr.fk_usr_req = ").append(idUser).append(" AND ").append(dateFilter);
                 } else {
@@ -378,30 +428,25 @@ public class STrnDBMaterialRequest {
                 }
                 break;
             case -1: // requisiciones PENDIENTES
-                query.append("AND cfg_get_st_authorn(")
-                     .append(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST).append(", '")
-                     .append(SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ)).append("', mr.id_mat_req, NULL, NULL, NULL, NULL) IN (")
+                query.append(WHERE_NOT_DELETED);
+                query.append("AND auth.auth_status_id IN (")
                      .append(SAuthorizationUtils.AUTH_STATUS_PENDING).append(", ")
                      .append(SAuthorizationUtils.AUTH_STATUS_IN_PROCESS).append(") ");
-                if (whereUsers.isEmpty()) {
-                    query.append("AND ").append(userStepSubquery);
-                } else {
-                    query.append("AND ((").append(whereUsers).append(") OR (").append(userStepSubquery).append(")) ");
+                if (!whereUsers.isEmpty()) {
+                    query.append("AND (").append(whereUsers).append(") ");
                 }
                 break;
             case 0: // TODAS EN LAS QUE PARTICIPO
+                query.append(WHERE_NOT_DELETED);
                 query.append("AND ").append(dateFilter);
-                if (whereUsers.isEmpty()) {
-                    query.append("AND ").append(userStepSubquery);
-                } else {
-                    query.append("AND ((").append(whereUsers).append(") OR (").append(userStepSubquery).append(")) ");
+                if (!whereUsers.isEmpty()) {
+                    query.append("AND (").append(whereUsers).append(") ");
                 }
                 break;
             default:
+                query.append(WHERE_NOT_DELETED);
                 if (statusFilter > 0) {
-                    query.append("AND cfg_get_st_authorn(")
-                         .append(SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST).append(", '")
-                         .append(SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ)).append("', mr.id_mat_req, NULL, NULL, NULL, NULL) = ")
+                    query.append("AND auth.auth_status_id = ")
                          .append(statusFilter).append(" AND ").append(dateFilter);
                 }
                 break;
