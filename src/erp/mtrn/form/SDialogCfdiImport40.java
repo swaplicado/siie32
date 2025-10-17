@@ -1054,7 +1054,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             rowCfdiImport.setOperationTypePk(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
             
             rowCfdiImport.prepareTableRow();
-            setSiieTaxes(rowCfdiImport);
+            setSiieTaxes(rowCfdiImport, 0 , 0);
             
             // Buscar partida de la OC si es que esta existe 
             if (moPurchaseOrder != null) {
@@ -1080,6 +1080,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     double cantConcepto = rowCfdiImport.getConcepto().getAttCantidad().getDouble();
                     SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(linkIndex);
                     SDataDpsEntry dpsEty = moPurchaseOrder.getDbmsDpsEntry(arrDpsLink.get(linkIndex).getDpsEntryKey());
+                    
                     double cantAVincular;
                     
                     // si la cantidad del concepto de la factura es menor o igual a la cantidad de la OC
@@ -1099,7 +1100,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     if (link) {
                         rowCfdiImport.setImportedEntryDpsDpsLink(dpsLink);
                         setMatchDataByPurchaseOrder(rowCfdiImport, dpsEty);
-                        setSiieTaxes(rowCfdiImport);
+                        setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
                     }
                 }
                 rowCfdiImport.prepareTableRow();
@@ -1188,7 +1189,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 
                 moConceptTablePane.renderTableRows();
                 moConceptTablePane.setTableRowSelection(selectedRow);
-                setSiieTaxes(rowCfdiImport);
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
                 
                 moRowCfdiCopy = null;
                 jbPasteRow.setEnabled(false);
@@ -1273,7 +1280,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.setTableRowSelection(selectedRow);
                 }
 
-                setSiieTaxes(rowCfdiImport);
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
             }
         }
     }
@@ -1308,7 +1320,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.setTableRowSelection(selectedRow);
                 }
                 
-                setSiieTaxes(rowCfdiImport);
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
             }
         }
     }
@@ -1341,7 +1358,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.setTableRowSelection(selectedRow);
                 }
                 
-                setSiieTaxes(rowCfdiImport);
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
             }
         }
     }
@@ -1375,7 +1397,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.setTableRowSelection(selectedRow);
                 }
                 
-                setSiieTaxes(rowCfdiImport);
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
             }
         }
     }
@@ -1415,7 +1442,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.setTableRowSelection(selectedRow);
                 }
                 
-                setSiieTaxes(rowCfdiImport);
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
             }
         }
     }
@@ -1446,7 +1478,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_FACTOR_CONV));
                     setMatchDataByPurchaseOrder(rowCfdiImport, (SDataDpsEntry) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
                     
-                    setSiieTaxes(rowCfdiImport);
+                    if (moPurchaseOrder != null) {
+                        setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                    }
+                    else {
+                        setSiieTaxes(rowCfdiImport, 0, 0);
+                    }
                     rowCfdiImport.prepareTableRow();
                     moConceptTablePane.renderTableRows();
                     moConceptTablePane.setTableRowSelection(selectedRow);
@@ -1663,10 +1700,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }    
     }
     
-    private void setSiieTaxes(final SRowCfdiImport40 rowCfdiImport) {
+    private void setSiieTaxes(final SRowCfdiImport40 rowCfdiImport, int taxIdyEmir, int taxIdyRecr) {
         try {
             rowCfdiImport.refreshDpsEntry();
-            calculateTotalDpsEntry(rowCfdiImport); 
+            calculateTotalDpsEntry(rowCfdiImport, taxIdyEmir, taxIdyRecr); 
             setSiieTaxesTableValues(rowCfdiImport);
             
             DElementConceptoImpuestos impuestos = rowCfdiImport.getConcepto().getEltOpcConceptoImpuestos();
@@ -1726,11 +1763,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
     }
     
-    private void calculateTotalDpsEntry(final SRowCfdiImport40 rowCfdiImport) {
+    private void calculateTotalDpsEntry(final SRowCfdiImport40 rowCfdiImport, int taxIdyEmir, int taxIdyRecr) {
         rowCfdiImport.calculateTotalDpsEntry(
                 moComprobante.getAttFecha().getDatetime(), 
-                moBizPartnerEmisor.getFkBizPartnerIdentityTypeId(),
-                moBizPartnerReceptor.getFkBizPartnerIdentityTypeId(), 
+                taxIdyEmir == 0 ? moBizPartnerEmisor.getFkTaxIdentityId() : taxIdyEmir,
+                taxIdyRecr == 0 ? moBizPartnerReceptor.getFkTaxIdentityId() : taxIdyRecr, 
                 miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { mnCfdiCurrencyId }) ? 1.0 : moComprobante.getAttTipoCambio().getDouble());
     }
     
