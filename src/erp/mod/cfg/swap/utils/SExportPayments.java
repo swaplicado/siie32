@@ -124,7 +124,7 @@ public class SExportPayments extends Thread {
         payment.payment_way = moPayment.getPaymentWay();
         payment.priority = moPayment.getPriority();
         payment.notes = moPayment.getNotes();
-        payment.notes = moPayment.getNotesAuthorization();
+        payment.notes_authz = moPayment.getNotesAuthorization();
         payment.is_receipt_payment_req = moPayment.isReceiptPaymentRequired() ? 1 : 0;
         payment.payment_status = moPayment.getFkStatusPaymentId();
         payment.authz_authorization_id = SModSysConsts.TRNS_ST_DPS_AUTHORN_NA;

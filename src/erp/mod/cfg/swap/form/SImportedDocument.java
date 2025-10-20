@@ -614,7 +614,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
 
                     msgTopic = "La serie del folio de este documento, '" + NumberSeries + "', ";
 
-                    if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase().isEmpty())) {
+                    if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase())) {
                         // match required:
                         msgError = msgTopic + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
                     }
