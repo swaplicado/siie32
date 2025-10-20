@@ -2075,8 +2075,15 @@ public abstract class SExportDataUtils {
      * @param notes
      * @return 
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, 
-            final int authStatusId, final int userId, final String notes, final double newAmount, final String newDate) {
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, 
+                                                            final int companyId, 
+                                                            final int resourceType, 
+                                                            final String resourceId, 
+                                                            final int authStatusId, 
+                                                            final int userId, 
+                                                            final String notes,
+                                                            final double newAmount,
+                                                            final String newDate) {
         SResourceStatusResponse oResponse;
         
         try {
@@ -2097,8 +2104,6 @@ public abstract class SExportDataUtils {
                                     + "ts_usr_sched = NOW(), ";
                             if (newAmount > 0) {
                                 // en partida: des_pay_app_ety_cur
-                                sSecondQuery = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " SET "
-                                        + "des_pay_app_ety_cur = " + newAmount + " "
                                         + "WHERE (id_pay = " + resourceId + ") and (id_ety = 1);";
                             }
                             if (newDate != null && !newDate.isEmpty()) {
@@ -2215,3 +2220,5 @@ public abstract class SExportDataUtils {
         }
     }
 }
+                                sSecondQuery = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " SET "
+                                        + "des_pay_app_ety_cur = " + newAmount + " "
