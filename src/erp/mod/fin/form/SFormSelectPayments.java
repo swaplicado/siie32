@@ -86,7 +86,7 @@ public class SFormSelectPayments extends SBeanFormDialog {
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 880, 550);
+        SGuiUtils.setWindowBounds(this, 1024, 590);
         
         moGridPayments = new SGridPaneForm(miClient, SModConsts.FIN_PAY_LAY_BANK, 0, "Pagos autorizados") {
             
@@ -99,14 +99,16 @@ public class SFormSelectPayments extends SBeanFormDialog {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario", 250));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio doc"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto autorizado $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
-                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_M, "Agregado");
+                SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado");
                 col.setEditable(true);
                 columns.add(col);
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago", 300));
 
                 return columns;
             }
@@ -137,7 +139,9 @@ public class SFormSelectPayments extends SBeanFormDialog {
                     "c.cur_key, " +
                     "b_rcpt_pay_req, " +
                     "p.fk_func, p.fk_func_sub, " +
-                    "p.fk_ben " +
+                    "p.fk_ben, " +
+                    "p.nts, " +
+                    "p.dt_req " +
                     "FROM fin_pay AS p " +
                     "INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                     "INNER JOIN erp.bpsu_bp AS b ON p.fk_ben = b.id_bp " +
@@ -160,6 +164,8 @@ public class SFormSelectPayments extends SBeanFormDialog {
                     row.setFuncArea(resultSet.getInt(10));
                     row.setFuncSubarea(resultSet.getInt(11));
                     row.setIdBeneficiary(resultSet.getInt(12));
+                    row.setNotes(resultSet.getString(13));
+                    row.setDate(resultSet.getDate(14));
                     row.setSelected(false);
                     maPayments.add(row);
                 }
