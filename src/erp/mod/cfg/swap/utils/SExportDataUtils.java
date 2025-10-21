@@ -2073,17 +2073,12 @@ public abstract class SExportDataUtils {
      * @param authStatusId
      * @param userId
      * @param notes
+     * @param newAmount
+     * @param newDate
      * @return 
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, 
-                                                            final int companyId, 
-                                                            final int resourceType, 
-                                                            final String resourceId, 
-                                                            final int authStatusId, 
-                                                            final int userId, 
-                                                            final String notes,
-                                                            final double newAmount,
-                                                            final String newDate) {
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, 
+            final int userId, final String notes, final double newAmount, final String newDate) {
         SResourceStatusResponse oResponse;
         
         try {
