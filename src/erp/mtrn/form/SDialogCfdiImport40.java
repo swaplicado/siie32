@@ -1018,6 +1018,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         populateTables();
     }
     
+    @SuppressWarnings("unchecked")
     private void loadPredefinedMatchedData(SRowCfdiImport40 rowCfdiImport) { // Carga los datos empatados con anterioridad.
         /*
         Se busca si ya hay datos de empate para el No. de identificación y el ID. del emisor,
@@ -1054,7 +1055,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             rowCfdiImport.setOperationTypePk(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
             
             rowCfdiImport.prepareTableRow();
-            setSiieTaxes(rowCfdiImport, 0 , 0);
+            setSiieTaxes(rowCfdiImport, 0, 0);
             
             // Buscar partida de la OC si es que esta existe 
             if (moPurchaseOrder != null) {

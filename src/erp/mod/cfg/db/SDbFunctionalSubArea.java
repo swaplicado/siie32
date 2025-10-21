@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collectors;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -221,25 +222,14 @@ public class SDbFunctionalSubArea extends SDbRegistryUser {
      * @return List of functional sub-areas.
      * @throws Exception 
      */
-    public static ArrayList<SDbFunctionalSubArea> readUserFunctionalSubArea(final SGuiSession session) throws Exception {
-        return readUserFunctionalSubArea(session, session.getUser().getPkUserId());
-    }
-    
-    /**
-     * Create list of functional sub-areas of given user.
-     * @param session GUI session.
-     * @param userId ID of required user.
-     * @return List of functional sub-areas.
-     * @throws Exception 
-     */
-    public static ArrayList<SDbFunctionalSubArea> readUserFunctionalSubArea(final SGuiSession session, final int userId) throws Exception {
+    public static ArrayList<SDbFunctionalSubArea> readUserFunctionalSubAreas(final SGuiSession session) throws Exception {
         ArrayList<SDbFunctionalSubArea> functionalSubAreas = new ArrayList<>();
         
         String sql = "SELECT fs.id_func_sub "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.fk_func = f.id_func "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON ufs.id_func_sub = fs.id_func_sub "
-                + "WHERE NOT f.b_del AND NOT fs.b_del AND ufs.id_usr = " + userId + " "
+                + "WHERE NOT f.b_del AND NOT fs.b_del AND ufs.id_usr = " + session.getUser().getPkUserId() + " "
                 + "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub;";
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -275,5 +265,28 @@ public class SDbFunctionalSubArea extends SDbRegistryUser {
         }
         
         return belongsTo;
+    }
+    
+    public static ArrayList<Integer> getUserFunctionalSubAreaIds(final SGuiSession session, final ArrayList<Integer> functionalAreaIds) throws Exception {
+        ArrayList<Integer> functionalSubAreaIds = new ArrayList<>();
+        
+        String sqlFunctionalAreaIds = functionalAreaIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        
+        String sql = "SELECT fs.id_func_sub "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.fk_func = f.id_func "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC_SUB) + " AS ufs ON ufs.id_func_sub = fs.id_func_sub "
+                + "WHERE NOT f.b_del AND NOT fs.b_del AND ufs.id_usr = " + session.getUser().getPkUserId() + " AND f.id_func IN (" + sqlFunctionalAreaIds + ") "
+                + "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub;";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                functionalSubAreaIds.add(resultSet.getInt("fs.id_func_sub"));
+            }
+        }
+        
+        return functionalSubAreaIds;
     }
 }

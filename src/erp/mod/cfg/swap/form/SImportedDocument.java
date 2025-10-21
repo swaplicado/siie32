@@ -28,6 +28,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SThinDps;
 import java.io.File;
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -48,7 +49,7 @@ import sa.lib.gui.SGuiSession;
  * In memory document received from SWAP Services.
  * @author Sergio Flores
  */
-public class SImportedDocument implements SGridRow, Comparable<SImportedDocument> {
+public class SImportedDocument implements SGridRow, Serializable, Comparable<SImportedDocument> {
     
     public static final int PAYMENT_DEFN_NOT_REQ = 0; // pago no requerido
     public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
@@ -887,7 +888,7 @@ public class SImportedDocument implements SGridRow, Comparable<SImportedDocument
             throw new Exception(EXC_PAY_NOT_REGISTERED);
         }
         else if (Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
-            throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago es diferente de 'nuevo'.");
+            throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser 'nuevo'.");
         }
         
         return true;

@@ -41,7 +41,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
 
@@ -249,7 +249,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         jtfPrecioCfdi.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfPrecioCfdi.setEnabled(false);
         jtfPrecioCfdi.setFocusable(false);
-        jtfPrecioCfdi.setPreferredSize(new java.awt.Dimension(115, 23));
+        jtfPrecioCfdi.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel7.add(jtfPrecioCfdi);
 
         jpCfdiConceptData.add(jPanel7);
@@ -259,7 +259,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         jpOrderEntry.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida OC:"));
         jpOrderEntry.setLayout(new java.awt.BorderLayout());
 
-        jpOrderEntryPrice.setLayout(new java.awt.GridLayout(2, 1));
+        jpOrderEntryPrice.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jlOrderPrice.setText("Precio u. OC $:");
         jlOrderPrice.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -268,7 +268,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         jtfOrderPrice.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfOrderPrice.setEnabled(false);
         jtfOrderPrice.setFocusable(false);
-        jtfOrderPrice.setPreferredSize(new java.awt.Dimension(115, 23));
+        jtfOrderPrice.setPreferredSize(new java.awt.Dimension(165, 23));
         jpOrderEntryPrice.add(jtfOrderPrice);
 
         jpOrderEntry.add(jpOrderEntryPrice, java.awt.BorderLayout.NORTH);
@@ -296,7 +296,6 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);

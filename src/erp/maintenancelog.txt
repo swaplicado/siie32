@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 290.23/ 2025-10-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de restricción de cambio de datos básicos en DPS que provienen de documentos importados.
+2) Refactorización de generación de registros del XML y PDF de CFD en DPS.
+3) Descarga y adjunción de archivos XML y PDF de CFD de documentos autorizados en SWAP Services al vincularse con DPS.
+4) Restricción de consulta de documentos limitada a las subáreas funcionales del usuario actual.
+5) Corrección a la validación de tipo de iniciativa en su captura.
+
+================================================================================
 SIIE 3.2 290.22/ 2025-10-16
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

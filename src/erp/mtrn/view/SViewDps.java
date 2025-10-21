@@ -36,6 +36,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
@@ -85,6 +86,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -104,7 +107,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -3364,7 +3367,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    String funcAreas = ((String) setting.getSetting());
+                    ArrayList<Integer> funcAreaIds = Stream.of(funcAreas.split(",")).map(String::trim).map(Integer::valueOf).collect(Collectors.toCollection(ArrayList::new));
+                    ArrayList<Integer> funcSubAreaIds = null;
+                    String sqlFuncSubAreaIds = "";
+                    
+                    try {
+                        funcSubAreaIds = SDbFunctionalSubArea.getUserFunctionalSubAreaIds(miClient.getSession(), funcAreaIds);
+                        sqlFuncSubAreaIds = funcSubAreaIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                    
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + funcAreas + ") " + (sqlFuncSubAreaIds.isEmpty() ? "" : "AND d.fid_func_sub IN (" + sqlFuncSubAreaIds + ") ");
                 }
             }
         }

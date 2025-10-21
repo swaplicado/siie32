@@ -726,7 +726,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         try {
             if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsFunctionalAreas()) {
-                maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubArea(miClient.getSession());
+                maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubAreas(miClient.getSession());
                 msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
 
                 if (msUserFunctionalSubAreasCodes.isEmpty()) {
@@ -1137,12 +1137,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             + "Búsqueda de documentos:\n\n";
                     
                     if (countRetreived == 0) {
-                        miClient.showMsgBoxWarning(message + "No se encontraron documentos autorizados.");
+                        message += "No se encontraron documentos autorizados.";
+                        
+                        miClient.showMsgBoxWarning(message);
                     }
                     else {
-                        miClient.showMsgBoxInformation(message + "Documentos autorizados encontrados en total: " + countRetreived + ";\n"
-                                + "Documentos elegibles para la empresa actual: " + countElegible + ";\n"
-                                + "Documentos elegibles para el usuario actual: " + countShown + ".");
+                        if (countRetreived != countElegible) {
+                            message += "Documentos autorizados en total: " + countRetreived + ";\n";
+                        }
+                        
+                        message += "Documentos autorizados de la empresa actual: " + countElegible + ";\n"
+                                + "Documentos elegibles al usuario actual: " + countShown + ".";
+                        
+                        miClient.showMsgBoxInformation(message);
                     }
 
                     Collections.sort(documents);
