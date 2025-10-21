@@ -6,6 +6,7 @@
 package erp.mod.fin.db;
 
 import java.io.Serializable;
+import java.util.Date;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -17,6 +18,7 @@ public class SRowPayments implements SGridRow, Serializable {
     protected int idYear;
     protected int idDoc;
     protected int idBeneficiary;
+    protected Date mtDate;
     protected int idPayment;
     protected String msBeneficiary;
     protected String msPayNum;
@@ -27,10 +29,12 @@ public class SRowPayments implements SGridRow, Serializable {
     protected int mnFuncArea;
     protected int mnFuncSubarea;
     protected boolean mbSelected = false;
+    protected String msNotes;
 
     public void setIdYear(int d) { idYear = d; };
     public void setIdDoc(int d) { idDoc = d; };
     public void setIdBeneficiary(int d) { idBeneficiary = d; };
+    public void setDate(Date t) { mtDate = t; };
     public void setIdPayment(int d) { idPayment = d; };
     public void setBeneficiary(String s) { msBeneficiary = s; };
     public void setPayNum(String s) { msPayNum = s; };
@@ -40,11 +44,13 @@ public class SRowPayments implements SGridRow, Serializable {
     public void setReceptionPayReq(boolean b) { mbReceptionPayReq = b; };
     public void setFuncArea(int n) { mnFuncArea = n; };
     public void setFuncSubarea(int n) { mnFuncSubarea = n; };
+    public void setNotes(String s) { msNotes = s; }
     public void setSelected(boolean b) { mbSelected = b; }
     
     public int getIdYear() { return idYear; }
     public int getIdDoc() { return idDoc; }
     public int getIdPayment() { return idPayment; }
+    public Date getDate() { return mtDate; }
     public int getIdBeneficiary() { return idBeneficiary; }
     public String getBeneficiary() { return msBeneficiary; }
     public String getPayNum() { return msPayNum; }
@@ -54,6 +60,7 @@ public class SRowPayments implements SGridRow, Serializable {
     public boolean getReceptionPayReq() { return mbReceptionPayReq; };
     public int getFuncArea() { return mnFuncArea; };
     public int getFuncSubarea() { return mnFuncSubarea; };
+    public String getNotes() { return msNotes; }
     public boolean getIsSelected() { return mbSelected; }
     
     @Override
@@ -97,11 +104,13 @@ public class SRowPayments implements SGridRow, Serializable {
         
         switch (col) {
             case 0: value = msBeneficiary; break;
-            case 1: value = msPayNum; break;
+            case 1: value = mtDate; break;
             case 2: value = msDocNum; break;
-            case 3: value = mdAmount; break;
-            case 4: value = msCur; break;
-            case 5: value = mbSelected; break;
+            case 3: value = msPayNum; break;
+            case 4: value = mdAmount; break;
+            case 5: value = msCur; break;
+            case 6: value = mbSelected; break;
+            case 7: value = msNotes; break;
         }
         
         return value;
@@ -110,7 +119,7 @@ public class SRowPayments implements SGridRow, Serializable {
     @Override
     public void setRowValueAt(Object value, int col) {
         switch (col) {
-            case 5: mbSelected = (boolean) value; break;
+            case 6: mbSelected = (boolean) value; break;
         }
     }
 }
