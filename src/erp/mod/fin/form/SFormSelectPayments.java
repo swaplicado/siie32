@@ -5,14 +5,21 @@
  */
 package erp.mod.fin.form;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SRowPayments;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -28,15 +35,24 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Isabel Servín
  */
-public class SFormSelectPayments extends SBeanFormDialog {
+public class SFormSelectPayments extends SBeanFormDialog implements ActionListener {
     
     private SGridPaneForm moGridPayments;
     
     private ArrayList<SRowPayments> maPayments;
     private ArrayList<SRowPayments> maSelectedPayments;
     
-    int mnCurPayment;
-    int mnCurDoc;
+    private JButton jbLayoutDate;
+    private JButton jbLayoutDateUntil;
+    private JButton jbLayoutDateAll;
+    private JButton jbResearch;
+    private JLabel jlText;
+    
+    private int mnCurPayment;
+    private int mnCurDoc;
+    private int mnBankPaymentTypeId;
+    private int mnBizPartnerBankId;
+    private Date mtDate;
     
     /**
      * Creates new form SFormConfMatConsSubentityVsCostCenter
@@ -63,7 +79,7 @@ public class SFormSelectPayments extends SBeanFormDialog {
         jpConsumption = new javax.swing.JPanel();
         jpGrid = new javax.swing.JPanel();
 
-        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Pagos:"));
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
         jpConsumption.setLayout(new java.awt.BorderLayout());
@@ -72,7 +88,7 @@ public class SFormSelectPayments extends SBeanFormDialog {
         jpGrid.setLayout(new java.awt.BorderLayout());
         jpConsumption.add(jpGrid, java.awt.BorderLayout.CENTER);
 
-        jpRegistry.add(jpConsumption, java.awt.BorderLayout.NORTH);
+        jpRegistry.add(jpConsumption, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
 
@@ -87,6 +103,25 @@ public class SFormSelectPayments extends SBeanFormDialog {
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 590);
+        
+        jbLayoutDate = new JButton();
+        jbLayoutDate.setText("Fecha layout");
+        jbLayoutDate.setPreferredSize(new java.awt.Dimension(140, 23));
+        
+        jbLayoutDateUntil = new JButton();
+        jbLayoutDateUntil.setText("Hasta fecha layout");
+        jbLayoutDateUntil.setPreferredSize(new java.awt.Dimension(140, 23));
+        
+        jbLayoutDateAll = new JButton();
+        jbLayoutDateAll.setText("Ver todos");
+        jbLayoutDateAll.setPreferredSize(new java.awt.Dimension(140, 23));
+        
+        jbResearch = new JButton();
+        jbResearch.setText("Volver a buscar");
+        jbResearch.setPreferredSize(new java.awt.Dimension(140, 23));
+        
+        jlText = new JLabel();
+        jlText.setPreferredSize(new java.awt.Dimension(200, 23));
         
         moGridPayments = new SGridPaneForm(miClient, SModConsts.FIN_PAY_LAY_BANK, 0, "Pagos autorizados") {
             
@@ -103,7 +138,7 @@ public class SFormSelectPayments extends SBeanFormDialog {
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio doc"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio pago"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto autorizado $"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto a pagar $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado");
                 col.setEditable(true);
@@ -114,18 +149,32 @@ public class SFormSelectPayments extends SBeanFormDialog {
             }
         };
 
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).removeAll();
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbLayoutDate);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbLayoutDateUntil);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbLayoutDateAll);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jbResearch);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).add(jlText);
+        
         jpGrid.add(moGridPayments);
         mvFormGrids.add(moGridPayments);
         
         mnCurPayment = 1;
         mnCurDoc = 1;
+        mnBankPaymentTypeId = 0;
+        mnBizPartnerBankId = 0;
+        mtDate = new Date();
+        
+        addAllListeners();
     }
     
-    private void readPayments() {
+    private void readPayments(String where) {
         try {
             String entryTp;
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                 entryTp = SDbPaymentEntry.ENTRY_TYPE_PAYMENT;
+                where += "AND EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
+                    (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") ";
             }
             else {
                 entryTp = SDbPaymentEntry.ENTRY_TYPE_ADVANCE;
@@ -147,8 +196,12 @@ public class SFormSelectPayments extends SBeanFormDialog {
                     "INNER JOIN erp.bpsu_bp AS b ON p.fk_ben = b.id_bp " +
                     "INNER JOIN erp.cfgu_cur AS c ON pe.fk_ety_cur = c.id_cur " +
                     "LEFT JOIN trn_dps AS d ON pe.fk_doc_year_n = d.id_year AND pe.fk_doc_doc_n = d.id_doc " +
-                    "WHERE p.fk_st_pay = 4 AND p.fk_cur = " + mnCurPayment + " AND pe.fk_ety_cur = " + mnCurDoc + " " + 
-                    "AND pe.ety_tp = '" + entryTp + "'";
+                    "LEFT JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
+                    "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
+                    "AND p.fk_cur = " + mnCurPayment + " AND pe.fk_ety_cur = " + mnCurDoc + " " + 
+                    "AND pe.ety_tp = '" + entryTp + "' " +
+                    where + " " + 
+                    "ORDER BY b.bp, p.dt_req, d.num_ser, d.num, p.ser, p.num";
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     SRowPayments row = new SRowPayments();
@@ -178,10 +231,49 @@ public class SFormSelectPayments extends SBeanFormDialog {
     
     private void populateGrid() {
         Vector<SGridRow> vRows = new Vector<>();
-        if (maPayments.size() > 0) {
-            vRows.addAll(maPayments);
-        }
+        vRows.addAll(maPayments);
         moGridPayments.populateGrid(vRows);
+    }
+    
+    private void actionLayoutDate() {
+        readPayments("AND p.dt_req = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        jbLayoutDate.setEnabled(false);
+        jbLayoutDateUntil.setEnabled(false);
+        jbLayoutDateAll.setEnabled(false);
+        jbResearch.setEnabled(true);
+        jlText.setText("Fecha layout: " + SLibUtils.DateFormatDate.format(mtDate));
+        populateGrid();
+        
+    }
+
+    private void actionLayoutDateUntill() {
+        readPayments("AND p.dt_req <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        jbLayoutDate.setEnabled(false);
+        jbLayoutDateUntil.setEnabled(false);
+        jbLayoutDateAll.setEnabled(false);
+        jbResearch.setEnabled(true);
+        jlText.setText("Fecha layout hasta: " + SLibUtils.DateFormatDate.format(mtDate));
+        populateGrid();
+    }
+
+    private void actionLayoutDateAll() {
+        readPayments("");
+        jbLayoutDate.setEnabled(false);
+        jbLayoutDateUntil.setEnabled(false);
+        jbLayoutDateAll.setEnabled(false);
+        jbResearch.setEnabled(true);
+        jlText.setText("Todos los pagos");
+        populateGrid();
+    }
+
+    private void actionResearch() {
+        jbLayoutDate.setEnabled(true);
+        jbLayoutDateUntil.setEnabled(true);
+        jbLayoutDateAll.setEnabled(true);
+        jbResearch.setEnabled(false);
+        maPayments.clear();
+        jlText.setText("");
+        populateGrid();
     }
     
     public ArrayList<SRowPayments> getSelectedPayments() {
@@ -205,6 +297,15 @@ public class SFormSelectPayments extends SBeanFormDialog {
         mnCurDoc = curDoc;
     }
     
+    public void setDataBank(int bankPaymentTypeId, int bizPartnerBankId) {
+        mnBankPaymentTypeId = bankPaymentTypeId;
+        mnBizPartnerBankId = bizPartnerBankId;
+    }
+    
+    public void setLayoutDate(Date date) {
+        mtDate = date;
+    }
+    
     public void setFormResult(int n) {
         mnFormResult = n;
     }
@@ -217,19 +318,25 @@ public class SFormSelectPayments extends SBeanFormDialog {
     
     @Override
     public void addAllListeners() {
-    
+        jbLayoutDate.addActionListener(this);
+        jbLayoutDateUntil.addActionListener(this);
+        jbLayoutDateAll.addActionListener(this);
+        jbResearch.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-    
+        jbLayoutDate.removeActionListener(this);
+        jbLayoutDateUntil.removeActionListener(this);
+        jbLayoutDateAll.removeActionListener(this);
+        jbResearch.removeActionListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
         maPayments = new ArrayList<>();
         maSelectedPayments = new ArrayList<>();
-        readPayments();
+        actionLayoutDate();
     }
 
     @Override
@@ -245,5 +352,25 @@ public class SFormSelectPayments extends SBeanFormDialog {
         SGuiValidation validation = moFields.validateFields();
         
         return validation;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbLayoutDate) {
+                actionLayoutDate();
+            }
+            else if (button == jbLayoutDateUntil) {
+                actionLayoutDateUntill();
+            }
+            else if (button == jbLayoutDateAll) {
+                actionLayoutDateAll();
+            }
+            else if (button == jbResearch) {
+                actionResearch();
+            }
+        }
     }
 }

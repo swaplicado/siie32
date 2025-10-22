@@ -25,6 +25,7 @@ import sa.lib.gui.SGuiSession;
 public class SDbComImportLog extends SDbRegistryUser {
     
     public static final String SYNC_TYPE_PUR_INV = "PUR_INV";
+    public static final String SYNC_TYPE_PUR_PAY_RC = "PUR_PAY_RC";
     
     protected static final String SUFIX_REQUEST_BODY = "_request_body";
     protected static final String SUFIX_RESPONSE_BODY = "_response_body";

@@ -518,6 +518,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
             case SModSysConsts.FINS_ST_PAY_EXEC_P:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_SCHED + ", "
+                        + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
                         + SModSysConsts.FINS_ST_PAY_IN_TREAS + ") ";
                 break;
             case SModSysConsts.FINS_ST_PAY_REJC:

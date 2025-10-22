@@ -987,7 +987,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             
             moBizPartnerReceptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moPurchaseOrder.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
             
-            jtfPurchaseOrderNumber.setText(moPurchaseOrder.getComprobanteFolio());
+            String folio = moPurchaseOrder.getComprobanteSerie().isEmpty() ? moPurchaseOrder.getComprobanteFolio() : moPurchaseOrder.getComprobanteSerie() + "-" + moPurchaseOrder.getComprobanteFolio();
+            jtfPurchaseOrderNumber.setText(folio);
             jtfPurchaseOrderDate.setText(SLibUtils.DbmsDateFormatDatetime.format(moPurchaseOrder.getComprobanteFecha()));
 
             jtfPurchaseOrderNumber.setCaretPosition(0);
@@ -1102,6 +1103,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         rowCfdiImport.setImportedEntryDpsDpsLink(dpsLink);
                         setMatchDataByPurchaseOrder(rowCfdiImport, dpsEty);
                         setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                        validateTaxes(rowCfdiImport);
                     }
                 }
                 rowCfdiImport.prepareTableRow();
@@ -1489,6 +1491,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     moConceptTablePane.renderTableRows();
                     moConceptTablePane.setTableRowSelection(selectedRow);
                     setPurchaseOrderPanelValues();
+                    validateTaxes(rowCfdiImport);
                 }
             }
         }
@@ -1822,6 +1825,44 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             
             jtfPoProcessedQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantityLinked() + processedQuantityCurrent));
             jtfPoPendingQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantity() - entryDpsDpsLink.getQuantityLinked() - processedQuantityCurrent)); 
+        }
+    }
+    
+    private void validateTaxes(SRowCfdiImport40 rowCfdiImport) {
+        boolean showMessage = false;
+        String message = "No corresponden los impuestos con la orden de compra:\n";
+        DElementConcepto concepto = rowCfdiImport.getConcepto();
+        if (concepto.getEltOpcConceptoImpuestos() != null) {
+            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
+                ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                TAXES:
+                for (DElementConceptoImpuestoTraslado traslado : traslados) {
+                    if (!rowCfdiImport.getTaxChargedMatched().contains(traslado)) {
+                        message += "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
+                                + "Tipo: trasladado. \n"
+                                + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
+                                + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".";
+                        showMessage = true;
+                    }
+                }
+            }
+
+            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                TAXES:
+                for (DElementConceptoImpuestoRetencion retencion : retenciones) {
+                    if (!rowCfdiImport.getTaxRetainedMatched().contains(retencion)) { 
+                        message += "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
+                                + "Tipo: retenido. \n"
+                                + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
+                                + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".";
+                        showMessage = true;
+                    }
+                }
+            }
+        }
+        if (showMessage) {
+            miClient.showMsgBoxWarning(message);
         }
     }
     
@@ -2168,6 +2209,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         if (isWithPurchaseOrder()) {
             dps.setFkFunctionalAreaId(moPurchaseOrder.getFkFunctionalAreaId());
             dps.setFkFunctionalSubAreaId(moPurchaseOrder.getFkFunctionalSubAreaId());
+            dps.setFkTaxIdentityEmisorTypeId(moPurchaseOrder.getFkTaxIdentityEmisorTypeId());
+            dps.setFkTaxIdentityReceptorTypeId(moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
         }
         else {
             if (!isApplingFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
@@ -2203,6 +2246,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
             SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+            if (isWithPurchaseOrder()) {
+                row.getNewDpsEntry().setConcept(moPurchaseOrder.getDbmsDpsEntry(row.getImportedEntryDpsDpsLink().getDpsEntryKey()).getConcept());
+            }
             dps.getDbmsDpsEntries().add(row.getNewDpsEntry());
             saveItemMatchBizPartner(row);
         }
@@ -2393,7 +2439,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     public void editingCanceled(ChangeEvent e) {
         // nothing
     }
-    
+
     public static class LinkedQuantity {
         int[] dpsKey;
         double quantity;

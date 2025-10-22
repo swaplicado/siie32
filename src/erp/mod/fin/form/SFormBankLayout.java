@@ -1335,6 +1335,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (moKeyBankLayoutCurrency.getSelectedIndex() > 0 && moKeyDpsCurrency.getSelectedIndex() > 0) {
                 moFormPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
             }
+            
+            moFormPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
+            moFormPayments.setLayoutDate(moDateDateLayout.getValue());
             moFormPayments.reloadCatalogues();
             isForPayments = false;
         }

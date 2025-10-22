@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 290.26/ 2025-10-22
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Adición de filtros en el picker de pagos en layots bancarios.
+2) Validación de los impuestos al momento de hacer un vinculo de una OC con una factura en la ventana de importación. 
+
+================================================================================
 SIIE 3.2 290.25/ 2025-10-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
