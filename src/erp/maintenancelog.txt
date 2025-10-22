@@ -4,6 +4,8 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Adición de filtros en el picker de pagos en layots bancarios.
 2) Validación de los impuestos al momento de hacer un vinculo de una OC con una factura en la ventana de importación. 
+3) Se preserva el concepto de la partida de la OC al hacer una importación a una factura.
+4) Corrección en la consulta en el picker de documentos en la captura de solicitudes de pago.
 
 ================================================================================
 SIIE 3.2 290.25/ 2025-10-21
