@@ -2329,7 +2329,7 @@ public abstract class SDataReadTableRows {
                         "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
                         (((Object[]) filterKey).length != 5 ? "" : 
                         " AND d.fid_func_sub IN (" +
-                        "SELECT GROUP_CONCAT(fs.id_func_sub) " +
+                        "SELECT fs.id_func_sub " +
                         "FROM cfgu_func_sub AS fs " +
                         "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func " +
                         "INNER JOIN usr_usr_func_sub AS ufs ON ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + ((int) ((Object[]) filterKey)[4]) + " " +
