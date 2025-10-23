@@ -6,6 +6,7 @@
 package erp.mod.fin.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
 import java.util.Date;
 import sa.lib.SLibConsts;
@@ -184,6 +185,17 @@ public class SDialogPaymentChangeSched extends SBeanFormDialog {
     
     public Date getDateSched() {
         return moDateSched.getValue();
+    }
+    
+    public void setFormType(int payStatusId) {
+        switch (payStatusId) {
+            case SModSysConsts.FINS_ST_PAY_REJC:
+                jlDateShed.setText("Fecha requerida:");
+                break;
+            case SModSysConsts.FINS_ST_PAY_SCHED:
+                jlDateShed.setText("Fecha programada:");
+                break;
+        }
     }
     
     @Override

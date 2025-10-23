@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 290.27/ 2025-10-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Modificación de las solicitudes de pago rechazadas.
+2) Adición de la fecha programada y ejecutada en la vista de solicitudes de pagos.
+3) Se quita la restricción de modificación de la fecha programada a los pagos de sistema.
+
+================================================================================
 SIIE 3.2 290.26/ 2025-10-22
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

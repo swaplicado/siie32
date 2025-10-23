@@ -501,6 +501,7 @@ public class SDbPayment extends SDbRegistryUser {
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
+            mnFkStatusPaymentId = mnFkStatusPaymentId == SModSysConsts.FINS_ST_PAY_REJC ? SModSysConsts.FINS_ST_PAY_NEW : mnFkStatusPaymentId;
             
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_pay = " + mnPkPaymentId + ", " +
