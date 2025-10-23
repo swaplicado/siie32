@@ -1643,7 +1643,7 @@ public abstract class SExportDataUtils {
                 String referenceId = "CONVERT(p.id_pay, CHAR)";
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT, database);
                 
-                String sql = "SELECT "
+                String sql = "SELECT DISTINCT " // XXX TO-DO: "DISTINCT" no debería ser necesario, se encontró un registro de procesamiento de datos de SWAP Services para el documento PK 2025-14514!!!
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
                         + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
@@ -1677,12 +1677,11 @@ public abstract class SExportDataUtils {
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
                         + "WHERE ("
-                        + "((NOT p.b_del AND ((p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_NEW + " AND p.b_sys) OR p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_EXEC_P + ")) "
+                        + "((NOT p.b_del) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT, database) + ") AND "
-                        + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                        + (lastSyncDatetime == null ? "" : " OR (p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
-                        + " "
+                        + "AND ((p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_NEW + " AND p.b_sys) OR p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_EXEC_P + ") "
                         + "ORDER BY "
                         + "p.ser, p.num, p.id_pay;";
 
