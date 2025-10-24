@@ -38,9 +38,10 @@ public class SDpsGoogleCloudUtils {
      *
      * @param session Sesión actual de la aplicación
      * @param fileData Metadatos del archivo a procesar
+     * @param forceUpload
      * @return SDbComSyncLogEntry con el resultado del procesamiento, o null si no se requiere logging
      */
-    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData) {
+    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData, final boolean forceUpload) {
         SDbComSyncLogEntry logEntry = new SDbComSyncLogEntry();
         logEntry.setReferenceId(fileData.getIdYear() + "_" + fileData.getIdDoc());
         logEntry.setAuxDatabase(fileData.getDbName());
@@ -50,7 +51,7 @@ public class SDpsGoogleCloudUtils {
 
         try {
             // 1. Verificar si el archivo existe en GCS
-            if (!CloudStorageManager.storagedFileExists(fileData.getFileName())) {
+            if (!CloudStorageManager.storagedFileExists(fileData.getFileName()) || forceUpload) {
                 // Subir si no existe en GCS
                 SDataDps oDps = new SDataDps();
                 oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
@@ -237,7 +238,7 @@ public class SDpsGoogleCloudUtils {
 
             // Recorre todos los archivos que se desean subir
             for (SFileData fileData : lFiles) {
-                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData);
+                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData, false);
                 
                 if (logEntry != null) {
                     lLogs.add(logEntry);

@@ -1025,6 +1025,7 @@ public abstract class SExportDataUtils {
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
+                        + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
@@ -1048,12 +1049,13 @@ public abstract class SExportDataUtils {
                         + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                         + "AND d.id_year >= " + session.getSystemYear() + " " // establecer como límite hasta el año actual
                         + "AND ("
-                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND d.b_authorn AND NOT d.b_link) "
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ") "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
                         + (lastSyncDatetime == null ? "" : " OR ("
-                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR d.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                        + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ")";
                 sql += ";";
 
@@ -1084,8 +1086,17 @@ public abstract class SExportDataUtils {
                     SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
                             session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
                     if (oLogEty != null) {
+                        SFileData oFd = null;
+                        // comparacion de last update para actualizar el archivo
                         SExportDataDpsFile oFile = new SExportDataDpsFile();
-                        SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                        if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
+                            oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                            lLogFiles.add(oLogEty);
+                        }
+                        else {
+                            oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                        }
                         oFile.filename_storage = oFd.getFileName();
                         if (oFile.filename_storage.isEmpty()) {
                             Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
@@ -1110,8 +1121,8 @@ public abstract class SExportDataUtils {
                             SFileData oFileData = new SFileData(oDpsExport.id_year, 
                                                             oDpsExport.id_doc, 
                                                             database, 
-                                                            resultSet.getTimestamp("d.ts_edit"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData);
+                                                            resultSet.getTimestamp("_last_upd"));
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
                             if (oLogEty != null) {
                                 if (Integer.parseInt(oLogEty.getResponseCode()) == 200 
                                     || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
@@ -1128,7 +1139,6 @@ public abstract class SExportDataUtils {
                                         oFileToExport.project_id = oFd.getProjectId();
                                         oContainer.file.add(oFileToExport);
                                     }
-                                    oLogEty.setAuxDatabase(database);
                                     lLogFiles.add(oLogEty);
                                 }
                                 else {

@@ -93,6 +93,8 @@ public class SProcDpsSendAuthornWeb extends Thread {
                 }
             }
             else {
+                Logger.getLogger(SProcDpsSendAuthornWeb.class.getName()).log(Level.SEVERE, "Ocurrió un error al cambiar el estatus del documento.\nContactar a soporte." + 
+                        auth.getAuxMessage());
                 miClient.showMsgBoxWarning("Ocurrió un error al cambiar el estatus del documento.\nContactar a soporte.");
             }
         }
