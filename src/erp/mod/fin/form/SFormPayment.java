@@ -854,6 +854,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         removeAllListeners();
         reloadCatalogues();
+        stateChangeTypePayment();
         
         int etyCur = moRegistry.getChildEntries().isEmpty() ? 1 : moRegistry.getChildEntries().get(0).getFkEntryCurrencyId();
         
@@ -901,7 +902,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         moPanelDps.setDps(moDps, null);
         
-        if ((moRegistry.isRegistryNew() || moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) && !moRegistry.isSystem() ) { 
+        if ((moRegistry.isRegistryNew() 
+                || moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW 
+                || moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC) 
+                && !moRegistry.isSystem()) { 
             mbCanCapture = true;
             enablePayComponets(true);
             jbSave.setEnabled(true);
@@ -912,7 +916,6 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             jbSave.setEnabled(false);
         }
         
-        stateChangeTypePayment();
         addAllListeners();
     }
 

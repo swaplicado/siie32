@@ -157,6 +157,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
                 break;
             case SModSysConsts.FINS_ST_PAY_REJC:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
                 break;
             case SModSysConsts.FINS_ST_PAY_BLOC:
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentUnblock);
@@ -367,9 +368,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
             if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
             else if (!gridRow.isUpdatable()) {
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
@@ -380,12 +378,29 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                     }
                     SDbPayment moPayment = new SDbPayment();
                     moPayment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
+                    int payStatus = moPayment.getFkStatusPaymentId();
                     moDialogChangeSched.setRegistry(moPayment);
+                    moDialogChangeSched.setFormType(payStatus);
                     moDialogChangeSched.setVisible(true);
                     if (moDialogChangeSched.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                         moPayment.setAuxReloadEntries(false);
-                        moPayment.setDateSchedule_n(moDialogChangeSched.getDateSched());
-                        moPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
+                        switch (payStatus) {
+                            case SModSysConsts.FINS_ST_PAY_SCHED:
+                                moPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
+                                moPayment.setDateSchedule_n(moDialogChangeSched.getDateSched());
+                                break;
+                            case SModSysConsts.FINS_ST_PAY_REJC:
+                            case SModSysConsts.FINS_ST_PAY_REJC_P:
+                                moPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
+                                moPayment.setDateRequired(moDialogChangeSched.getDateSched());
+                                if (moPayment.isSystem()) {
+                                    miClient.showMsgBoxInformation("Este pago se enviará de manera automática a autorización.\nNo es necesario hacer nada más.");
+                                }
+                                else {
+                                    miClient.showMsgBoxInformation("Este pago fue creado por un usuario por lo que se debe enviar a autorización de modo manual.");
+                                }
+                                break;
+                        }
                         moPayment.save(miClient.getSession());
                         miClient.getSession().notifySuscriptors(mnGridType);
                     }
@@ -551,6 +566,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + "v.pay_exc_rate_app, "   
                 + "v.pay_app, "   
                 + "v.dt_req, " 
+                + "v.dt_sched_n, " 
+                + "v.dt_exec_n, " 
                 + "v.nts, "   
                 + "f.name AS func, "
                 + "fs.name AS func_s, "
@@ -626,6 +643,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(column);
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "ety_cur", "Moneda a pagar"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req", "Fecha requerida pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sched_n", "Fecha programada pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_exec_n", "Fecha ejecución pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cur", "Moneda requerida pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "pty", "Prioridad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "nts", "Instrucciones pago"));

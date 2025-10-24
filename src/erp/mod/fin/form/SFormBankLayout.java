@@ -1727,6 +1727,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setBankAccPk(new int[] {account.getPkBizPartnerBranchId(), account.getPkBankAccountId()});
                     break;
                 }
+                else if (!layoutBankRow.getAgreement().isEmpty() && (
+                        layoutBankRow.getAgreement().equals(account.getAgree()))) {
+                    layoutBankRow.setBankAccPk(new int[] {account.getPkBizPartnerBranchId(), account.getPkBankAccountId()});
+                }
             }
             
             for (SLayoutBankRow layoutBankRowToUpdate : maAllLayoutBankRows) {
