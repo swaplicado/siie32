@@ -1214,7 +1214,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 doctoRelacionado.getAttIdDocumento().setString(paymentEntryDoc.ThinDps.getThinCfd().getUuid());
                 doctoRelacionado.getAttSerie().setString(paymentEntryDoc.ThinDps.getNumberSeries());
                 doctoRelacionado.getAttFolio().setString(paymentEntryDoc.ThinDps.getNumber());
-                doctoRelacionado.getAttMonedaDR().setString(paymentEntryDoc.ThinDps.getDbmsCurrencyKey());
+                doctoRelacionado.getAttMonedaDR().setString(paymentEntryDoc.ThinDps.getDbmsCurrencyCode());
                 if (!pago.getAttMonedaP().getString().equals(doctoRelacionado.getAttMonedaDR().getString())) {
                     doctoRelacionado.getAttEquivalenciaDR().setDouble(paymentEntryDoc.ExchangeRate);
                 }

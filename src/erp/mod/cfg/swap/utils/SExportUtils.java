@@ -65,6 +65,10 @@ public abstract class SExportUtils {
     public static final int DECS_PAY_EXC_RATE = 4;
     public static final int DECS_PAY_CONV_RATE = 8;
     
+    public static final int EXPORT_MODE_SILENT = 0;
+    public static final int EXPORT_MODE_INFORM = 1; // has effect only if client has GUI
+    public static final int EXPORT_MODE_CONFIRM = 2; // has effect only if client has GUI
+    
     public static final DecimalFormat FormatStdAmount = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_AMOUNT));
     public static final DecimalFormat FormatStdExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_STD_EXC_RATE));
     public static final DecimalFormat FormatPayExchangeRate = new DecimalFormat("#0." + SLibUtils.textRepeat("0", DECS_PAY_EXC_RATE));
@@ -1023,12 +1027,12 @@ public abstract class SExportUtils {
      * 
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
-     * @param confirmToProceed Si el cliente es gráfico, solicitar confirmación para proceder con la sincronización, si no, solamente informarlo.
      * @param wakeUpServices Indicador para despertar todos los SWAP Services.
+     * @param exportMode Modo de exportación (EXPORT_MODE_...) Tiene efecto solo si el cliente tiene GUI.
      * @return <code>SResponses</code> con la información de laS peticiones a SWAP Services.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static SResponses exportData(final SGuiSession session, final SSyncType syncType, final boolean confirmToProceed, final boolean wakeUpServices) throws SQLException, Exception {
+    public static SResponses exportData(final SGuiSession session, final SSyncType syncType, final boolean wakeUpServices, final int exportMode) throws SQLException, Exception {
         SResponses responses = new SResponses(syncType);
         boolean proceed = true; // si el cliente no fuera gráfico, proceder de inmediato!
 
@@ -1037,11 +1041,15 @@ public abstract class SExportUtils {
             
             String message = "La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.";
             
-            if (confirmToProceed) {
-                proceed = session.getClient().showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
-            }
-            else {
-                session.getClient().showMsgBoxInformation(message);
+            switch (exportMode) {
+                case EXPORT_MODE_INFORM:
+                    session.getClient().showMsgBoxInformation(message);
+                    break;
+                case EXPORT_MODE_CONFIRM:
+                    proceed = session.getClient().showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                    break;
+                default:
+                    // nothing
             }
         }
         

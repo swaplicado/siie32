@@ -201,7 +201,7 @@ public class SViewUser extends erp.lib.table.STableTab implements java.awt.event
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, true, true);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_USR, mnTabType);
             }
             catch (Exception e) {

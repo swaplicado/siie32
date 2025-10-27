@@ -80,7 +80,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ActionListener 
         if (jbExportDataToSwapServices.isEnabled()) {
             try {
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, true);
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
                 SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
                 miClient.getSession().notifySuscriptors(SModConsts.FIN_PAY);
             }

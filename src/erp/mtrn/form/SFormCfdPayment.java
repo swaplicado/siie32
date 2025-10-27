@@ -2019,7 +2019,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-        String docCurrencyKey = moPaymentEntryDoc == null ? "" : moPaymentEntryDoc.ThinDps.getDbmsCurrencyKey();
+        String docCurrencyKey = moPaymentEntryDoc == null ? "" : moPaymentEntryDoc.ThinDps.getDbmsCurrencyCode();
         String payCurrencyKey = moPaneGridPayments.getSelectedTableRow() == null ? "" : paymentEntry.CurrencyKey;
         
         jtfDocPayBalancePrevCurRo.setText(payCurrencyKey);
@@ -2100,12 +2100,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPaymentMethodRo.setCaretPosition(0);
             jtfDocCurrencyRo.setCaretPosition(0);
             
-            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
             
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey() + "/" + paymentEntry.CurrencyKey);
+            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode() + "/" + paymentEntry.CurrencyKey);
             
             if (paymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                 jtfDocExchangeRate.setEditable(false);

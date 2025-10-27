@@ -33,6 +33,9 @@ public class SDbPayment extends SDbRegistryUser {
 
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
+    public static final String ST_NEW = "NUEVO";
+    public static final String ST_SCHED = "AUTORIZADO";
+    
     protected int mnPkPaymentId;
     protected String msSeries;
     protected int mnNumber;
@@ -224,6 +227,10 @@ public class SDbPayment extends SDbRegistryUser {
     
     public String getFolio() {
         return msSeries + (msSeries.isEmpty() ? "" : "-") + mnNumber;
+    }
+    
+    public boolean isExportable() {
+        return SLibUtils.belongsTo(mnFkStatusPaymentId, new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_SCHED });
     }
     
     public void deleteFiles(SGuiSession session) throws Exception {

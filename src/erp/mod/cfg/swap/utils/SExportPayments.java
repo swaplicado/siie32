@@ -176,7 +176,7 @@ public class SExportPayments extends Thread {
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());
 
-                    entry.document_currency = dps.getDbmsCurrencyKey();
+                    entry.document_currency = dps.getDbmsCurrencyCode();
                     entry.document_amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
                 }
             }

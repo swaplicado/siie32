@@ -197,7 +197,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         mvValues.add(DocBalancePrev);
         mvValues.add(DocPayment);
         mvValues.add(DocBalancePend);
-        mvValues.add(ThinDps.getDbmsCurrencyKey());
+        mvValues.add(ThinDps.getDbmsCurrencyCode());
         mvValues.add(ExchangeRate);
         mvValues.add(PayPayment);
         mvValues.add(ParentPaymentEntry.CurrencyKey);

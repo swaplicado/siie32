@@ -490,7 +490,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         jmiDpsSearchCfdiByUuid = new JMenuItem("Búsqueda de CFDI por UUID...");
         jmiDpsSearchDps = new JMenuItem("Búsqueda de documentos...");
-        jmiDpsImportDocuments = new JMenuItem("Importación de documentos...");
+        jmiDpsImportDocuments = new JMenuItem("Importación de facturaa autorizadas...");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);

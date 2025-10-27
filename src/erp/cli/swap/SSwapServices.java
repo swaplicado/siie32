@@ -39,10 +39,10 @@ public class SSwapServices {
             SResponses responses;
             SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN);
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_ORDER, false, true);
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_ORDER, true, SExportUtils.EXPORT_MODE_SILENT);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
             
-            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_PAYMENT, false, false);
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_PAYMENT, false, SExportUtils.EXPORT_MODE_SILENT);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
         }
         catch (Exception e) {

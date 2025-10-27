@@ -38,8 +38,11 @@ public class SThinDps implements Serializable, SThinData {
     protected int mnFkCurrencyId;
     
     protected String msDbmsCurrency;
-    protected String msDbmsCurrencyKey;
+    protected String msDbmsCurrencyCode;
     protected Object moDbmsRecordKey;
+    
+    protected int mnFkUserNewId;
+    protected String msDbmsUserNew;
     
     protected int mnDbmsCfdId;
     protected SThinDpsCfd moThinDpsCfd;
@@ -126,12 +129,20 @@ public class SThinDps implements Serializable, SThinData {
         return msDbmsCurrency;
     }
 
-    public String getDbmsCurrencyKey() {
-        return msDbmsCurrencyKey;
+    public String getDbmsCurrencyCode() {
+        return msDbmsCurrencyCode;
     }
     
     public Object getDbmsRecordKey() {
         return moDbmsRecordKey;
+    }
+
+    public int getFkUserNewId() {
+        return mnFkUserNewId;
+    }
+    
+    public String getDbmsUserNew() {
+        return msDbmsUserNew;
     }
     
     public int getDbmsCfdId() {
@@ -188,10 +199,13 @@ public class SThinDps implements Serializable, SThinData {
         mnFkCurrencyId = 0;
         
         msDbmsCurrency = "";
-        msDbmsCurrencyKey = "";
+        msDbmsCurrencyCode = "";
         moDbmsRecordKey = null;
-        mnDbmsCfdId = 0;
         
+        mnFkUserNewId = 0;
+        msDbmsUserNew = "";
+        
+        mnDbmsCfdId = 0;
         moThinDpsCfd = null;
         moThinCfd = null;
         moThinPdf = null;
@@ -204,11 +218,12 @@ public class SThinDps implements Serializable, SThinData {
         int[] key = (int[]) primaryKey;
         String sql = "SELECT d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.dt_start_cred, d.days_cred, d.tot_cur_r, d.tot_r, "
                 + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.fid_tp_pay, "
-                + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, "
+                + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, un.id_usr, un.usr, "
                 + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num, "
                 + "dcfd.id_year, dcfd.id_doc, cfd.id_cfd, pdf.doc_pdf_name "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
+                + "INNER JOIN erp.usru_usr AS un ON un.id_usr = d.fid_usr_new "
                 + "LEFT OUTER JOIN trn_dps_rec AS dr ON dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
                 + "LEFT OUTER JOIN trn_dps_cfd AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
                 + "LEFT OUTER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
@@ -240,7 +255,7 @@ public class SThinDps implements Serializable, SThinData {
                 mnFkCurrencyId = resultSet.getInt("d.fid_cur");
                 
                 msDbmsCurrency = resultSet.getString("c.cur");
-                msDbmsCurrencyKey = resultSet.getString("c.cur_key");
+                msDbmsCurrencyCode = resultSet.getString("c.cur_key");
                 
                 int recYearId = resultSet.getInt("dr.fid_rec_year");
                 int recPeriodId = resultSet.getInt("dr.fid_rec_per");
@@ -253,6 +268,9 @@ public class SThinDps implements Serializable, SThinData {
                 }
                 
                 // Recover all related CFD data:
+                
+                mnFkUserNewId = resultSet.getInt("un.id_usr");
+                msDbmsUserNew = resultSet.getString("un.usr");
                 
                 mnDbmsCfdId = resultSet.getInt("cfd.id_cfd"); // means "has CFD"
                 boolean hasPdfCfd = resultSet.getInt("dcfd.id_year") != 0 && resultSet.getInt("dcfd.id_doc") != 0;

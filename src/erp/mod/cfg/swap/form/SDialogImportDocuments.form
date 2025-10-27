@@ -30,7 +30,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Descarga de facturas autorizadas desde el Portal de Compras:"/>
+            <TitledBorder title="B&#xfa;squeda de facturas autorizadas:"/>
           </Border>
         </Property>
       </Properties>
@@ -266,7 +266,7 @@
                       <ComponentRef name="bgView"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Todas"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Ver todas las facturas"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Ver todas las facturas autorizadas"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[60, 23]"/>
                     </Property>
@@ -278,7 +278,7 @@
                       <ComponentRef name="bgView"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Activos"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Ver solo facturas de activos fijos"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Ver solo facturas autorizadas de activos fijos"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[65, 23]"/>
                     </Property>
@@ -290,7 +290,7 @@
                       <ComponentRef name="bgView"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Gastos/compras"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Ver solo facturas de gastos y compras"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Ver solo facturas autorizadas de gastos y compras"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[110, 23]"/>
                     </Property>
@@ -356,7 +356,69 @@
         <Property name="horizontalGap" type="int" value="5"/>
       </Layout>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="jpProcessing">
+        <Container class="javax.swing.JPanel" name="jpDocumentsGrid">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="Center"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="jPanel1">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                  <BorderConstraints direction="South"/>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                <Property name="columns" type="int" value="1"/>
+                <Property name="rows" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="2"/>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanel2">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JLabel" name="jlInvoiceUserNew">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Usr. factura:"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[100, 20]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel3">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JTextField" name="jtfInvoiceUserNew">
+                      <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
+                        <Property name="text" type="java.lang.String" value="user.name"/>
+                        <Property name="focusable" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[100, 20]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jpDocumentsProcessing">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
               <BorderConstraints direction="East"/>
@@ -387,9 +449,6 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbImportInvoiceFromCfdi">
                       <Properties>
-                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                          <Image iconType="3" name="/erp/img/icon_std_doc_import_cfd.gif"/>
-                        </Property>
                         <Property name="text" type="java.lang.String" value="Importar CFDI"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
@@ -410,9 +469,6 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jbCreateInvoiceFromScratch">
                       <Properties>
-                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                          <Image iconType="3" name="/erp/img/icon_std_new.gif"/>
-                        </Property>
                         <Property name="text" type="java.lang.String" value="Crear factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
@@ -473,6 +529,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlInvoice">
                       <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Tahoma" size="11" style="1"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Factura:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[125, 23]"/>
@@ -515,7 +574,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_seek.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver pedido..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver pedido de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -534,7 +593,7 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="2001-01 SUC C-000000"/>
-                        <Property name="toolTipText" type="java.lang.String" value="P&#xf3;liza contable"/>
+                        <Property name="toolTipText" type="java.lang.String" value="P&#xf3;liza contable de la factura"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[122, 23]"/>
@@ -546,7 +605,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_look.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver p&#xf3;liza contable..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver p&#xf3;liza contable de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -665,6 +724,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlPay">
                       <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Tahoma" size="11" style="1"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Solicitud de pago:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[125, 23]"/>
@@ -789,7 +851,18 @@
                         <Property name="toolTipText" type="java.lang.String" value="Fecha de programaci&#xf3;n del pago"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[100, 23]"/>
+                          <Dimension value="[105, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jbChangePaymentScheduledDate">
+                      <Properties>
+                        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                          <Image iconType="3" name="/erp/img/cal_cal.gif"/>
+                        </Property>
+                        <Property name="toolTipText" type="java.lang.String" value="Cambiar fecha de programaci&#xf3;n del pago..."/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[23, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -827,7 +900,7 @@
                         <Property name="toolTipText" type="java.lang.String" value="Fecha de operaci&#xf3;n del pago"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[100, 23]"/>
+                          <Dimension value="[105, 23]"/>
                         </Property>
                       </Properties>
                     </Component>

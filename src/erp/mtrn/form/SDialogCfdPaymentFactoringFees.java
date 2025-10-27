@@ -744,14 +744,14 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
             jtfDocDpsRelatedVersionRo.setCaretPosition(0);
             jtfDocCurrencyRo.setCaretPosition(0);
             
-            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentIntCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentFeeCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocPaymentFeeVatCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
-            jtfPayTotalPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey());
+            jtfDocDocBalancePrevCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocPaymentIntCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocPaymentFeeCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocPaymentFeeVatCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfDocDocBalancePendCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
+            jtfPayTotalPaymentCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode());
             
-            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyKey() + "/" + moParamPaymentEntry.CurrencyKey);
+            jtfDocExchangeRateCurRo.setText(moThinDocDpsRelated.getDbmsCurrencyCode() + "/" + moParamPaymentEntry.CurrencyKey);
             
             if (moParamPaymentEntry.CurrencyId == moThinDocDpsRelated.getFkCurrencyId()) {
                 jtfDocExchangeRate.setEditable(false);
@@ -1155,9 +1155,9 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
                     
                     if (totalPayment > moFieldDocBalancePrev.getDouble()) {
                         validation.setMessage("El monto total pagado "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(totalPayment) + " " + moThinDocDpsRelated.getDbmsCurrencyKey() + " "
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(totalPayment) + " " + moThinDocDpsRelated.getDbmsCurrencyCode() + " "
                                 + "no puede ser mayor que el saldo anterior del documento relacionado "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(moFieldDocBalancePrev.getDouble()) + " " + moThinDocDpsRelated.getDbmsCurrencyKey() + ".");
+                                + "$" + SLibUtils.getDecimalFormatAmount().format(moFieldDocBalancePrev.getDouble()) + " " + moThinDocDpsRelated.getDbmsCurrencyCode() + ".");
                         validation.setComponent(jtfDocDocPaymentInt);
                     }
                     else if (totalAmount > moParamPaymentEntry.Amount) {

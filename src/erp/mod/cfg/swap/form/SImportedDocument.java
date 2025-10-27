@@ -55,12 +55,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
     public static final int PAYMENT_DEFN_BY_PCT = 2; // pago definido por porcentaje
     
-    public static final String EXC_DOC_NOT_PROCESSED = "Este documento no ha sido procesado, no tiene aún una factura en el sistema.";
-    public static final String EXC_DOC_ALREADY_RECORDED_ = "Este documento ya fue procesado, tiene una factura en la póliza contable: ";
+    public static final String EXC_DOC_NOT_PROCESSED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
+    public static final String EXC_DOC_ALREADY_RECORDED_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
 
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
-    public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene una solicitud de pago.";
-    public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene una solicitud de pago: ";
+    public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene solicitud de pago.";
+    public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene solicitud de pago: ";
     
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
@@ -249,7 +249,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 refPrefix = SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE;
                 break;
             default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo de documento de la referencia: " + refDocType + ")");
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + refDocType + ".)");
         }
         
         if (hasReferences(refDocType)) {
@@ -532,7 +532,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 throw new Exception("El total o la moneda de este documento, "
                         + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
                         + "son distintos a los de la factura a vincular, "
-                        + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyKey() + ".");
+                        + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
             else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {
                 // match required:
@@ -660,7 +660,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                 ProcessedDps = new SDbSwapDataProcessing.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), 
                         recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode, 
-                        dps.getThinCfd() != null, dps.getThinPdf() != null);
+                        dps.getFkUserNewId(), dps.getDbmsUserNew(), dps.getThinCfd() != null, dps.getThinPdf() != null);
 
                 // check if first payment request already exists:
 
@@ -887,8 +887,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         else if (!isPaymentRequested()) {
             throw new Exception(EXC_PAY_NOT_REGISTERED);
         }
-        else if (Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
-            throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser 'nuevo'.");
+        else if (!Payment.isExportable()) {
+            throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "' o '" + SDbPayment.ST_SCHED + "'.");
         }
         
         return true;
@@ -906,34 +906,50 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         if (!isPaymentRequested()) {
             // payment request not yet created:
-
             if (!isPaymentRequestDataAvailable()) {
                 throw new Exception(EXC_PAY_NOT_REQUESTABLE);
-            }
-            else {
-                dateNew = pickDate(session);
-                
-                if (dateNew.before(Date)) {
-                    throw new Exception("La fecha requerida de vencimiento, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
-                }
             }
         }
         else {
             // payment request already created:
-
-            if (validateRequiredPaymentDateChanging()) {
-                dateNew = pickDate(session);
-
-                if (dateNew != null) {
-                    SImportUtils.updateDpsDaysOfCreditByDueDate(session, ProcessedDps.getDpsKey(), dateNew);
-                    
-                    Payment.setDateRequired(dateNew);
-                    Payment.save(session);
-                }
-            }
+            validateRequiredPaymentDateChanging(); // thorws exception on validation failure
         }
-        
+
+        dateNew = pickDate(session);
+
         if (dateNew != null) {
+            if (dateNew.before(session.getSystemDate())) {
+                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior al día de hoy '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
+            }
+            else if (dateNew.before(Date)) {
+                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
+            }
+            
+            if (isPaymentRequested()) {
+                // make due date of document match the new required date:
+                SImportUtils.updateDpsDaysOfCreditByDueDate(session, ProcessedDps.getDpsKey(), dateNew);
+
+                // update the new required date according to current status of payment:
+                
+                switch (Payment.getFkStatusPaymentId()) {
+                    case SModSysConsts.FINS_ST_PAY_NEW:
+                        Payment.setDateRequired(dateNew);
+                        break;
+                        
+                    case SModSysConsts.FINS_ST_PAY_SCHED:
+                        Payment.setDateSchedule_n(dateNew);
+                        Payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
+                        Payment.setFkUserScheduleId(session.getUser().getPkUserId());
+                        Payment.setTsUserSchedule(new Date());
+                        break;
+                        
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(ID no soportado de estatus de pago: " + Payment.getFkStatusPaymentId() + ".)");
+                }
+                
+                Payment.save(session);
+            }
+        
             RequiredPaymentDateNew = SLibTimeUtils.isSameDate(RequiredPaymentDate, dateNew) ? null : dateNew;
             
             changed = true;
@@ -1165,9 +1181,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = ExternalDocumentId;
                 break;
             case 26:
-                value = ExternalDocumentId;
-                break;
-            case 27:
                 value = ExternalDocumentUuid;
                 break;
             default:
