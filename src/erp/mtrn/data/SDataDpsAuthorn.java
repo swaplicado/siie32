@@ -35,6 +35,8 @@ public class SDataDpsAuthorn extends SDataRegistry {
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
     
+    protected String msAuxMessage;
+    
     public SDataDpsAuthorn() {
         super(SDataConstants.TRN_DPS_AUTHORN);
         reset();
@@ -67,6 +69,8 @@ public class SDataDpsAuthorn extends SDataRegistry {
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
+    
+    public java.lang.String getAuxMessage() { return msAuxMessage; }
     
     private void deleteAllRegistries(Connection connection) throws Exception {
         String sql = "UPDATE trn_dps_authorn SET " +
@@ -117,6 +121,8 @@ public class SDataDpsAuthorn extends SDataRegistry {
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
+        
+        msAuxMessage = "";
     }
 
     @Override
@@ -208,6 +214,7 @@ public class SDataDpsAuthorn extends SDataRegistry {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
         catch (java.lang.Exception e) {
+            msAuxMessage = e.getMessage();
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
