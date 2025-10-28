@@ -126,7 +126,7 @@ public class SExportPayments extends Thread {
         payment.notes = moPayment.getNotes();
         payment.notes_authz = moPayment.getNotesAuthorization();
         payment.is_receipt_payment_req = moPayment.isReceiptPaymentRequired() ? 1 : 0;
-        payment.payment_status = SModSysConsts.FINS_ST_PAY_IN_AUTH;
+        payment.payment_status = moPayment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW ? SModSysConsts.FINS_ST_PAY_IN_AUTH : moPayment.getFkStatusPaymentId();
         payment.authz_authorization_id = SModSysConsts.TRNS_ST_DPS_AUTHORN_NA;
         payment.paying_bank = "";
         payment.paying_bank_fiscal_id = "";
