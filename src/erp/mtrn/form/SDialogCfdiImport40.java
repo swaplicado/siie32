@@ -785,10 +785,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         moCfdiTaxesTablePane = new STablePane(miClient);
         jpCfdiTaxes.add(moCfdiTaxesTablePane, BorderLayout.CENTER);
 
-        taxColumns = new STableColumnForm[3];
+        taxColumns = new STableColumnForm[4];
         taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto", STableConstants.WIDTH_VALUE);
         taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto (SAT)", STableConstants.WIDTH_VALUE);
-        taxColumns[j] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tasa o cuota", STableConstants.WIDTH_NUM_INTEGER);
+        taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tasa o cuota", STableConstants.WIDTH_NUM_INTEGER);
+        taxColumns[j] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Factor", STableConstants.WIDTH_VALUE);
         
         for (j = 0; j < taxColumns.length; j++) {
             moCfdiTaxesTablePane.addTableColumn(taxColumns[j]);

@@ -42,12 +42,14 @@ public final class SRowCfdiTaxImport40 extends erp.lib.table.STableRow {
                 mvValues.add(DCfdi40Catalogs.DescripciónImpuestoTrasladado);
                 mvValues.add(DCfdi40Catalogs.Impuesto.get(oTraslado.getAttImpuesto().getString()));
                 mvValues.add(SLibUtils.DecimalFormatPercentage2D.format(oTraslado.getAttTasaOCuota().getDouble()));
+                mvValues.add(oTraslado.getAttTipoFactor().getString());
                 break;
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver40.DElementConceptoImpuestoRetencion oRetenciones = moImpuestos.getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().get(mnRow);
                 mvValues.add(DCfdi40Catalogs.DescripciónImpuestoRetenido);
                 mvValues.add(DCfdi40Catalogs.Impuesto.get(oRetenciones.getAttImpuesto().getString()));
                 mvValues.add(SLibUtils.DecimalFormatPercentage2D.format(oRetenciones.getAttTasaOCuota().getDouble()));
+                mvValues.add(oRetenciones.getAttTipoFactor().getString());
                 break;
             default:
         }
