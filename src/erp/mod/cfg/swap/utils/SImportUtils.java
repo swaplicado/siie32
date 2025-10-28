@@ -238,7 +238,7 @@ public abstract class SImportUtils {
                 SDataDps newDps = null;
                 
                 if (importedDocument != null) {
-                    newDps = importedDocument.createDps(client.getSession());
+                    newDps = importedDocument.createDps(client.getSession(), order);
                     newDps.setAuxFileXml(dpsXml);
                     newDps.setAuxFilePdf(dpsPdf);
                 }

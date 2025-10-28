@@ -317,9 +317,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldInitSpentBudget;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     
-    private erp.mtrn.data.SDataDps moParamDpsSource;
     private int mnParamCurrentUserPrivilegeLevel;
+    private erp.mtrn.data.SDataDps moParamDpsSource;
     private boolean mbParamIsReadOnly;
+    private boolean mbNewRegistryAlreadySet;
 
     private boolean mbIsDpsContract;
     private boolean mbIsDpsEstimate;
@@ -4269,8 +4270,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moDpsType = null;
 
         mnParamCurrentUserPrivilegeLevel = SLibConsts.UNDEFINED;
-        mbParamIsReadOnly = false;
         moParamDpsSource = null;
+        mbParamIsReadOnly = false;
+        mbNewRegistryAlreadySet = false;
+        
         mbIsLocalCurrency = false;
         mbIsImported = false;
         mbIsCopy = false;
@@ -4460,10 +4463,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (!moDps.getIsRegistryNew()) {
                 if (!moDps.getIsRecordAutomatic() && moRecordUserSLock == null) {
                     miClient.showMsgBoxWarning("La póliza contable manual no debe estar siendo utilizada por otro usuario.");
-                    actionCancel();     // if lock for manual record could not be gained, exit form
+                    mbFormSettingsOk = false;
+                    actionCancel(); // if lock for manual record could not be gained, exit form
                 }
                 else {
-                    jbCancel.requestFocus();
+                    jbCancel.requestFocusInWindow();
                 }
             }
             else {
@@ -4482,19 +4486,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         // new document from scratch:
 
                         if (moDpsType == null) {
-                            pickDpsType();    // choose DPS type
+                            pickDpsType(); // choose DPS type
+                            
                             if (moDpsType == null) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDpsType.getText() + "'.");
-                                mbFormSettingsOk = false;
+                                mbFormSettingsOk = goAhead = false;
                                 actionCancel();
                             }
                         } 
 
                         if (moBizPartner == null) {
                             pickBizPartner(); // choose business partner
+                            
                             if (moBizPartner == null) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
-                                mbFormSettingsOk = false;
+                                mbFormSettingsOk = goAhead = false;
                                 actionCancel();
                             }
                             else {
@@ -4518,103 +4524,114 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         // check business partner:
                                 
                         if (isBizPartnerBlocked(moParamDpsSource.getFkBizPartnerId_r())) {
+                            moParamDpsSource = null; // no longer needed
+                            mbNewRegistryAlreadySet = false; // no longer needed
+                            
                             miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                             mbFormSettingsOk = goAhead = false;
-                            moParamDpsSource = null;
                             actionCancel();
                         }
-
-                        if (!isApplingFiscalData()) {
-                            enableFiscalData(false);
-                        }
-                        
-                        // import data from previous document:
-                              
-                        try {
-                            SDataDps dpsModel;
-                            
-                            if (!mbMatRequestImport) {
-                                dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                        else {
+                            if (!isApplingFiscalData()) {
+                                enableFiscalData(false);
                             }
-                            else {
-                                dpsModel = moParamDpsSource;
-                                
-                                if (dpsModel.getFkBizPartnerId_r() == 0) {
-                                    pickBizPartner();
-                                    
-                                    if (moPickerBizPartner.getFormResult() != SLibConstants.FORM_RESULT_OK) {
-                                        releaseRecordUserSLock();
-                                        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-                                        setVisible(false);
-                                        return;
+
+                            // import data from previous document:
+
+                            try {
+                                SDataDps dpsModel;
+
+                                if (!mbMatRequestImport) {
+                                    dpsModel = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moParamDpsSource.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                                }
+                                else {
+                                    dpsModel = moParamDpsSource;
+
+                                    if (dpsModel.getFkBizPartnerId_r() == 0) {
+                                        pickBizPartner();
+
+                                        if (moPickerBizPartner.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                                            releaseRecordUserSLock();
+                                            mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+                                            setVisible(false);
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (!STrnDpsUtilities.isDpsAuthorized(miClient, dpsModel)) {
+                                    mbFormSettingsOk = goAhead = false;
+                                    actionCancel();
+                                }
+                                else {
+                                    mbDocBeingImported = true;
+
+                                    SDataDps dps = createNewDps(dpsModel);
+
+                                    if (!mbMatRequestImport) {
+                                        dps.getDbmsDpsEntries().clear();
+                                    }
+
+                                    for (SDataDpsNotes notes : dps.getDbmsDpsNotes()) {
+                                        notes.setIsRegistryEdited(true);    // force original document notes to be attached to new document even if they are not edited
+                                        notes.setPkNotesId(0);
+                                    }
+
+                                    if (!mbNewRegistryAlreadySet) {
+                                        setRegistry(dps); // set source document if there is not any imported document set before!
+                                    }
+
+                                    actionEdit();
+
+                                    if (manParamAdjustmentSubtypeKey != null) {
+                                        SFormUtilities.locateComboBoxItem(jcbAdjustmentSubtypeId, manParamAdjustmentSubtypeKey);
+                                    }
+
+                                    if (!mbMatRequestImport) {
+                                        actionEntryImportFromDps(moParamDpsSource);
                                     }
                                 }
                             }
-
-                            if (!STrnDpsUtilities.isDpsAuthorized(miClient, dpsModel)) {
+                            catch (Exception e) {
+                                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
+                                SLibUtilities.renderException(this, e);
+                            }
+                            finally {
+                                moParamDpsSource = null; // no longer needed
+                                mbNewRegistryAlreadySet = false; // no longer needed
+                                
+                                manParamAdjustmentSubtypeKey = null; // no longer needed
+                            }
+                        }
+                    }
+                    
+                    if (goAhead) {
+                        // check business partner credit:
+                        
+                        if (moBizPartnerCategory != null) {
+                            if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), true)) {
                                 mbFormSettingsOk = goAhead = false;
                                 actionCancel();
                             }
-                            else {
-                                mbDocBeingImported = true;
-                                
-                                SDataDps dps = createNewDps(dpsModel);
-                                if (!mbMatRequestImport) {
-                                    dps.getDbmsDpsEntries().clear();
-                                }
+                        }
 
-                                for (SDataDpsNotes notes : dps.getDbmsDpsNotes()) {
-                                    notes.setIsRegistryEdited(true);    // force original document notes to be attached to new document even if they are not edited
-                                    notes.setPkNotesId(0);
-                                }
-
-                                setRegistry(dps);
-                                actionEdit();
-
-                                if (manParamAdjustmentSubtypeKey != null) {
-                                    SFormUtilities.locateComboBoxItem(jcbAdjustmentSubtypeId, manParamAdjustmentSubtypeKey);
-                                }
-                                
-                                if (!mbMatRequestImport) {
-                                    actionEntryImportFromDps(moParamDpsSource);
-                                }
+                        if (goAhead) {
+                            try {
+                                obtainNextNumber();
+                                updateDpsWithCurrentFormData();
+                                adequateDatesForOrderPrevious();
+                                addSystemNotes();
                             }
-                        }
-                        catch (Exception e) {
-                            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
-                            SLibUtilities.renderException(this, e);
-                        }
-                        finally {
-                            moParamDpsSource = null;                // no longer needed
-                            manParamAdjustmentSubtypeKey = null;    // no longer needed
-                        }
-                    }
-                    
-                    // check business partner credit:
-                    
-                    if (moBizPartnerCategory != null) {
-                        if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), true)) {
-                            mbFormSettingsOk = goAhead = false;
-                            actionCancel();
-                        }
-                    }
+                            catch (Exception e) {
+                                SLibUtilities.renderException(this, e);
+                            }
 
-                    if (goAhead) {
-                        try {
-                            obtainNextNumber();
-                            updateDpsWithCurrentFormData();
-                            adequateDatesForOrderPrevious();
-                            addSystemNotes();
-                        }
-                        catch (Exception e) {
-                            SLibUtilities.renderException(this, e);
-                        }
-                        
-                        if (jftDate.isEditable()) {
-                            jftDate.requestFocus();
-                        }
-                        else {
-                            jtfNumber.requestFocus();
+                            if (jftDate.isEditable()) {
+                                jftDate.requestFocusInWindow();
+                            }
+                            else {
+                                jtfNumber.requestFocusInWindow();
+                            }
                         }
                     }
                 }
@@ -5998,6 +6015,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
                 entry.setPkEntryId(0);
                 entry.setIsRegistryNew(true); // force entries to be treated as new
+                
                 if (mbMatRequestImport) {
                     if (moBizPartnerBranch != null) {
                         entry.setFkTaxRegionId(moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n());
@@ -7743,7 +7761,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 SDataCostCenter costCenter = new SDataCostCenter();
                 costCenter.read(new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moAccEntryItem.getPkItemId()) }, miClient.getSession().getStatement());
                 moAccEntryCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
-                jcbAccEntryItem.requestFocus();
+                jcbAccEntryItem.requestFocusInWindow();
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -7923,7 +7941,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (rate != 0d) {
             moFieldExchangeRate.setFieldValue(rate);
-            jtfExchangeRate.requestFocus();
+            jtfExchangeRate.requestFocusInWindow();
         }
     }
 
@@ -7973,7 +7991,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + " '" + SGuiUtils.getLabelName(jlTaxRegionId.getText()) + "'.");
-                jcbTaxRegionId.requestFocus();
+                jcbTaxRegionId.requestFocusInWindow();
             }
         }
     }
@@ -8321,7 +8339,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (mbIsDpsAdjustment) {
                 if (jcbAdjustmentSubtypeId.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + " '" + jlAdjustmentSubtypeId.getText() + "'.");
-                    jcbAdjustmentSubtypeId.requestFocus();
+                    jcbAdjustmentSubtypeId.requestFocusInWindow();
                     return;
                 }
                 else {
@@ -9151,7 +9169,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SFormUtilities.locateComboBoxItem(jcbTaxRegionId, picker.getSelectedPrimaryKey());
-            jcbTaxRegionId.requestFocus();
+            jcbTaxRegionId.requestFocusInWindow();
         }
     }
     
@@ -9160,7 +9178,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jcbTaxRegionId.setEnabled(true);
             jbTaxRegionId.setEnabled(true);
             jbEditTaxRegion.setEnabled(false);
-            jcbTaxRegionId.requestFocus();
+            jcbTaxRegionId.requestFocusInWindow();
         }
     }
 
@@ -10262,7 +10280,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateDoc.setEditable(true);
             jftDateDoc.setFocusable(true);
             jbDateDoc.setEnabled(true);
-            jftDateDoc.requestFocus();
+            jftDateDoc.requestFocusInWindow();
         }
         else {
             jftDateDoc.setEditable(false);
@@ -10278,7 +10296,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateStartCredit.setFocusable(true);
             jbDateStartCredit.setEnabled(true);
             jbDateMaturity.setEnabled(true);
-            jftDateStartCredit.requestFocus();
+            jftDateStartCredit.requestFocusInWindow();
         }
         else {
             jftDateStartCredit.setEditable(false);
@@ -10304,7 +10322,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jckShipments.isSelected()) {
             jtfShipments.setEditable(true);
             jtfShipments.setFocusable(true);
-            jtfShipments.requestFocus();
+            jtfShipments.requestFocusInWindow();
         }
         else {
             jtfShipments.setEditable(false);
@@ -10316,7 +10334,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void itemStateChangedIsDiscountDocApplying(boolean calculate) {
         if (jckIsDiscountDocApplying.isSelected()) {
             jckIsDiscountDocPercentage.setEnabled(true);
-            jckIsDiscountDocPercentage.requestFocus();
+            jckIsDiscountDocPercentage.requestFocusInWindow();
         }
         else {
             jckIsDiscountDocPercentage.setEnabled(false);
@@ -10332,7 +10350,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (jckIsDiscountDocPercentage.isSelected()) {
             jtfDiscountDocPercentage.setEditable(true);
             jtfDiscountDocPercentage.setFocusable(true);
-            jtfDiscountDocPercentage.requestFocus();
+            jtfDiscountDocPercentage.requestFocusInWindow();
         }
         else {
             jtfDiscountDocPercentage.setEditable(false);
@@ -10794,7 +10812,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId())) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
-            jbCancel.requestFocus();
+            jbCancel.requestFocusInWindow();
         }
         else {
             switch (moDps.getFkDpsStatusId()) {
@@ -10818,13 +10836,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jbOk.setEnabled(true);
 
                 if (jftDate.isEditable()) {
-                    jftDate.requestFocus();
+                    jftDate.requestFocusInWindow();
                 }
                 else if (jtfNumber.isEditable()) {
-                    jtfNumber.requestFocus();
+                    jtfNumber.requestFocusInWindow();
                 }
                 else {
-                    jbCancel.requestFocus();
+                    jbCancel.requestFocusInWindow();
                 }
             }
         }
@@ -10903,7 +10921,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 focusLost(new FocusEvent(this.getFocusOwner(), FocusEvent.FOCUS_LOST));
             }
 
-            jbOk.requestFocus(); // this forces all pending focus lost function to be called
+            jbOk.requestFocusInWindow(); // this forces all pending focus lost function to be called
 
             validation = formValidate();
 
@@ -10912,7 +10930,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     jTabbedPane.setSelectedIndex(validation.getTabbedPaneIndex());
                 }
                 if (validation.getComponent() != null) {
-                    validation.getComponent().requestFocus();
+                    validation.getComponent().requestFocusInWindow();
                 }
                 if (validation.getMessage().length() > 0) {
                     miClient.showMsgBoxWarning(validation.getMessage());
@@ -13042,6 +13060,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbResetingForm = true;
 
         moDps = (SDataDps) registry;
+        mbNewRegistryAlreadySet = moDps.getIsRegistryNew() && moDps.getXtaImportedDocument() != null;
         
         if (!moDps.getIsRegistryNew()) {
             maUserGroupsIds = SUserUtils.getUserGroupsIds(miClient.getSession().getStatement(), moDps.getFkUserNewId());

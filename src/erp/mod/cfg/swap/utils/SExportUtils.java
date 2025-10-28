@@ -12,7 +12,6 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComSyncLog;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbSyncLog;
@@ -536,12 +535,13 @@ public abstract class SExportUtils {
                         
                         ArrayList<SDbSyncLogEntry> entries = syncLogEntriesPerDatabaseMap.get(database);
                         
-                        if (syncType == SSyncType.PUR_PAYMENT) {
-                            Object value = new Object[] { SModSysConsts.FINS_ST_PAY_IN_AUTH, session.getUser().getPkUserId(), database };
-                            complementProcessing(session, syncType, entries, value);
-                        }
-                        else if (syncType == SSyncType.PUR_PAYMENT_UPD) {
-                            complementProcessing(session, syncType, entries, null); // el argumento 'value' se definirá individualmente para cada partida de sincronización
+                        switch (syncType) {
+                            case PUR_PAYMENT:
+                            case PUR_PAYMENT_UPD:
+                                complementProcessing(session, syncType, entries, null);
+                                break;
+                            default:
+                            // NA
                         }
 
                         // log sync:
@@ -649,27 +649,18 @@ public abstract class SExportUtils {
     public static void complementProcessing(final SGuiSession session, final SSyncType syncType, ArrayList<SDbSyncLogEntry> entries, Object value) throws SQLException, Exception {
         switch (syncType) {
             case PUR_PAYMENT:
-                // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
-                
-                SDbPayment payment = new SDbPayment();
-                
-                for (SDbSyncLogEntry entry : entries) {
-                    payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, value);
-                }
-                break;
-                
             case PUR_PAYMENT_UPD:
                 // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
                 
                 for (SDbSyncLogEntry entry : entries) {
                     int paymentId = SLibUtils.parseInt(entry.getReferenceId());
-                    SDbPayment paymentBeingUpdated = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
-                    int newStatusPayment = SDbPayment.getSettledStatusPaymentId(paymentBeingUpdated.getFkStatusPaymentId());
+                    SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
+                    int newStatusPaymentId = SDbPayment.getSettledStatusPaymentId(payment.getFkStatusPaymentId());
                     
-                    if (newStatusPayment != 0) {
-                        Object valueToUpdate = new Object[] { newStatusPayment, paymentBeingUpdated.getFkUserUpdateId(), entry.getAuxDatabase() };
+                    if (newStatusPaymentId != 0) {
+                        Object valueToUpdate = new Object[] { newStatusPaymentId, payment.getFkUserUpdateId(), entry.getAuxDatabase() }; // nuevo estatus, usuario, base de datos:
                         
-                        paymentBeingUpdated.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
+                        payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
                     }
                 }
                 break;

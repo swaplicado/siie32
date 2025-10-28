@@ -961,9 +961,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Create a new DPS from this document.
      * @param session GUI session.
+     * @param order Order, can be <code>null</code>.
      * @return 
      */
-    public SDataDps createDps(final SGuiSession session) throws Exception {
+    public SDataDps createDps(final SGuiSession session, final SDataDps order) throws Exception {
         int year = SLibTimeUtils.digestYear(Date)[0];
         SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
         SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
@@ -1014,7 +1015,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setPayments(
         //dps.setPaymentMethod(
         //dps.setPaymentAccount(
-        //dps.setAccountingTag(
+        if (order != null) {
+            dps.setAccountingTag(order.getAccountingTag());
+        }
         //dps.setAutomaticAuthorizationRejection(
         //dps.setIsPublic(
         //dps.setIsLinked(
@@ -1025,7 +1028,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setIsRebill(
         //dps.setIsAudited(
         //dps.setIsAuthorized(
-        //dps.setIsRecordAutomatic(
+        dps.setIsRecordAutomatic(true);
         //dps.setIsCopy(
         //dps.setIsCopied(
         //dps.setIsSystem(
@@ -1034,12 +1037,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
         dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
         dps.setFkPaymentTypeId(dueDate != null ? SDataConstantsSys.TRNS_TP_PAY_CREDIT : SDataConstantsSys.TRNS_TP_PAY_CASH);
-        //dps.setFkPaymentSystemTypeId(
+        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
         //dps.setFkDpsValidityStatusId(
         //dps.setFkDpsAuthorizationStatusId(
         //dps.setFkDpsAnnulationTypeId(
-        //dps.setFkDpsNatureId(
+        if (order != null) {
+            dps.setFkDpsNatureId(order.getFkDpsNatureId());
+        }
         dps.setFkCompanyBranchId(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranchId());
         dps.setFkFunctionalAreaId(functionalSubArea.getFkFunctionalAreaId());
         dps.setFkFunctionalSubAreaId(functionalSubArea.getPkFunctionalSubAreaId());
@@ -1063,11 +1068,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setFkSalesAgentBizPartnerId_n(
         //dps.setFkSalesSupervisorId_n(
         //dps.setFkSalesSupervisorBizPartnerId_n(
-        //dps.setFkIncotermId(
+        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
         //dps.setFkSpotSourceId_n(
         //dps.setFkSpotDestinyId_n(
-        //dps.setFkModeOfTransportationTypeId(
-        //dps.setFkCarrierTypeId(
+        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
         //dps.setFkCarrierId_n(
         //dps.setFkVehicleTypeId_n(
         //dps.setFkVehicleId_n(

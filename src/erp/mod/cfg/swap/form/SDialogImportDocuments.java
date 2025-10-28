@@ -887,10 +887,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    /*
-     * Protected methods.
-     */
-    
     private void handleShowException(final Exception e) {
         System.err.println(e);
         SLibUtils.showException(this, e);
@@ -1443,7 +1439,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
                         if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no se ha seleccionado una sucursal de la empresa en la sesión de usuario
+                            // no branch selected in current user session:
+                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
                         }
                         else {
                             // validate availability of exchange rate, if needed:
@@ -1572,7 +1569,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML] == null) {
                                 throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
                             }
-                            else if (!isBizPartnerDomestic && files[SImportUtils.CFDI_PDF] == null) {
+                            else if (files[SImportUtils.CFDI_PDF] == null) {
                                 throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
                             }
                             else {
@@ -2010,13 +2007,26 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     /*
      * Overriden methods.
      */
+    
+    @Override
+    protected void windowActivated() {
+        if (mbFirstActivation) {
+            if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
+                // no branch selected in current user session:
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH + "\n"
+                        + "No se podrá importar o capturar facturas, hasta que se seleccione una sucursal de la empresa.");
+            }
+            
+            super.windowActivated();
+        }
+    }
 
     @Override
     public void resetForm() {
         removeAllListeners();
         
         mnFormResult = 0;
-        mbFirstActivation = false;
+        mbFirstActivation = true;
         
         mbExportPaymentRequests = false;
         moBoolExportPaymentRequestsOnClose.setSelected(true);
