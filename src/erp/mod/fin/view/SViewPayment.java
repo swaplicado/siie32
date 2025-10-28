@@ -569,6 +569,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
                 + "v.dt_sched_n, " 
                 + "v.dt_exec_n, " 
                 + "v.nts, "   
+                + "v.nts_auth, "   
                 + "f.name AS func, "
                 + "fs.name AS func_s, "
                 + "sp.name AS status, "
@@ -648,6 +649,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cur", "Moneda requerida pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "pty", "Prioridad"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "nts", "Instrucciones pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "nts_auth", "Notas autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pay_cur", "Monto moneda requerida pago $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "cur_key", "Moneda requerida pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_EXC_RATE, "pay_exc_rate_app", "TC moneda requerida pago $"));
