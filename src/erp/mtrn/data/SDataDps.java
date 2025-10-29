@@ -2456,9 +2456,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkSourceDocId_n = 0;
         mnFkMfgYearId_n = 0;
         mnFkMfgOrderId_n = 0;
-        mnFkUserLinkedId = 0;
-        mnFkUserClosedId = 0;
-        mnFkUserClosedCommissionsId = 0;
+        mnFkUserLinkedId = SUtilConsts.USR_NA_ID;
+        mnFkUserClosedId = SUtilConsts.USR_NA_ID;
+        mnFkUserClosedCommissionsId = SUtilConsts.USR_NA_ID;
         mnFkUserShippedId = 0;
         mnFkUserDpsDeliveryAckId = 0;
         mnFkUserAuditedId = 0;

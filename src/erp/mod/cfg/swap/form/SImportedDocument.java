@@ -1039,9 +1039,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dps.setFkPaymentTypeId(dueDate != null ? SDataConstantsSys.TRNS_TP_PAY_CREDIT : SDataConstantsSys.TRNS_TP_PAY_CASH);
         dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
-        //dps.setFkDpsValidityStatusId(
-        //dps.setFkDpsAuthorizationStatusId(
-        //dps.setFkDpsAnnulationTypeId(
+        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
         if (order != null) {
             dps.setFkDpsNatureId(order.getFkDpsNatureId());
         }
@@ -1081,11 +1081,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setFkSourceDocId_n(
         //dps.setFkMfgYearId_n(
         //dps.setFkMfgOrderId_n(
-        //dps.setFkUserLinkedId(
-        //dps.setFkUserClosedId(
-        //dps.setFkUserClosedCommissionsId(
-        //dps.setFkUserShippedId(
-        //dps.setFkUserDpsDeliveryAckId(
+        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
         //dps.setFkUserAuditedId(
         //dps.setFkUserAuthorizedId(
         //dps.setFkUserNewId(
@@ -1349,7 +1351,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return importedDocument;
     }
     
-    public static class Reference {
+    public static class Reference implements Serializable {
         
         public int ReferenceType;
         public String Reference;
