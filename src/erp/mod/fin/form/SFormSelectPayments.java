@@ -190,7 +190,12 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
                     "p.fk_func, p.fk_func_sub, " +
                     "p.fk_ben, " +
                     "p.nts, " +
-                    "p.dt_req " +
+                    "p.dt_req, " +
+                    "pe.install, " +
+                    "pe.doc_bal_prev_app_cur, " +
+                    "pe.doc_bal_unpd_app_cur_r, " +
+                    "pe.doc_bal_prev_cur, " +
+                    "pe.doc_bal_unpd_cur_r " +
                     "FROM fin_pay AS p " +
                     "INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                     "INNER JOIN erp.bpsu_bp AS b ON p.fk_ben = b.id_bp " +
@@ -205,20 +210,25 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     SRowPayments row = new SRowPayments();
-                    row.setIdYear(resultSet.getInt(1));
-                    row.setIdDoc(resultSet.getInt(2));
-                    row.setIdPayment(resultSet.getInt(3));
-                    row.setBeneficiary(resultSet.getString(4));
-                    row.setPayNum(resultSet.getString(5));
-                    row.setDocNum(resultSet.getString(6));
-                    row.setAmount(resultSet.getDouble(7));
-                    row.setCur(resultSet.getString(8));
-                    row.setReceptionPayReq(resultSet.getBoolean(9));
-                    row.setFuncArea(resultSet.getInt(10));
-                    row.setFuncSubarea(resultSet.getInt(11));
-                    row.setIdBeneficiary(resultSet.getInt(12));
-                    row.setNotes(resultSet.getString(13));
-                    row.setDate(resultSet.getDate(14));
+                    row.setIdYear(resultSet.getInt("d.id_year"));
+                    row.setIdDoc(resultSet.getInt("d.id_doc"));
+                    row.setIdPayment(resultSet.getInt("p.id_pay"));
+                    row.setBeneficiary(resultSet.getString("b.bp"));
+                    row.setPayNum(resultSet.getString("folio_p"));
+                    row.setDocNum(resultSet.getString("folio_d"));
+                    row.setAmount(resultSet.getDouble("des_pay_app_ety_cur"));
+                    row.setCur(resultSet.getString("cur_key"));
+                    row.setReceptionPayReq(resultSet.getBoolean("b_rcpt_pay_req"));
+                    row.setFuncArea(resultSet.getInt("p.fk_func"));
+                    row.setFuncSubarea(resultSet.getInt("p.fk_func_sub"));
+                    row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
+                    row.setNotes(resultSet.getString("p.nts"));
+                    row.setDate(resultSet.getDate("p.dt_req"));
+                    row.setInstallment(resultSet.getInt("pe.install"));
+                    row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));
+                    row.setDocBalanceUnpayAppCy(resultSet.getInt("pe.doc_bal_unpd_app_cur_r"));
+                    row.setDocBalancePrevCy(resultSet.getInt("pe.doc_bal_prev_cur"));
+                    row.setDocBalanceUnpayCy(resultSet.getInt("pe.doc_bal_unpd_cur_r"));
                     row.setSelected(false);
                     maPayments.add(row);
                 }
