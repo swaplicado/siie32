@@ -1771,6 +1771,15 @@ public class SDbBankLayout extends SDbRegistryUser {
             
             statement = session.getDatabase().getConnection().createStatement();
             
+            maAuxOldPaymentsIds = new ArrayList<>();
+            msSql = "SELECT p.id_pay FROM fin_pay AS p "
+                    + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
+                    + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ")";
+            resultSet = statement.executeQuery(msSql);
+            while (resultSet.next()) {
+                maAuxOldPaymentsIds.add(resultSet.getInt(1));
+            }
+            
             maAuxNewPayments = new ArrayList<>();
             msSql = "SELECT p.id_pay FROM fin_pay AS p "
                     + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
@@ -1907,8 +1916,15 @@ public class SDbBankLayout extends SDbRegistryUser {
         
         // Guardar pagos en caso de existir
         
+        msSql = "DELETE b " +
+                "FROM fin_pay_lay_bank AS b " +
+                "INNER JOIN fin_pay AS p ON p.id_pay = b.id_pay " +
+                "WHERE b.id_lay_bank = " + mnPkBankLayoutId + " " +
+                "AND p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ");";
+        session.getStatement().execute(msSql);
+        
         for (int paymentId : maAuxOldPaymentsIds) {
-            msSql = "UPDATE fin_pay SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR_P + " "
+            msSql = "UPDATE fin_pay SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR + " "
                     + "WHERE id_pay = " + paymentId;
             session.getStatement().execute(msSql);
             msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + paymentId + ", " + mnPkBankLayoutId + ")";
@@ -2021,6 +2037,44 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+    
+    @Override
+    public void delete(final SGuiSession session) throws SQLException, Exception {
+        initQueryMembers();
+        mnQueryResultId = SDbConsts.SAVE_ERROR;
+
+        mbDeleted = !mbDeleted;
+        mnFkUserUpdateId = session.getUser().getPkUserId();
+
+        msSql = "UPDATE " + getSqlTable() + " SET " +
+                "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                "ts_usr_upd = NOW() " +
+                getSqlWhere();
+
+        session.getStatement().execute(msSql);
+        
+        msSql = "SELECT p.id_pay FROM fin_pay AS p "
+                + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
+                + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
+        ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
+        while (resultSet.next()) {
+            SDbPayment pay = new SDbPayment();
+            pay.read(session, new int[] { resultSet.getInt(1) } );
+            pay.delete(session);
+        }
+        
+        msSql = "SELECT p.id_pay FROM fin_pay AS p "
+                + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
+                + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ")";
+        resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
+        while (resultSet.next()) {
+            SDbPayment pay = new SDbPayment();
+            pay.read(session, new int[] { resultSet.getInt(1) } );
+            pay.updatePaymentStatus(session, SModSysConsts.FINS_ST_PAY_SCHED);
+        }
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 }
 
