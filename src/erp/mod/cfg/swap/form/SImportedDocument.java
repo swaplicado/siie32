@@ -527,11 +527,21 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         + "es distinto al de la factura a vincular "
                         + "'" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
             }
-            else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) || CurrencyId != dps.getFkCurrencyId()) {
+            else if (CurrencyId != dps.getFkCurrencyId()) {
                 // match required:
-                throw new Exception("El total o la moneda de este documento, "
+                throw new Exception("La moneda de este documento, "
+                        + CurrencyCode + ", "
+                        + "es distinta a la de la factura a vincular, "
+                        + dps.getDbmsCurrencyCode() + ".");
+            }
+            else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
+                    Math.abs(Total - dps.getTotalCy_r()) >= 1 ||
+                    Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm("Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + "\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)) {
+                // match required:
+                throw new Exception("El total de este documento, "
                         + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
-                        + "son distintos a los de la factura a vincular, "
+                        + "es distinto al de la factura a vincular, "
                         + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
             else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {

@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import sa.lib.SLibUtils;
@@ -580,11 +581,17 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 
                 if (!validation.getIsError() && moParamDpsSource.isOrder()){
                     try {
-                        double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());
-                        if (totalsupplied > entry.getQuantityToLink()) {
-                            validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                    "la cantidad minima a vincular debe ser " + (totalsupplied < entry.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
-                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalsupplied) + " ya que tiene sutidos previos.");
+                        double quantitySupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());
+                        
+                        if (quantitySupplied > entry.getQuantityToLink()) {
+                            String message = "Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
+                                    "la cantidad minima a vincular debería ser " + (quantitySupplied < entry.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
+                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantitySupplied) + " ya que tiene sutidos previos.\n" +
+                                    "¿Está seguro que desea hacer caso omiso y continuar?";
+                            
+                            if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
+                                validation.setMessage("La cantidad a vincular debería ser al menos " + SLibUtils.getDecimalFormatQuantity().format(quantitySupplied) + ".");
+                            }
                             break;
                         }
                     }

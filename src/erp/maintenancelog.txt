@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 290.32/ 2025-10-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Compleción de datos faltantes en nuevo DPS creado en la captura abierta de facturas en la importación de facturas autorizadas en el Portal de Compras.
+2) Habilitación de difirencia de tolerancia menor a $1.00 (moneda local) en el total neto al vincular facturas autorizadas en el Portal de Compras.
+
+================================================================================
 SIIE 3.2 290.31/ 2025-10-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Habilitación de captura abierta de facturas en la importación de facturas autorizadas desde Portal de Compras.
+1) Habilitación de captura abierta de facturas en la importación de facturas autorizadas desde el Portal de Compras.
 
 ================================================================================
 SIIE 3.2 290.30/ 2025-10-27
