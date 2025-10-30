@@ -2074,7 +2074,7 @@ public abstract class SExportDataUtils {
     }
     
     /**
-     * 
+     * Update status of authorizable resource.
      * @param statement
      * @param companyId
      * @param resourceType
@@ -2135,7 +2135,7 @@ public abstract class SExportDataUtils {
                             return oResponse;
                     }
                     
-                    sUpdate += "nts_auth = '" + SLibUtils.textToSql(notes) + "', "
+                    sUpdate += "nts_auth_flow = '" + SLibUtils.textToSql(notes) + "', "
                             + "fk_usr_upd = " + userId + ", "
                             + "ts_usr_upd = NOW() ";
                     
