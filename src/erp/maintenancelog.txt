@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 291.0/ 2025-10-31
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización general de vistas y gestión de pagos.
+2) Incorporación de descripción de facturas autorizadas en Portal de Compras como comentarios para la autorización de pagos.
+
+================================================================================
 SIIE 3.2 290.33/ 2025-10-30
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
