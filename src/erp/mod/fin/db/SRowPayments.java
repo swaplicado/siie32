@@ -30,6 +30,11 @@ public class SRowPayments implements SGridRow, Serializable {
     protected int mnFuncSubarea;
     protected boolean mbSelected = false;
     protected String msNotes;
+    protected int mnInsallment;
+    protected double mdDocBalancePrevAppCy;
+    protected double mdDocBalanceUnpayAppCy;
+    protected double mdDocBalancePrevCy;
+    protected double mdDocBalanceUnpayCy;
 
     public void setIdYear(int d) { idYear = d; };
     public void setIdDoc(int d) { idDoc = d; };
@@ -46,6 +51,11 @@ public class SRowPayments implements SGridRow, Serializable {
     public void setFuncSubarea(int n) { mnFuncSubarea = n; };
     public void setNotes(String s) { msNotes = s; }
     public void setSelected(boolean b) { mbSelected = b; }
+    public void setInstallment(int n) { mnInsallment = n; }
+    public void setDocBalancePrevAppCy(double d) { mdDocBalancePrevAppCy = d; }
+    public void setDocBalanceUnpayAppCy(double d) { mdDocBalanceUnpayAppCy = d; }
+    public void setDocBalancePrevCy(double d) { mdDocBalancePrevCy = d; }
+    public void setDocBalanceUnpayCy(double d) { mdDocBalanceUnpayCy = d; }
     
     public int getIdYear() { return idYear; }
     public int getIdDoc() { return idDoc; }
@@ -62,6 +72,11 @@ public class SRowPayments implements SGridRow, Serializable {
     public int getFuncSubarea() { return mnFuncSubarea; };
     public String getNotes() { return msNotes; }
     public boolean getIsSelected() { return mbSelected; }
+    public int getInstallment() { return mnInsallment; }
+    public double getDocBalancePrevAppCy() { return mdDocBalancePrevAppCy; }
+    public double getDocBalanceUnpayAppCy() { return mdDocBalanceUnpayAppCy; }
+    public double getDocBalancePrevCy() { return mdDocBalancePrevCy; }
+    public double getDocBalanceUnpayCy() { return mdDocBalanceUnpayCy; }
     
     @Override
     public int[] getRowPrimaryKey() {

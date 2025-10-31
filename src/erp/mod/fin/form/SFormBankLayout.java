@@ -2015,6 +2015,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         pay.setPaymentCy(SLibUtils.roundAmount(pay.getPaymentCy() + row.getMoneyPayment().getLocalAmount()));
                         pay.setAuxOriginalAmount(SLibUtils.roundAmount(pay.getAuxOriginalAmount() + row.getMoneyPayment().getOriginalAmount()));
                         pay.setPayment(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
+                        pay.setPaymentApplication(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                         
                         if (!pay.isReceiptPaymentRequired()) {
                             pay.setReceiptPaymentRequired(row.getReceptionPayReq());
@@ -2031,6 +2032,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     pay.setDateSchedule_n(moDateDateLayout.getValue());
                     pay.setDateExecution_n(moDateDateLayout.getValue());
                     pay.setPaymentCy(row.getMoneyPayment().getLocalAmount()); // moneda de la cuenta bancaria
+                    pay.setPaymentExchangeRateApplication(moDecExchangeRate.getValue());
+                    pay.setPaymentApplication(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                     pay.setPaymentExchangeRate(moDecExchangeRate.getValue());
                     pay.setAuxOriginalAmount(row.getMoneyPayment().getOriginalAmount());
                     pay.setPayment(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
@@ -2060,13 +2063,26 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         SDbPaymentEntry payEty = new SDbPaymentEntry();
         payEty.setEntryType(SDbPaymentEntry.ENTRY_TYPE_PAYMENT);
         payEty.setEntryPaymentCy(row.getMoneyPayment().getLocalAmount());
+        payEty.setEntryPaymentApplication(SLibUtils.roundAmount(row.getMoneyPayment().getOriginalAmount() * moDecExchangeRate.getValue()));
+        payEty.setConversionRateApplication(SLibUtils.round(row.getMoneyPayment().getOriginalAmount() / row.getMoneyPayment().getLocalAmount(), 6));
+        payEty.setDestinyPaymentApplicationEntryCy(row.getMoneyPayment().getOriginalAmount());
         payEty.setEntryPayment(SLibUtils.roundAmount(row.getMoneyPayment().getOriginalAmount() * moDecExchangeRate.getValue()));
         payEty.setConversionRate(SLibUtils.round(row.getMoneyPayment().getOriginalAmount() / row.getMoneyPayment().getLocalAmount(), 6));
         payEty.setDestinyPaymentEntryCy(row.getMoneyPayment().getOriginalAmount());
         payEty.setFkDocYearId_n(row.getDpsYearId());
         payEty.setFkDocDocId_n(row.getDpsDocId());
         payEty.setFkEntryCurrencyId(row.getCurrencyId());
-        payEty.setFkPaymentRequestId_n(row.getPayments().get(0).getIdPayment());
+        for (SRowPayments rowPayment : row.getPayments()) {
+            if (row.getDpsYearId() == rowPayment.getIdYear() && row.getDpsDocId() == rowPayment.getIdDoc()) {
+                payEty.setInstallment(rowPayment.getInstallment());
+                payEty.setDocBalancePreviousApplicationCy(rowPayment.getDocBalancePrevAppCy());
+                payEty.setDocBalanceUnpaidApplicationCy_r(rowPayment.getDocBalanceUnpayAppCy());
+                payEty.setDocBalancePreviousCy(rowPayment.getDocBalancePrevCy());
+                payEty.setDocBalanceUnpaidCy_r(rowPayment.getDocBalanceUnpayCy());
+                payEty.setFkPaymentRequestId_n(rowPayment.getIdPayment());
+                break;
+            }
+        }
         
         return payEty;
     }
