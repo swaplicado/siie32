@@ -546,9 +546,6 @@ public abstract class SModSysConsts {
     public static final int FINS_ST_PAY_BLOC_P = 18; // bloqueado en proceso
     public static final int FINS_ST_PAY_CANC_P = 19; // cancelado en proceso
     
-    public static final int FINX_ST_PAY_EXEC_DET = 105; //ejecutados a detalle
-    public static final int FINX_ST_PAY_RCPT_DET = 107; //comprobados a detalle
-
     public static final int FIN_ACC_NA = 1;
     public static final int FIN_CC_NA = 1;
     

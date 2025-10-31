@@ -27,7 +27,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
@@ -46,21 +45,19 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormPayment extends SBeanForm implements ActionListener, ItemListener, FocusListener {
     
     private SDbPayment moRegistry;
     private SPanelDps moPanelDps;
-    
-    private SDataBizPartner moBizPartner;
     private SDataDps moDps;
     
     private boolean mbCanCapture;
     
     private SDialogPickerDps moDialogDpsPicker;
     
-    private double mdIns;
+    private double mdDpsBalance;
     
     /**
      * Creates new form SFormPayment2
@@ -82,21 +79,21 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        bgEntryType = new javax.swing.ButtonGroup();
         jpRegistry = new javax.swing.JPanel();
         jpPayment = new javax.swing.JPanel();
         jpPayWest = new javax.swing.JPanel();
         jpPayWestRow1 = new javax.swing.JPanel();
-        jlSerieNumber = new javax.swing.JLabel();
-        moTextSerie = new sa.lib.gui.bean.SBeanFieldText();
+        jlFolio = new javax.swing.JLabel();
+        moTextSeries = new sa.lib.gui.bean.SBeanFieldText();
         moIntNumber = new sa.lib.gui.bean.SBeanFieldInteger();
         jpPayWestRow2 = new javax.swing.JPanel();
         jlDateApplication = new javax.swing.JLabel();
         moDateApplication = new sa.lib.gui.bean.SBeanFieldDate();
         jpPayWestRow3 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
-        moRadDocPayment = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadSimplePayment = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadTypePayment = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadTypeAdvance = new sa.lib.gui.bean.SBeanFieldRadio();
         jpPayWestRow4 = new javax.swing.JPanel();
         jlBeneficiary = new javax.swing.JLabel();
         moKeyBeneficiary = new sa.lib.gui.bean.SBeanFieldKey();
@@ -116,7 +113,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow2 = new javax.swing.JPanel();
         jlPaymentCy = new javax.swing.JLabel();
         moCurAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jbIns = new javax.swing.JButton();
+        jbRetrieveDpsBalance = new javax.swing.JButton();
         jpPayCenterRow3 = new javax.swing.JPanel();
         jlPaymentExcRateApp = new javax.swing.JLabel();
         moDecExcRate = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -132,13 +129,17 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow6 = new javax.swing.JPanel();
         jlPriority = new javax.swing.JLabel();
         moKeyPriority = new sa.lib.gui.bean.SBeanFieldKey();
+        jLabel1 = new javax.swing.JLabel();
+        jchkIsSystem = new javax.swing.JCheckBox();
         jpNotes = new javax.swing.JPanel();
         jpNotesRow1 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jlNotesHint = new javax.swing.JLabel();
         jpNotesRow2 = new javax.swing.JPanel();
-        jlNotesAuth = new javax.swing.JLabel();
-        moTextNotesAuth = new sa.lib.gui.bean.SBeanFieldText();
+        jlNotesAuthorization = new javax.swing.JLabel();
+        moTextNotesAuthorization = new sa.lib.gui.bean.SBeanFieldText();
+        jlNotesAuthorizationHint = new javax.swing.JLabel();
         jpDocument = new javax.swing.JPanel();
         jlPanelDps = new javax.swing.JLabel();
 
@@ -153,21 +154,22 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpRegistry.setLayout(new java.awt.BorderLayout());
 
         jpPayment.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del pago:"));
-        jpPayment.setLayout(new java.awt.BorderLayout());
+        jpPayment.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jpPayWest.setLayout(new java.awt.GridLayout(7, 0, 0, 5));
+        jpPayWest.setLayout(new java.awt.GridLayout(7, 0, 0, 3));
 
         jpPayWestRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSerieNumber.setText("Serie y folio:*");
-        jlSerieNumber.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpPayWestRow1.add(jlSerieNumber);
+        jlFolio.setText("Serie y folio:*");
+        jlFolio.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpPayWestRow1.add(jlFolio);
 
-        moTextSerie.setEnabled(false);
-        jpPayWestRow1.add(moTextSerie);
+        moTextSeries.setEnabled(false);
+        moTextSeries.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPayWestRow1.add(moTextSeries);
 
+        moIntNumber.setHorizontalAlignment(javax.swing.JTextField.LEADING);
         moIntNumber.setEnabled(false);
-        moIntNumber.setPreferredSize(new java.awt.Dimension(61, 23));
         jpPayWestRow1.add(moIntNumber);
 
         jpPayWest.add(jpPayWestRow1);
@@ -189,14 +191,16 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPayWestRow3.add(jlPaymentType);
 
-        buttonGroup1.add(moRadDocPayment);
-        moRadDocPayment.setSelected(true);
-        moRadDocPayment.setText("Pago");
-        jpPayWestRow3.add(moRadDocPayment);
+        bgEntryType.add(moRadTypePayment);
+        moRadTypePayment.setSelected(true);
+        moRadTypePayment.setText("Pago");
+        moRadTypePayment.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPayWestRow3.add(moRadTypePayment);
 
-        buttonGroup1.add(moRadSimplePayment);
-        moRadSimplePayment.setText("Anticipo");
-        jpPayWestRow3.add(moRadSimplePayment);
+        bgEntryType.add(moRadTypeAdvance);
+        moRadTypeAdvance.setText("Anticipo");
+        moRadTypeAdvance.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPayWestRow3.add(moRadTypeAdvance);
 
         jpPayWest.add(jpPayWestRow3);
 
@@ -248,15 +252,15 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayment.add(jpPayWest, java.awt.BorderLayout.WEST);
 
-        jpPayCenter.setLayout(new java.awt.GridLayout(7, 0, 0, 5));
+        jpPayCenter.setLayout(new java.awt.GridLayout(7, 0, 0, 3));
 
         jpPayCenterRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEntryCurrency.setText("Moneda a pagar:*");
-        jlEntryCurrency.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlEntryCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow7.add(jlEntryCurrency);
 
-        moKeyEntryCurrency.setPreferredSize(new java.awt.Dimension(140, 23));
+        moKeyEntryCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow7.add(moKeyEntryCurrency);
 
         jpPayCenter.add(jpPayCenterRow7);
@@ -264,21 +268,21 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentCy.setText("Monto a pagar:*");
-        jlPaymentCy.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlPaymentCy.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow2.add(jlPaymentCy);
         jpPayCenterRow2.add(moCurAmount);
 
-        jbIns.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
-        jbIns.setToolTipText("Agregar saldo insoluto");
-        jbIns.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpPayCenterRow2.add(jbIns);
+        jbRetrieveDpsBalance.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif"))); // NOI18N
+        jbRetrieveDpsBalance.setToolTipText("Agregar saldo insoluto");
+        jbRetrieveDpsBalance.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPayCenterRow2.add(jbRetrieveDpsBalance);
 
         jpPayCenter.add(jpPayCenterRow2);
 
         jpPayCenterRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentExcRateApp.setText("Tipo de cambio:*");
-        jlPaymentExcRateApp.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlPaymentExcRateApp.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow3.add(jlPaymentExcRateApp);
 
         moDecExcRate.setEnabled(false);
@@ -289,7 +293,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentApplication.setText("Monto a pagar local:");
-        jlPaymentApplication.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlPaymentApplication.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow4.add(jlPaymentApplication);
 
         moCurAmountLoc.setEnabled(false);
@@ -300,7 +304,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateRequired.setText("Fecha requerida de pago:*");
-        jlDateRequired.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlDateRequired.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow5.add(jlDateRequired);
         jpPayCenterRow5.add(moDateRequired);
 
@@ -309,10 +313,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCurrency.setText("Moneda de pago:*");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow1.add(jlCurrency);
 
-        moKeyCurrency.setPreferredSize(new java.awt.Dimension(140, 23));
+        moKeyCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow1.add(moKeyCurrency);
 
         jpPayCenter.add(jpPayCenterRow1);
@@ -320,37 +324,59 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPriority.setText("Prioridad:*");
-        jlPriority.setPreferredSize(new java.awt.Dimension(160, 23));
+        jlPriority.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow6.add(jlPriority);
 
-        moKeyPriority.setPreferredSize(new java.awt.Dimension(140, 23));
+        moKeyPriority.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow6.add(moKeyPriority);
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jpPayCenterRow6.add(jLabel1);
+
+        jchkIsSystem.setText("Registro de sistema");
+        jchkIsSystem.setEnabled(false);
+        jchkIsSystem.setPreferredSize(new java.awt.Dimension(135, 23));
+        jpPayCenterRow6.add(jchkIsSystem);
 
         jpPayCenter.add(jpPayCenterRow6);
 
         jpPayment.add(jpPayCenter, java.awt.BorderLayout.CENTER);
 
-        jpNotes.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
+        jpNotes.setLayout(new java.awt.GridLayout(2, 0, 0, 3));
 
-        jpNotesRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+        jpNotesRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlNotes.setForeground(new java.awt.Color(0, 102, 102));
         jlNotes.setText("Intrucciones de pago:");
-        jlNotes.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlNotes.setPreferredSize(new java.awt.Dimension(125, 23));
         jpNotesRow1.add(jlNotes);
 
-        moTextNotes.setPreferredSize(new java.awt.Dimension(680, 23));
+        moTextNotes.setPreferredSize(new java.awt.Dimension(580, 23));
         jpNotesRow1.add(moTextNotes);
+
+        jlNotesHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlNotesHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlNotesHint.setToolTipText("Indicaciones para la correcta realización del pago");
+        jlNotesHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpNotesRow1.add(jlNotesHint);
 
         jpNotes.add(jpNotesRow1);
 
         jpNotesRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotesAuth.setText("Notas para autorización:");
-        jlNotesAuth.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpNotesRow2.add(jlNotesAuth);
+        jlNotesAuthorization.setForeground(new java.awt.Color(0, 102, 102));
+        jlNotesAuthorization.setText("Notas para autorización:");
+        jlNotesAuthorization.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpNotesRow2.add(jlNotesAuthorization);
 
-        moTextNotesAuth.setPreferredSize(new java.awt.Dimension(680, 23));
-        jpNotesRow2.add(moTextNotesAuth);
+        moTextNotesAuthorization.setPreferredSize(new java.awt.Dimension(680, 23));
+        jpNotesRow2.add(moTextNotesAuthorization);
+
+        jlNotesAuthorizationHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlNotesAuthorizationHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlNotesAuthorizationHint.setToolTipText("Comentarios a considerar en la autorización del pago");
+        jlNotesAuthorizationHint.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpNotesRow2.add(jlNotesAuthorizationHint);
 
         jpNotes.add(jpNotesRow2);
 
@@ -363,7 +389,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlPanelDps.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jlPanelDps.setText("[Panel de documento de compras-ventas]");
         jlPanelDps.setPreferredSize(new java.awt.Dimension(100, 200));
-        jpDocument.add(jlPanelDps, java.awt.BorderLayout.CENTER);
+        jpDocument.add(jlPanelDps, java.awt.BorderLayout.NORTH);
 
         jpRegistry.add(jpDocument, java.awt.BorderLayout.CENTER);
 
@@ -377,26 +403,30 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     }//GEN-LAST:event_formWindowClosed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup bgEntryType;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton jbDpsFinder;
     private javax.swing.JButton jbDpsPicker;
-    private javax.swing.JButton jbIns;
+    private javax.swing.JButton jbRetrieveDpsBalance;
+    private javax.swing.JCheckBox jchkIsSystem;
     private javax.swing.JLabel jlBeneficiary;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDateApplication;
     private javax.swing.JLabel jlDateRequired;
     private javax.swing.JLabel jlDps;
     private javax.swing.JLabel jlEntryCurrency;
+    private javax.swing.JLabel jlFolio;
     private javax.swing.JLabel jlFunctionalArea;
     private javax.swing.JLabel jlNotes;
-    private javax.swing.JLabel jlNotesAuth;
+    private javax.swing.JLabel jlNotesAuthorization;
+    private javax.swing.JLabel jlNotesAuthorizationHint;
+    private javax.swing.JLabel jlNotesHint;
     private javax.swing.JLabel jlPanelDps;
     private javax.swing.JLabel jlPaymentApplication;
     private javax.swing.JLabel jlPaymentCy;
     private javax.swing.JLabel jlPaymentExcRateApp;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPriority;
-    private javax.swing.JLabel jlSerieNumber;
     private javax.swing.JPanel jpDocument;
     private javax.swing.JPanel jpNotes;
     private javax.swing.JPanel jpNotesRow1;
@@ -430,26 +460,25 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldKey moKeyEntryCurrency;
     private sa.lib.gui.bean.SBeanFieldKey moKeyFunctionalArea;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriority;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadDocPayment;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadSimplePayment;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadTypeAdvance;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadTypePayment;
     private sa.lib.gui.bean.SBeanFieldText moTextDps;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
-    private sa.lib.gui.bean.SBeanFieldText moTextNotesAuth;
-    private sa.lib.gui.bean.SBeanFieldText moTextSerie;
+    private sa.lib.gui.bean.SBeanFieldText moTextNotesAuthorization;
+    private sa.lib.gui.bean.SBeanFieldText moTextSeries;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 960, 600);
+        SGuiUtils.setWindowBounds(this, 880, 550);
         
-        moTextSerie.setTextSettings(SGuiUtils.getLabelName(jlSerieNumber), 5, 0);
-        moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlSerieNumber), SGuiConsts.GUI_TYPE_INT, true);
+        moTextSeries.setTextSettings(SGuiUtils.getLabelName(jlFolio), 5, 0);
+        moIntNumber.setIntegerSettings(SGuiUtils.getLabelName(jlFolio), SGuiConsts.GUI_TYPE_INT, true);
         moDateApplication.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateApplication), true);
-        moRadDocPayment.setBooleanSettings(SGuiUtils.getLabelName(moRadDocPayment.getText()), true);
-        moRadSimplePayment.setBooleanSettings(SGuiUtils.getLabelName(moRadSimplePayment.getText()), false);
+        moRadTypePayment.setBooleanSettings(SGuiUtils.getLabelName(moRadTypePayment.getText()), true);
+        moRadTypeAdvance.setBooleanSettings(SGuiUtils.getLabelName(moRadTypeAdvance.getText()), false);
         moKeyBeneficiary.setKeySettings(miClient, SGuiUtils.getLabelName(jlBeneficiary), true);
         moTextDps.setTextSettings(SGuiUtils.getLabelName(jlDps), 50);
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
-        moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency), true);
         moKeyEntryCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlEntryCurrency), true);
         moCurAmount.setCompoundFieldSettings(miClient);
         moCurAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -457,26 +486,31 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moCurAmountLoc.setCompoundFieldSettings(miClient);
         moCurAmountLoc.getField().setDecimalSettings(SGuiUtils.getLabelName(jlPaymentApplication), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDateRequired.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateRequired), true);
+        moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency), true);
         moKeyPriority.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriority), false);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes), 100, 0);
-        moTextNotesAuth.setTextSettings(SGuiUtils.getLabelName(jlNotes), 100, 0);
+        moTextNotes.setTextCaseType(SLibConsts.UNDEFINED);
+        moTextNotesAuthorization.setTextSettings(SGuiUtils.getLabelName(jlNotesAuthorization), 512, 0);
+        moTextNotesAuthorization.setTextCaseType(SLibConsts.UNDEFINED);
         
-        moFields.addField(moTextSerie);
+        moFields.addField(moTextSeries);
         moFields.addField(moIntNumber);
         moFields.addField(moDateApplication);
-        moFields.addField(moRadDocPayment);
-        moFields.addField(moRadSimplePayment);
+        moFields.addField(moRadTypePayment);
+        moFields.addField(moRadTypeAdvance);
         moFields.addField(moKeyBeneficiary);
+        moFields.addField(moTextDps);
         moFields.addField(moKeyFunctionalArea);
-        moFields.addField(moKeyCurrency);
         moFields.addField(moKeyEntryCurrency);
         moFields.addField(moCurAmount.getField());
         moFields.addField(moDecExcRate);
         moFields.addField(moCurAmountLoc.getField());
         moFields.addField(moDateRequired);
+        moFields.addField(moKeyCurrency);
         moFields.addField(moKeyPriority);
         moFields.addField(moTextNotes);
-        moFields.addField(moTextNotesAuth);
+        moFields.addField(moTextNotesAuthorization);
+        moFields.setFormButton(jbSave);
         
         moDialogDpsPicker = new SDialogPickerDps((SClientInterface) miClient, SDataConstants.TRNX_DPS_PAY_PEND_PAY);
         
@@ -488,33 +522,19 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpCommandRight.remove(jbReadInfo);
     }
     
-    private int getNextNumber() {
-        try {
-            String sql = "SELECT COALESCE(MAX(num), 0) + 1 FROM fin_pay;";
-            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        }
-        catch (SQLException e) {
-            miClient.showMsgBoxError(e.getMessage());
-        }
-        return 0;
-    }
-    
     private void enablePayComponets(boolean enable) {
         moDateApplication.setEnabled(false);
-        moTextSerie.setEnabled(false);
+        moTextSeries.setEnabled(false);
         moIntNumber.setEnabled(false);
         moDateRequired.setEnabled(mbCanCapture && enable);
-        moRadDocPayment.setEnabled(mbCanCapture && enable);
-        moRadSimplePayment.setEnabled(mbCanCapture && enable);
+        moRadTypePayment.setEnabled(mbCanCapture && enable);
+        moRadTypeAdvance.setEnabled(mbCanCapture && enable);
         moKeyBeneficiary.setEnabled(mbCanCapture && enable);
         moKeyCurrency.setEnabled(mbCanCapture && enable);
         moCurAmount.setEnabled(mbCanCapture && enable);
         moKeyPriority.setEnabled(mbCanCapture && enable);
         moTextNotes.setEnabled(mbCanCapture && enable);
-        moTextNotesAuth.setEnabled(mbCanCapture && enable);
+        moTextNotesAuthorization.setEnabled(mbCanCapture && enable);
     }
     
     private boolean isApplingFunctionalAreas() {
@@ -544,8 +564,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void focusLostCurAmount() {
-        if (moDps != null && moCurAmount.getField().getValue() > mdIns) {
-            miClient.showMsgBoxInformation("No se puede pagar una cantidad mayor al saldo insoluto (" + SLibUtils.DecimalFormatValue2D.format(mdIns) + ")");
+        if (moDps != null && moCurAmount.getField().getValue() > mdDpsBalance) {
+            miClient.showMsgBoxInformation("No se puede pagar una cantidad mayor al saldo insoluto (" + SLibUtils.DecimalFormatValue2D.format(mdDpsBalance) + ")");
             moCurAmount.getField().setValue(0d);
         }
         calculateAmountLocal();
@@ -616,10 +636,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         return excRate;
     }
     
-    private double calculateIns() throws Exception {
-        double ins = 0;
+    private double getDpsBalance() throws Exception {
+        double balance = 0;
+        
         String sql = "SELECT " +
-                "(SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) + IFNULL(ps.sum_pay_cur, 0)) AS ins " +
+                "(SUM(IF(re.fid_cur <> d.fid_cur, 0, re.debit_cur - re.credit_cur)) + IFNULL(ps.sum_pay_cur, 0)) AS _balance " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON " +
                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
@@ -645,12 +666,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 "WHERE d.fid_bp_r = " + moDps.getFkBizPartnerId_r() + " " + 
                 "AND d.id_year = " + moDps.getPkYearId() + " AND d.id_doc = " + moDps.getPkDocId();
 
-        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            ins = resultSet.getDouble("ins") * -1;
+        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                balance = resultSet.getDouble("_balance") * -1;
+            }
         }
         
-        return ins;
+        return balance;
     }
     
     private void setDpsValues() throws Exception {
@@ -688,7 +710,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 try {
                     moDps = new SDataDps();
                     moDps.read(pickerDps.getSelectedPrimaryKey(), miClient.getSession().getStatement());
-                    mdIns = (double) pickerDps.getValue(SDialogPickerDps.COL_INS_VALUE) * -1;
+                    mdDpsBalance = (double) pickerDps.getValue(SDialogPickerDps.COL_INS_VALUE) * -1;
                     
                     setDpsValues();
                 }
@@ -719,8 +741,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 if (key != null) {
                     moDps = new SDataDps();
                     moDps.read(key, miClient.getSession().getStatement());
-                    mdIns = calculateIns();
-                    if (mdIns != 0) {
+                    mdDpsBalance = getDpsBalance();
+                    if (mdDpsBalance != 0) {
                         setDpsValues();
                     }
                     else {
@@ -736,12 +758,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 miClient.showMsgBoxInformation("Seleccione un beneficiario.");
             }
         }
-        catch (Exception e) {}
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
-    private void actionIns() {
-        if (jbIns.isEnabled()) {
-            moCurAmount.getField().setValue(mdIns);
+    private void actionRetrieveDpsBalance() {
+        if (jbRetrieveDpsBalance.isEnabled()) {
+            moCurAmount.getField().setValue(mdDpsBalance);
             calculateAmountLocal();
         }
     }
@@ -750,6 +774,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moDps = null;
         moPanelDps.setDps(moDps, null);
         moTextDps.setText("");
+        
         if (moKeyBeneficiary.getSelectedIndex() > 0) {
             SDataBizPartner bp = new SDataBizPartner();
             bp.read(moKeyBeneficiary.getValue(), miClient.getSession().getStatement());
@@ -762,30 +787,34 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private void stateChangeEntryCurrency() {
         if (moKeyEntryCurrency.getSelectedIndex() > 0) {
             moCurAmount.setCurrencyKey(moKeyEntryCurrency.getValue());
+            
             if (isLocalCurrency(moKeyEntryCurrency.getValue()[0])) {
                 moDecExcRate.setValue(1d);
             }
             else {
-                double excRate = getExchangeRate(moKeyEntryCurrency.getValue()[0]);
-                if (excRate == 0) {
+                double xrt = getExchangeRate(moKeyEntryCurrency.getValue()[0]);
+                
+                if (xrt == 0) {
                     miClient.showMsgBoxInformation("No hay un tipo de cambio para la moneda y fecha seleccionadas.");
                 }
-                moDecExcRate.setValue(excRate);
+                moDecExcRate.setValue(xrt);
             }
+            
             calculateAmountLocal();
         }
     }
     
     private void stateChangeTypePayment() {
-        jbDpsPicker.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
-        moKeyEntryCurrency.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
-        moKeyFunctionalArea.setEnabled(mbCanCapture && !moRadDocPayment.isSelected());
-        moTextDps.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
-        jbDpsFinder.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
-        jbIns.setEnabled(mbCanCapture && moRadDocPayment.isSelected());
-        if (!moRadDocPayment.isSelected()) {
+        jbDpsPicker.setEnabled(mbCanCapture && moRadTypePayment.isSelected());
+        moKeyEntryCurrency.setEnabled(mbCanCapture && !moRadTypePayment.isSelected());
+        moKeyFunctionalArea.setEnabled(mbCanCapture && !moRadTypePayment.isSelected());
+        moTextDps.setEnabled(mbCanCapture && moRadTypePayment.isSelected());
+        jbDpsFinder.setEnabled(mbCanCapture && moRadTypePayment.isSelected());
+        jbRetrieveDpsBalance.setEnabled(mbCanCapture && moRadTypePayment.isSelected());
+        
+        if (!moRadTypePayment.isSelected()) {
             moDps = null;
-            mdIns = 0d;
+            mdDpsBalance = 0d;
             moPanelDps.setDps(moDps, null);
             moTextDps.setText("");
             
@@ -805,28 +834,27 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     public void addAllListeners() {
         jbDpsPicker.addActionListener(this);
         jbDpsFinder.addActionListener(this);
-        jbIns.addActionListener(this);
+        jbRetrieveDpsBalance.addActionListener(this);
         
         moKeyBeneficiary.addItemListener(this);
         moKeyEntryCurrency.addItemListener(this);
-        moRadDocPayment.addItemListener(this);
-        moRadSimplePayment.addItemListener(this);
+        moRadTypePayment.addItemListener(this);
+        moRadTypeAdvance.addItemListener(this);
         
         ((SBeanFieldDecimal) moCurAmount.getField()).addFocusListener(this);
         moDecExcRate.addFocusListener(this);
-        
     }
 
     @Override
     public void removeAllListeners() {
         jbDpsPicker.removeActionListener(this);
         jbDpsFinder.removeActionListener(this);
-        jbIns.removeActionListener(this);
+        jbRetrieveDpsBalance.removeActionListener(this);
         
         moKeyBeneficiary.removeItemListener(this);
         moKeyEntryCurrency.removeItemListener(this);
-        moRadDocPayment.removeItemListener(this);
-        moRadSimplePayment.removeItemListener(this);
+        moRadTypePayment.removeItemListener(this);
+        moRadTypeAdvance.removeItemListener(this);
         
         ((SBeanFieldDecimal) moCurAmount.getField()).removeFocusListener(this);
         moDecExcRate.removeFocusListener(this);
@@ -856,49 +884,66 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         reloadCatalogues();
         stateChangeTypePayment();
         
-        int etyCur = moRegistry.getChildEntries().isEmpty() ? 1 : moRegistry.getChildEntries().get(0).getFkEntryCurrencyId();
+        SDbPaymentEntry entry;
         
         if (moRegistry.isRegistryNew()) {
-            moIntNumber.setValue(getNextNumber());
+            mbCanCapture = true;
+            
+            moTextSeries.setValue("");
+            moIntNumber.setValue(SDbPayment.computeNextNumber(miClient.getSession(), moTextSeries.getValue()));
             moDateApplication.setValue(miClient.getSession().getCurrentDate());
+            
+            entry = null;
+            
+            jchkIsSystem.setSelected(true);
+            bgEntryType.setSelected(moRadTypePayment.getModel(), true);
+            stateChangeTypePayment();
+
+            moCurAmount.setCurrencyKey(new int[] { SModSysConsts.CFGU_CUR_MXN });
+            moDps = null;
+            
             jtfRegistryKey.setText("");
-            moCurAmount.setCurrencyKey(new int[] { 1 });
         }
         else{
-            jtfRegistryKey.setText(moRegistry.getPkPaymentId() + "");
             moIntNumber.setValue(moRegistry.getNumber());
+            moTextSeries.setValue(moRegistry.getSeries());
             moDateApplication.setValue(moRegistry.getDateApplication());
-            moCurAmount.setCurrencyKey(new int[] { etyCur });
+            
+            entry = moRegistry.getChildEntries().get(0);
+            
+            jchkIsSystem.setSelected(moRegistry.isSystem());
+            bgEntryType.setSelected(entry.getEntryType().equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT) ? moRadTypePayment.getModel() : moRadTypeAdvance.getModel(), true);
+            stateChangeTypePayment();
+
+            moCurAmount.setCurrencyKey(new int[] { entry.getFkEntryCurrencyId() });
+            moDps = entry.getDpsRelated();
+            
+            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        SDbPaymentEntry ety = moRegistry.getChildEntries().isEmpty() ? new SDbPaymentEntry() : moRegistry.getChildEntries().get(0);
         
-        moTextSerie.setValue(moRegistry.getSeries());
-        switch(ety.getEntryType()) {
-            case SDbPaymentEntry.ENTRY_TYPE_PAYMENT:
-                moRadDocPayment.setSelected(true);
-                break;
-            case SDbPaymentEntry.ENTRY_TYPE_ADVANCE:
-                moRadSimplePayment.setSelected(true);
-                break;
-            default:
-                moRadDocPayment.setSelected(true);
-        }
-        
-        moDps = ety.getDpsRelated();
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextDps.setText(moDps == null ? "" : moDps.getDpsNumber());
         moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId(), moRegistry.getFkFunctionalSubareaId() });
-        moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
-        moKeyEntryCurrency.setValue(new int[] { ety.getFkEntryCurrencyId() });
-        moCurAmount.getField().setValue(ety.getDestinyPaymentApplicationEntryCy());
-        moDecExcRate.setValue(getExchangeRate(etyCur));
-        moCurAmountLoc.getField().setValue(ety.getEntryPaymentApplication());
+        
+        if (entry == null) {
+            moKeyEntryCurrency.setValue(new int[] { SModSysConsts.CFGU_CUR_MXN });
+            moCurAmount.getField().setValue(0d);
+            moDecExcRate.setValue(1d);
+            moCurAmountLoc.getField().setValue(0d);
+        }
+        else {
+            moKeyEntryCurrency.setValue(new int[] { entry.getFkEntryCurrencyId() });
+            moCurAmount.getField().setValue(entry.getDestinyPaymentApplicationEntryCy());
+            moDecExcRate.setValue(getExchangeRate(entry.getFkEntryCurrencyId()));
+            moCurAmountLoc.getField().setValue(entry.getEntryPaymentApplication());
+        }
+        
         moDateRequired.setValue(moRegistry.getDateRequired());
-        moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId(), moRegistry.getFkFunctionalSubareaId() });
+        moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
         moKeyPriority.setValue(new int[] { moRegistry.getPriority() });
         moTextNotes.setValue(moRegistry.getNotes());
-        moTextNotesAuth.setValue(moRegistry.getNotesAuthorization());
+        moTextNotesAuthorization.setValue(moRegistry.getNotesAuthorization());
         
         moPanelDps.setDps(moDps, null);
         
@@ -923,7 +968,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     public SDbRegistry getRegistry() throws Exception {
         SDbPayment registry = (SDbPayment) moRegistry.clone();
         
-        registry.setSeries(moTextSerie.getValue());
+        registry.setSeries(moTextSeries.getValue());
         registry.setNumber(moIntNumber.getValue());
         registry.setDateApplication(moDateApplication.getValue());
         registry.setDateRequired(moDateRequired.getValue());
@@ -932,7 +977,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setPaymentApplication(moCurAmountLoc.getField().getValue());
         registry.setPriority(moKeyPriority.getValue()[0]);
         registry.setNotes(moTextNotes.getValue());
-        registry.setNotesAuthorization(moTextNotesAuth.getValue());
+        registry.setNotesAuthorization(moTextNotesAuthorization.getValue());
         registry.setDeleted(false);
         registry.setSystem(false);
         registry.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
@@ -942,7 +987,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setFkCurrencyId(moKeyCurrency.getValue()[0]); 
         
         SDbPaymentEntry ety = new SDbPaymentEntry();
-        ety.setEntryType(moRadDocPayment.isSelected() ? SDbPaymentEntry.ENTRY_TYPE_PAYMENT : SDbPaymentEntry.ENTRY_TYPE_ADVANCE);
+        ety.setEntryType(moRadTypePayment.isSelected() ? SDbPaymentEntry.ENTRY_TYPE_PAYMENT : SDbPaymentEntry.ENTRY_TYPE_ADVANCE);
         ety.setEntryPaymentCy(registry.getPaymentCy());
         ety.setEntryPaymentApplication(moCurAmountLoc.getField().getValue());
         ety.setConversionRateApplication(SLibUtils.round(moCurAmount.getField().getValue() / registry.getPaymentCy(), 6));
@@ -967,7 +1012,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (validation.isValid() && moRadDocPayment.getValue() && moDps == null) {
+        if (validation.isValid() && moRadTypePayment.getValue() && moDps == null) {
             validation.setMessage("Debe seleccionarse un documento para la solicitud del pago.");
             validation.setComponent(moTextDps);
         }
@@ -986,8 +1031,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             else if (button == jbDpsFinder) {
                 actionDpsFinder();
             }
-            else if (button == jbIns) {
-                actionIns();
+            else if (button == jbRetrieveDpsBalance) {
+                actionRetrieveDpsBalance();
             }
         }
     }
@@ -996,6 +1041,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof JComboBox) {
             JComboBox comboBox = (JComboBox) e.getSource();
+            
             if (e.getStateChange() == ItemEvent.DESELECTED) {
                 if (comboBox == moKeyBeneficiary) {
                     stateChangeBeneficiary();
@@ -1008,10 +1054,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         else if (e.getSource() instanceof JRadioButton) {
             JRadioButton radioButton = (JRadioButton) e.getSource();
             
-            if (radioButton == moRadDocPayment) {
-                stateChangeTypePayment();
-            }
-            else if (radioButton == moRadSimplePayment) {
+            if (radioButton == moRadTypePayment || radioButton == moRadTypeAdvance) {
                 stateChangeTypePayment();
             }
         }

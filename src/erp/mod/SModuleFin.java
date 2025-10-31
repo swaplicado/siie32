@@ -604,45 +604,42 @@ public class SModuleFin extends SGuiModule {
                         title = "Solicitudes pago";
                         break;
                     case SModSysConsts.FINS_ST_PAY_IN_AUTH:
-                        title = "Pagos x autorizar";
-                        break;
-                    case SModSysConsts.FINS_ST_PAY_EXEC_P:
-                        title = "Pagos x ejecutar";
+                        title = "Solicitudes pago en autorización";
                         break;
                     case SModSysConsts.FINS_ST_PAY_REJC:
-                        title = "Pagos rechazados";
+                        title = "Solicitudes pago rechazadas";
                         break;
                     case SModSysConsts.FINS_ST_PAY_SCHED:
-                        title = "Pagos programados";
+                        title = "Solicitudes pago autorizadas";
                         break;
                     case SModSysConsts.FINS_ST_PAY_BLOC:
-                        title = "Pagos bloqueados";
+                        title = "Solicitudes pago bloqueadas";
                         break;
                     case SModSysConsts.FINS_ST_PAY_CANC:
-                        title = "Pagos cancelados";
+                        title = "Solicitudes pago canceladas";
                         break;
+                    default:
+                        // nothing
                 }
                 view = new SViewPayment(miClient, subtype, title);
                 break;
             case SModConsts.FINX_PAY_ST:
                 switch(subtype) {
-                    case SModSysConsts.FINS_ST_PAY_RCPT_P:
-                        title = "Pagos x comprobar";
+                    case SModSysConsts.FINS_ST_PAY_IN_TREAS:
+                        title = "Pagos en tesorería" + (params != null && params.getType() == SViewPaymentStatus.DETAILED ? " (detalle)" : "");
                         break;
                     case SModSysConsts.FINS_ST_PAY_EXEC:
-                        title = "Pagos ejecutados";
-                        break;
-                    case SModSysConsts.FINX_ST_PAY_EXEC_DET:
-                        title = "Pagos ejecutados (detalle)";
+                        title = "Pagos operados" + (params != null && params.getType() == SViewPaymentStatus.DETAILED ? " (detalle)" : "");
                         break;
                     case SModSysConsts.FINS_ST_PAY_RCPT:
-                        title = "Pagos comprobados";
+                        boolean isDetailed = params != null && params.getType() == SViewPaymentStatus.DETAILED;
+                        boolean isPending = params != null && params.getSubtype() == SViewPaymentStatus.PENDING;
+                        title = "Pagos " + (isPending ? "x comprobar" : "comprobados") + (isDetailed ? " (detalle)" : "");
                         break;
-                    case SModSysConsts.FINX_ST_PAY_RCPT_DET:
-                        title = "Pagos comprobados (detalle)";
-                        break;
+                    default:
+                        // nothing
                 }
-                view = new SViewPaymentStatus(miClient, subtype, title);
+                view = new SViewPaymentStatus(miClient, subtype, title, params);
                 break;
             case SModConsts.FINX_REP_CUS_ACC:
                 view = new SViewReportAccountingCustomizableReport(miClient, subtype, "Aux. contables: " + (String) params.getParamsMap().get(subtype));

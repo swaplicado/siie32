@@ -417,7 +417,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
                 payment.setPriority(SDbPayment.PRIORITY_NORMAL);
                 payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "-"); // "-" means no comments
-                payment.setNotesAuthorization("");
+                payment.setNotesAuthorization(!Description.isEmpty() ? Description : "-"); // "-" means no comments
+                payment.setNotesAuthorizationFlow("");
                 payment.setReceiptPaymentRequired(dps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT);
                 payment.setDeleted(false);
                 payment.setSystem(true);

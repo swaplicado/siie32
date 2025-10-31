@@ -180,7 +180,7 @@ public class SModuleCfg extends SGuiModule {
                 sql = "SELECT id_cur AS " + SDbConsts.FIELD_ID + "1, cur AS " + SDbConsts.FIELD_ITEM + ", cur_key AS " + SDbConsts.FIELD_COMP + " " +
                         "FROM erp.cfgu_cur " +
                         "WHERE NOT b_del " +
-                        "ORDER BY cur, id_cur ";
+                        "ORDER BY id_cur ";
                 break;
             case SModConsts.CFGS_TP_MMS:
                 settings = new SGuiCatalogueSettings("Configuración", 1, 0, SLibConsts.DATA_TYPE_TEXT);

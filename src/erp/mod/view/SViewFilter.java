@@ -186,7 +186,7 @@ public class SViewFilter extends JPanel implements SGridFilter {
                         + "cur AS " + SDbConsts.FIELD_PICK + "2 "
                         + "FROM erp.cfgu_cur " 
                         + "WHERE NOT b_del "
-                        + "ORDER BY cur_key, cur, id_cur";
+                        + "ORDER BY id_cur";
                 break;
                 
             default:

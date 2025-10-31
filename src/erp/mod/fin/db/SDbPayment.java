@@ -31,10 +31,14 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
+    public static final String DESC_PRIORITY_NORMAL = "Normal";
+    public static final String DESC_PRIORITY_URGENT = "Urgente";
+    
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
     public static final String ST_SCHED = "AUTORIZADO";
+    public static final String ST_BLOCK = "BLOQUEADO";
     
     protected int mnPkPaymentId;
     protected String msSeries;
@@ -52,6 +56,7 @@ public class SDbPayment extends SDbRegistryUser {
     protected int mnPriority;
     protected String msNotes;
     protected String msNotesAuthorization;
+    protected String msNotesAuthorizationFlow;
     protected boolean mbReceiptPaymentRequired;
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
@@ -98,18 +103,6 @@ public class SDbPayment extends SDbRegistryUser {
         super(SModConsts.FIN_PAY);
     }
     
-    public void computeNextNumber(final SGuiSession session) throws Exception {
-        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
-                + "FROM " + getSqlTable() + " "
-                + "WHERE ser = '" + msSeries + "' AND NOT b_del;";
-        
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                mnNumber = resultSet.getInt(1);
-            }
-        }
-    }
-    
     private boolean hasChangedSchedule() {
         return mnFkUserScheduleId != mnOldFkUserScheduleId ||
                 (mtDateSchedule_n == null && mtOldDateSchedule_n != null) ||
@@ -140,6 +133,7 @@ public class SDbPayment extends SDbRegistryUser {
     public void setPriority(int n) { mnPriority = n; }
     public void setNotes(String s) { msNotes = s; }
     public void setNotesAuthorization(String s) { msNotesAuthorization = s; }
+    public void setNotesAuthorizationFlow(String s) { msNotesAuthorizationFlow = s; }
     public void setReceiptPaymentRequired(boolean b) { mbReceiptPaymentRequired = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -177,6 +171,7 @@ public class SDbPayment extends SDbRegistryUser {
     public int getPriority() { return mnPriority; }
     public String getNotes() { return msNotes; }
     public String getNotesAuthorization() { return msNotesAuthorization; }
+    public String getNotesAuthorizationFlow() { return msNotesAuthorizationFlow; }
     public boolean isReceiptPaymentRequired() { return mbReceiptPaymentRequired; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
@@ -233,13 +228,13 @@ public class SDbPayment extends SDbRegistryUser {
         return SLibUtils.belongsTo(mnFkStatusPaymentId, new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_SCHED });
     }
     
-    public void deleteFiles(SGuiSession session) throws Exception {
+    public void deleteFiles(final SGuiSession session) throws Exception {
         for (SDbPaymentFile file : maFiles) {
             file.delete(session);
         }
     }
     
-    public void updatePaymentStatus(SGuiSession session, int status) throws Exception {
+    public void updatePaymentStatus(final SGuiSession session, final int status) throws Exception {
         msSql = "UPDATE " + getSqlTable() + " SET " +
                 "fk_st_pay = " + status + ", " + 
                 "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
@@ -248,7 +243,7 @@ public class SDbPayment extends SDbRegistryUser {
         session.getStatement().execute(msSql);
     }
     
-    public void updateAuthorizationData(SGuiSession session) throws Exception {
+    public void updateAuthorizationData(final SGuiSession session) throws Exception {
         msSql = "UPDATE " + getSqlTable() + " SET " + 
                 "priority = " + mnPriority + ", " + 
                 "nts_auth = '" + msNotesAuthorization + "' " + 
@@ -286,6 +281,7 @@ public class SDbPayment extends SDbRegistryUser {
         mnPriority = PRIORITY_NORMAL;
         msNotes = "";
         msNotesAuthorization = "";
+        msNotesAuthorizationFlow = "";
         mbReceiptPaymentRequired = false;
         mbDeleted = false;
         mbSystem = false;
@@ -386,6 +382,7 @@ public class SDbPayment extends SDbRegistryUser {
             mnPriority = resultSet.getInt("priority");
             msNotes = resultSet.getString("nts");
             msNotesAuthorization = resultSet.getString("nts_auth");
+            msNotesAuthorizationFlow = resultSet.getString("nts_auth_flow");
             mbReceiptPaymentRequired = resultSet.getBoolean("b_rcpt_pay_req");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
@@ -460,7 +457,8 @@ public class SDbPayment extends SDbRegistryUser {
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
-            computeNextNumber(session);
+            mnNumber = computeNextNumber(session, msSeries);
+            
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
@@ -484,6 +482,7 @@ public class SDbPayment extends SDbRegistryUser {
                     mnPriority + ", " + 
                     "'" + msNotes + "', " + 
                     "'" + msNotesAuthorization + "', " + 
+                    "'" + msNotesAuthorizationFlow + "', " + 
                     (mbReceiptPaymentRequired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
@@ -527,6 +526,7 @@ public class SDbPayment extends SDbRegistryUser {
                     "priority = " + mnPriority + ", " +
                     "nts = '" + msNotes + "', " +
                     "nts_auth = '" + msNotesAuthorization + "', " +
+                    "nts_auth_flow = '" + msNotesAuthorizationFlow + "', " +
                     "b_rcpt_pay_req = " + (mbReceiptPaymentRequired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
@@ -678,6 +678,7 @@ public class SDbPayment extends SDbRegistryUser {
         registry.setPriority(this.getPriority());
         registry.setNotes(this.getNotes());
         registry.setNotesAuthorization(this.getNotesAuthorization());
+        registry.setNotesAuthorizationFlow(this.getNotesAuthorizationFlow());
         registry.setReceiptPaymentRequired(this.isReceiptPaymentRequired());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
@@ -784,5 +785,28 @@ public class SDbPayment extends SDbRegistryUser {
         }
         
         return exportAsDeleted;
+    }
+    
+    /**
+     * Get next number.
+     * @param session GUI session.
+     * @param series Required folio series.
+     * @return Next number.
+     * @throws Exception 
+     */
+    public static int computeNextNumber(final SGuiSession session, final String series) throws Exception {
+        int nextNumber = 0;
+        
+        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " "
+                + "WHERE ser = '" + series + "';";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        
+        return nextNumber;
     }
 }

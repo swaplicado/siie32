@@ -55,7 +55,7 @@ public abstract class SDataReadTableRows {
 
                 sSql = "SELECT id_cur, cur, cur_key " +
                         "FROM erp.cfgu_cur WHERE b_del = 0 " +
-                        "ORDER BY cur, id_cur ";
+                        "ORDER BY id_cur ";
                 break;
 
             case SDataConstants.CFGU_CO:

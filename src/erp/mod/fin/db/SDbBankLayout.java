@@ -2055,25 +2055,28 @@ public class SDbBankLayout extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
-        msSql = "SELECT p.id_pay FROM fin_pay AS p "
+        msSql = "SELECT p.id_pay "
+                + "FROM fin_pay AS p "
                 + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
-        ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
-        while (resultSet.next()) {
-            SDbPayment pay = new SDbPayment();
-            pay.read(session, new int[] { resultSet.getInt(1) } );
-            pay.delete(session);
+                + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS + ";";
+        try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
+            while (resultSet.next()) {
+                SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { resultSet.getInt(1) });
+                payment.delete(session);
+            }
         }
         
-        msSql = "SELECT p.id_pay FROM fin_pay AS p "
+        msSql = "SELECT p.id_pay "
+                + "FROM fin_pay AS p "
                 + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ")";
-        resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql);
-        while (resultSet.next()) {
-            SDbPayment pay = new SDbPayment();
-            pay.read(session, new int[] { resultSet.getInt(1) } );
-            pay.updatePaymentStatus(session, SModSysConsts.FINS_ST_PAY_SCHED);
+                + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ");";
+        try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
+            while (resultSet.next()) {
+                SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { resultSet.getInt(1) });
+                payment.updatePaymentStatus(session, SModSysConsts.FINS_ST_PAY_SCHED);
+            }
         }
+        
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 }

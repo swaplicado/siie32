@@ -27,6 +27,9 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public static final String ENTRY_TYPE_ADVANCE = "A"; // anticipo
     public static final String ENTRY_TYPE_PAYMENT = "P"; // pago a documento
 
+    public static final String DESC_ENTRY_TYPE_ADVANCE = "Anticipo"; // anticipo
+    public static final String DESC_ENTRY_TYPE_PAYMENT = "Pago a documento"; // pago a documento
+
     protected int mnPkPaymentId;
     protected int mnPkEntryId;
     protected String msEntryType;

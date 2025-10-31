@@ -29,16 +29,14 @@ public class SExportPayments extends Thread {
     private final SDbPayment moPayment;
     private final int mnFlowModel;
     private final int mnPriority;
-    private final String msAuthNotes;
+    private final String msNotesAuthorization;
     
-    private String msError;
-    
-    public SExportPayments(SGuiClient client, SDbPayment payment, int flowModel, int priority, String notes) {
+    public SExportPayments(SGuiClient client, SDbPayment payment, int flowModel, int priority, String notesAuthorization) {
         miClient = client;
         moPayment = payment;
         mnFlowModel = flowModel;
         mnPriority = priority;
-        msAuthNotes = notes;
+        msNotesAuthorization = notesAuthorization;
         
         setDaemon(true);
     }
@@ -51,8 +49,9 @@ public class SExportPayments extends Thread {
             Object[] sendRequest = SAuthorizationUtils.sendPaymentFilesToCloud(miClient, moPayment);
             boolean sendPaymentFilesOk = (boolean) sendRequest[0];
             ArrayList<SExportDataFile> expDataFiles = (ArrayList<SExportDataFile>) sendRequest[1];
+            
             if (sendPaymentFilesOk) {
-                System.out.println("Subida al google cloud storage con éxito");
+                System.out.println("Subida de archivos a Google Cloud Storage con éxito.");
                 
                 String requestBody = createJSONrequestBody(expDataFiles); // creación del JSON que se envía a la app web 
                 
@@ -60,11 +59,11 @@ public class SExportPayments extends Thread {
                     moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_IN_AUTH);
                 }
                 else {
-                    miClient.showMsgBoxInformation("No se puedo comenzar el proceso de autorización, intente nuevamente.");
+                    miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.");
                 }
             }
             else {
-                System.out.println("Error al subir archivos al google cloud storage");
+                System.out.println("Falla en subida de archivos a Google Cloud Storage.");
             }
         }
         catch (Exception e) {
@@ -74,7 +73,7 @@ public class SExportPayments extends Thread {
     
     private void updatePaymentAuthData() throws Exception {
         moPayment.setPriority(mnPriority);
-        moPayment.setNotesAuthorization(msAuthNotes);
+        moPayment.setNotesAuthorization(msNotesAuthorization);
         moPayment.updateAuthorizationData(miClient.getSession());
     }
     
@@ -93,7 +92,7 @@ public class SExportPayments extends Thread {
             requestBody = mapper.writeValueAsString(paymentBody);
         }
         catch (Exception e) {
-            throw new Exception("Ocurrio un error al crear el JSON requestBody. " + e.getMessage());
+            throw new Exception("Ocurrió un error al crear el cuerpo de la solicitud en formato JSON.\n" + e.getMessage());
         }
         return requestBody;
     }
@@ -198,6 +197,7 @@ public class SExportPayments extends Thread {
     
     private int getDocumentId(SDbPaymentEntry paymentEty) {
         int docId = 0;
+        
         try {
             String sql = "SELECT ext_data_id FROM trn_swap_data_prc "
                     + "WHERE fk_dps_year_n = " + paymentEty.getFkDocYearId_n() + " "
@@ -210,6 +210,7 @@ public class SExportPayments extends Thread {
         catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
+        
         return docId;
     }
 }

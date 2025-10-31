@@ -34,6 +34,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.form.SDialogImportDocuments;
+import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mod.trn.form.SDialogSearchDps;
@@ -69,6 +70,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -190,13 +192,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiAccPend;
     private javax.swing.JMenuItem jmiAccPaymentRequests;
     private javax.swing.JMenuItem jmiAccPaymentsInAuth;
-    private javax.swing.JMenuItem jmiAccPaymentsToExec;
-    private javax.swing.JMenuItem jmiAccPaymentsToRcpt;
     private javax.swing.JMenuItem jmiAccPaymentsRejc;
+    private javax.swing.JMenuItem jmiAccPaymentsSched;
+    private javax.swing.JMenuItem jmiAccPaymentsInTreas;
+    private javax.swing.JMenuItem jmiAccPaymentsInTreasDetail;
     private javax.swing.JMenuItem jmiAccPaymentsExec;
-    private javax.swing.JMenuItem jmiAccPaymentsExecDet;
+    private javax.swing.JMenuItem jmiAccPaymentsExecDetail;
+    private javax.swing.JMenuItem jmiAccPaymentsToRcpt;
+    private javax.swing.JMenuItem jmiAccPaymentsToRcptDetail;
     private javax.swing.JMenuItem jmiAccPaymentsRcpt;
-    private javax.swing.JMenuItem jmiAccPaymentsRcptDet;
+    private javax.swing.JMenuItem jmiAccPaymentsRcptDetail;
     private javax.swing.JMenuItem jmiAccPaymentsBloc;
     private javax.swing.JMenuItem jmiAccPaymentsCanc;
     private javax.swing.JMenu jmRep;
@@ -585,30 +590,36 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend = new JMenu("CXP");
         jmiAccPend = new JMenuItem("Cuentas por pagar");
         jmiAccPaymentRequests = new JMenuItem("Solicitudes de pago");
-        jmiAccPaymentsInAuth = new JMenuItem("Pagos por autorizar");
-        jmiAccPaymentsToExec = new JMenuItem("Pagos por ejecutar");
+        jmiAccPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
+        jmiAccPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
+        jmiAccPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
+        jmiAccPaymentsInTreas = new JMenuItem("Pagos en tesorería");
+        jmiAccPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
+        jmiAccPaymentsExec = new JMenuItem("Pagos operados");
+        jmiAccPaymentsExecDetail = new JMenuItem("Pagos operados a detalle");
         jmiAccPaymentsToRcpt = new JMenuItem("Pagos por comprobar");
-        jmiAccPaymentsExec = new JMenuItem("Pagos ejecutados");
-        jmiAccPaymentsExecDet = new JMenuItem("Pagos ejecutados a detalle");
+        jmiAccPaymentsToRcptDetail = new JMenuItem("Pagos por comprobar a detalle");
         jmiAccPaymentsRcpt = new JMenuItem("Pagos comprobados");
-        jmiAccPaymentsRcptDet = new JMenuItem("Pagos comprobados a detalle");
-        jmiAccPaymentsRejc = new JMenuItem("Pagos rechazados");
-        jmiAccPaymentsBloc = new JMenuItem("Pagos bloqueados");
-        jmiAccPaymentsCanc = new JMenuItem("Pagos cancelados");
+        jmiAccPaymentsRcptDetail = new JMenuItem("Pagos comprobados a detalle");
+        jmiAccPaymentsBloc = new JMenuItem("Solicitudes de pago bloqueadas");
+        jmiAccPaymentsCanc = new JMenuItem("Solicitudes de pago canceladas");
         jmAccPend.add(jmiAccPend);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentRequests);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsInAuth);
-        jmAccPend.add(jmiAccPaymentsToExec);
-        jmAccPend.add(jmiAccPaymentsToRcpt);
-        jmAccPend.addSeparator();
-        jmAccPend.add(jmiAccPaymentsExec);
-        jmAccPend.add(jmiAccPaymentsExecDet);
-        jmAccPend.add(jmiAccPaymentsRcpt);
-        jmAccPend.add(jmiAccPaymentsRcptDet);
-        jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsRejc);
+        jmAccPend.add(jmiAccPaymentsSched);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPaymentsInTreas);
+        jmAccPend.add(jmiAccPaymentsInTreasDetail);
+        jmAccPend.add(jmiAccPaymentsExec);
+        jmAccPend.add(jmiAccPaymentsExecDetail);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPaymentsToRcpt);
+        jmAccPend.add(jmiAccPaymentsToRcptDetail);
+        jmAccPend.add(jmiAccPaymentsRcpt);
+        jmAccPend.add(jmiAccPaymentsRcptDetail);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsBloc);
         jmAccPend.add(jmiAccPaymentsCanc);
@@ -856,13 +867,16 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPend.addActionListener(this);
         jmiAccPaymentRequests.addActionListener(this);
         jmiAccPaymentsInAuth.addActionListener(this);
-        jmiAccPaymentsToExec.addActionListener(this);
-        jmiAccPaymentsToRcpt.addActionListener(this);
-        jmiAccPaymentsExec.addActionListener(this);
-        jmiAccPaymentsExecDet.addActionListener(this);
-        jmiAccPaymentsRcpt.addActionListener(this);
-        jmiAccPaymentsRcptDet.addActionListener(this);
         jmiAccPaymentsRejc.addActionListener(this);
+        jmiAccPaymentsSched.addActionListener(this);
+        jmiAccPaymentsInTreas.addActionListener(this);
+        jmiAccPaymentsInTreasDetail.addActionListener(this);
+        jmiAccPaymentsExec.addActionListener(this);
+        jmiAccPaymentsExecDetail.addActionListener(this);
+        jmiAccPaymentsToRcpt.addActionListener(this);
+        jmiAccPaymentsToRcptDetail.addActionListener(this);
+        jmiAccPaymentsRcpt.addActionListener(this);
+        jmiAccPaymentsRcptDetail.addActionListener(this);
         jmiAccPaymentsBloc.addActionListener(this);
         jmiAccPaymentsCanc.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
@@ -1044,7 +1058,22 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiScaItMap.setEnabled(hasRightScaleCfg);
         jmiScaItDetMap.setEnabled(hasRightScaleCfg);
         
-        jmAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
+        jmAccPend.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightReports);
+        jmiAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
+        jmiAccPaymentRequests.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsInAuth.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsRejc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsSched.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsInTreas.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsInTreasDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsExec.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsExecDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsToRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsToRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsBloc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsCanc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
 
         jmRep.setEnabled(hasRightReports);
         jmiRepAccDpsAccTag.setEnabled(hasConfAccTag);
@@ -2067,26 +2096,35 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiAccPaymentsInAuth) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_IN_AUTH, null);
             }
-            else if (item == jmiAccPaymentsToExec) {
-                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_EXEC_P, null);
+            else if (item == jmiAccPaymentsRejc) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_REJC, null);
             }
-            else if (item == jmiAccPaymentsToRcpt) {
-                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT_P, null);
+            else if (item == jmiAccPaymentsSched) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_SCHED, null);
+            }
+            else if (item == jmiAccPaymentsInTreas) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, null);
+            }
+            else if (item == jmiAccPaymentsInTreasDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, new SGuiParams(SViewPaymentStatus.DETAILED));
             }
             else if (item == jmiAccPaymentsExec) {
                 miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_EXEC, null);
             }
-            else if (item == jmiAccPaymentsExecDet) {
-                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINX_ST_PAY_EXEC_DET, null);
+            else if (item == jmiAccPaymentsExecDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_EXEC, new SGuiParams(SViewPaymentStatus.DETAILED));
+            }
+            else if (item == jmiAccPaymentsToRcpt) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SLibConsts.UNDEFINED, SViewPaymentStatus.PENDING));
+            }
+            else if (item == jmiAccPaymentsToRcptDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SViewPaymentStatus.DETAILED, SViewPaymentStatus.PENDING));
             }
             else if (item == jmiAccPaymentsRcpt) {
                 miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, null);
             }
-            else if (item == jmiAccPaymentsRcptDet) {
-                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINX_ST_PAY_RCPT_DET, null);
-            }
-            else if (item == jmiAccPaymentsRejc) {
-                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_REJC, null);
+            else if (item == jmiAccPaymentsRcptDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SViewPaymentStatus.DETAILED));
             }
             else if (item == jmiAccPaymentsBloc) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_BLOC, null);

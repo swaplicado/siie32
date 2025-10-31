@@ -116,6 +116,7 @@ import erp.mod.fin.form.SDialogRepMovsFileCvs;
 import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
+import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import erp.mtrn.data.SConfigurationItemDps;
@@ -128,6 +129,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -228,6 +230,22 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
+    private javax.swing.JSeparator jsFinAccRec;
+    private javax.swing.JMenu jmFinAccRec;
+    private javax.swing.JMenuItem jmiAccRecPaymentRequests;
+    private javax.swing.JMenuItem jmiAccRecPaymentsInAuth;
+    private javax.swing.JMenuItem jmiAccRecPaymentsRejc;
+    private javax.swing.JMenuItem jmiAccRecPaymentsSched;
+    private javax.swing.JMenuItem jmiAccRecPaymentsInTreas;
+    private javax.swing.JMenuItem jmiAccRecPaymentsInTreasDetail;
+    private javax.swing.JMenuItem jmiAccRecPaymentsExec;
+    private javax.swing.JMenuItem jmiAccRecPaymentsExecDetail;
+    private javax.swing.JMenuItem jmiAccRecPaymentsToRcpt;
+    private javax.swing.JMenuItem jmiAccRecPaymentsToRcptDetail;
+    private javax.swing.JMenuItem jmiAccRecPaymentsRcpt;
+    private javax.swing.JMenuItem jmiAccRecPaymentsRcptDetail;
+    private javax.swing.JMenuItem jmiAccRecPaymentsBloc;
+    private javax.swing.JMenuItem jmiAccRecPaymentsCanc;
     private javax.swing.JSeparator jsFinCash;
     private javax.swing.JMenuItem jmiFinLayoutBank;
     private javax.swing.JMenuItem jmiFinLayoutBankPending;
@@ -609,6 +627,22 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinDpsExchangeRateDiff = new JMenuItem("Diferencias cambiarias de cuentas liquidadas en moneda extranjera");
         jmiFinCashCheck = new JMenuItem("Cheques");
         jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
+        jsFinAccRec = new JPopupMenu.Separator();
+        jmFinAccRec = new JMenu("CXP");
+        jmiAccRecPaymentRequests = new JMenuItem("Solicitudes de pago");
+        jmiAccRecPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
+        jmiAccRecPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
+        jmiAccRecPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
+        jmiAccRecPaymentsInTreas = new JMenuItem("Pagos en tesorería");
+        jmiAccRecPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
+        jmiAccRecPaymentsExec = new JMenuItem("Pagos operados");
+        jmiAccRecPaymentsExecDetail = new JMenuItem("Pagos operados a detalle");
+        jmiAccRecPaymentsToRcpt = new JMenuItem("Pagos por comprobar");
+        jmiAccRecPaymentsToRcptDetail = new JMenuItem("Pagos por comprobar a detalle");
+        jmiAccRecPaymentsRcpt = new JMenuItem("Pagos comprobados");
+        jmiAccRecPaymentsRcptDetail = new JMenuItem("Pagos comprobados a detalle");
+        jmiAccRecPaymentsBloc = new JMenuItem("Solicitudes de pago bloqueadas");
+        jmiAccRecPaymentsCanc = new JMenuItem("Solicitudes de pago canceladas");
         jsFinCash = new JPopupMenu.Separator();
         jmiFinLayoutBank = new JMenuItem("Layouts de transferencias");
         jmiFinLayoutBankPending = new JMenuItem("Layouts de transferencias por pagar");
@@ -625,6 +659,25 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdiMassiveValidationPur = new JMenuItem("Validación masiva de estatus de CFDI recibidos...");
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
         jmiFinUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
+        
+        jmFinAccRec.add(jmiAccRecPaymentRequests);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsInAuth);
+        jmFinAccRec.add(jmiAccRecPaymentsRejc);
+        jmFinAccRec.add(jmiAccRecPaymentsSched);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsInTreas);
+        jmFinAccRec.add(jmiAccRecPaymentsInTreasDetail);
+        jmFinAccRec.add(jmiAccRecPaymentsExec);
+        jmFinAccRec.add(jmiAccRecPaymentsExecDetail);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsToRcpt);
+        jmFinAccRec.add(jmiAccRecPaymentsToRcptDetail);
+        jmFinAccRec.add(jmiAccRecPaymentsRcpt);
+        jmFinAccRec.add(jmiAccRecPaymentsRcptDetail);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsBloc);
+        jmFinAccRec.add(jmiAccRecPaymentsCanc);
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinBankNbDay);
@@ -634,6 +687,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCashCheck);
         jmFin.add(jmiFinCashCounterReceipt);
+        jmFin.add(jsFinAccRec); // separator
+        jmFin.add(jmFinAccRec); // accounts receivable
         jmFin.add(jsFinCash); // separator
         jmFin.add(jmiFinLayoutBank);
         jmFin.add(jmiFinLayoutBankPending);
@@ -967,6 +1022,20 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinDpsExchangeRateDiff.addActionListener(this);
         jmiFinCashCheck.addActionListener(this);
         jmiFinCashCounterReceipt.addActionListener(this);
+        jmiAccRecPaymentRequests.addActionListener(this);
+        jmiAccRecPaymentsInAuth.addActionListener(this);
+        jmiAccRecPaymentsRejc.addActionListener(this);
+        jmiAccRecPaymentsSched.addActionListener(this);
+        jmiAccRecPaymentsInTreas.addActionListener(this);
+        jmiAccRecPaymentsInTreasDetail.addActionListener(this);
+        jmiAccRecPaymentsExec.addActionListener(this);
+        jmiAccRecPaymentsExecDetail.addActionListener(this);
+        jmiAccRecPaymentsToRcpt.addActionListener(this);
+        jmiAccRecPaymentsToRcptDetail.addActionListener(this);
+        jmiAccRecPaymentsRcpt.addActionListener(this);
+        jmiAccRecPaymentsRcptDetail.addActionListener(this);
+        jmiAccRecPaymentsBloc.addActionListener(this);
+        jmiAccRecPaymentsCanc.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
         jmiFinLayoutBankPending.addActionListener(this);
         jmiFinLayoutBankDone.addActionListener(this);
@@ -1213,6 +1282,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinBankNbDay.setEnabled(hasRightExcRate);
         jmiFinCashCheck.setEnabled(hasRightMoveAccCash);
         jmiFinCashCounterReceipt.setEnabled(hasRightCounterRcpt);
+        jmFinAccRec.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBank.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankPending.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDone.setEnabled(hasRightMoveAccCash);
@@ -2265,6 +2335,48 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinCashCounterReceipt) {
                 showView(SDataConstants.TRN_CTR);
+            }
+            else if (item == jmiAccRecPaymentRequests) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiAccRecPaymentsInAuth) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_IN_AUTH, null);
+            }
+            else if (item == jmiAccRecPaymentsRejc) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_REJC, null);
+            }
+            else if (item == jmiAccRecPaymentsSched) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_SCHED, null);
+            }
+            else if (item == jmiAccRecPaymentsInTreas) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, null);
+            }
+            else if (item == jmiAccRecPaymentsInTreasDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, new SGuiParams(SViewPaymentStatus.DETAILED));
+            }
+            else if (item == jmiAccRecPaymentsExec) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_EXEC, null);
+            }
+            else if (item == jmiAccRecPaymentsExecDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_EXEC, new SGuiParams(SViewPaymentStatus.DETAILED));
+            }
+            else if (item == jmiAccRecPaymentsToRcpt) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SLibConsts.UNDEFINED, SViewPaymentStatus.PENDING));
+            }
+            else if (item == jmiAccRecPaymentsToRcptDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SViewPaymentStatus.DETAILED, SViewPaymentStatus.PENDING));
+            }
+            else if (item == jmiAccRecPaymentsRcpt) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, null);
+            }
+            else if (item == jmiAccRecPaymentsRcptDetail) {
+                miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_RCPT, new SGuiParams(SViewPaymentStatus.DETAILED));
+            }
+            else if (item == jmiAccRecPaymentsBloc) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_BLOC, null);
+            }
+            else if (item == jmiAccRecPaymentsCanc) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_CANC, null);
             }
             else if (item == jmiFinLayoutBank) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);

@@ -93,7 +93,7 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.CFGU_CUR:
                 lenPk = 1;
-                sql = "SELECT id_cur AS f_id_1, cur AS f_item, cur_key AS f_comp FROM erp.cfgu_cur WHERE b_del = 0 ORDER BY cur, id_cur ";
+                sql = "SELECT id_cur AS f_id_1, cur AS f_item, cur_key AS f_comp FROM erp.cfgu_cur WHERE b_del = 0 ORDER BY id_cur ";
                 text = "moneda";
                 isComplementApplying = true;
                 break;
