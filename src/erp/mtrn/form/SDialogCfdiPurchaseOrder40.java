@@ -702,6 +702,21 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                 break;
             }
         }
+        
+        if (!validation.getIsError()) {
+            boolean hasRowsSelected = false;
+            for (int i = 0; i < moTablePurchaseOrEntries.getTableGuiRowCount(); i++) {
+                SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTablePurchaseOrEntries.getTableRow(i);
+                if (entryDpsDpsLink.getSelected()) {
+                    hasRowsSelected = true;
+                    break;
+                }
+            }
+            if (!hasRowsSelected) {
+                validation.setMessage("Debe vincular al menos una partida.");
+                validation.setComponent(jbSelectAll);
+            }
+        }
          
         if (!validation.getIsError()) {
             if (moFieldConvFact.getDouble() != 1){

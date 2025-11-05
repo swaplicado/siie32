@@ -455,7 +455,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbSelectPurchaseOrderEntry.setText("Elegir partida OC");
+        jbSelectPurchaseOrderEntry.setText("Elegir partidas OC");
         jbSelectPurchaseOrderEntry.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel7.add(jbSelectPurchaseOrderEntry);
 
@@ -1813,7 +1813,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         moSiieTaxesTablePane.addTableRow(new SDataDpsEntryTaxRow(entryTax));
                     }
                 }
-            } 
+            }
         }
         
         moSiieTaxesTablePane.renderTableRows();
