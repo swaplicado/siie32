@@ -19,7 +19,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
-import erp.mod.fin.form.SDialogPaymentReschedule;
+import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.view.SViewFilter;
 import java.awt.Cursor;
@@ -78,6 +78,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private JButton jbAuthWebClearFiles;
     
     private JButton jbPaymentReschedule;
+    private JButton jbPaymentMarkAsPaid;
     private JButton jbPaymentBlock;
     private JButton jbPaymentUnblock;
     private JButton jbPaymentCancel;
@@ -85,7 +86,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private JButton jbExportDataToSwapServices;
     
     private JFileChooser moAuthWebFileChooser;
-    private SDialogPaymentReschedule moDialogPaymentReschedule;
+    private SDialogPaymentChangeStatus moDialogPaymentChangeStatus;
 
     public SViewPayment(SGuiClient client, int subType, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_PAY, subType, title);
@@ -157,6 +158,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         jbPaymentReschedule.addActionListener(this);
         jbPaymentReschedule.setToolTipText("Cambiar fecha requerida o programada");
         
+        jbPaymentMarkAsPaid = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")));
+        jbPaymentMarkAsPaid.setPreferredSize(new Dimension(23, 23));
+        jbPaymentMarkAsPaid.addActionListener(this);
+        jbPaymentMarkAsPaid.setToolTipText("Marcar como operado");
+        
         jbPaymentBlock = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")));
         jbPaymentBlock.setPreferredSize(new Dimension(23, 23));
         jbPaymentBlock.addActionListener(this);
@@ -207,6 +213,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 
             case SModSysConsts.FINS_ST_PAY_SCHED:
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentMarkAsPaid);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentBlock);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
                 
@@ -405,23 +412,23 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     int status = payment.getFkStatusPaymentId(); // convenience variable
                     
                     if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        if (moDialogPaymentReschedule == null) {
-                            moDialogPaymentReschedule = new SDialogPaymentReschedule(miClient, "Cambio de fecha requerida o programada");
+                        if (moDialogPaymentChangeStatus == null) {
+                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
                         }
 
-                        moDialogPaymentReschedule.setRegistry(payment);
-                        moDialogPaymentReschedule.setFormType(status);
-                        moDialogPaymentReschedule.setVisible(true);
+                        moDialogPaymentChangeStatus.setRegistry(payment);
+                        moDialogPaymentChangeStatus.setFormType(status);
+                        moDialogPaymentChangeStatus.setVisible(true);
 
-                        if (moDialogPaymentReschedule.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
                             payment.setAuxReloadEntries(false);
 
                             switch (status) {
                                 case SModSysConsts.FINS_ST_PAY_REJC:
                                     payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
-                                    payment.setDateRequired((Date) moDialogPaymentReschedule.getValue(SDialogPaymentReschedule.VALUE_DATE));
-                                    payment.setNotes((String) moDialogPaymentReschedule.getValue(SDialogPaymentReschedule.VALUE_NOTES));
-                                    payment.setNotesAuthorization((String) moDialogPaymentReschedule.getValue(SDialogPaymentReschedule.VALUE_NOTES_AUTH));
+                                    payment.setDateRequired((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+                                    payment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
+                                    payment.setNotesAuthorization((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES_AUTH));
 
                                     if (payment.isSystem()) {
                                         miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
@@ -435,7 +442,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
 
                                 case SModSysConsts.FINS_ST_PAY_SCHED:
                                     payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
-                                    payment.setDateSchedule_n((Date) moDialogPaymentReschedule.getValue(SDialogPaymentReschedule.VALUE_DATE));
+                                    payment.setDateSchedule_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
                                     
                                     miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
                                             + "(Si lo desea, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
@@ -455,6 +462,64 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                 miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar rechazada.\n"
                                         + "Intente más tarde de favor.");
                                 break;
+                            case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                        + "Intente más tarde de favor.");
+                                break;
+                            default:
+                                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxError(e.getMessage());
+                }                
+            }
+        }
+    }
+    
+    private void actionPaymentMarkAsPaid() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+            }
+            else {
+                try {
+                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                    int status = payment.getFkStatusPaymentId(); // convenience variable
+                    
+                    if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
+                        if (moDialogPaymentChangeStatus == null) {
+                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
+                        }
+
+                        moDialogPaymentChangeStatus.setRegistry(payment);
+                        moDialogPaymentChangeStatus.setFormType(SModSysConsts.FINS_ST_PAY_EXEC);
+                        moDialogPaymentChangeStatus.setVisible(true);
+
+                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            payment.setAuxReloadEntries(false);
+
+                            payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                            payment.setDateExecution_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+
+                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                    + "(Si lo desea, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
+
+                            payment.save(miClient.getSession());
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        }
+                    }
+                    else {
+                        switch (status) {
                             case SModSysConsts.FINS_ST_PAY_SCHED_P:
                                 miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
                                         + "Intente más tarde de favor.");
@@ -846,6 +911,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             }
             else if (button == jbPaymentReschedule) {
                 actionPaymentReschedule();
+            }
+            else if (button == jbPaymentMarkAsPaid) {
+                actionPaymentMarkAsPaid();
             }
             else if (button == jbPaymentBlock) {
                 actionPaymentBlock();

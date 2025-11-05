@@ -21,7 +21,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SDialogPaymentReschedule extends SBeanFormDialog {
+public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
     public final static int VALUE_DATE = 1;
     public final static int VALUE_NOTES = 2;
@@ -30,12 +30,12 @@ public class SDialogPaymentReschedule extends SBeanFormDialog {
     SDbPayment moRegistry;
     
     /**
-     * Creates new form SDialogPaymentReschedule
+     * Creates new form SDialogPaymentChangeStatus
      * @param client
      * @param title
      */
-    public SDialogPaymentReschedule(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY, SLibConsts.UNDEFINED, title);
+    public SDialogPaymentChangeStatus(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -267,23 +267,32 @@ public class SDialogPaymentReschedule extends SBeanFormDialog {
         moFields.addField(moDateNewDate);
         moFields.addField(moTextNotes);
         moFields.addField(moTextNotesAuthorization);
+        
+        moFields.setFormButton(jbSave);
     }
     
-    public void setFormType(int payStatusId) {
+    public void setFormType(int payStatusId) throws Exception {
         switch (payStatusId) {
-            case SModSysConsts.FINS_ST_PAY_NEW:
             case SModSysConsts.FINS_ST_PAY_REJC:
                 setTitle("Cambio de fecha requerida");
-                jlDateNewDate.setText("Fecha requerida:*");
+                jlAmount.setText("Monto a pagar:"); // to show amount
+                jlDateNewDate.setText("Fecha requerida:*"); // to get a new date
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_SCHED:
                 setTitle("Cambio de fecha programada");
-                jlDateNewDate.setText("Fecha programada:*");
+                jlAmount.setText("Monto a pagar:"); // to show amount
+                jlDateNewDate.setText("Fecha programada:*"); // to get a new date
+                break;
+                
+            case SModSysConsts.FINS_ST_PAY_EXEC:
+                setTitle("Marcar como pagado");
+                jlAmount.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
                 break;
                 
             default:
-                // nothing
+                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
     }
     
@@ -319,23 +328,23 @@ public class SDialogPaymentReschedule extends SBeanFormDialog {
         jtfAmountCur.setCaretPosition(0);
         
         switch (moRegistry.getFkStatusPaymentId()) {
-            case SModSysConsts.FINS_ST_PAY_NEW:
             case SModSysConsts.FINS_ST_PAY_REJC:
                 moDateNewDate.setValue(moRegistry.getDateRequired());
                 break;
             case SModSysConsts.FINS_ST_PAY_SCHED:
+            case SModSysConsts.FINS_ST_PAY_EXEC:
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
                 break;
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
             
-        moTextNotes.setValue(moRegistry.getNotes());
-        moTextNotesAuthorization.setValue(moRegistry.getNotesAuthorization());
-        jchkIsSystem.setSelected(moRegistry.isSystem());
+        moTextNotes.setValue(moRegistry.getNotes()); // can be editable
+        moTextNotesAuthorization.setValue(moRegistry.getNotesAuthorization()); // can be editable
+        jchkIsSystem.setSelected(moRegistry.isSystem()); // read only
         
-        moTextNotes.setEditable(SLibUtils.belongsTo(moRegistry.getFkStatusPaymentId(), new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_REJC }));
-        moTextNotesAuthorization.setEditable(SLibUtils.belongsTo(moRegistry.getFkStatusPaymentId(), new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_REJC }));
+        moTextNotes.setEditable(moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC);
+        moTextNotesAuthorization.setEditable(moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC);
     }
 
     @Override

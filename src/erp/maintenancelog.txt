@@ -4,6 +4,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización de constantes de extensiones de archivo.
 2) Corrección a validación de tipo de periodicidad en iniciativas.
+3) Implementación de funcionalidad para marcar los pagos como pagados.
 
 ================================================================================
 SIIE 3.2 291.1/ 2025-11-04
