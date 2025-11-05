@@ -15,6 +15,8 @@ public class SDataDpsEntryTaxRow extends erp.lib.table.STableRow {
         moData = data;
         prepareTableRow();
     }
+    
+    public SDataDpsEntryTax getDpsEntryTax() { return (SDataDpsEntryTax) moData; }
 
     @Override
     public void prepareTableRow() {

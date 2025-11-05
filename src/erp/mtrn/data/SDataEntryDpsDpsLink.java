@@ -20,10 +20,12 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     protected double mdQuantity;
     protected double mdQuantityLinked;
     protected double mdQuantityLinkedActual;
+    protected boolean msSelected;
     protected double mdQuantityToLink;
     protected java.lang.String msUnitSymbol;
     protected double mdSurplusPercentage;
     protected int mnItemId;
+    protected int mnUnitId;
     
     protected boolean mbAuxEntryPriceNeeded;
     protected SGuiDpsEntryPrice moAuxSGuiDpsEntryPrice;
@@ -43,9 +45,11 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public void setQuantityLinked(double d) { mdQuantityLinked = d; }
     public void setQuantityLinkedActual(double d) { mdQuantityLinkedActual = d; }
     public void setQuantityToLink(double d) { mdQuantityToLink = d; }
+    public void setSelected(boolean b) { msSelected = b; }
     public void setUnitSymbol(java.lang.String s) { msUnitSymbol = s; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
     public void setItemId(int n) { mnItemId = n; }
+    public void setUnitId(int n) { mnUnitId = n; }
    
     public void setAuxIsEntryPriceNeeded(boolean b) { mbAuxEntryPriceNeeded = b; }
     public void setAuxSGuiDpsEntryPrice(SGuiDpsEntryPrice d) { moAuxSGuiDpsEntryPrice = d; }
@@ -59,10 +63,12 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public double getQuantity() { return mdQuantity; }
     public double getQuantityLinked() { return mdQuantityLinked; }
     public double getQuantityLinkedActual() { return mdQuantityLinkedActual; }
+    public boolean getSelected() { return msSelected; }
     public double getQuantityToLink() { return mdQuantityToLink; }
     public java.lang.String getUnitSymbol() { return msUnitSymbol; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
     public int getItemId() { return mnItemId; }
+    public int getUnitId() { return mnUnitId; }
     
     public boolean getAuxIsEntryPriceNeeded() { return mbAuxEntryPriceNeeded; }
     public SGuiDpsEntryPrice getAuxSGuiDpsEntryPrice() { return moAuxSGuiDpsEntryPrice; }
@@ -80,10 +86,12 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mdQuantity = 0;
         mdQuantityLinked = 0;
         mdQuantityLinkedActual = 0;
+        msSelected = false;
         mdQuantityToLink = 0;
         msUnitSymbol = "";
         mdSurplusPercentage = 0;
         mnItemId = 0;
+        mnUnitId = 0;
         moAuxSGuiDpsEntryPrice = null;
     }
 
@@ -98,6 +106,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mvValues.add(mdQuantityLinked);
         mvValues.add(mdQuantityLinkedActual);
         mvValues.add(getQuantityToBeLinked());
+        mvValues.add(msSelected);
         mvValues.add(mdQuantityToLink);
         mvValues.add(msUnitSymbol);
         mvValues.add(mdSurplusPercentage);

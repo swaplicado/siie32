@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,8 +40,8 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
     
     private SGridPaneForm moGridPayments;
     
-    private ArrayList<SRowPayments> maPayments;
-    private ArrayList<SRowPayments> maSelectedPayments;
+    private HashSet<SRowPayments> maPayments;
+    private HashSet<SRowPayments> maAllSelectedPayments;
     
     private JButton jbLayoutDate;
     private JButton jbLayoutDateUntil;
@@ -230,7 +231,24 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
                     row.setDocBalancePrevCy(resultSet.getInt("pe.doc_bal_prev_cur"));
                     row.setDocBalanceUnpayCy(resultSet.getInt("pe.doc_bal_unpd_cur_r"));
                     row.setSelected(false);
-                    maPayments.add(row);
+                    boolean found = false;
+                    for (SRowPayments selectedRow : maAllSelectedPayments) {
+                        if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
+                            if (SLibUtils.compareKeys(row.getRowPrimaryKey(), selectedRow.getRowPrimaryKey())) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        else {
+                            if (row.getIdPayment() == row.getIdPayment()) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        maPayments.add(row);
+                    }
                 }
             }
         }
@@ -287,19 +305,21 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
     }
     
     public ArrayList<SRowPayments> getSelectedPayments() {
+        ArrayList<SRowPayments> selectedPayments = new ArrayList<>();
         for (SGridRow row : moGridPayments.getModel().getGridRows()) {
             SRowPayments pay = (SRowPayments) row;
             if (pay.getIsSelected()) {
                 maPayments.remove(pay);
-                maSelectedPayments.add(pay);
+                maAllSelectedPayments.add(pay);
+                selectedPayments.add(pay);
             }
         }
-        return maSelectedPayments;
+        return selectedPayments;
     }
     
     public void addPayments(ArrayList<SRowPayments> pays) {
         maPayments.addAll(pays);
-        maSelectedPayments.removeAll(pays);
+        maAllSelectedPayments.removeAll(pays);
     }
     
     public void setCurrencies(int curPayment, int curDoc) {
@@ -344,8 +364,8 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
 
     @Override
     public void reloadCatalogues() {
-        maPayments = new ArrayList<>();
-        maSelectedPayments = new ArrayList<>();
+        maPayments = new HashSet<>();
+        maAllSelectedPayments = new HashSet<>();
         actionLayoutDate();
     }
 

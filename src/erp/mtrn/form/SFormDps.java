@@ -10902,8 +10902,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (moDps.getXtaHasSuppFiles()) {
             msg += "\n- Este documento tiene archivos de soporte anexados.";
         }
-        if (moDps.getIsNotEditableByStatusAuth()) {
-            msg += "\n- Este documento no ha sido rechazado y ya inició el proceso de autorización via web.";
+        if (!moDps.getIsAuthorized() && moDps.getIsNotEditableByStatusAuth()) {
+            msg += "\n- Este documento tiene un proceso de autorización vía web.";
         }
 
         if (msg.length() == 0) {
