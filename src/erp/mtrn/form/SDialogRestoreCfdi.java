@@ -143,11 +143,11 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         
         if (mnFormSubtype == SCfdConsts.CFDI_FILE_XML) {
             msFileFilterDescription = SFileUtilities.XML_DESCRIP;
-            msFileFilterExtensions = SFileUtilities.XML;
+            msFileFilterExtensions = SFileUtilities.xml;
         }
         else {
             msFileFilterDescription = SFileUtilities.PDF_DESCRIP;
-            msFileFilterExtensions = SFileUtilities.PDF;
+            msFileFilterExtensions = SFileUtilities.pdf;
         }
         
         AbstractAction actionOk = new AbstractAction() {

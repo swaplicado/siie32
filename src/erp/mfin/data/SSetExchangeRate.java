@@ -8,16 +8,7 @@ package erp.mfin.data;
 import erp.SParamsApp;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.link.db.SConfigException;
-import erp.siieapp.SClientUtils;
-import erp.siieapp.portalproveedores.SAccountStatusApi;
-import erp.siieapp.portalproveedores.SEstimateRequestAPI;
-import erp.siieapp.portalproveedores.SPurcharseOrdersAPI;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -32,7 +23,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.xml.parsers.DocumentBuilder;
@@ -45,9 +35,7 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
-import sa.lib.gui.SGuiSession;
 import sa.lib.xml.SXmlUtils;
-import org.json.simple.JSONObject;
 
 /**
  *

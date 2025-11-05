@@ -2,7 +2,7 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
-    <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
+    <Component class="javax.swing.ButtonGroup" name="bgFileType">
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -243,7 +243,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Datos del archivo:"/>
+                    <TitledBorder title="Datos del archivo de soporte:"/>
                   </Border>
                 </Property>
               </Properties>
@@ -269,7 +269,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadPhoto">
                       <Properties>
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                          <ComponentRef name="buttonGroup1"/>
+                          <ComponentRef name="bgFileType"/>
                         </Property>
                         <Property name="selected" type="boolean" value="true"/>
                         <Property name="text" type="java.lang.String" value="Evidencia fotogr&#xe1;fica"/>
@@ -295,10 +295,10 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadAdvance">
+                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadReport">
                       <Properties>
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                          <ComponentRef name="buttonGroup1"/>
+                          <ComponentRef name="bgFileType"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Reporte de avance"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -323,12 +323,12 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadService">
+                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadInstallment">
                       <Properties>
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                          <ComponentRef name="buttonGroup1"/>
+                          <ComponentRef name="bgFileType"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Finiquito servicio"/>
+                        <Property name="text" type="java.lang.String" value="Soporte de parcialidad o finiquito"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
                         </Property>
@@ -337,6 +337,35 @@
                     <Component class="javax.swing.JButton" name="jbEtyAdd">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Aceptar"/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[85, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jpNorthFiletRow8">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOther">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="bgFileType"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="Otro soporte"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[300, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jbEtyCancel">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cancelar"/>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[85, 23]"/>
@@ -354,18 +383,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlFile">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Nombre archivo:*"/>
+                        <Property name="text" type="java.lang.String" value="Nombre del archivo:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
-                        </Property>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="jbEtyCancel">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Cancelar"/>
-                        <Property name="enabled" type="boolean" value="false"/>
-                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[85, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -382,7 +402,7 @@
                       <Properties>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[250, 23]"/>
+                          <Dimension value="[400, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -406,7 +426,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jlDescription">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Descripci&#xf3;n:"/>
+                        <Property name="text" type="java.lang.String" value="Descripci&#xf3;n del archivo:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
                         </Property>
@@ -425,18 +445,11 @@
                       <Properties>
                         <Property name="enabled" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[250, 23]"/>
+                          <Dimension value="[400, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
                   </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="jpNorthFiletRow8">
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                    <Property name="alignment" type="int" value="0"/>
-                    <Property name="verticalGap" type="int" value="0"/>
-                  </Layout>
                 </Container>
               </SubComponents>
             </Container>
@@ -446,7 +459,7 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="Archivos:"/>
+                <TitledBorder title="Archivos de soporte:"/>
               </Border>
             </Property>
           </Properties>

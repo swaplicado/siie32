@@ -729,7 +729,7 @@ public abstract class SDocUtils {
     public static JFileChooser createFileChooserForUpload() {
         JFileChooser moFileChooserUpload = new JFileChooser();
         moFileChooserUpload.setAcceptAllFileFilterUsed(false);
-        moFileChooserUpload.addChoosableFileFilter(SFileUtilities.createFileNameExtensionFilter(SFileUtilities.PDF));
+        moFileChooserUpload.addChoosableFileFilter(SFileUtilities.createFileNameExtensionFilter(SFileUtilities.pdf));
         moFileChooserUpload.addChoosableFileFilter(SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_ALL));
         moFileChooserUpload.setDialogTitle("Seleccionar archivo a cargar...");
         return moFileChooserUpload;

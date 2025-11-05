@@ -9360,14 +9360,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     @SuppressWarnings("deprecation")
     private void actionLoadFileXml() {
-        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
        
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.XML)) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                     String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     
                     if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, absolutePath)) {
@@ -9447,14 +9447,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionLoadFilePdf() {
-        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.PDF);
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.pdf);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);
        
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.PDF)) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.pdf)) {
                     moFieldCfdiPdfFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     moFilePdfJustLoaded = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                 }

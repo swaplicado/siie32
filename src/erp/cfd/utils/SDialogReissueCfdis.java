@@ -342,7 +342,7 @@ public class SDialogReissueCfdis extends SBeanFormDialog implements java.awt.eve
      */
     private void actionLoadFile() {
         String path = null;
-        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.csv);
         
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(filter);

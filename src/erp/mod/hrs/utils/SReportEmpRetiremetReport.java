@@ -113,8 +113,8 @@ public class SReportEmpRetiremetReport {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            fileChooser.setSelectedFile(new File("CuotasPatronalesPorCentroCosto_" + currentYear + "_" + monthName + "." + SFileUtilities.CSV));
-            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
+            fileChooser.setSelectedFile(new File("CuotasPatronalesPorCentroCosto_" + currentYear + "_" + monthName + "." + SFileUtilities.csv));
+            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.csv);
             fileChooser.setFileFilter(filter);
 
             int userSelection = fileChooser.showSaveDialog(null);

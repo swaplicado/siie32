@@ -6,7 +6,6 @@
 package erp.mod.fin.db;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.mod.hrs.utils.SDocUtils;
 import java.io.File;
 import java.io.Serializable;
@@ -21,9 +20,19 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbPaymentFile extends SDbRegistryUser implements SGridRow, Serializable {
+    
+    public static final String FILE_TP_EF = "EF"; // evidencia fotográfica
+    public static final String FILE_TP_RA = "RA"; // reporte de avance o bitácora de trabajo
+    public static final String FILE_TP_PF = "PF"; // soporte de parcialidad o finiquito
+    public static final String FILE_TP_OS = "OS"; // otro soporte
+    
+    public static final String DESC_FILE_TP_EF = "Evidencia fotográfica";
+    public static final String DESC_FILE_TP_RA = "Reporte de avance o bitácora de trabajo";
+    public static final String DESC_FILE_TP_PF = "Soporte de parcialidad o finiquito";
+    public static final String DESC_FILE_TP_OS = "Otro soporte";
     
     protected int mnPkPaymentId;
     protected int mnPkFileId;
@@ -330,17 +339,50 @@ public class SDbPaymentFile extends SDbRegistryUser implements SGridRow, Seriali
         Object value = null;
         
         switch (col) {
-            case 0: value = mnSortingPos; break;
-            case 1: value = msPaymentFileType.equals(SModSysConsts.FIN_PAY_FILE_TP_EF) ? "Evidencia fotográfica" : 
-                    msPaymentFileType.equals(SModSysConsts.FIN_PAY_FILE_TP_RA) ? "Reporte de avance" : "Finiquito servicio";
+            case 0:
+                value = mnSortingPos;
                 break;
-            case 2: value = msFileName; break;
-            case 3: value = msFileDescription; break;
+            case 1:
+                value = getFileTypeDescription(msPaymentFileType);
+                break;
+            case 2:
+                value = msFileName;
+                break;
+            case 3:
+                value = msFileDescription;
+                break;
+            default:
+                // nothing
         }
         
         return value;
     }
 
     @Override
-    public void setRowValueAt(Object value, int col) { }
+    public void setRowValueAt(Object value, int col) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public static String getFileTypeDescription(final String fileType) {
+        String description;
+        
+        switch (fileType) {
+            case FILE_TP_EF:
+                description = DESC_FILE_TP_EF;
+                break;
+            case FILE_TP_RA:
+                description = DESC_FILE_TP_RA;
+                break;
+            case FILE_TP_PF:
+                description = DESC_FILE_TP_PF;
+                break;
+            case FILE_TP_OS:
+                description = DESC_FILE_TP_OS;
+                break;
+            default:
+                description = "?";
+        }
+        
+        return description;
+    }
 }

@@ -157,7 +157,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
     }
     
     private void actionRowAdd () {
-        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
         miClient.getFileChooser().setFileFilter(filter);

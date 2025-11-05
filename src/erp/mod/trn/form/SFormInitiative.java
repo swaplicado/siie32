@@ -498,22 +498,22 @@ public class SFormInitiative extends SBeanForm implements ItemListener, FocusLis
     }
     
     private void enablePeriodicityType() {
-        moKeyPeriodicityType.setEnabled(moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_R);
+        moKeyPeriodicityType.setEnabled(moKeyType.getSelectedIndex() > 0 && moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_R);
     }
     
     private void itemStateChangedType() {
         enablePeriodicityType();
         
-        if (moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_R) {
-            moCurCompBudget.getField().setValue(0d);
-            moCurSpentBudget.getField().setValue(0d);
-            updateSpendableBudget();
-        } 
-        else {
+        if (moKeyType.getSelectedIndex() > 0 && moKeyType.getValue()[0] == SDbInitiative.ID_TYPE_E) {
             moKeyPeriodicityType.setValue(new int[] { SModSysConsts.TRNS_TP_PERIOD_NA });
             
             moCurCompBudget.getField().setValue(mdCompBudget);
             moCurSpentBudget.getField().setValue(mdSpentBudget);
+            updateSpendableBudget();
+        } 
+        else {
+            moCurCompBudget.getField().setValue(0d);
+            moCurSpentBudget.getField().setValue(0d);
             updateSpendableBudget();
         }
     }

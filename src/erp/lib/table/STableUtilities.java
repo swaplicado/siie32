@@ -397,9 +397,9 @@ public abstract class STableUtilities {
         java.lang.String buffer = "";
         java.util.Vector values = null;
 
-        client.getFileChooser().setSelectedFile(new File(title + " " + client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + "." + SFileUtilities.CSV));
+        client.getFileChooser().setSelectedFile(new File(title + " " + client.getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + "." + SFileUtilities.csv));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath() + (client.getFileChooser().getSelectedFile().getAbsolutePath().endsWith("." + SFileUtilities.CSV) ? "" : "." + SFileUtilities.CSV));
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath() + (client.getFileChooser().getSelectedFile().getAbsolutePath().endsWith("." + SFileUtilities.csv) ? "" : "." + SFileUtilities.csv));
 
             try {
                 // Prepare apostrophe control for strings:

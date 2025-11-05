@@ -3481,7 +3481,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     moFieldFileImagePhoto.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     try {
                         byteArrayOSImagePhoto = new ByteArrayOutputStream();
-                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_JPG, byteArrayOSImagePhoto);
+                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_jpg, byteArrayOSImagePhoto);
 
                         moXtaImageIconPhoto_n = new ImageIcon(byteArrayOSImagePhoto.toByteArray());
                         mbPhotoChange = true;
@@ -3541,7 +3541,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     moFieldFileImageSignature.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                     try {
                         byteArrayOSSignatureSignature = new ByteArrayOutputStream();
-                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_JPG, byteArrayOSSignatureSignature);
+                        ImageIO.write(ImageIO.read(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath())), SFileUtilities.IMG_jpg, byteArrayOSSignatureSignature);
 
                         moXtaImageIconSignature_n = new ImageIcon(byteArrayOSSignatureSignature.toByteArray());
                         mbSignatureChange = true;

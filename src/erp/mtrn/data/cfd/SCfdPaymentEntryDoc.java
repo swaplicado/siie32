@@ -43,7 +43,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     public double DocBalancePrev;   // in original currency of document
     public double DocPayment;       // in original currency of document
     public double DocBalancePend;   // in original currency of document
-    public double ExchangeRate;     // to exchange original currency of document into currency of payment
+    public double ExchangeRate;     // to exchange currency of payment into original currency of document
     public double PayBalancePrev;   // in currency of payment
     public double PayPayment;       // in currency of payment
     public double PayPaymentPac;    // in currency of payment

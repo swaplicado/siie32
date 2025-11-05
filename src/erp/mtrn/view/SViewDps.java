@@ -1541,7 +1541,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         fileChooser.setCurrentDirectory(new java.io.File("C:\\"));
         fileChooser.setDialogTitle("Seleccionar imagen");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_JPG_PNG);
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.IMGS_jpg_png);
         fileChooser.setFileFilter(filter);
         fileChooser.setAcceptAllFileFilterUsed(false);
 

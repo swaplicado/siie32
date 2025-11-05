@@ -127,7 +127,7 @@ public abstract class SImportUtils {
                 
                 if (chosenFile == null) {
                     chooserUsed = true;
-                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
                     client.getFileChooser().repaint();
                     client.getFileChooser().setAcceptAllFileFilterUsed(false);
                     client.getFileChooser().setFileFilter(filter);
@@ -137,7 +137,7 @@ public abstract class SImportUtils {
                     }
                 }
 
-                if (chosenFile.getName().toLowerCase().contains("." + SFileUtilities.XML)) {
+                if (chosenFile.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                     SCfdRenderer renderer = new SCfdRenderer(client);
                     SDataDps newDps = renderer.renderCfdi(chosenFile, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
@@ -333,20 +333,20 @@ public abstract class SImportUtils {
                 case MODE_DOCS_ALL_FILES_AS_ZIP:
                     // ask for desired ZIP file:
                     
-                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.ZIP);
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
                     JFileChooser fileChooser = session.getClient().getFileChooser();
                     fileChooser.repaint();
                     fileChooser.setAcceptAllFileFilterUsed(false);
                     fileChooser.setFileFilter(filter);
 
-                    fileChooser.setSelectedFile(new File(DownloadFilePrefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.ZIP));
+                    fileChooser.setSelectedFile(new File(DownloadFilePrefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
 
                     if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
                         zipFile = fileChooser.getSelectedFile();
 
                         // Ensure file ends with ".zip"
-                        if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.ZIP)) {
-                            zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.ZIP);
+                        if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.zip)) {
+                            zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.zip);
                         }
                     }
                     break;
@@ -356,7 +356,7 @@ public abstract class SImportUtils {
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
                     System.out.println("Temporary directory created at: " + tempDir);
                     
-                    tempFile = Files.createFile(tempDir.resolve(DownloadFilePrefix + FormatDatetime.format(new Date()) + "." + SFileUtilities.ZIP));
+                    tempFile = Files.createFile(tempDir.resolve(DownloadFilePrefix + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
                     zipFile = tempFile.toFile();
                     break;
                     
@@ -424,14 +424,14 @@ public abstract class SImportUtils {
 
                                 zis.closeEntry();
                                 
-                                if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.XML) && xmlFile == null) {
+                                if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
                                     // choose firt retrieved XML:
                                     xmlFile = newFile;
-                                    xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.XML);
+                                    xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.xml);
                                 }
-                                else if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.PDF)) {
+                                else if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
                                     // reserve all retrieved PDF's:
-                                    pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.PDF), newFile);
+                                    pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.pdf), newFile);
                                 }
                                 
                                 if (!xmlFileName.isEmpty() && !pdfFilesMap.isEmpty() && pdfFile == null) {

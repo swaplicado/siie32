@@ -45,9 +45,9 @@ public class SMfgCsvFileManager {
         
         try {
             JFileChooser fileChooser = new JFileChooser();
-            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
+            FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.csv);
             fileChooser.setFileFilter(filter);
-            fileChooser.setSelectedFile(new File("explosion." + SFileUtilities.CSV));
+            fileChooser.setSelectedFile(new File("explosion." + SFileUtilities.csv));
             
             iSelection = fileChooser.showSaveDialog(fileChooser);
  

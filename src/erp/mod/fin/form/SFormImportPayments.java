@@ -967,7 +967,7 @@ public class SFormImportPayments extends SBeanForm implements ActionListener, It
         String msXmlPath = "";
         String fileName = "";
         String nameAux = "";
-        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.EXP);
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.exp);
         
         miClient.getFileChooser().repaint();
         miClient.getFileChooser().setAcceptAllFileFilterUsed(false);

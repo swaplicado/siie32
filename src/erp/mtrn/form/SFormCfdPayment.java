@@ -5,6 +5,7 @@
 
 package erp.mtrn.form;
 
+import cfd.DAttributeTipoCambio10d;
 import cfd.DCfdConsts;
 import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DCfdi33Utils;
@@ -338,11 +339,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel34 = new javax.swing.JPanel();
         jlDocInstallment = new javax.swing.JLabel();
         jtfDocInstallment = new javax.swing.JTextField();
+        jlDocInstallmentHint = new javax.swing.JLabel();
         jPanel35 = new javax.swing.JPanel();
         jlDocExchangeRate = new javax.swing.JLabel();
         jtfDocExchangeRate = new javax.swing.JTextField();
         jtfDocExchangeRateCurRo = new javax.swing.JTextField();
         jbDocExchangeRateInvert = new javax.swing.JButton();
+        jlDocExchangeRateHint = new javax.swing.JLabel();
         jPanel36 = new javax.swing.JPanel();
         jlDocBalancePrev = new javax.swing.JLabel();
         jtfDocDocBalancePrev = new javax.swing.JTextField();
@@ -805,7 +808,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel29.add(jtfPayAmountCurRo);
 
         jtfPayExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayExchangeRate.setText("999,999.99");
+        jtfPayExchangeRate.setText("9.9999");
         jtfPayExchangeRate.setToolTipText("Tipo de cambio");
         jtfPayExchangeRate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel29.add(jtfPayExchangeRate);
@@ -1133,30 +1136,40 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocInstallment.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel34.add(jtfDocInstallment);
 
+        jlDocInstallmentHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDocInstallmentHint.setText("(Número de parcialidad al doc.)");
+        jlDocInstallmentHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel34.add(jlDocInstallmentHint);
+
         jpDocument.add(jPanel34);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDocExchangeRate.setText("Tipo cambio:*");
+        jlDocExchangeRate.setText("Equivalencia:*");
         jlDocExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlDocExchangeRate);
 
         jtfDocExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfDocExchangeRate.setText("999,999.99");
-        jtfDocExchangeRate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfDocExchangeRate.setText("9.9999999999");
+        jtfDocExchangeRate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jtfDocExchangeRate);
 
         jtfDocExchangeRateCurRo.setEditable(false);
         jtfDocExchangeRateCurRo.setText("DOC/PAY");
-        jtfDocExchangeRateCurRo.setToolTipText("");
+        jtfDocExchangeRateCurRo.setToolTipText("Equivalencia o tipo de cambio");
         jtfDocExchangeRateCurRo.setFocusable(false);
         jtfDocExchangeRateCurRo.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel35.add(jtfDocExchangeRateCurRo);
 
-        jbDocExchangeRateInvert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_exc_rate.gif"))); // NOI18N
-        jbDocExchangeRateInvert.setToolTipText("Invertir tipo de cambio (1/x)");
+        jbDocExchangeRateInvert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif"))); // NOI18N
+        jbDocExchangeRateInvert.setToolTipText("Invertir equivalencia o tipo de cambio (1/x)");
         jbDocExchangeRateInvert.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel35.add(jbDocExchangeRateInvert);
+
+        jlDocExchangeRateHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDocExchangeRateHint.setText("(TC moneda doc. vs.  moneda pago)");
+        jlDocExchangeRateHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel35.add(jlDocExchangeRateHint);
 
         jpDocument.add(jPanel35);
 
@@ -1436,7 +1449,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
      */
 
     private void initComponentsExtra() {
-        moExchangeRateFormat = new DecimalFormat("#,#0.000000");
+        moExchangeRateFormat = new DecimalFormat("#,#0." + SLibUtils.textRepeat("0", DAttributeTipoCambio10d.DECS));
         
         // initialize input fields:
         
@@ -3700,7 +3713,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlDocCurrency;
     private javax.swing.JLabel jlDocDpsRelated;
     private javax.swing.JLabel jlDocExchangeRate;
+    private javax.swing.JLabel jlDocExchangeRateHint;
     private javax.swing.JLabel jlDocInstallment;
+    private javax.swing.JLabel jlDocInstallmentHint;
     private javax.swing.JLabel jlDocPayment;
     private javax.swing.JLabel jlDocPaymentMethod;
     private javax.swing.JLabel jlDocPaymentType;

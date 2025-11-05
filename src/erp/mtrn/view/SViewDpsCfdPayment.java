@@ -261,14 +261,14 @@ public class SViewDpsCfdPayment extends erp.lib.table.STableTab implements java.
     private void actionUploadXml() {
         if (jbUploadXml.isEnabled()) {
             if (isRowSelected()) {
-                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
                 miClient.getFileChooser().repaint();
                 miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
                 miClient.getFileChooser().setFileFilter(filter);
 
                 try {
                     if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                        if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.XML)) {
+                        if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                             int bpId = 0;
                             String sql = "SELECT fid_bp_r FROM trn_dps WHERE id_year = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0] + 
                                     " AND id_doc = " + ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1];

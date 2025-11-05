@@ -553,7 +553,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     
     private void actionSelectFile() {
         JFileChooser fileChooser = new JFileChooser();
-        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
+        FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.csv);
         fileChooser.setFileFilter(filter);
         fileChooser.showOpenDialog(this);
         

@@ -319,6 +319,7 @@ public class SDbInitiative extends SDbRegistryUser {
     public static ArrayList<SGuiItem> createTypesGuiItem() {
         ArrayList<SGuiItem> guiItems = new ArrayList<>();
         
+        guiItems.add(new SGuiItem(new int[] { 0 }, "- Tipo iniciativa -" ));
         guiItems.add(new SGuiItem(new int[] { ID_TYPE_E }, TYPE_PER_EVENT, TYPE_E ));
         guiItems.add(new SGuiItem(new int[] { ID_TYPE_R }, TYPE_RECURRENT, TYPE_R ));
         

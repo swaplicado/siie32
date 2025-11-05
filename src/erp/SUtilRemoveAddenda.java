@@ -160,7 +160,7 @@ public class SUtilRemoveAddenda extends javax.swing.JFrame {
     private void initComponentsExtra() {
         jtfXml.setText("");
         moFileChooser = new JFileChooser();
-        moFileFilter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XML);
+        moFileFilter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
         moFileChooser.setAcceptAllFileFilterUsed(false);
         moFileChooser.setFileFilter(moFileFilter);
     }

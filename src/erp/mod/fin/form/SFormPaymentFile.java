@@ -37,14 +37,13 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormPaymentFile extends SBeanForm implements ActionListener, ListSelectionListener {
     
     private final String FILE_EXT = "doc|docx|xls|xlsx|jpg|png|jpeg|pdf";
     
     private SDbPayment moRegistry;
-    private SDbPaymentFile moPaymentFileDeleted;
     private File moFile;
     
     ArrayList<SDbPaymentFile> maPaymentFiles;
@@ -83,7 +82,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
+        bgFileType = new javax.swing.ButtonGroup();
         jpRegistry = new javax.swing.JPanel();
         jpNorth = new javax.swing.JPanel();
         jpNorthPay = new javax.swing.JPanel();
@@ -114,14 +113,16 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moRadPhoto = new sa.lib.gui.bean.SBeanFieldRadio();
         jbEtyNew = new javax.swing.JButton();
         jpNorthFileRow2 = new javax.swing.JPanel();
-        moRadAdvance = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadReport = new sa.lib.gui.bean.SBeanFieldRadio();
         jbEtyDelete = new javax.swing.JButton();
         jpNorthFileRow3 = new javax.swing.JPanel();
-        moRadService = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadInstallment = new sa.lib.gui.bean.SBeanFieldRadio();
         jbEtyAdd = new javax.swing.JButton();
+        jpNorthFiletRow8 = new javax.swing.JPanel();
+        moRadOther = new sa.lib.gui.bean.SBeanFieldRadio();
+        jbEtyCancel = new javax.swing.JButton();
         jpNorthFileRow4 = new javax.swing.JPanel();
         jlFile = new javax.swing.JLabel();
-        jbEtyCancel = new javax.swing.JButton();
         jpNorthFileRow5 = new javax.swing.JPanel();
         jtfFile = new javax.swing.JTextField();
         jbFilePicker = new javax.swing.JButton();
@@ -129,7 +130,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         jlDescription = new javax.swing.JLabel();
         jpNorthFileRow7 = new javax.swing.JPanel();
         moTextDescription = new sa.lib.gui.bean.SBeanFieldText();
-        jpNorthFiletRow8 = new javax.swing.JPanel();
         jpPayFiles = new javax.swing.JPanel();
         jpGridPayFiles = new javax.swing.JPanel();
         jpPayFilesControls = new javax.swing.JPanel();
@@ -235,12 +235,12 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorth.add(jpNorthPay, java.awt.BorderLayout.WEST);
 
-        jpNorthFile.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del archivo:"));
+        jpNorthFile.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del archivo de soporte:"));
         jpNorthFile.setLayout(new java.awt.GridLayout(8, 0, 0, 5));
 
         jpNorthFileRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        buttonGroup1.add(moRadPhoto);
+        bgFileType.add(moRadPhoto);
         moRadPhoto.setSelected(true);
         moRadPhoto.setText("Evidencia fotográfica");
         moRadPhoto.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -254,10 +254,10 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorthFileRow2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        buttonGroup1.add(moRadAdvance);
-        moRadAdvance.setText("Reporte de avance");
-        moRadAdvance.setPreferredSize(new java.awt.Dimension(300, 23));
-        jpNorthFileRow2.add(moRadAdvance);
+        bgFileType.add(moRadReport);
+        moRadReport.setText("Reporte de avance");
+        moRadReport.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpNorthFileRow2.add(moRadReport);
 
         jbEtyDelete.setText("Eliminar");
         jbEtyDelete.setPreferredSize(new java.awt.Dimension(85, 23));
@@ -267,10 +267,10 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorthFileRow3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        buttonGroup1.add(moRadService);
-        moRadService.setText("Finiquito servicio");
-        moRadService.setPreferredSize(new java.awt.Dimension(300, 23));
-        jpNorthFileRow3.add(moRadService);
+        bgFileType.add(moRadInstallment);
+        moRadInstallment.setText("Soporte de parcialidad o finiquito");
+        moRadInstallment.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpNorthFileRow3.add(moRadInstallment);
 
         jbEtyAdd.setText("Aceptar");
         jbEtyAdd.setEnabled(false);
@@ -279,23 +279,32 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorthFile.add(jpNorthFileRow3);
 
-        jpNorthFileRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpNorthFiletRow8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFile.setText("Nombre archivo:*");
-        jlFile.setPreferredSize(new java.awt.Dimension(300, 23));
-        jpNorthFileRow4.add(jlFile);
+        bgFileType.add(moRadOther);
+        moRadOther.setText("Otro soporte");
+        moRadOther.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpNorthFiletRow8.add(moRadOther);
 
         jbEtyCancel.setText("Cancelar");
         jbEtyCancel.setEnabled(false);
         jbEtyCancel.setPreferredSize(new java.awt.Dimension(85, 23));
-        jpNorthFileRow4.add(jbEtyCancel);
+        jpNorthFiletRow8.add(jbEtyCancel);
+
+        jpNorthFile.add(jpNorthFiletRow8);
+
+        jpNorthFileRow4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFile.setText("Nombre del archivo:*");
+        jlFile.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpNorthFileRow4.add(jlFile);
 
         jpNorthFile.add(jpNorthFileRow4);
 
         jpNorthFileRow5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfFile.setEnabled(false);
-        jtfFile.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfFile.setPreferredSize(new java.awt.Dimension(400, 23));
         jpNorthFileRow5.add(jtfFile);
 
         jbFilePicker.setText("...");
@@ -307,7 +316,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
 
         jpNorthFileRow6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDescription.setText("Descripción:");
+        jlDescription.setText("Descripción del archivo:");
         jlDescription.setPreferredSize(new java.awt.Dimension(300, 23));
         jpNorthFileRow6.add(jlDescription);
 
@@ -316,19 +325,16 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         jpNorthFileRow7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moTextDescription.setEnabled(false);
-        moTextDescription.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextDescription.setPreferredSize(new java.awt.Dimension(400, 23));
         jpNorthFileRow7.add(moTextDescription);
 
         jpNorthFile.add(jpNorthFileRow7);
-
-        jpNorthFiletRow8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpNorthFile.add(jpNorthFiletRow8);
 
         jpNorth.add(jpNorthFile, java.awt.BorderLayout.CENTER);
 
         jpRegistry.add(jpNorth, java.awt.BorderLayout.NORTH);
 
-        jpPayFiles.setBorder(javax.swing.BorderFactory.createTitledBorder("Archivos:"));
+        jpPayFiles.setBorder(javax.swing.BorderFactory.createTitledBorder("Archivos de soporte:"));
         jpPayFiles.setLayout(new java.awt.BorderLayout());
 
         jpGridPayFiles.setLayout(new java.awt.BorderLayout());
@@ -359,7 +365,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup bgFileType;
     private javax.swing.JButton jbDown;
     private javax.swing.JButton jbEtyAdd;
     private javax.swing.JButton jbEtyCancel;
@@ -405,9 +411,10 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBeneficiary;
     private sa.lib.gui.bean.SBeanFieldKey moKeyFunctionalArea;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadAdvance;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadInstallment;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOther;
     private sa.lib.gui.bean.SBeanFieldRadio moRadPhoto;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadService;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadReport;
     private sa.lib.gui.bean.SBeanFieldText moTextDescription;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentCyCur;
     private sa.lib.gui.bean.SBeanFieldText moTextSerie;
@@ -431,8 +438,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moKeyFunctionalArea.setKeySettings(miClient, SGuiUtils.getLabelName(jlFunctionalArea), true);
         
         moRadPhoto.setBooleanSettings(moRadPhoto.getText(), true);
-        moRadAdvance.setBooleanSettings(moRadAdvance.getText(), false);
-        moRadService.setBooleanSettings(moRadService.getText(), false);
+        moRadReport.setBooleanSettings(moRadReport.getText(), false);
+        moRadInstallment.setBooleanSettings(moRadInstallment.getText(), false);
         moTextDescription.setTextSettings(SGuiUtils.getLabelName(jlDescription), 255, 0);
         
         moFields.addField(moKeyBeneficiary);
@@ -444,13 +451,13 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moFields.addField(moKeyFunctionalArea);
         
         moFieldsEty.addField(moRadPhoto);
-        moFieldsEty.addField(moRadAdvance);
-        moFieldsEty.addField(moRadService);
+        moFieldsEty.addField(moRadReport);
+        moFieldsEty.addField(moRadInstallment);
         moFieldsEty.addField(moTextDescription);
         
         moDialogDocDpsRelatedPickerPend = new SDialogPickerDps((SClientInterface) miClient, SDataConstants.TRNX_DPS_PAY_PEND);
         
-        moGridFiles = new SGridPaneForm(miClient, SModConsts.FIN_PAY_FILE, SLibConsts.UNDEFINED, "Archivos de solicitud de pago") {
+        moGridFiles = new SGridPaneForm(miClient, SModConsts.FIN_PAY_FILE, SLibConsts.UNDEFINED, "Archivos de soporte") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -499,8 +506,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     
     private void enablePayComponets(boolean enable) {
         moRadPhoto.setEnabled(mbCanCapture && enable);
-        moRadAdvance.setEnabled(mbCanCapture && enable);
-        moRadService.setEnabled(mbCanCapture && enable);
+        moRadReport.setEnabled(mbCanCapture && enable);
+        moRadInstallment.setEnabled(mbCanCapture && enable);
         jbFilePicker.setEnabled(mbCanCapture && enable);
     }
     
@@ -513,8 +520,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     
     private void enableFileControls(boolean enable) {
         moRadPhoto.setEnabled(mbCanCapture && enable);
-        moRadAdvance.setEnabled(mbCanCapture && enable);
-        moRadService.setEnabled(mbCanCapture && enable);
+        moRadReport.setEnabled(mbCanCapture && enable);
+        moRadInstallment.setEnabled(mbCanCapture && enable);
         moTextDescription.setEnabled(mbCanCapture && enable);
         jbFilePicker.setEnabled(mbCanCapture && enable);
         jbEtyNew.setEnabled(mbCanCapture && !enable);
@@ -529,21 +536,28 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         return ((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
     
-    private void setComponetsFileData(SDbPaymentFile file) {
-        if (file != null) {
-            switch (file.getPaymentFileType()) {
-                case SModSysConsts.FIN_PAY_FILE_TP_EF:
+    private void setComponetsFileData(SDbPaymentFile paymentFile) {
+        if (paymentFile != null) {
+            
+            switch (paymentFile.getPaymentFileType()) {
+                case SDbPaymentFile.FILE_TP_EF:
                     moRadPhoto.setSelected(true);
                     break;
-                case SModSysConsts.FIN_PAY_FILE_TP_RA:
-                    moRadAdvance.setSelected(true);
+                case SDbPaymentFile.FILE_TP_RA:
+                    moRadReport.setSelected(true);
                     break;
-                case SModSysConsts.FIN_PAY_FILE_TP_FS:
-                    moRadService.setSelected(true);
+                case SDbPaymentFile.FILE_TP_PF:
+                    moRadInstallment.setSelected(true);
                     break;
+                case SDbPaymentFile.FILE_TP_OS:
+                    moRadOther.setSelected(true);
+                    break;
+                default:
+                    // nothing
             }
-            jtfFile.setText(file.getFileName());
-            moTextDescription.setValue(file.getFileDescription());
+            
+            jtfFile.setText(paymentFile.getFileName());
+            moTextDescription.setValue(paymentFile.getFileDescription());
         }
         else {
             clearFileControls();
@@ -557,7 +571,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         SGuiValidation validation = moFieldsEty.validateFields();
         
         if (validation.isValid() && (moFile == null || jtfFile.getText().isEmpty())) {
-            validation.setMessage("No se ha seleccionado un archivo.");
+            validation.setMessage("No se ha seleccionado un archivo de soporte.");
             validation.setComponent(jtfFile);
         }
         if (validation.isValid() && !moFile.exists()) {
@@ -592,6 +606,25 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             }
         }
     }
+    
+    private String getFiyeType() {
+        String fileType = "?";
+        
+        if (moRadPhoto.isSelected()) {
+            fileType = SDbPaymentFile.FILE_TP_EF;
+        }
+        else if (moRadReport.isSelected()) {
+            fileType = SDbPaymentFile.FILE_TP_RA;
+        }
+        else if (moRadInstallment.isSelected()) {
+            fileType = SDbPaymentFile.FILE_TP_PF;
+        }
+        else if (moRadOther.isSelected()) {
+            fileType = SDbPaymentFile.FILE_TP_OS;
+        }
+        
+        return fileType;
+    }
 
     private void actionEtyAdd() {
         if (jbEtyAdd.isEnabled()) {
@@ -599,7 +632,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             if (validation.isValid()) {
                 enableFileControls(false);
                 SDbPaymentFile file = new SDbPaymentFile();
-                file.setPaymentFileType(moRadPhoto.isSelected() ? SModSysConsts.FIN_PAY_FILE_TP_EF : moRadAdvance.isSelected() ? SModSysConsts.FIN_PAY_FILE_TP_RA : SModSysConsts.FIN_PAY_FILE_TP_FS);
+                file.setPaymentFileType(getFiyeType());
                 file.setAuxFile(moFile);
                 file.setFileName(moFile.getName());
                 file.setFileDescription(moTextDescription.getValue());
@@ -809,7 +842,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         
         if (validation.isValid()) {
             if (moGridFiles.getModel().getRowCount() <= 0) {
-                validation.setMessage("Debe añadir al menos un archivo");
+                validation.setMessage("Debe añadir al menos un archivo de soporte.");
                 validation.setComponent(jbEtyNew);
             }
         }

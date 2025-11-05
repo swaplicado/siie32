@@ -1771,10 +1771,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private void actionPerfomedImportFile() {
         if (jbImportFile.isEnabled()) {
             try {
-                FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.XLSX);
+                FileNameExtensionFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xlsx);
                 miClient.getFileChooser().setFileFilter(filter);
                 if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(" + SFileUtilities.XLSX + ")$")) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().matches(".*\\.(" + SFileUtilities.xlsx + ")$")) {
                         
                         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                         ArrayList<SDataRecordEntry> entries = SFinRecordUtils.processRecordEntriesFile(miClient, miClient.getFileChooser().getSelectedFile(), moRecord);

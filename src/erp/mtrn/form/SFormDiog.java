@@ -3064,13 +3064,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 int warnings = 0;
                 Statement statement  = miClient.getSession().getDatabase().getConnection().createStatement();
                 
-                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.CSV);
+                FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.csv);
                 miClient.getFileChooser().repaint();
                 miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
                 miClient.getFileChooser().setFileFilter(filter);
             
                 if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.CSV)) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.csv)) {
                         String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                         BufferedReader br = new BufferedReader(new FileReader(absolutePath));
                         String line = br.readLine();

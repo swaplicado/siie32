@@ -101,7 +101,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
             resultSet = statement.executeQuery(sql);
             
             if (!resultSet.next()) {
-                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Registro " + SFileUtilities.PDF.toUpperCase() + ")");
+                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Registro " + SFileUtilities.pdf.toUpperCase() + ")");
             }
             else {
                 mnPkYearId = resultSet.getInt("id_year");
@@ -153,7 +153,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
             
             if (!mbAuxDelete) {
                 if (msDocPdfName.isEmpty()) {
-                    throw new Exception("No se ha proporcionado el archivo " + SFileUtilities.PDF.toUpperCase() + ".");
+                    throw new Exception("No se ha proporcionado el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
                 }
                 
                 if (mbIsRegistryNew) {
@@ -213,10 +213,10 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     
     private String composePdfDirectory() throws Exception {
         if (msPdfDirectory.isEmpty()) {
-            throw new Exception("No se ha proporcionado el directorio " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("No se ha proporcionado el directorio " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         else if (mnPkYearId == 0) {
-            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         
         return msPdfDirectory + (msPdfDirectory.endsWith("/") ? "" : "/") + "ext/" + mnPkYearId;
@@ -224,10 +224,10 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     
     private String composePdfFileNameStd() throws Exception {
         if (mnPkYearId == 0 || mnPkDocId == 0) {
-            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         
-        return mnPkYearId + "_" + DCfdUtils.CfdNumberFormat.format(mnPkDocId) + "." + SFileUtilities.PDF;
+        return mnPkYearId + "_" + DCfdUtils.CfdNumberFormat.format(mnPkDocId) + "." + SFileUtilities.pdf;
     }
     
     private File createPdfFile() throws Exception {
@@ -241,7 +241,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
      * @throws Exception 
      */
     public void uploadPdfFile(final File pdfFile, final String pdfDirectory) throws Exception {
-        if (pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.PDF)) {
+        if (pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
             msPdfDirectory = pdfDirectory;
             
             byte[] pdfBytes = Files.readAllBytes(pdfFile.toPath());
@@ -250,7 +250,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
             msDocPdfName = pdfFile.getName();
         }
         else {
-            throw new Exception("El archivo '" + pdfFile.getName() + "' debe ser " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("El archivo '" + pdfFile.getName() + "' debe ser " + SFileUtilities.pdf.toUpperCase() + ".");
         }
     }
     
@@ -261,7 +261,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
      */
     public void downloadPdfFile(SClientInterface client) throws Exception {
         if (msPdfAsBase64.isEmpty()) {
-            throw new Exception("No se ha codificado el archivo " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         
         JFileChooser fileChooser = null;
@@ -269,7 +269,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         
         try {
             File pdfFile = null;
-            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.PDF);
+            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.pdf);
             
             fileChooser = client.getFileChooser();
             fileChooser.repaint();
@@ -282,8 +282,8 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                 pdfFile = fileChooser.getSelectedFile();
 
                 // Ensure file ends with ".pdf"
-                if (!pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.PDF)) {
-                    pdfFile = new File(pdfFile.getAbsolutePath() + "." + SFileUtilities.PDF);
+                if (!pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
+                    pdfFile = new File(pdfFile.getAbsolutePath() + "." + SFileUtilities.pdf);
                 }
             }
 
@@ -291,7 +291,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                 byte[] pdfBytes = Base64.getDecoder().decode(msPdfAsBase64);
                 Files.write(pdfFile.toPath(), pdfBytes);
 
-                client.showMsgBoxInformation("El archivo " + SFileUtilities.PDF.toUpperCase() + " ha sido descargado en:\n" + pdfFile.getAbsolutePath());
+                client.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " ha sido descargado en:\n" + pdfFile.getAbsolutePath());
             }
         }
         catch (Exception e) {
@@ -320,7 +320,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     
     private void savePdfFile() throws Exception {
         if (msPdfAsBase64.isEmpty()) {
-            throw new Exception("No se ha codificado el archivo " + SFileUtilities.PDF.toUpperCase() + ".");
+            throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         
         File directory = new File(composePdfDirectory());
