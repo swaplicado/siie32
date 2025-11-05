@@ -1172,11 +1172,13 @@ public class SFormSupplierFileProcess extends SBeanForm implements ActionListene
         }
             
         if (validation.isValid()) {
-            for (SDbSupplierFile file : maSuppFiles) {
-                if (file.getNumber().equals(moTextSuppNum.getValue()) && file.getFkBizPartnerId_n() == moKeySuppBp.getValue()[0]) {
-                    validation.setMessage("El folio del archivo de soporte ya ha sido añadido para el asociado de negocios seleccionado.\nFavor de verificar.");
-                    validation.setComponent(moTextSuppNum);
-                    break;
+            if (jbTechnical.isSelected()) {
+                for (SDbSupplierFile file : maSuppFiles) {
+                    if (file.getNumber().equals(moTextSuppNum.getValue()) && file.getFkBizPartnerId_n() == moKeySuppBp.getValue()[0]) {
+                        validation.setMessage("El folio del archivo de soporte ya ha sido añadido para el asociado de negocios seleccionado.\nFavor de verificar.");
+                        validation.setComponent(moTextSuppNum);
+                        break;
+                    }
                 }
             }
         }
