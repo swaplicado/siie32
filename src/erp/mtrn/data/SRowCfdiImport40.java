@@ -352,7 +352,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         if (!moNewDpsEntries.isEmpty()) {
             for (SDataDpsEntry moNewDpsEntry : moNewDpsEntries) {
                 moNewDpsEntry.calculateTotal(miClient, date, idyEmisor, idyReceptor, false, 0, exchangeRate);
-                moNewDpsEntry.setIsTaxesAutomaticApplying(false);
+                //moNewDpsEntry.setIsTaxesAutomaticApplying(false);
             }
             moTaxChargedMatched.clear();
             moTaxRetainedMatched.clear();

@@ -1739,8 +1739,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                                     if (dpsEntryTax.getPkTaxBasicId() == tax.getPkTaxBasicId() &&
                                             dpsEntryTax.getPkTaxId() == tax.getPkTaxId() &&
                                             SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(trasladado.get(i).getAttTasaOCuota().getDouble())) &&
-                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED && 
-                                            dpsEntryTax.getFkTaxCalculationTypeId() == SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
                                         
                                         newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(trasladado.get(i).getAttImporte().getDouble() / cantDpsEntries);
                                         rowCfdiImport.addTaxChargedMatched(trasladado.get(i)); 
@@ -1766,8 +1765,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                                     if (dpsEntryTax.getPkTaxBasicId() == tax.getPkTaxBasicId() &&
                                             dpsEntryTax.getPkTaxId() == tax.getPkTaxId() &&
                                             SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(retencion.get(i).getAttTasaOCuota().getDouble())) &&
-                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED && 
-                                            dpsEntryTax.getFkTaxCalculationTypeId() == SModSysConsts.FINS_TP_TAX_CAL_RATE) {
+                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
 
                                         newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(retencion.get(i).getAttImporte().getDouble() / cantDpsEntries);
                                         rowCfdiImport.addTaxRetainedMatched(retencion.get(i));
@@ -1798,11 +1796,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         if (!rowCfdiImport.getNewDpsEntries().isEmpty()) {
             for (SDataDpsEntry dpsEntry : rowCfdiImport.getNewDpsEntries()) {
-                for (int i = 0; i < dpsEntry.getDbmsEntryTaxes().size(); i++) {
-                    SDataDpsEntryTax entryTax = dpsEntry.getDbmsEntryTaxes().get(i);
+                for (int tax = 0; tax < dpsEntry.getDbmsEntryTaxes().size(); tax++) {
+                    SDataDpsEntryTax entryTax = dpsEntry.getDbmsEntryTaxes().get(tax);
                     boolean found = false;
-                    for (int j = 0; j < moSiieTaxesTablePane.getTableModelRowCount(); j++) {
-                        SDataDpsEntryTaxRow taxRow = (SDataDpsEntryTaxRow) moSiieTaxesTablePane.getTableRow(i);
+                    for (int row = 0; row < moSiieTaxesTablePane.getTableModelRowCount(); row++) {
+                        SDataDpsEntryTaxRow taxRow = (SDataDpsEntryTaxRow) moSiieTaxesTablePane.getTableRow(row);
                         if (entryTax.getPkTaxBasicId() == taxRow.getDpsEntryTax().getPkTaxBasicId() &&
                                 entryTax.getPkTaxId() == taxRow.getDpsEntryTax().getPkTaxId() &&
                                 entryTax.getFkTaxTypeId() == taxRow.getDpsEntryTax().getFkTaxTypeId()) {
@@ -1924,8 +1922,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int [] { dpsEntry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
             rowCfdiImport.setUnit(unit);
 
-            // se asigna la región de impuestos seleccionada:
-            SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, ((SFormComponentItem) jcbTaxRegion.getSelectedItem()).getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+            // se asigna la región de impuestos de la partida del pedido:
+            SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, new int[] { dpsEntry.getFkTaxRegionId() }, SLibConstants.EXEC_MODE_SILENT);
             rowCfdiImport.setTaxRegion(taxRegion);
 
             // se asigna el centro de costo de la partida del pedido o el predefinido del ítem principal:

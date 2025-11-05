@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 291.3/ 2025-11-05
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección al leer los impuestos en la vinculación de documentos.
+2) Corrección al procesar los impuestos con IVA exento en la vinculación de documentos.
+
+================================================================================
 SIIE 3.2 291.2/ 2025-11-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
