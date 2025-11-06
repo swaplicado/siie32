@@ -29,8 +29,11 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     
     protected boolean mbAuxEntryPriceNeeded;
     protected SGuiDpsEntryPrice moAuxSGuiDpsEntryPrice;
+    
+    protected final boolean mbIsSelectedReq;
 
-    public SDataEntryDpsDpsLink() {
+    public SDataEntryDpsDpsLink(boolean selectedReq) {
+        mbIsSelectedReq = selectedReq;
         reset();
         prepareTableRow();
     }
@@ -106,7 +109,9 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mvValues.add(mdQuantityLinked);
         mvValues.add(mdQuantityLinkedActual);
         mvValues.add(getQuantityToBeLinked());
-        mvValues.add(msSelected);
+        if (mbIsSelectedReq) {
+            mvValues.add(msSelected);
+        }
         mvValues.add(mdQuantityToLink);
         mvValues.add(msUnitSymbol);
         mvValues.add(mdSurplusPercentage);
