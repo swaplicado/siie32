@@ -404,7 +404,7 @@ public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements e
                     Double quantity = moPurchaseOrderEntriesMap == null ? 0.0 : moPurchaseOrderEntriesMap.get(SLibUtils.textKey((int[]) entry.getPrimaryKey()));
                     double linkedActual = quantity == null ? 0 : quantity;
                     
-                    entryDpsDpsLink = new SDataEntryDpsDpsLink();
+                    entryDpsDpsLink = new SDataEntryDpsDpsLink(true);
                     entryDpsDpsLink.setPkYearId(entry.getPkYearId());
                     entryDpsDpsLink.setPkDocId(entry.getPkDocId());
                     entryDpsDpsLink.setPkEntryId(entry.getPkEntryId());

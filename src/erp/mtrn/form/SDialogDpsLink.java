@@ -314,7 +314,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                         }
                     }
 
-                    entryLink = new SDataEntryDpsDpsLink();
+                    entryLink = new SDataEntryDpsDpsLink(false);
                     entryLink.setPkYearId(entry.getPkYearId());
                     entryLink.setPkDocId(entry.getPkDocId());
                     entryLink.setPkEntryId(entry.getPkEntryId());
