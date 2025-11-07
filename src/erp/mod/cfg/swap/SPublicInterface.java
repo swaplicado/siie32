@@ -112,9 +112,9 @@ public class SPublicInterface {
                 
                 return oResponse;
             }
-
+            
             return SExportDataUtils.updateResourceStatus(conn.createStatement(), 
-                                                        companyId, 
+                                                        this.oDbObj.getMainDatabaseName(companyId), 
                                                         resourceType, 
                                                         resourceId, 
                                                         authStatusId,
@@ -125,6 +125,8 @@ public class SPublicInterface {
         }
         catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SPublicInterface.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

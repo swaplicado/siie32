@@ -2076,7 +2076,7 @@ public abstract class SExportDataUtils {
     /**
      * Update status of authorizable resource.
      * @param statement
-     * @param companyId
+     * @param companyDbName
      * @param resourceType
      * @param resourceId
      * @param authStatusId
@@ -2086,7 +2086,7 @@ public abstract class SExportDataUtils {
      * @param newDate
      * @return 
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final int companyId, final int resourceType, final String resourceId, final int authStatusId, 
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final String companyDbName, final int resourceType, final String resourceId, final int authStatusId, 
             final int userId, final String notes, final double newAmount, final String newDate) {
         SResourceStatusResponse oResponse;
         
@@ -2108,7 +2108,7 @@ public abstract class SExportDataUtils {
                                     + "ts_usr_sched = NOW(), ";
                             if (newAmount > 0) {
                                 // en partida: des_pay_app_ety_cur
-                                sSecondQuery = "UPDATE " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " SET "
+                                sSecondQuery = "UPDATE " + companyDbName + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " SET "
                                         + "des_pay_app_ety_cur = " + newAmount + " "
                                         + "WHERE (id_pay = " + resourceId + ") and (id_ety = 1);";
                             }
@@ -2150,8 +2150,8 @@ public abstract class SExportDataUtils {
                     return oResponse;
             }
 
-            String sql = "UPDATE " + sTable + " SET " + sUpdate + sWhere + ";";
-            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY {1} ", new Object[]{companyId, sql});
+            String sql = "UPDATE " + companyDbName + "." + sTable + " SET " + sUpdate + sWhere + ";";
+            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY: {1} ", new Object[]{companyDbName, sql});
 
             // Iniciar transacción
             Connection conn = statement.getConnection();
@@ -2161,7 +2161,7 @@ public abstract class SExportDataUtils {
 
                 int res = statement.executeUpdate(sql);
                 if (sSecondQuery != null && !sSecondQuery.isEmpty()) {
-                    Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PARTIDA PAGO, company: {0}. QUERY{1} ", new Object[]{companyId, sSecondQuery});
+                    Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PARTIDA PAGO, company: {0}. QUERY{1}: ", new Object[]{companyDbName, sSecondQuery});
                     res = statement.getConnection().createStatement().executeUpdate(sSecondQuery);
                 }
                 if (res != 1) {
