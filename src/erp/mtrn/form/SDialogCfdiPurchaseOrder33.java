@@ -618,7 +618,7 @@ public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements e
                             if (totalsupplied > entryDpsDpsLink.getQuantityToLink()) {
                                 validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
                                         "la cantidad minima a vincular debe ser " + (totalsupplied < entryDpsDpsLink.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
-                                        SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene sutidos previos.");
+                                        SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene surtidos previos.");
                             }
                         }
                         catch (Exception e) {
