@@ -2041,9 +2041,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                             for (LinkedQuantity linkedQ : arrLinkedQuantity) {
                                 if (SLibUtils.compareKeys(linkedQ.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
                                     if (totalsupplied > linkedQ.quantity) {
-                                        validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                        String message = "Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
                                                 "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQ.quantity ? "mayor o " : "") + "igual a " + 
-                                                SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene sutidos previos.");
+                                                SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene surtidos previos.\n" + 
+                                                "¿Está seguro que desea hacer caso omiso y continuar?";
+                                        if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
+                                            validation.setMessage("La cantidad a vincular debería ser al menos " + SLibUtils.getDecimalFormatQuantity().format(linkedQ.quantity) + ".");
+                                        }
                                         break ROWS;
                                     }
                                     break;
