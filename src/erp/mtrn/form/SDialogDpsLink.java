@@ -586,7 +586,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                         if (quantitySupplied > entry.getQuantityToLink()) {
                             String message = "Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
                                     "la cantidad minima a vincular debería ser " + (quantitySupplied < entry.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
-                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantitySupplied) + " ya que tiene sutidos previos.\n" +
+                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantitySupplied) + " ya que tiene surtidos previos.\n" +
                                     "¿Está seguro que desea hacer caso omiso y continuar?";
                             
                             if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {

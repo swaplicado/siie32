@@ -558,7 +558,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                         if (miClient.showMsgBoxConfirm("La solicitud de pago '" + payment.getFolio()+ "' será bloqueada.\n"
                                 + "Podrá desbloquearla en la vista 'Solicitudes de pago bloqueadas'.\n"
                                 + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                            payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_BLOC_P);
+                            payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_BLOC);
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }
