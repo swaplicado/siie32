@@ -1373,20 +1373,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             found = true;
                             double balance = layout.getMoneyDpsBalance().getOriginalAmount();
                             double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
-                            if (payment <= balance) {
-                                layout.setForPayment(true);
-                                layout.getMoneyPayment().setOriginalAmount(payment);
-                                layout.setIsForExtPayment(true);
-                                layout.setReceptionPayReq(pay.getReceptionPayReq());
-                                layout.setFuncArea(pay.getFuncArea());
-                                layout.setFuncSubarea(pay.getFuncSubarea());
-                                layout.getPayments().add(pay);
+                            if (payment > balance) {
+                                payment = balance;
+                                pay.setAmount(payment);
                             }
-                            else {
-                                warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el monto autorizado es mayor al saldo del documento " + pay.getDocNum()+ ".\n" ;
-                                cantWarn++;
-                                notVinculed.add(pay);
-                            }
+                            layout.setForPayment(true);
+                            layout.getMoneyPayment().setOriginalAmount(payment);
+                            layout.setIsForExtPayment(true);
+                            layout.setReceptionPayReq(pay.getReceptionPayReq());
+                            layout.setFuncArea(pay.getFuncArea());
+                            layout.setFuncSubarea(pay.getFuncSubarea());
+                            layout.getPayments().add(pay);
                         }
                     }
 
@@ -3409,6 +3406,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     }
                     else {
                         editingStoppedModePayment();
+                        if (mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                            editingStoppedAgreement();
+                        }                        
                     }
                     break;
 
