@@ -112,7 +112,7 @@ public class SDbSyncLog extends SDbRegistryUser {
 
     @Override
     public String getSqlTable() {
-        return (msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxDatabase == null || msAuxDatabase.isEmpty() ? "" : msAuxDatabase + ".") + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
