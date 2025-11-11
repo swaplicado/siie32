@@ -85,8 +85,6 @@ public class SDbSyncLogEntry extends SDbRegistryUser {
         msResponseBody = "";
         msReferenceId = "";
         mtTsSync = null;
-            
-        msAuxDatabase = "";
     }
 
     @Override

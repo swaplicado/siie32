@@ -1002,8 +1002,8 @@ public abstract class SExportDataUtils {
     private static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> lDps = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
-        String sBucketName = "";
-        String sProjectID = "";
+        String sBucketName = CloudStorageManager.getBucketName();
+        String sProjectID = CloudStorageManager.getProjectID();
         ArrayList<SFileData> lFileData = new ArrayList<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -1104,20 +1104,14 @@ public abstract class SExportDataUtils {
                         else {
                             oFile.filename_original = oFile.filename_storage;
                             oFile.title = "PDF de la OC";
-                            oFile.bucket_name = oFd.getBucketName();
-                            oFile.project_id = oFd.getProjectId();
+                            oFile.bucket_name = sBucketName;
+                            oFile.project_id = sProjectID;
                             oContainer.file.add(oFile);
                         }
-
-                        sBucketName = oFile.bucket_name;
-                        sProjectID = oFile.project_id;
                     }
                     // Si no existe en la bitácora de siie, se sube
                     else {
                         try {
-                            sBucketName = CloudStorageManager.getBucketName();
-                            sProjectID = CloudStorageManager.getProjectID();
-
                             SFileData oFileData = new SFileData(oDpsExport.id_year, 
                                                             oDpsExport.id_doc, 
                                                             database, 
@@ -1135,8 +1129,8 @@ public abstract class SExportDataUtils {
                                     else {
                                         oFileToExport.filename_original = oFileToExport.filename_storage;
                                         oFileToExport.title = "PDF de la OC";
-                                        oFileToExport.bucket_name = oFd.getBucketName();
-                                        oFileToExport.project_id = oFd.getProjectId();
+                                        oFileToExport.bucket_name = sBucketName;
+                                        oFileToExport.project_id = sProjectID;
                                         oContainer.file.add(oFileToExport);
                                     }
                                     lLogFiles.add(oLogEty);

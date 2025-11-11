@@ -7,6 +7,10 @@ package erp.mod.trn.api.db;
 
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.StorageManagerException;
+import erp.mod.SModConsts;
+import erp.mod.hrs.link.db.SMySqlClass;
+import erp.mod.trn.api.data.SWebDpsFile;
+import erp.mod.trn.api.data.SWebFile;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,12 +18,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import erp.mod.SModConsts;
-import erp.mod.hrs.link.db.SConfigException;
-import erp.mod.hrs.link.db.SMySqlClass;
-import erp.mod.trn.api.data.SWebDpsFile;
-import erp.mod.trn.api.data.SWebFile;
 
 /**
  *
@@ -125,13 +123,11 @@ public class STrnDBDocuments {
                     "   AND fdps.id_year = " + idYear + " " +
                     "   AND fdps.id_doc = " + idDoc + ";";
 
-            Logger.getLogger(STrnDBDocuments.class.getName()).log(Level.INFO, query);
             if (st == null) {
                 return null;
             }
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsFile> lWebDpsFiles = new ArrayList<>();
-            String sqlEty = "";
             while (res.next()) {
                 SWebDpsFile oWebDpsFile = new SWebDpsFile();
                 oWebDpsFile.setIdCompany(mnIdCompany);

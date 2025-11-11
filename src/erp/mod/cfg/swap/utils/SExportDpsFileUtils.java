@@ -95,6 +95,7 @@ public class SExportDpsFileUtils {
             resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
             if (resultSet.next()) {
                 SDbComSyncLogEntry oLogEntry = new SDbComSyncLogEntry();
+                oLogEntry.setAuxDatabase(dbName);
                 oLogEntry.read(session, new int[] { resultSet.getInt("id_sync_log"), resultSet.getInt("id_ety") });
                 return oLogEntry;
             }
