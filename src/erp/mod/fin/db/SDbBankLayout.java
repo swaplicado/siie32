@@ -1940,9 +1940,11 @@ public class SDbBankLayout extends SDbRegistryUser {
         else {
             for (SDbPayment pay : maAuxNewPayments) {
                 pay.save(session);
-
-                msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + pay.getPkPaymentId() + ", " + mnPkBankLayoutId + ")";
-                session.getStatement().execute(msSql);
+                try {
+                    msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + pay.getPkPaymentId() + ", " + mnPkBankLayoutId + ")";
+                    session.getStatement().execute(msSql);
+                }
+                catch (Exception e) {}
             }
         }
         
