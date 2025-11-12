@@ -37,6 +37,7 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
+    public static final String ST_REJC = "RECHAZADO";
     public static final String ST_SCHED = "AUTORIZADO";
     public static final String ST_BLOCK = "BLOQUEADO";
     

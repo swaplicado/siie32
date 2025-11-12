@@ -1,9 +1,13 @@
 ================================================================================
-SIIE 3.2 291.8/ 2025-11-11
+SIIE 3.2 291.8/ 2025-11-12
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Corrección en la selección de la referencia en cuentas por convenio en los layots bancarios.
 2) Corrección en la seleccion de pagos en layots para cuando los primeros tengan un monto mayor al saldo de la factura.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de cancelación de solicitudes de pago rechazadas.
 
 ================================================================================
 SIIE 3.2 291.7/ 2025-11-11

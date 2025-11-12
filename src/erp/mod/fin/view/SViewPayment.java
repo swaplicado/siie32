@@ -207,6 +207,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 
             case SModSysConsts.FINS_ST_PAY_REJC:
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
                 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
                 break;
@@ -432,7 +433,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
 
                                     if (payment.isSystem()) {
                                         miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                                + "(Si lo desea, puede acelerar el envío con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
+                                                + "(Si es indispensable, puede acelerar el envío con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
                                     }
                                     else {
                                         miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' requiere enviarse nuevamente a autorizar de manera manual.\n"
@@ -445,7 +446,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                     payment.setDateSchedule_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
                                     
                                     miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                            + "(Si lo desea, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
+                                            + "(Si es indispensable, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
                                     break;
 
                                 default:
@@ -512,7 +513,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             payment.setDateExecution_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
 
                             miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                    + "(Si lo desea, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
+                                    + "(Si es indispensable, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
 
                             payment.save(miClient.getSession());
                             miClient.getSession().notifySuscriptors(mnGridType);
@@ -629,10 +630,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
                     int status = payment.getFkStatusPaymentId(); // convenience variable
                     
-                    if (status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_BLOC) {
+                    if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_BLOC) {
                         if (miClient.showMsgBoxConfirm("La solicitud de pago '" + gridRow.getRowCode() + "' será cancelada, y esta acción no se puede revertir.\n"
                                 + "La solicitud de pago se eliminará de manera automática del " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                + "(Si lo desea, puede acelerar la eliminación con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').\n"
+                                + "(Si es indispensable, puede acelerar la eliminación con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').\n"
                                 + SGuiConsts.MSG_CNF_CONT) == JOptionPane.OK_OPTION) {
                             payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_CANC_P);
                             miClient.getSession().notifySuscriptors(mnGridType);
@@ -640,7 +641,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     }
                     else {
                         String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
-                        miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_SCHED + "' o '" + SDbPayment.ST_BLOCK + "' para poderse cancelar.");
+                        miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_REJC + "', '" + SDbPayment.ST_SCHED + "' o '" + SDbPayment.ST_BLOCK + "' para poderse cancelar.");
                     }
                 }
                 catch (Exception e) {

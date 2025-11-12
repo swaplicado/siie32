@@ -553,7 +553,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
-                String msgChooseOtherInvoice = "Favor de elegir otra factura para vincularla a este documento.";
+                String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
                 // check folio number: it must match its counterpart in document, in DPS it is allways available:
 
@@ -581,7 +581,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                         // match required:
                         msgError = " ni UUID,\n"
-                                + "y el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
+                                + "mientras que el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
                     }
                     else {
                         // UUID available, attempt to find similitudes:
