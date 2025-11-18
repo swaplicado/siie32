@@ -1096,6 +1096,10 @@ public abstract class SExportDataUtils {
                         }
                         else {
                             oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                            if (! CloudStorageManager.storagedFileExists(oFd.getFileName())) {
+                                oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
+                                SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                            }
                         }
                         oFile.filename_storage = oFd.getFileName();
                         if (oFile.filename_storage.isEmpty()) {
