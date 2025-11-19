@@ -6,8 +6,25 @@
 package erp.mod.hrs.link.pub;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.SModConsts;
+import erp.mod.cfg.swap.SPublicInterface;
+import erp.mod.cfg.swap.utils.SExportDataUser;
+import erp.mod.hrs.link.db.SConfigException;
+import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.link.utils.SPrepayroll;
 import erp.mod.hrs.link.utils.SUtilsJSON;
+import erp.mod.hrs.utils.SCAPResponse;
+import erp.mod.trn.api.data.SWebAuthorization;
+import erp.mod.trn.api.data.SWebDps;
+import erp.mod.trn.api.data.SWebDpsEty;
+import erp.mod.trn.api.data.SWebDpsFile;
+import erp.mod.trn.api.data.SWebDpsNote;
+import erp.mod.trn.api.data.SWebDpsRow;
+import erp.mod.trn.api.data.SWebMaterialRequest;
+import erp.mod.trn.api.db.STrnDBCore;
+import erp.mod.trn.api.db.STrnDBDocuments;
+import erp.mod.trn.api.db.STrnDBMaterialRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,25 +42,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.mod.SModConsts;
-import erp.mod.cfg.swap.SPublicInterface;
-import erp.mod.cfg.swap.utils.SExportDataUser;
-import erp.mod.hrs.link.db.SConfigException;
-import erp.mod.hrs.link.db.SMySqlClass;
-import erp.mod.hrs.utils.SCAPResponse;
-import erp.mod.trn.api.data.SWebAuthorization;
-import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import erp.mod.trn.api.db.STrnDBCore;
-import erp.mod.trn.api.data.SWebDps;
-import erp.mod.trn.api.data.SWebDpsEty;
-import erp.mod.trn.api.data.SWebDpsFile;
-import erp.mod.trn.api.data.SWebDpsNote;
-import erp.mod.trn.api.data.SWebDpsRow;
-import erp.mod.trn.api.data.SWebMaterialRequest;
-import erp.mod.trn.api.db.STrnDBDocuments;
-import erp.mod.trn.api.db.STrnDBMaterialRequest;
 
 /**
  *
@@ -351,7 +351,7 @@ public class SShareData {
          */
         boolean withUrl = true;
         // se manda el statement en null para que tome la conexión del JSON
-        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc, withUrl, null);
+        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc, withUrl, null, null);
         oWebDocument.getlFiles().clear();
         oWebDocument.getlFiles().addAll(lDpsFiles);
         
