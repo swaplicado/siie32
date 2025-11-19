@@ -79,6 +79,7 @@ public abstract class SExportDataUtils {
                 
             case FUNCTIONAL_AREA:
             case PUR_ORDER:
+            case PUR_ORDER_FILE:
             case PUR_REF_ORDER:
             case PUR_PAYMENT:
             case PUR_PAYMENT_UPD:
@@ -1001,10 +1002,8 @@ public abstract class SExportDataUtils {
      */
     private static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> lDps = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
         String sBucketName = CloudStorageManager.getBucketName();
         String sProjectID = CloudStorageManager.getProjectID();
-        ArrayList<SFileData> lFileData = new ArrayList<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -1018,7 +1017,6 @@ public abstract class SExportDataUtils {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER, database);
-                ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
 
                 String sql = "SELECT "
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
@@ -1086,21 +1084,9 @@ public abstract class SExportDataUtils {
                     SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
                             session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
                     if (oLogEty != null) {
-                        SFileData oFd = null;
+                        SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
                         // comparacion de last update para actualizar el archivo
                         SExportDataDpsFile oFile = new SExportDataDpsFile();
-                        if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
-                            oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
-                            lLogFiles.add(oLogEty);
-                        }
-                        else {
-                            oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
-                            if (! CloudStorageManager.storagedFileExists(oFd.getFileName())) {
-                                oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                                SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
-                            }
-                        }
                         oFile.filename_storage = oFd.getFileName();
                         if (oFile.filename_storage.isEmpty()) {
                             Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
@@ -1115,46 +1101,13 @@ public abstract class SExportDataUtils {
                     }
                     // Si no existe en la bitácora de siie, se sube
                     else {
-                        try {
-                            SFileData oFileData = new SFileData(oDpsExport.id_year, 
-                                                            oDpsExport.id_doc, 
-                                                            database, 
-                                                            resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
-                            if (oLogEty != null) {
-                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200 
-                                    || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
-                                    SExportDataDpsFile oFileToExport = new SExportDataDpsFile();
-                                    SFileData oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
-                                    oFileToExport.filename_storage = oFd.getFileName();
-                                    if (oFileToExport.filename_storage.isEmpty()) {
-                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                                    }
-                                    else {
-                                        oFileToExport.filename_original = oFileToExport.filename_storage;
-                                        oFileToExport.title = "PDF de la OC";
-                                        oFileToExport.bucket_name = sBucketName;
-                                        oFileToExport.project_id = sProjectID;
-                                        oContainer.file.add(oFileToExport);
-                                    }
-                                    lLogFiles.add(oLogEty);
-                                }
-                                else {
-                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. " + 
-                                    oDpsExport.id_year + "_" + oDpsExport.id_doc + ". " +
-                                            oLogEty.getResponseBody());
-                                }
-                            }
-                        }
-                        catch (Exception e) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. " + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
-                        }
+                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
                     }
                     
                     // documentos (archivos de cotizaciones)
                     
                     boolean withUrl = false;
-                    ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement());
+                    ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement(), database);
                     for (SWebDpsFile oDpsFile : lDpsFiles) {
                         SExportDataDpsFile oDpsFileExport = new SExportDataDpsFile();
                         oDpsFileExport.filename_storage = oDpsFile.getoWebFile().getCloudStorageName();
@@ -1173,7 +1126,6 @@ public abstract class SExportDataUtils {
                     }
                     
                     // documentos (archivos de requisiciones)
-                    
                     String rms = resultSet.getString("_rms");
                     String fileName;
                     String[] idsRms;
@@ -1204,13 +1156,104 @@ public abstract class SExportDataUtils {
                     
                     lDps.add(oContainer);
                 }
-                
-                // guardar encabezado de log de archivos:
-                SDpsGoogleCloudUtils.saveSyncLogs(session, lLogFiles, false);
             }
         }
         
         return lDps;
+    }
+    
+    private static void exportPurchaseOrdersFiles(final SGuiSession session) throws SQLException, Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+
+            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+
+            // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
+            for (Integer companyId : databasesMap.keySet()) {
+                String database = databasesMap.get(companyId);
+                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
+                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER_FILE, database);
+                ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
+
+                String sql = "SELECT "
+                        + "d.id_year, d.id_doc, "
+                        + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                        + "WHERE "
+                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                        + "AND d.id_year >= " + session.getSystemYear() + " " // establecer como límite hasta el año actual
+                        + "AND ("
+                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ")"
+//                        + ") AND MONTH(d.dt) >= 10 " // Se comenta para forzar sincronización en caso de reporte de archivos faltantes
+                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER_FILE, database) + "))"
+                        + (lastSyncDatetime == null ? "" : " OR ("
+                                + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + ")";
+                sql += ";";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    SExportDataDps oDpsExport = new SExportDataDps();
+
+                    oDpsExport.company = companyId;
+                    oDpsExport.id_year = resultSet.getInt("d.id_year");
+                    oDpsExport.id_doc = resultSet.getInt("d.id_doc");
+
+                    // PDF de la OC:
+                    SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
+                            session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
+                    if (oLogEty != null) {
+                        SFileData oFd = null;
+                        // comparacion de last update para actualizar el archivo
+                        if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
+                            oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                            lLogFiles.add(oLogEty);
+                        } else {
+                            oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
+                            if (!CloudStorageManager.storagedFileExists(oFd.getFileName())) {
+                                oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                                lLogFiles.add(oLogEty);
+                            }
+                        }
+                    } // Si no existe en la bitácora de siie, se sube
+                    else {
+                        try {
+                            SFileData oFileData = new SFileData(oDpsExport.id_year,
+                                    oDpsExport.id_doc,
+                                    database,
+                                    resultSet.getTimestamp("_last_upd"));
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
+                            if (oLogEty != null) {
+                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200
+                                        || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
+                                    lLogFiles.add(oLogEty);
+                                } else {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. "
+                                            + oDpsExport.id_year + "_" + oDpsExport.id_doc + ". "
+                                            + oLogEty.getResponseBody());
+                                }
+                            }
+                        } catch (Exception e) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. " + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                        }
+                    }
+
+                }
+                // guardar encabezado de log de archivos:
+                SDpsGoogleCloudUtils.saveSyncLogs(session, lLogFiles, false);
+            }
+        }
     }
 
     /**
@@ -2012,6 +2055,7 @@ public abstract class SExportDataUtils {
                 break;
                 
             case PUR_ORDER:
+                exportPurchaseOrdersFiles(session);
                 data = getListOfPurchaseOrdersToExport(session);
                 break;
                 
