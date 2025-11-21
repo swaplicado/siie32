@@ -497,12 +497,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Link document to given DPS, and optionally create its payment request.
      * @param session GUI session.
      * @param dpsKey DPS primary key.
+     * @param allowLaterInvoice Allow link to a later issued invoice.
      * @param createPaymentRequest Create-payment-request flag.
      * @param docFilesDownloadSrvUrl URL of document files download service.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final int[] dpsKey, final boolean createPaymentRequest, final String docFilesDownloadSrvUrl) throws Exception {
+    public boolean link(final SGuiSession session, final int[] dpsKey, final boolean allowLaterInvoice, final boolean createPaymentRequest, final String docFilesDownloadSrvUrl) throws Exception {
         boolean linked = false;
         
         // Validate linkage:
@@ -545,7 +546,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         + "es distinto al de la factura a vincular, "
                         + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
-            else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {
+            else if ((!allowLaterInvoice && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
+                    (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la factura a vincular, "
+                            + SLibUtils.DateFormatDate.format(dps.getDate()) + ", es posterior a la de este documento, " + SLibUtils.DateFormatDate.format(Date) + ".\n"
+                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION)))) {
                 // match required:
                 throw new Exception("La fecha de este documento, "
                         + SLibUtils.DateFormatDate.format(Date) + ", "
@@ -596,7 +600,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         }
                         else {
                             // match required:
-                            msgError = msgConfirm + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
+                            msgError = msgTopic + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
                                     + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
                         }
                     }
@@ -609,7 +613,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "Aún así es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
                             + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                         throw new Exception(msgChooseOtherInvoice);
                     }
@@ -652,7 +656,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "De cualquier manera es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
                             + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                         throw new Exception(msgChooseOtherInvoice);
                     }
@@ -929,11 +933,15 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dateNew = pickDate(session);
 
         if (dateNew != null) {
-            if (dateNew.before(session.getSystemDate())) {
-                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior al día de hoy '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
+            dateNew = SLibTimeUtils.convertToDateOnly(dateNew);
+            
+            String message = "La nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior ";
+            
+            if (dateNew.before(SLibTimeUtils.convertToDateOnly(session.getSystemDate()))) {
+                throw new Exception(message + "al día de hoy, " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
             }
-            else if (dateNew.before(Date)) {
-                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
+            else if (dateNew.before(SLibTimeUtils.convertToDateOnly(Date))) {
+                throw new Exception(message + "a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
             }
             
             if (isPaymentRequested()) {

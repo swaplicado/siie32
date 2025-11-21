@@ -22,9 +22,13 @@ import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,10 +40,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -101,86 +113,154 @@ public abstract class SExportUtils {
      * 
      * @param queryUrl Parámetros de consulta para la URL (opcional).
      * @param serviceUrl URL del servicio al que se realiza la solicitud.
-     * @param method Método HTTP a utilizar (GET, POST, PUT, etc.).
-     * @param body Cuerpo de la solicitud (para métodos como POST).
+     * @param httpMethod Método HTTP a utilizar (GET, POST, PUT, PATCH, etc.).
+     * @param jsonBody Cuerpo de la solicitud (para métodos como POST, PUT y PATCH).
      * @param token Token de autorización (opcional).
      * @param apiKey API Key de autorización (opcional).
      * @param timeout Timeout en segundos.
      * @return Respuesta del servicio en formato JSON.
      * @throws Exception
      */
-    public static String requestSwapService(final String queryUrl, final String serviceUrl, final String method, final String body, final String token, final String apiKey, final int timeout) throws Exception {
+    @SuppressWarnings("deprecation")
+    public static String requestSwapService(final String queryUrl, final String serviceUrl, final String httpMethod, final String jsonBody, final String token, final String apiKey, final int timeout) throws Exception {
         String responseBody = "";
         HttpURLConnection connection = null;
-
+        boolean isHttpMethodPatch = httpMethod.equalsIgnoreCase(SHttpConsts.METHOD_PATCH);
+        
         try {
-            URL url;
-            String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+            String charset = StandardCharsets.UTF_8.name();
             
-            if (SHttpConsts.METHOD_GET.equalsIgnoreCase(method) && queryUrl != null && !queryUrl.isEmpty()) {
-                url = new URL(serviceUrl + "?" + queryUrl);
+            if (isHttpMethodPatch) {
+                // PATCH HTTP method request:
+                
+                RequestConfig requestConfig = RequestConfig.custom()
+                        .setConnectTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .setResponseTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .build();
+                
+                try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
+                    HttpPatch patch = new HttpPatch(serviceUrl);
+                    
+                    StringEntity entity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON.withCharset(charset));
+                    
+                    patch.setEntity(entity);
+                    
+                    //patch.setHeader("User-Agent", "MyJavaClient/1.0");
+                    patch.setHeader("User-Agent", SSwapConsts.SIIE_USER_AGENT);
+                    patch.setHeader("Accept", "application/json");
+                    
+                    if (token != null && !token.isEmpty()) {
+                        patch.setHeader("Authorization", token);
+                    }
+                    else if (apiKey != null && !apiKey.isEmpty()) {
+                        patch.setHeader("X-API-Key", apiKey);
+                    }
+                    
+                     try (CloseableHttpResponse response = httpClient.execute(patch)) {
+                        int status = response.getCode();
+                        
+                        BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                        responseBody = sb.toString();
+
+                        System.out.println("HTTP Status (PATCH method): " + status);
+                        System.out.println("Response: (PATCH method) " + responseBody);
+                    }
+                }
             }
             else {
-                url = new URL(serviceUrl);
-            }
+                // Non PATCH HTTP method request (i.e., GET, POST, PUT, etc.):
+                
+                String method = httpMethod.toUpperCase();
+                boolean isHttpMethodGet = method.equals(SHttpConsts.METHOD_GET);
+                URL url;
 
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(timeout); // timeout para conectar
-            connection.setReadTimeout(timeout); // timeout para leer la respuesta
-            connection.setRequestMethod(method.toUpperCase());
-            connection.setRequestProperty("Accept-Charset", charset);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            if (token != null && !token.isEmpty()) {
-                connection.setRequestProperty("Authorization", token);
-            }
-            if (apiKey != null && !apiKey.isEmpty()) {
-                connection.setRequestProperty("x-api-key", apiKey);
-            }
-            connection.setDoInput(true);
-
-            // Para métodos que envían datos (POST, PUT, etc.)
-            
-            boolean isBodySent = false; // 2025-08-13, Sergio Flores: ¡no es claro el propósito de esta variable, declarada desde la versión inicial de este método!
-            
-            if (!SHttpConsts.METHOD_GET.equalsIgnoreCase(method)) {
-                if (body != null && !body.trim().isEmpty()) {
-                    // Validar que el body sea un JSON válido
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        mapper.readTree(body); // Lanza excepción si no es JSON válido
-                    }
-                    catch (JsonProcessingException ex) {
-                        throw new IllegalArgumentException("El parámetro 'sBody' no es un JSON válido.", ex);
-                    }
-                    connection.setDoOutput(true);
-                    try (java.io.OutputStream os = connection.getOutputStream()) {
-                        byte[] input = body.getBytes(charset);
-                        os.write(input, 0, input.length);
-                    }
-                    isBodySent = true;
+                if (isHttpMethodGet && queryUrl != null && !queryUrl.isEmpty()) {
+                    url = new URL(serviceUrl + "?" + queryUrl);
                 }
-                else if (queryUrl != null && !queryUrl.isEmpty()) {
-                    connection.setDoOutput(true);
-                    try (java.io.OutputStream os = connection.getOutputStream()) {
-                        byte[] input = queryUrl.getBytes(charset);
-                        os.write(input, 0, input.length);
-                    }
-                    isBodySent = true;
+                else {
+                    url = new URL(serviceUrl);
                 }
+
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(timeout); // timeout para conectar
+                connection.setReadTimeout(timeout); // timeout para leer la respuesta
+                connection.setRequestMethod(method);
+                connection.setRequestProperty("User-Agent", SSwapConsts.SIIE_USER_AGENT);
+                connection.setRequestProperty("Accept-Charset", charset);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+
+                if (token != null && !token.isEmpty()) {
+                    connection.setRequestProperty("Authorization", token);
+                }
+                else if (apiKey != null && !apiKey.isEmpty()) {
+                    connection.setRequestProperty("x-api-key", apiKey);
+                }
+
+                connection.setDoInput(true);
+
+                // Para métodos que envían datos (POST, PUT, PATCH, etc.)
+
+                if (!isHttpMethodGet) {
+                    String request = "";
+
+                    if (jsonBody != null && !jsonBody.isEmpty()) {
+                        // validar que el body sea un JSON válido:
+
+                        try {
+                            new ObjectMapper().readTree(jsonBody);
+                        }
+                        catch (JsonProcessingException ex) {
+                            throw new IllegalArgumentException("El parámetro 'body' no es un JSON válido.", ex);
+                        }
+
+                        request = jsonBody;
+                    }
+                    else if (queryUrl != null && !queryUrl.isEmpty()) {
+                        request = queryUrl;
+                    }
+
+                    if (!request.isEmpty()) {
+                        connection.setDoOutput(true);
+
+                        try (java.io.OutputStream os = connection.getOutputStream()) {
+                            byte[] input = request.getBytes(charset);
+                            os.write(input, 0, input.length);
+                        }
+                    }
+                    else {
+                        throw new Exception("El cuerpo de la petición '" + method + "' está vacío.");
+                    }
+                }
+
+                int status = connection.getResponseCode();
+                InputStream responseStream = (status >= SHttpConsts.RSC_SUCC_OK && status < SHttpConsts.RSC_ERR_BAD_REQUEST) ? connection.getInputStream() : connection.getErrorStream();
+
+                try (Scanner scanner = new Scanner(responseStream, charset)) {
+                    responseBody = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                }
+
+                /*
+                System.out.println("HTTP Status (non PATCH method): " + status);
+                System.out.println("Response: (non PATCH method) " + responseBody);
+                */
             }
-
-            int status = connection.getResponseCode();
-            InputStream responseStream = (status >= SHttpConsts.RSC_SUCC_OK && status < SHttpConsts.RSC_ERR_BAD_REQUEST) ? connection.getInputStream() : connection.getErrorStream();
-
-            try (Scanner scanner = new Scanner(responseStream, charset)) {
-                responseBody = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
-            }
-
-            System.out.println("Respuesta desde " + url);
         }
-        catch (JsonProcessingException e) {
-            e.printStackTrace();
+        catch (JsonProcessingException | URISyntaxException e) {
+            try {
+                e.printStackTrace();
+            }
+            catch (Exception e1) {
+                // nothing at all!
+            }
+            
             Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, e);
         }
         finally {
@@ -735,6 +815,8 @@ public abstract class SExportUtils {
         if (((SClientInterface) session.getClient()).isDev()) {
             // hosts para pruebas:
             
+            System.out.println("*** Running in dev mode! ***");
+            
             switch (syncType) {
                 case USER:
                 case PARTNER_SUPPLIER:
@@ -858,13 +940,13 @@ public abstract class SExportUtils {
                 syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
             }
             
-            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
+            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token genérico del end point
             
             if (!testApyKey.isEmpty()) {
                 syncApiKey = testApyKey;
             }
             else {
-                syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+                syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY); // recuperar API key genérica del end point
             }
         }
         
@@ -873,11 +955,11 @@ public abstract class SExportUtils {
         syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
         
         if (syncToken.isEmpty()) {
-            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico
+            syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico del end point
         }
         
         if (syncApiKey.isEmpty()) {
-            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_API_KEY); // recuperar API key específica
+            syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_API_KEY); // recuperar API key específica del end point
         }
         
         syncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_LIMIT));
