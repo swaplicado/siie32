@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 291.11/ 2025-11-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de rechazo de facturas autorizadas en el diálogo importación de facturas de SWAP Services.
+2) Habilitación de posibilidad de vincular facturas autorizadas con la factura correspondiente capturada en una fecha posterior (en el diálogo del punto 1.)
+3) Corrección a la validación de nueva fecha requerida de pago vs. el día de hoy (en el diálogo del punto 1.)
+
+================================================================================
 SIIE 3.2 291.10/ 2025-11-19
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
