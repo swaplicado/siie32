@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 291.12/ 2025-11-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de anulación de flujos de autorización de pagos.
+2) Implementación de consulta de estatus de flujos de autorización de pagos.
+
+================================================================================
 SIIE 3.2 291.11/ 2025-11-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
