@@ -111,7 +111,7 @@ public abstract class SExportUtils {
     /**
      * Realiza una solicitud HTTP a un servicio de intercambio de datos.
      * 
-     * @param queryUrl Parámetros de consulta para la URL (opcional).
+     * @param urlQuery Parámetros de consulta para la URL (opcional).
      * @param serviceUrl URL del servicio al que se realiza la solicitud.
      * @param httpMethod Método HTTP a utilizar (GET, POST, PUT, PATCH, etc.).
      * @param jsonBody Cuerpo de la solicitud (para métodos como POST, PUT y PATCH).
@@ -122,7 +122,7 @@ public abstract class SExportUtils {
      * @throws Exception
      */
     @SuppressWarnings("deprecation")
-    public static String requestSwapService(final String queryUrl, final String serviceUrl, final String httpMethod, final String jsonBody, final String token, final String apiKey, final int timeout) throws Exception {
+    public static String requestSwapService(final String urlQuery, final String serviceUrl, final String httpMethod, final String jsonBody, final String token, final String apiKey, final int timeout) throws Exception {
         String responseBody = "";
         HttpURLConnection connection = null;
         boolean isHttpMethodPatch = httpMethod.equalsIgnoreCase(SHttpConsts.METHOD_PATCH);
@@ -181,8 +181,8 @@ public abstract class SExportUtils {
                 boolean isHttpMethodGet = method.equals(SHttpConsts.METHOD_GET);
                 URL url;
 
-                if (isHttpMethodGet && queryUrl != null && !queryUrl.isEmpty()) {
-                    url = new URL(serviceUrl + "?" + queryUrl);
+                if (isHttpMethodGet && urlQuery != null && !urlQuery.isEmpty()) {
+                    url = new URL(serviceUrl + "?" + urlQuery);
                 }
                 else {
                     url = new URL(serviceUrl);
@@ -223,8 +223,8 @@ public abstract class SExportUtils {
 
                         request = jsonBody;
                     }
-                    else if (queryUrl != null && !queryUrl.isEmpty()) {
-                        request = queryUrl;
+                    else if (urlQuery != null && !urlQuery.isEmpty()) {
+                        request = urlQuery;
                     }
 
                     if (!request.isEmpty()) {

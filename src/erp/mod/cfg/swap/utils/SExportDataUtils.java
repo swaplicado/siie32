@@ -197,7 +197,7 @@ public abstract class SExportDataUtils {
         String table = getSqlTableSyncLog(syncType, database);
         
         String sql = "SELECT "
-                + "MAX(id_sync_log) " // timestamp of server device!
+                + "MAX(id_sync_log) "
                 + "FROM "
                 + table + " "
                 + "WHERE "

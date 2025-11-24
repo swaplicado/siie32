@@ -1443,57 +1443,41 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     
                     if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
                         if (!isDocumentAlreadyRecorded(document)) {
-                            int userId = miClient.getSession().getUser().getPkUserId();
-                            String user = "'" + miClient.getSession().getUser().getName() + "'";
+                            SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
                             
-                            if (userId == SDataConstantsSys.USRX_USER_SUPER || userId == SDataConstantsSys.USRX_USER_ADMIN) {
-                                userId = 0;
-                                
-                                String input = JOptionPane.showInputDialog(rootPane, "ID del usuario que solicita el rechazo:");
-                                
-                                if (input != null) {
-                                    userId = SLibUtils.parseInt(input);
-                                    user += " (ID = " + userId + ")";
+                            if (rejectData != null) {
+                                confirm = "Se rechazará la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ",\n"
+                                        + "por el usuario: " + rejectData.User + ",\n"
+                                        + "con los siguientes comentarios:\n"
+                                        + "\"" + rejectData.Notes + "\"\n"
+                                        + SGuiConsts.MSG_CNF_CONT;
+
+                                if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                    SDataRejectResource data = new SDataRejectResource();
+
+                                    data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
+                                    data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
+                                    data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_INVOICE;
+                                    data.external_resource_id = document.ExternalDocumentId;
+                                    data.external_resource_uuid = document.ExternalDocumentUuid; // UUID (not required in SWAP Services!)
+                                    data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
+                                    data.external_user_id = rejectData.UserId;
+                                    data.notes = rejectData.Notes;
+
+                                    SServicesUtils.requestRejectResource(miClient.getSession(), data);
+
+                                    int index = moDocumentsGrid.getTable().getSelectedRow();
+
+                                    maDocuments.remove(document);
+                                    itemStateChangedView(); // reload documents grid
+
+                                    moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
+
+                                    miClient.showMsgBoxInformation("La factura originalmente autorizada '" + document.getFolio() + "' de " + document.BizPartner + " acaba de ser rechazada.");
                                 }
                             }
-                            
-                            if (userId != 0) {
-                                String notes = JOptionPane.showInputDialog(rootPane, "Comentarios de rechazo:");
-
-                                if (notes != null && !notes.isEmpty()) {
-                                    confirm = "Se rechazará la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ",\n"
-                                            + "por el usuario: " + user + ",\n"
-                                            + "con los siguientes comentarios:\n"
-                                            + "\"" + notes + "\"\n"
-                                            + SGuiConsts.MSG_CNF_CONT;
-
-                                    if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
-                                        SDataRejectResource data = new SDataRejectResource();
-
-                                        data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
-                                        data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
-                                        data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_INVOICE;
-                                        data.external_resource_id = document.ExternalDocumentId;
-                                        data.external_resource_uuid = document.ExternalDocumentUuid; // UUID (not required in SWAP Services!)
-                                        data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
-                                        data.external_user_id = userId;
-                                        data.notes = notes;
-
-                                        SServicesUtils.requestRejectResource(miClient.getSession(), data);
-
-                                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                                        
-                                        maDocuments.remove(document);
-                                        itemStateChangedView(); // reload documents grid
-
-                                        moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
-                                        
-                                        miClient.showMsgBoxInformation("La factura originalmente autorizada '" + document.getFolio() + "' de " + document.BizPartner + " acaba de ser rechazada.");
-                                    }
-                                }
-                                else {
-                                    miClient.showMsgBoxWarning("Para proceder es necesario especificar los comentarios de rechazo.");
-                                }
+                            else {
+                                miClient.showMsgBoxWarning("Para proceder es necesario especificar los comentarios de rechazo.");
                             }
                         }
                         else {

@@ -13,8 +13,11 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SDataRejectResource;
+import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
@@ -60,6 +63,8 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
+    private static final String SUGGESTION_SPEED_UP = "SUGERENCIA: Si urge acelerar la aplicación de esta modificación, haga clic en el botón ";
+    
     private JLabel jlDate;
     private JRadioButton jrbDateApp;
     private JRadioButton jrbDateReq;
@@ -72,10 +77,12 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private boolean mbAppliesDateRequired;
     
-    private JButton jbAuthWebLoadFiles;
+    private JButton jbAuthWebLoadSupportFiles;
     private JButton jbAuthWebStartAuth;
-    private JButton jbAuthWebDownloadFiles;
-    private JButton jbAuthWebClearFiles;
+    private JButton jbAuthWebViewAuthLog;
+    private JButton jbAuthWebDownloadSupportFiles;
+    private JButton jbAuthWebClearSupportFiles;
+    private JButton jbAuthWebAnnullAuth;
     
     private JButton jbPaymentReschedule;
     private JButton jbPaymentMarkAsPaid;
@@ -95,10 +102,12 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private void initComponetsCustom() {
         if (mnGridSubtype == SLibConstants.UNDEFINED) {
+            // payments management:
             setRowButtonsEnabled(true, false, true, false, true);
             jtbFilterDeleted.setEnabled(true);
         }
         else {
+            // payments monitoring:
             setRowButtonsEnabled(false);
             jtbFilterDeleted.setEnabled(false);
         }
@@ -133,26 +142,36 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         moFilterCurrency = new SViewFilter(miClient, this, SModConsts.CFGU_CUR);
         moFilterCurrency.initFilter(null);
         
-        jbAuthWebLoadFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
-        jbAuthWebLoadFiles.setPreferredSize(new Dimension(23, 23));
-        jbAuthWebLoadFiles.addActionListener(this);
-        jbAuthWebLoadFiles.setToolTipText("Cargar archivos de soporte a la solicitud");
+        jbAuthWebLoadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_add_ora.gif")));
+        jbAuthWebLoadSupportFiles.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebLoadSupportFiles.addActionListener(this);
+        jbAuthWebLoadSupportFiles.setToolTipText("Cargar archivos de soporte a la solicitud");
         
         jbAuthWebStartAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")));
         jbAuthWebStartAuth.setPreferredSize(new Dimension(23, 23));
         jbAuthWebStartAuth.addActionListener(this);
         jbAuthWebStartAuth.setToolTipText("Iniciar autorización de la solicitud en app web");
         
-        jbAuthWebDownloadFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
-        jbAuthWebDownloadFiles.setPreferredSize(new Dimension(23, 23));
-        jbAuthWebDownloadFiles.addActionListener(this);
-        jbAuthWebDownloadFiles.setToolTipText("Descargar archivos de soporte de la solicitud");
+        jbAuthWebViewAuthLog = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")));
+        jbAuthWebViewAuthLog.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebViewAuthLog.addActionListener(this);
+        jbAuthWebViewAuthLog.setToolTipText("Ver estatus de autorización de la solicitud en app web");
 
-        jbAuthWebClearFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")));
-        jbAuthWebClearFiles.setPreferredSize(new Dimension(23, 23));
-        jbAuthWebClearFiles.addActionListener(this);
-        jbAuthWebClearFiles.setToolTipText("Eliminar archivos de soporte de la solicitud");
+        jbAuthWebDownloadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
+        jbAuthWebDownloadSupportFiles.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebDownloadSupportFiles.addActionListener(this);
+        jbAuthWebDownloadSupportFiles.setToolTipText("Descargar archivos de soporte de la solicitud");
 
+        jbAuthWebClearSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")));
+        jbAuthWebClearSupportFiles.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebClearSupportFiles.addActionListener(this);
+        jbAuthWebClearSupportFiles.setToolTipText("Eliminar archivos de soporte de la solicitud");
+
+        jbAuthWebAnnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_down_red.jpg")));
+        jbAuthWebAnnullAuth.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebAnnullAuth.addActionListener(this);
+        jbAuthWebAnnullAuth.setToolTipText("Anular autorización de la solicitud en app web");
+        
         jbPaymentReschedule = new JButton(new ImageIcon(getClass().getResource("/erp/img/gui_cal.gif")));
         jbPaymentReschedule.setPreferredSize(new Dimension(23, 23));
         jbPaymentReschedule.addActionListener(this);
@@ -193,19 +212,24 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterCurrency);
         
         switch (mnGridSubtype) {
-            case SLibConstants.UNDEFINED:
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebLoadFiles);
+            case SLibConstants.UNDEFINED: // payments management
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebLoadSupportFiles);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebStartAuth);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebDownloadFiles);
-                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebClearFiles);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebDownloadSupportFiles);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebClearSupportFiles);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebAnnullAuth);
                 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_IN_AUTH:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebAnnullAuth);
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_REJC:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
                 
@@ -213,6 +237,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_SCHED:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentMarkAsPaid);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentBlock);
@@ -236,90 +261,124 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         }
     }
     
-    private void actionAuthWebLoadFile() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+    private void actionAuthWebLoadSupportFiles() {
+        if (jbAuthWebLoadSupportFiles.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SGuiParams params = new SGuiParams();
-                    params.setKey(gridRow.getRowPrimaryKey());
-                    miClient.getSession().getModule(SModConsts.MOD_FIN_N).showForm(SModConsts.FIN_PAY_FILE, SLibConstants.UNDEFINED, params);
-                    miClient.getSession().notifySuscriptors(mnGridType);
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SGuiParams params = new SGuiParams();
+                        params.setKey(gridRow.getRowPrimaryKey());
+                        miClient.getSession().getModule(SModConsts.MOD_FIN_N).showForm(SModConsts.FIN_PAY_FILE, SLibConstants.UNDEFINED, params);
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
+                }
             }
         }
     }
 
     private void actionAuthWebStartAuth() {
-        try {
-            if (jbAuthWebStartAuth.isEnabled()) {
-                if (jtTable.getSelectedRowCount() != 1) {
-                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        if (jbAuthWebStartAuth.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                    }
-                    else if (gridRow.isRowSystem()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                    }
-                    else if (!gridRow.isUpdatable()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                    }
-                    else {
+                    try {
                         if (SAuthorizationUtils.sendAuthornPaymentsAppWeb((SClientInterface) miClient, gridRow.getRowPrimaryKey())) {
                             miClient.getSession().notifySuscriptors(mnGridType);
                         }
                     }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
         }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
+    }
+    
+    private void actionAuthWebViewAuthLog() {
+        if (jbAuthWebViewAuthLog.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status != SModSysConsts.FINS_ST_PAY_NEW) {
+                            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, payment.getPkPaymentId());
+                            miClient.showMsgBoxInformation(authFlowStatus.toString());
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' debe ser distinto de '" + SDbPayment.ST_IN_AUTH + "' para poderse ver su estatus de autorización.");
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
+                }
+            }
         }
     }
     
-    private void actionAuthWebDownloadFiles() {
-        try {
-            if (jbAuthWebDownloadFiles.isEnabled()) {
-                if (jtTable.getSelectedRowCount() != 1) {
-                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+    private void actionAuthWebDownloadSupportFiles() {
+        if (jbAuthWebDownloadSupportFiles.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
 
-                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                    }
-                    else if (gridRow.isRowSystem()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                    }
-                    else if (!gridRow.isUpdatable()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                    }
-                    else {
-                        SDbPayment payment = new SDbPayment();
-                        payment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
                         if (payment.getFiles().isEmpty()) {
-                            miClient.showMsgBoxWarning("La solicitud de pago '" + payment.getFolio() + "' no tiene archivos de soporte.");
+                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' no tiene archivos de soporte.");
                         }
                         else {
                             if (moAuthWebFileChooser == null) {
@@ -328,10 +387,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                 moAuthWebFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                 moAuthWebFileChooser.setDialogTitle("Seleccionar directorio para descargar archivos...");
                             }
-                            
+
                             if (moAuthWebFileChooser.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                                 int files = 0;
-                                
+
                                 for (SDbPaymentFile file : payment.getFiles()) {
                                     if (!file.getFilevaultId().isEmpty()) {
                                         boolean returnPath = false;
@@ -344,40 +403,42 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             }
                         }
                     }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
         }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
-        }
     }
 
-    private void actionAuthWebClearFiles() {
-        try {
-            if (jbAuthWebClearFiles.isEnabled()) {
-                if (jtTable.getSelectedRowCount() != 1) {
-                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+    private void actionAuthWebClearSupportFiles() {
+        if (jbAuthWebClearSupportFiles.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
 
-                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                    }
-                    else if (gridRow.isRowSystem()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                    }
-                    else if (!gridRow.isUpdatable()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                    }
-                    else {
-                        SDbPayment payment = new SDbPayment();
-                        payment.read(miClient.getSession(), gridRow.getRowPrimaryKey());
                         if (payment.getFiles().isEmpty()) {
-                            miClient.showMsgBoxWarning("La solicitud de pago '" + payment.getFolio() + "' no tiene archivos de soporte.");
+                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' no tiene archivos de soporte.");
                         }
                         else {
-                            if (miClient.showMsgBoxConfirm("¿Está seguro que desea eliminar todos los archivos de soporte de la solicitud de pago '" + payment.getFolio() + "'?") == JOptionPane.YES_OPTION) {
+                            String confirm = "¿Está seguro que desea eliminar todos los archivos de soporte de la solicitud de pago '" + payment.getFolio() + "'?";
+
+                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
                                 int cant = payment.getFiles().size();
                                 payment.deleteFiles(miClient.getSession());
 
@@ -386,267 +447,350 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             }
                         }
                     }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
         }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
+    }
+    
+    private void actionAuthWebAnnullAuth() {
+        if (jbAuthWebAnnullAuth.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status == SModSysConsts.FINS_ST_PAY_IN_AUTH) {
+                            String confirm = "La autorización de la solicitud de pago '" + payment.getFolio() + "' será anulada, y esta acción no se puede revertir.\n"
+                                    + "La solicitud de pago se eliminará de manera automática del " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                    + "IMPORTATE: La solicitud de pago quedará con el estatus '" + SDbPayment.ST_REJC + "'.\n"
+                                    + SGuiConsts.MSG_CNF_CONT;
+
+                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.OK_OPTION) {
+                                SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
+
+                                if (rejectData != null) {
+                                    confirm = "Se anulará la autorización de la solicitud de pago '" + payment.getFolio() + "',\n"
+                                            + "por el usuario: " + rejectData.User + ",\n"
+                                            + "con los siguientes comentarios:\n"
+                                            + "\"" + rejectData.Notes + "\"\n"
+                                            + SGuiConsts.MSG_CNF_CONT;
+
+                                    if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                        SDataRejectResource data = new SDataRejectResource();
+
+                                        data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
+                                        data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
+                                        data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT;
+                                        data.external_resource_id = payment.getPkPaymentId();
+                                        data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
+                                        data.external_user_id = rejectData.UserId;
+                                        data.notes = rejectData.Notes;
+
+                                        SServicesUtils.requestCancelFlow(miClient.getSession(), SModConsts.FIN_PAY, data);
+                                        miClient.getSession().notifySuscriptors(mnGridType);
+                                        
+                                        miClient.showMsgBoxInformation("La autorización de la solicitud de pago '" + payment.getFolio() + "' acaba de ser anulada.");
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_IN_AUTH + "' para poderse anular su autorización.");
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
+                }
+            }
         }
     }
     
     private void actionPaymentReschedule() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+        if (jbPaymentReschedule.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-                    
-                    if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        if (moDialogPaymentChangeStatus == null) {
-                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
-                        }
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
-                        moDialogPaymentChangeStatus.setRegistry(payment);
-                        moDialogPaymentChangeStatus.setFormType(status);
-                        moDialogPaymentChangeStatus.setVisible(true);
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
 
-                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            payment.setAuxReloadEntries(false);
-
-                            switch (status) {
-                                case SModSysConsts.FINS_ST_PAY_REJC:
-                                    payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
-                                    payment.setDateRequired((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
-                                    payment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
-                                    payment.setNotesAuthorization((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES_AUTH));
-
-                                    if (payment.isSystem()) {
-                                        miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                                + "(Si es indispensable, puede acelerar el envío con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
-                                    }
-                                    else {
-                                        miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' requiere enviarse nuevamente a autorizar de manera manual.\n"
-                                                + "Favor de hacerlo en la vista 'Solicitudes de pago'.");
-                                    }
-                                    break;
-
-                                case SModSysConsts.FINS_ST_PAY_SCHED:
-                                    payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
-                                    payment.setDateSchedule_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
-                                    
-                                    miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                            + "(Si es indispensable, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
-                                    break;
-
-                                default:
-                                    // nothing
+                        if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED) {
+                            if (moDialogPaymentChangeStatus == null) {
+                                moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
                             }
 
-                            payment.save(miClient.getSession());
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                            moDialogPaymentChangeStatus.setRegistry(payment);
+                            moDialogPaymentChangeStatus.setFormType(status);
+                            moDialogPaymentChangeStatus.setVisible(true);
+
+                            if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                                payment.setAuxReloadEntries(false);
+
+                                switch (status) {
+                                    case SModSysConsts.FINS_ST_PAY_REJC:
+                                        payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
+                                        payment.setDateRequired((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+                                        payment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
+                                        payment.setNotesAuthorization((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES_AUTH));
+
+                                        if (payment.isSystem()) {
+                                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                                    + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
+                                        }
+                                        else {
+                                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' requiere enviarse nuevamente a autorizar de manera manual.\n"
+                                                    + "Favor de hacerlo en la vista 'Solicitudes de pago'.");
+                                        }
+                                        break;
+
+                                    case SModSysConsts.FINS_ST_PAY_SCHED:
+                                        payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
+                                        payment.setDateSchedule_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+
+                                        miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                                + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
+                                        break;
+
+                                    default:
+                                        // nothing
+                                }
+
+                                payment.save(miClient.getSession());
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
+                        else {
+                            switch (status) {
+                                case SModSysConsts.FINS_ST_PAY_REJC_P:
+                                    miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar rechazada.\n"
+                                            + "Intente más tarde de favor.");
+                                    break;
+                                case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                                    miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                            + "Intente más tarde de favor.");
+                                    break;
+                                default:
+                                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                            }
                         }
                     }
-                    else {
-                        switch (status) {
-                            case SModSysConsts.FINS_ST_PAY_REJC_P:
-                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar rechazada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            default:
-                                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
             }
         }
     }
     
     private void actionPaymentMarkAsPaid() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+        if (jbPaymentMarkAsPaid.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-                    
-                    if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        if (moDialogPaymentChangeStatus == null) {
-                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
-                        }
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
-                        moDialogPaymentChangeStatus.setRegistry(payment);
-                        moDialogPaymentChangeStatus.setFormType(SModSysConsts.FINS_ST_PAY_EXEC);
-                        moDialogPaymentChangeStatus.setVisible(true);
-
-                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            payment.setAuxReloadEntries(false);
-
-                            payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
-                            payment.setDateExecution_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
-
-                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                    + "(Si es indispensable, puede acelerar la actualización con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').");
-
-                            payment.save(miClient.getSession());
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                    }
-                    else {
-                        switch (status) {
-                            case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            default:
-                                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                    }
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
+                            if (moDialogPaymentChangeStatus == null) {
+                                moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
+                            }
+
+                            moDialogPaymentChangeStatus.setRegistry(payment);
+                            moDialogPaymentChangeStatus.setFormType(SModSysConsts.FINS_ST_PAY_EXEC);
+                            moDialogPaymentChangeStatus.setVisible(true);
+
+                            if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                                payment.setAuxReloadEntries(false);
+
+                                payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                                payment.setDateExecution_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+
+                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                        + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
+
+                                payment.save(miClient.getSession());
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
+                        else {
+                            switch (status) {
+                                case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                                    miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                            + "Intente más tarde de favor.");
+                                    break;
+                                default:
+                                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
+                }
             }
         }
     }
     
     private void actionPaymentBlock() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+        if (jbPaymentBlock.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-                    
-                    if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        if (miClient.showMsgBoxConfirm("La solicitud de pago '" + payment.getFolio()+ "' será bloqueada.\n"
-                                + "Podrá desbloquearla en la vista 'Solicitudes de pago bloqueadas'.\n"
-                                + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                            payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_BLOC);
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
+                            String confirm = "La solicitud de pago '" + payment.getFolio()+ "' será bloqueada.\n"
+                                    + "Podrá desbloquearla en la vista 'Solicitudes de pago bloqueadas'.\n"
+                                    + SGuiConsts.MSG_CNF_CONT;
+
+                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_BLOC);
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
+                        else {
+                            String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_SCHED + "' para poderse bloquear.");
                         }
                     }
-                    else {
-                        String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
-                        miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_SCHED + "' para poderse bloquear.");
-                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
             }
         }
     }
     
     private void actionPaymentUnblock() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+        if (jbPaymentUnblock.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-                    
-                    if (status == SModSysConsts.FINS_ST_PAY_BLOC) {
-                        if (miClient.showMsgBoxConfirm("La solicitud de pago '" + payment.getFolio() + "' será desbloqueada, y quedará nuevamente con estatus '" + SDbPayment.ST_SCHED + "'.\n"
-                                + SGuiConsts.MSG_CNF_CONT) == JOptionPane.OK_OPTION) {
-                            payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_SCHED);
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status == SModSysConsts.FINS_ST_PAY_BLOC) {
+                            String confirm = "La solicitud de pago '" + payment.getFolio() + "' será desbloqueada, y quedará nuevamente con estatus '" + SDbPayment.ST_SCHED + "'.\n"
+                                    + SGuiConsts.MSG_CNF_CONT;
+
+                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.OK_OPTION) {
+                                payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_SCHED);
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
+                        else {
+                            String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_BLOCK + "' para poderse desbloquear.");
                         }
                     }
-                    else {
-                        String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
-                        miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_BLOCK + "' para poderse desbloquear.");
-                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
             }
         }
     }
     
     private void actionPaymentCancel() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+        if (jbPaymentCancel.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                try {
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-                    
-                    if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_BLOC) {
-                        if (miClient.showMsgBoxConfirm("La solicitud de pago '" + gridRow.getRowCode() + "' será cancelada, y esta acción no se puede revertir.\n"
-                                + "La solicitud de pago se eliminará de manera automática del " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                + "(Si es indispensable, puede acelerar la eliminación con la opción '" + jbExportDataToSwapServices.getToolTipText() + "').\n"
-                                + SGuiConsts.MSG_CNF_CONT) == JOptionPane.OK_OPTION) {
-                            payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_CANC_P);
-                            miClient.getSession().notifySuscriptors(mnGridType);
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
+                        int status = payment.getFkStatusPaymentId(); // convenience variable
+
+                        if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_BLOC) {
+                            String confirm = "La solicitud de pago '" + payment.getFolio()+ "' será cancelada, y esta acción no se puede revertir.\n"
+                                    + "La solicitud de pago se eliminará de manera automática del " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                    + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.\n"
+                                    + SGuiConsts.MSG_CNF_CONT;
+
+                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.OK_OPTION) {
+                                payment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_CANC_P);
+                                miClient.getSession().notifySuscriptors(mnGridType);
+                            }
+                        }
+                        else {
+                            String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_REJC + "', '" + SDbPayment.ST_SCHED + "' o '" + SDbPayment.ST_BLOCK + "' para poderse cancelar.");
                         }
                     }
-                    else {
-                        String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
-                        miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_REJC + "', '" + SDbPayment.ST_SCHED + "' o '" + SDbPayment.ST_BLOCK + "' para poderse cancelar.");
-                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
                 }
-                catch (Exception e) {
-                    miClient.showMsgBoxError(e.getMessage());
-                }                
             }
         }
     }
@@ -715,7 +859,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         setShowSums(filter != null && ((String) filter).split(",").length == 1); // only if a single currency is selected!
         
         switch (mnGridSubtype) {
-            case SLibConstants.UNDEFINED:
+            case SLibConstants.UNDEFINED: // payments management
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                 + SModSysConsts.FINS_ST_PAY_NEW + ", " 
                 + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " 
@@ -895,20 +1039,23 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbAuthWebLoadFiles) {
-                actionAuthWebLoadFile();
+            if (button == jbAuthWebLoadSupportFiles) {
+                actionAuthWebLoadSupportFiles();
             }
             else if (button == jbAuthWebStartAuth) {
                 actionAuthWebStartAuth();
             }
-            else if (button == jbAuthWebDownloadFiles) {
-                actionAuthWebDownloadFiles();
+            else if (button == jbAuthWebViewAuthLog) {
+                actionAuthWebViewAuthLog();
             }
-            else if (button == jbAuthWebClearFiles) {
-                actionAuthWebClearFiles();
+            else if (button == jbAuthWebDownloadSupportFiles) {
+                actionAuthWebDownloadSupportFiles();
             }
-            else if (button == jbPaymentCancel) {
-                actionPaymentCancel();
+            else if (button == jbAuthWebClearSupportFiles) {
+                actionAuthWebClearSupportFiles();
+            }
+            else if (button == jbAuthWebAnnullAuth) {
+                actionAuthWebAnnullAuth();
             }
             else if (button == jbPaymentReschedule) {
                 actionPaymentReschedule();
@@ -921,6 +1068,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             }
             else if (button == jbPaymentUnblock) {
                 actionPaymentUnblock();
+            }
+            else if (button == jbPaymentCancel) {
+                actionPaymentCancel();
             }
             else if (button == jbExportDataToSwapServices) {
                 actionExportDataToSwapServices();

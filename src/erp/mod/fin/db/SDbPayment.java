@@ -37,6 +37,7 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
+    public static final String ST_IN_AUTH = "EN AUTORIZACIÓN";
     public static final String ST_REJC = "RECHAZADO";
     public static final String ST_SCHED = "AUTORIZADO";
     public static final String ST_BLOCK = "BLOQUEADO";
@@ -235,9 +236,9 @@ public class SDbPayment extends SDbRegistryUser {
         }
     }
     
-    public void updatePaymentStatus(final SGuiSession session, final int status) throws Exception {
+    public void updatePaymentStatus(final SGuiSession session, final int newStatus) throws Exception {
         msSql = "UPDATE " + getSqlTable() + " SET " +
-                "fk_st_pay = " + status + ", " + 
+                "fk_st_pay = " + newStatus + ", " + 
                 "fk_usr_upd = " + session.getUser().getPkUserId() + ", " +
                 "ts_usr_upd = NOW() " +
                 getSqlWhere();

@@ -165,7 +165,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebViewAuthComments;
     private javax.swing.JButton jbAuthWebDownloadSupportFiles;
     private javax.swing.JButton jbAuthWebClearSupportFiles;
-    private javax.swing.JButton jbAuthWebAnullAuth;
+    private javax.swing.JButton jbAuthWebAnnullAuth;
     private javax.swing.JFileChooser moAuthWebFileChooser;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -522,10 +522,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebClearSupportFiles.addActionListener(this);
             jbAuthWebClearSupportFiles.setToolTipText("Eliminar archivos de soporte de la orden");
 
-            jbAuthWebAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_down_red.jpg")));
-            jbAuthWebAnullAuth.setPreferredSize(new Dimension(23, 23));
-            jbAuthWebAnullAuth.addActionListener(this);
-            jbAuthWebAnullAuth.setToolTipText("Anular autorización de la orden en app web");
+            jbAuthWebAnnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_down_red.jpg")));
+            jbAuthWebAnnullAuth.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebAnnullAuth.addActionListener(this);
+            jbAuthWebAnnullAuth.setToolTipText("Anular autorización de la orden en app web");
         }
         
         moTabFilterUser = new STabFilterUsers(miClient, this);
@@ -599,7 +599,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthWebViewAuthComments);
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
             addTaskBarUpperComponent(jbAuthWebClearSupportFiles);
-            addTaskBarUpperComponent(jbAuthWebAnullAuth);
+            addTaskBarUpperComponent(jbAuthWebAnnullAuth);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -684,7 +684,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthComments.setEnabled(true);
             jbAuthWebDownloadSupportFiles.setEnabled(true);
             jbAuthWebClearSupportFiles.setEnabled(true);
-            jbAuthWebAnullAuth.setEnabled(true);
+            jbAuthWebAnnullAuth.setEnabled(true);
         }
 
         STableField[] aoKeyFields = new STableField[2];
@@ -3282,9 +3282,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionAuthWebAnullAuth() {
+    private void actionAuthWebAnnullAuth() {
          try {
-            if (jbAuthWebAnullAuth.isEnabled()) {
+            if (jbAuthWebAnnullAuth.isEnabled()) {
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
                     fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
@@ -3754,8 +3754,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbAuthWebClearSupportFiles) {
                     actionAuthWebClearSupportFiles();
                 }
-                else if (button == jbAuthWebAnullAuth) {
-                    actionAuthWebAnullAuth();
+                else if (button == jbAuthWebAnnullAuth) {
+                    actionAuthWebAnnullAuth();
                 }
             }
         }
