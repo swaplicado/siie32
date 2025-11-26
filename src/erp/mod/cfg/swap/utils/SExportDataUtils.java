@@ -1101,7 +1101,52 @@ public abstract class SExportDataUtils {
                     }
                     // Si no existe en la bitácora de siie, se sube
                     else {
-                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. "
+                                + "Sincronizando: " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                        try {
+                            SFileData oFileData = new SFileData(oDpsExport.id_year,
+                                    oDpsExport.id_doc,
+                                    database,
+                                    null);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
+                            if (oLogEty != null) {
+                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200
+                                        || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
+                                    SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
+                                    // comparacion de last update para actualizar el archivo
+                                    SExportDataDpsFile oFile = new SExportDataDpsFile();
+                                    oFile.filename_storage = oFd.getFileName();
+                                    if (oFile.filename_storage.isEmpty()) {
+                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. "
+                                                + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                                    }
+                                    else {
+                                        oFile.filename_original = oFile.filename_storage;
+                                        oFile.title = "PDF de la OC";
+                                        oFile.bucket_name = sBucketName;
+                                        oFile.project_id = sProjectID;
+                                        oContainer.file.add(oFile);
+                                    }
+                                } else {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. "
+                                            + oDpsExport.id_year + "_" + oDpsExport.id_doc + ". "
+                                            + oLogEty.getResponseBody());
+                                }
+                                ArrayList<SDbSyncLogEntry> l = new ArrayList<>();
+                                l.add(oLogEty);
+                                try {
+                                    // guardar encabezado de log de archivos:
+                                    SDpsGoogleCloudUtils.saveSyncLogs(session, l, false);
+                                }
+                                catch (Exception e) {
+                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudieron guardar los logs de sincronización de archivos de OC.", e);
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. "
+                                    + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                        }
                     }
                     
                     // documentos (archivos de cotizaciones)
@@ -1245,13 +1290,19 @@ public abstract class SExportDataUtils {
                                 }
                             }
                         } catch (Exception e) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. " + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. "
+                                    + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
                         }
                     }
 
                 }
-                // guardar encabezado de log de archivos:
-                SDpsGoogleCloudUtils.saveSyncLogs(session, lLogFiles, false);
+                try {
+                    // guardar encabezado de log de archivos:
+                    SDpsGoogleCloudUtils.saveSyncLogs(session, lLogFiles, false);
+                }
+                catch (Exception e) {
+                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudieron guardar los logs de sincronización de archivos de OC.", e);
+                }
             }
         }
     }
