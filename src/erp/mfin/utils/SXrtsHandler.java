@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.xml.SXmlUtils;
@@ -91,9 +92,11 @@ public class SXrtsHandler {
         maBankNonBizDates = new ArrayList<>();
         
         try (Statement statement = miConnection.createStatement()) {
+            // retrieve non business days (limit query up to 1 week from today):
+            
             String sql = "SELECT nb_day "
                     + "FROM erp.finu_bank_nb_day "
-                    + "WHERE NOT b_del AND nb_day >= " + "'" + SLibUtils.DbmsDateFormatDate.format(mtToday) + "'" + " "
+                    + "WHERE NOT b_del AND nb_day BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtToday) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(mtToday, 0, 0, SLibTimeConsts.WEEK_DAYS)) + "' "
                     + "ORDER BY nb_day, name, id_bank_nb_day;";
             ResultSet resultSet = statement.executeQuery(sql);
             
@@ -231,11 +234,13 @@ public class SXrtsHandler {
 
                 // create exchange rates for companies with Banxico policy:
                 for (String db : maErpCompanyDbsXrtUsdPolicyBanxico) {
+                    // start from one day after the "next business day":
                     Date nextDay = SLibTimeUtils.addDate(nextBizDay, 0, 0, 1);
-                    boolean isFirstNextDayNonBizDay = !isBankBizDay(nextDay);
+                    boolean isFirstNextDayNonBizDay = !isBankBizDay(nextDay); // check if the starting day is non business
                     
+                    // compute exchange rate and go on while the following day is non business, but only if the starting day is also non business:
                     do {
-                        insertXrt(statement, db, currency, nextDay, xrt.Xrt, logWriter);
+                        insertXrt(statement, db, currency, nextDay, xrt.Xrt, logWriter); // insers only if there isn't yet a register for the required day
 
                         nextDay = SLibTimeUtils.addDate(nextDay, 0, 0, 1);
                     } while (isFirstNextDayNonBizDay && !isBankBizDay(nextDay));
@@ -247,10 +252,12 @@ public class SXrtsHandler {
 
                 // create exchange rates for companies with informal policy:
                 for (String db : maErpCompanyDbsXrtUsdPolicyInformal) {
+                    // start from the same "next business day":
                     Date nextDay = SLibTimeUtils.convertToDateOnly(nextBizDay);
                     
+                    // compute exchange rate and go on while the following day is non business:
                     do {
-                        insertXrt(statement, db, currency, nextDay, xrt.Xrt, logWriter);
+                        insertXrt(statement, db, currency, nextDay, xrt.Xrt, logWriter); // insers only if there isn't yet a register for the required day
 
                         nextDay = SLibTimeUtils.addDate(nextDay, 0, 0, 1);
                     } while (!isBankBizDay(nextDay));
