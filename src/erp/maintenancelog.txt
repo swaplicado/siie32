@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 292.0/ 2025-11-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de funcionalidad de automatización de registro de tipos de cambio a partir de RSS de Banco de México (Banxico) desde Command Line Interface (CLI).
+    - Tanto USD como EUR.
+2) Adecuación a la estructura JSON vigente de petición de anulación de flujo de autorización de pagos, y de petición de rechazo de facturas autorizadas en SWAP Services.
+
+================================================================================
 SIIE 3.2 291.14/ 2025-11-26
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
