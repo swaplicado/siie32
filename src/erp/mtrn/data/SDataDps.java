@@ -5101,7 +5101,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         String msg = "";
         String companyName = "";
         String bpName = "";
-        ArrayList<String> toRecipients = null;
+        ArrayList<String> toRecipients = new ArrayList<>();
         HashSet<String> emailsSet = new HashSet<>();
         SDbMmsConfig mmsConfig = null;
         SDataDpsType dpsType = null;
@@ -5145,7 +5145,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mmsConfig = new SDbMmsConfig();
                         mmsConfig.read(client.getSession(), mmsConfigKey);
 
-                        emailsSet.add(mmsConfig.getEmail());
+//                        emailsSet.add(mmsConfig.getEmail());
+                        emailsSet.add("claudio.pena@swaplicado.com.mx");
                     }
                 }
                 catch (java.lang.Exception e) {
