@@ -147,7 +147,7 @@ public abstract class SServicesUtils {
             if (code.equals("" + SHttpConsts.RSC_SUCC_OK)) {
                 switch (registryType) {
                     case SModConsts.FIN_PAY:
-                        SDbPayment payment = (SDbPayment) session.readRegistry(registryType, new int[] { SLibUtils.parseInt(data.external_resource_id) });
+                        SDbPayment payment = (SDbPayment) session.readRegistry(registryType, new int[] { SLibUtils.parseInt(data.siie_resource_id) });
                         payment.updatePaymentStatus(session, SModSysConsts.FINS_ST_PAY_REJC);
                         break;
                         

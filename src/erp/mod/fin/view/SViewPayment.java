@@ -511,7 +511,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                         }
                         else {
                             String statusDescrip = (String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { status }, SDbRegistry.FIELD_NAME);
-                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', pero debe ser '" + SDbPayment.ST_IN_AUTH + "' para poderse anular su autorización.");
+                            miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' es '" + statusDescrip + "', solo si es '" + SDbPayment.ST_IN_AUTH + "' se puede anular su autorización.");
                         }
                     }
                     catch (Exception e) {
