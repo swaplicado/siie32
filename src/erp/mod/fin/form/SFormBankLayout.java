@@ -41,7 +41,7 @@ import erp.mod.fin.db.SRowPayments;
 import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
-import erp.mod.fin.util.SBankLayoutConsts;
+import erp.mod.fin.utils.SBankLayoutConsts;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.redis.SLockUtils;
 import java.awt.BorderLayout;

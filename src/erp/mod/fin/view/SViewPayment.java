@@ -496,7 +496,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                         data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                                         data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
                                         data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT;
-                                        data.external_resource_id = payment.getPkPaymentId();
+                                        data.siie_resource_id = "" + payment.getPkPaymentId();
                                         data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
                                         data.external_user_id = rejectData.UserId;
                                         data.notes = rejectData.Notes;

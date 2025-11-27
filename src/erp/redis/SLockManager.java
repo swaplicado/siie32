@@ -12,7 +12,7 @@ import sa.lib.srv.SLockManagerInterface;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SLockManager implements SLockManagerInterface{
     

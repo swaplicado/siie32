@@ -13,7 +13,7 @@ import sa.lib.srv.SLock;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SLockUtils {
     public static SLock gainLock(SClientInterface client, int registryType, Object registryPk, long timeout) throws Exception {

@@ -30,7 +30,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -90,7 +90,6 @@ public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlYear.setForeground(new java.awt.Color(0, 0, 255));
         jlYear.setText("Año a copiar:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlYear);
@@ -120,7 +119,7 @@ public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(336, 239));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -129,7 +128,7 @@ public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfYear, jlYear);
         moFieldYear.setLengthMax(4);
@@ -271,10 +270,11 @@ public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         SDataBankNbDay registry = new SDataBankNbDay();
+        
         try {
             if (SFinUtilities.finYearExists(miClient, miClient.getSession().getCurrentYear())) {
-                if (!SDataBankNbDay.existBankNbDayInYear(miClient.getSession().getStatement(), miClient.getSession().getCurrentYear())) {
-                    if (SDataBankNbDay.existBankNbDayInYear(miClient.getSession().getStatement(), moFieldYear.getInteger())) {
+                if (!SDataBankNbDay.existBankNbDaysInYear(miClient.getSession().getStatement(), miClient.getSession().getCurrentYear())) {
+                    if (SDataBankNbDay.existBankNbDaysInYear(miClient.getSession().getStatement(), moFieldYear.getInteger())) {
                         String sql = "SELECT * FROM erp.finu_bank_nb_day WHERE YEAR(nb_day) = " + moFieldYear.getInteger() + " AND NOT b_del;";
                         Statement statement = miClient.getSession().getStatement();
                         ResultSet resultSet = statement.executeQuery(sql);
@@ -282,8 +282,8 @@ public class SFormCopyBankNbDays extends javax.swing.JDialog implements erp.lib.
                         while (resultSet.next()) {
                             registry.reset();
                             registry.setName(resultSet.getString("name"));
-                            registry.setNonBizDay(SLibTimeUtils.addDate(resultSet.getDate("nb_day"), miClient.getSession().getCurrentYear() - moFieldYear.getInteger(), 
-                                    SLibConstants.UNDEFINED, SLibConstants.UNDEFINED));
+                            registry.setNonBizDay(SLibTimeUtils.addDate(resultSet.getDate("nb_day"), miClient.getSession().getCurrentYear() - moFieldYear.getInteger(), 0, 0));
+                            registry.setNonBizType(resultSet.getString("nb_type"));
                             registry.setIsCanEdit(resultSet.getBoolean("b_can_edit"));
                             registry.setIsCanDelete(resultSet.getBoolean("b_can_del"));
                             registry.setIsDeleted(false);

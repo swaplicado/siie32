@@ -1458,7 +1458,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                                     data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
                                     data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_INVOICE;
-                                    data.external_resource_id = document.ExternalDocumentId;
+                                    data.external_resource_id = "" + document.ExternalDocumentId;
                                     data.external_resource_uuid = document.ExternalDocumentUuid; // UUID (not required in SWAP Services!)
                                     data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
                                     data.external_user_id = rejectData.UserId;

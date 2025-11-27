@@ -20,7 +20,7 @@ import erp.mod.fin.db.SAnalystDepositRow;
 import erp.mod.fin.db.SDbBankLayoutDeposits;
 import erp.mod.fin.db.SDbBankLayoutDepositsAnalyst;
 import erp.mod.fin.db.SFinConsts;
-import erp.mod.fin.util.SImportPayments;
+import erp.mod.fin.utils.SImportPayments;
 import erp.redis.SLockUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
