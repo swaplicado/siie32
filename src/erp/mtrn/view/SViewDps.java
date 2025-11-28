@@ -837,7 +837,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "d.ts_close", "Cierre surtido", STableConstants.WIDTH_DATE_TIME);
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Folio ped.", STableConstants.WIDTH_DOC_NUM);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Pedidos", STableConstants.WIDTH_DOC_NUM);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rper", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rbkc_code", "Centro contable", STableConstants.WIDTH_CODE_COB);
@@ -3460,13 +3460,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "    '')))) AS user_in_turn, ";
         }
         
+        String sqlOrders = mbIsDoc ? (
+                "SELECT GROUP_CONCAT(DISTINCT CONCAT(ord.num_ser, IF(ord.num_ser = '', '', '-'), ord.num) ORDER BY ord.num_ser, ord.num SEPARATOR '; ' ) "
+                + "FROM trn_dps_dps_supply AS dds "
+                + "INNER JOIN trn_dps AS ord ON ord.id_year = dds.id_src_year AND ord.id_doc = dds.id_src_doc "
+                + "WHERE NOT ord.b_del AND ord.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND dds.id_des_year = d.id_year AND dds.id_des_doc = d.id_doc") : "";
+        
         msSql += "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT f.code FROM cfgu_func AS f WHERE d.fid_func = f.id_func) AS f_func_code, " +
                 "(SELECT fs.code FROM cfgu_func_sub AS fs WHERE d.fid_func_sub = fs.id_func_sub) AS f_func_sub_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
-                "(SELECT CONCAT(dps_src.num_ser, IF(length(dps_src.num_ser) = 0, '', '-'), dps_src.num) " +
-                "FROM trn_dps AS dps_src INNER JOIN trn_dps_dps_supply AS spl ON dps_src.id_doc = spl.id_src_doc AND dps_src.id_year = spl.id_src_year " +
-                "WHERE spl.id_des_doc = d.id_doc AND dps_src.id_year = d.id_year AND dps_src.b_del = 0 LIMIT 1) AS f_ord_num, " +
+                "(" + (!sqlOrders.isEmpty() ? sqlOrders : "''") + ") AS f_ord_num, " +
                 "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
                 "(SELECT CONCAT(mo.id_year, '-', mo.num) FROM mfg_ord AS mo WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +

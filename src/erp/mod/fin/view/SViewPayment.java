@@ -6,6 +6,7 @@
 package erp.mod.fin.view;
 
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
@@ -904,6 +905,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 // nothing
         }
         
+        String sqlOrders = "SELECT GROUP_CONCAT(DISTINCT CONCAT(ord.num_ser, IF(ord.num_ser = '', '', '-'), ord.num) ORDER BY ord.num_ser, ord.num SEPARATOR '; ' ) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS ord ON ord.id_year = dds.id_src_year AND ord.id_doc = dds.id_src_doc "
+                + "WHERE NOT ord.b_del AND ord.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND dds.id_des_year = d.id_year AND dds.id_des_doc = d.id_doc";
+        
         msSql = "SELECT "
                 + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
                 + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
@@ -948,7 +954,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
                 + "us.usr AS usr_sched, "
-                + "us.usr AS usr_exec "
+                + "us.usr AS usr_exec, "
+                + "(" + sqlOrders + ") AS _orders "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS ve ON "
                 + "v.id_pay = ve.id_pay " 
@@ -988,6 +995,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_ety_tp", "Tipo solicitud"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, SDbConsts.FIELD_NAME, "Beneficiario pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "_dps", "Documento pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "_orders", "Pedidos documento pago", 65));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "des_pay_app_ety_cur", "Monto a pagar $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "_ety_cur_key", "Moneda a pagar"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_req", "Fecha requerida pago"));

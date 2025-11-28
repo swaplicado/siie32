@@ -73,6 +73,9 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         jlDpsEntry = new javax.swing.JLabel();
         jtfDpsEntry = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jtfPkRo = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -118,12 +121,27 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         getContentPane().add(jpDps, java.awt.BorderLayout.CENTER);
 
         jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkRo.setEditable(false);
+        jtfPkRo.setText("2001-999999-999");
+        jtfPkRo.setEnabled(false);
+        jtfPkRo.setFocusable(false);
+        jtfPkRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jtfPkRo);
+
+        jpControls.add(jPanel1);
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbClose.setText("Cerrar");
         jbClose.setToolTipText("[Escape]");
         jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbClose);
+        jPanel2.add(jbClose);
+
+        jpControls.add(jPanel2);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
@@ -139,10 +157,10 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         int i = 0;
 
         maoTableColumnsDps = new STableColumnForm[8];
-        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo vínculo", 150);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo vínculo", 200);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
-        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio doc.", 125);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE_2X);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total mon $", STableConstants.WIDTH_VALUE_2X);
         maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
@@ -188,12 +206,25 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         }
     }
 
+    private void renderDps() {
+        moPanelDps.setDps(moParamDps, null); // moParamDps can be null, and it's okay!
+        
+        if (moParamDps == null) {
+            jtfPkRo.setText("");
+        }
+        else {
+            jtfPkRo.setText(moParamDps.getPkYearId() + "-" + moParamDps.getPkDocId());
+        }
+    }
+
     private void renderDpsEntry() {
         if (moParamDpsEntry == null) {
             jlDpsEntry.setEnabled(false);
             jtfDpsEntry.setEnabled(false);
 
             jtfDpsEntry.setText("");
+            
+            jtfPkRo.setText("");
         }
         else {
             jlDpsEntry.setEnabled(true);
@@ -204,6 +235,8 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                     miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moParamDpsEntry.getOriginalQuantity()) + " " +
                     moParamDpsEntry.getDbmsOriginalUnitSymbol() + "; " + moParamDpsEntry.getConceptKey() + " - " + moParamDpsEntry.getConcept());
             jtfDpsEntry.setCaretPosition(0);
+            
+            jtfPkRo.setText(moParamDpsEntry.getPkYearId() + "-" + moParamDpsEntry.getPkDocId() + "-" + moParamDpsEntry.getPkEntryId());
         }
     }
 
@@ -212,6 +245,8 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbClose;
     private javax.swing.ButtonGroup jbtButtonGroup;
@@ -222,6 +257,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jpDpsEntry;
     private javax.swing.JPanel jpDpsRelations;
     private javax.swing.JTextField jtfDpsEntry;
+    private javax.swing.JTextField jtfPkRo;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -236,7 +272,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         mbFirstTime = true;
 
         moParamDps = null;
-        moPanelDps.setDps(null, null);
+        renderDps();
 
         moParamDpsEntry = null;
         renderDpsEntry();
@@ -287,7 +323,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
         switch (type) {
             case SDataConstants.TRN_DPS:
                 moParamDps = (SDataDps) value;
-                moPanelDps.setDps(moParamDps, null);
+                renderDps();
                 break;
 
             case SDataConstants.TRN_DPS_ETY:
@@ -609,11 +645,24 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         (anSubclassKey == null ? "" : "AND NOT (fid_tp_acc_mov = " + anSubclassKey[0] + " AND fid_cl_acc_mov = " + anSubclassKey[1] + " AND fid_cls_acc_mov = " + anSubclassKey[2] + ") ") +
                         (anSubclassKeyForAdjs == null ? "" : "AND NOT (fid_tp_acc_mov = " + anSubclassKeyForAdjs[0] + " AND fid_cl_acc_mov = " + anSubclassKeyForAdjs[1] + " AND fid_cls_acc_mov = " + anSubclassKeyForAdjs[2] + ") ") +
                         "UNION " +
-                        "SELECT DISTINCT 21 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, 'ENT' AS f_code, d.num, 0.0 AS f_tot, 0.0 AS f_tot_cur, '' AS f_cur, '' AS f_cob " +
+                        "SELECT DISTINCT 21 AS f_id_type, 'VÍNCULO COMO ORIGEN' AS f_type, d.dt, 'ENT' AS f_code, d.num AS f_num, 0.0 AS f_tot, 0.0 AS f_tot_cur, '' AS f_cur, '' AS f_cob " +
                         "FROM trn_dvy AS d " +
                         "INNER JOIN trn_dvy_ety AS de ON d.id_dvy = de.id_dvy " +
-                        "WHERE NOT d.b_del AND ((de.fk_dps_year =  " + moParamDps.getPkYearId() + " AND de.fk_dps_doc =  " + moParamDps.getPkDocId() + ") " +
-                        "OR (de.fk_ord_year =  " + moParamDps.getPkYearId() + " AND de.fk_ord_doc =  " + moParamDps.getPkDocId() + ")) "+
+                        "WHERE NOT d.b_del AND ((de.fk_dps_year = " + moParamDps.getPkYearId() + " AND de.fk_dps_doc = " + moParamDps.getPkDocId() + ") " +
+                        "OR (de.fk_ord_year = " + moParamDps.getPkYearId() + " AND de.fk_ord_doc = " + moParamDps.getPkDocId() + ")) "+
+                        "UNION " +
+                        "SELECT DISTINCT 31 AS f_id_type, 'PROCESAMIENTO SWAP SERVICES' AS f_type, sdp.ts_usr_ins AS dt, '' AS f_code, CONCAT('ID: ', sdp.id_swap_data_prc, '/ ID-Ext.: ', sdp.ext_data_id) AS f_num, d.tot_r AS f_tot, d.tot_cur_r AS f_tot_cur, c.cur_key AS f_cur, cob.code AS f_cob " +
+                        "FROM trn_swap_data_prc AS sdp " +
+                        "INNER JOIN trn_dps AS d ON d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n " +
+                        "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur " +
+                        "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = d.fid_cob " +
+                        "WHERE NOT sdp.b_del AND NOT d.b_del AND sdp.fk_dps_year_n = " + moParamDps.getPkYearId() + " AND sdp.fk_dps_doc_n = " + moParamDps.getPkDocId() + " " +
+                        "UNION " +
+                        "SELECT DISTINCT 41 AS f_id_type, 'SOLICITUD PAGO | PAGO' AS f_type, p.dt_app AS dt, '' AS f_code, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS f_num, pe.ety_pay_app AS f_tot, pe.ety_pay_cur AS f_tot_cur, c.cur_key AS f_cur, '' AS f_cob " +
+                        "FROM fin_pay AS p " +
+                        "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
+                        "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = p.fk_cur " +
+                        "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + moParamDps.getPkYearId() + " AND pe.fk_doc_doc_n = " + moParamDps.getPkDocId() + " " +
                         "ORDER BY f_id_type, f_code, f_num ";
 
                 oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
@@ -639,6 +688,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
 
                         moPaneGrid.addTableRow(row);
                     }
+                    
                     moPaneGrid.renderTableRows();
                     moPaneGrid.setTableRowSelection(0);
 

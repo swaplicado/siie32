@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 292.1/ 2025-11-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de información de validación de factura SIIE vs. factura SWAP Services en diálogo de importación de facturas autorizadas.
+2) Adición de columna con folios de pedidos de compras en vista de solicitudes de pago.
+
+================================================================================
 SIIE 3.2 292.0/ 2025-11-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

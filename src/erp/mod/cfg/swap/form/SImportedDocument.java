@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.form;
 
 import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -32,6 +33,7 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
@@ -62,6 +64,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene solicitud de pago.";
     public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene solicitud de pago: ";
     
+    private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
+    private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
+    
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
     public int BizPartnerId;
@@ -90,7 +95,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public boolean Download;
     public boolean AlreadyDownloaded;
     
-    public SDbSwapDataProcessing.ProcessedDps ProcessedDps;
+    public ProcessedDps ProcessedDps;
     public SDbSwapDataProcessing SwapDataProcessing;
     public SDbPayment Payment;
     
@@ -673,7 +678,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 int recNumberId = (Integer) recKey[4];
                 String recCompanyBranchCode = SDataRecord.getCompanyBranchCode(dps.getDbmsRecordKey(), session.getStatement());
 
-                ProcessedDps = new SDbSwapDataProcessing.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), 
+                ProcessedDps = new SImportedDocument.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), dps.getDpsNumber(), dps.getDate(), dps.getTotalCy_r(), dps.getDbmsCurrencyCode(), 
                         recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode, 
                         dps.getFkUserNewId(), dps.getDbmsUserNew(), dps.getThinCfd() != null, dps.getThinPdf() != null);
 
@@ -834,7 +839,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     public void retrieveProcessing(final SGuiSession session, final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
-        ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
+        ProcessedDps = SImportedDocument.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
 
         if (ProcessedDps != null) {
             SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
@@ -1159,7 +1164,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = isProcessed();
                 break;
             case 10:
-                value = !isProcessed() ? "" : ProcessedDps.composeRecord();
+                value = !isProcessed() ? null : ProcessedDps.composeRecord();
                 break;
             case 11:
                 value = !isProcessed() ? false : ProcessedDps.HasCfd;
@@ -1198,16 +1203,48 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = RequiredPaymentNotes;
                 break;
             case 23:
-                value = isPaymentRequested() ? Payment.getFolio() : null;
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 24:
-                value = isPaymentRequested() ? Payment.getDateApplication() : null;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 25:
                 value = ExternalDocumentId;
                 break;
             case 26:
                 value = ExternalDocumentUuid;
+                break;
+            case 27:
+                value = !isProcessed() ? null : ProcessedDps.DpsFolio;
+                break;
+            case 28:
+                value = !isProcessed() ? null : ProcessedDps.DpsDate;
+                break;
+            case 29:
+                value = !isProcessed() ? null : ProcessedDps.DpsTotalCy;
+                break;
+            case 30:
+                value = !isProcessed() ? null : ProcessedDps.DpsCurrencyCode;
+                break;
+            case 31:
+                String string = null;
+                if (isProcessed()) {
+                    boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
+                    boolean isCurrencyOk = CurrencyCode.equals(ProcessedDps.DpsCurrencyCode);
+                    
+                    if (isTotalOk && isCurrencyOk) {
+                        string = "OK";
+                    }
+                    else {
+                        if (!isTotalOk) {
+                            string = "Dif. total: " + SLibUtils.getDecimalFormatAmount().format(ProcessedDps.DpsTotalCy - Total);
+                        }
+                        if (!isCurrencyOk) {
+                            string = (string == null ? "" : string + "; ") + "Dif. moneda: " + ProcessedDps.DpsCurrencyCode;
+                        }
+                    }
+                }
+                value = string;
                 break;
             default:
                 // nothing
@@ -1304,6 +1341,114 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
+     * Create prepared statement to get Processed DPS from SWAP processed data by its external ID.
+     * @param statement DB statement.
+     * @return A prepared statment with these columns: id_swap_data_prc, dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @throws Exception 
+     */
+    public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final Statement statement) throws Exception {
+        String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, "
+                + "sdp.fk_dps_year_n AS dps_id_year, sdp.fk_dps_doc_n AS dps_id_doc, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS dps_folio, d.dt AS dps_date, d.tot_cur_r AS dps_tot_cur, c.cur_key AS dps_cur_code, "
+                + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code, "
+                + "un.id_usr, un.usr, cfd.id_cfd, pdf.doc_pdf_name "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
+                + "d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON "
+                + "c.id_cur = d.fid_cur "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON "
+                + "dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON "
+                + "r.id_year = dr.fid_rec_year AND r.id_per = dr.fid_rec_per AND r.id_bkc = dr.fid_rec_bkc AND r.id_tp_rec = dr.fid_rec_tp_rec AND r.id_num = dr.fid_rec_num "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON "
+                + "cob.id_bpb = r.fid_cob "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON "
+                + "un.id_usr = d.fid_usr_new "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON "
+                + "cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
+                + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(statement.getConnection()) + "." + SModConsts.TablesMap.get(SModConsts.TRN_PDF) + " AS pdf ON "
+                + "pdf.id_year = d.id_year AND pdf.id_doc = d.id_doc "
+                + "WHERE NOT sdp.b_del AND sdp.data_type = ? AND sdp.txn_cat = ? AND sdp.ext_data_id = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
+     * Get Processed DPS from SWAP processed data, if any, by its external ID.
+     * @param preparedStatement Prepared statement.
+     * @param dataType Constants DATA_TYPE...: INV = invoice; DB = debit note; CN = credit note.
+     * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
+     * @param externalId External ID.
+     * @return A Processed DPS if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SImportedDocument.ProcessedDps getProcessedDpsByExternalId(final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+        SImportedDocument.ProcessedDps processedDps = null;
+        
+        preparedStatement.setString(1, dataType);
+        preparedStatement.setInt(2, txnCategory);
+        preparedStatement.setInt(3, externalId);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                processedDps = new SImportedDocument.ProcessedDps(resultSet.getInt("id_swap_data_prc"), resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), resultSet.getString("dps_folio"), resultSet.getDate("dps_date"), resultSet.getDouble("dps_tot_cur"), resultSet.getString("dps_cur_code"), 
+                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"), 
+                        resultSet.getInt("un.id_usr"), resultSet.getString("un.usr"), resultSet.getInt("id_cfd") != 0, resultSet.getString("doc_pdf_name") != null);
+            }
+        }
+        
+        return processedDps;
+    }
+    
+    /**
+     * Create prepared statement to get Processed DPS from Payable or Receivable Accounts by its own document data.
+     * @param statement DB statement.
+     * @param dpsTypeKey Key of DPS type: (category, class & type).
+     * @return A prepared statment with these columns: dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @throws Exception 
+     */
+    public static PreparedStatement createPrepStatementToGetDpsKeyByDocData(final Statement statement, final int[] dpsTypeKey) throws Exception {
+        String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                + "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " "
+                + "AND d.fid_bp_r = ? AND d.dt = ? AND d.num_ser = ? AND d.num = ? AND d.tot_cur_r = ? AND d.fid_cur = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
+     * Get DPS primary key from Payable or Receivable Accounts, if any, by its own document data.
+     * @param preparedStatement Prepared statement.
+     * @param bizPartnerId Document's ID of business partner.
+     * @param date Document's date.
+     * @param numberSeries Document's folio series.
+     * @param number Document's folio number.
+     * @param total Document's net total.
+     * @param currencyId Document's ID of currency.
+     * @return A DPS primary key if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static int[] getDpsKeyByDocData(final PreparedStatement preparedStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
+        int[] dpsKey = null;
+        
+        preparedStatement.setInt(1, bizPartnerId);
+        preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
+        preparedStatement.setString(3, numberSeries);
+        preparedStatement.setString(4, number);
+        preparedStatement.setDouble(5, total);
+        preparedStatement.setInt(6, currencyId);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                dpsKey = new int[] { resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc") };
+            }
+        }
+        
+        return dpsKey;
+    }
+    
+    /**
      * Create a basic and elemental version of an imported document from SWAP data processed DPS to be used in SFormDps.
      * @param statement DB statement.
      * @param dpsKey DPS key.
@@ -1368,6 +1513,80 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         return importedDocument;
+    }
+    
+    /**
+     * In memory Processed DPS.
+     */
+    public static class ProcessedDps implements Serializable {
+        
+        public int SwapDataProcessingId;
+        public int DpsYearId;
+        public int DpsDocId;
+        public String DpsFolio;
+        public Date DpsDate;
+        public double DpsTotalCy;
+        public String DpsCurrencyCode;
+        public int RecYearId;
+        public int RecPeriodId;
+        public int RecBookkeepingCenterId;
+        public String RecRecordTypeId;
+        public int RecNumberId;
+        public String RecCompanyBranchCode;
+        public int UserNewId;
+        public String UserNew;
+        public boolean HasCfd;
+        public boolean HasPdf;
+        
+        public ProcessedDps(final int swapDataProcessingId, final int dpsYearId, final int dpsDocId, final String dpsFolio, final Date dpsDate, final double dpsTotalCy, final String dpsCurrencyCode, 
+                final int recYearId, final int recPeriodId, final int recBookkeepingCenterId, final String recRecordTypeId, final int recNumberId, final String recCompanyBranchCode, 
+                final int userNewId, final String userNew, final boolean hasCfd, final boolean hasPdf) {
+            SwapDataProcessingId = swapDataProcessingId;
+            DpsYearId = dpsYearId;
+            DpsDocId = dpsDocId;
+            DpsFolio = dpsFolio;
+            DpsDate = dpsDate;
+            DpsTotalCy = dpsTotalCy;
+            DpsCurrencyCode = dpsCurrencyCode;
+            RecYearId = recYearId;
+            RecPeriodId = recPeriodId;
+            RecBookkeepingCenterId = recBookkeepingCenterId;
+            RecRecordTypeId = recRecordTypeId;
+            RecNumberId = recNumberId;
+            RecCompanyBranchCode = recCompanyBranchCode;
+            UserNewId = userNewId;
+            UserNew = userNew;
+            HasCfd = hasCfd;
+            HasPdf = hasPdf;
+        }
+        
+        public int[] getDpsKey() {
+            int[] key = null;
+            
+            if (DpsYearId != 0 && DpsDocId != 0) {
+                key = new int[] { DpsYearId, DpsDocId };
+            }
+            
+            return key;
+        }
+        
+        public Object[] getRecordKey() {
+            Object[] key = null;
+            
+            if (RecYearId != 0 && RecPeriodId != 0 && RecBookkeepingCenterId != 0 && !RecRecordTypeId.isEmpty() && RecNumberId != 0) {
+                key = new Object[] { RecYearId, RecPeriodId, RecBookkeepingCenterId, RecRecordTypeId, RecNumberId };
+            }
+            
+            return key;
+        }
+        
+        public String composeRecord() {
+            return RecYearId + "-" +
+                    RecPeriodFormat.format(RecPeriodId) + " " +
+                    RecCompanyBranchCode + " " +
+                    RecRecordTypeId + "-" +
+                    RecNumberFormat.format(RecNumberId);
+        }
     }
     
     public static class Reference implements Serializable {

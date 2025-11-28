@@ -815,7 +815,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES)); // col 25
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES));
-
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
+                
                 return gridColumnsForm;
             }
         };
@@ -901,9 +906,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             // Instanciar prepared statements:
             
-            moPrepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession());
-            moPrepStatToGetProcessedDpsByExternalId = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession());
-            moPrepStatToGetDpsKeyByDocData = SDbSwapDataProcessing.createPrepStatementToGetDpsKeyByDocData(miClient.getSession(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
+            moPrepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession().getStatement());
+            moPrepStatToGetProcessedDpsByExternalId = SImportedDocument.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession().getStatement());
+            moPrepStatToGetDpsKeyByDocData = SImportedDocument.createPrepStatementToGetDpsKeyByDocData(miClient.getSession().getStatement(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -979,7 +984,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         boolean isRegistered = document.isProcessed();
         
         if (!isRegistered) {
-            int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+            int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
             if (dpsKey != null) {
                 isRegistered = true;
@@ -1327,7 +1332,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     if (!document.isProcessed()) {
                         unlinked++;
-                        int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+                        int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
                             if (document.link(miClient.getSession(), dpsKey, false, false, msSyncUrlDownload)) {

@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -518,17 +519,17 @@ public abstract class SImportUtils {
      *      3   User ID.
      *      4   Entry response code.
      *      5   Reference ID.
-     * @param session GUI session.
+     * @param statement DB statement.
      * @return Prepared statement.
      * @throws Exception 
      */
-    public static PreparedStatement createPreparedStatementToCountImports(final SGuiSession session) throws Exception {
+    public static PreparedStatement createPreparedStatementToCountImports(final Statement statement) throws Exception {
         String sql = "SELECT COUNT(*) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG) + " AS il "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG_ETY) + " AS ile ON ile.id_sync_log = il.id_sync_log "
                 + "WHERE il.sync_type = ? AND il.response_code = ? AND il.fk_usr = ? AND ile.response_code = ? AND ile.reference_id = ?;";
         
-        return session.getStatement().getConnection().prepareStatement(sql);
+        return statement.getConnection().prepareStatement(sql);
     }
     
     /**
