@@ -1047,6 +1047,7 @@ public abstract class SExportDataUtils {
                         + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                         + "AND d.id_year >= " + session.getSystemYear() + " " // establecer como límite hasta el año actual
                         + "AND ("
+//                        + "d.id_doc = 14947 "
                         + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
                         + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ") "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"

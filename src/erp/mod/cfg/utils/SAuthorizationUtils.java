@@ -2212,7 +2212,10 @@ public abstract class SAuthorizationUtils {
                             sent = true; 
                             System.out.println("Enviado a autorización con éxito.");
                         }
-                        else System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                        else {
+                            System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, responseJson);
+                        } 
                     }
                 }
             }
