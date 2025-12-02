@@ -2892,7 +2892,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     }
                     else {
                         SCfdRenderer renderer = new SCfdRenderer(miClient);
-                        renderer.showCfdi(cfd.getDocXml());
+                        renderer.showCfd(cfd.getDocXml());
                     }
                 }
                 catch (Exception e) {

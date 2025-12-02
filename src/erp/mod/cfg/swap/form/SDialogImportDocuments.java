@@ -8,6 +8,7 @@ package erp.mod.cfg.swap.form;
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -108,6 +109,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected SBeanFieldBoolean moBoolExportPaymentRequestsOnClose;
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
+    protected SDialogPdfViewer moDialogPdfViewer;
     
     /**
      * Creates new form SDialogImportDocuments
@@ -183,6 +185,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbRejectInvoice = new javax.swing.JButton();
         jpProcessingN6 = new javax.swing.JPanel();
         jlInvoice = new javax.swing.JLabel();
+        jbViewInvoicePdf = new javax.swing.JButton();
         jpProcessingN7 = new javax.swing.JPanel();
         jtfInvoice = new javax.swing.JTextField();
         jbViewInvoice = new javax.swing.JButton();
@@ -452,8 +455,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlInvoice.setText("Factura:");
-        jlInvoice.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
         jpProcessingN6.add(jlInvoice);
+
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setToolTipText("Ver PDF de la factura...");
+        jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN6.add(jbViewInvoicePdf);
 
         jpProcessingN.add(jpProcessingN6);
 
@@ -497,7 +505,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlReqPay.setText("Pago requerido:");
-        jlReqPay.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlReqPay.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN9.add(jlReqPay);
 
         jpProcessingN.add(jpProcessingN9);
@@ -552,7 +560,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jlPay.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlPay.setText("Solicitud de pago:");
-        jlPay.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPay.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN13.add(jlPay);
 
         jpProcessingN.add(jpProcessingN13);
@@ -607,7 +615,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaySched.setText("Programación del pago:");
-        jlPaySched.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPaySched.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN17.add(jlPaySched);
 
         jpProcessingN.add(jpProcessingN17);
@@ -632,7 +640,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayExec.setText("Operación del pago:");
-        jlPayExec.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPayExec.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN19.add(jlPayExec);
 
         jpProcessingN.add(jpProcessingN19);
@@ -690,6 +698,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbShowDocs;
     private javax.swing.JButton jbUnlinkInvoice;
     private javax.swing.JButton jbViewInvoice;
+    private javax.swing.JButton jbViewInvoicePdf;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JButton jbViewRecord;
     private javax.swing.JLabel jlDateEnd;
@@ -1722,6 +1731,46 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void actionPerformedViewInvoicePdf() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                File pdf = SImportUtils.getDocumentFileFromTempDir(document.ExternalDocumentId, SFileUtilities.pdf);
+                
+                if (pdf == null) {
+                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
+
+                    if (files == null || files.length != 2) {
+                        throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+                    }
+                    else if (files[SImportUtils.CFDI_PDF] == null) {
+                        throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+                    }
+                    else {
+                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF]);
+                    }
+                }
+                
+                if (pdf != null) {
+                    if (moDialogPdfViewer == null) {
+                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                    }
+
+                    moDialogPdfViewer.setPdf(new SDocumentInfo(document), pdf);
+                    moDialogPdfViewer.setVisible(true);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     private void actionPerformedViewInvoice() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
@@ -1959,6 +2008,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbLinkInvoice.setEnabled(false);
             jbRejectInvoice.setEnabled(false);
             jbUnlinkInvoice.setEnabled(false);
+            jbViewInvoicePdf.setEnabled(false);
             jbViewInvoice.setEnabled(false);
             jbViewOrder.setEnabled(false);
             jbViewRecord.setEnabled(false);
@@ -1994,6 +2044,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbLinkInvoice.setEnabled(true);
             jbRejectInvoice.setEnabled(true);
             jbUnlinkInvoice.setEnabled(true);
+            jbViewInvoicePdf.setEnabled(true);
             jbViewInvoice.setEnabled(true);
             jbViewOrder.setEnabled(true);
             jbViewRecord.setEnabled(true);
@@ -2150,6 +2201,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkInvoice.addActionListener(this);
         jbRejectInvoice.addActionListener(this);
         jbUnlinkInvoice.addActionListener(this);
+        jbViewInvoicePdf.addActionListener(this);
         jbViewInvoice.addActionListener(this);
         jbViewOrder.addActionListener(this);
         jbViewRecord.addActionListener(this);
@@ -2178,6 +2230,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkInvoice.removeActionListener(this);
         jbRejectInvoice.removeActionListener(this);
         jbUnlinkInvoice.removeActionListener(this);
+        jbViewInvoicePdf.removeActionListener(this);
         jbViewInvoice.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
         jbViewRecord.removeActionListener(this);
@@ -2258,6 +2311,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else if (button == jbUnlinkInvoice) {
                 actionPerformedUnlinkInvoice();
+            }
+            else if (button == jbViewInvoicePdf) {
+                actionPerformedViewInvoicePdf();
             }
             else if (button == jbViewInvoice) {
                 actionPerformedViewInvoice();

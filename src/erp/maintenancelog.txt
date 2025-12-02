@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 292.2/ 2025-12-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de visualización del PDF de facturas autorizadas al contabilizarse.
+- En el díalogo de importación de facturas autorizadas.
+- En el visor del XML del CFDI de facturas autorizadas.
+- Al relacionar la OC en la importación de facturas autorizadas.
+
+================================================================================
 SIIE 3.2 292.1/ 2025-11-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

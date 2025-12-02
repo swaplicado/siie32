@@ -273,7 +273,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
 
         jpCfdiConcept.add(jpCfdiConceptData, java.awt.BorderLayout.CENTER);
 
-        jpOrderEntry.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida OC:"));
+        jpOrderEntry.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida seleccionada de la OC:"));
         jpOrderEntry.setLayout(new java.awt.BorderLayout());
 
         jpOrderEntryPrice.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
@@ -294,7 +294,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
 
         jpDocumentEntries.add(jpCfdiConcept, java.awt.BorderLayout.NORTH);
 
-        jpDocumentEntriesGrid.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas de la OC disponibles para vinculación:"));
+        jpDocumentEntriesGrid.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas de la OC disponibles para relacionar:"));
         jpDocumentEntriesGrid.setPreferredSize(new java.awt.Dimension(865, 90));
         jpDocumentEntriesGrid.setLayout(new java.awt.BorderLayout(0, 2));
 
