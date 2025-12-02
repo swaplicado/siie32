@@ -522,7 +522,7 @@ public abstract class SExportUtils {
      * @return Number of entries logged.
      * @throws SQLException Si ocurre un error en las actualizaciones.
      */
-    protected static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
+    public static int logSync(final SGuiSession session, final SSyncType syncType, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<SDbSyncLogEntry> syncLogEntries) throws SQLException, Exception {
         int entriesLogged = 0;
         String fileNameRequestBody = "";
         String fileNameResponseBody = "";

@@ -54,12 +54,12 @@ public class SExportPayments extends Thread {
                 System.out.println("Subida de archivos a Google Cloud Storage con éxito.");
                 
                 String requestBody = createJSONrequestBody(expDataFiles); // creación del JSON que se envía a la app web 
-                
-                if (SAuthorizationUtils.computePaymentRequest(miClient.getSession(), SSwapConsts.CFG_OBJ_TXN_PUR_PAY, requestBody)) {
+                String sResult = SAuthorizationUtils.computeRequest(miClient.getSession(), SSwapConsts.CFG_OBJ_TXN_PUR_PAY, requestBody);
+                if (sResult.isEmpty()) {
                     moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_IN_AUTH);
                 }
                 else {
-                    miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.");
+                    miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + sResult);
                 }
             }
             else {

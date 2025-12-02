@@ -38,10 +38,11 @@ public class SDpsGoogleCloudUtils {
      *
      * @param session Sesión actual de la aplicación
      * @param fileData Metadatos del archivo a procesar
+     * @param oPdfFile
      * @param forceUpload
      * @return SDbComSyncLogEntry con el resultado del procesamiento, o null si no se requiere logging
      */
-    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData, final boolean forceUpload) {
+    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData, File oPdfFile, final boolean forceUpload) {
         SDbComSyncLogEntry logEntry = new SDbComSyncLogEntry();
         logEntry.setReferenceId(fileData.getIdYear() + "_" + fileData.getIdDoc());
         logEntry.setAuxDatabase(fileData.getDbName());
@@ -55,9 +56,14 @@ public class SDpsGoogleCloudUtils {
                 // Subir si no existe en GCS
                 SDataDps oDps = new SDataDps();
                 oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
-                File pdf = new File("temp", fileData.getFileName());
-
-                STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                File pdf;
+                if (oPdfFile == null) {
+                    pdf = new File("temp", fileData.getFileName());
+                    STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                }
+                else {
+                    pdf = oPdfFile;
+                }
                 gcsFile = SDpsGoogleCloudUtils.uploadFile(pdf.getAbsolutePath(), fileData.getFileName());
                 logEntry.setResponseCode((gcsFile == null ? HttpURLConnection.HTTP_INTERNAL_ERROR : HttpURLConnection.HTTP_OK) + "");
                 shouldLog = true;
@@ -74,8 +80,14 @@ public class SDpsGoogleCloudUtils {
                 if (lastSync == null || fileData.getLastUpdate() == null || fileData.getLastUpdate().after(lastSync)) {
                     SDataDps oDps = new SDataDps();
                     oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
-                    File pdf = new File("temp", fileData.getFileName());
-                    STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                    File pdf;
+                    if (oPdfFile == null) {
+                        pdf = new File("temp", fileData.getFileName());
+                        STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                    }
+                    else {
+                        pdf = oPdfFile;
+                    }
                     gcsFile = SDpsGoogleCloudUtils.uploadFile(pdf.getAbsolutePath(), fileData.getFileName());
                     logEntry.setResponseCode((gcsFile == null ? HttpURLConnection.HTTP_INTERNAL_ERROR : HttpURLConnection.HTTP_OK) + "");
                     shouldLog = true;
@@ -113,7 +125,8 @@ public class SDpsGoogleCloudUtils {
                     ObjectMapper objectMapper = new ObjectMapper();
                     logEntry.setResponseBody(objectMapper.writeValueAsString(fileData));
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 // Evita que un error serializando JSON bloquee el log
                 logEntry.setResponseBody("Error serializando datos del archivo.");
             }
@@ -142,84 +155,9 @@ public class SDpsGoogleCloudUtils {
             for (Map.Entry<SFileData, File> entrySet : mFiles.entrySet()) {
                 SFileData fileData = entrySet.getKey();   // Metadatos del archivo
                 File file = entrySet.getValue();          // Archivo físico en el sistema
-                SDbComSyncLogEntry logEntry = new SDbComSyncLogEntry(); // Registro de log por archivo
+                SDbComSyncLogEntry logEntry = SDpsGoogleCloudUtils.processSingleRecord(session, fileData, file, false);
+                lLogs.add(logEntry);
 
-                // Construcción del identificador de referencia para el log
-                logEntry.setReferenceId(fileData.getIdYear() + "_" + fileData.getIdDoc());
-                logEntry.setAuxDatabase(fileData.getDbName());
-
-                CloudStorageFile gcsFile = null;
-                boolean shouldLog = false;
-
-                try {
-                    // 1. Verificar si el archivo existe en GCS
-                    if (!CloudStorageManager.storagedFileExists(fileData.getFileName())) {
-                        // Subir si no existe en GCS
-                        gcsFile = SDpsGoogleCloudUtils.uploadFile(file.getAbsolutePath(), fileData.getFileName());
-                        logEntry.setResponseCode((gcsFile == null ? HttpURLConnection.HTTP_INTERNAL_ERROR : HttpURLConnection.HTTP_OK) + "");
-                        shouldLog = true;
-                        if (gcsFile == null) {
-                            hasErrors = true;
-                        }
-                    }
-                    else {
-                        // 2. Si ya existe, verificar sincronización en la BD
-                        Date lastSync = SExportDpsFileUtils.isResourceCompanySinchronized(
-                                session.getStatement().getConnection().createStatement(),
-                                SSyncType.PUR_ORDER_FILE,
-                                fileData.getIdYear() + "_" + fileData.getIdDoc()
-                        );
-
-                        if (lastSync == null || fileData.getLastUpdate().after(lastSync)) {
-                            gcsFile = SDpsGoogleCloudUtils.uploadFile(file.getAbsolutePath(), fileData.getFileName());
-                            logEntry.setResponseCode((gcsFile == null ? HttpURLConnection.HTTP_INTERNAL_ERROR : HttpURLConnection.HTTP_OK) + "");
-                            shouldLog = true;
-                            if (gcsFile == null) {
-                                hasErrors = true;
-                            }
-                        }
-                    }
-
-                    // Si se subió correctamente, actualizar los metadatos con info de GCS
-                    if (gcsFile != null) {
-                        fileData.setProjectId(gcsFile.getProjectId());
-                        fileData.setBucketName(gcsFile.getBucketName());
-                    }
-                }
-                catch (StorageManagerException ex) {
-                    // Error específico en uploadFile → se marca el log con error
-                    Logger.getLogger(SDpsGoogleCloudUtils.class.getName()).log(Level.SEVERE,
-                            "Error al subir archivo a GCS: " + fileData.getFileName(), ex);
-                    logEntry.setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR + "");
-                    logEntry.setResponseBody("Error en GCS: " + ex.getMessage());
-                    shouldLog = true;
-                    hasErrors = true;
-                }
-                catch (Exception ex) {
-                    // Cualquier otro error inesperado en este archivo
-                    Logger.getLogger(SDpsGoogleCloudUtils.class.getName()).log(Level.SEVERE,
-                            "Error inesperado al procesar archivo: " + fileData.getFileName(), ex);
-                    logEntry.setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR + "");
-                    logEntry.setResponseBody("Error inesperado: " + ex.getMessage());
-                    shouldLog = true;
-                    hasErrors = true;
-                }
-
-                // Registrar en log si hubo acción de subida o error
-                if (shouldLog) {
-                    try {
-                        if (logEntry.getResponseBody() == null || logEntry.getResponseBody().isEmpty()) {
-                            logEntry.setResponseBody(objectMapper.writeValueAsString(fileData));
-                        }
-                    }
-                    catch (Exception ex) {
-                        // Evita que un error serializando JSON bloquee el log
-                        logEntry.setResponseBody("Error serializando datos del archivo.");
-                    }
-                    lLogs.add(logEntry);
-                }
-
-                file.delete();
             }
 
             // Guardar todos los logs de la operación de sincronización
@@ -238,7 +176,7 @@ public class SDpsGoogleCloudUtils {
 
             // Recorre todos los archivos que se desean subir
             for (SFileData fileData : lFiles) {
-                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData, false);
+                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData, null, false);
                 
                 if (logEntry != null) {
                     lLogs.add(logEntry);
@@ -250,7 +188,8 @@ public class SDpsGoogleCloudUtils {
 
             // Guardar todos los logs de la operación de sincronización
             saveSyncLogs(session, lLogs, hasErrors);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             // Este catch global solo atrapa errores "fuera del ciclo"
             Logger.getLogger(SDpsGoogleCloudUtils.class.getName()).log(Level.SEVERE, "Error inesperado en el proceso de carga", ex);
         }
@@ -271,6 +210,10 @@ public class SDpsGoogleCloudUtils {
 
     /**
      * Guarda los logs de sincronización en la base de datos
+     * @param session
+     * @param logs
+     * @param hasErrors
+     * @throws java.lang.Exception
      */
     public static void saveSyncLogs(final SGuiSession session, final ArrayList<SDbSyncLogEntry> logs, final boolean hasErrors) throws Exception {
         // Código de respuesta general: 206 si hubo errores, 200 si todo OK
@@ -295,7 +238,8 @@ public class SDpsGoogleCloudUtils {
         try {
             int code = Integer.parseInt(responseCode);
             return code >= 400;
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             return true;
         }
     }

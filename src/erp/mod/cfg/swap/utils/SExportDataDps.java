@@ -5,6 +5,8 @@
  */
 package erp.mod.cfg.swap.utils;
 
+import erp.mod.trn.api.data.SWebDps;
+
 /**
  * Clase que representa la estructura de datos para exportar información de referencias en formato JSON.
  * Utilizada para el intercambio de datos con sistemas externos.
@@ -14,6 +16,10 @@ package erp.mod.cfg.swap.utils;
  * @author Edwin Carmona
  */
 public class SExportDataDps implements SExportData {
+
+    public SExportDataDps() {
+        this.authz_authorization = 1;
+    }
     
     /**
      * ID de la empresa del documento en el sistema externo.
@@ -81,6 +87,16 @@ public class SExportDataDps implements SExportData {
     public String payment_method;
     
     /**
+     * Conceptos de gasto de las partidas del documento
+     */
+    public String concepts;
+    
+    /**
+     * Centros de costo de las partidas del documento
+     */
+    public String cost_profit_center;
+    
+    /**
      * Notas del documento a nivel encabezado.
      */
     public String notes;
@@ -94,4 +110,24 @@ public class SExportDataDps implements SExportData {
      * Indicador de borrada del documento.
      */
     public boolean is_deleted;
+    
+    /**
+     * Prioridad de la autorización
+     */
+    public int priority;
+    
+    /**
+     * Estatus de autorización para el sistema externo
+     */
+    public int authz_authorization;
+    
+    /**
+     * Notas de quien inició el proceso de autorización
+     */
+    public String authz_notes;
+    
+    /**
+     * JSON de la OC para el portal de compras.
+     */
+    public SWebDps document_json;
 }

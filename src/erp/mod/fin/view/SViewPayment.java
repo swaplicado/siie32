@@ -342,7 +342,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                         int status = payment.getFkStatusPaymentId(); // convenience variable
 
                         if (status != SModSysConsts.FINS_ST_PAY_NEW) {
-                            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, payment.getPkPaymentId());
+                            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), 
+                                                                                    SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, 
+                                                                                    payment.getPkPaymentId() + "");
                             miClient.showMsgBoxInformation(authFlowStatus.toString());
                         }
                         else {

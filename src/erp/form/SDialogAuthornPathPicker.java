@@ -89,7 +89,7 @@ public class SDialogAuthornPathPicker extends JDialog implements ActionListener 
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Seleccionar ruta de autorización");
+        setTitle("Seleccionar ruta de autorización (Portal Compras)");
         setIconImages(null);
         setModal(true);
         setResizable(false);
@@ -233,44 +233,50 @@ public class SDialogAuthornPathPicker extends JDialog implements ActionListener 
     private void readPaths() {
         try {
             maPaths = new ArrayList<>();
-            switch(mnPickerType) {
-                case SModConsts.FIN_PAY:
-                    String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG;
-                    String jsonBaseKey = SSwapConsts.CFG_OBJ_AUTH_SRV;
-                    
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), cfgParamKey));
-                    String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
-                    
-                    syncUrl += "/flow-models-by?"
-                            + "id_external_system=" + SSwapConsts.SIIE_EXT_SYS_ID + "&"
-                            + "id_external_user=" + miClient.getSession().getUser().getPkUserId() + "&"
-                            + "id_model_type=" + SSwapConsts.FLOW_MODEL_TYPE + "&"
-                            + "id_flow_type=" + SSwapConsts.FLOW_TYPE + "";
-                    String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
-                    String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
-                    String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
-                    
-                    JsonNode responseJson = new ObjectMapper().readTree(responseBody);
-                    if (SAuthJsonUtils.containsElement(responseJson, "", "flow_models")) {
-                        JsonNode models = responseJson.path("flow_models");
-                        if (models.isArray()) {
-                            for (JsonNode model : models) {
-                                if (model.has("id") && model.has("name") && model.has("description") && model.has("is_deleted")) {
-                                    if (!model.path("is_deleted").asBoolean()) {
-                                        SRowAuthornPathPicker row = new SRowAuthornPathPicker();
-                                        row.setPkId(model.path("id").asInt());
-                                        row.setName(model.path("name").asText());
-                                        row.setDescription(model.path("description").asText());
-                                        maPaths.add(row);
-                                    }
-                                }
+            int flowType = 0;
+            switch (mnPickerType) {
+                case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+                    flowType = SSwapConsts.FLOW_TYPE_PAYMENT;
+                    break;
+                case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+                    flowType = SSwapConsts.FLOW_TYPE_PUR_ORDER;
+                    break;
+                default:
+                    break;
+            }
+            
+            String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG;
+            String jsonBaseKey = SSwapConsts.CFG_OBJ_AUTH_SRV;
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), cfgParamKey));
+            String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+
+            syncUrl += "/flow-models-by?"
+                    + "id_external_system=" + SSwapConsts.SIIE_EXT_SYS_ID + "&"
+                    + "id_external_user=" + miClient.getSession().getUser().getPkUserId() + "&"
+                    + "id_model_type=" + SSwapConsts.FLOW_MODEL_TYPE + "&"
+                    + "id_flow_type=" + flowType + "";
+            String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
+            String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+            String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_GET, "", syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
+
+            JsonNode responseJson = new ObjectMapper().readTree(responseBody);
+            if (SAuthJsonUtils.containsElement(responseJson, "", "flow_models")) {
+                JsonNode models = responseJson.path("flow_models");
+                if (models.isArray()) {
+                    for (JsonNode model : models) {
+                        if (model.has("id") && model.has("name") && model.has("description") && model.has("is_deleted")) {
+                            if (!model.path("is_deleted").asBoolean()) {
+                                SRowAuthornPathPicker row = new SRowAuthornPathPicker();
+                                row.setPkId(model.path("id").asInt());
+                                row.setName(model.path("name").asText());
+                                row.setDescription(model.path("description").asText());
+                                maPaths.add(row);
                             }
                         }
                     }
-                    break;
-                
-                default:
+                }
             }
             populateGridPaths();
         }

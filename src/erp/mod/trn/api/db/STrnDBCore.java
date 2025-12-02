@@ -12,7 +12,6 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
-import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.trn.api.data.SWebAuthStep;
 import erp.mod.trn.api.data.SWebAuthorization;
@@ -30,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
 
 /**
  * Clase que gestiona consultas relacionadas con documentos (DPS) desde la base
@@ -41,18 +41,20 @@ import sa.lib.SLibUtils;
 public class STrnDBCore {
 
     SMySqlClass oDbObj;
+    SGuiSession oSession;
     String msMainDatabase;
     int mnIdCompany;
 
+    public STrnDBCore(SGuiSession session) {
+        oDbObj = null;
+        this.oSession = session;   
+    }
+
     public STrnDBCore(SMySqlClass oDbObj, int idCompany) throws Exception {
-        try {
-            this.oDbObj = oDbObj;
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
-            this.mnIdCompany = this.oDbObj.getMainBb();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.oDbObj = oDbObj;
+        this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+        this.mnIdCompany = this.oDbObj.getMainBb();
+        Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
     }
 
     /**
@@ -62,7 +64,12 @@ public class STrnDBCore {
      */
     private Connection getConnection() {
         try {
-            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            if (this.oDbObj != null) {
+                return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            }
+            else if (this.oSession != null) {
+                return this.oSession.getStatement().getConnection();
+            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -407,6 +414,21 @@ public class STrnDBCore {
                 return null;
             }
 
+            return this.getDocumentByPk(conn, idYear, idDoc);
+
+        }
+        catch (Exception ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    public SWebDpsRow getDocumentByPk(Connection conn, int idYear, int idDoc) {
+        try {
+            if (conn == null) {
+                return null;
+            }
+
             String query = BASE_QUERY_FIRST
                     + "    COALESCE((SELECT  "
                     + "                    COUNT(*) "
@@ -542,7 +564,14 @@ public class STrnDBCore {
     public ArrayList<SWebDpsEty> getWebDpsEtiesFull(int idYear, int idDoc, String dpsDate) {
         ArrayList<SWebDpsEty> lEties = this.getWebDpsEties(idYear, idDoc, dpsDate);
 
-        STrnDBMaterialRequest oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
+        STrnDBMaterialRequest oMrCore;
+        if (this.oDbObj != null) {
+            oMrCore = new STrnDBMaterialRequest(this.oDbObj, this.msMainDatabase);
+        }
+        else {
+            oMrCore = new STrnDBMaterialRequest(this.oSession);
+        }
+        
         for (SWebDpsEty oEty : lEties) {
             oEty.getlItemHistory().addAll(this.getDpsItemHistory(dpsDate, oEty.getIdItem(), oEty.getPrice(), oEty.getPriceCur(), 1));
             oEty.setoMaterialRequest(oMrCore.getMaterialRequestOfDpsEty(idYear, idDoc, oEty.getIdEty()));
@@ -574,7 +603,8 @@ public class STrnDBCore {
                     + "    i.part_num, "
                     + "    u.unit, "
                     + "    u.symbol, "
-                    + "    COALESCE(CONCAT(fcc.id_cc, ' - ', fcc.cc), '') AS ceco "
+                    + "    COALESCE(CONCAT(fcc.id_cc, ' - ', fcc.cc), '') AS ceco, "
+                    + "    COALESCE(CONCAT(ritm.item_key, ' - ', ritm.item), '') AS item_ref "
                     + "FROM "
                     + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
                     + "        INNER JOIN "
@@ -586,6 +616,8 @@ public class STrnDBCore {
                     + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
                     + "        LEFT JOIN " 
                     + "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
+                    + "        LEFT JOIN "
+                    + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS ritm ON ety.fid_item_ref_n = ritm.id_item "
                     + "WHERE "
                     + "   NOT dps.b_del AND NOT ety.b_del "
                     + "   AND dps.id_year = " + idYear + " "
@@ -608,6 +640,7 @@ public class STrnDBCore {
                 oEty.setIdUnit(res.getInt("fid_unit"));
                 oEty.setUnitSymbol(res.getString("symbol"));
                 oEty.setCostCenter(res.getString("ceco"));
+                oEty.setItemRef(res.getString("item_ref"));
                 oEty.setQuantity(res.getDouble("qty"));
                 oEty.setPrice(res.getDouble("price_u"));
                 oEty.setPriceCur(res.getDouble("price_u_cur"));

@@ -43,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
@@ -318,13 +319,22 @@ public class SShareData {
         return lDocs;
     }
     
-    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idUser, Integer idCompany) throws Exception {
-        if (this.oMysql == null) {
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idCompany, SGuiSession oSession) throws Exception {
+        if (this.oMysql == null && oSession == null) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener un DPS");
             throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
         }
         SWebDps oWebDocument = new SWebDps(idCompany, idYear, idDoc);
-        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
+        STrnDBCore oTrnCore;
+        STrnDBDocuments oDocCore;
+        if (this.oMysql != null) {
+            oTrnCore = new STrnDBCore(this.oMysql, idCompany);
+            oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
+        }
+        else {
+            oTrnCore = new STrnDBCore(oSession);
+            oDocCore = new STrnDBDocuments(oSession);
+        }
         /**
          * Se obtiene el DPS
          */
@@ -345,7 +355,6 @@ public class SShareData {
         oWebDocument.getlNotes().clear();
         oWebDocument.getlNotes().addAll(lNotes);
         
-        STrnDBDocuments oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
         /**
          * Documentos
          */

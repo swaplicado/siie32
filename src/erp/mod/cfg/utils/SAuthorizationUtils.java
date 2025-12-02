@@ -988,6 +988,22 @@ public abstract class SAuthorizationUtils {
         sendNotificationsOnSend(session, authorizationType, (int[])pkDps);
     }
     
+    
+    /**
+     * Procesa la configuración especificamente de un DPS y guarda en la base de datos la ruta de autorizaciones con los
+     * usuarios correspondientes.
+     * 
+     * @param session
+     * @param priority
+     * @param pkDps
+     * 
+     * @throws Exception 
+     */
+    public static void processAuthorizationsDps(SGuiSession session, final int priority, final Object pkDps) throws Exception {
+        // Enviar notificaciones push
+        sendNotificationsOnSend(session, SAuthorizationUtils.AUTH_TYPE_DPS, (int[])pkDps);
+    }
+    
     /**
      * Devuelve todas las configuraciones asociadas a un tipo de autorización.
      * 
@@ -1727,13 +1743,54 @@ public abstract class SAuthorizationUtils {
         }
     }
     
+    public static boolean sendAuthornPurchaseOrderAppWeb(SClientInterface client, int[] pk) {
+        try {
+            SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
+            fileProcess.read(client.getSession(), pk);
+            if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
+                    fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                if (canSendAuthornOrderAppWeb(client, fileProcess)) {
+                    SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SSwapConsts.RESOURCE_TYPE_PUR_ORDER);
+                    picker.setNotes("");
+                    picker.setPriority(0);
+                    if (picker.hasAuthornPaths()) {
+                        picker.setVisible(true);
+                        if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            new SProcDpsSendAuthornWeb(client, fileProcess, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        client.showMsgBoxInformation("El usuario '" + client.getSession().getUser().getName() + "' no tiene configuradas rutas de autorización para este recurso.\n"
+                                + "Contacte al administrador del sistema.");
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+                return false;
+            }
+            return true;
+        }
+        catch (Exception e) {
+            client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
+            return false;
+        }
+    }
+    
     public static boolean sendAuthornPaymentsAppWeb(SClientInterface client, int[] pk) {
         try {
             SDbPayment payment = new SDbPayment();
             payment.read(client.getSession(), pk);
             if (payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) {
                 if (client.showMsgBoxConfirm("Se enviará la solicitud de pago a un proceso de autorización.\n¿Desea continuar?")== JOptionPane.OK_OPTION) {
-                    SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SModConsts.FIN_PAY);
+                    SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT);
                     picker.setNotes(payment.getNotesAuthorization());
                     picker.setPriority(payment.getPriority());
                     if (picker.hasAuthornPaths()) {
@@ -2182,35 +2239,47 @@ public abstract class SAuthorizationUtils {
         return result;
     }
     
-    public static boolean computePaymentRequest(SGuiSession session, String jsonConfigKey, String requestBody) throws Exception {
-        boolean sent = false;
-        String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
-        String jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
-        
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
-        
-        String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
-        //String syncUrl = "http://192.168.7.56:8003";
-        String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
-        String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
-        
-        // Recuperar la configuración del servicio:
-        
-        syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
-        
-        String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
-       
-        JsonNode responseJson = new ObjectMapper().readTree(responseBody);
-        
-        if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
-            JsonNode results = responseJson.path("results");
-            if (results.isArray()) {
-                for (JsonNode result : results) {
-                    if (result.has("status_code")) {
-                        if (result.path("status_code").asInt() == 200){
-                            sent = true; 
-                            System.out.println("Enviado a autorización con éxito.");
+    public static String computeRequest(SGuiSession session, String jsonConfigKey, String requestBody) throws Exception {
+        String sSent = "";
+        try {
+            String cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
+            String jsonBaseKey = SSwapConsts.CFG_OBJ_TXN_SRV;
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), cfgParamKey));
+
+            String syncUrl = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_URL);
+            //String syncUrl = "http://192.168.7.56:8003";
+            String syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_TOKEN);
+            String syncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, jsonBaseKey, SSwapConsts.CFG_ATT_API_KEY);
+
+            // Recuperar la configuración del servicio:
+
+            syncUrl += SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_URL); // complementar la URL
+
+            String responseBody = SExportUtils.requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
+
+            JsonNode responseJson = new ObjectMapper().readTree(responseBody);
+
+            if (SAuthJsonUtils.containsElement(responseJson, "", "results")) {
+                JsonNode results = responseJson.path("results");
+                if (results.isArray()) {
+                    for (JsonNode result : results) {
+                        if (result.has("status_code")) {
+                            if (result.path("status_code").asInt() == 200 && result.path("sent_to_authorization").asBoolean()) {
+                                System.out.println("Enviado a autorización con éxito.");
+                                return sSent;
+                            }
+                            else {
+                                try {
+                                    System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                                    sSent = result.path("status_code").asInt() + " " + result.path("error").asText() + " " + result.path("authorization_message").asText();
+                                }
+                                catch (Exception e) {
+                                    sSent = e.getMessage();
+                                }
+                                break;
+                            }
                         }
                         else {
                             System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
@@ -2220,7 +2289,12 @@ public abstract class SAuthorizationUtils {
                 }
             }
         }
-        return sent;
+        catch (Exception e) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
+            sSent = e.getMessage();
+        }
+        
+        return sSent;
     }
     
     /**

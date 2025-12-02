@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.gui.SGuiSession;
 
 /**
  * Clase para manejar operaciones de base de datos relacionadas con requisiciones de materiales
@@ -126,6 +127,7 @@ public class STrnDBMaterialRequest {
     private static final String ORDER_BY_ID = "ORDER BY mr.id_mat_req DESC ";
 
     SMySqlClass oDbObj;
+    SGuiSession oSession;
     String msMainDatabase;
     int mnIdCompany;
     private final ArrayList<SWebMaterialRequest> lMaterialRequests;
@@ -136,25 +138,35 @@ public class STrnDBMaterialRequest {
         this.lMaterialRequests = new ArrayList<>();
     }
     
+    public STrnDBMaterialRequest(SGuiSession session) {
+        this.oSession = session;
+        this.oDbObj = null;
+        this.lMaterialRequests = new ArrayList<>();
+    }
+    
     public STrnDBMaterialRequest(SMySqlClass oDbObj, int idCompany) throws Exception {
-        try {
-            this.oDbObj = oDbObj;
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
-            this.mnIdCompany = this.oDbObj.getMainBb();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.oDbObj = oDbObj;
+        this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+        this.mnIdCompany = this.oDbObj.getMainBb();
+        Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
         
         this.lMaterialRequests = new ArrayList<>();
     }
     
     private Connection getConnection() {
         try {
-            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
-        } catch (ClassNotFoundException | SQLException ex) {
+            if (this.oDbObj != null) {
+                return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            }
+            else if (this.oSession != null) {
+                return this.oSession.getStatement().getConnection();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return null;
     }
     

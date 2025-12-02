@@ -26,6 +26,11 @@ import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataCurrency;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.utils.SDataRejectResource;
+import erp.mod.cfg.swap.utils.SExportDataAuthActor;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
@@ -52,6 +57,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -454,6 +460,42 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
                                 }
                                 else {
+                                    if (isOrderPur() && !SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, moTablePane.getSelectedTableRow().getPrimaryKey())) {
+                                        SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
+                                        String confirm;
+                                        if (rejectData != null) {
+                                            confirm = "Se anulará la autorización del pedido '" + dps.getNumberSeries() + "-" + dps.getNumber() + "',\n"
+                                                    + "por el usuario: " + rejectData.User + ",\n"
+                                                    + "con los siguientes comentarios:\n"
+                                                    + "\"" + rejectData.Notes + "\"\n"
+                                                    + SGuiConsts.MSG_CNF_CONT;
+
+                                            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                                SDataRejectResource data = new SDataRejectResource();
+
+                                                data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
+                                                data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
+                                                data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_ORDER;
+                                                data.siie_resource_id = "" + dps.getPkYearId() + "_" + dps.getPkDocId();
+                                                data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
+                                                data.external_user_id = rejectData.UserId;
+                                                data.notes = rejectData.Notes;
+                                                
+                                                if (sendMail) {
+                                                    SServicesUtils.requestRejectResource(miClient.getSession(), data);
+                                                }
+                                                else {
+                                                    SServicesUtils.requestCancelFlow(miClient.getSession(), SModConsts.TRN_DPS, data);
+                                                }
+
+                                                miClient.showMsgBoxInformation("La autorización del pedido '" + dps.getNumberSeries() + "-" + dps.getNumber() + "' acaba de ser anulada.");
+                                            }
+                                        }
+                                        else {
+                                            miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo");
+                                            return;
+                                        }
+                                    }
                                     if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
                                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
                                     }

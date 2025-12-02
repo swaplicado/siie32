@@ -5,6 +5,7 @@
  */
 package erp.mtrn.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
@@ -12,7 +13,17 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.cfg.db.SDbAuthorizationPath;
+import erp.mod.cfg.db.SDbComSyncLogEntry;
+import erp.mod.cfg.db.SDbSyncLogEntry;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SExportData;
+import erp.mod.cfg.swap.utils.SExportDataDpsContainer;
+import erp.mod.cfg.swap.utils.SExportDataUtils;
+import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SRequestDpsBody;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -21,8 +32,10 @@ import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,6 +59,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
     private final SClientInterface miClient;
     private final SDbSupplierFileProcess moSuppFileProc;
     private final ArrayList<SDbAuthorizationPath> maAuthPaths;
+    private final int mnPathId;
     private final int mnPriority;
     private final String msAuthNotes;
     
@@ -55,6 +69,17 @@ public class SProcDpsSendAuthornWeb extends Thread {
         miClient = client;
         moSuppFileProc = proc;
         maAuthPaths = paths;
+        mnPathId = 0;
+        mnPriority = priority;
+        msAuthNotes = notes;
+        setDaemon(true);
+    }
+    
+    public SProcDpsSendAuthornWeb(SClientInterface client, SDbSupplierFileProcess proc, int pathId, int priority, String notes) {
+        miClient = client;
+        moSuppFileProc = proc;
+        maAuthPaths = null;
+        mnPathId = pathId;
         mnPriority = priority;
         msAuthNotes = notes;
         setDaemon(true);
@@ -80,14 +105,16 @@ public class SProcDpsSendAuthornWeb extends Thread {
                     auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_PEND);
                     auth.save(miClient.getSession().getDatabase().getConnection());
                     moSuppFileProc.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING);
+                    
+                    miClient.showMsgBoxInformation("El registro fue enviado exitosamente");
                 }
                 else {
                     auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SNDF); 
-                    if (msError.length() > ERROR_LEN) {
+                    if (msError != null && msError.length() > ERROR_LEN) {
                         auth.setException(SLibUtilities.textLeft(msError, ERROR_LEN));
                     }
                     else {
-                        auth.setException(msError);
+                        auth.setException("Error al enviar autorización.");
                     }
                     auth.save(connection);
                 }
@@ -101,11 +128,11 @@ public class SProcDpsSendAuthornWeb extends Thread {
         catch (Exception e) {
             msError = e.getMessage();
             auth.setFkAuthorizationStatusId(SDataConstantsSys.CFGS_ST_AUTHORN_SNDF); 
-            if (msError.length() > ERROR_LEN) {
+            if (msError != null && msError.length() > ERROR_LEN) {
                 auth.setException(SLibUtilities.textLeft(msError, ERROR_LEN));
             }
             else {
-                auth.setException(msError);
+                auth.setException(e.getMessage());
             }
             auth.save(connection);
             miClient.showMsgBoxWarning(e.getMessage());
@@ -122,10 +149,82 @@ public class SProcDpsSendAuthornWeb extends Thread {
 
         if (!sResult.isEmpty()) {
             miClient.showMsgBoxWarning(sResult);
+            msError = sResult;
             return false;
         }
-
-        SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, mnPriority, SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
+        
+        if (mnPathId > 0) {
+            boolean uploadPdf = false;
+            ArrayList<SExportData> lDps = SExportDataUtils.getListOfPurchaseOrdersToExport(miClient.getSession(), 
+                                                                                moSuppFileProc.getPrimaryKey()[0], 
+                                                                                moSuppFileProc.getPrimaryKey()[1],
+                                                                                uploadPdf);
+            if (lDps.size() == 1) {
+                SDbComSyncLogEntry oLogEty = new SDbComSyncLogEntry();
+                oLogEty.setAuxDatabase(miClient.getSession().getDatabase().getDbName());
+                oLogEty.setResponseCode("" + HttpURLConnection.HTTP_INTERNAL_ERROR);
+                SShareData oSD = new SShareData();
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    SRequestDpsBody purchaseOrderBody = new SRequestDpsBody();
+                    purchaseOrderBody.work_instance = new String[] { "" + miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_INSTANCE) };
+                    SExportDataDpsContainer oOc = (SExportDataDpsContainer) lDps.get(0);
+                    oOc.document.priority = mnPriority;
+                    oOc.document.document_json = oSD.getDpsByPk(oOc.document.id_year, 
+                                                                oOc.document.id_doc, 
+                                                                miClient.getSession().getConfigCompany().getCompanyId(), 
+                                                                miClient.getSession());
+                    oOc.document.authz_authorization = SSwapConsts.AUTHZ_STATUS_IN_PROGRESS;
+                    oOc.document.authz_notes = msAuthNotes;
+                    oLogEty.setReferenceId(oOc.document.id_year + "_" + oOc.document.id_doc);
+                    purchaseOrderBody.documents = new SExportDataDpsContainer[] { oOc };
+                    String requestBody = mapper.writeValueAsString(purchaseOrderBody);
+                    String sRequestResult = SAuthorizationUtils.computeRequest(miClient.getSession(), SSwapConsts.CFG_OBJ_TXN_PUR_ORD, requestBody);
+                    oLogEty.setResponseBody(sRequestResult);
+                    if (! sRequestResult.isEmpty()) {
+                        miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + sRequestResult);
+                        msError = "No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + sRequestResult;
+                        return false;
+                    }
+                    oLogEty.setResponseCode("" + HttpURLConnection.HTTP_OK);
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + e.getMessage());
+                    msError = "No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + e.getMessage();
+                    return false;
+                }
+                finally {
+                    try {
+                        ArrayList<SDbSyncLogEntry> logs = new ArrayList<>();
+                        logs.add(oLogEty);
+                        SExportUtils.logSync(
+                                miClient.getSession(),
+                                SSyncType.PUR_ORDER,
+                                "",
+                                new Date(),
+                                Integer.parseInt(oLogEty.getResponseCode()),
+                                "",
+                                new Date(),
+                                logs
+                        );
+                    }
+                    catch (Exception e) {
+                        Logger.getLogger(SProcDpsSendAuthornWeb.class.getName()).log(Level.SEVERE, null, e);
+                    }
+                }
+                
+                // Enviar notificaciones push
+                SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), mnPriority, moSuppFileProc.getPrimaryKey());
+            }
+            else {
+                msError = "No se pudo crear la petición para su envío a autorización.";
+                msError = "No se pudo crear la petición para su envío a autorización.";
+                return false;
+            }
+        }
+        else {
+            SAuthorizationUtils.processAuthorizationsDps(miClient.getSession(), maAuthPaths, mnPriority, SAuthorizationUtils.AUTH_TYPE_DPS, moSuppFileProc.getPrimaryKey(), true);
+        }
 
         System.out.println("Documento enviado a autorización con éxito.");
         return true;
@@ -252,5 +351,5 @@ public class SProcDpsSendAuthornWeb extends Thread {
         }
 
         return msError; // Vacio = operación exitosa
-    } 
+    }
 }

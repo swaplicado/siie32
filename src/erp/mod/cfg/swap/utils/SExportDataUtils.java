@@ -997,18 +997,35 @@ public abstract class SExportDataUtils {
      * Consulta los pedidos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
      * 
      * @param session Sesión de usuario.
+     * @param idYear
+     * @param idDoc
+     * @param uploadOcPDF
      * @return Lista de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session) throws SQLException, Exception {
+    public static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session, final int idYear, final int idDoc, final boolean uploadOcPDF) throws SQLException, Exception {
         ArrayList<SExportData> lDps = new ArrayList<>();
         String sBucketName = CloudStorageManager.getBucketName();
         String sProjectID = CloudStorageManager.getProjectID();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
+            HashMap<Integer, String> databasesMap;
+
+            // Si se proporciona un documento específico, crear un mapa con una sola entrada
+            if (idYear > 0 && idDoc > 0) {
+                databasesMap = new HashMap<>();
+                // Obtener el ID de empresa del documento específico
+                Integer companyId = session.getConfigCompany().getCompanyId();
+                String database = session.getDatabase().getDbName();
+                if (database != null) {
+                    databasesMap.put(companyId, database);
+                }
+            }
+            else {
+                databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            }
             
-            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
             STrnDBDocuments oDocCore = new STrnDBDocuments();
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -1022,7 +1039,7 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
-                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
@@ -1036,6 +1053,20 @@ public abstract class SExportDataUtils {
                         + "dn.id_year = d.id_year AND dn.id_doc = d.id_doc AND NOT dn.b_del), '') AS _notes "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                        + "INNER JOIN "
+                        + "    (SELECT  "
+                        + "        GROUP_CONCAT(DISTINCT CONCAT(fcc.id_cc, ' - ', fcc.cc) "
+                        + "                SEPARATOR '/ ') AS cecos, "
+                        + "            GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
+                        + "                SEPARATOR '/ ') AS ref_items, "
+                        + "            de.id_year, "
+                        + "            de.id_doc "
+                        + "    FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " de "
+                        + "    LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS r_itm ON de.fid_item_ref_n = r_itm.id_item "
+                        + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON de.fid_cc_n = fcc.id_cc "
+                        + "    WHERE "
+                        + "        NOT de.b_del "
+                        + "    GROUP BY de.id_year , de.id_doc) AS c_info ON d.id_year = c_info.id_year AND d.id_doc = c_info.id_doc "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
@@ -1044,18 +1075,24 @@ public abstract class SExportDataUtils {
                         + "WHERE "
                         + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                         + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                        + "AND d.id_year >= " + session.getSystemYear() + " " // establecer como límite hasta el año actual
-                        + "AND ("
-//                        + "d.id_doc = 14947 "
-                        + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
-                        + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ") "
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR ("
-                        + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                        + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
-                        + ")";
+                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " ";
+                
+                // Agregar filtro específico de documento si se proporcionó
+                if (idYear > 0 && idDoc > 0) {
+                    sql += "AND d.id_year = " + idYear + " AND d.id_doc = " + idDoc + " ";
+                }
+                else {
+                    sql += "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " ";
+                    sql += "AND ("
+                            + "((NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                            + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ") "
+                            + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
+                            + (lastSyncDatetime == null ? "" : " OR ("
+                            + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                            + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                            + ")";
+                }
                 sql += ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -1079,79 +1116,82 @@ public abstract class SExportDataUtils {
                     oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
                     oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
                     oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("d.b_authorn") || resultSet.getBoolean("d.b_link");
+                    oDpsExport.concepts = resultSet.getString("c_info.ref_items");
+                    oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
+                    oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     
                     // PDF de la OC:
-                    SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
-                            session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
-                    if (oLogEty != null) {
-                        SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
-                        // comparacion de last update para actualizar el archivo
-                        SExportDataDpsFile oFile = new SExportDataDpsFile();
-                        oFile.filename_storage = oFd.getFileName();
-                        if (oFile.filename_storage.isEmpty()) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                        }
-                        else {
-                            oFile.filename_original = oFile.filename_storage;
-                            oFile.title = "PDF de la OC";
-                            oFile.bucket_name = sBucketName;
-                            oFile.project_id = sProjectID;
-                            oContainer.file.add(oFile);
-                        }
-                    }
-                    // Si no existe en la bitácora de siie, se sube
-                    else {
-                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. "
-                                + "Sincronizando: " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                        try {
-                            SFileData oFileData = new SFileData(oDpsExport.id_year,
-                                    oDpsExport.id_doc,
-                                    database,
-                                    null);
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
-                            if (oLogEty != null) {
-                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200
-                                        || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
-                                    SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
-                                    // comparacion de last update para actualizar el archivo
-                                    SExportDataDpsFile oFile = new SExportDataDpsFile();
-                                    oFile.filename_storage = oFd.getFileName();
-                                    if (oFile.filename_storage.isEmpty()) {
-                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. "
-                                                + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                                    }
-                                    else {
-                                        oFile.filename_original = oFile.filename_storage;
-                                        oFile.title = "PDF de la OC";
-                                        oFile.bucket_name = sBucketName;
-                                        oFile.project_id = sProjectID;
-                                        oContainer.file.add(oFile);
-                                    }
-                                } else {
-                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. "
-                                            + oDpsExport.id_year + "_" + oDpsExport.id_doc + ". "
-                                            + oLogEty.getResponseBody());
-                                }
-                                ArrayList<SDbSyncLogEntry> l = new ArrayList<>();
-                                l.add(oLogEty);
-                                try {
-                                    // guardar encabezado de log de archivos:
-                                    SDpsGoogleCloudUtils.saveSyncLogs(session, l, false);
-                                }
-                                catch (Exception e) {
-                                    Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudieron guardar los logs de sincronización de archivos de OC.", e);
-                                }
+                    if (uploadOcPDF) {
+                        SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
+                                session, SSyncType.PUR_ORDER_FILE, oDpsExport.id_year + "_" + oDpsExport.id_doc, database);
+                        if (oLogEty != null) {
+                            SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
+                            // comparacion de last update para actualizar el archivo
+                            SExportDataDpsFile oFile = new SExportDataDpsFile();
+                            oFile.filename_storage = oFd.getFileName();
+                            if (oFile.filename_storage.isEmpty()) {
+                                Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                            }
+                            else {
+                                oFile.filename_original = oFile.filename_storage;
+                                oFile.title = "PDF de la OC";
+                                oFile.bucket_name = sBucketName;
+                                oFile.project_id = sProjectID;
+                                oContainer.file.add(oFile);
                             }
                         }
-                        catch (Exception e) {
-                            Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. "
-                                    + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                        // Si no existe en la bitácora de siie, se sube
+                        else {
+                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. "
+                                    + "Sincronizando: " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                            try {
+                                SFileData oFileData = new SFileData(oDpsExport.id_year,
+                                        oDpsExport.id_doc,
+                                        database,
+                                        null);
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
+                                if (oLogEty != null) {
+                                    if (Integer.parseInt(oLogEty.getResponseCode()) == 200
+                                            || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
+                                        SFileData oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, lastSyncDatetime);
+                                        // comparacion de last update para actualizar el archivo
+                                        SExportDataDpsFile oFile = new SExportDataDpsFile();
+                                        oFile.filename_storage = oFd.getFileName();
+                                        if (oFile.filename_storage.isEmpty()) {
+                                            Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. "
+                                                    + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc);
+                                        }
+                                        else {
+                                            oFile.filename_original = oFile.filename_storage;
+                                            oFile.title = "PDF de la OC";
+                                            oFile.bucket_name = sBucketName;
+                                            oFile.project_id = sProjectID;
+                                            oContainer.file.add(oFile);
+                                        }
+                                    } else {
+                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. "
+                                                + oDpsExport.id_year + "_" + oDpsExport.id_doc + ". "
+                                                + oLogEty.getResponseBody());
+                                    }
+                                    ArrayList<SDbSyncLogEntry> l = new ArrayList<>();
+                                    l.add(oLogEty);
+                                    try {
+                                        // guardar encabezado de log de archivos:
+                                        SDpsGoogleCloudUtils.saveSyncLogs(session, l, false);
+                                    }
+                                    catch (Exception e) {
+                                        Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudieron guardar los logs de sincronización de archivos de OC.", e);
+                                    }
+                                }
+                            }
+                            catch (Exception e) {
+                                Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. "
+                                        + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
+                            }
                         }
                     }
                     
                     // documentos (archivos de cotizaciones)
-                    
                     boolean withUrl = false;
                     ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement(), database);
                     for (SWebDpsFile oDpsFile : lDpsFiles) {
@@ -1262,13 +1302,13 @@ public abstract class SExportDataUtils {
                         // comparacion de last update para actualizar el archivo
                         if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
                             lLogFiles.add(oLogEty);
                         } else {
                             oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
                             if (!CloudStorageManager.storagedFileExists(oFd.getFileName())) {
                                 oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
                                 lLogFiles.add(oLogEty);
                             }
                         }
@@ -1279,7 +1319,7 @@ public abstract class SExportDataUtils {
                                     oDpsExport.id_doc,
                                     database,
                                     resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
                             if (oLogEty != null) {
                                 if (Integer.parseInt(oLogEty.getResponseCode()) == 200
                                         || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
@@ -2108,7 +2148,8 @@ public abstract class SExportDataUtils {
                 
             case PUR_ORDER:
                 exportPurchaseOrdersFiles(session);
-                data = getListOfPurchaseOrdersToExport(session);
+                boolean uploadPdf = true;
+                data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf);
                 break;
                 
             case PUR_REF_ORDER:

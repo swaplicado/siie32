@@ -23,6 +23,7 @@ public class SWebDpsEty {
     String partNumber;
     String unitSymbol;
     String costCenter;
+    String itemRef;
     double quantity;
     double price;
     double priceCur;
@@ -105,6 +106,12 @@ public class SWebDpsEty {
     }
     public void setCostCenter(String costCenter) {
         this.costCenter = costCenter;
+    }
+    public String getItemRef() {
+        return itemRef;
+    }
+    public void setItemRef(String itemRef) {
+        this.itemRef = itemRef;
     }
     public double getQuantity() {
         return quantity;

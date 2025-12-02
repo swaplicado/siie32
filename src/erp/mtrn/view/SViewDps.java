@@ -40,9 +40,12 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SDataRejectResource;
+import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -100,6 +103,7 @@ import org.json.simple.parser.JSONParser;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -161,6 +165,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbAuthWebLoadSupportFiles;
     private javax.swing.JButton jbAuthWebStartAuth;
+    private javax.swing.JButton jbAuthWebStartAuthGc;
     private javax.swing.JButton jbAuthWebViewAuthLog;
     private javax.swing.JButton jbAuthWebViewAuthComments;
     private javax.swing.JButton jbAuthWebDownloadSupportFiles;
@@ -501,6 +506,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebStartAuth.setPreferredSize(new Dimension(23, 23));
             jbAuthWebStartAuth.addActionListener(this);
             jbAuthWebStartAuth.setToolTipText("Iniciar autorización de la orden en app web");
+            
+            jbAuthWebStartAuthGc = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ora.gif")));
+            jbAuthWebStartAuthGc.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebStartAuthGc.addActionListener(this);
+            jbAuthWebStartAuthGc.setToolTipText("Iniciar autorización de la orden en app web gc");
 
             jbAuthWebViewAuthLog = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")));
             jbAuthWebViewAuthLog.setPreferredSize(new Dimension(23, 23));
@@ -594,7 +604,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsAuthWebAvailable) {
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbAuthWebLoadSupportFiles);
-            addTaskBarUpperComponent(jbAuthWebStartAuth);
+//            addTaskBarUpperComponent(jbAuthWebStartAuth); Se comenta para dejar de utilizar autorización en portal de autorizaciones
+            addTaskBarUpperComponent(jbAuthWebStartAuthGc);
             addTaskBarUpperComponent(jbAuthWebViewAuthLog);
             addTaskBarUpperComponent(jbAuthWebViewAuthComments);
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
@@ -680,6 +691,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsAuthWebAvailable) { // just for consistence, because buttons are instantiated ONLY if needed
             jbAuthWebLoadSupportFiles.setEnabled(true);
             jbAuthWebStartAuth.setEnabled(true);
+            jbAuthWebStartAuthGc.setEnabled(true);
             jbAuthWebViewAuthLog.setEnabled(true);
             jbAuthWebViewAuthComments.setEnabled(true);
             jbAuthWebDownloadSupportFiles.setEnabled(true);
@@ -3282,8 +3294,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionAuthWebStartAuthGc() {
+        try {
+            if (jbAuthWebStartAuthGc.isEnabled()) {
+                if (isRowSelected()) {
+                    if (SAuthorizationUtils.sendAuthornPurchaseOrderAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
+                        miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                        miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
     private void actionAuthWebAnnullAuth() {
-         try {
+        try {
             if (jbAuthWebAnnullAuth.isEnabled()) {
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
@@ -3294,18 +3322,56 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         miClient.showMsgBoxInformation("No se puede anular la autorización porque el estatus de autorización de la orden seleccionada es '" + fileProcess.getDpsStatus() + "'.");
                     }
                     else {
+                        boolean wasCancelled = false;
                         if (miClient.showMsgBoxConfirm("Se anulará el proceso de autorización de la orden seleccionada.\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.OK_OPTION) {
-                            fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
-
-                            // Eliminar archivos de la nube:
-                            SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
-
                             // Eliminar pasos de autorización:
-                            SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+                            if (!SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, moTablePane.getSelectedTableRow().getPrimaryKey())) {
+                                SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
+                                String confirm;
+                                if (rejectData != null) {
+                                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                                    confirm = "Se anulará la autorización del pedido '" + dps.getNumberSeries() + "-" + dps.getNumber() + "',\n"
+                                            + "por el usuario: " + rejectData.User + ",\n"
+                                            + "con los siguientes comentarios:\n"
+                                            + "\"" + rejectData.Notes + "\"\n"
+                                            + SGuiConsts.MSG_CNF_CONT;
 
-                            // Actualizar estatus de autorización:
-                            String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
-                            miClient.getSession().getStatement().execute(sql);
+                                    if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                        SDataRejectResource data = new SDataRejectResource();
+
+                                        data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
+                                        data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
+                                        data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_ORDER;
+                                        data.siie_resource_id = "" + dps.getPkYearId() + "_" + dps.getPkDocId();
+                                        data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
+                                        data.external_user_id = rejectData.UserId;
+                                        data.notes = rejectData.Notes;
+
+                                        wasCancelled = SServicesUtils.requestCancelFlow(miClient.getSession(), SModConsts.TRN_DPS, data);
+
+                                        miClient.showMsgBoxInformation("La autorización del pedido '" + dps.getNumberSeries() + "-" + dps.getNumber() + "' acaba de ser anulada.");
+                                    }
+                                }
+                                else {
+                                    miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo");
+                                    return;
+                                }
+                            }
+                            else {
+                                SAuthorizationUtils.deleteStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, fileProcess.getPrimaryKey());
+                                wasCancelled = true;
+                            }
+                            
+                            if (wasCancelled) {
+                                // Eliminar archivos de la nube:
+                                SDocUtils.deleteFilesToCloud(miClient.getSession(), fileProcess);
+
+                                fileProcess.updateDpsStatus(miClient.getSession(), SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+
+                                // Actualizar estatus de autorización:
+                                String sql = "UPDATE trn_dps_authorn SET b_del = 1 WHERE id_year = " + fileProcess.getPkYearId() + " AND id_doc = " + fileProcess.getPkDocId();
+                                miClient.getSession().getStatement().execute(sql);
+                            }
 
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                             miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
@@ -3320,9 +3386,27 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionAuthWebViewAuthLog() {
-        if (jbViewLinks.isEnabled()) {
-            if (isRowSelected()) {
-                SModuleUtilities.showSendsAuthAppWebLog(miClient, moTablePane.getSelectedTableRow());
+        if (jbAuthWebViewAuthLog.isEnabled()) {
+            if (! isRowSelected()) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                if (SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, moTablePane.getSelectedTableRow().getPrimaryKey())) {
+                    SModuleUtilities.showSendsAuthAppWebLog(miClient, moTablePane.getSelectedTableRow());
+                }
+                else {
+                    try {
+                        int[] pk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                        String sPk = pk[0] + "_" + pk[1];
+                        SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), 
+                                                                                    SSwapConsts.RESOURCE_TYPE_PUR_ORDER, 
+                                                                                    sPk);
+                        miClient.showMsgBoxInformation(authFlowStatus.toString());
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }                
+                }
             }
         }
     }
@@ -3420,7 +3504,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 STableConstants.ICON_NULL + ")) AS ico_send_warn, "
                 : "");
         if (mbIsAuthWebAvailable) {
-            msSql += "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
+            msSql += "IF ((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stp WHERE "
+                    + "     NOT stp.b_del AND stp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND stp.res_pk_n1_n = d.id_year AND stp.res_pk_n2_n = d.id_doc) > 0,"
+                    + "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
                     + "    COALESCE((SELECT GROUP_CONCAT(usr SEPARATOR ',') "
                     + "    FROM "
                     + "        cfgu_authorn_step AS steps1 "
@@ -3457,7 +3544,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        AND NOT step2.b_authorn AND NOT step2.b_reject "
                     + "    ORDER BY step2.lev ASC "
                     + "    LIMIT 1)), "
-                    + "    '')))) AS user_in_turn, ";
+                    + "    '')))),"
+                    + "'N/D') AS user_in_turn, ";
         }
         
         String sqlOrders = mbIsDoc ? (
@@ -3745,6 +3833,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbAuthWebStartAuth) {
                     actionAuthWebStartAuth();
+                }
+                else if (button == jbAuthWebStartAuthGc) {
+                    actionAuthWebStartAuthGc();
                 }
                 else if (button == jbAuthWebViewAuthLog) {
                     actionAuthWebViewAuthLog();

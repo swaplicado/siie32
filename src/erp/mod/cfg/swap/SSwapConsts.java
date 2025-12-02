@@ -21,6 +21,8 @@ public abstract class SSwapConsts {
     public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
     public static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
+    public static final int SINCE_YEAR = 2025;
+    
     /*
      * SWAP Services.
      */
@@ -95,11 +97,17 @@ public abstract class SSwapConsts {
     public static final int AUTHZ_STATUS_REJECTED = 8;
     public static final int AUTHZ_STATUS_OK = 9;
     
+    public static final int RESOURCE_TYPE_PUR_ORDER = 3;
     public static final int RESOURCE_TYPE_PUR_INVOICE = 4;
     public static final int RESOURCE_TYPE_PUR_PAYMENT = 11;
     
     public static final int FLOW_MODEL_TYPE = 1;
-    public static final int FLOW_TYPE = 2;
+    public static final int FLOW_TYPE_INVOICE = 1;
+    public static final int FLOW_TYPE_PAYMENT = 2;
+    public static final int FLOW_TYPE_SUPPLIER = 3;
+    public static final int FLOW_TYPE_CREDIT_NOTE = 4;
+    public static final int FLOW_TYPE_CRP = 5;
+    public static final int FLOW_TYPE_PUR_ORDER = 6;
 
     /**
      * Separator for foreign fiscal ID separator from country code.

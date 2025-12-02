@@ -59,13 +59,20 @@ public class SAuthorizationsAPI {
      * @param pk
      * @param userId
      * @param comments
+     * @param isSwapServicesRequest
      * @return 
      */
-    public SAppLinkResponse approbeResource(int typeResource, Object pk, int userId, String comments) {
+    public SAppLinkResponse approbeResource(int typeResource, Object pk, int userId, String comments, boolean isSwapServicesRequest) {
         SAppLinkResponse oResponse = new SAppLinkResponse();
         try {
-            oResponse.setMessage(SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments));
-            String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
+            String message;
+            if (! isSwapServicesRequest) {
+                message = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments);
+            }
+            else {
+                message = "";
+            }
+            oResponse.setMessage(message);
             if (oResponse.getMessage() != null && oResponse.getMessage().isEmpty()) {
                 switch(typeResource) {
                     case AUTH_TYPE_MAT_REQUEST:
@@ -80,9 +87,17 @@ public class SAuthorizationsAPI {
                         break;
                         
                     case AUTH_TYPE_DPS:
-                        if (SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
+                        // Cuando llega una petición desde portal de compras, significa que ya fue aprobado.
+                        if (isSwapServicesRequest) {
+                            updateDpsAuthStatus(pk,
+                                    SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
+                                    userId);
+                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
+                        }
+                        if (! isSwapServicesRequest && SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
                             try {
+                                String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
                                 updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
                                         userId);
@@ -100,25 +115,27 @@ public class SAuthorizationsAPI {
                             ArrayList<Integer> lUsers;
                             ArrayList<Integer> lUsersNotified;
                             try {
-                                boolean toNotification = true;
-                                lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
-                                if (! lUsers.isEmpty()) {
-                                    HashMap<String, String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
-                                    if (! lMails.isEmpty()) {
-                                        for (Map.Entry<String, String> oRow : lMails.entrySet()) {
-                                            String userMail = oRow.getValue();
-                                            Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "Enviando mail a: {0}", userMail);
-                                            SAuthorizationUtils.sendAuthornMails(oSession, AUTH_MAIL_AUTH_PEND, userMail, "", "", ((int[]) pk), "", "");
+                                if (! isSwapServicesRequest) {
+                                    boolean toNotification = true;
+                                    lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
+                                    if (! lUsers.isEmpty()) {
+                                        HashMap<String, String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
+                                        if (! lMails.isEmpty()) {
+                                            for (Map.Entry<String, String> oRow : lMails.entrySet()) {
+                                                String userMail = oRow.getValue();
+                                                Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "Enviando mail a: {0}", userMail);
+                                                SAuthorizationUtils.sendAuthornMails(oSession, AUTH_MAIL_AUTH_PEND, userMail, "", "", ((int[]) pk), "", "");
+                                            }
                                         }
                                     }
+                                    
+                                    boolean toNotificationPush = false;
+                                    lUsersNotified = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotificationPush);
+                                    oResponse.getNextUsers().addAll(lUsersNotified);
+                                    boolean folioWithCode = false;
+                                    String folio = SAuthorizationUtils.getDpsFolio(oSession.getStatement().getConnection().createStatement(), ((int[]) pk), folioWithCode);
+                                    oResponse.setFolio(folio);
                                 }
-                                
-                                boolean toNotificationPush = false;
-                                lUsersNotified = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotificationPush);
-                                oResponse.getNextUsers().addAll(lUsersNotified);
-                                boolean folioWithCode = false;
-                                String folio = SAuthorizationUtils.getDpsFolio(oSession.getStatement().getConnection().createStatement(), ((int[]) pk), folioWithCode);
-                                oResponse.setFolio(folio);
                             }
                             catch (SQLException ex) {
                                 Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -135,7 +152,7 @@ public class SAuthorizationsAPI {
             }
             
         }
-        catch (SQLException ex) {
+        catch (Exception ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -149,13 +166,19 @@ public class SAuthorizationsAPI {
      * @param pk
      * @param userId
      * @param comment
+     * @param isSwapServicesRequest
      * @return 
      */
-    public String rejectResource(int typeResource, Object pk, int userId, String comment) {
+    public String rejectResource(int typeResource, Object pk, int userId, String comment, boolean isSwapServicesRequest) {
         String res;
         try {
             String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
-            res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
+            if (! isSwapServicesRequest) {
+                res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
+            }
+            else {
+                res = "";
+            }
             if (res != null && res.isEmpty()) {
                 switch(typeResource) {
                     case AUTH_TYPE_MAT_REQUEST:
@@ -179,7 +202,9 @@ public class SAuthorizationsAPI {
                             updateDpsAuthStatus(pk,
                                     SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT,
                                     userId);
-                            SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
+                            if (! isSwapServicesRequest) {
+                                SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
+                            }
                             
                             if (sendProvMail) {
                                 //SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));

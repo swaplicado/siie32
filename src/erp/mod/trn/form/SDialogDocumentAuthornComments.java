@@ -56,7 +56,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jpAuthorizationRoute = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Comentarios de autorización");
+        setTitle("Comentarios de autorización (de momento solo para siie)");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);

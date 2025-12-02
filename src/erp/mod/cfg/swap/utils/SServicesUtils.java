@@ -70,24 +70,44 @@ public abstract class SServicesUtils {
             String code = status.asText();
             
             if (code.equals("" + SHttpConsts.RSC_SUCC_OK)) {
-                SDbComImportLogEntry entry = new SDbComImportLogEntry();
-                entry.setResponseCode(code);
-                entry.setResponseBody(SJsonUtils.sanitizeJson(responseBody));
-                entry.setReferenceId("" + data.external_resource_id);
-                entry.setReferenceUuid(data.external_resource_uuid);
+                switch (data.id_resource_type) {
+                    case SSwapConsts.RESOURCE_TYPE_PUR_INVOICE:
+                        SDbComImportLogEntry entry = new SDbComImportLogEntry();
+                        entry.setReferenceUuid(data.external_resource_uuid);
+                        entry.setResponseCode(code);
+                        entry.setResponseBody(SJsonUtils.sanitizeJson(responseBody));
+                        entry.setReferenceId("" + data.external_resource_id);
+                        entry.setReferenceUuid(data.external_resource_uuid);
 
-                //int registriesSynced = SExportUtils.computeResponse(session, null, requestBody, requestDatetime, responseBody, responseDatetime);
+                        //int registriesSynced = SExportUtils.computeResponse(session, null, requestBody, requestDatetime, responseBody, responseDatetime);
 
-                SDbComImportLog log = new SDbComImportLog();
-                log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
-                log.setRequestTimestamp(requestDatetime);
-                log.setResponseCode(code);
-                log.setResponseTimestamp(responseDatetime);
-                log.getEntries().add(entry);
-                log.save(session);
-                
-                SExportLogsUtils.safeWriteToLogFile(log.getRequestBodyFileName(), requestBody);
-                SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
+                        SDbComImportLog log = new SDbComImportLog();
+                        log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+                        log.setRequestTimestamp(requestDatetime);
+                        log.setResponseCode(code);
+                        log.setResponseTimestamp(responseDatetime);
+                        log.getEntries().add(entry);
+                        log.save(session);
+                        
+                        SExportLogsUtils.safeWriteToLogFile(log.getRequestBodyFileName(), requestBody);
+                        SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
+                        
+                        break;
+                        
+                    case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+                        String[] sPkDps = data.siie_resource_id.split("_");
+                        int[] pkDps = new int[] { SLibUtils.parseInt(sPkDps[0]), SLibUtils.parseInt(sPkDps[1]) };
+                        String sqlDpsAuth = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
+                                + "SET fid_st_authorn = " + (SDataConstantsSys.CFGS_ST_AUTHORN_REJ) + ",  "
+                                + "fid_usr_edit = " + data.external_user_id + ", "
+                                + "ts_edit = NOW() "
+                                + "WHERE id_year = " + pkDps[0] + " AND id_doc = " + pkDps[1] + " AND NOT b_del;";
+                        session.getStatement().execute(sqlDpsAuth);
+                        
+                        break;
+                        
+                    default:
+                }
                 
                 ok = true;
             }
@@ -114,11 +134,13 @@ public abstract class SServicesUtils {
      * @param session Sesión de usuario.
      * @param registryType Tipo de registro (SModConsts...)
      * @param data Datos del recurso autorizado a rechazar.
+     * @return 
      * @throws Exception Si ocurre un error en la petición.
      */
-    public static void requestCancelFlow(final SGuiSession session, final int registryType, final SDataRejectResource data) throws Exception {
+    public static boolean requestCancelFlow(final SGuiSession session, final int registryType, final SDataRejectResource data) throws Exception {
         switch (registryType) {
             case SModConsts.FIN_PAY:
+            case SModConsts.TRN_DPS:
                 break;
                 
             default:
@@ -150,6 +172,8 @@ public abstract class SServicesUtils {
                         SDbPayment payment = (SDbPayment) session.readRegistry(registryType, new int[] { SLibUtils.parseInt(data.siie_resource_id) });
                         payment.updatePaymentStatus(session, SModSysConsts.FINS_ST_PAY_REJC);
                         break;
+                    case SModConsts.TRN_DPS:
+                        break;
                         
                     default:
                         // nothing
@@ -173,6 +197,8 @@ public abstract class SServicesUtils {
             
             throw new Exception(error);
         }
+        
+        return ok;
     }
     
     /**
@@ -183,8 +209,10 @@ public abstract class SServicesUtils {
      * @return 
      * @throws java.lang.Exception
      */
-    public static AuthFlowStatus getAuthFlowStatus(final SGuiSession session, final int resourceType, final int resourceId) throws Exception {
+    public static AuthFlowStatus getAuthFlowStatus(final SGuiSession session, final int resourceType, final String resourceId) throws Exception {
         switch (resourceType) {
+            case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+            case SSwapConsts.RESOURCE_TYPE_PUR_INVOICE:
             case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
                 break;
                 
@@ -207,7 +235,9 @@ public abstract class SServicesUtils {
         String responseBody = SExportUtils.requestSwapService(urlQuery, syncSettings.Url, SHttpConsts.METHOD_GET, "", syncSettings.Token, syncSettings.ApiKey, SSwapConsts.TIME_30_SEC);
         JsonNode responseJson = new ObjectMapper().readTree(responseBody);
         
-        if (SAuthJsonUtils.containsElement(responseJson, "", "status")) {
+        if (SAuthJsonUtils.containsElement(responseJson, "", "status") 
+                && SAuthJsonUtils.containsElement(responseJson, "", "flow")
+                && ! responseJson.path("flow").asText().equals("null")) {
             authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_SUCC_OK, "");
             
             JsonNode status = responseJson.path("status");
@@ -249,6 +279,12 @@ public abstract class SServicesUtils {
             JsonNode errors = responseJson.path("errors");
             JsonNode messages = errors.path("siie_resource_id");
             String message = messages.get(0).asText();
+            
+            authFlowStatus = new AuthFlowStatus(code, message);
+        }
+        else if (SAuthJsonUtils.containsElement(responseJson, "", "status")) {
+            int code = responseJson.path("status").asInt();
+            String message = responseJson.path("error").toString();
             
             authFlowStatus = new AuthFlowStatus(code, message);
         }
@@ -379,6 +415,9 @@ public abstract class SServicesUtils {
                 }
                 
                 string += ".";
+            }
+            else {
+                string += "Código respuesta: " + ResponseCode + ", " + ResponseMessage;
             }
             
             return string;

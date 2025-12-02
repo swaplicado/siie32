@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
@@ -26,33 +27,40 @@ import java.util.logging.Logger;
 public class STrnDBDocuments {
     
     SMySqlClass oDbObj;
+    SGuiSession oSession;
     String msMainDatabase;
     int mnIdCompany;
 
     public STrnDBDocuments() {
         // Constructor vacío para invocar desde las utilerías de exportación
     }
+
+    public STrnDBDocuments(SGuiSession session) {
+        this.oSession = session;
+        this.oDbObj = null;
+    }
     
     public STrnDBDocuments(SMySqlClass oDbObj, int idCompany) throws Exception {
-        try {
-            this.oDbObj = oDbObj;
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
-            this.mnIdCompany = this.oDbObj.getMainBb();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.oDbObj = oDbObj;
+        this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+        this.mnIdCompany = this.oDbObj.getMainBb();
+        Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
     }
     
     private Connection getConnection() {
         try {
-            return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            if (this.oDbObj != null) {
+                return this.oDbObj.connect("", "", this.msMainDatabase, "", "");
+            }
+            else if (this.oSession != null) {
+                return this.oSession.getStatement().getConnection();
+            }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
     }
     
