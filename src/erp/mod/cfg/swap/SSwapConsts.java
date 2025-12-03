@@ -14,6 +14,7 @@ public abstract class SSwapConsts {
     public static int SIIE_EXT_SYS_ID = 1;
     public static final String SIIE = "SIIE";
     public static final String SIIE_USER_AGENT = "SIIE/3.2";
+    public static final String SWAP = "SWAP";
     public static final String SWAP_SERVICES = "SWAP Services";
     public static final String PURCHASE_PORTAL = "Portal de Compras";
     

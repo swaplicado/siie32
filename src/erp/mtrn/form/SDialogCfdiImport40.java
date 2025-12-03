@@ -42,6 +42,8 @@ import erp.mitm.data.SItemUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mod.cfg.swap.form.SDialogPdfViewer;
+import erp.mod.cfg.swap.form.SDocumentInfo;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -69,6 +71,7 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 
@@ -108,7 +111,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private SFormField moFieldFunctionalSubArea;
     private SFormOptionPicker moPickerOpsType;
     private File moCfdiFile;
+    private File moPdfFile;
+    private SDocumentInfo moDocumentInfo;
     private int mnCfdiCurrencyId;
+    private SDialogPdfViewer moDialogPdfViewer;
     private SDialogCfdiPurchaseOrder40 moDialogCfdiPurchaseOrder;
     
     SRowCfdiImport40 moRowCfdiCopy;
@@ -116,13 +122,17 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     /** Creates new form SDialogDpsLink
      * @param client
      * @param purchaseOrder
-     * @param cfdi
+     * @param cfdiFile
+     * @param pdfFile
+     * @param documentInfo
      */
-    public SDialogCfdiImport40(erp.client.SClientInterface client, SDataDps purchaseOrder, File cfdi) {
+    public SDialogCfdiImport40(erp.client.SClientInterface client, SDataDps purchaseOrder, File cfdiFile, File pdfFile, SDocumentInfo documentInfo) {
         super(client.getFrame(), true);
         miClient = client;
         moPurchaseOrder = purchaseOrder;
-        moCfdiFile = cfdi;
+        moCfdiFile = cfdiFile;
+        moPdfFile = pdfFile;
+        moDocumentInfo = documentInfo;
         
         initComponents();
         initComponentsExtra();
@@ -149,6 +159,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jlInvoiceCfdi = new javax.swing.JLabel();
         jtfInvoiceCfdi = new javax.swing.JTextField();
         jtfPaymentType = new javax.swing.JTextField();
+        jbViewInvoicePdf = new javax.swing.JButton();
         jlDateCfdi = new javax.swing.JLabel();
         jtfDateCfdi = new javax.swing.JTextField();
         jpImportAdditionalData = new javax.swing.JPanel();
@@ -161,6 +172,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPurchaseOrderNumber = new javax.swing.JTextField();
         jlPurchaseOrderDate = new javax.swing.JLabel();
         jtfPurchaseOrderDate = new javax.swing.JTextField();
+        jbViewPurchaseOrder = new javax.swing.JButton();
         jpCfdiConcepts = new javax.swing.JPanel();
         jpCfdiConceptsGrid = new javax.swing.JPanel();
         jpCfdiConceptsGridCommands = new javax.swing.JPanel();
@@ -263,7 +275,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jtfNameEmisor.setEditable(false);
         jtfNameEmisor.setFocusable(false);
-        jtfNameEmisor.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfNameEmisor.setPreferredSize(new java.awt.Dimension(265, 23));
         jPanel6.add(jtfNameEmisor);
 
         jlRfcEmisor.setText("  RFC:");
@@ -285,13 +297,19 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jtfInvoiceCfdi.setEditable(false);
         jtfInvoiceCfdi.setFocusable(false);
-        jtfInvoiceCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfInvoiceCfdi.setPreferredSize(new java.awt.Dimension(180, 23));
         jPanel12.add(jtfInvoiceCfdi);
 
         jtfPaymentType.setEditable(false);
+        jtfPaymentType.setToolTipText("Método pago");
         jtfPaymentType.setFocusable(false);
-        jtfPaymentType.setPreferredSize(new java.awt.Dimension(95, 23));
+        jtfPaymentType.setPreferredSize(new java.awt.Dimension(52, 23));
         jPanel12.add(jtfPaymentType);
+
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setToolTipText("Ver PDF del CFDI...");
+        jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jbViewInvoicePdf);
 
         jlDateCfdi.setText("  Fecha CFDI:");
         jlDateCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -306,7 +324,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jpCfdiData.add(jpCfdiHeader, java.awt.BorderLayout.CENTER);
 
-        jpImportAdditionalData.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales de empate:"));
+        jpImportAdditionalData.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales de importación:"));
         jpImportAdditionalData.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -315,7 +333,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jlTaxRegion.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlTaxRegion);
 
-        jcbTaxRegion.setPreferredSize(new java.awt.Dimension(300, 23));
+        jcbTaxRegion.setPreferredSize(new java.awt.Dimension(275, 23));
         jPanel8.add(jcbTaxRegion);
 
         jbPickTaxRegion.setText("...");
@@ -334,9 +352,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPurchaseOrderNumber.setEditable(false);
         jtfPurchaseOrderNumber.setEnabled(false);
         jtfPurchaseOrderNumber.setFocusable(false);
-        jtfPurchaseOrderNumber.setPreferredSize(new java.awt.Dimension(120, 23));
+        jtfPurchaseOrderNumber.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel13.add(jtfPurchaseOrderNumber);
 
+        jlPurchaseOrderDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPurchaseOrderDate.setText("  Fecha OC:");
         jlPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jlPurchaseOrderDate);
@@ -344,8 +363,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPurchaseOrderDate.setEditable(false);
         jtfPurchaseOrderDate.setEnabled(false);
         jtfPurchaseOrderDate.setFocusable(false);
-        jtfPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jtfPurchaseOrderDate);
+
+        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_seek.gif"))); // NOI18N
+        jbViewPurchaseOrder.setToolTipText("Ver OC de la factura...");
+        jbViewPurchaseOrder.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel13.add(jbViewPurchaseOrder);
 
         jpImportAdditionalData.add(jPanel13);
 
@@ -402,7 +426,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jpCfdiConceptsDataNorth.setLayout(new java.awt.BorderLayout());
 
-        jpCfdiConceptSetup.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de empate del concepto del CFDI:"));
+        jpCfdiConceptSetup.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de importación del concepto seleccionado del CFDI:"));
         jpCfdiConceptSetup.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -450,7 +474,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jpCfdiConceptsDataNorth.add(jpCfdiConceptSetup, java.awt.BorderLayout.CENTER);
 
-        jpCfdiConceptPurchaseOrder.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida de la OC del concepto del CFDI:"));
+        jpCfdiConceptPurchaseOrder.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas de la OC del concepto del CFDI:"));
         jpCfdiConceptPurchaseOrder.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -569,11 +593,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jpCfdiConceptTaxes.setLayout(new java.awt.GridLayout(1, 2));
 
-        jpCfdiTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Imptos. del concepto del CFDI:"));
+        jpCfdiTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos del concepto del CFDI:"));
         jpCfdiTaxes.setLayout(new java.awt.BorderLayout());
         jpCfdiConceptTaxes.add(jpCfdiTaxes);
 
-        jpSiieTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Imptos. de la partida del documento:"));
+        jpSiieTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos de la partida de la factura:"));
         jpSiieTaxes.setLayout(new java.awt.BorderLayout());
         jpCfdiConceptTaxes.add(jpSiieTaxes);
 
@@ -712,7 +736,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(1136, 739));
+        setSize(new java.awt.Dimension(1040, 709));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -826,10 +850,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         
+        jbViewInvoicePdf.addActionListener(this);
+        jbPickTaxRegion.addActionListener(this);
+        jbViewPurchaseOrder.addActionListener(this);
+        
         jbCopyRow.addActionListener(this);
         jbPasteRow.addActionListener(this);
-        
-        jbPickTaxRegion.addActionListener(this); 
         
         jbSelectItem.addActionListener(this);
         jbSelectUnit.addActionListener(this);
@@ -878,8 +904,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         
         // Activar o desactivar componentes:
         
+        jbViewInvoicePdf.setEnabled(isWithInvoicePdf());
         jcbTaxRegion.setEnabled(!isWithPurchaseOrder());
         jbPickTaxRegion.setEnabled(!isWithPurchaseOrder());
+        jbViewPurchaseOrder.setEnabled(isWithPurchaseOrder());
         jcbDpsNature.setEnabled(!isWithPurchaseOrder());
         jcbFunctionalSubArea.setEnabled(!isWithPurchaseOrder() && isApplingFunctionalAreas());
         
@@ -920,6 +948,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     private boolean isApplingFunctionalAreas() {
         return miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
+    }
+    
+    private boolean isWithInvoicePdf() {
+        return moPdfFile != null;
     }
     
     private boolean isWithPurchaseOrder() {
@@ -1212,10 +1244,28 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
     }
     
+    private void actionViewInvoicePdf() {
+        if (isWithInvoicePdf()) {
+            if (moDialogPdfViewer == null) {
+                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
+            }
+
+            moDialogPdfViewer.setPdf(moDocumentInfo, moPdfFile);
+            moDialogPdfViewer.setVisible(true);
+        }
+    }
+    
     private void actionPickTaxRegion() {
         miClient.pickOption(SDataConstants.FINU_TAX_REG, moFieldTaxRegion, null);
     }
 
+    private void actionViewPurchaseOrder() {
+        if (isWithPurchaseOrder()) {
+            miClient.getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+            miClient.getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, moPurchaseOrder.getPrimaryKey());
+        }
+    }
+    
     /**
      * 
      * @param choiceOfItem Indica el ítem deseado: ITEM_MAIN or ITEM_REF.
@@ -1598,6 +1648,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private javax.swing.JButton jbSelectReferenceItem;
     private javax.swing.JButton jbSelectTaxRegion;
     private javax.swing.JButton jbSelectUnit;
+    private javax.swing.JButton jbViewInvoicePdf;
+    private javax.swing.JButton jbViewPurchaseOrder;
     private javax.swing.JComboBox jcbDpsNature;
     private javax.swing.JComboBox jcbFunctionalSubArea;
     private javax.swing.JComboBox jcbTaxRegion;
@@ -2433,14 +2485,20 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             else if (button == jbCancel) {
                 actionCancel();
             }
+            else if (button == jbViewInvoicePdf) {
+                actionViewInvoicePdf();
+            }
+            else if (button == jbPickTaxRegion) {
+                actionPickTaxRegion();
+            }
+            else if (button == jbViewPurchaseOrder) {
+                actionViewPurchaseOrder();
+            }
             else if (button == jbCopyRow) {
                 actionCopyRow();
             }
             else if (button == jbPasteRow) {
                 actionPasteRow();
-            }
-            else if (button == jbPickTaxRegion) {
-                actionPickTaxRegion();
             }
             else if (button == jbSelectItem) {
                 actionSelectItem(ITEM_MAIN);

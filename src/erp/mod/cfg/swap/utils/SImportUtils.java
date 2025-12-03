@@ -26,6 +26,7 @@ import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -33,9 +34,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,12 +61,14 @@ public abstract class SImportUtils {
     private static final int MODE_DOCS_ALL_FILES_AS_ZIP = 1;
     private static final int MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 2;
     
-    private static final String DownloadFilePrefix = "facturas compras "; // keep final blank space!
+    private static final String DOWNLOAD_FILE_PREFIX = "facturas compras "; // keep final blank space!
+    private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
     
     public static final int FILES_ZIP = 0;
     public static final int CFDI_XML = 0;
     public static final int CFDI_PDF = 1;
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+    public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
     
     /**
      * Get file name without extension.
@@ -124,9 +129,9 @@ public abstract class SImportUtils {
 
         try {
             if (!linkToOrder || (linkToOrder && order != null)) {
-                File chosenFile = cfdiXml;
+                File chosenCfdiXml = cfdiXml;
                 
-                if (chosenFile == null) {
+                if (chosenCfdiXml == null) {
                     chooserUsed = true;
                     FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
                     client.getFileChooser().repaint();
@@ -134,13 +139,13 @@ public abstract class SImportUtils {
                     client.getFileChooser().setFileFilter(filter);
                     
                     if (client.getFileChooser().showOpenDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        chosenFile = client.getFileChooser().getSelectedFile();
+                        chosenCfdiXml = client.getFileChooser().getSelectedFile();
                     }
                 }
 
-                if (chosenFile.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
+                if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                     SCfdRenderer renderer = new SCfdRenderer(client);
-                    SDataDps newDps = renderer.renderCfdi(chosenFile, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                    SDataDps newDps = renderer.renderCfd(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
                     if (newDps != null) {
                         int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
@@ -165,7 +170,7 @@ public abstract class SImportUtils {
                 }
                 else {
                     client.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
-                            + "(Archivo proporcionado: '" + chosenFile.getName() + "')");
+                            + "(Archivo proporcionado: '" + chosenCfdiXml.getName() + "')");
                 }
             }
         }
@@ -340,7 +345,7 @@ public abstract class SImportUtils {
                     fileChooser.setAcceptAllFileFilterUsed(false);
                     fileChooser.setFileFilter(filter);
 
-                    fileChooser.setSelectedFile(new File(DownloadFilePrefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+                    fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
 
                     if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
                         zipFile = fileChooser.getSelectedFile();
@@ -357,7 +362,7 @@ public abstract class SImportUtils {
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
                     System.out.println("Temporary directory created at: " + tempDir);
                     
-                    tempFile = Files.createFile(tempDir.resolve(DownloadFilePrefix + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+                    tempFile = Files.createFile(tempDir.resolve(DOWNLOAD_FILE_PREFIX + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
                     zipFile = tempFile.toFile();
                     break;
                     
@@ -509,6 +514,77 @@ public abstract class SImportUtils {
         ArrayList<Integer> documents = new ArrayList<>();
         documents.add(document);
         return downloadDocumentsFiles(session, serviceUrl, MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents);
+    }
+    
+    /**
+     * Get temporal file absolute path for required document external ID and file extension. Creates temporal directory if not exists.
+     * @param externalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @return Temporal file absolute path.
+     * @throws IOException 
+     */
+    public static String getDocumentTempFileAbsolutePath(final int externalId, final String fileExtension) throws IOException {
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        File tempFilePath = new File(sysTempDir + TEMP_DIR_DOCS_PDF);
+        
+        if (!tempFilePath.exists()) {
+            boolean ok = tempFilePath.mkdirs();
+            if (!ok) {
+                throw new RuntimeException("Failed to create directory: " + tempFilePath.getAbsolutePath());
+            }
+        }
+        
+        System.out.println("tempFilePath.getAbsolutePath()  : " + tempFilePath.getAbsolutePath());
+        System.out.println("tempFilePath.getCanonicalPath() : " + tempFilePath.getCanonicalPath());
+        System.out.println("tempFilePath.getName()          : " + tempFilePath.getName());
+        System.out.println("tempFilePath.getParent()        : " + tempFilePath.getParent());
+        System.out.println("tempFilePath.getPath()          : " + tempFilePath.getPath());
+        System.out.println("tempFilePath.toString()         : " + tempFilePath.toString());
+        
+        String absolutePath = tempFilePath.getAbsolutePath() + "\\" + FormatExternalId.format(externalId) + "." + fileExtension;
+        
+        System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
+        
+        return absolutePath;
+    }
+    
+    /**
+     * Get document file from temporal directory.
+     * @param externalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @return Document file from temporal directory if exists, otherwise <code>null</code>.
+     * @throws IOException 
+     */
+    public static File getDocumentFileFromTempDir(final int externalId, final String fileExtension) throws IOException {
+        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
+        File tempFile = new File(fileName);
+        
+        if (!tempFile.exists()) {
+            tempFile = null;
+        }
+        
+        return tempFile;
+    }
+    
+    /**
+     * Copy document original file to temporal directory.
+     * @param externalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @param originalFile Document original file.
+     * @return Just created document file from temporal directory.
+     * @throws IOException 
+     */
+    public static File copyDocumentFileToTempDir(final int externalId, final String fileExtension, final File originalFile) throws IOException {
+        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
+        File tempFile = new File(fileName);
+        
+        Files.copy(
+            originalFile.toPath(),
+            tempFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        );
+        
+        return tempFile;
     }
     
     /**
