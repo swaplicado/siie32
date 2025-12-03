@@ -11,6 +11,6 @@ package erp.mod.cfg.swap.form;
  */
 public interface SDocument {
     
-    public String getEffectiveFolio();
+    public String getFolio();
     public String getIssuer();
 }

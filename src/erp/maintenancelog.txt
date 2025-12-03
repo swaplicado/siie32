@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 292.3/ 2025-12-03
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión de descarga de archivos XML y PDF del CFDI desde SWAP Services.
+2) Revisión de diálogo visor de XML del CFDI para mostrarse simultáneamente con el visor de PDF.
+3) Revisión de visualización de folios de facturas cuando carecen de serie y folio.
+
+================================================================================
 SIIE 3.2 292.2/ 2025-12-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

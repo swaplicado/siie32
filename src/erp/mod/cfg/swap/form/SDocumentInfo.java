@@ -5,7 +5,9 @@
  */
 package erp.mod.cfg.swap.form;
 
+import cfd.ver4.DCfdVer4Consts;
 import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -13,24 +15,32 @@ import java.util.Date;
  */
 public class SDocumentInfo implements SDocument {
     
-    protected String msFolio;
+    public static final String NON_FOLIO = "SIN FOLIO";
+    
+    protected String msNumberSeries;
+    protected String msNumber;
     protected String msUuid;
     protected Date mtDate;
     protected String msIssuer;
     
-    public SDocumentInfo(final String folio, final String uuid, final Date date, final String issuer) {
-        msFolio = folio;
+    public SDocumentInfo(final String numberSeries, final String number, final String uuid, final Date date, final String issuer) {
+        msNumberSeries = numberSeries;
+        msNumber = number;
         msUuid = uuid;
         mtDate = date;
         msIssuer = issuer;
     }
 
     public SDocumentInfo(final SImportedDocument document) {
-        this(document.getFolio(), document.ExternalDocumentUuid, document.Date, document.BizPartner);
+        this(document.NumberSeries, document.Number, document.ExternalDocumentUuid, document.Date, document.BizPartner);
     }
 
-    public String getFolio() {
-        return msFolio;
+    public String getNumberSeries() {
+        return msNumberSeries;
+    }
+    
+    public String getNumber() {
+        return msNumber;
     }
     
     public String getUuid() {
@@ -42,12 +52,17 @@ public class SDocumentInfo implements SDocument {
     }
 
     @Override
+    public String getFolio() {
+        return SDocumentInfo.composeFolio(msNumberSeries, msNumber, msUuid);
+    }
+    
+    @Override
     public String getIssuer() {
         return msIssuer;
     }
     
-    @Override
-    public String getEffectiveFolio() {
-        return !msFolio.isEmpty() ? msFolio : msUuid;
+    public static String composeFolio(final String numberSeries, final String number, final String uuid) {
+        String folio = numberSeries + (numberSeries.isEmpty() ? "" : "-") + number;
+        return !folio.isEmpty() ? folio : "[" + (!uuid.isEmpty() ? SLibUtils.textLeft(uuid.toUpperCase(), DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) + "...": SDocumentInfo.NON_FOLIO) + "]";
     }
 }

@@ -372,9 +372,8 @@ public class SCfdDataConcepto {
         if (!msPredial.isEmpty()) {
             cfd.ver40.DElementConceptoCuentaPredial cuentaPredial = new cfd.ver40.DElementConceptoCuentaPredial();
             cuentaPredial.getAttNumero().setString(msPredial);
-            ArrayList<cfd.ver40.DElementConceptoCuentaPredial> arrCuentaPredial = new ArrayList<>();
-            arrCuentaPredial.add(cuentaPredial);
-            concepto.setEltOpcConceptoCuentaPredial(arrCuentaPredial);
+            
+            concepto.getEltOpcConceptoCuentaPredials().add(cuentaPredial);
         }
         
         return concepto;

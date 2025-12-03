@@ -97,7 +97,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jchkDeleteOnClose = new javax.swing.JCheckBox();
         jScrollPane = new javax.swing.JScrollPane();
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 3));
 
         jtfCurrentPage.setEditable(false);
         jtfCurrentPage.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -131,7 +131,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jbGoLastPage.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel1.add(jbGoLastPage);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(35, 23));
+        jLabel1.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel1.add(jLabel1);
 
         jtfCurrentZoom.setEditable(false);
@@ -160,7 +160,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jbZoomOut.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel1.add(jbZoomOut);
 
-        jLabel2.setPreferredSize(new java.awt.Dimension(35, 23));
+        jLabel2.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel1.add(jLabel2);
 
         jtfDocument.setEditable(false);
@@ -174,7 +174,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jtfFile.setText("file.pdf");
         jtfFile.setToolTipText("Archivo PDF");
         jtfFile.setFocusable(false);
-        jtfFile.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfFile.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel1.add(jtfFile);
 
         jbFileSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"))); // NOI18N
@@ -247,6 +247,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         }
         else {
             jtfCurrentPage.setText((mnCurrentPageIndex + 1) + "/" + mnPages);
+            jtfCurrentPage.setCaretPosition(0);
         }
     }
     
@@ -256,6 +257,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         }
         else {
             jtfCurrentZoom.setText(ZOOM_OPTIONS[mnCurrentZoomIndex] + "%");
+            jtfCurrentZoom.setCaretPosition(0);
         }
     }
     
@@ -268,10 +270,12 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             jtfFile.setToolTipText(TOOL_TIP_FILE);
         }
         else {
-            jtfDocument.setText(moDocument.getEffectiveFolio());
+            jtfDocument.setText(moDocument.getFolio());
+            jtfDocument.setCaretPosition(0);
             jtfDocument.setToolTipText(TOOL_TIP_DOCUMENT + ": " + jtfDocument.getText());
             
             jtfFile.setText(moPdf.getName());
+            jtfFile.setCaretPosition(0);
             jtfFile.setToolTipText(TOOL_TIP_FILE + ": " + jtfFile.getText());
         }
     }
@@ -366,7 +370,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             fileChooser.setAcceptAllFileFilterUsed(false);
             fileChooser.setFileFilter(filter);
 
-            String safeFileName = moDocument.getEffectiveFolio().replaceAll("[\\\\/:*?\"<>|]", "");
+            String safeFileName = moDocument.getFolio().replaceAll("[\\\\/:*?\"<>|]", "");
             fileChooser.setSelectedFile(new File(safeFileName + "." + SFileUtilities.pdf));
 
             if (fileChooser.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -402,7 +406,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             
             String fileInfo = "Información del archivo PDF:\n\n"
                     + "Emisor documento: " + moDocument.getIssuer() + "\n"
-                    + "Folio documento: " + moDocument.getEffectiveFolio() + "\n\n"
+                    + "Folio documento: " + moDocument.getFolio() + "\n\n"
                     + "Archivo: " + moPdf.getAbsolutePath() + "\n"
                     + "Creado: " + SLibUtils.DateFormatDatetimeTimeZone.format(new Date(attrs.creationTime().toMillis())) + "\n"
                     + "Modificado: " + SLibUtils.DateFormatDatetimeTimeZone.format(new Date(attrs.lastModifiedTime().toMillis())) + "\n"
@@ -416,20 +420,20 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     }
     private void actionPerformedFileDeleteToUpdate() {
         if (!jchkDeleteOnClose.isSelected()) {
-            String confirmDeletion = "¡Este archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getEffectiveFolio() + "' será descartado!\n"
+            String confirmDeletion = "¡Este archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getFolio() + "' será descartado!\n"
                     + "La próxima vez que solicite visualizarlo será descargado nuevamente desde " + SSwapConsts.SWAP_SERVICES + ".\n"
                     + SGuiConsts.MSG_CNF_CONT;
             
             if (miClient.showMsgBoxConfirm(confirmDeletion) == JOptionPane.YES_OPTION) {
                 // set delete on close:
                 jchkDeleteOnClose.setSelected(true);
-                miClient.showMsgBoxWarning("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getEffectiveFolio() + "' será descartado al cerrarse este diálogo.");
+                miClient.showMsgBoxWarning("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getFolio() + "' será descartado al cerrarse este diálogo.");
             }
         }
         else {
             // revert delete on close:
             jchkDeleteOnClose.setSelected(false);
-            miClient.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getEffectiveFolio() + "' ya no será descartado al cerrarse este diálogo.");
+            miClient.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + moDocument.getFolio() + "' ya no será descartado al cerrarse este diálogo.");
         }
     }
 

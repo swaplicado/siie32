@@ -13,7 +13,6 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
-import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
@@ -1013,6 +1012,44 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         return isRegistered;
     }
     
+    private SDataDps readOrderAndPrepareDialogDpsFinder(final SImportedDocument document) throws Exception {
+        SDataDps order = null;
+        boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
+
+        if (linkToOrder) {
+            int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
+
+            if (orderKey != null) {
+                order = new SDataDps();
+                if (order.read(orderKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Orden de compra PK " + SLibUtils.textKey(orderKey) + ".)");
+                }
+            }
+        }
+
+        // prepare DPS finder dialog:
+
+        if (linkToOrder && order == null && moDialogDpsFinder == null) {
+            moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
+        }
+        
+        return order;
+    }
+    
+    private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
+        if (dpsKey != null) {
+            if (document.link(miClient.getSession(), dpsKey, false, true, msSyncUrlDownload)) {
+                int index = moDocumentsGrid.getTable().getSelectedRow();
+                moDocumentsGrid.renderGridRows();
+                moDocumentsGrid.setSelectedGridRow(index);
+
+                if (document.isPaymentRequested()) {
+                    mbExportPaymentRequests = true;
+                }
+            }
+        }
+    }
+    
     private void actionPerformedShowDocs() {
         SGuiValidation validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
         
@@ -1098,6 +1135,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     
                                     document.NumberSeries = docNode.get("series").asText();
                                     document.Number = docNode.get("number").asText();
+                                    
+                                    if (document.NumberSeries.isEmpty() && document.Number.isEmpty() && document.ExternalDocumentUuid.isEmpty()) {
+                                        document.Number = docNode.get("folio").asText();
+                                    }
+                                    
                                     document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
                                     
                                     JsonNode referencesNode = docNode.path("references");
@@ -1583,53 +1625,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 else {
                                     // retrieve order, if available:
 
-                                    SDataDps order = null;
-                                    boolean linkToOrder = document.References != null && document.References.length > 0 && document.ReferencesType == SSwapConsts.TXN_DOC_TYPE_ORDER;
-
-                                    if (linkToOrder) {
-                                        int[] orderKey = null;
-                                        SImportUtils.DpsKey orderDpsKey = document.References[0].createDpsKey();
-
-                                        if (orderDpsKey != null) {
-                                            orderKey = orderDpsKey.asKey();
-                                        }
-                                        else {
-                                            SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(document.References[0].Reference, SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE);
-
-                                            if (orderDpsFolio != null) {
-                                                orderKey = SDataUtilities.obtainDpsKey((SClientInterface) miClient, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
-                                            }
-                                        }
-
-                                        if (orderKey != null) {
-                                            order = new SDataDps();
-                                            if (order.read(orderKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                                                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Orden de compra PK " + SLibUtils.textKey(orderKey) + ".)");
-                                            }
-                                        }
-                                    }
-
-                                    // prepare DPS finder dialog:
-
-                                    if (linkToOrder && order == null && moDialogDpsFinder == null) {
-                                        moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-                                    }
+                                    SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                                    boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
 
                                     // import CFDI:
 
                                     int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
-
-                                    if (dpsKey != null) {
-                                        if (document.link(miClient.getSession(), dpsKey, false, true, msSyncUrlDownload)) {
-                                            int index = moDocumentsGrid.getTable().getSelectedRow();
-                                            moDocumentsGrid.renderGridRows();
-                                            moDocumentsGrid.setSelectedGridRow(index);
-
-                                            if (document.isPaymentRequested()) {
-                                                mbExportPaymentRequests = true;
-                                            }
-                                        }
-                                    }
+                                    linkAndProcessNewDps(document, dpsKey);
                                 }
                             }
                         }
@@ -1687,39 +1689,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             else {
                                 // retrieve order, if available:
 
-                                SDataDps order = null;
+                                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
                                 boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
-
-                                if (linkToOrder) {
-                                    int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
-
-                                    if (orderKey != null) {
-                                        order = new SDataDps();
-                                        order.read(orderKey, miClient.getSession().getStatement());
-                                    }
-                                }
-
-                                // prepare DPS finder dialog:
-
-                                if (linkToOrder && order == null && moDialogDpsFinder == null) {
-                                    moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-                                }
 
                                 // create CFDI:
 
                                 int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
-
-                                if (dpsKey != null) {
-                                    if (document.link(miClient.getSession(), dpsKey, false, true, msSyncUrlDownload)) {
-                                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                                        moDocumentsGrid.renderGridRows();
-                                        moDocumentsGrid.setSelectedGridRow(index);
-
-                                        if (document.isPaymentRequested()) {
-                                            mbExportPaymentRequests = true;
-                                        }
-                                    }
-                                }
+                                linkAndProcessNewDps(document, dpsKey);
                             }
                         }
                     }
@@ -1804,20 +1780,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                
-                if (!document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_PROCESSED);
+                int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
+
+                if (orderKey == null) {
+                    throw new Exception("La factura autorizada no está relacionada con ningún pedido.");
                 }
                 else {
-                    int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
-                    
-                    if (orderKey == null) {
-                        throw new Exception("La factura autorizada no tiene pedido.");
-                    }
-                    else {
-                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
-                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
-                    }
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
                 }
             }
         }

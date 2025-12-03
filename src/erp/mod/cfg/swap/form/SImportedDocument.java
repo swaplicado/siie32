@@ -142,16 +142,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public String getFolio() {
-        return NumberSeries + (NumberSeries.isEmpty() ? "" : "-") + Number;
-    }
-
-    /**
-     * Get folio of document in format series-number, if exists, otherwise UUID of document.
-     * @return 
-     */
-    public String getEffectiveFolio() {
-        String folio = getFolio();
-        return !folio.isEmpty() ? folio : ExternalDocumentUuid;
+        return SDocumentInfo.composeFolio(NumberSeries, Number, ExternalDocumentUuid);
     }
 
     /**

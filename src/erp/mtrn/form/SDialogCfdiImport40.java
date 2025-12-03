@@ -366,7 +366,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jtfPurchaseOrderDate);
 
-        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_seek.gif"))); // NOI18N
+        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbViewPurchaseOrder.setToolTipText("Ver OC de la factura...");
         jbViewPurchaseOrder.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jbViewPurchaseOrder);
@@ -753,6 +753,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
+        mnFormResult = 0;
+        mbFirstTime = true;
+        
         // Tabla general (conceptos):
         
         int i = 0;
