@@ -190,6 +190,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
                 + "v.pay, "   
                 + "v.dt_req, " 
                 + "v.nts, "   
+                + "v.nts_auth, "
                 + "f.name AS _func, "
                 + "fs.name AS _func_sub, "
                 + "sp.name AS _status, "
@@ -270,6 +271,8 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "_ety_cur_key", "Moneda a pagar"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "_dps", "Documento pago"));
         }
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nts", "Instrucciones pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nts_auth", "Notas para autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_status", "Estatus"));

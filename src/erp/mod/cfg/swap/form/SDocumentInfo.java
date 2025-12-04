@@ -5,9 +5,7 @@
  */
 package erp.mod.cfg.swap.form;
 
-import cfd.ver4.DCfdVer4Consts;
 import java.util.Date;
-import sa.lib.SLibUtils;
 
 /**
  *
@@ -53,16 +51,11 @@ public class SDocumentInfo implements SDocument {
 
     @Override
     public String getFolio() {
-        return SDocumentInfo.composeFolio(msNumberSeries, msNumber, msUuid);
+        return SDocumentUtils.composeFolio(msNumberSeries, msNumber, msUuid);
     }
     
     @Override
     public String getIssuer() {
         return msIssuer;
-    }
-    
-    public static String composeFolio(final String numberSeries, final String number, final String uuid) {
-        String folio = numberSeries + (numberSeries.isEmpty() ? "" : "-") + number;
-        return !folio.isEmpty() ? folio : "[" + (!uuid.isEmpty() ? SLibUtils.textLeft(uuid.toUpperCase(), DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) + "...": SDocumentInfo.NON_FOLIO) + "]";
     }
 }

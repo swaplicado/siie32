@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 292.4/ 2025-12-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de visualización del PDF de facturas y NC de compras en la vista principal de documentos.
+2) Implementación de visualización del PDF de facturas y NC de compras durante su captura en la importación desde SWAP Services.
+3) Mostrado de instrucciones de pago (notas) y comentarios para autorización (notas autorización) en vistas de pagos.
+
+================================================================================
 SIIE 3.2 292.3/ 2025-12-03
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

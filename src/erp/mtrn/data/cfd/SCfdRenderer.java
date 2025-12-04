@@ -99,7 +99,7 @@ public final class SCfdRenderer implements ActionListener {
             moCfdiViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             
             if (mbCreateProcessingButtons) {
-                mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png")));
+                mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
                 mjViewPdf.setBounds(440, 1, 25, 25);
                 mjViewPdf.addActionListener(this);
                 mjViewPdf.setToolTipText("Ver PDF del CFDI...");

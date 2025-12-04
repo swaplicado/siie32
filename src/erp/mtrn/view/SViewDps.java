@@ -40,6 +40,8 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.form.SDialogPdfViewer;
+import erp.mod.cfg.swap.form.SDocument;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
@@ -57,6 +59,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryIogEntryTransfer;
 import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
+import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
@@ -143,10 +146,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbPrintContractKgAsTon;
     private javax.swing.JButton jbPrintContractMoves;
     private javax.swing.JButton jbPrintOrderGoods;
-    private javax.swing.JButton jbGetXml;
-    private javax.swing.JButton jbGetPdf;
+    private javax.swing.JButton jbShowCfdiXml;
+    private javax.swing.JButton jbGetCfdiXml;
+    private javax.swing.JButton jbShowDocPdf;
+    private javax.swing.JButton jbGetDocPdf;
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
-    private javax.swing.JButton jbShowCfdi;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbValidateCfdi;
     private javax.swing.JButton jbGetCfdiStatus;
@@ -182,6 +186,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private erp.mod.cfg.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private java.text.DecimalFormat moUsQuantityFormat;
 
     private boolean mbIsCategoryPur;
@@ -424,26 +429,31 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintOrderGoods.addActionListener(this);
         jbPrintOrderGoods.setToolTipText("Imprimir orden de salida de almacén");
 
-        jbGetXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
-        jbGetXml.setPreferredSize(new Dimension(23, 23));
-        jbGetXml.addActionListener(this);
-        jbGetXml.setToolTipText("Obtener XML del comprobante");
+        jbShowCfdiXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon-file-xml.png")));
+        jbShowCfdiXml.setPreferredSize(new Dimension(23, 23)); 
+        jbShowCfdiXml.addActionListener(this);
+        jbShowCfdiXml.setToolTipText("Ver XML del CFDI del comprobante");
         
-        jbGetPdf = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
-        jbGetPdf.setPreferredSize(new Dimension(23, 23));
-        jbGetPdf.addActionListener(this);
-        jbGetPdf.setToolTipText("Obtener PDF del comprobante");
+        jbGetCfdiXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
+        jbGetCfdiXml.setPreferredSize(new Dimension(23, 23));
+        jbGetCfdiXml.addActionListener(this);
+        jbGetCfdiXml.setToolTipText("Obtener XML del CFDI del comprobante");
+        
+        jbShowDocPdf = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
+        jbShowDocPdf.setPreferredSize(new Dimension(23, 23)); 
+        jbShowDocPdf.addActionListener(this);
+        jbShowDocPdf.setToolTipText("Ver PDF del comprobante");
+        
+        jbGetDocPdf = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
+        jbGetDocPdf.setPreferredSize(new Dimension(23, 23));
+        jbGetDocPdf.addActionListener(this);
+        jbGetDocPdf.setToolTipText("Obtener PDF del comprobante");
         
         jbGetAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL));
         jbGetAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbGetAcknowledgmentCancellation.addActionListener(this);
         jbGetAcknowledgmentCancellation.setToolTipText("Obtener XML del acuse de cancelación del CFDI");
 
-        jbShowCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
-        jbShowCfdi.setPreferredSize(new Dimension(23, 23)); 
-        jbShowCfdi.addActionListener(this);
-        jbShowCfdi.setToolTipText("Mostrar CFDI del comprobante");
-        
         jbSignXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN));
         jbSignXml.setPreferredSize(new Dimension(23, 23));
         jbSignXml.addActionListener(this);
@@ -611,9 +621,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbPrintContractMoves);
         addTaskBarLowerComponent(jbPrintOrderGoods);
         addTaskBarLowerSeparator();
-        addTaskBarLowerComponent(jbShowCfdi);
-        addTaskBarLowerComponent(jbGetXml);
-        addTaskBarLowerComponent(jbGetPdf);
+        addTaskBarLowerComponent(jbShowCfdiXml);
+        addTaskBarLowerComponent(jbGetCfdiXml);
+        addTaskBarLowerComponent(jbShowDocPdf);
+        addTaskBarLowerComponent(jbGetDocPdf);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbRestoreCfdStamped);
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
@@ -664,9 +675,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintContractKgAsTon.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
-        jbGetXml.setEnabled(mbIsDoc || mbIsDocAdj);
-        jbGetPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
-        jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbShowCfdiXml.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbGetCfdiXml.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbShowDocPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
+        jbGetDocPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
@@ -2840,9 +2852,30 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
     }
+    
+    private void actionShowCfdiXml() {
+        if(jbShowCfdiXml.isEnabled()) {
+            if (isRowSelected()) {
+                try {
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    
+                    if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                    }
+                    else {
+                        SCfdRenderer renderer = new SCfdRenderer(miClient);
+                        renderer.showCfd(cfd.getDocXml());
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
 
     private void actionGetXml() {
-        if (jbGetXml.isEnabled()) {
+        if (jbGetCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
                     SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
@@ -2855,8 +2888,50 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionGetPdf() {
-        if (jbGetPdf.isEnabled()) {
+    private void actionShowDocPdf() {
+        if (jbShowDocPdf.isEnabled()) {
+            if (isRowSelected()) {
+                try {
+                    int[] dpsKey = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+                    File pdf = SCfdUtils.getXmlPdfInTempFile(miClient, dpsKey);
+                    
+                    if (pdf != null) {
+                        if (moDialogPdfViewer == null) {
+                            moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
+                        }
+                        
+                        String folio = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
+                        String issuer = SThinDps.readDpsBizPartner(dpsKey, miClient.getSession().getStatement());
+                        
+                        SDocument document = new SDocument() {
+
+                            @Override
+                            public String getFolio() {
+                                return folio;
+                            }
+
+                            @Override
+                            public String getIssuer() {
+                                return issuer;
+                            }
+                        };
+
+                        moDialogPdfViewer.setPdf(document, pdf);
+                        moDialogPdfViewer.setVisible(true);
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("El documento no tiene archivo PDF.");
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void actionGetDocPdf() {
+        if (jbGetDocPdf.isEnabled()) {
             if (isRowSelected()) {
                 try {
                     SCfdUtils.downloadXmlPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
@@ -2874,26 +2949,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 try {
                     SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                     SCfdUtils.printCfdCancelAck(miClient, cfd, 0, SDataConstantsPrint.PRINT_MODE_VIEWER);
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-            }
-        }
-    }
-    
-    private void actionShowCfdi() {
-        if(jbShowCfdi.isEnabled()) {
-            if (isRowSelected()) {
-                try {
-                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                    }
-                    else {
-                        SCfdRenderer renderer = new SCfdRenderer(miClient);
-                        renderer.showCfd(cfd.getDocXml());
-                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -3701,17 +3756,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbPrintPhotoInvoice) {
                     actionPrintPhotoInvoice();
                 }
-                else if (button == jbGetXml) {
+                else if (button == jbShowCfdiXml) {
+                    actionShowCfdiXml();
+                }
+                else if (button == jbGetCfdiXml) {
                     actionGetXml();
                 }
-                else if (button == jbGetPdf) {
-                    actionGetPdf();
+                else if (button == jbShowDocPdf) {
+                    actionShowDocPdf();
+                }
+                else if (button == jbGetDocPdf) {
+                    actionGetDocPdf();
                 }
                 else if (button == jbPrintAcknowledgmentCancellation) {
                     actionPrintAcknowledgmentCancellation();
-                }
-                else if (button == jbShowCfdi) {
-                    actionShowCfdi();
                 }
                 else if (button == jbGetAcknowledgmentCancellation) {
                     actionGetAcknowledgmentCancellation();

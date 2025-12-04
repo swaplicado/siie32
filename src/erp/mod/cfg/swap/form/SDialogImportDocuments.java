@@ -457,7 +457,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
         jpProcessingN6.add(jlInvoice);
 
-        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewInvoicePdf.setToolTipText("Ver PDF de la factura...");
         jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jpProcessingN6.add(jbViewInvoicePdf);
@@ -1628,7 +1628,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
                                     boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
 
-                                    // import CFDI:
+                                    // import CFDI (dialog DPS Finder should be previously prepared):
 
                                     int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
                                     linkAndProcessNewDps(document, dpsKey);
@@ -1692,7 +1692,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
                                 boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
 
-                                // create CFDI:
+                                // create CFDI (dialog DPS Finder should be previously prepared):
 
                                 int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
                                 linkAndProcessNewDps(document, dpsKey);
@@ -1716,7 +1716,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                File pdf = SImportUtils.getDocumentFileFromTempDir(document.ExternalDocumentId, SFileUtilities.pdf);
+                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ExternalDocumentId, SFileUtilities.pdf);
                 
                 if (pdf == null) {
                     File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);

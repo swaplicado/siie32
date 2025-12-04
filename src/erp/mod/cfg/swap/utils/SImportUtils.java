@@ -48,6 +48,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -520,35 +521,58 @@ public abstract class SImportUtils {
     }
     
     /**
-     * Get temporal file absolute path for required document external ID and file extension. Creates temporal directory if not exists.
-     * @param externalId Document external ID.
-     * @param fileExtension Extension of temporal file.
-     * @return Temporal file absolute path.
+     * Create documents local temporal directory.
+     * @param fileExtension Extension of temporal files to be stored in temporal directory.
+     * @return
      * @throws IOException 
      */
-    public static String getDocumentTempFileAbsolutePath(final int externalId, final String fileExtension) throws IOException {
-        String sysTempDir = System.getProperty("java.io.tmpdir");
-        File tempFilePath = new File(sysTempDir + TEMP_DIR_DOCS_PDF);
+    public static File createDocumentsLocalTempDir(final String fileExtension) throws IOException {
+        String subdir = "";
         
-        if (!tempFilePath.exists()) {
-            boolean ok = tempFilePath.mkdirs();
+        switch (fileExtension) {
+            case SFileUtilities.pdf:
+                subdir = TEMP_DIR_DOCS_PDF;
+                break;
+            default:
+                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Extensión de archivo: " + fileExtension + ")");
+        }
+        
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + subdir);
+        
+        if (!localTempDir.exists()) {
+            boolean ok = localTempDir.mkdirs();
             if (!ok) {
-                throw new RuntimeException("Failed to create directory: " + tempFilePath.getAbsolutePath());
+                throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
             }
         }
         
-        System.out.println("tempFilePath.getAbsolutePath()  : " + tempFilePath.getAbsolutePath());
-        System.out.println("tempFilePath.getCanonicalPath() : " + tempFilePath.getCanonicalPath());
-        System.out.println("tempFilePath.getName()          : " + tempFilePath.getName());
-        System.out.println("tempFilePath.getParent()        : " + tempFilePath.getParent());
-        System.out.println("tempFilePath.getPath()          : " + tempFilePath.getPath());
-        System.out.println("tempFilePath.toString()         : " + tempFilePath.toString());
+        System.out.println("localTempDir.getAbsolutePath()  : " + localTempDir.getAbsolutePath());
+        /* Keep for debuggin purposes:
+        System.out.println("localTempDir.getCanonicalPath() : " + localTempDir.getCanonicalPath());
+        System.out.println("localTempDir.getName()          : " + localTempDir.getName());
+        System.out.println("localTempDir.getParent()        : " + localTempDir.getParent());
+        System.out.println("localTempDir.getPath()          : " + localTempDir.getPath());
+        System.out.println("localTempDir.toString()         : " + localTempDir.toString());
+        */
         
-        String absolutePath = tempFilePath.getAbsolutePath() + "\\" + FormatExternalId.format(externalId) + "." + fileExtension;
+        return localTempDir;
+    }
+    
+    /**
+     * Get local temporal file for required document external ID and file extension. Creates local temporal directory if not exists.
+     * @param externalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @return Local temporal file.
+     * @throws IOException 
+     */
+    public static File createDocumentLocalTempFile(final int externalId, final String fileExtension) throws IOException {
+        File localTempDir = createDocumentsLocalTempDir(fileExtension);
+        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatExternalId.format(externalId) + "." + fileExtension;
         
         System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
         
-        return absolutePath;
+        return new File(absolutePath);
     }
     
     /**
@@ -558,9 +582,8 @@ public abstract class SImportUtils {
      * @return Document file from temporal directory if exists, otherwise <code>null</code>.
      * @throws IOException 
      */
-    public static File getDocumentFileFromTempDir(final int externalId, final String fileExtension) throws IOException {
-        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
-        File tempFile = new File(fileName);
+    public static File getDocumentFileFromTempDirIfExists(final int externalId, final String fileExtension) throws IOException {
+        File tempFile = createDocumentLocalTempFile(externalId, fileExtension);
         
         if (!tempFile.exists()) {
             tempFile = null;
@@ -578,8 +601,7 @@ public abstract class SImportUtils {
      * @throws IOException 
      */
     public static File copyDocumentFileToTempDir(final int externalId, final String fileExtension, final File originalFile) throws IOException {
-        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
-        File tempFile = new File(fileName);
+        File tempFile = createDocumentLocalTempFile(externalId, fileExtension);
         
         Files.copy(
             originalFile.toPath(),

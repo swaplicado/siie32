@@ -142,7 +142,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public String getFolio() {
-        return SDocumentInfo.composeFolio(NumberSeries, Number, ExternalDocumentUuid);
+        return SDocumentUtils.composeFolio(NumberSeries, Number, ExternalDocumentUuid);
     }
 
     /**
@@ -1006,7 +1006,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setDateDocLapsing_n(
         //dps.setDateDocDelivery_n(
         dps.setNumberSeries(NumberSeries);
-        dps.setNumber(Number);
+        dps.setNumber(!Number.isEmpty() ? Number : SDocumentUtils.getUuidFirstSegment(ExternalDocumentUuid));
         //dps.setNumberReference(
         //dps.setCommissionsReference(
         //dps.setConditionsPayment(
@@ -1266,12 +1266,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     @Override
     public String toString() {
-        return BizPartner + "; " // allways available
-                + getFolio() + "; " // allways available
-                + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
-                + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
-                + (!FunctionalSubArea.isEmpty() ? "; " + FunctionalSubArea : "") // may not be available
-                + (ExternalDocumentId != 0 ? "; ID " + ExternalDocumentId : "") // may not be available
+        return "Emisor: " + BizPartner + "; " // allways available
+                + "Folio: " + getFolio() + "; " // allways available
+                + "Fecha: " + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
+                + "Total: $ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
+                + (!FunctionalSubArea.isEmpty() ? "; Subárea funcional: " + FunctionalSubArea : "") // may not be available
+                + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
                 + ".";
     }
 
