@@ -12,6 +12,7 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.cfg.swap.utils.SImportUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.sql.PreparedStatement;
@@ -19,6 +20,7 @@ import java.sql.ResultSet;
 import java.util.Base64;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import sa.lib.SLibConsts;
 
 /**
  * Objects of this class must be read and saved throw SIIE Server to work properly. Otherwise phisical files can be read or saved in the wrong host.
@@ -26,6 +28,11 @@ import javax.swing.filechooser.FileFilter;
  * @author Isabel Servín, Sergio Flores
  */
 public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    /** Download mode to custom directory. */
+    public static final int MODE_CUST_DIR = 1;
+    /** Download mode to temporal directory. */
+    public static final int MODE_TEMP_DIR = 2;
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -257,56 +264,79 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     /**
      * Download original PDF file to user's file system.
      * @param client GUI client.
+     * @param downloadMode MODE_CUST_DIR or MODE_TEMP_DIR.
+     * @return Downloaded PDF file.
      * @throws Exception 
      */
-    public void downloadPdfFile(SClientInterface client) throws Exception {
+    public File downloadPdfFile(final SClientInterface client, final int downloadMode) throws Exception {
         if (msPdfAsBase64.isEmpty()) {
-            throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
+            // throw an exception message according to a download action:
+            throw new Exception("No se encontró o no está disponible el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
         }
         
+        File pdfFile = null;
         JFileChooser fileChooser = null;
         Exception exception = null;
         
         try {
-            File pdfFile = null;
-            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.pdf);
-            
-            fileChooser = client.getFileChooser();
-            fileChooser.repaint();
-            fileChooser.setAcceptAllFileFilterUsed(false);
-            fileChooser.setFileFilter(filter);
+            switch (downloadMode) {
+                case MODE_CUST_DIR:
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.pdf);
 
-            fileChooser.setSelectedFile(new File(msDocPdfName));
+                    fileChooser = client.getFileChooser();
+                    fileChooser.repaint();
+                    fileChooser.setAcceptAllFileFilterUsed(false);
+                    fileChooser.setFileFilter(filter);
 
-            if (fileChooser.showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                pdfFile = fileChooser.getSelectedFile();
+                    fileChooser.setSelectedFile(new File(msDocPdfName));
 
-                // Ensure file ends with ".pdf"
-                if (!pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
-                    pdfFile = new File(pdfFile.getAbsolutePath() + "." + SFileUtilities.pdf);
-                }
+                    if (fileChooser.showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                        pdfFile = fileChooser.getSelectedFile();
+
+                        // Ensure file ends with ".pdf"
+                        if (!pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
+                            pdfFile = new File(pdfFile.getAbsolutePath() + "." + SFileUtilities.pdf);
+                        }
+                    }
+                    break;
+                    
+                case MODE_TEMP_DIR:
+                    File localTempDir = SImportUtils.createDocumentsLocalTempDir(SFileUtilities.pdf);
+                    pdfFile = new File(localTempDir.getAbsolutePath() + (localTempDir.getAbsolutePath().endsWith("\\") ? "" : "\\") + composePdfFileNameStd());
+                    break;
+                    
+                default:
+                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Modalidad de descarga: " + downloadMode + ").");
             }
 
             if (pdfFile != null) {
-                byte[] pdfBytes = Base64.getDecoder().decode(msPdfAsBase64);
-                Files.write(pdfFile.toPath(), pdfBytes);
-
-                client.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " ha sido descargado en:\n" + pdfFile.getAbsolutePath());
+                if (downloadMode == MODE_CUST_DIR || (downloadMode == MODE_TEMP_DIR && !pdfFile.exists())) {
+                    byte[] pdfBytes = Base64.getDecoder().decode(msPdfAsBase64);
+                    Files.write(pdfFile.toPath(), pdfBytes);
+                }
             }
         }
         catch (Exception e) {
             exception = e;
         }
         finally {
-            if (fileChooser != null) {
-                fileChooser.resetChoosableFileFilters();
-                fileChooser.setAcceptAllFileFilterUsed(true);
+            if (downloadMode == MODE_CUST_DIR) {
+                if (fileChooser != null) {
+                    fileChooser.resetChoosableFileFilters();
+                    fileChooser.setAcceptAllFileFilterUsed(true);
+                }
+                
+                if (pdfFile != null) {
+                    client.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " ha sido guardado en:\n" + pdfFile.getAbsolutePath());
+                }
             }
         }
         
         if (exception != null) {
             throw exception;
         }
+        
+        return pdfFile;
     }
     
     private void readPdfFile() throws Exception {
@@ -320,7 +350,8 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     
     private void savePdfFile() throws Exception {
         if (msPdfAsBase64.isEmpty()) {
-            throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + ".");
+            // throw an exception message according to a save action:
+            throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + " en Base64.");
         }
         
         File directory = new File(composePdfDirectory());

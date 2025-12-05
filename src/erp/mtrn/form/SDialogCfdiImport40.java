@@ -11,7 +11,6 @@
 
 package erp.mtrn.form;
 
-import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import cfd.ver40.DElementConcepto;
 import cfd.ver40.DElementConceptoImpuestoRetencion;
@@ -44,6 +43,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocumentInfo;
+import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -306,7 +306,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(52, 23));
         jPanel12.add(jtfPaymentType);
 
-        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewInvoicePdf.setToolTipText("Ver PDF del CFDI...");
         jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbViewInvoicePdf);
@@ -366,7 +366,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jtfPurchaseOrderDate);
 
-        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_seek.gif"))); // NOI18N
+        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbViewPurchaseOrder.setToolTipText("Ver OC de la factura...");
         jbViewPurchaseOrder.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jbViewPurchaseOrder);
@@ -753,6 +753,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     @SuppressWarnings("unchecked")
     private void initComponentsExtra() {
+        mnFormResult = 0;
+        mbFirstTime = true;
+        
         // Tabla general (conceptos):
         
         int i = 0;
@@ -2276,7 +2279,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         String uuid = "";
         cfd.ver40.DElementTimbreFiscalDigital tfd = moComprobante.getEltOpcComplementoTimbreFiscalDigital();
         if (tfd != null) {
-            uuid = tfd.getAttUUID().getString().toUpperCase();
+            uuid = tfd.getAttUUID().getString();
         }
         
         Date date = SLibTimeUtils.convertToDateOnly(moComprobante.getAttFecha().getDatetime());
@@ -2288,7 +2291,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         dps.setDateStartCredit(date);
         
         dps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
-        dps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) : "");
+        dps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
         dps.setNumberReference(isWithPurchaseOrder() ? moPurchaseOrder.getNumberReference() : "");
         
         dps.setDaysOfCredit(isCash ? 0 : isWithPurchaseOrder() ? moPurchaseOrder.getDaysOfCredit() : moBizPartnerReceptor.getDbmsCategorySettingsSup().getDaysOfCredit());

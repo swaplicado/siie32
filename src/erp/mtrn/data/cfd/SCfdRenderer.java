@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -71,13 +70,14 @@ public final class SCfdRenderer implements ActionListener {
     private ArrayList<cfd.ver33.DElementConcepto> moConceptos33; 
     private ArrayList<cfd.ver40.DElementConcepto> moConceptos40; 
     private HashMap<String, Object> moParamsMap;
+    private boolean mbCreateProcessingButtons;
     private JButton mjViewPdf;
     private JButton mjProcessCfd;
+    private JButton mjClose;
     private SDataDps moPurchaseOrder;
     private SDataDps moDpsRendered;
     private int mnBizCategory; 
     private JDialog moCfdiViewer;
-    private boolean mbShowValidateButton;
     protected SDialogPdfViewer moDialogPdfViewer;
     protected DCfdUtils.CfdEssentials moCfdEssentials;
     
@@ -93,12 +93,13 @@ public final class SCfdRenderer implements ActionListener {
 
     private void showCfdiViewer() {
         try {
-            moCfdiViewer = new JDialog(new JFrame(),"CFDI", true);
+            moCfdiViewer = new JDialog(miClient.getFrame(),"Visor de CFDI", true);
             moCfdiViewer.setSize(1000, 650);
             moCfdiViewer.setLocationRelativeTo(null);
+            moCfdiViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             
-            if (mbShowValidateButton) {
-                mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png")));
+            if (mbCreateProcessingButtons) {
+                mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
                 mjViewPdf.setBounds(440, 1, 25, 25);
                 mjViewPdf.addActionListener(this);
                 mjViewPdf.setToolTipText("Ver PDF del CFDI...");
@@ -112,6 +113,12 @@ public final class SCfdRenderer implements ActionListener {
                 
                 mjViewPdf.setEnabled(moPdfFile != null);
             }
+
+            mjClose = new JButton("Cerrar");
+            mjClose.setBounds(850, 1, 100, 25);
+            mjClose.addActionListener(this);
+            mjClose.setToolTipText("Cerrar el visor de CFDI");
+            moCfdiViewer.add(mjClose);
             
             File fileTemplate;
             if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
@@ -154,7 +161,7 @@ public final class SCfdRenderer implements ActionListener {
         moPdfFile = pdfFile;
         moPurchaseOrder = order;
         mnBizCategory = category;
-        mbShowValidateButton = true;
+        mbCreateProcessingButtons = true;
         mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
         
         if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
@@ -174,10 +181,10 @@ public final class SCfdRenderer implements ActionListener {
             moCfdEssentials = DCfdUtils.getCfdi40Essentials(msCfdiXml);
         }
         
-        return new SDocumentInfo(moCfdEssentials.composeFolio(), moCfdEssentials.Uuid, moCfdEssentials.Fecha, moCfdEssentials.Emisor);
+        return new SDocumentInfo(moCfdEssentials.Serie, moCfdEssentials.Folio, moCfdEssentials.Uuid, moCfdEssentials.Fecha, moCfdEssentials.Emisor);
     }
       
-    private void viewPdf() throws Exception {
+    private void actionPerformedViewPdf() throws Exception {
         if (moPdfFile != null && mjViewPdf.isEnabled()) {
             if (moDialogPdfViewer == null) {
                 moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
@@ -188,14 +195,14 @@ public final class SCfdRenderer implements ActionListener {
         }
     }
       
-    private void processCfd() throws Exception {
+    private void actionPerformedProcessCfd() throws Exception {
         SFormValidation validation = null;
         
-        if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
-            validation = validateCfdi33();
-        }
-        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
             validation = validateCfdi40();
+        }
+        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
+            validation = validateCfdi33();
         }
         else {
             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nVersión CFD: " + mfCfdiVersion + ".");
@@ -204,6 +211,10 @@ public final class SCfdRenderer implements ActionListener {
         if (validation.getIsError()) {
             miClient.showMsgBoxWarning(validation.getMessage());
         }
+    }
+    
+    private void actionPerformedClose() {
+        moCfdiViewer.setVisible(false);
     }
     
     private SFormValidation validateCfdi40() throws Exception {
@@ -369,7 +380,6 @@ public final class SCfdRenderer implements ActionListener {
     }
 
     @Deprecated
-    @SuppressWarnings("deprecation")
     private SFormValidation validateCfdi33() throws Exception {
         SFormValidation validation = new SFormValidation();
         
@@ -536,7 +546,7 @@ public final class SCfdRenderer implements ActionListener {
      * @param xml CFDI del doc.
      */
     public void showCfd(String xml) {
-        mbShowValidateButton = false;
+        mbCreateProcessingButtons = false;
         msCfdiXml = xml;
         
         try {
@@ -635,7 +645,6 @@ public final class SCfdRenderer implements ActionListener {
     }
     
     @Deprecated
-    @SuppressWarnings("deprecation")
     private void createParamsMap33() {
         try {
             moParamsMap = new HashMap<>();
@@ -717,10 +726,13 @@ public final class SCfdRenderer implements ActionListener {
                 JButton button = (JButton) e.getSource();
                 
                 if (button == mjViewPdf) {
-                    viewPdf();
+                    actionPerformedViewPdf();
                 }
                 else if (button == mjProcessCfd) {
-                    processCfd();
+                    actionPerformedProcessCfd();
+                }
+                else if (button == mjClose) {
+                    actionPerformedClose();
                 }
             }
         }

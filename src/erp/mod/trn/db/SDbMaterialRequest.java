@@ -434,7 +434,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             msSql = "SELECT id_ety " + 
                     "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " " +
-                    "WHERE id_mat_req = " + mnPkMatRequestId + " " + 
+                    "WHERE id_mat_req = " + mnPkMatRequestId + " AND NOT b_del " + 
                     "ORDER BY id_ety ";
             
             resultSet = statement.executeQuery(msSql);

@@ -16,7 +16,6 @@ import cfd.ver33.DElementConcepto;
 import cfd.ver33.DElementConceptoImpuestoRetencion;
 import cfd.ver33.DElementConceptoImpuestoTraslado;
 import cfd.ver33.DElementConceptoImpuestos;
-import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -42,6 +41,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -1891,7 +1891,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         String uuid = "";
         cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante.getEltOpcComplementoTimbreFiscalDigital();
         if (tfd != null) {
-            uuid = tfd.getAttUUID().getString().toUpperCase();
+            uuid = tfd.getAttUUID().getString();
         }
 
         moNewDps.setDate(moComprobante.getAttFecha().getDatetime());
@@ -1902,8 +1902,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         moNewDps.setDateDocLapsing_n(null);
         moNewDps.setDateDocDelivery_n(null);
         moNewDps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
-        moNewDps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? 
-                moComprobante.getAttFolio().getString() : SLibUtils.textLeft(uuid, DCfdVer4Consts.LEN_UUID_1ST_SEGMENT) : "");
+        moNewDps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
         moNewDps.setNumberReference("");
         moNewDps.setCommissionsReference("");
         moNewDps.setApprovalYear(0);

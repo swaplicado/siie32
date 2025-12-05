@@ -48,6 +48,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
@@ -76,7 +77,7 @@ public abstract class SImportUtils {
      * @param extension Estension.
      * @return 
      */
-    private static String getFileNameWithoutExtension(final String fileName, final String extension) {
+    private static String truncExtensionFromFilename(final String fileName, final String extension) {
         String fileNameWithoutExtension;
         int extensionIndex = fileName.toLowerCase().lastIndexOf(extension.toLowerCase());
         
@@ -362,7 +363,7 @@ public abstract class SImportUtils {
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
                     System.out.println("Temporary directory created at: " + tempDir);
                     
-                    tempFile = Files.createFile(tempDir.resolve(DOWNLOAD_FILE_PREFIX + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+                    tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
                     zipFile = tempFile.toFile();
                     break;
                     
@@ -401,12 +402,12 @@ public abstract class SImportUtils {
                         break;
 
                     case MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
-                        // decompress files in temporal directory:
+                        // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
                         
                         System.out.println("Extracting temporal files...");
                         
-                        File xmlFile = null;
                         String xmlFileName = "";
+                        File xmlFile = null;
                         File pdfFile = null;
                         HashMap<String, File> pdfFilesMap = new HashMap<>();
                         
@@ -416,10 +417,10 @@ public abstract class SImportUtils {
                             while ((entry = zis.getNextEntry()) != null) {
                                 System.out.println("Extracting: " + entry.getName());
 
-                                File newFile = new File(tempDir.toString() + "\\output", entry.getName());
-                                newFile.getParentFile().mkdirs();
+                                File currentFile = new File(tempDir.toString() + "\\output", entry.getName());
+                                currentFile.getParentFile().mkdirs(); // decompress files in temporal directory
 
-                                try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
                                     int bytesRead;
                                     byte[] buffer = new byte[8192];
 
@@ -430,28 +431,31 @@ public abstract class SImportUtils {
 
                                 zis.closeEntry();
                                 
-                                if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
-                                    // choose firt retrieved XML:
-                                    xmlFile = newFile;
-                                    xmlFileName = getFileNameWithoutExtension(xmlFile.getName(), "." + SFileUtilities.xml);
+                                // process current file:
+                                if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
+                                    // choose the first retrieved XML file:
+                                    xmlFile = currentFile;
+                                    xmlFileName = truncExtensionFromFilename(xmlFile.getName(), "." + SFileUtilities.xml);
                                 }
-                                else if (newFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
-                                    // reserve all retrieved PDF's:
-                                    pdfFilesMap.put(getFileNameWithoutExtension(newFile.getName(), "." + SFileUtilities.pdf), newFile);
-                                }
-                                
-                                if (!xmlFileName.isEmpty() && !pdfFilesMap.isEmpty() && pdfFile == null) {
-                                    pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF by matching the same name as irs XML counterpart
+                                else if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
+                                    // preserve all retrieved PDF files:
+                                    pdfFilesMap.put(truncExtensionFromFilename(currentFile.getName(), "." + SFileUtilities.pdf), currentFile);
                                 }
                                 
+                                // attempt to match the PDF file:
+                                if (!xmlFileName.isEmpty() && pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                    pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF file by matching the name of the XML file
+                                }
+                                
+                                // check if matching processing is done:
                                 if (xmlFile != null && pdfFile != null) {
-                                    break; // no more files needed!
+                                    break; // a pair of matching XML and PDF files found, no more processing needed!
                                 }
                             }
                             
-                            if (xmlFile != null && pdfFile == null && !pdfFilesMap.isEmpty()) {
-                                // last chance, choose firt retrieved PDF:
-                                pdfFile = (File) pdfFilesMap.values().toArray()[0];
+                            // last chance to get at least one PDF file!:
+                            if (pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                pdfFile = (File) pdfFilesMap.values().toArray()[0]; // choose the very first retrieved PDF!
                             }
                         }
                         
@@ -517,35 +521,58 @@ public abstract class SImportUtils {
     }
     
     /**
-     * Get temporal file absolute path for required document external ID and file extension. Creates temporal directory if not exists.
-     * @param externalId Document external ID.
-     * @param fileExtension Extension of temporal file.
-     * @return Temporal file absolute path.
+     * Create documents local temporal directory.
+     * @param fileExtension Extension of temporal files to be stored in temporal directory.
+     * @return
      * @throws IOException 
      */
-    public static String getDocumentTempFileAbsolutePath(final int externalId, final String fileExtension) throws IOException {
-        String sysTempDir = System.getProperty("java.io.tmpdir");
-        File tempFilePath = new File(sysTempDir + TEMP_DIR_DOCS_PDF);
+    public static File createDocumentsLocalTempDir(final String fileExtension) throws IOException {
+        String subdir = "";
         
-        if (!tempFilePath.exists()) {
-            boolean ok = tempFilePath.mkdirs();
+        switch (fileExtension) {
+            case SFileUtilities.pdf:
+                subdir = TEMP_DIR_DOCS_PDF;
+                break;
+            default:
+                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Extensión de archivo: " + fileExtension + ")");
+        }
+        
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + subdir);
+        
+        if (!localTempDir.exists()) {
+            boolean ok = localTempDir.mkdirs();
             if (!ok) {
-                throw new RuntimeException("Failed to create directory: " + tempFilePath.getAbsolutePath());
+                throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
             }
         }
         
-        System.out.println("tempFilePath.getAbsolutePath()  : " + tempFilePath.getAbsolutePath());
-        System.out.println("tempFilePath.getCanonicalPath() : " + tempFilePath.getCanonicalPath());
-        System.out.println("tempFilePath.getName()          : " + tempFilePath.getName());
-        System.out.println("tempFilePath.getParent()        : " + tempFilePath.getParent());
-        System.out.println("tempFilePath.getPath()          : " + tempFilePath.getPath());
-        System.out.println("tempFilePath.toString()         : " + tempFilePath.toString());
+        System.out.println("localTempDir.getAbsolutePath()  : " + localTempDir.getAbsolutePath());
+        /* Keep for debuggin purposes:
+        System.out.println("localTempDir.getCanonicalPath() : " + localTempDir.getCanonicalPath());
+        System.out.println("localTempDir.getName()          : " + localTempDir.getName());
+        System.out.println("localTempDir.getParent()        : " + localTempDir.getParent());
+        System.out.println("localTempDir.getPath()          : " + localTempDir.getPath());
+        System.out.println("localTempDir.toString()         : " + localTempDir.toString());
+        */
         
-        String absolutePath = tempFilePath.getAbsolutePath() + "\\" + FormatExternalId.format(externalId) + "." + fileExtension;
+        return localTempDir;
+    }
+    
+    /**
+     * Get local temporal file for required document external ID and file extension. Creates local temporal directory if not exists.
+     * @param externalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @return Local temporal file.
+     * @throws IOException 
+     */
+    public static File createDocumentLocalTempFile(final int externalId, final String fileExtension) throws IOException {
+        File localTempDir = createDocumentsLocalTempDir(fileExtension);
+        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatExternalId.format(externalId) + "." + fileExtension;
         
         System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
         
-        return absolutePath;
+        return new File(absolutePath);
     }
     
     /**
@@ -555,9 +582,8 @@ public abstract class SImportUtils {
      * @return Document file from temporal directory if exists, otherwise <code>null</code>.
      * @throws IOException 
      */
-    public static File getDocumentFileFromTempDir(final int externalId, final String fileExtension) throws IOException {
-        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
-        File tempFile = new File(fileName);
+    public static File getDocumentFileFromTempDirIfExists(final int externalId, final String fileExtension) throws IOException {
+        File tempFile = createDocumentLocalTempFile(externalId, fileExtension);
         
         if (!tempFile.exists()) {
             tempFile = null;
@@ -575,8 +601,7 @@ public abstract class SImportUtils {
      * @throws IOException 
      */
     public static File copyDocumentFileToTempDir(final int externalId, final String fileExtension, final File originalFile) throws IOException {
-        String fileName = getDocumentTempFileAbsolutePath(externalId, fileExtension);
-        File tempFile = new File(fileName);
+        File tempFile = createDocumentLocalTempFile(externalId, fileExtension);
         
         Files.copy(
             originalFile.toPath(),

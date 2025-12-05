@@ -309,7 +309,7 @@ public class SThinDps implements Serializable, SThinData {
      * @return
      * @throws Exception 
      */
-    public static String readDpsNumber(Object primaryKey, Statement statement) throws Exception {
+    public static String readDpsNumber(final Object primaryKey, final Statement statement) throws Exception {
         String dpsNumber = "";
         int[] key = (int[]) primaryKey;
         String sql = "SELECT CONCAT(num_ser, IF(num_ser = '', '', '-'), num) AS _dps_num "
@@ -326,5 +326,32 @@ public class SThinDps implements Serializable, SThinData {
         }
         
         return dpsNumber;
+    }
+    
+    /**
+     * Read dps folio number in format series-number.
+     * @param primaryKey DPS primary key.
+     * @param statement DB statement.
+     * @return
+     * @throws Exception 
+     */
+    public static String readDpsBizPartner(final Object primaryKey, final Statement statement) throws Exception {
+        String bizPartner = "";
+        int[] key = (int[]) primaryKey;
+        String sql = "SELECT b.bp "
+                + "FROM trn_dps AS d "
+                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_bp_r "
+                + "WHERE d.id_year = " + key[0] + " AND d.id_doc = " + key[1] + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (!resultSet.next()) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nDocumento (ID " + SLibUtils.textKey(key) + ").");
+            }
+            else {
+                bizPartner = resultSet.getString("b.bp");
+            }
+        }
+        
+        return bizPartner;
     }
 }
