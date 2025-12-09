@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 294.0/ 2025-12-09
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a funcionalidad de cambio de moneda de pago de solicitudes de pago.
+2) Revisión a funcionalidad de marcado manual como pagado de solicitudes de pago, con opción a modificar el monto pagado.
+3) Revisión de casos de modificación de solicitudes de pago: reactivación, reprogramación, cambio de moneda de pago y marcado manual como pagado.
+4) Preservación de usuario que reprograma pagos y del caso de marcado manual como pagado en solicitudes de pago.
+5) Implementación de distinción de tipos de pago: solicitud de pago ("Request") y pago ("Payment").
+6) Implementación de consulta y descarga de XML de CFDI y PDF de documents en vista de solicitudes de pago.
+
+================================================================================
 SIIE 3.2 292.5/ 2025-12-05
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
