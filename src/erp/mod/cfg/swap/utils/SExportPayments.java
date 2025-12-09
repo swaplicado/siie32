@@ -114,8 +114,8 @@ public class SExportPayments extends Thread {
         payment.req_date = SLibUtils.DbmsDateFormatDate.format(moPayment.getDateRequired());
         payment.sched_date_n = moPayment.getDateSchedule_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateSchedule_n());
         payment.exec_date_n = moPayment.getDateExecution_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateExecution_n());
-        payment.currency = moPayment.getDbmsCurrency().getKey();
-        payment.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentCy()));
+        payment.currency = moPayment.getDbmsDataCurrency().getKey();
+        payment.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentApplicationCy()));
         payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRateApplication(), SExportUtils.DECS_PAY_EXC_RATE));
         payment.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentApplication()));
         payment.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), SExportUtils.DECS_PAY_EXC_RATE));
@@ -149,7 +149,7 @@ public class SExportPayments extends Thread {
         for (SDbPaymentEntry paymentEty : moPayment.getChildEntries()) {
             SExportDataPaymentEntry entry = new SExportDataPaymentEntry();
             entry.entry_type = paymentEty.getEntryType();
-            entry.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentCy()));
+            entry.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentApplicationCy()));
             entry.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPaymentApplication()));
             entry.entry_currency = paymentEty.getEntryCurrency().getKey();
             entry.conv_rate_app = SExportUtils.FormatPayConversionRate.format(SLibUtils.round(paymentEty.getConversionRateApplication(), SExportUtils.DECS_PAY_CONV_RATE));
@@ -157,12 +157,12 @@ public class SExportPayments extends Thread {
             entry.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getEntryPayment()));
             entry.conv_rate_exec = SExportUtils.FormatPayConversionRate.format(SLibUtils.round(paymentEty.getConversionRate(), SExportUtils.DECS_PAY_CONV_RATE));
             entry.entry_amount_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDestinyPaymentEntryCy()));
-            entry.installment = paymentEty.getInstallment();
+            entry.installment = paymentEty.getDocInstallment();
             entry.document_bal_prev_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousApplicationCy()));
             entry.document_bal_unpd_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidApplicationCy_r()));
             entry.document_bal_prev_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalancePreviousCy()));
             entry.document_bal_unpd_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(paymentEty.getDocBalanceUnpaidCy_r()));
-            if (entry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
+            if (entry.entry_type.equals(SDbPaymentEntry.TYPE_PAYMENT)) {
                 int docId = getDocumentId(paymentEty);
                 if (docId != 0) {
                     entry.document_n_id = docId;

@@ -1600,7 +1600,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                                // throw exception if exchanga rate is not available:
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
                             }
                             
                             // validate business partner:
@@ -1666,7 +1667,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                                // throw exception if exchanga rate is not available:
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
                             }
                             
                             // validate business partner:

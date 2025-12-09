@@ -6,7 +6,11 @@
 package erp.mod.cfg.swap.form;
 
 import cfd.ver4.DCfdVer4Consts;
+import erp.client.SClientInterface;
+import erp.data.SDataUtilities;
+import java.util.Date;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
@@ -40,5 +44,31 @@ public abstract class SDocumentUtils {
         String folio = numberSeries + (numberSeries.isEmpty() ? "" : "-") + number;
         
         return !folio.isEmpty() ? folio : "[" + (!uuid.isEmpty() ? SDocumentUtils.getUuidFirstSegment(uuid) + "..." : SDocumentInfo.NON_FOLIO) + "]";
+    }
+    
+    /**
+     * Get exchange rate in desired date, if available.
+     * @param session GUI session.
+     * @param currencyId ID of currency.
+     * @param date Desired date.
+     * @return
+     * @throws Exception
+     */
+    public static double getExchangeRate(final SGuiSession session, final int currencyId, final Date date) throws Exception {
+        double exchangeRate = 0;
+        int[] currencyKey = new int[] { currencyId };
+
+        if (session.getSessionCustom().isLocalCurrency(currencyKey)) {
+            exchangeRate = 1;
+        }
+        else {
+            exchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) session.getClient(), currencyId, date);
+
+            if (exchangeRate == 0) {
+                throw new Exception("No se ha capturado el tipo de cambio " + session.getSessionCustom().getLocalCurrencyCode() + "/" + session.getSessionCustom().getCurrencyCode(currencyKey) + " para el día " + SLibUtils.DateFormatDate.format(date) + ".");
+            }
+        }
+        
+        return exchangeRate;
     }
 }

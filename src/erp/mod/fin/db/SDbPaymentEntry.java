@@ -24,8 +24,8 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serializable {
     
-    public static final String ENTRY_TYPE_ADVANCE = "A"; // anticipo
-    public static final String ENTRY_TYPE_PAYMENT = "P"; // pago a documento
+    public static final String TYPE_ADVANCE = "A"; // anticipo
+    public static final String TYPE_PAYMENT = "P"; // pago a documento
 
     public static final String DESC_ENTRY_TYPE_ADVANCE = "Anticipo"; // anticipo
     public static final String DESC_ENTRY_TYPE_PAYMENT = "Pago a documento"; // pago a documento
@@ -33,20 +33,35 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     protected int mnPkPaymentId;
     protected int mnPkEntryId;
     protected String msEntryType;
-    protected double mdEntryPaymentCy;
+    /** Monto de la partida en la moneda de pago del día de creación de la solicitud de pago o del pago. */
+    protected double mdEntryPaymentApplicationCy;
+    /** Monto de la partida en la moneda local del día de creación de la solicitud de pago o del pago. */
     protected double mdEntryPaymentApplication;
+    /** Tasa de conversión (moneda de pago vs. moneda de la partida) del día de creación de la solicitud de pago o del pago. */
     protected double mdConversionRateApplication;
+    /** Monto de la partida en la moneda de la partida.del día de creación de la solicitud de pago o del pago. */
     protected double mdDestinyPaymentApplicationEntryCy;
+    /** Monto de la partida en la moneda de pago del día de operación del pago. */
+    protected double mdEntryPaymentCy;
+    /** Monto de la partida en la moneda local del día de operación del pago. */
     protected double mdEntryPayment;
+    /** Tasa de conversión (moneda de pago vs. moneda de la partida) del día de operación del pago. */
     protected double mdConversionRate;
+    /** Monto de la partida en la moneda de la partida.del día de operación del pago. */
     protected double mdDestinyPaymentEntryCy;
-    protected int mnInstallment;
+    /** Número de parcialidad del documento que representa este pago. */
+    protected int mnDocInstallment;
+    /** Saldo anterior en la moneda del documento.del día de creación de la solicitud de pago o del pago. */
     protected double mdDocBalancePreviousApplicationCy;
+    /** Saldo insoluto en la moneda del documento.del día de creación de la solicitud de pago o del pago. */
     protected double mdDocBalanceUnpaidApplicationCy_r;
+    /** Saldo anterior en la moneda del documento.del día de operación del pago. */
     protected double mdDocBalancePreviousCy;
+    /** Saldo insoluto en la moneda del documento.del día de operación del pago. */
     protected double mdDocBalanceUnpaidCy_r;
     protected int mnFkDocYearId_n;
     protected int mnFkDocDocId_n;
+    /** Moneda de la partida. */
     protected int mnFkEntryCurrencyId;
     protected int mnFkPaymentRequestId_n;
     
@@ -61,14 +76,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public void setPkPaymentId(int n) { mnPkPaymentId = n; }
     public void setPkEntryId(int n) { mnPkEntryId = n; }
     public void setEntryType(String s) { msEntryType = s; }
-    public void setEntryPaymentCy(double d) { mdEntryPaymentCy = d; }
+    public void setEntryPaymentApplicationCy(double d) { mdEntryPaymentApplicationCy = d; }
     public void setEntryPaymentApplication(double d) { mdEntryPaymentApplication = d; }
     public void setConversionRateApplication(double d) { mdConversionRateApplication = d; }
     public void setDestinyPaymentApplicationEntryCy(double d) { mdDestinyPaymentApplicationEntryCy = d; }
+    public void setEntryPaymentCy(double d) { mdEntryPaymentCy = d; }
     public void setEntryPayment(double d) { mdEntryPayment = d; }
     public void setConversionRate(double d) { mdConversionRate = d; }
     public void setDestinyPaymentEntryCy(double d) { mdDestinyPaymentEntryCy = d; }
-    public void setInstallment(int n) { mnInstallment = n; }
+    public void setDocInstallment(int n) { mnDocInstallment = n; }
     public void setDocBalancePreviousApplicationCy(double d) { mdDocBalancePreviousApplicationCy = d; }
     public void setDocBalanceUnpaidApplicationCy_r(double d) { mdDocBalanceUnpaidApplicationCy_r = d; }
     public void setDocBalancePreviousCy(double d) { mdDocBalancePreviousCy = d; }
@@ -81,14 +97,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public int getPkPaymentId() { return mnPkPaymentId; }
     public int getPkEntryId() { return mnPkEntryId; }
     public String getEntryType() { return msEntryType; }
-    public double getEntryPaymentCy() { return mdEntryPaymentCy; }
+    public double getEntryPaymentApplicationCy() { return mdEntryPaymentApplicationCy; }
     public double getEntryPaymentApplication() { return mdEntryPaymentApplication; }
     public double getConversionRateApplication() { return mdConversionRateApplication; }
     public double getDestinyPaymentApplicationEntryCy() { return mdDestinyPaymentApplicationEntryCy; }
+    public double getEntryPaymentCy() { return mdEntryPaymentCy; }
     public double getEntryPayment() { return mdEntryPayment; }
     public double getConversionRate() { return mdConversionRate; }
     public double getDestinyPaymentEntryCy() { return mdDestinyPaymentEntryCy; }
-    public int getInstallment() { return mnInstallment; }
+    public int getDocInstallment() { return mnDocInstallment; }
     public double getDocBalancePreviousApplicationCy() { return mdDocBalancePreviousApplicationCy; }
     public double getDocBalanceUnpaidApplicationCy_r() { return mdDocBalanceUnpaidApplicationCy_r; }
     public double getDocBalancePreviousCy() { return mdDocBalancePreviousCy; }
@@ -105,6 +122,14 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
     public SDataDps getDpsRelated() { return moDpsRelated; }
     public SDataCurrency getPayCurrency() { return moPayCurrency; }
     public SDataCurrency getEntryCurrency() { return moEntryCurrency; }
+    
+    /**
+     * Get document's primary key.
+     * @return If available, document's primary key, otherwise, <code>null</code>.
+     */
+    public int[] getDocKey() {
+        return mnFkDocYearId_n != 0 && mnFkDocDocId_n != 0 ? new int[] { mnFkDocYearId_n, mnFkDocDocId_n } : null;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -124,14 +149,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         mnPkPaymentId = 0;
         mnPkEntryId = 0;
         msEntryType = "";
-        mdEntryPaymentCy = 0;
+        mdEntryPaymentApplicationCy = 0;
         mdEntryPaymentApplication = 0;
         mdConversionRateApplication = 0;
         mdDestinyPaymentApplicationEntryCy = 0;
+        mdEntryPaymentCy = 0;
         mdEntryPayment = 0;
         mdConversionRate = 0;
         mdDestinyPaymentEntryCy = 0;
-        mnInstallment = 0;
+        mnDocInstallment = 0;
         mdDocBalancePreviousApplicationCy = 0;
         mdDocBalanceUnpaidApplicationCy_r = 0;
         mdDocBalancePreviousCy = 0;
@@ -194,14 +220,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
             mnPkPaymentId = resultSet.getInt("id_pay");
             mnPkEntryId = resultSet.getInt("id_ety");
             msEntryType = resultSet.getString("ety_tp");
-            mdEntryPaymentCy = resultSet.getDouble("ety_pay_cur");
+            mdEntryPaymentApplicationCy = resultSet.getDouble("ety_pay_app_cur");
             mdEntryPaymentApplication = resultSet.getDouble("ety_pay_app");
             mdConversionRateApplication = resultSet.getDouble("conv_rate_app");
             mdDestinyPaymentApplicationEntryCy = resultSet.getDouble("des_pay_app_ety_cur");
+            mdEntryPaymentCy = resultSet.getDouble("ety_pay_cur");
             mdEntryPayment = resultSet.getDouble("ety_pay");
             mdConversionRate = resultSet.getDouble("conv_rate");
             mdDestinyPaymentEntryCy = resultSet.getDouble("des_pay_ety_cur");
-            mnInstallment = resultSet.getInt("install");
+            mnDocInstallment = resultSet.getInt("install");
             mdDocBalancePreviousApplicationCy = resultSet.getDouble("doc_bal_prev_app_cur");
             mdDocBalanceUnpaidApplicationCy_r = resultSet.getDouble("doc_bal_unpd_app_cur_r");
             mdDocBalancePreviousCy = resultSet.getDouble("doc_bal_prev_cur");
@@ -242,14 +269,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
                     mnPkPaymentId + ", " + 
                     mnPkEntryId + ", " + 
                     "'" + msEntryType + "', " + 
-                    mdEntryPaymentCy + ", " + 
+                    mdEntryPaymentApplicationCy + ", " + 
                     mdEntryPaymentApplication + ", " + 
                     mdConversionRateApplication + ", " + 
                     mdDestinyPaymentApplicationEntryCy + ", " + 
+                    mdEntryPaymentCy + ", " + 
                     mdEntryPayment + ", " + 
                     mdConversionRate + ", " + 
                     mdDestinyPaymentEntryCy + ", " + 
-                    mnInstallment + ", " + 
+                    mnDocInstallment + ", " + 
                     mdDocBalancePreviousApplicationCy + ", " + 
                     mdDocBalanceUnpaidApplicationCy_r + ", " + 
                     mdDocBalancePreviousCy + ", " + 
@@ -268,14 +296,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
                     //"id_pay = " + mnPkPaymentId + ", " +
                     //"id_ety = " + mnPkEntryId + ", " +
                     "ety_tp = '" + msEntryType + "', " +
-                    "ety_pay_cur = " + mdEntryPaymentCy + ", " +
+                    "ety_pay_app_cur = " + mdEntryPaymentApplicationCy + ", " +
                     "ety_pay_app = " + mdEntryPaymentApplication + ", " +
                     "conv_rate_app = " + mdConversionRateApplication + ", " +
                     "des_pay_app_ety_cur = " + mdDestinyPaymentApplicationEntryCy + ", " +
+                    "ety_pay_cur = " + mdEntryPaymentCy + ", " +
                     "ety_pay = " + mdEntryPayment + ", " +
                     "conv_rate = " + mdConversionRate + ", " +
                     "des_pay_ety_cur = " + mdDestinyPaymentEntryCy + ", " +
-                    "install = " + mnInstallment + ", " +
+                    "install = " + mnDocInstallment + ", " +
                     "doc_bal_prev_app_cur = " + mdDocBalancePreviousApplicationCy + ", " +
                     "doc_bal_unpd_app_cur_r = " + mdDocBalanceUnpaidApplicationCy_r + ", " +
                     "doc_bal_prev_cur = " + mdDocBalancePreviousCy + ", " +
@@ -300,14 +329,15 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         registry.setPkPaymentId(this.getPkPaymentId());
         registry.setPkEntryId(this.getPkEntryId());
         registry.setEntryType(this.getEntryType());
-        registry.setEntryPaymentCy(this.getEntryPaymentCy());
+        registry.setEntryPaymentApplicationCy(this.getEntryPaymentApplicationCy());
         registry.setEntryPaymentApplication(this.getEntryPaymentApplication());
         registry.setConversionRateApplication(this.getConversionRateApplication());
         registry.setDestinyPaymentApplicationEntryCy(this.getDestinyPaymentApplicationEntryCy());
+        registry.setEntryPaymentCy(this.getEntryPaymentCy());
         registry.setEntryPayment(this.getEntryPayment());
         registry.setConversionRate(this.getConversionRate());
         registry.setDestinyPaymentEntryCy(this.getDestinyPaymentEntryCy());
-        registry.setInstallment(this.getInstallment());
+        registry.setDocInstallment(this.getDocInstallment());
         registry.setDocBalancePreviousApplicationCy(this.getDocBalancePreviousApplicationCy());
         registry.setDocBalanceUnpaidApplicationCy_r(this.getDocBalanceUnpaidApplicationCy_r());
         registry.setDocBalancePreviousCy(this.getDocBalancePreviousCy());
@@ -362,12 +392,26 @@ public class SDbPaymentEntry extends SDbRegistryUser implements SGridRow, Serial
         Object value = null;
         
         switch (col) {
-            case 0: value = msEntryType.equals(ENTRY_TYPE_PAYMENT) ? "Pago a documento" : "Pago simple"; break;
-            case 1: value = moDpsRelated == null ? "" : moDpsRelated.getDpsNumber(); break;
-            case 2: value = mdEntryPaymentCy; break;
-            case 3: value = moPayCurrency.getKey(); break;
-            case 4: value = mdDestinyPaymentApplicationEntryCy; break;
-            case 5: value = moEntryCurrency.getKey(); break;
+            case 0:
+                value = msEntryType.equals(TYPE_PAYMENT) ? DESC_ENTRY_TYPE_PAYMENT : DESC_ENTRY_TYPE_ADVANCE;
+                break;
+            case 1:
+                value = moDpsRelated == null ? "" : moDpsRelated.getDpsNumber();
+                break;
+            case 2:
+                value = mdEntryPaymentApplicationCy;
+                break;
+            case 3:
+                value = moPayCurrency.getKey();
+                break;
+            case 4:
+                value = mdDestinyPaymentApplicationEntryCy;
+                break;
+            case 5:
+                value = moEntryCurrency.getKey();
+                break;
+            default:
+                // nothing
         }
         
         return value;

@@ -34,7 +34,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormSelectPayments extends SBeanFormDialog implements ActionListener {
     
@@ -173,12 +173,12 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
         try {
             String entryTp;
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
-                entryTp = SDbPaymentEntry.ENTRY_TYPE_PAYMENT;
+                entryTp = SDbPaymentEntry.TYPE_PAYMENT;
                 where += "AND EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") ";
             }
             else {
-                entryTp = SDbPaymentEntry.ENTRY_TYPE_ADVANCE;
+                entryTp = SDbPaymentEntry.TYPE_ADVANCE;
             }
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
             String sql = "SELECT d.id_year, d.id_doc, p.id_pay, " +

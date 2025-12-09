@@ -2091,7 +2091,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSession().showView(SModConsts.TRNX_ACC_PEND, SModSysConsts.BPSS_CT_BP_SUP, null);
             }
             else if (item == jmiAccPaymentRequests) {
-                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiAccPaymentsInAuth) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_IN_AUTH, null);

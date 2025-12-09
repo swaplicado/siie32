@@ -658,7 +658,7 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         "INNER JOIN erp.bpsu_bpb AS cob ON cob.id_bpb = d.fid_cob " +
                         "WHERE NOT sdp.b_del AND NOT d.b_del AND sdp.fk_dps_year_n = " + moParamDps.getPkYearId() + " AND sdp.fk_dps_doc_n = " + moParamDps.getPkDocId() + " " +
                         "UNION " +
-                        "SELECT DISTINCT 41 AS f_id_type, 'SOLICITUD PAGO | PAGO' AS f_type, p.dt_app AS dt, '' AS f_code, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS f_num, pe.ety_pay_app AS f_tot, pe.ety_pay_cur AS f_tot_cur, c.cur_key AS f_cur, '' AS f_cob " +
+                        "SELECT DISTINCT 41 AS f_id_type, 'SOLICITUD PAGO | PAGO' AS f_type, p.dt_app AS dt, '' AS f_code, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS f_num, pe.ety_pay_app AS f_tot, pe.ety_pay_app_cur AS f_tot_cur, c.cur_key AS f_cur, '' AS f_cob " +
                         "FROM fin_pay AS p " +
                         "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
                         "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = p.fk_cur " +
