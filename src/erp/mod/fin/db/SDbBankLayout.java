@@ -68,7 +68,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés
+ * @author Juan Barajas, Alfredo Pérez, Isabel Servín, Adrián Avilés, Sergio Flores
  */
 public class SDbBankLayout extends SDbRegistryUser {
     
@@ -1781,7 +1781,8 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
             
             maAuxNewPayments = new ArrayList<>();
-            msSql = "SELECT p.id_pay FROM fin_pay AS p "
+            msSql = "SELECT p.id_pay "
+                    + "FROM fin_pay AS p "
                     + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
                     + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
             resultSet = statement.executeQuery(msSql);
@@ -1961,14 +1962,14 @@ public class SDbBankLayout extends SDbRegistryUser {
         switch (field) {
             case FIELD_CLOSE:
                 msSql += "b_clo_pay = " + (Boolean) value + " ";
-
                 break;
+
             case FIELD_CLOSE_USER:
                 msSql += "fk_usr_clo_pay = " + (int) value + ", ts_usr_clo_pay = NOW() ";
-
                 break;
+
             default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Field: " + field + ")");
         }
 
         msSql += getSqlWhere(pk);

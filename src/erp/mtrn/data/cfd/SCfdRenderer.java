@@ -231,7 +231,7 @@ public final class SCfdRenderer implements ActionListener {
         }
         
         if (!validation.getIsError()) {
-            if (!miClient.isDev() && ((SDataParamsCompany) miClient.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
+            if (((SDataParamsCompany) miClient.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
                 String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
 
                 if (!cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {

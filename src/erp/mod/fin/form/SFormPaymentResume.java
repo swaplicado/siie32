@@ -57,7 +57,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormPaymentResume extends SBeanForm implements ActionListener, ItemListener, FocusListener, ListSelectionListener {
     
@@ -1073,7 +1073,7 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         if (ety != null) {
             moPayEtyDps = ety.getDpsRelated();
 
-            if (ety.getEntryType().equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
+            if (ety.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT)) {
                 moRadDocPayment.setSelected(true);
             }
             else {
@@ -1086,13 +1086,13 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
                 moTextDps.setValue("");
             }
             moKeyEntryCurrency.setValue(new int[] { ety.getFkEntryCurrencyId() });
-            moDecEntryPaymentCy.setValue(ety.getEntryPaymentCy());
+            moDecEntryPaymentCy.setValue(ety.getEntryPaymentApplicationCy());
             moTextEntryPaymentCyCur.setValue(moPayCurrency.getKey());
             moDecConvertionRateApp.setValue(ety.getConversionRateApplication());
             moDecDesPaymentAppEntryCurrency.setValue(ety.getDestinyPaymentApplicationEntryCy());
             moTextDesPaymentAppEntryCurrencyCur.setValue(ety.getEntryCurrency().getKey());
             moDecConvertionRate.setValue(ety.getConversionRate());
-            moIntInstall.setValue(ety.getInstallment());
+            moIntInstall.setValue(ety.getDocInstallment());
             moDecDocumentBalPreviousAppCurrency.setValue(ety.getDocBalancePreviousApplicationCy());
             moTextDocumentBalPreviousAppCurrencyCur.setValue(ety.getEntryCurrency().getKey());
             moDecDocumentBalUnpayedAppCurrency.setValue(ety.getDocBalanceUnpaidApplicationCy_r());
@@ -1187,7 +1187,7 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
     private void calculateTotalPayments() {
         double payments = 0d;
         for (SDbPaymentEntry ety : maPaymentEntries) {
-            payments += SLibUtils.roundAmount(ety.getEntryPaymentCy());
+            payments += SLibUtils.roundAmount(ety.getEntryPaymentApplicationCy());
         }
         moTotal.setValue(payments);
         moTextTotalCur.setValue(moPayCurrency == null ? "" : moPayCurrency.getKey());
@@ -1220,12 +1220,12 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         
         if (validation.isValid()) {
             for (SDbPaymentEntry entry : maPaymentEntries) {
-                if (moRadDocPayment.isSelected() && entry.getEntryType().equals(SDbPaymentEntry.ENTRY_TYPE_ADVANCE)) {
+                if (moRadDocPayment.isSelected() && entry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE)) {
                     validation.setMessage("Todas las partidas deben ser de pago simple.");
                     validation.setComponent(moRadDocPayment);
                     break;
                 }
-                else if (moRadSimplePayment.isSelected() && entry.getEntryType().equals(SDbPaymentEntry.ENTRY_TYPE_PAYMENT)) {
+                else if (moRadSimplePayment.isSelected() && entry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT)) {
                     validation.setMessage("Todas las partidas deben ser de pago a documento.");
                     validation.setComponent(moRadDocPayment);
                     break;
@@ -1317,15 +1317,15 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
             if (validation.isValid()) {
                 enableEntryControls(false);
                 SDbPaymentEntry ety = new SDbPaymentEntry();
-                ety.setEntryType(moRadDocPayment.isSelected() ? SDbPaymentEntry.ENTRY_TYPE_PAYMENT : SDbPaymentEntry.ENTRY_TYPE_ADVANCE);
-                ety.setEntryPaymentCy(moDecEntryPaymentCy.getValue());
+                ety.setEntryType(moRadDocPayment.isSelected() ? SDbPaymentEntry.TYPE_PAYMENT : SDbPaymentEntry.TYPE_ADVANCE);
+                ety.setEntryPaymentApplicationCy(moDecEntryPaymentCy.getValue());
                 ety.setEntryPaymentApplication(SLibUtils.roundAmount(moDecEntryPaymentCy.getValue() * moDecPaymentExcRateApp.getValue()));
                 ety.setConversionRateApplication(moDecConvertionRateApp.getValue());
                 ety.setDestinyPaymentApplicationEntryCy(moDecDesPaymentAppEntryCurrency.getValue());
                 ety.setFkDocYearId_n(moPayEtyDps == null ? 0 : moPayEtyDps.getPkYearId());
                 ety.setFkDocDocId_n(moPayEtyDps == null ? 0 : moPayEtyDps.getPkDocId());
                 ety.setFkEntryCurrencyId(moKeyEntryCurrency.getValue()[0]);
-                ety.setInstallment(moIntInstall.getValue());
+                ety.setDocInstallment(moIntInstall.getValue());
                 ety.setDocBalancePreviousApplicationCy(moDecDocumentBalPreviousAppCurrency.getValue());
                 ety.setDocBalanceUnpaidApplicationCy_r(moDecDocumentBalUnpayedAppCurrency.getValue());
                 
@@ -1598,7 +1598,7 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         removeAllListeners();
         reloadCatalogues();
         
-        moPayCurrency = moRegistry.getDbmsCurrency();
+        moPayCurrency = moRegistry.getDbmsDataCurrency();
         
         if (moRegistry.isRegistryNew()) {
             moIntNumber.setValue(getNextNumber());
@@ -1613,7 +1613,7 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextSerie.setValue(moRegistry.getSeries());
-        moDecPaymentCy.setValue(moRegistry.getPaymentCy());
+        moDecPaymentCy.setValue(moRegistry.getPaymentApplicationCy());
         moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
         moDecPaymentExcRateApp.setValue(moRegistry.getPaymentExchangeRateApplication());
         moDecPaymentApplication.setValue(moRegistry.getPaymentApplication());
@@ -1631,8 +1631,8 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         moTextTotalCur.setValue("");
         
         maPaymentEntries = new ArrayList<>();
-        for (SDbPaymentEntry ety : moRegistry.getChildEntries()) {
-            maPaymentEntries.add(ety);
+        for (SDbPaymentEntry entry : moRegistry.getChildEntries()) {
+            maPaymentEntries.add(entry);
         }
         
         populateGridEntries();
@@ -1664,7 +1664,7 @@ public class SFormPaymentResume extends SBeanForm implements ActionListener, Ite
         registry.setNumber(moIntNumber.getValue());
         registry.setDateApplication(moDateApplication.getValue());
         registry.setDateRequired(moDateRequired.getValue());
-        registry.setPaymentCy(moDecPaymentCy.getValue());
+        registry.setPaymentApplicationCy(moDecPaymentCy.getValue());
         registry.setPaymentExchangeRateApplication(moDecPaymentExcRateApp.getValue());
         registry.setPaymentApplication(moDecPaymentApplication.getValue());
         registry.setPriority(moKeyPriority.getValue()[0]);

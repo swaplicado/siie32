@@ -1749,11 +1749,11 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT DISTINCT " // XXX TO-DO: "DISTINCT" no debería ser necesario, se encontró un registro de procesamiento de datos de SWAP Services para el documento PK 2025-14514!!!
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
-                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
+                        + "p.pay_app_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
                         + "p.fk_usr_ins, p.fk_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec, "
                         // payment entry:
-                        + "pe.ety_tp, pe.ety_pay_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
+                        + "pe.ety_tp, pe.ety_pay_app_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
                         + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
                         // bank accounts:
                         + "ba_ac.acc_num, ba_ac.acc_num_std, ba_ac_b.bp, ba_ac_b.fiscal_id, ba_ac_b.fiscal_frg_id, "
@@ -1817,7 +1817,7 @@ public abstract class SExportDataUtils {
                         Date dateExecution = resultSet.getDate("p.dt_exec_n");
                         currentPayment.exec_date_n = resultSet.wasNull() ? null : SLibUtils.DbmsDateFormatDate.format(dateExecution);
                         currentPayment.currency = resultSet.getString("_pay_cur_key");
-                        currentPayment.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_cur"));
+                        currentPayment.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_app_cur"));
                         currentPayment.exchange_rate_app = SExportUtils.FormatStdExchangeRate.format(resultSet.getDouble("p.pay_exc_rate_app"));
                         currentPayment.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("p.pay_app"));
                         currentPayment.exchange_rate_exec = currentPayment.exchange_rate_app; // same value "at application"!
@@ -1866,7 +1866,7 @@ public abstract class SExportDataUtils {
                     SExportDataPaymentEntry paymentEntry = new SExportDataPaymentEntry();
 
                     paymentEntry.entry_type = resultSet.getString("pe.ety_tp");
-                    paymentEntry.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_cur"));
+                    paymentEntry.amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_app_cur"));
                     paymentEntry.amount_loc_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.ety_pay_app"));
                     paymentEntry.entry_currency = resultSet.getString("_pay_ety_cur_key");
                     //paymentEntry.conv_rate_app = SExportUtils.FormatPayConversionRate.format(resultSet.getDouble("pe.conv_rate_app"));
@@ -1883,7 +1883,7 @@ public abstract class SExportDataUtils {
                     
                     int externalId = resultSet.getInt("sdp.ext_data_id");
                     
-                    if (resultSet.wasNull() || paymentEntry.entry_type.equals(SDbPaymentEntry.ENTRY_TYPE_ADVANCE)) {
+                    if (resultSet.wasNull() || paymentEntry.entry_type.equals(SDbPaymentEntry.TYPE_ADVANCE)) {
                         paymentEntry.document_n_id = null;
                         paymentEntry.document_uuid = null;
                         paymentEntry.document_folio = null;
@@ -1970,7 +1970,7 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT "
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
-                        + "p.pay_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
+                        + "p.pay_app_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
                         + "p.fk_usr_ins, p.fk_usr_upd, p.ts_usr_ins, p.ts_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec "
                         + "FROM "

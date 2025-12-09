@@ -2854,18 +2854,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
     
     private void actionShowCfdiXml() {
-        if(jbShowCfdiXml.isEnabled()) {
+        if (jbShowCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    
-                    if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                    }
-                    else {
-                        SCfdRenderer renderer = new SCfdRenderer(miClient);
-                        renderer.showCfd(cfd.getDocXml());
-                    }
+                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2874,12 +2866,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionGetXml() {
+    private void actionGetCfdiXml() {
         if (jbGetCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    SCfdUtils.downloadXmlCfd(miClient, cfd);
+                    SViewDps.getCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2892,36 +2883,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbShowDocPdf.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    int[] dpsKey = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
-                    File pdf = SCfdUtils.getXmlPdfInTempFile(miClient, dpsKey);
+                    if (moDialogPdfViewer == null) {
+                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
+                    }
                     
-                    if (pdf != null) {
-                        if (moDialogPdfViewer == null) {
-                            moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
-                        }
-                        
-                        String folio = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
-                        String issuer = SThinDps.readDpsBizPartner(dpsKey, miClient.getSession().getStatement());
-                        
-                        SDocument document = new SDocument() {
-
-                            @Override
-                            public String getFolio() {
-                                return folio;
-                            }
-
-                            @Override
-                            public String getIssuer() {
-                                return issuer;
-                            }
-                        };
-
-                        moDialogPdfViewer.setPdf(document, pdf);
-                        moDialogPdfViewer.setVisible(true);
-                    }
-                    else {
-                        miClient.showMsgBoxWarning("El documento no tiene archivo PDF.");
-                    }
+                    SViewDps.showDocPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moDialogPdfViewer);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2934,7 +2900,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbGetDocPdf.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SCfdUtils.downloadXmlPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    SViewDps.getDocPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -3760,7 +3726,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     actionShowCfdiXml();
                 }
                 else if (button == jbGetCfdiXml) {
-                    actionGetXml();
+                    actionGetCfdiXml();
                 }
                 else if (button == jbShowDocPdf) {
                     actionShowDocPdf();
@@ -3827,5 +3793,80 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         finally {
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
+    }
+    
+    /**
+     * Retrieve and show CFDI's XML.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
+
+        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+        }
+        else {
+            SCfdRenderer renderer = new SCfdRenderer(client);
+            renderer.showCfd(cfd.getDocXml());
+        }
+    }
+    
+    /**
+     * Retrieve and allow to save CFDI's XML.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void getCfdiXml(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
+        SCfdUtils.downloadXmlCfd(client, cfd);
+    }
+    
+    /**
+     * Retrive and show document's PDF.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @param dialogPdfViewer PDF viewer.
+     * @throws Exception 
+     */
+    public static void showDocPdf(final SClientInterface client, final int[] dpsKey, final SDialogPdfViewer dialogPdfViewer) throws Exception {
+        File pdf = SCfdUtils.getXmlPdfInTempFile(client, dpsKey);
+
+        if (pdf != null) {
+            String folio = SThinDps.readDpsNumber(dpsKey, client.getSession().getStatement());
+            String issuer = SThinDps.readDpsBizPartner(dpsKey, client.getSession().getStatement());
+
+            SDocument document = new SDocument() {
+
+                @Override
+                public String getFolio() {
+                    return folio;
+                }
+
+                @Override
+                public String getIssuer() {
+                    return issuer;
+                }
+            };
+
+            dialogPdfViewer.setPdf(document, pdf);
+            dialogPdfViewer.setVisible(true);
+        }
+        else {
+            client.showMsgBoxWarning("El documento no tiene archivo PDF.");
+        }
+    }
+    
+    /**
+     * Retrive and allow to save document's PDF.
+     * This method is barely needed, but declared for consistence with rest of show/get methods.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void getDocPdf(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SCfdUtils.downloadXmlPdf(client, dpsKey);
     }
 }

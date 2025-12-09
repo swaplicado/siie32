@@ -343,92 +343,40 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             
             if (payment == null) {
                 Date date = session.getCurrentDate();
-                double exchangeRate = getExchangeRate(session, this, date);
+                
+                // throw exception if exchange rate is not available:
+                double exchangeRate = SDocumentUtils.getExchangeRate(session, CurrencyId, date);
 
-                // create payment:
+                // create & prepare payment and its single one payment entry:
 
                 payment = new SDbPayment();
+                
+                SDbPaymentEntry singleEntry = new SDbPaymentEntry();
+                payment.getChildEntries().add(singleEntry);
+                
+                payment.processPaymentAtApplication(session, getRequiredPaymentAmount(), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, Total);
 
                 //payment.setPkPaymentId(...);
+                payment.setPaymentType(SDbPayment.TYPE_REQUEST);
                 payment.setSeries("");
                 payment.setNumber(0);
                 payment.setDateApplication(date);
                 payment.setDateRequired(getRequiredPaymentDateEffective());
                 payment.setDateSchedule_n(null);
                 payment.setDateExecution_n(null);
-
-                double paymentAmount;
-                double paymentExchangeRate;
-                int paymentCurrencyId;
-
-                double entryConversionRate;
-
-                /*
-                Payment cases:
-
-                1. currency == local + is_payment_local == true | false
-                    payment data:
-                        currency: local
-                        computation: required payment
-                        exchange rate: 1
-
-                2. currency <> local + is_payment_local == true
-                    payment data:
-                        currency: local
-                        computation: required payment * applicable exchange rate
-                        exchange rate: 1
-
-                3. currency <> local + is_payment_local == false
-                    payment data:
-                        currency: local
-                        computation: required payment
-                        exchange rate: applicable exchange rate
-                */
-
-                boolean isLocalCurrency = session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }); // convenience variable
-                
-                if (isLocalCurrency) {
-                    // payment case 1:
-                    paymentAmount = getRequiredPaymentAmount();
-                    paymentExchangeRate = 1;
-                    paymentCurrencyId = CurrencyId;
-
-                    entryConversionRate = 1; // currencies conversion: from local to local
-                }
-                else {
-                    if (IsRequiredPaymentLoc) {
-                        // payment case 2:
-                        paymentAmount = SLibUtils.roundAmount(getRequiredPaymentAmount() * exchangeRate);
-                        paymentExchangeRate = 1;
-                        paymentCurrencyId = session.getSessionCustom().getLocalCurrencyKey()[0];
-
-                        entryConversionRate = 1 / exchangeRate; // currencies conversion: from local to foreign
-                    }
-                    else {
-                        // payment case 3:
-                        paymentAmount = getRequiredPaymentAmount();
-                        paymentExchangeRate = exchangeRate;
-                        paymentCurrencyId = CurrencyId;
-
-                        entryConversionRate = 1; // currencies conversion: from foreign to the same foreign
-                    }
-                }
-
-                payment.setPaymentCy(paymentAmount);
-                payment.setPaymentExchangeRateApplication(paymentExchangeRate);
-                payment.setPaymentApplication(SLibUtils.roundAmount(paymentAmount * paymentExchangeRate));
-                payment.setPaymentExchangeRate(payment.getPaymentExchangeRateApplication()); // same value "at application"!
-                payment.setPayment(payment.getPaymentApplication()); // same value "at application"!
+                // ...
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
                 payment.setPriority(SDbPayment.PRIORITY_NORMAL);
                 payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "-"); // "-" means no comments
                 payment.setNotesAuthorization(!Description.isEmpty() ? Description : "-"); // "-" means no comments
                 payment.setNotesAuthorizationFlow("");
                 payment.setReceiptPaymentRequired(dps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+                payment.setRescheduled(false);
+                payment.setExecutedManually(false);
                 payment.setDeleted(false);
                 payment.setSystem(true);
                 payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
-                payment.setFkCurrencyId(paymentCurrencyId);
+                //payment.setFkCurrencyId(...); // set in SDbPayment.processPaymentCy()
                 payment.setFkBeneficiaryId(BizPartnerId);
                 payment.setFkFunctionalAreaId(dps.getFkFunctionalAreaId());
                 payment.setFkFunctionalSubareaId(dps.getFkFunctionalSubAreaId());
@@ -437,41 +385,30 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setFkBeneficiaryBankBizParterBranchId_n(0);
                 payment.setFkBeneficiaryBankAccountCashId_n(0);
                 payment.setFkUserScheduleId(SUtilConsts.USR_NA_ID);
+                payment.setFkUserRescheduleId(SUtilConsts.USR_NA_ID);
                 payment.setFkUserExecutiondId(SUtilConsts.USR_NA_ID);
                 //payment.setFkUserInsertId(...);
                 //payment.setFkUserUpdateId(...);
-                //payment.setTsUserScheduledId(...);
+                //payment.setTsUserScheduled(...);
+                //payment.setTsUserRescheduled(...);
                 //payment.setTsUserExecuted(...);
                 //payment.setTsUserInsert(...);
                 //payment.setTsUserUpdate(...);
 
                 payment.setDbmsStatus((String) session.readField(SModConsts.FINS_ST_PAY, new int[] { payment.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
+                //payment.setDbmsBeneficiary(...);
+                //payment.setDbmsDataCurrency(...);
 
-                // create payment entry:
-
-                SDbPaymentEntry paymentEntry = new SDbPaymentEntry();
+                // prepare payment entry:
 
                 //paymentEntry.setPkPaymentId(...);
                 //paymentEntry.setPkEntryId(...);
-                paymentEntry.setEntryType(SDbPaymentEntry.ENTRY_TYPE_PAYMENT);
-                paymentEntry.setEntryPaymentCy(payment.getPaymentCy());
-                paymentEntry.setEntryPaymentApplication(payment.getPaymentApplication());
-                paymentEntry.setConversionRateApplication(entryConversionRate);
-                paymentEntry.setDestinyPaymentApplicationEntryCy(getRequiredPaymentAmount());
-                paymentEntry.setEntryPayment(paymentEntry.getEntryPaymentApplication()); // same value "at application"!
-                paymentEntry.setConversionRate(paymentEntry.getConversionRateApplication()); // same value "at application"!
-                paymentEntry.setDestinyPaymentEntryCy(paymentEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
-                paymentEntry.setInstallment(1);
-                paymentEntry.setDocBalancePreviousApplicationCy(Total);
-                paymentEntry.setDocBalanceUnpaidApplicationCy_r(SLibUtils.roundAmount(Total - paymentEntry.getEntryPaymentCy()));
-                paymentEntry.setDocBalancePreviousCy(paymentEntry.getDocBalancePreviousApplicationCy()); // same value "at application"!
-                paymentEntry.setDocBalanceUnpaidCy_r(paymentEntry.getDocBalanceUnpaidApplicationCy_r()); // same value "at application"!
-                paymentEntry.setFkDocYearId_n(dps.getPkYearId());
-                paymentEntry.setFkDocDocId_n(dps.getPkDocId());
-                paymentEntry.setFkEntryCurrencyId(CurrencyId);
-                paymentEntry.setFkPaymentRequestId_n(0);
-
-                payment.getChildEntries().add(paymentEntry);
+                singleEntry.setEntryType(SDbPaymentEntry.TYPE_PAYMENT);
+                //...
+                singleEntry.setFkDocYearId_n(dps.getPkYearId());
+                singleEntry.setFkDocDocId_n(dps.getPkDocId());
+                //paymentEntry.setFkEntryCurrencyId(...); // set in SDbPayment.processPaymentCy()
+                singleEntry.setFkPaymentRequestId_n(0);
 
                 Exception exception = null;
                 
@@ -1313,31 +1250,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     @Override
     public void setRowEdited(boolean edited) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    /**
-     * Get exchange rate in desired date, if available.
-     * @param session GUI session.
-     * @param importedDocument Imported document.
-     * @param date Desired date.
-     * @return
-     * @throws Exception
-     */
-    public static double getExchangeRate(final SGuiSession session, final SImportedDocument importedDocument, final Date date) throws Exception {
-        double exchangeRate = 0;
-
-        if (session.getSessionCustom().isLocalCurrency(new int[] { importedDocument.CurrencyId })) {
-            exchangeRate = 1;
-        }
-        else {
-            exchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) session.getClient(), importedDocument.CurrencyId, date);
-
-            if (exchangeRate == 0) {
-                throw new Exception("No se ha capturado el tipo de cambio " + session.getSessionCustom().getLocalCurrencyCode() + "/" + importedDocument.CurrencyCode + " para el día " + SLibUtils.DateFormatDate.format(date) + ".");
-            }
-        }
-        
-        return exchangeRate;
     }
     
     /**

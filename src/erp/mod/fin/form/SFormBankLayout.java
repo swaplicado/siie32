@@ -90,7 +90,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -2009,7 +2009,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             row.getBankAccPk()[0] == pay.getFkBeneficiaryBankBizParterBranchId_n() &&
                             row.getBankAccPk()[1] == pay.getFkBeneficiaryBankAccountCashId_n()) {
                         found = true;
-                        pay.setPaymentCy(SLibUtils.roundAmount(pay.getPaymentCy() + row.getMoneyPayment().getLocalAmount()));
+                        pay.setPaymentApplicationCy(SLibUtils.roundAmount(pay.getPaymentApplicationCy() + row.getMoneyPayment().getLocalAmount()));
                         pay.setAuxOriginalAmount(SLibUtils.roundAmount(pay.getAuxOriginalAmount() + row.getMoneyPayment().getOriginalAmount()));
                         pay.setPayment(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                         pay.setPaymentApplication(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
@@ -2022,33 +2022,49 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     }
                 }
                 if (!found) {
-                    SDbPayment pay = new SDbPayment();
+                    SDbPayment payment = new SDbPayment();
 
-                    pay.setDateApplication(miClient.getSession().getCurrentDate());
-                    pay.setDateRequired(miClient.getSession().getCurrentDate());
-                    pay.setDateSchedule_n(moDateDateLayout.getValue());
-                    pay.setDateExecution_n(moDateDateLayout.getValue());
-                    pay.setPaymentCy(row.getMoneyPayment().getLocalAmount()); // moneda de la cuenta bancaria
-                    pay.setPaymentExchangeRateApplication(moDecExchangeRate.getValue());
-                    pay.setPaymentApplication(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
-                    pay.setPaymentExchangeRate(moDecExchangeRate.getValue());
-                    pay.setAuxOriginalAmount(row.getMoneyPayment().getOriginalAmount());
-                    pay.setPayment(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
-                    pay.setPaymentWay(DCfdi40Catalogs.FDP_TRANSFERENCIA);
-                    pay.setReceiptPaymentRequired(row.getReceptionPayReq());
-                    pay.setSystem(true);
-                    pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_IN_TREAS);
-                    pay.setFkCurrencyId(moKeyBankLayoutCurrency.getValue()[0]); 
-                    pay.setFkBeneficiaryId(row.getBizPartnerId()); 
-                    pay.setFkFunctionalAreaId(row.getFuncArea()); 
-                    pay.setFkFunctionalSubareaId(row.getFuncSubarea()); 
-                    pay.setFkPayerCashBizPartnerBranchId_n(moKeyBankAccountCash.getValue()[0]); 
-                    pay.setFkPayerCashAccountingCashId_n(moKeyBankAccountCash.getValue()[1]);
-                    pay.setFkBeneficiaryBankBizParterBranchId_n(row.getBankAccPk()[0]);
-                    pay.setFkBeneficiaryBankAccountCashId_n(row.getBankAccPk()[1]);
-                    pay.getChildEntries().add(createAuxNewPaymentEntry(row));
+                    payment.setPaymentType(SDbPayment.TYPE_PAYMENT);
+                    payment.setSeries(SDbPayment.TYPE_PAYMENT);
+                    payment.setNumber(0);
+                    payment.setDateApplication(miClient.getSession().getCurrentDate());
+                    payment.setDateRequired(miClient.getSession().getCurrentDate());
+                    payment.setDateSchedule_n(moDateDateLayout.getValue());
+                    payment.setDateExecution_n(moDateDateLayout.getValue());
+                    payment.setPaymentApplicationCy(row.getMoneyPayment().getLocalAmount()); // moneda de la cuenta bancaria
+                    payment.setPaymentExchangeRateApplication(moDecExchangeRate.getValue());
+                    payment.setPaymentApplication(SLibUtils.roundAmount(payment.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
+                    payment.setPaymentExchangeRate(moDecExchangeRate.getValue());
+                    payment.setAuxOriginalAmount(row.getMoneyPayment().getOriginalAmount());
+                    payment.setPayment(SLibUtils.roundAmount(payment.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
+                    payment.setPaymentWay(DCfdi40Catalogs.FDP_TRANSFERENCIA);
+                    payment.setReceiptPaymentRequired(row.getReceptionPayReq());
+                    payment.setRescheduled(false);
+                    payment.setExecutedManually(false);
+                    payment.setSystem(true);
+                    payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_IN_TREAS);
+                    payment.setFkCurrencyId(moKeyBankLayoutCurrency.getValue()[0]); 
+                    payment.setFkBeneficiaryId(row.getBizPartnerId()); 
+                    payment.setFkFunctionalAreaId(row.getFuncArea()); 
+                    payment.setFkFunctionalSubareaId(row.getFuncSubarea()); 
+                    payment.setFkPayerCashBizPartnerBranchId_n(moKeyBankAccountCash.getValue()[0]); 
+                    payment.setFkPayerCashAccountingCashId_n(moKeyBankAccountCash.getValue()[1]);
+                    payment.setFkBeneficiaryBankBizParterBranchId_n(row.getBankAccPk()[0]);
+                    payment.setFkBeneficiaryBankAccountCashId_n(row.getBankAccPk()[1]);
+                    payment.setFkUserScheduleId(SUtilConsts.USR_NA_ID);
+                    payment.setFkUserRescheduleId(SUtilConsts.USR_NA_ID);
+                    payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                    //payment.setFkUserInsertId(...);
+                    //payment.setFkUserUpdateId(...);
+                    //payment.setTsUserScheduled(...);
+                    //payment.setTsUserRescheduled(...);
+                    //payment.setTsUserExecuted(...);
+                    //payment.setTsUserInsert(...);
+                    //payment.setTsUserUpdate(...);
                     
-                    newPays.add(pay);
+                    payment.getChildEntries().add(createAuxNewPaymentEntry(row));
+                    
+                    newPays.add(payment);
                 }
             }
         }
@@ -2058,8 +2074,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private SDbPaymentEntry createAuxNewPaymentEntry(SLayoutBankRow row) {
         SDbPaymentEntry payEty = new SDbPaymentEntry();
-        payEty.setEntryType(SDbPaymentEntry.ENTRY_TYPE_PAYMENT);
-        payEty.setEntryPaymentCy(row.getMoneyPayment().getLocalAmount());
+        payEty.setEntryType(SDbPaymentEntry.TYPE_PAYMENT);
+        payEty.setEntryPaymentApplicationCy(row.getMoneyPayment().getLocalAmount());
         payEty.setEntryPaymentApplication(SLibUtils.roundAmount(row.getMoneyPayment().getOriginalAmount() * moDecExchangeRate.getValue()));
         payEty.setConversionRateApplication(SLibUtils.round(row.getMoneyPayment().getOriginalAmount() / row.getMoneyPayment().getLocalAmount(), 6));
         payEty.setDestinyPaymentApplicationEntryCy(row.getMoneyPayment().getOriginalAmount());
@@ -2071,7 +2087,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         payEty.setFkEntryCurrencyId(row.getCurrencyId());
         for (SRowPayments rowPayment : row.getPayments()) {
             if (row.getDpsYearId() == rowPayment.getIdYear() && row.getDpsDocId() == rowPayment.getIdDoc()) {
-                payEty.setInstallment(rowPayment.getInstallment());
+                payEty.setDocInstallment(rowPayment.getInstallment());
                 payEty.setDocBalancePreviousApplicationCy(rowPayment.getDocBalancePrevAppCy());
                 payEty.setDocBalanceUnpaidApplicationCy_r(rowPayment.getDocBalanceUnpayAppCy());
                 payEty.setDocBalancePreviousCy(rowPayment.getDocBalancePrevCy());

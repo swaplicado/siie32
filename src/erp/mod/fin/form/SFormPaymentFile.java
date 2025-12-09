@@ -783,8 +783,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moIntNumber.setValue(moRegistry.getNumber());
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextSerie.setValue(moRegistry.getSeries());
-        moDecPaymentCy.setValue(moRegistry.getPaymentCy());
-        moTextPaymentCyCur.setValue(moRegistry.getDbmsCurrency().getKey());
+        moDecPaymentCy.setValue(moRegistry.getPaymentApplicationCy());
+        moTextPaymentCyCur.setValue(moRegistry.getDbmsDataCurrency().getKey());
         moDateRequired.setValue(moRegistry.getDateRequired());
         moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId(), moRegistry.getFkFunctionalSubareaId() });
         

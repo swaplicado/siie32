@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -316,7 +316,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
-    public static final int PRV_PUR_INIT = 103061;
+    public static final int PRV_PUR_INIT = 103081;
+    public static final int PRV_PUR_LINK_INV_GREATER = 103091;
     public static final int PRV_PUR_SCA_CFG = 103101;
     public static final int PRV_PUR_SCA_TIC = 103102;
     public static final int PRV_PUR_SCA_TIC_REP = 103106;
