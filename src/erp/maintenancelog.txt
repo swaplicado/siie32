@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 292.5/ 2025-12-05
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega verificación de tabla trn_dps_authorn para que los PDF subidos no salgan con la leyenda NO, verificación extra.
+2) Corrección de clase registro de lectura de partida de requisiciones.
+
+================================================================================
 SIIE 3.2 292.4/ 2025-12-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

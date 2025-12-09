@@ -22,6 +22,8 @@ public abstract class SSwapConsts {
     public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
     public static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
     
+    public static final int SINCE_YEAR = 2025; 
+    
     /*
      * SWAP Services.
      */
