@@ -382,8 +382,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             if (isRowDataSelected()) {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
 
                     if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                         miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
@@ -400,13 +398,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                         }
                         else {
                             miClient.showMsgBoxInformation("El estatus de solicitud de pago '" + payment.getFolio()+ "' debe ser distinto de '" + SDbPayment.ST_IN_AUTH + "' para poderse ver su estatus de autorización.");
-                        }
-                        if (status != SModSysConsts.FINS_ST_PAY_NEW) {
-                            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, payment.getPkPaymentId());
-                            miClient.showMsgBoxInformation(authFlowStatus.toString());
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("El estatus de la solicitud de pago '" + payment.getFolio()+ "' debe ser distinto de '" + SDbPayment.ST_IN_AUTH + "' para poderse ver su estatus de autorización.");
                         }
                     }
                 }
