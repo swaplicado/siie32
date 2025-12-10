@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 294.1/ 2025-12-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de exportación a SWAP Services de referencias de boletos de báscula.
+2) Corrección a sentencia de inserción de solicitudes de pagos.
+
+================================================================================
 SIIE 3.2 294.0/ 2025-12-09
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
