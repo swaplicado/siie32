@@ -408,6 +408,7 @@ public abstract class SExportUtils {
 
                     case FUNCTIONAL_AREA:
                     case PUR_REF_ORDER:
+                    case PUR_REF_SCALE_TICKET:
                         databasesMap = getSwapCompaniesDatabasesMap(session);
                         
                         for (JsonNode result : results) {
@@ -552,6 +553,7 @@ public abstract class SExportUtils {
                         case PUR_ORDER:
                         case PUR_ORDER_FILE:
                         case PUR_REF_ORDER:
+                        case PUR_REF_SCALE_TICKET:
                         case PUR_PAYMENT:
                         case PUR_PAYMENT_UPD:
                             log = new SDbComSyncLog();
@@ -602,6 +604,7 @@ public abstract class SExportUtils {
                             case PUR_ORDER:
                             case PUR_ORDER_FILE:
                             case PUR_REF_ORDER:
+                            case PUR_REF_SCALE_TICKET:
                             case PUR_PAYMENT:
                             case PUR_PAYMENT_UPD:
                                 log = new SDbComSyncLog();
@@ -702,6 +705,7 @@ public abstract class SExportUtils {
             case PUR_ORDER:
             case PUR_ORDER_FILE:
             case PUR_REF_ORDER:
+            case PUR_REF_SCALE_TICKET:
             case PUR_PAYMENT:
             case PUR_PAYMENT_UPD:
                 HashMap<Integer, String> databasesMap = getSwapCompaniesDatabasesMap(session);
@@ -827,6 +831,7 @@ public abstract class SExportUtils {
 
                 case PUR_ORDER:
                 case PUR_REF_ORDER:
+                case PUR_REF_SCALE_TICKET:
                     testHost = "https://transaction-backend-test-515680676790.europe-west1.run.app";
                     break;
                     
@@ -872,6 +877,7 @@ public abstract class SExportUtils {
                 
             case PUR_ORDER:
             case PUR_REF_ORDER:
+            case PUR_REF_SCALE_TICKET:
             case PUR_PAYMENT:
             case PUR_PAYMENT_UPD:
                 cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG;
@@ -883,6 +889,7 @@ public abstract class SExportUtils {
                         break;
 
                     case PUR_REF_ORDER:
+                    case PUR_REF_SCALE_TICKET:
                         jsonConfigKey = SSwapConsts.CFG_OBJ_TXN_PUR_REF;
                         break;
                         
@@ -1025,6 +1032,7 @@ public abstract class SExportUtils {
                     break;
 
                 case PUR_REF_ORDER:
+                case PUR_REF_SCALE_TICKET:
                     SRequestReferencesBody referencesBody = new SRequestReferencesBody();
                     referencesBody.work_instance = instanceArray;
                     referencesBody.references = (SExportDataReference[]) currentExportDatas.toArray(new SExportDataReference[0]);
@@ -1143,6 +1151,7 @@ public abstract class SExportUtils {
                     case USER:
                     case PUR_ORDER:
                     case PUR_REF_ORDER:
+                    case PUR_REF_SCALE_TICKET:
                     case PUR_PAYMENT:
                     case PUR_PAYMENT_UPD:
                         // exportar antes áreas funcionales:
@@ -1197,6 +1206,12 @@ public abstract class SExportUtils {
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }
+                        }
+                        
+                        if (syncType == SSyncType.PUR_REF_SCALE_TICKET) {
+                            syncTypeInProgress = SSyncType.PUR_REF_SCALE_TICKET;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
                         }
                         break;
                         

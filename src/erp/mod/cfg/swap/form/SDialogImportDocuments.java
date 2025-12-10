@@ -1014,10 +1014,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private SDataDps readOrderAndPrepareDialogDpsFinder(final SImportedDocument document) throws Exception {
         SDataDps order = null;
-        boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
+        boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
         if (linkToOrder) {
-            int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
+            int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
 
             if (orderKey != null) {
                 order = new SDataDps();
@@ -1627,7 +1627,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     // retrieve order, if available:
 
                                     SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                                    boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
+                                    boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
                                     // import CFDI (dialog DPS Finder should be previously prepared):
 
@@ -1692,7 +1692,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 // retrieve order, if available:
 
                                 SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
+                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
                                 // create CFDI (dialog DPS Finder should be previously prepared):
 
@@ -1782,7 +1782,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
+                int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
 
                 if (orderKey == null) {
                     throw new Exception("La factura autorizada no está relacionada con ningún pedido.");

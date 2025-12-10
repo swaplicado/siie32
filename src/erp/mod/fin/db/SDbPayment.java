@@ -552,8 +552,8 @@ public class SDbPayment extends SDbRegistryUser {
             mnFkUserExecutiondId = SUtilConsts.USR_NA_ID;
             
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    "'" + msPaymentType + "', " + 
                     mnPkPaymentId + ", " + 
+                    "'" + msPaymentType + "', " + 
                     "'" + msSeries + "', " + 
                     mnNumber + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateApplication) + "', " + 

@@ -754,7 +754,7 @@ public abstract class SImportUtils {
         DpsFolio dpsFolio = null;
         
         if (!refFolio.isEmpty() && !refPrefix.isEmpty()) {
-            String prefix = refPrefix + SSwapConsts.SEPARATOR_DOC_REF;
+            String prefix = refPrefix + SSwapConsts.SEPARATOR_REF;
             String folio = refFolio.substring(prefix.length());
             String[] folioElements = folio.split("-");
             String series = folioElements.length == 1 ? "" : folioElements[0];

@@ -250,8 +250,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         String refPrefix = "";
         
         switch (refDocType) {
-            case SSwapConsts.TXN_DOC_TYPE_ORDER:
-                refPrefix = SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE;
+            case SSwapConsts.TXN_REF_TYPE_ORDER:
+                refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + refDocType + ".)");
@@ -1394,7 +1394,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Number = resultSet.getString("d.num");
                 importedDocument.Date = resultSet.getDate("d.dt");
                 String referencesAsText = resultSet.getString("sdp.dps_refs");
-                importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_DOC_TYPE_ORDER;
+                importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_REF_TYPE_ORDER;
                 importedDocument.ReferencesAsText = referencesAsText;
                 importedDocument.Description = resultSet.getString("sdp.dps_descrip");
                 importedDocument.FunctionalSubAreaId = resultSet.getInt("d.fid_func_sub");
