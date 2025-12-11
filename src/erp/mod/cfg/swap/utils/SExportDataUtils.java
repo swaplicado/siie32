@@ -290,13 +290,13 @@ public abstract class SExportDataUtils {
                         // comparacion de last update para actualizar el archivo
                         if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
                             lLogFiles.add(oLogEty);
                         } else {
                             oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
                             if (!CloudStorageManager.storagedFileExists(oFd.getFileName())) {
                                 oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, true);
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
                                 lLogFiles.add(oLogEty);
                             }
                         }
@@ -307,7 +307,7 @@ public abstract class SExportDataUtils {
                                     oDpsExport.id_doc,
                                     database,
                                     resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, false);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
                             if (oLogEty != null) {
                                 if (Integer.parseInt(oLogEty.getResponseCode()) == 200
                                         || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
