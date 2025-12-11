@@ -23,6 +23,7 @@ import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
@@ -1000,10 +1001,12 @@ public abstract class SExportDataUtils {
      * @param idYear
      * @param idDoc
      * @param uploadOcPDF
+     * @param withJsonData
      * @return Lista de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session, final int idYear, final int idDoc, final boolean uploadOcPDF) throws SQLException, Exception {
+    public static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session, final int idYear, final int idDoc, 
+                                                                        final boolean uploadOcPDF, final boolean withJsonData) throws SQLException, Exception {
         ArrayList<SExportData> lDps = new ArrayList<>();
         String sBucketName = CloudStorageManager.getBucketName();
         String sProjectID = CloudStorageManager.getProjectID();
@@ -1027,6 +1030,7 @@ public abstract class SExportDataUtils {
             }
             
             STrnDBDocuments oDocCore = new STrnDBDocuments();
+            String rms = "";
             
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             
@@ -1040,7 +1044,7 @@ public abstract class SExportDataUtils {
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
-                        + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, "
+                        + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
@@ -1119,6 +1123,14 @@ public abstract class SExportDataUtils {
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                    rms = resultSet.getString("_rms");
+                    
+                    if (resultSet.getInt("d.fid_st_dps_authorn") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
+                        oDpsExport.authz_authorization = SSwapConsts.AUTHZ_STATUS_OK;
+                    }
+                    else if (resultSet.getInt("d.fid_st_dps_authorn") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
+                        oDpsExport.authz_authorization = SSwapConsts.AUTHZ_STATUS_REJECTED;
+                    }
                     
                     // PDF de la OC:
                     if (uploadOcPDF) {
@@ -1212,7 +1224,6 @@ public abstract class SExportDataUtils {
                     }
                     
                     // documentos (archivos de requisiciones)
-                    String rms = resultSet.getString("_rms");
                     String fileName;
                     String[] idsRms;
                     SExportDataDpsFile oRmFile;
@@ -1242,6 +1253,19 @@ public abstract class SExportDataUtils {
                     
                     lDps.add(oContainer);
                 }
+            }
+        }
+        
+        SShareData oSD = new SShareData();
+        boolean withUrl = false;
+        for (SExportData oDps : lDps) {
+            SExportDataDpsContainer wDps = (SExportDataDpsContainer) oDps;
+            if (withJsonData || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_OK || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_REJECTED) {
+                wDps.document.document_json = oSD.getDpsByPk(wDps.document.id_year, 
+                                                        wDps.document.id_doc, 
+                                                        wDps.document.company, 
+                                                        withUrl,
+                                                        session);
             }
         }
         
@@ -2155,7 +2179,8 @@ public abstract class SExportDataUtils {
             case PUR_ORDER:
                 exportPurchaseOrdersFiles(session);
                 boolean uploadPdf = true;
-                data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf);
+                boolean withJsonData = false;
+                data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf, withJsonData);
                 break;
                 
             case PUR_REF_ORDER:

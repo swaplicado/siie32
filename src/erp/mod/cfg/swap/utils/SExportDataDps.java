@@ -5,6 +5,7 @@
  */
 package erp.mod.cfg.swap.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import erp.mod.trn.api.data.SWebDps;
 
 /**
@@ -117,6 +118,11 @@ public class SExportDataDps implements SExportData {
     public int priority;
     
     /**
+     * Modelo de flujo para la autorización del recurso
+     */
+    public int id_flow_model;
+    
+    /**
      * Estatus de autorización para el sistema externo
      */
     public int authz_authorization;
@@ -129,5 +135,6 @@ public class SExportDataDps implements SExportData {
     /**
      * JSON de la OC para el portal de compras.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public SWebDps document_json;
 }

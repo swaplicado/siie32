@@ -23,7 +23,6 @@ import erp.mod.cfg.swap.utils.SExportDataUtils;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SRequestDpsBody;
 import erp.mod.cfg.utils.SAuthorizationUtils;
-import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -155,25 +154,23 @@ public class SProcDpsSendAuthornWeb extends Thread {
         
         if (mnPathId > 0) {
             boolean uploadPdf = false;
+            boolean withJsonData = true;
             ArrayList<SExportData> lDps = SExportDataUtils.getListOfPurchaseOrdersToExport(miClient.getSession(), 
                                                                                 moSuppFileProc.getPrimaryKey()[0], 
                                                                                 moSuppFileProc.getPrimaryKey()[1],
-                                                                                uploadPdf);
+                                                                                uploadPdf,
+                                                                                withJsonData);
             if (lDps.size() == 1) {
                 SDbComSyncLogEntry oLogEty = new SDbComSyncLogEntry();
                 oLogEty.setAuxDatabase(miClient.getSession().getDatabase().getDbName());
                 oLogEty.setResponseCode("" + HttpURLConnection.HTTP_INTERNAL_ERROR);
-                SShareData oSD = new SShareData();
                 try {
                     ObjectMapper mapper = new ObjectMapper();
                     SRequestDpsBody purchaseOrderBody = new SRequestDpsBody();
                     purchaseOrderBody.work_instance = new String[] { "" + miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_INSTANCE) };
                     SExportDataDpsContainer oOc = (SExportDataDpsContainer) lDps.get(0);
                     oOc.document.priority = mnPriority;
-                    oOc.document.document_json = oSD.getDpsByPk(oOc.document.id_year, 
-                                                                oOc.document.id_doc, 
-                                                                miClient.getSession().getConfigCompany().getCompanyId(), 
-                                                                miClient.getSession());
+                    oOc.document.id_flow_model = mnPathId;
                     oOc.document.authz_authorization = SSwapConsts.AUTHZ_STATUS_IN_PROGRESS;
                     oOc.document.authz_notes = msAuthNotes;
                     oLogEty.setReferenceId(oOc.document.id_year + "_" + oOc.document.id_doc);

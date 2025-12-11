@@ -319,7 +319,7 @@ public class SShareData {
         return lDocs;
     }
     
-    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idCompany, SGuiSession oSession) throws Exception {
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idCompany, boolean withUrl, SGuiSession oSession) throws Exception {
         if (this.oMysql == null && oSession == null) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener un DPS");
             throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
@@ -339,6 +339,9 @@ public class SShareData {
          * Se obtiene el DPS
          */
         SWebDpsRow oDps = oTrnCore.getDocumentByPk(idYear, idDoc);
+        if (oDps == null) {
+            return null;
+        }
         oWebDocument.setoDpsHeader(oDps);
         
         /**
@@ -358,7 +361,6 @@ public class SShareData {
         /**
          * Documentos
          */
-        boolean withUrl = true;
         // se manda el statement en null para que tome la conexión del JSON
         ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc, withUrl, null, null);
         oWebDocument.getlFiles().clear();
