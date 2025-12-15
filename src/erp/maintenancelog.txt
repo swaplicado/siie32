@@ -3,7 +3,7 @@ SIIE 3.2 294.2/ 2025-12-11
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de permiso de usuario para vincular facturas autorizadas en SWAP Services con facturas de total mayor.
-2) Mejora al manejo de facturas con pagos en proceso al momento de crearles solicitudes de pago adicinales.
+2) Mejora al manejo de facturas con pagos en proceso al momento de crearles solicitudes de pago adicionales.
 3) Refactorización de la obtención del saldo de documentos incluyendo pagos en proceso.
 4 Inclusión de lista de empresas del ERP en la exportación de proveedores a SWAP Services.
 
