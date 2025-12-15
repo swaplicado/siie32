@@ -106,6 +106,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected PreparedStatement moPrepStatToGetDpsKeyByDocData;
     protected JLabel jlStatus;
     protected SBeanFieldBoolean moBoolExportPaymentRequestsOnClose;
+    protected boolean mbAllowLinkGreaterInvoices;
+    
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
     protected SDialogPdfViewer moDialogPdfViewer;
@@ -846,6 +848,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         ((FlowLayout) jpCommandCenter.getLayout()).setAlignment(FlowLayout.RIGHT);
         jpCommandCenter.add(moBoolExportPaymentRequestsOnClose);
         
+        mbAllowLinkGreaterInvoices = miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_LINK_INV_GREATER);
+        
         jtfUserName.setText(miClient.getSession().getUser().getName());
         jtfUserName.setCaretPosition(0);
         
@@ -1000,7 +1004,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 String dpsNumber = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
 
                 if (miClient.showMsgBoxConfirm("Se encontró la factura " + SSwapConsts.SIIE + " '" + dpsNumber + "', ¿desea vincularla a esta factura autorizada?") == JOptionPane.YES_OPTION) {
-                    if (document.link(miClient.getSession(), dpsKey, false, false, msSyncUrlDownload)) {
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
                         int index = moDocumentsGrid.getTable().getSelectedRow();
                         moDocumentsGrid.renderGridRows();
                         moDocumentsGrid.setSelectedGridRow(index);
@@ -1038,7 +1042,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
         if (dpsKey != null) {
-            if (document.link(miClient.getSession(), dpsKey, false, true, msSyncUrlDownload)) {
+            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false)) {
                 int index = moDocumentsGrid.getTable().getSelectedRow();
                 moDocumentsGrid.renderGridRows();
                 moDocumentsGrid.setSelectedGridRow(index);
@@ -1386,7 +1390,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
-                            if (document.link(miClient.getSession(), dpsKey, false, false, msSyncUrlDownload)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
                                 newlyLinked++;
                             }
                         }
@@ -1464,7 +1468,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                             int[] dpsKey = (int[]) picker.getOption();
 
-                            if (document.link(miClient.getSession(), dpsKey, true, false, msSyncUrlDownload)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, true, mbAllowLinkGreaterInvoices)) {
                                 int index = moDocumentsGrid.getTable().getSelectedRow();
                                 moDocumentsGrid.renderGridRows();
                                 moDocumentsGrid.setSelectedGridRow(index);

@@ -625,6 +625,7 @@ public abstract class SExportDataUtils {
     @Deprecated
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
+        int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String database = "erp_aeth";
@@ -823,6 +824,7 @@ public abstract class SExportDataUtils {
                 
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
+                    user.companies = companies;
                     users.add(user);
                 }
             }
@@ -840,6 +842,7 @@ public abstract class SExportDataUtils {
      */
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
+        int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(b.id_bp, CHAR)";
@@ -868,6 +871,7 @@ public abstract class SExportDataUtils {
                 
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
+                    user.companies = companies;
                     users.add(user);
                 }
             }

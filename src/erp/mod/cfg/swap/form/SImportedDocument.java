@@ -438,20 +438,22 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Link document to given DPS, and optionally create its payment request.
      * @param session GUI session.
-     * @param dpsKey DPS primary key.
-     * @param allowLaterInvoice Allow link to a later issued invoice.
-     * @param createPaymentRequest Create-payment-request flag.
      * @param docFilesDownloadSrvUrl URL of document files download service.
+     * @param dpsKey DPS primary key.
+     * @param allowLaterInvoice Allow linking an invoice wichi is issued later.
+     * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
+     * @param createPaymentRequest Create-payment-request flag.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final int[] dpsKey, final boolean allowLaterInvoice, final boolean createPaymentRequest, final String docFilesDownloadSrvUrl) throws Exception {
+    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final boolean createPaymentRequest, final boolean allowLaterInvoice, final boolean allowGreaterInvoice) throws Exception {
         boolean linked = false;
+        String prefix = "No se pudo realizar la vinculación:\n";
         
         // Validate linkage:
         
         if (isProcessed()) {
-            throw new Exception(EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
+            throw new Exception(prefix + EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
         }
         else {
             // Read DPS in its "thin" version:
@@ -462,41 +464,40 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             // Validate DPS:
             
             if (dps.getDbmsRecordKey() == null) {
-                throw new Exception("La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
+                throw new Exception(prefix + "La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
             }
             else if (BizPartnerId != dps.getFkBizPartnerId_r()) {
-                // match required:
-                throw new Exception("El asociado de negocios de este documento, "
-                        + "'" + BizPartner + "' (ID = " + BizPartnerId + "), "
-                        + "es distinto al de la factura a vincular "
-                        + "'" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
+                // business partner does not match:
+                throw new Exception(prefix + "El asociado de negocios de este documento, '" + BizPartner + "' (ID = " + BizPartnerId + "), "
+                        + "es distinto al de la factura a vincular '" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
             }
             else if (CurrencyId != dps.getFkCurrencyId()) {
-                // match required:
-                throw new Exception("La moneda de este documento, "
-                        + CurrencyCode + ", "
-                        + "es distinta a la de la factura a vincular, "
-                        + dps.getDbmsCurrencyCode() + ".");
+                // currency does not match:
+                throw new Exception(prefix + "La moneda de este documento, " + CurrencyCode + ", "
+                        + "es distinta a la de la factura a vincular, " + dps.getDbmsCurrencyCode() + ".");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
-                    Math.abs(Total - dps.getTotalCy_r()) >= 1 ||
-                    Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm("Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + "\n"
-                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)) {
-                // match required:
-                throw new Exception("El total de este documento, "
-                        + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
-                        + "es distinto al de la factura a vincular, "
-                        + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
+                    (Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm(
+                            "Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION) ||
+                    (Math.abs(Total - dps.getTotalCy_r()) >= 1 && (Total > dps.getTotalCy_r()) || !allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
+                            "El total de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                /*
+                total does not match AND
+                (absolute difference is < $1 AND user doesn't accept) OR
+                (absolute difference is >= $1 AND (this total is > document's OR no greater invoices allowed OR user user doesn't accept))
+                */
+                throw new Exception(prefix + "El total de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
+                        + "es distinto al de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
             else if ((!allowLaterInvoice && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
                     (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la factura a vincular, "
                             + SLibUtils.DateFormatDate.format(dps.getDate()) + ", es posterior a la de este documento, " + SLibUtils.DateFormatDate.format(Date) + ".\n"
-                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION)))) {
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 // match required:
-                throw new Exception("La fecha de este documento, "
-                        + SLibUtils.DateFormatDate.format(Date) + ", "
-                        + "es distinta a la de la factura a vincular, "
-                        + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
+                throw new Exception(prefix + "La fecha de este documento, " + SLibUtils.DateFormatDate.format(Date) + ", "
+                        + "es distinta a la de la factura a vincular, " + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
                 String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
@@ -551,7 +552,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 // processs folio number validation:
 
                 if (!msgError.isEmpty()) {
-                    throw new Exception(msgError);
+                    throw new Exception(prefix + msgError);
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
@@ -594,7 +595,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 // processs folio series validation:
 
                 if (!msgError.isEmpty()) {
-                    throw new Exception(msgError);
+                    throw new Exception(prefix + msgError);
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
@@ -681,7 +682,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                             cfd.setTimestamp(dps.getDate());
 
                             if (cfd.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
+                                throw new Exception(prefix + SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
                             }
                             
                             ProcessedDps.HasCfd = true;
@@ -700,7 +701,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                             pdf.setPkDocId(dps.getPkDocId());
 
                             if (pdf.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
+                                throw new Exception(prefix + SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
                             }
                             
                             ProcessedDps.HasPdf = true;
@@ -1206,7 +1207,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return "Emisor: " + BizPartner + "; " // allways available
                 + "Folio: " + getFolio() + "; " // allways available
                 + "Fecha: " + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
-                + "Total: $ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
+                + "Total: $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
                 + (!FunctionalSubArea.isEmpty() ? "; Subárea funcional: " + FunctionalSubArea : "") // may not be available
                 + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
                 + ".";

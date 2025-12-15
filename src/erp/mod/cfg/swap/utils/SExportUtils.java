@@ -1192,8 +1192,7 @@ public abstract class SExportUtils {
                                 info = computeRequest(session, syncTypeInProgress);
                                 responses.getInfos().add(info);
                             }
-
-                            if (syncType == SSyncType.PUR_PAYMENT) {
+                            else if (syncType == SSyncType.PUR_PAYMENT) {
                                 // exportar también actualizaciones de pagos de compras:
                                 syncTypeInProgress = SSyncType.PUR_PAYMENT_UPD;
                                 info = computeRequest(session, syncTypeInProgress);
@@ -1223,12 +1222,10 @@ public abstract class SExportUtils {
                         responses.getInfos().add(info);
 
                         if (info.isResponseOk()) {
-                            if (info.isResponseOk()) {
-                                // exportar los datos solicitados:
-                                syncTypeInProgress = syncType;
-                                info = computeRequest(session, syncTypeInProgress);
-                                responses.getInfos().add(info);
-                            }
+                            // exportar los datos solicitados:
+                            syncTypeInProgress = syncType;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
                         }
                         break;
                         
@@ -1339,5 +1336,36 @@ public abstract class SExportUtils {
         }
         
         return databasesMap;
+    }
+    
+    /**
+     * Obtener los ID de todas las empresas habilitadas para SWAWP Services en el ERP.
+     * @param session Sesión de usuario.
+     * @return Arreglo de enteros de los ID de todas las empresas habilitadas para SWAWP Services.
+     * @throws Exception
+     */
+    public static int[] getLinkedUpSwapCompanies(final SGuiSession session) throws Exception {
+        ArrayList<Integer> companies = new ArrayList<>();
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ObjectMapper mapper = new ObjectMapper();
+            
+            String sql = "SELECT id_co, bd "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
+                    + "WHERE NOT b_del "
+                    + "ORDER BY id_co;";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                String paramValue = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG, resultSet.getString("bd"));
+                JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), paramValue));
+                boolean linkedUp = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_LINK_UP)) == 1;
+                if (linkedUp) {
+                    companies.add(resultSet.getInt("id_co"));
+                }
+            }
+        }
+        
+        return companies.stream().mapToInt(Integer::intValue).toArray();
     }
 }
