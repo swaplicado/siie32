@@ -235,11 +235,7 @@ public abstract class SServicesUtils {
         String responseBody = SExportUtils.requestSwapService(urlQuery, syncSettings.Url, SHttpConsts.METHOD_GET, "", syncSettings.Token, syncSettings.ApiKey, SSwapConsts.TIME_30_SEC);
         JsonNode responseJson = new ObjectMapper().readTree(responseBody);
         
-        if (SAuthJsonUtils.containsElement(responseJson, "", "status") 
-                && SAuthJsonUtils.containsElement(responseJson, "", "flow")
-                && ! responseJson.path("flow").asText().equals("null")) {
-            authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_SUCC_OK, "");
-            
+        if (responseJson.has("status")) {
             JsonNode status = responseJson.path("status");
             if (status.isInt() && status.asInt() == SHttpConsts.RSC_ERR_SERVER) {
                 authFlowStatus = new AuthFlowStatus(status.asInt(), responseJson.path("error").asText());
@@ -292,12 +288,6 @@ public abstract class SServicesUtils {
 
                 authFlowStatus = new AuthFlowStatus(code, message);
             }
-        }
-        else if (SAuthJsonUtils.containsElement(responseJson, "", "status")) {
-            int code = responseJson.path("status").asInt();
-            String message = responseJson.path("error").toString();
-            
-            authFlowStatus = new AuthFlowStatus(code, message);
         }
         
         return authFlowStatus;
