@@ -8,6 +8,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 4) Incorporación de validación de RFC genérico, XEXX010101, para asociados de negocios del extranjero.
 5) Cambio de filtro de fecha para tomar la programada en búsqueda de solicitudes de pago en layouts bancarios.
 6) Corrección para preservar sucursal del proveedor en la importación o creación de facturas importadas desde SWAP Services.
+7) Habilitación de exportación de boletos de báscula a SWAP Services de múltiples categorías de insumo.
 
 ================================================================================
 SIIE 3.2 294.2/ 2025-12-11
