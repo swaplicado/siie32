@@ -387,7 +387,14 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
 
                     if (status != SModSysConsts.FINS_ST_PAY_NEW) {
                         SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, payment.getPkPaymentId());
-                        miClient.showMsgBoxInformation(authFlowStatus.toString());
+                        
+                        if (authFlowStatus != null) {
+                            miClient.showMsgBoxInformation(authFlowStatus.toString());
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pudo consultar el estatus de la solicitud de pago '" + payment.getFolio()+ "'.\n"
+                                    + "Inténtelo más tarde de favor. En caso de persistir el problema, contacte a soporte técnico.");
+                        }
                     }
                     else {
                         miClient.showMsgBoxInformation("El estatus de la solicitud de pago '" + payment.getFolio()+ "' debe ser distinto de '" + SDbPayment.ST_IN_AUTH + "' para poderse ver su estatus de autorización.");

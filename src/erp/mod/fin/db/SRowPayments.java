@@ -11,14 +11,14 @@ import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SRowPayments implements SGridRow, Serializable {
     
     protected int idYear;
     protected int idDoc;
     protected int idBeneficiary;
-    protected Date mtDate;
+    protected Date mtDateScheduled;
     protected int idPayment;
     protected String msBeneficiary;
     protected String msPayNum;
@@ -39,7 +39,7 @@ public class SRowPayments implements SGridRow, Serializable {
     public void setIdYear(int d) { idYear = d; };
     public void setIdDoc(int d) { idDoc = d; };
     public void setIdBeneficiary(int d) { idBeneficiary = d; };
-    public void setDate(Date t) { mtDate = t; };
+    public void setDateScheduled(Date t) { mtDateScheduled = t; };
     public void setIdPayment(int d) { idPayment = d; };
     public void setBeneficiary(String s) { msBeneficiary = s; };
     public void setPayNum(String s) { msPayNum = s; };
@@ -60,7 +60,7 @@ public class SRowPayments implements SGridRow, Serializable {
     public int getIdYear() { return idYear; }
     public int getIdDoc() { return idDoc; }
     public int getIdPayment() { return idPayment; }
-    public Date getDate() { return mtDate; }
+    public Date getDateScheduled() { return mtDateScheduled; }
     public int getIdBeneficiary() { return idBeneficiary; }
     public String getBeneficiary() { return msBeneficiary; }
     public String getPayNum() { return msPayNum; }
@@ -118,14 +118,32 @@ public class SRowPayments implements SGridRow, Serializable {
         Object value = null;
         
         switch (col) {
-            case 0: value = msBeneficiary; break;
-            case 1: value = mtDate; break;
-            case 2: value = msDocNum; break;
-            case 3: value = msPayNum; break;
-            case 4: value = mdAmount; break;
-            case 5: value = msCur; break;
-            case 6: value = mbSelected; break;
-            case 7: value = msNotes; break;
+            case 0:
+                value = msBeneficiary;
+                break;
+            case 1:
+                value = mtDateScheduled;
+                break;
+            case 2:
+                value = msDocNum;
+                break;
+            case 3:
+                value = msPayNum;
+                break;
+            case 4:
+                value = mdAmount;
+                break;
+            case 5:
+                value = msCur;
+                break;
+            case 6:
+                value = mbSelected;
+                break;
+            case 7:
+                value = msNotes;
+                break;
+            default:
+                // nothing
         }
         
         return value;

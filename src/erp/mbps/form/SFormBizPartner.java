@@ -3202,7 +3202,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
             
             int[] countryKey = (int[]) moPanelBizPartnerBranch.getValue(SDataConstants.LOCU_CTY);
-            boolean isForeign = countryKey != null && countryKey[0] != 0 && !SLibUtils.compareKeys(countryKey, miClient.getSession().getSessionCustom().getLocalCountryKey());
+            boolean isForeign = countryKey != null && countryKey[0] != 0 && !miClient.getSession().getSessionCustom().isLocalCountry(countryKey);
             
             if (moFieldFkTaxIdentityTypeId.getKeyAsIntArray()[0] == 0) {
                 validation.setTabbedPaneIndex(TAB_MAIN);
@@ -3233,6 +3233,11 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFiscalId);
                 validation.setMessage("El valor del campo '" + jlFiscalId.getText() + "', '" + fiscalId + "', debe tener " + fiscalIdLength + " caracteres.");
+            }
+            else if (isForeign && !fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El '" + getTitle() + "' es extranjero, por lo que el valor del campo '" + jlFiscalId.getText() + "' debe ser " + DCfdConsts.RFC_GEN_INT + ".");
             }
             else if (!alternativeId.isEmpty() && alternativeId.length() != DCfdConsts.LEN_CURP) {
                 validation.setTabbedPaneIndex(TAB_MAIN);

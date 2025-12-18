@@ -6904,7 +6904,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
                 if (entry.getDbmsDpsCfdEntry() == null || entry.getDbmsDpsCfdEntry().getConcept().isEmpty()) {
-                    //use original data of current document entry:
+                    // use original data of current document entry:
                     
                     String descripcion = entry.getConcept();
                     
@@ -6921,7 +6921,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     concepto.setDescripcion(descripcion);
                 }
                 else {
-                    //use custom (user defined) data of current document entry:
+                    // use custom (user defined) data of current document entry:
                     
                     concepto.setClaveProdServ(entry.getDbmsDpsCfdEntry().getCfdProdServ());
                     concepto.setNoIdentificacion(entry.getDbmsDpsCfdEntry().getConceptKey());
@@ -6930,7 +6930,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     concepto.setDescripcion(entry.getDbmsDpsCfdEntry().getConcept());
                 }
                 
-                if (entry.getDbmsDpsCfdEntry() != null && entry.getDbmsDpsCfdEntry().getPredial().isEmpty()) {
+                if (entry.getDbmsDpsCfdEntry() != null && !entry.getDbmsDpsCfdEntry().getPredial().isEmpty()) {
                     concepto.setPredial(entry.getDbmsDpsCfdEntry().getPredial());
                 }
                 

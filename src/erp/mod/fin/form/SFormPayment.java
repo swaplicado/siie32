@@ -1065,9 +1065,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         singleEntry.setConversionRate(singleEntry.getConversionRateApplication()); // same value "at application"!
         singleEntry.setDestinyPaymentEntryCy(singleEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
         
-        singleEntry.setDocInstallment(1);
-        singleEntry.setDocBalancePreviousApplicationCy(moDpsBalance.BalanceNetCy);
-        singleEntry.setDocBalanceUnpaidApplicationCy_r(SLibUtils.roundAmount(moDpsBalance.BalanceNetCy - moCurPaymentCy.getField().getValue()));
+        singleEntry.setDocInstallment(moDps == null ? 0 : 1);
+        singleEntry.setDocBalancePreviousApplicationCy(moDps == null ? 0 : moDpsBalance.BalanceNetCy);
+        singleEntry.setDocBalanceUnpaidApplicationCy_r(moDps == null ? 0 : SLibUtils.roundAmount(moDpsBalance.BalanceNetCy - moCurPaymentCy.getField().getValue()));
         singleEntry.setDocBalancePreviousCy(singleEntry.getDocBalancePreviousApplicationCy()); // same value "at application"!
         singleEntry.setDocBalanceUnpaidCy_r(singleEntry.getDocBalanceUnpaidApplicationCy_r()); // same value "at application"!
         singleEntry.setFkDocYearId_n(moDps == null ? 0 : moDps.getPkYearId());

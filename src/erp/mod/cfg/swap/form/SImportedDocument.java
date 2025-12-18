@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -53,16 +54,53 @@ import sa.lib.gui.SGuiSession;
  */
 public class SImportedDocument implements SGridRow, Serializable, Comparable<SImportedDocument> {
     
-    public static final int PAYMENT_DEFN_NOT_REQ = 0; // pago no requerido
-    public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
-    public static final int PAYMENT_DEFN_BY_PCT = 2; // pago definido por porcentaje
+    public static final int DOC_TYPE_ALL = 0;
+    public static final int DOC_TYPE_ASSETS = 1;
+    public static final int DOC_TYPE_EXPENSES = 2;
     
-    public static final String EXC_DOC_NOT_PROCESSED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
-    public static final String EXC_DOC_ALREADY_RECORDED_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
+    public static final int DOC_CASE_ALL = 0;
+    public static final int DOC_CASE_STANDARD = 1;
+    public static final int DOC_CASE_FRUIT_FREIGHT = 2;
+    public static final int DOC_CASE_FRUIT_PURCHASE = 3;
+    
+    public static final int PROC_TYPE_STANDARD = 0; // NA
+    public static final int PROC_TYPE_FRUIT_FREIGHT = 11;
+    public static final int PROC_TYPE_FRUIT_PURCHASE = 12;
+    
+    /** Document types. */
+    public static final HashMap<Integer, String> DocTypes = new HashMap<>();
+    /** Document cases. */
+    public static final HashMap<Integer, String> DocCases = new HashMap<>();
+    /** Processing types (in SWAP Services). */
+    public static final HashMap<Integer, String> ProcTypes = new HashMap<>();
+    
+    static {
+        DocTypes.put(DOC_TYPE_ALL, "Todas");
+        DocTypes.put(DOC_TYPE_ASSETS, "Activo fijo");
+        DocTypes.put(DOC_TYPE_EXPENSES, "Compras y gastos");
+        
+        DocCases.put(DOC_CASE_ALL, "Todas");
+        DocCases.put(DOC_CASE_STANDARD, "Estándar");
+        DocCases.put(DOC_CASE_FRUIT_FREIGHT, "Fletes fruta");
+        DocCases.put(DOC_CASE_FRUIT_PURCHASE, "Compras fruta");
+        
+        ProcTypes.put(PROC_TYPE_STANDARD, "STD");
+        ProcTypes.put(PROC_TYPE_FRUIT_FREIGHT, "FRF");
+        ProcTypes.put(PROC_TYPE_FRUIT_PURCHASE, "FRC");
+    }
+    
+    public static final int PAY_IS_NOT_REQ = 0; // pago no requerido
+    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
+    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
+    
+    // Exception messages:
+    
+    public static final String EXC_DOC_NOT_RECORDED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
+    public static final String EXC_DOC_ALREADY_RECORDED_IN_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
 
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
-    public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene solicitud de pago.";
-    public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene solicitud de pago: ";
+    public static final String EXC_PAY_NOT_REQUESTED = "Este documento no tiene solicitud de pago.";
+    public static final String EXC_PAY_ALREADY_REQUESTED_IN_ = "Este documento ya tiene solicitud de pago: ";
     
     private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
     private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
@@ -90,6 +128,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public Date RequiredPaymentDateNew;
     public boolean IsRequiredPaymentLoc;
     public String RequiredPaymentNotes;
+    public int RevisionYear;
+    public int RevisionWeek;
+    public int ProcessingTypeId;
+    public String ProcessingTypeCode;
     public int StatusId;
     public String Status;
     public boolean Download;
@@ -118,13 +160,17 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Total = 0;
         CurrencyId = 0;
         CurrencyCode = "";
-        RequiredPaymentDefinition = PAYMENT_DEFN_NOT_REQ;
+        RequiredPaymentDefinition = PAY_IS_NOT_REQ;
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
         RequiredPaymentDate = null;
         RequiredPaymentDateNew = null;
         IsRequiredPaymentLoc = false;
         RequiredPaymentNotes = "";
+        RevisionYear = 0;
+        RevisionWeek = 0;
+        ProcessingTypeId = 0;
+        ProcessingTypeCode = "";
         StatusId = 0;
         Status = "";
         Download = false;
@@ -178,7 +224,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public double getRequiredPaymentAmount() {
-        return RequiredPaymentDefinition == PAYMENT_DEFN_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
+        return RequiredPaymentDefinition == PAY_DEF_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
     }
     
     /**
@@ -206,10 +252,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Check if document is processed.
+     * Check if document is registered.
      * @return 
      */
-    public boolean isProcessed() {
+    public boolean isRecorded() {
         return ProcessedDps != null && ProcessedDps.getDpsKey() != null && ProcessedDps.SwapDataProcessingId != 0 && SwapDataProcessing != null;
     }
     
@@ -310,11 +356,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
         SDbPayment payment = null;
         
-        if (RequiredPaymentDefinition == PAYMENT_DEFN_NOT_REQ) {
+        if (RequiredPaymentDefinition == PAY_IS_NOT_REQ) {
             throw new Exception("Este documento carece de la indicación de requerir un pago.");
         }
-        else if (validateIsProcessed && !isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        else if (validateIsProcessed && !isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
@@ -452,8 +498,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         // Validate linkage:
         
-        if (isProcessed()) {
-            throw new Exception(prefix + EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
+        if (isRecorded()) {
+            throw new Exception(prefix + EXC_DOC_ALREADY_RECORDED_IN_ + ProcessedDps.composeRecord() + ".");
         }
         else {
             // Read DPS in its "thin" version:
@@ -723,8 +769,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public boolean unlink(final SGuiSession session) throws Exception {
         boolean unlinked = false;
         
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else {
             // check if payment can be deleted:
@@ -794,11 +840,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     private boolean validatePaymentRequestCreation() throws Exception {
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (isPaymentRequested()) {
-            throw new Exception(EXC_PAY_ALREADY_REGISTERED_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
+            throw new Exception(EXC_PAY_ALREADY_REQUESTED_IN_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
         }
         else if (!isPaymentRequestDataAvailable()) {
             throw new Exception(EXC_PAY_NOT_REQUESTABLE);
@@ -839,11 +885,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     private boolean validateRequiredPaymentDateChanging() throws Exception {
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (!isPaymentRequested()) {
-            throw new Exception(EXC_PAY_NOT_REGISTERED);
+            throw new Exception(EXC_PAY_NOT_REQUESTED);
         }
         else if (!Payment.isExportable()) {
             throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "' o '" + SDbPayment.ST_SCHED + "'.");
@@ -977,9 +1023,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setPayments(
         //dps.setPaymentMethod(
         //dps.setPaymentAccount(
-        if (order != null) {
-            dps.setAccountingTag(order.getAccountingTag());
-        }
+        dps.setAccountingTag(order != null ? order.getAccountingTag() : "");
         //dps.setAutomaticAuthorizationRejection(
         //dps.setIsPublic(
         //dps.setIsLinked(
@@ -1004,27 +1048,39 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
         dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
         dps.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
-        if (order != null) {
-            dps.setFkDpsNatureId(order.getFkDpsNatureId());
-        }
+        dps.setFkDpsNatureId(order != null ? order.getFkDpsNatureId() : SDataConstantsSys.TRNU_DPS_NAT_DEF);
         dps.setFkCompanyBranchId(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranchId());
         dps.setFkFunctionalAreaId(functionalSubArea.getFkFunctionalAreaId());
         dps.setFkFunctionalSubAreaId(functionalSubArea.getPkFunctionalSubAreaId());
-        dps.setFkBizPartnerId_r(bizPartner.getPkBizPartnerId());
-        dps.setFkBizPartnerBranchId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
-        dps.setFkBizPartnerBranchAddressId(bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
-        //dps.setFkBizPartnerAltId_r(
-        //dps.setFkBizPartnerBranchAltId(
-        //dps.setFkBizPartnerBranchAddressAltId(
-        //dps.setFkBizPartnerAddresseeId_n(
-        //dps.setFkAddresseeBizPartnerId_nr(
-        //dps.setFkAddresseeBizPartnerBranchId_n(
-        //dps.setFkAddresseeBizPartnerBranchAddressId_n(
+        if (order != null) {
+            dps.setFkBizPartnerId_r(order.getFkBizPartnerId_r());
+            dps.setFkBizPartnerBranchId(order.getFkBizPartnerBranchId());
+            dps.setFkBizPartnerBranchAddressId(order.getFkBizPartnerBranchAddressId());
+            dps.setFkBizPartnerAltId_r(order.getFkBizPartnerAltId_r());
+            dps.setFkBizPartnerBranchAltId(order.getFkBizPartnerBranchAltId());
+            dps.setFkBizPartnerBranchAddressAltId(order.getFkBizPartnerBranchAddressAltId());
+            dps.setFkBizPartnerAddresseeId_n(order.getFkBizPartnerAddresseeId_n());
+            dps.setFkAddresseeBizPartnerId_nr(order.getFkAddresseeBizPartnerId_nr());
+            dps.setFkAddresseeBizPartnerBranchId_n(order.getFkAddresseeBizPartnerBranchId_n());
+            dps.setFkAddresseeBizPartnerBranchAddressId_n(order.getFkAddresseeBizPartnerBranchAddressId_n());
+        }
+        else {
+            dps.setFkBizPartnerId_r(bizPartner.getPkBizPartnerId());
+            dps.setFkBizPartnerBranchId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+            dps.setFkBizPartnerBranchAddressId(bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
+            //dps.setFkBizPartnerAltId_r(
+            //dps.setFkBizPartnerBranchAltId(
+            //dps.setFkBizPartnerBranchAddressAltId(
+            //dps.setFkBizPartnerAddresseeId_n(
+            //dps.setFkAddresseeBizPartnerId_nr(
+            //dps.setFkAddresseeBizPartnerBranchId_n(
+            //dps.setFkAddresseeBizPartnerBranchAddressId_n(
+        }
         //dps.setFkContactBizPartnerBranchId_n(
         //dps.setFkContactContactId_n(
         //dps.setFkTaxIdentityEmisorTypeId(
         //dps.setFkTaxIdentityReceptorTypeId(
-        dps.setFkLanguajeId(bizPartner.getDbmsCategorySettingsSup().getFkLanguageId_n());
+        dps.setFkLanguajeId(order != null ? order.getFkLanguajeId() : bizPartner.getDbmsCategorySettingsSup().getFkLanguageId_n());
         dps.setFkCurrencyId(CurrencyId);
         //dps.setFkSalesAgentId_n(
         //dps.setFkSalesAgentBizPartnerId_n(
@@ -1099,74 +1155,77 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = AlreadyDownloaded;
                 break;
             case 9:
-                value = isProcessed();
+                value = isRecorded();
                 break;
             case 10:
-                value = !isProcessed() ? null : ProcessedDps.composeRecord();
+                value = !isRecorded() ? null : ProcessedDps.composeRecord();
                 break;
             case 11:
-                value = !isProcessed() ? false : ProcessedDps.HasCfd;
+                value = !isRecorded() ? false : ProcessedDps.HasCfd;
                 break;
             case 12:
-                value = !isProcessed() ? false : ProcessedDps.HasPdf;
+                value = !isRecorded() ? false : ProcessedDps.HasPdf;
                 break;
             case 13:
-                value = Status;
-                break;
-            case 14:
                 value = FunctionalSubArea;
                 break;
-            case 15:
+            case 14:
                 value = FiscalUseCode;
                 break;
+            case 15:
+                value = ProcessingTypeCode;
+                break;
             case 16:
-                value = getRequiredPaymentAmount();
+                value = Status;
                 break;
             case 17:
-                value = CurrencyCode;
+                value = getRequiredPaymentAmount();
                 break;
             case 18:
-                value = getRequiredPaymentPct();
+                value = CurrencyCode;
                 break;
             case 19:
-                value = RequiredPaymentDate;
+                value = getRequiredPaymentPct();
                 break;
             case 20:
-                value = RequiredPaymentDateNew;
+                value = RequiredPaymentDate;
                 break;
             case 21:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 22:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 23:
-                value = !isPaymentRequested() ? null : Payment.getFolio();
+                value = RequiredPaymentNotes;
                 break;
             case 24:
-                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 25:
-                value = ExternalDocumentId;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 26:
-                value = ExternalDocumentUuid;
+                value = ExternalDocumentId;
                 break;
             case 27:
-                value = !isProcessed() ? null : ProcessedDps.DpsFolio;
+                value = ExternalDocumentUuid;
                 break;
             case 28:
-                value = !isProcessed() ? null : ProcessedDps.DpsDate;
+                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
                 break;
             case 29:
-                value = !isProcessed() ? null : ProcessedDps.DpsTotalCy;
+                value = !isRecorded() ? null : ProcessedDps.DpsDate;
                 break;
             case 30:
-                value = !isProcessed() ? null : ProcessedDps.DpsCurrencyCode;
+                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
                 break;
             case 31:
+                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                break;
+            case 32:
                 String string = null;
-                if (isProcessed()) {
+                if (isRecorded()) {
                     boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
                     boolean isCurrencyOk = CurrencyCode.equals(ProcessedDps.DpsCurrencyCode);
                     
@@ -1405,13 +1464,17 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Total = resultSet.getDouble("d.tot_cur_r");
                 importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
                 importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
-                importedDocument.RequiredPaymentDefinition = PAYMENT_DEFN_NOT_REQ;
+                importedDocument.RequiredPaymentDefinition = PAY_IS_NOT_REQ;
                 importedDocument.RequiredPaymentAmount = 0;
                 importedDocument.RequiredPaymentPct = 0;
                 importedDocument.RequiredPaymentDate = null;
                 importedDocument.RequiredPaymentDateNew = null;
                 importedDocument.IsRequiredPaymentLoc = false;
                 importedDocument.RequiredPaymentNotes = "";
+                importedDocument.RevisionYear = 0;
+                importedDocument.RevisionWeek = 0;
+                importedDocument.ProcessingTypeId = 0;
+                importedDocument.ProcessingTypeCode = "";
                 importedDocument.StatusId = 0;
                 importedDocument.Status = "";
                 importedDocument.Download = false;

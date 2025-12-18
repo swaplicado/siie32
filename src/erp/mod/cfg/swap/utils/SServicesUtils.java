@@ -207,50 +207,59 @@ public abstract class SServicesUtils {
         String responseBody = SExportUtils.requestSwapService(urlQuery, syncSettings.Url, SHttpConsts.METHOD_GET, "", syncSettings.Token, syncSettings.ApiKey, SSwapConsts.TIME_30_SEC);
         JsonNode responseJson = new ObjectMapper().readTree(responseBody);
         
-        if (SAuthJsonUtils.containsElement(responseJson, "", "status")) {
-            authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_SUCC_OK, "");
-            
+        if (responseJson.has("status")) {
             JsonNode status = responseJson.path("status");
-            JsonNode flow = responseJson.path("flow");
-            JsonNode currAction = responseJson.path("current_action");
-            JsonNode currActionStatus = currAction.path("flow_status");
-            JsonNode currActionActionedBy = currAction.path("actioned_by");
-            JsonNode currActionActionedAllActors = currAction.path("all_actors");
-            
-            authFlowStatus.FlowId = flow.get("id").asInt();
-            authFlowStatus.FlowStatusId = status.get("id").asInt();
-            authFlowStatus.FlowStatusCode = status.get("code").asText();
-            authFlowStatus.FlowStatusName = status.get("name").asText();
-            authFlowStatus.FlowPriority = flow.get("priority").asInt();
-            authFlowStatus.FlowNotes = flow.get("notes").asText();
-
-            authFlowStatus.CurrActionId = currAction.get("id").asInt();
-            authFlowStatus.CurrActionSequence = currAction.get("sequence").asInt();
-            authFlowStatus.CurrActionStatusId = currActionStatus.get("id").asInt();
-            authFlowStatus.CurrActionStatusCode = currActionStatus.get("code").asText();
-            authFlowStatus.CurrActionStatusName = currActionStatus.get("name").asText();
-            authFlowStatus.CurrActionNotes = currAction.get("notes").asText();
-            
-            if (!currActionActionedBy.isNull()) {
-                authFlowStatus.CurrActionActionedAt = currAction.get("actioned_at").asText(); // if currActionActionedBy is null, then "actioned_at" is also null
-                authFlowStatus.CurrActionActionedById = currActionActionedBy.get("external_id").asInt();
-                authFlowStatus.CurrActionActionedByName = currActionActionedBy.get("full_name").asText();
+            if (status.isInt() && status.asInt() == SHttpConsts.RSC_ERR_SERVER) {
+                authFlowStatus = new AuthFlowStatus(status.asInt(), responseJson.path("error").asText());
             }
-            else {
-                if (currActionActionedAllActors.isArray()) {
-                    for (JsonNode actor : currActionActionedAllActors) {
-                        authFlowStatus.CurrActionAllActors += (authFlowStatus.CurrActionAllActors.isEmpty() ? "" : "; ") + actor.path("full_name").asText();
+        }
+        
+        if (authFlowStatus == null) {
+            if (SAuthJsonUtils.containsElement(responseJson, "", "status")) {
+                authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_SUCC_OK, "");
+
+                JsonNode status = responseJson.path("status");
+                JsonNode flow = responseJson.path("flow");
+                JsonNode currAction = responseJson.path("current_action");
+                JsonNode currActionStatus = currAction.path("flow_status");
+                JsonNode currActionActionedBy = currAction.path("actioned_by");
+                JsonNode currActionActionedAllActors = currAction.path("all_actors");
+
+                authFlowStatus.FlowId = flow.get("id").asInt();
+                authFlowStatus.FlowStatusId = status.get("id").asInt();
+                authFlowStatus.FlowStatusCode = status.get("code").asText();
+                authFlowStatus.FlowStatusName = status.get("name").asText();
+                authFlowStatus.FlowPriority = flow.get("priority").asInt();
+                authFlowStatus.FlowNotes = flow.get("notes").asText();
+
+                authFlowStatus.CurrActionId = currAction.get("id").asInt();
+                authFlowStatus.CurrActionSequence = currAction.get("sequence").asInt();
+                authFlowStatus.CurrActionStatusId = currActionStatus.get("id").asInt();
+                authFlowStatus.CurrActionStatusCode = currActionStatus.get("code").asText();
+                authFlowStatus.CurrActionStatusName = currActionStatus.get("name").asText();
+                authFlowStatus.CurrActionNotes = currAction.get("notes").asText();
+
+                if (!currActionActionedBy.isNull()) {
+                    authFlowStatus.CurrActionActionedAt = currAction.get("actioned_at").asText(); // if currActionActionedBy is null, then "actioned_at" is also null
+                    authFlowStatus.CurrActionActionedById = currActionActionedBy.get("external_id").asInt();
+                    authFlowStatus.CurrActionActionedByName = currActionActionedBy.get("full_name").asText();
+                }
+                else {
+                    if (currActionActionedAllActors.isArray()) {
+                        for (JsonNode actor : currActionActionedAllActors) {
+                            authFlowStatus.CurrActionAllActors += (authFlowStatus.CurrActionAllActors.isEmpty() ? "" : "; ") + actor.path("full_name").asText();
+                        }
                     }
                 }
             }
-        }
-        else if (SAuthJsonUtils.containsElement(responseJson, "", "status_code")) {
-            int code = responseJson.path("status_code").asInt();
-            JsonNode errors = responseJson.path("errors");
-            JsonNode messages = errors.path("siie_resource_id");
-            String message = messages.get(0).asText();
-            
-            authFlowStatus = new AuthFlowStatus(code, message);
+            else if (SAuthJsonUtils.containsElement(responseJson, "", "status_code")) {
+                int code = responseJson.path("status_code").asInt();
+                JsonNode errors = responseJson.path("errors");
+                JsonNode messages = errors.path("siie_resource_id");
+                String message = messages.get(0).asText();
+
+                authFlowStatus = new AuthFlowStatus(code, message);
+            }
         }
         
         return authFlowStatus;
@@ -379,6 +388,11 @@ public abstract class SServicesUtils {
                 }
                 
                 string += ".";
+            }
+            else {
+                string += "RESPUESTA DE CONSULTA DEL FLUJO DE AUTORIZACIÓN:\n"
+                        + "- Mensaje: " + ResponseMessage + "\n"
+                        + "- Código: " + ResponseCode + "";
             }
             
             return string;
