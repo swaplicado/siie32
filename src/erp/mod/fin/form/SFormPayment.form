@@ -188,7 +188,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyBeneficiary">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[250, 23]"/>
+                          <Dimension value="[300, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -230,7 +230,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_look.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Buscar documento por serie y folio"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Buscar documento por serie y folio..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -256,7 +256,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyFunctionalArea">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[250, 23]"/>
+                          <Dimension value="[300, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -268,6 +268,17 @@
                     <Property name="alignment" type="int" value="0"/>
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JCheckBox" name="jchkIsSystem">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Registro de sistema"/>
+                        <Property name="enabled" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[135, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
                 </Container>
               </SubComponents>
             </Container>
@@ -325,12 +336,12 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurPaymentCy">
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbRetrieveDpsBalance">
+                    <Component class="javax.swing.JButton" name="jbSetDpsBalanceNetCur">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_wizard.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Agregar saldo insoluto"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Copiar saldo neto"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -454,15 +465,6 @@
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[25, 23]"/>
-                        </Property>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JCheckBox" name="jchkIsSystem">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Registro de sistema"/>
-                        <Property name="enabled" type="boolean" value="false"/>
-                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[135, 23]"/>
                         </Property>
                       </Properties>
                     </Component>

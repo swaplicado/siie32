@@ -94,13 +94,15 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanel10 = new javax.swing.JPanel();
         jlPriority = new javax.swing.JLabel();
         moKeyPriority = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel11 = new javax.swing.JPanel();
         jchkIsSystem = new javax.swing.JCheckBox();
-        jPanelN2 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
+        jPanelN2 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
         jlNotesHint = new javax.swing.JLabel();
-        jPanel11 = new javax.swing.JPanel();
+        jPanel22 = new javax.swing.JPanel();
         jlNotesAuthorization = new javax.swing.JLabel();
         moTextNotesAuthorization = new sa.lib.gui.bean.SBeanFieldText();
         jlNotesAuthorizationHint = new javax.swing.JLabel();
@@ -213,52 +215,59 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moKeyPriority.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(moKeyPriority);
 
+        jPanelN1.add(jPanel10);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jchkIsSystem.setText("Registro de sistema");
         jchkIsSystem.setEnabled(false);
         jchkIsSystem.setPreferredSize(new java.awt.Dimension(135, 23));
-        jPanel10.add(jchkIsSystem);
+        jPanel11.add(jchkIsSystem);
 
-        jPanelN1.add(jPanel10);
+        jPanelN1.add(jPanel11);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanelN1.add(jPanel12);
 
         jPayment.add(jPanelN1, java.awt.BorderLayout.CENTER);
 
         jPanelN2.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setForeground(new java.awt.Color(0, 102, 102));
         jlNotes.setText("Intrucciones de pago:");
         jlNotes.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel12.add(jlNotes);
+        jPanel21.add(jlNotes);
 
         moTextNotes.setPreferredSize(new java.awt.Dimension(580, 23));
-        jPanel12.add(moTextNotes);
+        jPanel21.add(moTextNotes);
 
         jlNotesHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlNotesHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlNotesHint.setToolTipText("Indicaciones para la correcta realización del pago");
         jlNotesHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel12.add(jlNotesHint);
+        jPanel21.add(jlNotesHint);
 
-        jPanelN2.add(jPanel12);
+        jPanelN2.add(jPanel21);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotesAuthorization.setForeground(new java.awt.Color(0, 102, 102));
         jlNotesAuthorization.setText("Notas para autorización:");
         jlNotesAuthorization.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel11.add(jlNotesAuthorization);
+        jPanel22.add(jlNotesAuthorization);
 
         moTextNotesAuthorization.setPreferredSize(new java.awt.Dimension(680, 23));
-        jPanel11.add(moTextNotesAuthorization);
+        jPanel22.add(moTextNotesAuthorization);
 
         jlNotesAuthorizationHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlNotesAuthorizationHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlNotesAuthorizationHint.setToolTipText("Comentarios a considerar en la autorización del pago");
         jlNotesAuthorizationHint.setPreferredSize(new java.awt.Dimension(15, 23));
-        jPanel11.add(jlNotesAuthorizationHint);
+        jPanel22.add(jlNotesAuthorizationHint);
 
-        jPanelN2.add(jPanel11);
+        jPanelN2.add(jPanel22);
 
         jPayment.add(jPanelN2, java.awt.BorderLayout.SOUTH);
 
@@ -287,6 +296,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;

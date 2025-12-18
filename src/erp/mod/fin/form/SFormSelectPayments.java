@@ -135,10 +135,10 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario", 250));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio doc"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Folio pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario pago", 250));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha programada pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Documento pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto a pagar $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado");
@@ -191,7 +191,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
                     "p.fk_func, p.fk_func_sub, " +
                     "p.fk_ben, " +
                     "p.nts, " +
-                    "p.dt_req, " +
+                    "p.dt_sched_n, " +
                     "pe.install, " +
                     "pe.doc_bal_prev_app_cur, " +
                     "pe.doc_bal_unpd_app_cur_r, " +
@@ -207,7 +207,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
                     "AND p.fk_cur = " + mnCurPayment + " AND pe.fk_ety_cur = " + mnCurDoc + " " + 
                     "AND pe.ety_tp = '" + entryTp + "' " +
                     where + " " + 
-                    "ORDER BY b.bp, p.dt_req, d.num_ser, d.num, p.ser, p.num";
+                    "ORDER BY b.bp, p.dt_sched_n, d.num_ser, d.num, p.ser, p.num";
             try (ResultSet resultSet = statement.executeQuery(sql)) {
                 while (resultSet.next()) {
                     SRowPayments row = new SRowPayments();
@@ -224,7 +224,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
                     row.setFuncSubarea(resultSet.getInt("p.fk_func_sub"));
                     row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
                     row.setNotes(resultSet.getString("p.nts"));
-                    row.setDate(resultSet.getDate("p.dt_req"));
+                    row.setDateScheduled(resultSet.getDate("p.dt_sched_n"));
                     row.setInstallment(resultSet.getInt("pe.install"));
                     row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));
                     row.setDocBalanceUnpayAppCy(resultSet.getInt("pe.doc_bal_unpd_app_cur_r"));
@@ -264,7 +264,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
     }
     
     private void actionLayoutDate() {
-        readPayments("AND p.dt_req = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        readPayments("AND p.dt_sched_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
         jbLayoutDate.setEnabled(false);
         jbLayoutDateUntil.setEnabled(false);
         jbLayoutDateAll.setEnabled(false);
@@ -275,7 +275,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
     }
 
     private void actionLayoutDateUntill() {
-        readPayments("AND p.dt_req <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        readPayments("AND p.dt_sched_n <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
         jbLayoutDate.setEnabled(false);
         jbLayoutDateUntil.setEnabled(false);
         jbLayoutDateAll.setEnabled(false);

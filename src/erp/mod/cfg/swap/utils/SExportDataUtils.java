@@ -626,6 +626,7 @@ public abstract class SExportDataUtils {
     @Deprecated
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
+        int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String database = "erp_aeth";
@@ -824,6 +825,7 @@ public abstract class SExportDataUtils {
                 
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
+                    user.companies = companies;
                     users.add(user);
                 }
             }
@@ -841,6 +843,7 @@ public abstract class SExportDataUtils {
      */
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
+        int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(b.id_bp, CHAR)";
@@ -869,6 +872,7 @@ public abstract class SExportDataUtils {
                 
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
+                    user.companies = companies;
                     users.add(user);
                 }
             }
@@ -1848,14 +1852,14 @@ public abstract class SExportDataUtils {
 
                                 String sql = "SELECT "
                                         + "t.id_tic, s.code, t.num, t.dt, i.name, t.qty, u.code, t.drv, t.pla, t.pla_cag, t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
-                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct = " + somSettings.InputCategoryId + ") AS _is_active "
+                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active "
                                         + "FROM s_tic AS t "
                                         + "INNER JOIN su_sca AS s ON s.id_sca = t.fk_sca "
                                         + "INNER JOIN su_item AS i ON i.id_item = t.fk_item "
                                         + "INNER JOIN su_unit AS u ON u.id_unit = t.fk_unit "
                                         + "LEFT OUTER JOIN su_freight_orig AS f ON f.id_freight_orig = t.fk_freight_orig_n "
                                         + "WHERE ("
-                                        + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct = " + somSettings.InputCategoryId + ") "
+                                        + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) "
                                         + "AND " + referenceId + " NOT IN (" + syncedRegistries + "))"
                                         + (lastSyncDatetime == null ? "" : " OR ("
                                         + "t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")

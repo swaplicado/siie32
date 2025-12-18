@@ -6,7 +6,9 @@
 package erp.mod.cfg.swap;
 
 import erp.mod.SModSysConsts;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Collectors;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -123,14 +125,14 @@ public abstract class SSwapUtils {
         public String DbmsUser;
         public String DbmsPswd;
         public Date Start;
-        public int InputCategoryId;
+        public int[] InputCategoryIds;
         public int FunctionalSubAreaId;
         public String CfdiUsage;
         public int OwnerUserId;
         
         /**
          * Create a new SOM Settings instance.
-         * @param configParamValue Configuration parameter value in format: link-up=0; host=host; port=port; db=db; user=user; pswd=pswd; start=yyyy-mm-dd; inp_ct:1=func_sub:1,usage:S01,owner:1
+         * @param configParamValue Configuration parameter value in format: link-up=0; host=host; port=port; db=db; user=user; pswd=pswd; start=yyyy-mm-dd; inp_ct:1,2,3=func_sub:1,usage:S01,owner:1
          * @throws java.lang.Exception
          */
         public SomSettings(final String configParamValue) throws Exception {
@@ -200,7 +202,8 @@ public abstract class SSwapUtils {
                             config = "inp_ct";
                             if (isValid = key.startsWith(config)) {
                                 keyValuePair = key.split(":");
-                                InputCategoryId = SLibUtils.parseInt(keyValuePair[1]);
+                                String[] ids = keyValuePair[1].split(",");
+                                InputCategoryIds = Arrays.stream(ids).mapToInt(Integer::parseInt).toArray();
 
                                 String[] valuesInpCt = value.split(",");
 
@@ -264,10 +267,14 @@ public abstract class SSwapUtils {
             DbmsUser = "";
             DbmsPswd = "";
             Start = null;
-            InputCategoryId = 0;
+            InputCategoryIds = null;
             FunctionalSubAreaId = 0;
             CfdiUsage = "";
             OwnerUserId = 0;
+        }
+        
+        public String getInputCategoryIdsAsText() {
+            return Arrays.stream(InputCategoryIds).mapToObj(String::valueOf).collect(Collectors.joining(", "));
         }
     }
 }

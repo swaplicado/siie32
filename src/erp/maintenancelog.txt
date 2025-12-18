@@ -1,4 +1,25 @@
 ================================================================================
+SIIE 3.2 294.3/ 2025-12-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Recepción de fecha y semana de revisión y de tipo de procesamiento en la importación de facturas desde SWAP Services.
+2) Habilitación de filtro de facturas contabilizadas en la importación de facturas desde SWAP Services.
+3) Habilitación de mensaje de bitácora de autorización de solicitudes de pago cuando el pago no existe en SWAP Services (HTTP internal server error, code 500).
+4) Incorporación de validación de RFC genérico, XEXX010101, para asociados de negocios del extranjero.
+5) Cambio de filtro de fecha para tomar la programada en búsqueda de solicitudes de pago en layouts bancarios.
+6) Corrección para preservar sucursal del proveedor en la importación o creación de facturas importadas desde SWAP Services.
+7) Habilitación de exportación de boletos de báscula a SWAP Services de múltiples categorías de insumo.
+
+================================================================================
+SIIE 3.2 294.2/ 2025-12-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de permiso de usuario para vincular facturas autorizadas en SWAP Services con facturas de total mayor.
+2) Mejora al manejo de facturas con pagos en proceso al momento de crearles solicitudes de pago adicionales.
+3) Refactorización de la obtención del saldo de documentos incluyendo pagos en proceso.
+4) Inclusión de lista de empresas del ERP en la exportación de proveedores a SWAP Services.
+
+================================================================================
 SIIE 3.2 294.1/ 2025-12-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

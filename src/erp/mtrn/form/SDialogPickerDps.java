@@ -38,8 +38,6 @@ import javax.swing.JTextField;
  */
 public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
     
-    public static final int COL_INS_VALUE = 12;
-
     private erp.client.SClientInterface miClient;
     private int mnOptionType;
     private int mnFormResult;
@@ -257,8 +255,8 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo $", STableConstants.WIDTH_VALUE);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo mon $", STableConstants.WIDTH_VALUE);
-                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Pagos en proceso $", STableConstants.WIDTH_VALUE);
-                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo insoluto $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Pagos en proceso mon $", STableConstants.WIDTH_VALUE);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Saldo neto mon $", STableConstants.WIDTH_VALUE);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
                 break;
 
@@ -631,12 +629,6 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         }
 
         return pk;
-    }
-    
-    public Object getValue(int opc) {
-        Object value;
-        value = moPaneOptions.getSelectedTableRow().getValues().get(opc);
-        return value;
     }
 
     @Override
