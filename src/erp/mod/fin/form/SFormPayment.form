@@ -187,6 +187,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyBeneficiary">
                       <Properties>
+                        <Property name="maximumRowCount" type="int" value="16"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
                         </Property>
@@ -255,6 +256,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyFunctionalArea">
                       <Properties>
+                        <Property name="maximumRowCount" type="int" value="12"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
                         </Property>

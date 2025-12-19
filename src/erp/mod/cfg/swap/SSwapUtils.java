@@ -6,6 +6,7 @@
 package erp.mod.cfg.swap;
 
 import erp.mod.SModSysConsts;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ import sa.lib.SLibUtils;
  * @author Sergio Flores
  */
 public abstract class SSwapUtils {
+    
+    public static final SimpleDateFormat SwapDatetimeMicrosecsTimeZoneFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
     
     public static String translateSyncType(final SSyncType syncType, final String languageIso639) {
         String translation = "";

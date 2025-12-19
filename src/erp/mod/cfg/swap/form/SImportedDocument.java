@@ -130,6 +130,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public String RequiredPaymentNotes;
     public int RevisionYear;
     public int RevisionWeek;
+    public Date RevisionDatetime;
     public int ProcessingTypeId;
     public String ProcessingTypeCode;
     public int StatusId;
@@ -169,6 +170,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         RequiredPaymentNotes = "";
         RevisionYear = 0;
         RevisionWeek = 0;
+        RevisionDatetime = null;
         ProcessingTypeId = 0;
         ProcessingTypeCode = "";
         StatusId = 0;
@@ -189,6 +191,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     public String getFolio() {
         return SDocumentUtils.composeFolio(NumberSeries, Number, ExternalDocumentUuid);
+    }
+    
+    /**
+     * Get revision year and week in format yyyy-ww.
+     * @return 
+     */
+    public String getRevisionYearWeek() {
+        return SLibUtils.DecimalFormatCalendarYear.format(RevisionYear) + "-" + SLibUtils.DecimalFormatCalendarWeek.format(RevisionWeek);
     }
 
     /**
@@ -1121,6 +1131,52 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         return dps;
     }
+
+    @Override
+    public int[] getRowPrimaryKey() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getRowCode() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getRowName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isRowSystem() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isRowDeletable() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isRowEdited() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setRowEdited(boolean edited) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setRowValueAt(Object value, int col) {
+        switch (col) {
+            case 7:
+                Download = (Boolean) value;
+                break;
+            default:
+                // nothing
+        }
+    }
     
     @Override
     public Object getRowValueAt(int col) {
@@ -1176,54 +1232,57 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = ProcessingTypeCode;
                 break;
             case 16:
-                value = Status;
+                value = getRevisionYearWeek();
                 break;
             case 17:
-                value = getRequiredPaymentAmount();
+                value = RevisionDatetime;
                 break;
             case 18:
-                value = CurrencyCode;
+                value = getRequiredPaymentAmount();
                 break;
             case 19:
-                value = getRequiredPaymentPct();
+                value = CurrencyCode;
                 break;
             case 20:
-                value = RequiredPaymentDate;
+                value = getRequiredPaymentPct();
                 break;
             case 21:
-                value = RequiredPaymentDateNew;
+                value = RequiredPaymentDate;
                 break;
             case 22:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 23:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 24:
-                value = !isPaymentRequested() ? null : Payment.getFolio();
+                value = RequiredPaymentNotes;
                 break;
             case 25:
-                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 26:
-                value = ExternalDocumentId;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 27:
-                value = ExternalDocumentUuid;
+                value = ExternalDocumentId;
                 break;
             case 28:
-                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
+                value = ExternalDocumentUuid;
                 break;
             case 29:
-                value = !isRecorded() ? null : ProcessedDps.DpsDate;
+                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
                 break;
             case 30:
-                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
+                value = !isRecorded() ? null : ProcessedDps.DpsDate;
                 break;
             case 31:
-                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
                 break;
             case 32:
+                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                break;
+            case 33:
                 String string = null;
                 if (isRecorded()) {
                     boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
@@ -1251,14 +1310,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
 
     @Override
-    public void setRowValueAt(Object value, int col) {
-        switch (col) {
-            case 7:
-                Download = (Boolean) value;
-                break;
-            default:
-                // nothing
-        }
+    public int compareTo(SImportedDocument o) {
+        return this.toString().compareTo(o.toString());
     }
     
     @Override
@@ -1270,46 +1323,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 + (!FunctionalSubArea.isEmpty() ? "; Subárea funcional: " + FunctionalSubArea : "") // may not be available
                 + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
                 + ".";
-    }
-
-    @Override
-    public int compareTo(SImportedDocument o) {
-        return this.toString().compareTo(o.toString());
-    }
-
-    @Override
-    public int[] getRowPrimaryKey() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public String getRowCode() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public String getRowName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean isRowSystem() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean isRowDeletable() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean isRowEdited() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void setRowEdited(boolean edited) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     /**
@@ -1473,6 +1486,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.RequiredPaymentNotes = "";
                 importedDocument.RevisionYear = 0;
                 importedDocument.RevisionWeek = 0;
+                importedDocument.RevisionDatetime = null;
                 importedDocument.ProcessingTypeId = 0;
                 importedDocument.ProcessingTypeCode = "";
                 importedDocument.StatusId = 0;

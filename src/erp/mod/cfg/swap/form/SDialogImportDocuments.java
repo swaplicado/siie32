@@ -55,10 +55,12 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -71,6 +73,7 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiField;
 import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
@@ -92,8 +95,11 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
-    protected static final int MODE_OFF = 0;
-    protected static final int MODE_ON = 1;
+    protected static final int OFF = 0;
+    protected static final int ON = 1;
+    protected static final int LIMIT_DAYS = 31; // 1 calendar month
+    protected static final int LIMIT_WEEKS = 4; // 1 lunar month
+    protected static final int LIMIT_DOWNLOADS = 250; // 0.25 k documents
     
     protected String msCompanyName;
     protected int mnSearchMode;
@@ -102,7 +108,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected ArrayList<SImportedDocument> maDocuments;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
     protected String msUserFunctionalSubAreasCodes;
-    protected String msSyncUrlRetrieve;
+    protected String msSyncUrlRetrieveByPeriod;
+    protected String msSyncUrlRetrieveByWeek;
     protected String msSyncUrlDownload;
     protected String msSyncToken;
     protected String msSyncApiKey;
@@ -879,7 +886,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_PURCHASE)));
         
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
-        mnSearchMode = MODE_OFF;
+        mnSearchMode = OFF;
         
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
             @Override
@@ -910,21 +917,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Caso factura")); // col 15
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus factura"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Semana revisión factura", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha-hora revisión factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago")); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
                 
@@ -976,7 +984,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
             
-            msSyncUrlRetrieve = "";
+            msSyncUrlRetrieveByPeriod = "";
+            msSyncUrlRetrieveByWeek = "";
             msSyncToken = "";
             msSyncApiKey = "";
             mnSyncLimit = 0;
@@ -998,7 +1007,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
             
             // documents retreival service: /api/documents/filter-by-date-and-type/?start_date=<start_date>&end_date=<end_date>&document_type=<document_type>; date format: yyyy-mm-dd; document type format: 0 (raw integer)
-            msSyncUrlRetrieve = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByPeriod = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByWeek = msSyncUrlRetrieveByPeriod.substring(0, msSyncUrlRetrieveByPeriod.indexOf("?") + 1);
             
             // documents download service: /api/documents/download-docs-zip/
             msSyncUrlDownload = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC_DWNLD, SSwapConsts.CFG_ATT_URL); // complementar la URL
@@ -1033,7 +1043,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void enableFieldsOfSearchBy() {
-        boolean isSearchModeOff = mnSearchMode == MODE_OFF;
+        boolean isSearchModeOff = mnSearchMode == OFF;
         
         boolean isSearchByPeriod = moRadSearchByPeriod.isSelected();
         moDatePeriodStart.setEditable(isSearchModeOff && isSearchByPeriod);
@@ -1046,7 +1056,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void enableFieldsOfDocMode() {
-        boolean isSearchModeOn = mnSearchMode == MODE_ON;
+        boolean isSearchModeOn = mnSearchMode == ON;
         
         boolean isDocModeType = moRadDocModeType.isSelected();
         moKeyDocModeType.setEditable(isSearchModeOn && isDocModeType);
@@ -1056,7 +1066,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void enableFieldsForSearch(final boolean enableSearchModeOn) {
-        mnSearchMode = enableSearchModeOn ? MODE_ON : MODE_OFF;
+        mnSearchMode = enableSearchModeOn ? ON : OFF;
         
         // START OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
         
@@ -1068,7 +1078,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         // END OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
         
         moRadSearchByPeriod.setEnabled(!enableSearchModeOn);
-        moRadSearchByWeek.setEnabled(false/*!enableSearchModeOn*/);
+        moRadSearchByWeek.setEnabled(!enableSearchModeOn);
         enableFieldsOfSearchBy();
         
         moRadDocModeType.setEnabled(enableSearchModeOn);
@@ -1179,7 +1189,38 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void actionPerformedShowDocs() {
-        SGuiValidation validation = SGuiUtils.validateDateRange(moDatePeriodStart, moDatePeriodEnd);
+        SGuiValidation validation = null;
+        String capacityLimit = "Por eficiencia en el procesamiento de su petición, la consulta está restringida máximo a ";
+        
+        if (moRadSearchByPeriod.isSelected()) {
+            validation = SGuiUtils.validateDateRange(moDatePeriodStart, moDatePeriodEnd);
+            
+            if (validation.isValid()) {
+                if (SLibTimeUtils.countPeriodDays(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) > LIMIT_DAYS) {
+                    validation.setMessage(capacityLimit + LIMIT_DAYS + " días.");
+                    validation.setComponent(moDatePeriodStart.getComponent());
+                }
+            }
+        }
+        else if (moRadSearchByWeek.isSelected()) {
+            for (SGuiField field : new SGuiField[] { moCalWeekYear, moCalWeekStart, moCalWeekEnd }) {
+                validation = field.validateField();
+                if (!validation.isValid()) {
+                    break;
+                }
+            }
+            
+            if (validation.isValid()) {
+                if (moCalWeekStart.getValue() > moCalWeekEnd.getValue()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moCalWeekStart.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + moCalWeekEnd.getFieldName() + "'.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+                else if (moCalWeekEnd.getValue() - moCalWeekStart.getValue() + 1 > LIMIT_WEEKS) {
+                    validation.setMessage(capacityLimit + LIMIT_WEEKS + " semanas.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+            }
+        }
         
         if (SGuiUtils.computeValidation(miClient, validation)) {
             try {
@@ -1191,11 +1232,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 int companyId = miClient.getSession().getConfigCompany().getCompanyId();
                 
                 String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-                String urlQuery = msSyncUrlRetrieve;
+                String urlQuery = "";
                 
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                if (moRadSearchByPeriod.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByPeriod;
+
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                }
+                else if (moRadSearchByWeek.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByWeek
+                            + "year_revision=" + moCalWeekYear.getValue()
+                            + "&week_revision_start=" + moCalWeekStart.getValue()
+                            + "&week_revision_end=" + moCalWeekEnd.getValue()
+                            + "&document_type=" + SSwapConsts.TXN_DOC_TYPE_INVOICE;
+                }
                 
                 urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
 
@@ -1309,8 +1361,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                         int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
                                         double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
                                         double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
-                                        String requiredPaymentDateAsText = docNode.get("payment_date").asText();
-                                        Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
+                                        String requiredPaymentDateAsText = docNode.has("payment_date") ? docNode.get("payment_date").asText() : "";
+                                        Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
 
                                         if (requiredPaymentDate == null && requiredPaymentPct == 0) {
                                             document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;
@@ -1328,12 +1380,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                             document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
                                             document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
                                         }
+                                        
+                                        if (document.ExternalDocumentId == 4246) {
+                                            System.out.println("El 4246");
+                                        }
 
-                                        String revisionDateAsText = docNode.has("date_week_revision") && !docNode.path("date_week_revision").isNull() ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
-                                        Date revisionDate = revisionDateAsText == null || revisionDateAsText.isEmpty() || revisionDateAsText.equals("null") ? document.Date : SLibUtils.IsoFormatDate.parse(revisionDateAsText);
-
-                                        document.RevisionYear = SLibTimeUtils.digestYear(revisionDate)[0];
+                                        String revisionDatetimeAsText = docNode.has("date_week_revision") ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
+                                        Date revisionDatetime = docNode.path("date_week_revision").isNull() || revisionDatetimeAsText == null || revisionDatetimeAsText.isEmpty() || revisionDatetimeAsText.equals("null") ? null : SSwapUtils.SwapDatetimeMicrosecsTimeZoneFormat.parse(revisionDatetimeAsText.replaceFirst("(\\.\\d{3})\\d+", "$1")); // trunc microsecontds to milliseconds
+                                        
+                                        document.RevisionYear = docNode.get("year_week_revision").asInt();
                                         document.RevisionWeek = docNode.get("number_week_revision").asInt();
+                                        document.RevisionDatetime = revisionDatetime;
                                         document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
                                         document.ProcessingTypeCode = SImportedDocument.ProcTypes.get(document.ProcessingTypeId);
                                         document.StatusId = 0;
@@ -1354,12 +1411,24 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         }
                     }
                     
+                    String range = "";
+                    
+                    if (moRadSearchByPeriod.isSelected()) {
+                        range = (SLibTimeUtils.isSameDate(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) ?
+                                ("Día:\n- " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue())) :
+                                ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDatePeriodEnd.getValue())));
+                    }
+                    else if (moRadSearchByWeek.isSelected()) {
+                        range = "Año:\n- " + moCalWeekYear.getValue() + "\n" +
+                                (Objects.equals(moCalWeekStart.getValue(), moCalWeekEnd.getValue()) ?
+                                ("Semana:\n- " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue())) :
+                                ("Semana:\n- de la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue()) + " a la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekEnd.getValue())));
+                    }
+                    
                     String message = "Resumen de la búsqueda de facturas autorizadas en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
                             + "Empresa actual:\n- " + msCompanyName + ".\n"
                             + "Subáreas funcionales del usuario actual:\n- " + msUserFunctionalSubAreasCodes + ".\n"
-                            + (SLibTimeUtils.isSameDate(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) ?
-                            ("Día:\n- " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue())) :
-                            ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDatePeriodEnd.getValue()))) + ".\n\n";
+                            + range + ".\n\n";
                     
                     message += "Búsqueda de facturas autorizadas:\n";
                     
@@ -1406,8 +1475,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
             enableFieldsForSearch(false);
 
-            moDatePeriodStart.getComponent().requestFocusInWindow();
             jlStatus.setText("");
+            
+            if (moRadSearchByPeriod.isSelected()) {
+                moDatePeriodStart.getComponent().requestFocusInWindow();
+            }
+            else if (moRadSearchByWeek.isSelected()) {
+                ((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField().requestFocusInWindow();
+            }
         }
         catch (Exception e) {
             System.err.println(e);
@@ -1464,6 +1539,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         if (documents.isEmpty()) {
             miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga.");
+        }
+        else if (documents.size() > LIMIT_DOWNLOADS && miClient.showMsgBoxConfirm("Se recomienda descargar los archivos en bloques no mayores a " + LIMIT_DOWNLOADS + " facturas autorizadas.\n"
+                + "Sin embargo, puede intentar descargar las " + documents.size() + " facturas autorizadas seleccionadas.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+            miClient.showMsgBoxWarning("Se sugiere seleccionar hasta " + LIMIT_DOWNLOADS + " facturas autorizadas para realizar la descarga.");
         }
         else {
             try {

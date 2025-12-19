@@ -26,7 +26,7 @@ import javax.swing.AbstractAction;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormUnitType extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -96,6 +96,7 @@ public class SFormUnitType extends javax.swing.JDialog implements erp.lib.form.S
         jtfUnitType.setText("TEXT");
         jPanel3.add(jtfUnitType);
 
+        jlUnitBase.setForeground(new java.awt.Color(0, 102, 102));
         jlUnitBase.setText("Unidad base: *");
         jPanel3.add(jlUnitBase);
 

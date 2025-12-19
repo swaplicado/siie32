@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 294.4/ 2025-12-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de obtención de facturas autorizadas desde SWAP Services por semana de revisión.
+2) Adición de advertencias para obtención o descarga de facturas autorizadas desde SWAP Services para períodos extensos o muchos documentos.
+3) Ajuste a validación de pagos en proceso en la creación de nuevas solicitudes de pago.
+
+================================================================================
 SIIE 3.2 294.3/ 2025-12-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -2353,8 +2353,10 @@ public abstract class SDataReadTableRows {
                         "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
                         "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
                         "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
+                        /*
                         "   " + SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
                         "   " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
+                        */
                         "   " + SModSysConsts.FINS_ST_PAY_BLOC + ", " + 
                         "   " + SModSysConsts.FINS_ST_PAY_BLOC_P + ") " +
                         "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +

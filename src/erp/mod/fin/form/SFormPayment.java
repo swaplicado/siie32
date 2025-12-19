@@ -209,6 +209,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlBeneficiary.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPayWestRow4.add(jlBeneficiary);
 
+        moKeyBeneficiary.setMaximumRowCount(16);
         moKeyBeneficiary.setPreferredSize(new java.awt.Dimension(300, 23));
         jpPayWestRow4.add(moKeyBeneficiary);
 
@@ -241,6 +242,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jlFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
         jpPayWestRow6.add(jlFunctionalArea);
 
+        moKeyFunctionalArea.setMaximumRowCount(12);
         moKeyFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
         jpPayWestRow6.add(moKeyFunctionalArea);
 
@@ -662,8 +664,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
                 "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
                 "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
+                /*
                 "   " + SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
                 "   " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
+                */
                 "   " + SModSysConsts.FINS_ST_PAY_BLOC + ", " + 
                 "   " + SModSysConsts.FINS_ST_PAY_BLOC_P + ") " +
                 "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
