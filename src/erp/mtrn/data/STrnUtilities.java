@@ -2391,7 +2391,7 @@ public abstract class STrnUtilities {
                 SMailSender sender = null;
                 Map<String, String> images = null;
                 Date sentDate = null;
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, images, sentDate);
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc, sender, images, sentDate, false);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -3913,7 +3913,8 @@ public abstract class STrnUtilities {
                                 final ArrayList<String> requestedRecipientsBcc, 
                                 SMailSender senderReceived,
                                 final Map<String, String> imagesMap,
-                                final Date sentDate) throws Exception {
+                                final Date sentDate, 
+                                final boolean isEdited) throws Exception {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         SDbMms mms = getMms(client, mmsType);
@@ -3962,7 +3963,18 @@ public abstract class STrnUtilities {
                     else {
                         sender = senderReceived;
                     }
-                    String subject = mms.getTextSubject() + (subjectComplement != null && !subjectComplement.isEmpty() ? " " + SLibUtils.textTrim(subjectComplement) : "");
+                    String mmSubject = mms.getTextSubject();
+                    String subject = mmSubject != null ? mmSubject : "";
+
+                    if (mmSubject != null && mmSubject.toLowerCase().contains("contrato") && isEdited) {
+                        subject = mmSubject + " MODIFICADO";
+                    }
+                    
+                    if (subjectComplement != null && !subjectComplement.isEmpty()) {
+                        subject += " " + SLibUtils.textTrim(subjectComplement);
+                    }
+                    mms.setTextSubject(subject);
+
                     SMail oMail = null;
                     if (imagesMap != null && !imagesMap.isEmpty()) {
                         oMail = new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc);
