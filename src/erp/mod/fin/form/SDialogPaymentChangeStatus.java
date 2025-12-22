@@ -364,25 +364,25 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
     public void setFormCase(int formCase) throws Exception {
         switch (formCase) {
-            case CASE_REACTIVATE:
+            case CASE_REACTIVATE: // payment is rejected
                 setTitle("Cambio de fecha requerida");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha requerida:*"); // to get a new date
                 break;
                 
-            case CASE_RESCHEDULE:
+            case CASE_RESCHEDULE: // payment is scheduled
                 setTitle("Cambio de fecha programada");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha programada:*"); // to get a new date
                 break;
                 
-            case CASE_CHANGE_CURRENCY:
+            case CASE_CHANGE_CURRENCY: // payment is scheduled
                 setTitle("Cambio de moneda de pago");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha programada:*"); // to get a new date
                 break;
                 
-            case CASE_MARK_AS_PAID:
+            case CASE_MARK_AS_PAID: // payment is scheduled
                 setTitle("Marcar como pagado");
                 jlPaymentCy.setText("Monto pagado:"); // to show amount
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
@@ -488,7 +488,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDateNewDate.setEditable(!changingCurrency);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
         moKeyPriority.setEditable(reactivating);
-        moTextNotes.setEditable(reactivating);
+        moTextNotes.setEditable(reactivating || rescheduling);
         moTextNotesAuthorization.setEditable(reactivating);
         
         addAllListeners();
