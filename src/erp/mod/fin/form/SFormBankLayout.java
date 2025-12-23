@@ -62,7 +62,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
@@ -110,8 +109,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int MAX_MISSING_CFD = 8;
     
     //private JCheckBox jckShowOnlyDocsDateDue;
-    private SBeanFieldBoolean jckShowOnlyDocsDateDue;
-    private JCheckBox jckShowOnlyBenefsWithAccounts;
+    private SBeanFieldBoolean moBoolShowOnlyDocsDueDate;
+    private SBeanFieldBoolean moBoolShowOnlyBenefsWithAccounts;
     private JButton jbExchangeRateReset;
     private JButton jbExchangeRateRefresh;
     private JButton jbGridRowsCheckAll;
@@ -703,12 +702,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Subtipo de forma: " + mnFormSubtype + ")");
         }
 
-        jckShowOnlyDocsDateDue = new SBeanFieldBoolean();
-        jckShowOnlyDocsDateDue.setText("Solo documentos del vecimiento");
-        jckShowOnlyDocsDateDue.setPreferredSize(new Dimension(200, 23));
+        moBoolShowOnlyDocsDueDate = new SBeanFieldBoolean();
+        moBoolShowOnlyDocsDueDate.setText("Solo documentos del vecimiento");
+        moBoolShowOnlyDocsDueDate.setPreferredSize(new Dimension(200, 23));
         
-        jckShowOnlyBenefsWithAccounts = new JCheckBox("Solo cuentas bancarias configuradas");
-        jckShowOnlyBenefsWithAccounts.setPreferredSize(new Dimension(200, 23));
+        moBoolShowOnlyBenefsWithAccounts = new SBeanFieldBoolean();
+        moBoolShowOnlyBenefsWithAccounts.setText("Solo cuentas bancarias configuradas");
+        moBoolShowOnlyBenefsWithAccounts.setPreferredSize(new Dimension(225, 23));
 
         jbExchangeRateReset = new JButton("TC original");
         jbExchangeRateReset.setToolTipText("Poner TC original del documento al renglón");
@@ -856,8 +856,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 return gridColumnsForm;
             }
         };
-        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jckShowOnlyDocsDateDue);
-        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jckShowOnlyBenefsWithAccounts);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moBoolShowOnlyDocsDueDate);
+        moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moBoolShowOnlyBenefsWithAccounts);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExchangeRateReset);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExchangeRateRefresh);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGridRowsCheckAll);
@@ -1108,7 +1108,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moRegistry.parseBankLayoutXml(miClient, false);
             
             moGridPayments.populateGrid(new Vector<>(moRegistry.getAuxLayoutBankPaymentRows()));
-            moGridPayments.getTable().getTableHeader().setEnabled(false);
+            
+            moGridPayments.getTable().setColumnSelectionAllowed(false);
+            moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
+            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);            
             
             if (moGridPayments.getTable().getRowCount() > 0) {
                 moGridPayments.renderGridRows();
@@ -1326,7 +1329,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.populateGrid(gridRows);
             moGridPayments.createGridColumns();
 
-            moGridPayments.getTable().getTableHeader().setEnabled(false);
+            //moGridPayments.getTable().getTableHeader().setEnabled(false);
             moGridPayments.getTable().setColumnSelectionAllowed(false);
             moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
             moGridPayments.getTable().getTableHeader().setResizingAllowed(true);            
@@ -1348,7 +1351,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             
             moDialogChoosePayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
-            moDialogChoosePayments.setLayoutDate(moDateDateLayout.getValue());
+            moDialogChoosePayments.setLayoutDueDate(moDateDateDue.getValue());
             moDialogChoosePayments.reloadCatalogues();
             isForPayments = false;
         }
@@ -1372,8 +1375,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             isForPayments = true;
             String warn = "";
             int cantWarn = 0;
-            ArrayList<SRowPayments> paymentRows = moDialogChoosePayments.getSelectedPayments();
             ArrayList<SRowPayments> notVinculed = new ArrayList<>();
+            ArrayList<SRowPayments> paymentRows = moDialogChoosePayments.getSelectedPayments();
             
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                 for (SRowPayments pay : paymentRows) {
@@ -1477,7 +1480,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      * @param showValidationOfExistingRows 
      */
     private void populateGridWithBenefsFromDb(final boolean showValidationOfExistingRows) {
-        Vector<SGridRow> rows = new Vector<>();
+        Vector<SGridRow> gridRows = new Vector<>();
         
         maAllLayoutBankRows = new ArrayList<>();
         mltAccountCredits = new ArrayList<>();
@@ -1546,7 +1549,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setBranchBankAccountCreditArray(maBizPartnerBranchBankAccounts);
                     
                     if (!maBizPartnerBranchBankAccounts.isEmpty()) {
-                        rows.add(layoutBankRow);
+                        gridRows.add(layoutBankRow);
                         mltAccountCredits.add(maBeneficiaryAccountGuiItems);
                     }
                     
@@ -1558,7 +1561,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
             }
             
-            moGridPayments.populateGrid(rows);
+            moGridPayments.populateGrid(gridRows);
             moGridPayments.createGridColumns();
 
             moGridPayments.getTable().setColumnSelectionAllowed(false);
@@ -1697,8 +1700,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
             if (isModeForTransfersOfPayments()) {
                 for (SLayoutBankRow layoutBankRow : maAllLayoutBankRows) {
-                    if (!jckShowOnlyDocsDateDue.isSelected() || moDateDateDue.getValue().equals(layoutBankRow.getDpsDateMaturity())) {
-                        if (!jckShowOnlyBenefsWithAccounts.isSelected() || layoutBankRow.getAccountCredits().size() > 0) {
+                    if (!moBoolShowOnlyDocsDueDate.isSelected() || moDateDateDue.getValue().equals(layoutBankRow.getDpsDateMaturity())) {
+                        if (!moBoolShowOnlyBenefsWithAccounts.isSelected() || layoutBankRow.getAccountCredits().size() > 0) {
                             mltAccountCredits.add(layoutBankRow.getAccountCredits());
                             mltAgreementsReferences.add(moAgreementReferencesMap.get(layoutBankRow.getAgreement()));
                             moGridPayments.addGridRow(layoutBankRow);
@@ -1708,7 +1711,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             else if (isModeForTransfersOfPrepayments()) {
                 for (SLayoutBankRow layoutBankRow : maAllLayoutBankRows) {
-                    if (!jckShowOnlyBenefsWithAccounts.isSelected() || layoutBankRow.getAccountCredits().size() > 0) {
+                    if (!moBoolShowOnlyBenefsWithAccounts.isSelected() || layoutBankRow.getAccountCredits().size() > 0) {
                         mltAccountCredits.add(layoutBankRow.getAccountCredits());
                         mltAgreementsReferences.add(moAgreementReferencesMap.get(layoutBankRow.getAgreement()));
                         moGridPayments.addGridRow(layoutBankRow);
@@ -2234,8 +2237,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
 
     private void enableFieldsGrid(final boolean enableFields) {
-        jckShowOnlyDocsDateDue.setEnabled(enableFields && isModeForTransfersOfPayments());
-        jckShowOnlyBenefsWithAccounts.setEnabled(enableFields && isModeForTransfers());
+        moBoolShowOnlyDocsDueDate.setEnabled(enableFields && isModeForTransfersOfPayments());
+        moBoolShowOnlyBenefsWithAccounts.setEnabled(enableFields && isModeForTransfers());
         
         if (mnFormSubtype != SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) { 
             jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired() && 
@@ -2416,10 +2419,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
         else {
             // clear controls:
-            jckShowOnlyDocsDateDue.setEnabled(false); // to prevent action in item-state-changed event handler
-            jckShowOnlyDocsDateDue.setSelected(false);
-            jckShowOnlyBenefsWithAccounts.setEnabled(false); // to prevent action in item-state-changed event handler
-            jckShowOnlyBenefsWithAccounts.setSelected(false);
+            moBoolShowOnlyDocsDueDate.setEnabled(false); // to prevent action in item-state-changed event handler
+            moBoolShowOnlyDocsDueDate.setSelected(false);
+            moBoolShowOnlyBenefsWithAccounts.setEnabled(false); // to prevent action in item-state-changed event handler
+            moBoolShowOnlyBenefsWithAccounts.setSelected(false);
             jtfLayoutPath.setText(""); // clear path each time grid rows are shown
             jtfLayoutPath.setToolTipText(null); // clear path each time grid rows are shown
             
@@ -2432,14 +2435,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     populateGridWithDocsFromDb(true);
-                    jckShowOnlyDocsDateDue.setSelected(true); // select & trigger item-state-changed events
-                    jckShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
+                    moBoolShowOnlyDocsDueDate.setSelected(true); // select & trigger item-state-changed events
+                    moBoolShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
                     break;
                     
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                     populateGridWithBenefsFromDb(true);
-                    jckShowOnlyDocsDateDue.setSelected(false); // does not apply, remains unselected
-                    jckShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
+                    moBoolShowOnlyDocsDueDate.setSelected(false); // does not apply, remains unselected
+                    moBoolShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
                     break;
                     
                 default:
@@ -2454,8 +2457,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         
         moGridPayments.clearGridRows();
         
-        jckShowOnlyDocsDateDue.setSelected(false); // already disabled; action of event handler will be omited!
-        jckShowOnlyBenefsWithAccounts.setSelected(false); // already disabled; action of event handler will be omited!
+        moBoolShowOnlyDocsDueDate.setSelected(false); // already disabled; action of event handler will be omited!
+        moBoolShowOnlyBenefsWithAccounts.setSelected(false); // already disabled; action of event handler will be omited!
     }
 
     /**
@@ -2626,14 +2629,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         processDpsCurrency();
     }
     
-    private void itemStateChangedShowOnlyDocsDateDue() {
-        if (jckShowOnlyDocsDateDue.isEnabled()) {
+    private void itemStateChangedShowOnlyDocsDueDate() {
+        if (moBoolShowOnlyDocsDueDate.isEnabled()) {
             refreshGridRows();
         }
     }
 
     private void itemStateChangedShowOnlyBenefsWithAccounts() {
-        if (jckShowOnlyBenefsWithAccounts.isEnabled()) {
+        if (moBoolShowOnlyBenefsWithAccounts.isEnabled()) {
             refreshGridRows();
         }
     }
@@ -2919,8 +2922,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moKeyBankLayoutCurrency.addItemListener(this);
         moKeyBankAccountCash.addItemListener(this);
         moKeyDpsCurrency.addItemListener(this);
-        jckShowOnlyDocsDateDue.addItemListener(this);
-        jckShowOnlyBenefsWithAccounts.addItemListener(this);
+        moBoolShowOnlyDocsDueDate.addItemListener(this);
+        moBoolShowOnlyBenefsWithAccounts.addItemListener(this);
     }
 
     @Override
@@ -2942,8 +2945,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moKeyBankLayoutCurrency.removeItemListener(this);
         moKeyBankAccountCash.removeItemListener(this);
         moKeyDpsCurrency.removeItemListener(this);
-        jckShowOnlyDocsDateDue.removeItemListener(this);
-        jckShowOnlyBenefsWithAccounts.removeItemListener(this);
+        moBoolShowOnlyDocsDueDate.removeItemListener(this);
+        moBoolShowOnlyBenefsWithAccounts.removeItemListener(this);
     }
 
     @Override
@@ -2972,7 +2975,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         reloadCatalogues();
 
         if (moRegistry.isRegistryNew()) {
-            jckShowOnlyDocsDateDue.setSelected(true);
+            moBoolShowOnlyDocsDueDate.setSelected(true);
 
             moRegistry.setDateLayout(miClient.getSession().getCurrentDate());
             moRegistry.setDateDue(miClient.getSession().getCurrentDate());
@@ -2981,7 +2984,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             jtfRegistryKey.setText("");
         }
         else {
-            jckShowOnlyDocsDateDue.setSelected(false);
+            moBoolShowOnlyDocsDueDate.setSelected(false);
 
             jtfNumber.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
@@ -3016,8 +3019,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         // set grid rows data:
 
-        jckShowOnlyDocsDateDue.setSelected(false);
-        jckShowOnlyBenefsWithAccounts.setSelected(isModeForTransfers());
+        moBoolShowOnlyDocsDueDate.setSelected(false);
+        moBoolShowOnlyBenefsWithAccounts.setSelected(isModeForTransfers());
 
         maLayoutBankRecords = new ArrayList<>();
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
@@ -3412,13 +3415,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
             }
         }
-        else if (e.getSource() instanceof JCheckBox) {
-            JCheckBox checkBox = (JCheckBox) e.getSource();
+        else if (e.getSource() instanceof SBeanFieldBoolean) {
+            SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
 
-            if (checkBox == jckShowOnlyDocsDateDue) {
-                itemStateChangedShowOnlyDocsDateDue();
+            if (field == moBoolShowOnlyDocsDueDate) {
+                itemStateChangedShowOnlyDocsDueDate();
             }
-            else if (checkBox == jckShowOnlyBenefsWithAccounts) {
+            else if (field == moBoolShowOnlyBenefsWithAccounts) {
                 itemStateChangedShowOnlyBenefsWithAccounts();
             }
         }

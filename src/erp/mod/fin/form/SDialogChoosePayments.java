@@ -53,7 +53,7 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
     private int mnCurDoc;
     private int mnBankPaymentTypeId;
     private int mnBizPartnerBankId;
-    private Date mtDate;
+    private Date mtDueDate;
     
     /**
      * Creates new form SFormConfMatConsSubentityVsCostCenter
@@ -164,7 +164,7 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
         mnCurDoc = 1;
         mnBankPaymentTypeId = 0;
         mnBizPartnerBankId = 0;
-        mtDate = new Date();
+        mtDueDate = new Date();
         
         addAllListeners();
     }
@@ -264,23 +264,23 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
     }
     
     private void actionLayoutDate() {
-        readPayments("AND p.dt_sched_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        readPayments("AND p.dt_sched_n = '" + SLibUtils.DbmsDateFormatDate.format(mtDueDate) + "' ");
         jbLayoutDate.setEnabled(false);
         jbLayoutDateUntil.setEnabled(false);
         jbLayoutDateAll.setEnabled(false);
         jbResearch.setEnabled(true);
-        jlText.setText("Fecha layout: " + SLibUtils.DateFormatDate.format(mtDate));
+        jlText.setText("Fecha layout: " + SLibUtils.DateFormatDate.format(mtDueDate));
         populateGrid();
         
     }
 
     private void actionLayoutDateUntill() {
-        readPayments("AND p.dt_sched_n <= '" + SLibUtils.DbmsDateFormatDate.format(mtDate) + "' ");
+        readPayments("AND p.dt_sched_n <= '" + SLibUtils.DbmsDateFormatDate.format(mtDueDate) + "' ");
         jbLayoutDate.setEnabled(false);
         jbLayoutDateUntil.setEnabled(false);
         jbLayoutDateAll.setEnabled(false);
         jbResearch.setEnabled(true);
-        jlText.setText("Fecha layout hasta: " + SLibUtils.DateFormatDate.format(mtDate));
+        jlText.setText("Fecha layout hasta: " + SLibUtils.DateFormatDate.format(mtDueDate));
         populateGrid();
     }
 
@@ -306,6 +306,7 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
     
     public ArrayList<SRowPayments> getSelectedPayments() {
         ArrayList<SRowPayments> selectedPayments = new ArrayList<>();
+        
         for (SGridRow row : moGridPayments.getModel().getGridRows()) {
             SRowPayments pay = (SRowPayments) row;
             if (pay.getIsSelected()) {
@@ -314,6 +315,7 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
                 selectedPayments.add(pay);
             }
         }
+        
         return selectedPayments;
     }
     
@@ -332,8 +334,8 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
         mnBizPartnerBankId = bizPartnerBankId;
     }
     
-    public void setLayoutDate(Date date) {
-        mtDate = date;
+    public void setLayoutDueDate(Date date) {
+        mtDueDate = date;
     }
     
     public void setFormResult(int n) {
@@ -370,16 +372,34 @@ public class SDialogChoosePayments extends SBeanFormDialog implements ActionList
     }
 
     @Override
-    public void setRegistry(SDbRegistry registry) throws Exception { }
-
-    @Override
-    public SDbRegistry getRegistry() throws Exception {
-        return null;
+    public void setRegistry(SDbRegistry registry) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
+    public SDbRegistry getRegistry() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            boolean areThereRowsSelected = false;
+            
+            for (SGridRow row : moGridPayments.getModel().getGridRows()) {
+                if (((SRowPayments) row).getIsSelected()) {
+                    areThereRowsSelected = true;
+                    break;
+                }
+            }
+            
+            if (!areThereRowsSelected) {
+                validation.setMessage("No se ha seleccionado ningún pago.");
+                validation.setComponent(moGridPayments.getTable());
+            }
+        }
         
         return validation;
     }
