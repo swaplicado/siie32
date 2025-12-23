@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 294.7/ 2025-12-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de consumos de incidencias, que afectaba el cálculo de ISR retenido por salarios, en nóminas semanales de cambio de año calendario.
+2) Corrección a la obtención del siguiente número de nómina semanal cuando la primer nómina del año actual tiene el consecutivo de la última semana del año previo.
+
+================================================================================
 SIIE 3.2 294.6/ 2025-12-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

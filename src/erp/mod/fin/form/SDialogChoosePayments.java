@@ -36,7 +36,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SFormSelectPayments extends SBeanFormDialog implements ActionListener {
+public class SDialogChoosePayments extends SBeanFormDialog implements ActionListener {
     
     private SGridPaneForm moGridPayments;
     
@@ -61,7 +61,7 @@ public class SFormSelectPayments extends SBeanFormDialog implements ActionListen
      * @param title
      * @param subType
      */
-    public SFormSelectPayments(SGuiClient client, int subType, String title) {
+    public SDialogChoosePayments(SGuiClient client, int subType, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY_LAY_BANK, subType, title);
         initComponents();
         initComponentsCustom();

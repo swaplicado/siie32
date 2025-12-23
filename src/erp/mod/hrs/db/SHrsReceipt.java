@@ -347,6 +347,7 @@ public class SHrsReceipt {
         if (hrsAccumulatedDeduction != null) {
             annualTaxPayed = SLibUtils.roundAmount(hrsAccumulatedDeduction.getAcummulated());
         }
+        
         return annualTaxPayed;
     }
     

@@ -83,6 +83,7 @@ import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 import sa.lib.srv.SLock;
@@ -108,7 +109,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private static final int MAX_MISSING_CFD = 8;
     
-    private JCheckBox jckShowOnlyDocsDateDue;
+    //private JCheckBox jckShowOnlyDocsDateDue;
+    private SBeanFieldBoolean jckShowOnlyDocsDateDue;
     private JCheckBox jckShowOnlyBenefsWithAccounts;
     private JButton jbExchangeRateReset;
     private JButton jbExchangeRateRefresh;
@@ -160,7 +162,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SLock> maSLocks;
     private boolean mbShowConfirmCloseDialog;
     
-    private SFormSelectPayments moFormPayments;
+    private SDialogChoosePayments moDialogChoosePayments;
     private boolean isForPayments;
     
     /**
@@ -184,15 +186,16 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        jpRegistry = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        bgInput = new javax.swing.ButtonGroup();
+        jpLayout = new javax.swing.JPanel();
+        jpLayoutW = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlDateLayout = new javax.swing.JLabel();
         moDateDateLayout = new sa.lib.gui.bean.SBeanFieldDate();
-        jlDummy = new javax.swing.JLabel();
+        jlDummy1 = new javax.swing.JLabel();
         jlNumber = new javax.swing.JLabel();
         jtfNumber = new javax.swing.JTextField();
+        jlDummy2 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jlLayoutBank = new javax.swing.JLabel();
         moKeyLayoutBank = new sa.lib.gui.bean.SBeanFieldKey();
@@ -213,7 +216,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jtfRecordBookkeepingCenter = new javax.swing.JTextField();
         jtfRecordNumber = new javax.swing.JTextField();
         jbPickRecord = new javax.swing.JButton();
-        jPanel14 = new javax.swing.JPanel();
+        jpLayoutC = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlConsecutive = new javax.swing.JLabel();
         moIntConsecutive = new sa.lib.gui.bean.SBeanFieldInteger();
@@ -231,13 +234,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlDateDue = new javax.swing.JLabel();
         moDateDateDue = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel22 = new javax.swing.JPanel();
-        moRadModeManual = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadModePayment = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadInputManual = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadInputChoosingPayments = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel21 = new javax.swing.JPanel();
         jbGridRowsShow = new javax.swing.JButton();
         jbGridRowsClear = new javax.swing.JButton();
-        jbGridRowsPays = new javax.swing.JButton();
-        jbGridRowsPaysDelete = new javax.swing.JButton();
+        jbGridRowsAddPayments = new javax.swing.JButton();
+        jbGridRowsClearPayments = new javax.swing.JButton();
         jpSettings = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -262,10 +265,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
         });
 
-        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jpRegistry.setLayout(new java.awt.BorderLayout());
+        jpLayout.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpLayout.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jpLayoutW.setLayout(new java.awt.GridLayout(7, 1, 0, 3));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -274,8 +277,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jPanel4.add(jlDateLayout);
         jPanel4.add(moDateDateLayout);
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jlDummy);
+        jlDummy1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel4.add(jlDummy1);
 
         jlNumber.setText("Folio: ");
         jlNumber.setToolTipText("");
@@ -289,7 +292,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jtfNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jtfNumber);
 
-        jPanel1.add(jPanel4);
+        jlDummy2.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel4.add(jlDummy2);
+
+        jpLayoutW.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -297,10 +303,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlLayoutBank.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel5.add(jlLayoutBank);
 
-        moKeyLayoutBank.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyLayoutBank.setPreferredSize(new java.awt.Dimension(278, 23));
         jPanel5.add(moKeyLayoutBank);
 
-        jPanel1.add(jPanel5);
+        jpLayoutW.add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -308,10 +314,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlBankLayoutType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jlBankLayoutType);
 
-        moKeyBankLayoutType.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyBankLayoutType.setPreferredSize(new java.awt.Dimension(278, 23));
         jPanel6.add(moKeyBankLayoutType);
 
-        jPanel1.add(jPanel6);
+        jpLayoutW.add(jPanel6);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -319,10 +325,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlBankLayoutCurrency);
 
-        moKeyBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(278, 23));
         jPanel8.add(moKeyBankLayoutCurrency);
 
-        jPanel1.add(jPanel8);
+        jpLayoutW.add(jPanel8);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -330,13 +336,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jlBankAccountCash.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlBankAccountCash);
 
-        moKeyBankAccountCash.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyBankAccountCash.setPreferredSize(new java.awt.Dimension(278, 23));
         jPanel9.add(moKeyBankAccountCash);
 
-        jPanel1.add(jPanel9);
+        jpLayoutW.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel1.add(jPanel10);
+        jpLayoutW.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -377,11 +383,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbPickRecord.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbPickRecord);
 
-        jPanel1.add(jPanel11);
+        jpLayoutW.add(jPanel11);
 
-        jpRegistry.add(jPanel1, java.awt.BorderLayout.WEST);
+        jpLayout.add(jpLayoutW, java.awt.BorderLayout.WEST);
 
-        jPanel14.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jpLayoutC.setLayout(new java.awt.GridLayout(7, 1, 0, 3));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -390,7 +396,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jPanel7.add(jlConsecutive);
         jPanel7.add(moIntConsecutive);
 
-        jPanel14.add(jPanel7);
+        jpLayoutC.add(jPanel7);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -401,7 +407,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moTextConcept.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(moTextConcept);
 
-        jPanel14.add(jPanel16);
+        jpLayoutC.add(jPanel16);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -412,11 +418,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moKeyDpsCurrency.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel18.add(moKeyDpsCurrency);
 
-        jPanel14.add(jPanel18);
+        jpLayoutC.add(jPanel18);
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExchangeRate.setText("Tipo de cambio:");
+        jlExchangeRate.setText("Tipo de cambio:*");
         jlExchangeRate.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel20.add(jlExchangeRate);
         jPanel20.add(moDecExchangeRate);
@@ -426,7 +432,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbPickExchangeRate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel20.add(jbPickExchangeRate);
 
-        jPanel14.add(jPanel20);
+        jpLayoutC.add(jPanel20);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -435,22 +441,22 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jPanel19.add(jlDateDue);
         jPanel19.add(moDateDateDue);
 
-        jPanel14.add(jPanel19);
+        jpLayoutC.add(jPanel19);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        buttonGroup1.add(moRadModeManual);
-        moRadModeManual.setSelected(true);
-        moRadModeManual.setText("Captura de documentos");
-        moRadModeManual.setPreferredSize(new java.awt.Dimension(280, 23));
-        jPanel22.add(moRadModeManual);
+        bgInput.add(moRadInputManual);
+        moRadInputManual.setSelected(true);
+        moRadInputManual.setText("Capturar pagos manualmente");
+        moRadInputManual.setPreferredSize(new java.awt.Dimension(255, 23));
+        jPanel22.add(moRadInputManual);
 
-        buttonGroup1.add(moRadModePayment);
-        moRadModePayment.setText("Captura a partir de pagos");
-        moRadModePayment.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel22.add(moRadModePayment);
+        bgInput.add(moRadInputChoosingPayments);
+        moRadInputChoosingPayments.setText("Capturar mediante solicitudes de pago");
+        moRadInputChoosingPayments.setPreferredSize(new java.awt.Dimension(255, 23));
+        jPanel22.add(moRadInputChoosingPayments);
 
-        jPanel14.add(jPanel22);
+        jpLayoutC.add(jPanel22);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -464,23 +470,23 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbGridRowsClear.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel21.add(jbGridRowsClear);
 
-        jbGridRowsPays.setText("Buscar pagos");
-        jbGridRowsPays.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbGridRowsPays.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel21.add(jbGridRowsPays);
+        jbGridRowsAddPayments.setText("Agregar pagos");
+        jbGridRowsAddPayments.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbGridRowsAddPayments.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel21.add(jbGridRowsAddPayments);
 
-        jbGridRowsPaysDelete.setText("Eliminar pago");
-        jbGridRowsPaysDelete.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbGridRowsPaysDelete.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel21.add(jbGridRowsPaysDelete);
+        jbGridRowsClearPayments.setText("Eliminar pagos");
+        jbGridRowsClearPayments.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbGridRowsClearPayments.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel21.add(jbGridRowsClearPayments);
 
-        jPanel14.add(jPanel21);
+        jpLayoutC.add(jPanel21);
 
-        jpRegistry.add(jPanel14, java.awt.BorderLayout.CENTER);
+        jpLayout.add(jpLayoutC, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jpRegistry, java.awt.BorderLayout.NORTH);
+        getContentPane().add(jpLayout, java.awt.BorderLayout.NORTH);
 
-        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle:"));
+        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle del layout:"));
         jpSettings.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -551,12 +557,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }//GEN-LAST:event_formWindowActivated
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.ButtonGroup bgInput;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
@@ -572,9 +576,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbGridRowsAddPayments;
     private javax.swing.JButton jbGridRowsClear;
-    private javax.swing.JButton jbGridRowsPays;
-    private javax.swing.JButton jbGridRowsPaysDelete;
+    private javax.swing.JButton jbGridRowsClearPayments;
     private javax.swing.JButton jbGridRowsShow;
     private javax.swing.JButton jbPickExchangeRate;
     private javax.swing.JButton jbPickLayoutPath;
@@ -589,13 +593,16 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private javax.swing.JLabel jlDateDue;
     private javax.swing.JLabel jlDateLayout;
     private javax.swing.JLabel jlDpsCurrency;
-    private javax.swing.JLabel jlDummy;
+    private javax.swing.JLabel jlDummy1;
+    private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlLayoutBank;
     private javax.swing.JLabel jlLayoutPath;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlRecord;
-    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JPanel jpLayout;
+    private javax.swing.JPanel jpLayoutC;
+    private javax.swing.JPanel jpLayoutW;
     private javax.swing.JPanel jpSettings;
     private javax.swing.JTextField jtfLayoutPath;
     private javax.swing.JTextField jtfNumber;
@@ -615,8 +622,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private sa.lib.gui.bean.SBeanFieldKey moKeyBankLayoutType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDpsCurrency;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLayoutBank;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadModeManual;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadModePayment;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadInputChoosingPayments;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadInputManual;
     private sa.lib.gui.bean.SBeanFieldText moTextConcept;
     // End of variables declaration//GEN-END:variables
 
@@ -649,8 +656,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moDecBalanceTotal.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecBalanceTotalPayed.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotalPayed), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
-        moRadModeManual.setBooleanSettings(moRadModeManual.getText(), true);
-        moRadModePayment.setBooleanSettings(moRadModePayment.getText(), false);
+        moRadInputManual.setBooleanSettings(moRadInputManual.getText(), true);
+        moRadInputChoosingPayments.setBooleanSettings(moRadInputChoosingPayments.getText(), false);
         
         moFields.addField(moDateDateLayout);
         moFields.addField(moKeyLayoutBank);
@@ -668,33 +675,36 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_ACC:
                 jbGridRowsShow.setText("Mostrar renglones");
                 jbGridRowsClear.setText("Limpiar renglones");
-                moRadModeManual.setValue(true);
-                moRadModeManual.setEnabled(false);
-                moRadModePayment.setEnabled(false);
+                
+                moRadInputManual.setSelected(true);
+                moRadInputManual.setEnabled(false);
+                moRadInputChoosingPayments.setEnabled(false);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                 jbGridRowsShow.setText("Mostrar documentos");
                 jbGridRowsClear.setText("Limpiar documentos");
-                moRadModeManual.setText("Captura manual de documentos");
-                moRadModeManual.setValue(true);
-                moRadModeManual.setEnabled(true);
-                moRadModePayment.setEnabled(true);
+                
+                moRadInputManual.setSelected(true);
+                moRadInputManual.setEnabled(true);
+                moRadInputChoosingPayments.setEnabled(true);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 jbGridRowsShow.setText("Mostrar beneficiarios");
                 jbGridRowsClear.setText("Limpiar beneficiarios");
-                moRadModeManual.setText("Captura manual de beneficiarios");
-                moRadModeManual.setValue(true);
-                moRadModeManual.setEnabled(false);
-                moRadModePayment.setEnabled(false);
+                
+                moRadInputManual.setSelected(true);
+                moRadInputManual.setEnabled(false);
+                moRadInputChoosingPayments.setEnabled(false);
                 break;
 
             default:
+                miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Subtipo de forma: " + mnFormSubtype + ")");
         }
 
-        jckShowOnlyDocsDateDue = new JCheckBox("Solo documentos del vecimiento",true);
+        jckShowOnlyDocsDateDue = new SBeanFieldBoolean();
+        jckShowOnlyDocsDateDue.setText("Solo documentos del vecimiento");
         jckShowOnlyDocsDateDue.setPreferredSize(new Dimension(200, 23));
         
         jckShowOnlyBenefsWithAccounts = new JCheckBox("Solo cuentas bancarias configuradas");
@@ -832,6 +842,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
 
                     default:
+                        // nothing
                 }
 
                 moGridPayments.getTable().getDefaultEditor(Double.class).addCellEditorListener(SFormBankLayout.this);
@@ -857,15 +868,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moCellEditorOptions = new STableCellEditorOptions((SClientInterface) miClient);
         moCellEditorOptionsAgreementReference = new STableCellEditorOptions((SClientInterface) miClient, true);
         
-        moFormPayments = new SFormSelectPayments(miClient, mnFormSubtype, "Seleccionar pagos");
+        moDialogChoosePayments = new SDialogChoosePayments(miClient, mnFormSubtype, "Seleccionar pagos");
     }
     
     private boolean isModeForAccounting() {
         return mnFormSubtype == SModSysConsts.FINX_LAY_BANK_ACC;
-    }
-
-    private boolean isModeForTransfers() {
-        return isModeForTransfersOfPayments() || isModeForTransfersOfPrepayments();
     }
 
     private boolean isModeForTransfersOfPayments() {
@@ -874,6 +881,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
     private boolean isModeForTransfersOfPrepayments() {
         return mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY;
+    }
+
+    private boolean isModeForTransfers() {
+        return isModeForTransfersOfPayments() || isModeForTransfersOfPrepayments();
     }
 
     private boolean isEditableConsecutive() {
@@ -1333,12 +1344,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             
             if (moKeyBankLayoutCurrency.getSelectedIndex() > 0 && moKeyDpsCurrency.getSelectedIndex() > 0) {
-                moFormPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
+                moDialogChoosePayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
             }
             
-            moFormPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
-            moFormPayments.setLayoutDate(moDateDateLayout.getValue());
-            moFormPayments.reloadCatalogues();
+            moDialogChoosePayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
+            moDialogChoosePayments.setLayoutDate(moDateDateLayout.getValue());
+            moDialogChoosePayments.reloadCatalogues();
             isForPayments = false;
         }
         catch (Exception e) {
@@ -1353,16 +1364,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
     }
     
-    private void actionPerformedGridRowsPays() {
-        moFormPayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
-        moFormPayments.setVisible(true);
-        SDialogShowImportErrors errors;
-        if (moFormPayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+    private void actionPerformedGridRowsAddPayments() {
+        moDialogChoosePayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
+        moDialogChoosePayments.setVisible(true);
+        
+        if (moDialogChoosePayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             isForPayments = true;
             String warn = "";
             int cantWarn = 0;
-            ArrayList<SRowPayments> paymentRows = moFormPayments.getSelectedPayments();
+            ArrayList<SRowPayments> paymentRows = moDialogChoosePayments.getSelectedPayments();
             ArrayList<SRowPayments> notVinculed = new ArrayList<>();
+            
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                 for (SRowPayments pay : paymentRows) {
                     boolean found = false;
@@ -1422,7 +1434,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             
             if (cantWarn > 0) {
-                errors = new SDialogShowImportErrors("", warn, 0, cantWarn);
+                SDialogShowImportErrors errors = new SDialogShowImportErrors("", warn, 0, cantWarn);
                 errors.setVisible(true);
             }
             
@@ -1431,14 +1443,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(0);
             
-            moFormPayments.addPayments(notVinculed);
+            moDialogChoosePayments.addPayments(notVinculed);
         }
     }
     
-    private void actionPerformedGridRowsPaysDelete() {
-        if (moGridPayments.getTable().getSelectedRow() >= 0) {
+    private void actionPerformedGridRowsClearPayments() {
+        int index = moGridPayments.getTable().getSelectedRow();
+        
+        if (index == -1) {
+            miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_GRID_ROW);
+        }
+        else {
             SLayoutBankRow layout = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
-            moFormPayments.addPayments(layout.getPayments());
+            moDialogChoosePayments.addPayments(layout.getPayments());
             layout.setForPayment(false);
             layout.getMoneyPayment().setOriginalAmount(0);
             layout.setIsForExtPayment(false);
@@ -1447,7 +1464,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             
             computeBalance();
             moGridPayments.renderGridRows();
-            moGridPayments.setSelectedGridRow(0);
+            moGridPayments.setSelectedGridRow(index);
         }
     }
 
@@ -1557,7 +1574,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moCellEditorOptionsAgreementReference.setElements(mltAgreementsReferences);
             }
             
-            moFormPayments.reloadCatalogues();
+            moDialogChoosePayments.reloadCatalogues();
             isForPayments = false;
         }
         catch (Exception e) {
@@ -2156,6 +2173,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 break;
                 
             default:
+                // nothing
         }
 
         jtfRows.setText(SLibUtils.DecimalFormatInteger.format(mnSelectedRows) + "/" + SLibUtils.DecimalFormatInteger.format(moGridPayments.getModel().getRowCount()));
@@ -2180,10 +2198,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
                 jbGridRowsShow.setEnabled(false);
                 jbGridRowsClear.setEnabled(false);
-                jbGridRowsPays.setEnabled(false);
-                jbGridRowsPaysDelete.setEnabled(false);
-                moRadModeManual.setEnabled(false);
-                moRadModePayment.setEnabled(false);
+                jbGridRowsAddPayments.setEnabled(false);
+                jbGridRowsClearPayments.setEnabled(false);
+                moRadInputManual.setEnabled(false);
+                moRadInputChoosingPayments.setEnabled(false);
                 break;
 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
@@ -2202,20 +2220,23 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbPickExchangeRate.setEnabled(enable && !isExchangeRateNotRequired());
                 moDateDateDue.setEditable(enable);
                 
-                moRadModeManual.setEnabled(enable);
-                moRadModePayment.setEnabled(enable);
+                moRadInputManual.setEnabled(enable);
+                moRadInputChoosingPayments.setEnabled(enable);
                 jbGridRowsShow.setEnabled(enable);
                 jbGridRowsClear.setEnabled(!enable);
-                jbGridRowsPays.setEnabled(!enable && moRadModePayment.getValue());
-                jbGridRowsPaysDelete.setEnabled(!enable && moRadModePayment.getValue());
+                jbGridRowsAddPayments.setEnabled(!enable && moRadInputChoosingPayments.getValue());
+                jbGridRowsClearPayments.setEnabled(!enable && moRadInputChoosingPayments.getValue());
                 break;
+                
             default:
+                // nothing
         }
     }
 
     private void enableFieldsGrid(final boolean enableFields) {
         jckShowOnlyDocsDateDue.setEnabled(enableFields && isModeForTransfersOfPayments());
         jckShowOnlyBenefsWithAccounts.setEnabled(enableFields && isModeForTransfers());
+        
         if (mnFormSubtype != SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) { 
             jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired() && 
                     !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && 
@@ -2224,8 +2245,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && 
                             !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue())));
         }
-        jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadModeManual.getValue());
-        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadModeManual.getValue());
+        
+        jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadInputManual.getValue());
+        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments() && moRadInputManual.getValue());
         
         jbPickLayoutPath.setEnabled(enableFields && isModeForTransfers());
     }
@@ -2407,17 +2429,21 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     break;
+                    
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     populateGridWithDocsFromDb(true);
                     jckShowOnlyDocsDateDue.setSelected(true); // select & trigger item-state-changed events
                     jckShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
                     break;
+                    
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                     populateGridWithBenefsFromDb(true);
                     jckShowOnlyDocsDateDue.setSelected(false); // does not apply, remains unselected
                     jckShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
                     break;
+                    
                 default:
+                    // nothing
             }
         }
     }
@@ -2506,6 +2532,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
                         
                     default:
+                        // nothing
                 }
                 
                 computeBalance();
@@ -2563,6 +2590,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     break;
                     
                 default:
+                    // nothing
             }
             
             computeBalance();
@@ -2617,6 +2645,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void editingStoppedAccountingChecked() {
         if (isModeForAccounting()) {
             SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) moGridPayments.getSelectedGridRow();
+            
             try {
                 layoutBankPaymentRow = (SLayoutBankPaymentRow) moGridPayments.getSelectedGridRow();
                 SLayoutBankPayment layoutBankPayment = layoutBankPaymentRow.getLayoutBankPayment().clone();
@@ -2882,8 +2911,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateRefresh.addActionListener(this);
         jbGridRowsCheckAll.addActionListener(this);
         jbGridRowsUncheckAll.addActionListener(this);
-        jbGridRowsPays.addActionListener(this);
-        jbGridRowsPaysDelete.addActionListener(this);
+        jbGridRowsAddPayments.addActionListener(this);
+        jbGridRowsClearPayments.addActionListener(this);
         
         moKeyLayoutBank.addItemListener(this);
         moKeyBankLayoutType.addItemListener(this);
@@ -2905,8 +2934,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateRefresh.removeActionListener(this);
         jbGridRowsCheckAll.removeActionListener(this);
         jbGridRowsUncheckAll.removeActionListener(this);
-        jbGridRowsPays.removeActionListener(this);
-        jbGridRowsPaysDelete.removeActionListener(this);
+        jbGridRowsAddPayments.removeActionListener(this);
+        jbGridRowsClearPayments.removeActionListener(this);
         
         moKeyLayoutBank.removeItemListener(this);
         moKeyBankLayoutType.removeItemListener(this);
@@ -2954,8 +2983,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else {
             jckShowOnlyDocsDateDue.setSelected(false);
 
-            jtfNumber.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));       // the same value for both!
-            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));  // the same value for both!
+            jtfNumber.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
+            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
         }
 
         // set header data:
@@ -3020,6 +3049,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 break;
 
             default:
+                // nothing
         }
         
         jtfLayoutPath.setText(""); // clear path
@@ -3032,14 +3062,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (moRegistry.isRegistryNew()) {
             // registry is being created:
 
-            moRadModeManual.setValue(true);
+            bgInput.setSelected(moRadInputManual.getModel(), true);
+            
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     break;
+                    
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                     actionPerformedGridRowsClear();
                     break;
+                    
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
@@ -3047,8 +3080,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else {
             // registry is being modified:
 
-            moRadModeManual.setValue(moRegistry.getAuxNewPayments().isEmpty());
-            moRadModePayment.setValue(!moRegistry.getAuxNewPayments().isEmpty());
+            bgInput.setSelected(moRegistry.getAuxNewPayments().isEmpty() ? moRadInputManual.getModel() : moRadInputChoosingPayments.getModel(), true);
+            
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     enableFieldsForm(true);
@@ -3056,14 +3089,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     jbGridRowsCheckAll.setEnabled(true); // but enable this one
                     jbGridRowsUncheckAll.setEnabled(true); // but enable this one
                     break;
+                    
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     enableFieldsForm(false);
                     enableFieldsGrid(true);
                     break;
+                    
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                     enableFieldsForm(false);
                     enableFieldsGrid(true);
                     break;
+                    
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
@@ -3283,7 +3319,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (!mbShowConfirmCloseDialog) {
                 close();
             }
-            else if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION){
+            else if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION) {
                 close();
             }
         }
@@ -3332,6 +3368,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             else if (button == jbGridRowsClear) {
                 actionPerformedGridRowsClear();
             }
+            else if (button == jbGridRowsAddPayments) {
+                actionPerformedGridRowsAddPayments();
+            }
+            else if (button == jbGridRowsClearPayments) {
+                actionPerformedGridRowsClearPayments();
+            }
             else if (button == jbExchangeRateReset) {
                 actionPerformedExchangeRateResetOriginal();
             }
@@ -3343,12 +3385,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             else if (button == jbGridRowsUncheckAll) {
                 actionPerformedGridRowsUncheckAll();
-            }
-            else if (button == jbGridRowsPays) {
-                actionPerformedGridRowsPays();
-            }
-            else if (button == jbGridRowsPaysDelete) {
-                actionPerformedGridRowsPaysDelete();
             }
         }
     }
@@ -3402,7 +3438,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     break;
 
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
-                    if (moRadModeManual.getValue()) {
+                    if (moRadInputManual.getValue()) {
                         switch (moGridPayments.getTable().getSelectedColumn()) {
                             case COL_TRN_TP_PAY_CHECK:
                                 editingStoppedPaymentChecked();
@@ -3429,7 +3465,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     break;
 
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                    if (moRadModeManual.getValue()) {
+                    if (moRadInputManual.getValue()) {
                         switch (moGridPayments.getTable().getSelectedColumn()) {
                             case COL_TRN_TP_PREPAY_PREPAY:
                                 editingStoppedPaymentEntered();
@@ -3449,6 +3485,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     break;
 
                 default:
+                    // nothing
             }
         }
     }
