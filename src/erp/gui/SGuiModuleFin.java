@@ -236,6 +236,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiAccRecPaymentsInAuth;
     private javax.swing.JMenuItem jmiAccRecPaymentsRejc;
     private javax.swing.JMenuItem jmiAccRecPaymentsSched;
+    private javax.swing.JMenuItem jmiAccRecPaymentsSchedReport;
     private javax.swing.JMenuItem jmiAccRecPaymentsInTreas;
     private javax.swing.JMenuItem jmiAccRecPaymentsInTreasDetail;
     private javax.swing.JMenuItem jmiAccRecPaymentsExec;
@@ -633,6 +634,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
         jmiAccRecPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
         jmiAccRecPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
+        jmiAccRecPaymentsSchedReport = new JMenuItem("Reporte solicitudes de pago");
         jmiAccRecPaymentsInTreas = new JMenuItem("Pagos en tesorería");
         jmiAccRecPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
         jmiAccRecPaymentsExec = new JMenuItem("Pagos operados");
@@ -665,6 +667,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinAccRec.add(jmiAccRecPaymentsInAuth);
         jmFinAccRec.add(jmiAccRecPaymentsRejc);
         jmFinAccRec.add(jmiAccRecPaymentsSched);
+        jmFinAccRec.add(jmiAccRecPaymentsSchedReport);
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiAccRecPaymentsInTreas);
         jmFinAccRec.add(jmiAccRecPaymentsInTreasDetail);
@@ -1026,6 +1029,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsInAuth.addActionListener(this);
         jmiAccRecPaymentsRejc.addActionListener(this);
         jmiAccRecPaymentsSched.addActionListener(this);
+        jmiAccRecPaymentsSchedReport.addActionListener(this);
         jmiAccRecPaymentsInTreas.addActionListener(this);
         jmiAccRecPaymentsInTreasDetail.addActionListener(this);
         jmiAccRecPaymentsExec.addActionListener(this);
@@ -2347,6 +2351,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiAccRecPaymentsSched) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_SCHED, null);
+            }
+            else if (item == jmiAccRecPaymentsSchedReport) {
+                miClient.getSession().showView(SModConsts.FIN_PAY_REP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiAccRecPaymentsInTreas) {
                 miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, null);

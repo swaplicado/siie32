@@ -58,6 +58,7 @@ import erp.mod.fin.view.SViewCustomReportsExpenses;
 import erp.mod.fin.view.SViewDpsPayment;
 import erp.mod.fin.view.SViewImportFile;
 import erp.mod.fin.view.SViewPayment;
+import erp.mod.fin.view.SViewReportPayment;
 import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.fin.view.SViewReportAccountingCustomizableReport;
 import erp.mod.fin.view.SViewTaxItemLink;
@@ -87,7 +88,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SModuleFin extends SGuiModule {
 
@@ -622,6 +623,16 @@ public class SModuleFin extends SGuiModule {
                         // nothing
                 }
                 view = new SViewPayment(miClient, subtype, title);
+                break;
+            case SModConsts.FIN_PAY_REP:
+                switch (subtype) {
+                    case SLibConsts.UNDEFINED:
+                        title = "Reporte solicitudes pago";
+                        break;
+                    default:
+                        // nothing
+                }
+                view = new SViewReportPayment(miClient, subtype, title);
                 break;
             case SModConsts.FINX_PAY_ST:
                 switch(subtype) {
