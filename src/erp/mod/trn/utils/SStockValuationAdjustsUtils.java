@@ -5,13 +5,13 @@
  */
 package erp.mod.trn.utils;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnStockMove;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,10 +20,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
-
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -54,7 +52,9 @@ public abstract class SStockValuationAdjustsUtils {
                 + "    oc_e.price_u_real_r, "
                 + "    oc.fid_ct_dps, "
                 + "    oc.fid_cl_dps, "
-                + "    oc.fid_tp_dps, "
+                + "    oc.fid_tp_dps,"
+                + "    oc.fid_dps_nat, "
+                + "    fac.fid_dps_nat, "
                 + "    fac_e.price_u_real_r, "
                 + "    fac_e.id_year AS fact_e_id_year, "
                 + "    fac_e.id_doc AS fact_e_id_doc, "
@@ -105,8 +105,13 @@ public abstract class SStockValuationAdjustsUtils {
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
                     oMvtAdjust.setQuantityMovement(0d);
                     oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
-                    oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
-                                                        - resultSet.getDouble("mvt.cost_r"), 8));
+                    if (resultSet.getInt("fac.fid_dps_nat") != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                        oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
+                                                            - resultSet.getDouble("mvt.cost_r"), 8));
+                    }
+                    else {
+                        oMvtAdjust.setCost_r(0d);
+                    }
                     oMvtAdjust.setFkStockValuationId(idValuation);
                     oMvtAdjust.setFkStockValuationMvtId_n(resultSet.getInt("fk_stk_val_mvt_n"));
                     oMvtAdjust.setFkDiogCategoryId(resultSet.getInt("fk_ct_iog"));
