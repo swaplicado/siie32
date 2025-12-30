@@ -30,7 +30,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -168,7 +168,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moTablePane.reset();
 
         STableField[] aoKeyFields = new STableField[3];
-        maoTableColumns = new STableColumn[30];
+        maoTableColumns = new STableColumn[31];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "de.id_year");
@@ -182,6 +182,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_dnum", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_duuid", "UUID doc.", 150);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 200);
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave AN", 50);
@@ -390,6 +391,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                 "d.dt, " +
                 "dt.code, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS _dnum, " +
+                "cfd.uuid AS _duuid, " +
                 "cob.code, " +
                 "bp.bp, " +
                 "bpc.bp_key, " +
@@ -431,6 +433,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                 "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
                 "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
                 "LEFT OUTER JOIN fin_bkc AS rbkc ON r.id_bkc = rbkc.id_bkc " +
+                "LEFT OUTER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc " +
                 "LEFT OUTER JOIN erp.bpsu_bpb AS rcob ON r.fid_cob = rcob.id_bpb " +
                 "WHERE NOT d.b_del AND NOT de.b_del " + 
                 sqlWhereDpsTypes + sqlWherePeriod + sqlWhereFuncArea + sqlWhereItemBizPartnerOne + "AND " +

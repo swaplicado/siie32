@@ -4,6 +4,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a la modificación de solicitudes de pago de tipo anticipo, por intento innecesario de obtención del saldo del documento relacionado.
 2) Reforzamiento a la copia de configuraciones de contabilización de nóminas, para aclarar si es posible o no tener varios registros a la vez en los distintos tipos de configuración.
+3) Adición de columna UUID del CFDI, si existe, en consulta de documentos por ítem y asociado de negocios (cliente o proveedor).
 
 SIIE 3.2 294.8/ 2025-12-30
 Edwin Omar CARMONA FIGUEROA
