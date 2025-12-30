@@ -981,7 +981,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
         else {
             moDps = singleEntry.getDpsRelated();
-            moDpsBalance = getDpsBalance(true); // note that all fields must be already set with proper values!
+            moDpsBalance = moDps == null ? null : getDpsBalance(true); // note that all fields must be already set with proper values!
         }
         
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());

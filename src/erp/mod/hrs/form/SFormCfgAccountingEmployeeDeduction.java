@@ -299,8 +299,19 @@ public class SFormCfgAccountingEmployeeDeduction extends SBeanForm implements Ac
         removeAllListeners();
         reloadCatalogues();
         
+        int employeeId = moRegistry.getPkEmployeeId();
+        int deductionId = moRegistry.getPkDeductionId();
+        
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            
+            if (employeeId != 0 || deductionId != 0) {
+                // registry is being copied:
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que solo puede haber UNA configuración de contabilización para cada empleado y deducción.\n"
+                        + "El empleado '" + miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { employeeId }, SDbRegistry.FIELD_NAME) + "' y la deducción '" + miClient.getSession().readField(SModConsts.HRS_DED, new int[] { deductionId }, SDbRegistry.FIELD_NAME) + "' ya tienen su propia configuración.\n"
+                        + "Si en efecto desea crear una nueva configuración a partir de la original, tendrá que seleccionar una opción distinta en los campos '" + moKeyEmployee.getFieldName() + "' y/o '" + moKeyDeduction.getFieldName() + "'.");
+            }
             
             jtfRegistryKey.setText("");
         }
@@ -308,8 +319,8 @@ public class SFormCfgAccountingEmployeeDeduction extends SBeanForm implements Ac
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        moKeyEmployee.setValue(new int[] { moRegistry.getPkEmployeeId()});
-        moKeyDeduction.setValue(new int[] { moRegistry.getPkDeductionId()});
+        moKeyEmployee.setValue(new int[] { employeeId });
+        moKeyDeduction.setValue(new int[] { deductionId });
         itemStateChangedEarning();
         moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId() });
         

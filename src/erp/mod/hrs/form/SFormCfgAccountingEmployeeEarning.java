@@ -299,8 +299,19 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
         removeAllListeners();
         reloadCatalogues();
         
+        int employeeId = moRegistry.getPkEmployeeId();
+        int earningId = moRegistry.getPkEarningId();
+        
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            
+            if (employeeId != 0 || earningId != 0) {
+                // registry is being copied:
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que solo puede haber UNA configuración de contabilización para cada empleado y percepción.\n"
+                        + "El empleado '" + miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { employeeId }, SDbRegistry.FIELD_NAME) + "' y la percepción '" + miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { earningId }, SDbRegistry.FIELD_NAME) + "' ya tienen su propia configuración.\n"
+                        + "Si en efecto desea crear una nueva configuración a partir de la original, tendrá que seleccionar una opción distinta en los campos '" + moKeyEmployee.getFieldName() + "' y/o '" + moKeyEarning.getFieldName() + "'.");
+            }
             
             jtfRegistryKey.setText("");
         }
@@ -308,8 +319,8 @@ public class SFormCfgAccountingEmployeeEarning extends SBeanForm implements Acti
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        moKeyEmployee.setValue(new int[] { moRegistry.getPkEmployeeId()});
-        moKeyEarning.setValue(new int[] { moRegistry.getPkEarningId() });
+        moKeyEmployee.setValue(new int[] { employeeId });
+        moKeyEarning.setValue(new int[] { earningId });
         itemStateChangedEarning();
         moKeyBizPartner.setValue(new int[] { moRegistry.getFkBizPartnerId() });
         

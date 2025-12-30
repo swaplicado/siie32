@@ -406,12 +406,23 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
         removeAllListeners();
         reloadCatalogues();
         
+        int earningId = moRegistry.getPkEarningId();
+        
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             
-            moRegistry.setFkAccountId(SDataConstantsSys.NA);
-            moRegistry.setFkPackExpensesId(SDataConstantsSys.NA);
-            moRegistry.setFkPackCostCentersId(SDataConstantsSys.NA);
+            if (earningId == 0) {
+                // registry is totally new, it means that it is not being copied:
+                moRegistry.setFkAccountId(SDataConstantsSys.NA);
+                moRegistry.setFkPackExpensesId(SDataConstantsSys.NA);
+                moRegistry.setFkPackCostCentersId(SDataConstantsSys.NA);
+            }
+            else {
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que solo puede haber UNA configuración de contabilización para cada percepción.\n"
+                        + "La percepción '" + miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { earningId }, SDbRegistry.FIELD_NAME) + "' ya tiene su propia configuración.\n"
+                        + "Si en efecto desea crear una nueva configuración a partir de la original, tendrá que seleccionar una opción distinta en el campo '" + moKeyEarning.getFieldName() + "'.");
+            }
             
             jtfRegistryKey.setText("");
         }
@@ -419,7 +430,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        moKeyEarning.setValue(new int[] { moRegistry.getPkEarningId() });
+        moKeyEarning.setValue(new int[] { earningId });
         itemStateChangedEarning();
         moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId() });
         moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
