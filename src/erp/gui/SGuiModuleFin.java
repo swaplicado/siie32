@@ -634,7 +634,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
         jmiAccRecPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
         jmiAccRecPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
-        jmiAccRecPaymentsSchedReport = new JMenuItem("Reporte solicitudes de pago");
+        jmiAccRecPaymentsSchedReport = new JMenuItem("Consulta solicitudes de pago");
         jmiAccRecPaymentsInTreas = new JMenuItem("Pagos en tesorería");
         jmiAccRecPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
         jmiAccRecPaymentsExec = new JMenuItem("Pagos operados");
@@ -667,6 +667,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinAccRec.add(jmiAccRecPaymentsInAuth);
         jmFinAccRec.add(jmiAccRecPaymentsRejc);
         jmFinAccRec.add(jmiAccRecPaymentsSched);
+        jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiAccRecPaymentsSchedReport);
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiAccRecPaymentsInTreas);

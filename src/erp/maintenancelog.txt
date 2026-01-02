@@ -1,7 +1,15 @@
+================================================================================
+SIIE 3.2 294.10/ 2026-01-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de control de progreso de recuperación de facturas autorizadas desde SWAP Services.
+
+================================================================================
 SIIE 3.2 294.9/ 2025-12-30
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Adicción del reporte de totales de solicitud de pagos 
+1) Adicción del reporte de totales de solicitudes de pagos.
+
 ================================================================================
 SIIE 3.2 294.8/ 2025-12-30
 Sergio Abraham FLORES GUTIÉRREZ

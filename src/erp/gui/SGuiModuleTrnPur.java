@@ -594,7 +594,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
         jmiAccPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
         jmiAccPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
-        jmiAccPaymentsSchedReport = new JMenuItem("Reporte solicitudes de pago");
+        jmiAccPaymentsSchedReport = new JMenuItem("Consulta de solicitudes de pago");
         jmiAccPaymentsInTreas = new JMenuItem("Pagos en tesorería");
         jmiAccPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
         jmiAccPaymentsExec = new JMenuItem("Pagos operados");
@@ -612,6 +612,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend.add(jmiAccPaymentsInAuth);
         jmAccPend.add(jmiAccPaymentsRejc);
         jmAccPend.add(jmiAccPaymentsSched);
+        jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsSchedReport);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsInTreas);
@@ -1068,7 +1069,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsInAuth.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsRejc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsSched.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsSchedReport.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsSchedReport.setEnabled(false);
         jmiAccPaymentsInTreas.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsInTreasDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsExec.setEnabled(hasRightDocOrder || hasRightDocTransaction);

@@ -58,9 +58,9 @@ import erp.mod.fin.view.SViewCustomReportsExpenses;
 import erp.mod.fin.view.SViewDpsPayment;
 import erp.mod.fin.view.SViewImportFile;
 import erp.mod.fin.view.SViewPayment;
-import erp.mod.fin.view.SViewReportPayment;
 import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.fin.view.SViewReportAccountingCustomizableReport;
+import erp.mod.fin.view.SViewReportPayment;
 import erp.mod.fin.view.SViewTaxItemLink;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -627,7 +627,7 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_PAY_REP:
                 switch (subtype) {
                     case SLibConsts.UNDEFINED:
-                        title = "Reporte solicitudes pago";
+                        title = "Consulta solicitudes pago";
                         break;
                     default:
                         // nothing
