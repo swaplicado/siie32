@@ -104,7 +104,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
-import erp.mod.fin.form.SDialogChoseAccountingCustomReport;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
@@ -116,6 +115,7 @@ import erp.mod.fin.form.SDialogRepMovsFileCvs;
 import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
+import erp.mod.fin.form.SPickerAccountingCustomReport;
 import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
@@ -2309,12 +2309,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.FINX_REC_DPS, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiRecAccCus) {
-                SDialogChoseAccountingCustomReport dialog = new SDialogChoseAccountingCustomReport((SGuiClient) miClient);
-                dialog.setVisible(true);
-                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    int subType = (int) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_ID);
+                SPickerAccountingCustomReport picker = new SPickerAccountingCustomReport((SGuiClient) miClient);
+                picker.setVisible(true);
+                if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    int subType = (int) picker.getValue(SPickerAccountingCustomReport.PARAM_REP_ID);
                     SGuiParams params = new SGuiParams();
-                    params.getParamsMap().put(subType, ((String) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
+                    params.getParamsMap().put(subType, ((String) picker.getValue(SPickerAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
                     miClient.getSession().showView(SModConsts.FINX_REP_CUS_ACC, subType, params);
                 }
             }

@@ -481,7 +481,7 @@ public class SFormCfgAccountingEarning extends SBeanForm implements ActionListen
                     
                     if (SDbCfgAccountingEarning.countExistingRegistries(miClient.getSession(), id) > 0) {
                         throw new Exception("Ya existe un registro para la percepción '" + miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { id }, SDbRegistry.FIELD_NAME) + "'."
-                                + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
+                                + "\nSi no visualiza el registro en cuestión en la vista, quite el filtro de registros eliminados.");
                     }
                 }
                 catch (Exception e) {

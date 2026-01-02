@@ -244,7 +244,7 @@ public class SDbFunctionalSubArea extends SDbRegistryUser {
         return functionalSubAreas;
     }
     
-    public static String composeFunctionalSubAreasCodes(final ArrayList<SDbFunctionalSubArea> functionalSubAreas) {
+    public static String composeFunctionalSubAreaCodes(final ArrayList<SDbFunctionalSubArea> functionalSubAreas) {
         String codes = "";
         
         for (SDbFunctionalSubArea functionalSubArea : functionalSubAreas) {

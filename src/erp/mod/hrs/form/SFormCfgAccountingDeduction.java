@@ -481,7 +481,7 @@ public class SFormCfgAccountingDeduction extends SBeanForm implements ActionList
                     
                     if (SDbCfgAccountingDeduction.countExistingRegistries(miClient.getSession(), id) > 0) {
                         throw new Exception("Ya existe un registro para la deducción '" + miClient.getSession().readField(SModConsts.HRS_DED, new int[] { id }, SDbRegistry.FIELD_NAME) + "'."
-                                + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
+                                + "\nSi no visualiza el registro en cuestión en la vista, quite el filtro de registros eliminados.");
                     }
                 }
                 catch (Exception e) {

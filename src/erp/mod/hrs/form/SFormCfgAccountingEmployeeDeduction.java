@@ -365,7 +365,7 @@ public class SFormCfgAccountingEmployeeDeduction extends SBeanForm implements Ac
                     
                     if (SDbCfgAccountingEmployeeDeduction.countExistingRegistries(miClient.getSession(), key) > 0) {
                         throw new Exception("Ya existe un registro para el empleado '" + moKeyEmployee.getSelectedItem().getItem() + "' y la deducción '" + moKeyDeduction.getSelectedItem().getItem() + "'."
-                                + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
+                                + "\nSi no visualiza el registro en cuestión en la vista, quite el filtro de registros eliminados.");
                     }
                 }
                 catch (Exception e) {

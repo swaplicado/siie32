@@ -22,7 +22,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Isabel Servin
  */
-public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implements ActionListener {
+public class SPickerAccountingCustomReport extends SBeanFormDialog implements ActionListener {
 
     public static final int PARAM_REP_ID = 1;
     public static final int PARAM_REP_NAME = 2;
@@ -34,7 +34,7 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
      * Creates new form SDialogChoseAccountingCustomReport
      * @param client
      */
-    public SDialogChoseAccountingCustomReport(SGuiClient client) {
+    public SPickerAccountingCustomReport(SGuiClient client) {
         miClient = client;
         initComponents();
         initComponentsCustom();
@@ -78,9 +78,9 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de la consulta:"));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.GridLayout(2, 0));
+        jPanel6.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAccCusRep.setText("Seleccionar opción:");
         jlAccCusRep.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -90,7 +90,7 @@ public class SDialogChoseAccountingCustomReport extends SBeanFormDialog implemen
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moKeyAccCusRep.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyAccCusRep.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel8.add(moKeyAccCusRep);
 
         jPanel6.add(jPanel8);

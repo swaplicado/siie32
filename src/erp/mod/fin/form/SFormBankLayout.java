@@ -161,7 +161,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SLock> maSLocks;
     private boolean mbShowConfirmCloseDialog;
     
-    private SDialogChoosePayments moDialogChoosePayments;
+    private SPickerPayments moPickerPayments;
     private boolean isForPayments;
     
     /**
@@ -868,7 +868,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moCellEditorOptions = new STableCellEditorOptions((SClientInterface) miClient);
         moCellEditorOptionsAgreementReference = new STableCellEditorOptions((SClientInterface) miClient, true);
         
-        moDialogChoosePayments = new SDialogChoosePayments(miClient, mnFormSubtype, "Seleccionar pagos");
+        moPickerPayments = new SPickerPayments(miClient, mnFormSubtype, "Seleccionar pagos");
     }
     
     private boolean isModeForAccounting() {
@@ -1347,12 +1347,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
             
             if (moKeyBankLayoutCurrency.getSelectedIndex() > 0 && moKeyDpsCurrency.getSelectedIndex() > 0) {
-                moDialogChoosePayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
+                moPickerPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
             }
             
-            moDialogChoosePayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
-            moDialogChoosePayments.setLayoutDueDate(moDateDateDue.getValue());
-            moDialogChoosePayments.reloadCatalogues();
+            moPickerPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
+            moPickerPayments.setLayoutDueDate(moDateDateDue.getValue());
+            moPickerPayments.reloadCatalogues();
             isForPayments = false;
         }
         catch (Exception e) {
@@ -1368,15 +1368,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
     
     private void actionPerformedGridRowsAddPayments() {
-        moDialogChoosePayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
-        moDialogChoosePayments.setVisible(true);
+        moPickerPayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
+        moPickerPayments.setVisible(true);
         
-        if (moDialogChoosePayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+        if (moPickerPayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             isForPayments = true;
             String warn = "";
             int cantWarn = 0;
             ArrayList<SRowPayments> notVinculed = new ArrayList<>();
-            ArrayList<SRowPayments> paymentRows = moDialogChoosePayments.getSelectedPayments();
+            ArrayList<SRowPayments> paymentRows = moPickerPayments.getSelectedPayments();
             
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                 for (SRowPayments pay : paymentRows) {
@@ -1446,7 +1446,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(0);
             
-            moDialogChoosePayments.addPayments(notVinculed);
+            moPickerPayments.addPayments(notVinculed);
         }
     }
     
@@ -1458,7 +1458,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
         else {
             SLayoutBankRow layout = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
-            moDialogChoosePayments.addPayments(layout.getPayments());
+            moPickerPayments.addPayments(layout.getPayments());
             layout.setForPayment(false);
             layout.getMoneyPayment().setOriginalAmount(0);
             layout.setIsForExtPayment(false);
@@ -1577,7 +1577,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moCellEditorOptionsAgreementReference.setElements(mltAgreementsReferences);
             }
             
-            moDialogChoosePayments.reloadCatalogues();
+            moPickerPayments.reloadCatalogues();
             isForPayments = false;
         }
         catch (Exception e) {
