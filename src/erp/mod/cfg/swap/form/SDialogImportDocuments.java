@@ -1113,9 +1113,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         boolean isDocModeType = moRadDocModeType.isSelected();
         moKeyDocModeType.setEditable(isShowingDocsModeOn && isDocModeType);
+        if (!isDocModeType) {
+            moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
+        }
 
         boolean isDocModeCase = moRadDocModeCase.isSelected();
         moKeyDocModeCase.setEditable(isShowingDocsModeOn && isDocModeCase);
+        if (!isDocModeCase) {
+            moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
+        }
     }
     
     private void enableFieldsForShowingDocs(final boolean setShowingDocsModeOn) {
@@ -1468,7 +1474,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     miClient.showMsgBoxInformation(message);
                 }
 
-                itemStateChangedDocType();
+                itemStateChangedDocType(true);
             }
         }
         catch (Exception e) {
@@ -1592,9 +1598,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             catch (Exception e) {
                 handleShowException(e);
-            }
-            finally {
-                mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
             }
         }
     }
@@ -1877,7 +1880,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int index = moDocumentsGrid.getTable().getSelectedRow();
 
                                     maDocuments.remove(document);
-                                    itemStateChangedDocType(); // reload documents grid
+                                    itemStateChangedDocType(false); // reload documents grid
 
                                     moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
 
@@ -2439,14 +2442,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents) {
+    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGridTable) {
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
         
-        moDocumentsGrid.getTable().requestFocusInWindow();
+        if (focusDocumentsGridTable) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
         
         jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
     }
@@ -2457,12 +2462,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void itemStateChangedDocMode() {
         enableFieldsOfDocMode();
+        
+        if (moRadDocModeType.isSelected()) {
+            itemStateChangedDocType(false);
+        }
+        else if (moRadDocModeCase.isSelected()) {
+            itemStateChangedDocCase(false);
+        }
     }
     
-    private void itemStateChangedDocType() {
+    private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
         if (moKeyDocModeType.isEnabled()) {
             if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ALL) {
-                populateDocumentsGrid(maDocuments);
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
             else {
                 ArrayList<SImportedDocument> documents = new ArrayList<>();
@@ -2482,15 +2494,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents);
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
         }
     }
     
-    private void itemStateChangedDocCase() {
+    private void itemStateChangedDocCase(final boolean focusDocumentsGridTable) {
         if (moKeyDocModeCase.isEnabled()) {
             if (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_ALL) {
-                populateDocumentsGrid(maDocuments);
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
             else {
                 Integer processingTypeId = null;
@@ -2519,7 +2531,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents);
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
         }
     }
@@ -2751,10 +2763,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SBeanFieldKey field = (SBeanFieldKey) e.getSource();
                 
                 if (field == moKeyDocModeType) {
-                    itemStateChangedDocType();
+                    itemStateChangedDocType(false);
                 }
                 else if (field == moKeyDocModeCase) {
-                    itemStateChangedDocCase();
+                    itemStateChangedDocCase(false);
                 }
             }
         }
