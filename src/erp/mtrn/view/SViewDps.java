@@ -1703,7 +1703,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                                 + "<p>ROUTING NUMBER: 121000358</p>"
                                                 + "<p>WIRE: 026009593</p>"
                                                 + "<br>"
-                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>PLEASE SEND CHECKS TO CALIFORNIA ADRESS 251 SOUTH LAKE AVENUE SUITE 800 PASADENA, CA 91101 USA</p>"
                                                 + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
                                         );
                                 }
@@ -2283,7 +2283,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                                 + "<p>ROUTING NUMBER: 121000358</p>"
                                                 + "<p>WIRE: 026009593</p>"
                                                 + "<br>"
-                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>PLEASE SEND CHECKS TO CALIFORNIA ADRESS 251 SOUTH LAKE AVENUE SUITE 800 PASADENA, CA 91101 USA</p>"
                                                 + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
                                         );
                                 }
