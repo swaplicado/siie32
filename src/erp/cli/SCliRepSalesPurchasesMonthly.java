@@ -34,9 +34,9 @@ import sa.lib.mail.SMailSender;
 import sa.lib.mail.SMailUtils;
 
 /**
+ * Envía el reporte de ventas Ítem - cliente de todo el mes pasado de fecha de la ejecución.
  *
  * @author Isabel Servín
- * Envía el reporte de ventas Ítem - cliente de todo el mes pasado de fecha de la ejecución.
  */
 public class SCliRepSalesPurchasesMonthly {
     public static final String ERR_ARGS_INVALID = "Argumentos inválidos.";
