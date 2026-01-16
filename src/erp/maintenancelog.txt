@@ -1,10 +1,11 @@
 ================================================================================
-SIIE 3.2 294.12/ 2026-01-15
+SIIE 3.2 294.12/ 2026-01-16
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Eliminación de intentos fallidos de carga de archivos de OC al sincronizar OC con SWAP Services.
 2) Restricción de creación de documentos cuyo receptor sea la empresa de la sesión de usuario.
 3) Despliegue del ID de solicitudes de pago en diálogo de modificación de pagos.
+4) Corrección a la exportación de proveedores a SWAP Services para que tengan empresas asignadas.
 
 ================================================================================
 SIIE 3.2 294.11/ 2026-01-12

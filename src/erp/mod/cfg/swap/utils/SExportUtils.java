@@ -1358,7 +1358,7 @@ public abstract class SExportUtils {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 String paramValue = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG, resultSet.getString("bd"));
-                JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), paramValue));
+                JsonNode config = mapper.readTree(paramValue);
                 boolean linkedUp = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_LINK_UP)) == 1;
                 if (linkedUp) {
                     companies.add(resultSet.getInt("id_co"));
