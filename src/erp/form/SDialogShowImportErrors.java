@@ -12,7 +12,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogShowImportErrors extends javax.swing.JDialog implements ActionListener {
 
@@ -76,7 +76,9 @@ public class SDialogShowImportErrors extends javax.swing.JDialog implements Acti
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jtaErrors.setColumns(20);
+        jtaErrors.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jtaErrors.setRows(5);
+        jtaErrors.setText("Texto de prueba.");
         jScrollPane1.setViewportView(jtaErrors);
 
         jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);

@@ -85,6 +85,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanel7 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         jtfPaymentType = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jtfPaymentId = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         moKeyCurrency = new sa.lib.gui.bean.SBeanFieldKey();
@@ -180,6 +182,15 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jtfPaymentType.setEnabled(false);
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfPaymentType);
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel7.add(jLabel1);
+
+        jtfPaymentId.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPaymentId.setToolTipText("ID del pago");
+        jtfPaymentId.setEnabled(false);
+        jtfPaymentId.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel7.add(jtfPaymentId);
 
         jPanelN1.add(jPanel7);
 
@@ -292,6 +303,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jMain;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -326,6 +338,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JTextField jtfBeneficiary;
     private javax.swing.JTextField jtfDate;
     private javax.swing.JTextField jtfFolio;
+    private javax.swing.JTextField jtfPaymentId;
     private javax.swing.JTextField jtfPaymentType;
     private javax.swing.JTextField jtfStatus;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentCy;
@@ -364,25 +377,25 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
     public void setFormCase(int formCase) throws Exception {
         switch (formCase) {
-            case CASE_REACTIVATE:
+            case CASE_REACTIVATE: // payment is rejected
                 setTitle("Cambio de fecha requerida");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha requerida:*"); // to get a new date
                 break;
                 
-            case CASE_RESCHEDULE:
+            case CASE_RESCHEDULE: // payment is scheduled
                 setTitle("Cambio de fecha programada");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha programada:*"); // to get a new date
                 break;
                 
-            case CASE_CHANGE_CURRENCY:
+            case CASE_CHANGE_CURRENCY: // payment is scheduled
                 setTitle("Cambio de moneda de pago");
                 jlPaymentCy.setText("Monto a pagar:"); // to show amount
                 jlDateNewDate.setText("Fecha programada:*"); // to get a new date
                 break;
                 
-            case CASE_MARK_AS_PAID:
+            case CASE_MARK_AS_PAID: // payment is scheduled
                 setTitle("Marcar como pagado");
                 jlPaymentCy.setText("Monto pagado:"); // to show amount
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
@@ -432,12 +445,14 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
         jtfDate.setText(SLibUtils.DateFormatDate.format(moRegistry.getDateApplication()));
         jtfPaymentType.setText(singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT) ? SDbPaymentEntry.DESC_ENTRY_TYPE_PAYMENT : SDbPaymentEntry.DESC_ENTRY_TYPE_ADVANCE);
+        jtfPaymentId.setText("ID: " + moRegistry.getPkPaymentId());
         jtfBeneficiary.setText(moRegistry.getDbmsBeneficiary());
         
         jtfFolio.setCaretPosition(0);
         jtfStatus.setCaretPosition(0);
         jtfDate.setCaretPosition(0);
         jtfPaymentType.setCaretPosition(0);
+        jtfPaymentId.setCaretPosition(0);
         jtfBeneficiary.setCaretPosition(0);
 
         boolean reactivating = false;
@@ -488,7 +503,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDateNewDate.setEditable(!changingCurrency);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
         moKeyPriority.setEditable(reactivating);
-        moTextNotes.setEditable(reactivating);
+        moTextNotes.setEditable(reactivating || rescheduling);
         moTextNotesAuthorization.setEditable(reactivating);
         
         addAllListeners();

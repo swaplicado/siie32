@@ -152,10 +152,19 @@ public class SFormCfgAccountingDepartmentPackCostCenters extends SBeanForm {
 
         removeAllListeners();
         reloadCatalogues();
+        
+        int departmentId = moRegistry.getPkDepartmentId();
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.setSystem(false); // all editable registries are non-system
+            
+            if (departmentId != 0) {
+                // registry is being copied:
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que el departamento '" + miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { departmentId }, SDbRegistry.FIELD_NAME) + "' ya tiene al menos otra configuración de contabilización.\n"
+                        + "Para evitar resultados inesperados al contabilizar las nóminas de este departamento,\n"
+                        + "¡valide cuidadosamente que el inicio de vigencia de esta nueva configuración sea el requerido!");
+            }
             
             moRegistry.setDateStart(miClient.getSession().getCurrentDate());
             
@@ -165,8 +174,8 @@ public class SFormCfgAccountingDepartmentPackCostCenters extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
-        moKeyDepartment.setValue(new int[] { moRegistry.getPkDepartmentId() });
-        moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId()});
+        moKeyDepartment.setValue(new int[] { departmentId });
+        moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId() });
         moDateStart.setValue(moRegistry.getDateStart());
         
         // finish setting this form:

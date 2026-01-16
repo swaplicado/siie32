@@ -604,6 +604,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                     payment.setDateSchedule_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
                                     payment.setRescheduled(true);
                                     payment.setFkUserRescheduleId(miClient.getSession().getUser().getPkUserId());
+                                    payment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
 
                                     miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
                                             + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");

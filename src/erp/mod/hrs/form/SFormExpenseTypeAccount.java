@@ -156,10 +156,21 @@ public class SFormExpenseTypeAccount extends SBeanForm implements ItemListener {
         removeAllListeners();
         reloadCatalogues();
         
+        int expenseTypeId = moRegistry.getPkExpenseTypeId();
+        
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             
-            moRegistry.setFkAccountId(SDataConstantsSys.NA);
+            if (expenseTypeId == 0) {
+                // registry is totally new, it means that it is not being copied:
+                moRegistry.setFkAccountId(SDataConstantsSys.NA);
+            }
+            else {
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que solo puede haber UNA configuración de contabilización para cada tipo de gasto.\n"
+                        + "El tipo de gasto '" + miClient.getSession().readField(SModConsts.HRSU_TP_EXP, new int[] { expenseTypeId }, SDbRegistry.FIELD_NAME) + "' ya tiene su propia configuración.\n"
+                        + "Si en efecto desea crear una nueva configuración a partir de la original, tendrá que seleccionar una opción distinta en el campo '" + moKeyExpenseType.getFieldName() + "'.");
+            }
             
             jtfRegistryKey.setText("");
         }
@@ -167,7 +178,7 @@ public class SFormExpenseTypeAccount extends SBeanForm implements ItemListener {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
-        moKeyExpenseType.setValue(new int[] { moRegistry.getPkExpenseTypeId()});
+        moKeyExpenseType.setValue(new int[] { expenseTypeId });
         itemStateChangedTypeExpense();
         moPanelAccount.setSelectedAccount(new SAccount(moRegistry.getFkAccountId(), (String) miClient.getSession().readField(SModConsts.FIN_ACC, new int[] { moRegistry.getFkAccountId() }, SDbRegistry.FIELD_CODE), "", false, 0, 0));
         
@@ -208,7 +219,7 @@ public class SFormExpenseTypeAccount extends SBeanForm implements ItemListener {
                     
                     if (SDbExpenseTypeAccount.countExistingRegistries(miClient.getSession(), id) > 0) {
                         throw new Exception("Ya existe un registro para el tipo de gasto '" + miClient.getSession().readField(SModConsts.HRSU_TP_EXP, new int[] { id }, SDbRegistry.FIELD_NAME) + "'."
-                                + "\nSi no visualiza el registro existente en la vista, busque entre los registros eliminados.");
+                                + "\nSi no visualiza el registro en cuestión en la vista, quite el filtro de registros eliminados.");
                     }
                 }
                 catch (Exception e) {

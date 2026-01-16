@@ -244,6 +244,24 @@ public abstract class SExportDataUtils {
                 String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER_FILE, database);
                 ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
+                
+                // eliminar intentos erróneos previos de procesamiento de archivos de OC:
+                
+                String sqlDelete = "DELETE le FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS le "
+                        + "INNER JOIN (SELECT "
+                        + "DISTINCT le.reference_id "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " le "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " l ON le.id_sync_log = l.id_sync_log "
+                        + "WHERE "
+                        + "le.response_body LIKE '%error%' "
+                        + "AND l.sync_type IN ('" + SSyncType.PUR_ORDER + "' , '" + SSyncType.PUR_ORDER_FILE + "') "
+                        + "ORDER BY le.reference_id) AS err ON err.reference_id = le.reference_id;";
+                
+                statement.execute(sqlDelete);
+                
+                // procesamiento de archivos de OC:
 
                 String sql = "SELECT "
                         + "d.id_year, d.id_doc, "
@@ -292,7 +310,8 @@ public abstract class SExportDataUtils {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
                             oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
                             lLogFiles.add(oLogEty);
-                        } else {
+                        }
+                        else {
                             oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
                             if (!CloudStorageManager.storagedFileExists(oFd.getFileName())) {
                                 oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
@@ -309,21 +328,22 @@ public abstract class SExportDataUtils {
                                     resultSet.getTimestamp("_last_upd"));
                             oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
                             if (oLogEty != null) {
-                                if (Integer.parseInt(oLogEty.getResponseCode()) == 200
-                                        || Integer.parseInt(oLogEty.getResponseCode()) == 201) {
+                                int responseCode = Integer.parseInt(oLogEty.getResponseCode());
+                                if (responseCode == SHttpConsts.RSC_SUCC_OK || responseCode == SHttpConsts.RSC_SUCC_CREATED) {
                                     lLogFiles.add(oLogEty);
-                                } else {
+                                }
+                                else {
                                     Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "Error al subir el archivo de la OC. "
                                             + oDpsExport.id_year + "_" + oDpsExport.id_doc + ". "
                                             + oLogEty.getResponseBody());
                                 }
                             }
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e) {
                             Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudo generar el PDF de la OC para exportación. "
                                     + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc, e);
                         }
                     }
-
                 }
                 try {
                     // guardar encabezado de log de archivos:

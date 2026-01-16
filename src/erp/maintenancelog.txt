@@ -1,4 +1,82 @@
 ================================================================================
+SIIE 3.2 294.13/ 2026-01-16
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección del reporte de totales en solicitudes de pago, con los anticipos
+
+SIIE 3.2 294.12/ 2026-01-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la exportación de proveedores a SWAP Services para que tengan empresas asignadas.
+
+================================================================================
+SIIE 3.2 294.12/ 2026-01-15
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Eliminación de intentos fallidos de carga de archivos de OC al sincronizar OC con SWAP Services.
+2) Restricción de creación de documentos cuyo receptor sea la empresa de la sesión de usuario.
+3) Despliegue del ID de solicitudes de pago en diálogo de modificación de pagos.
+
+================================================================================
+SIIE 3.2 294.11/ 2026-01-12
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Cambio de la dirección de la empresa en saporis internacional
+
+================================================================================
+SIIE 3.2 294.10/ 2026-01-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de control de progreso de recuperación de facturas autorizadas desde SWAP Services.
+
+================================================================================
+SIIE 3.2 294.9/ 2025-12-30
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Adicción del reporte de totales de solicitudes de pagos.
+
+================================================================================
+SIIE 3.2 294.8/ 2025-12-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la modificación de solicitudes de pago de tipo anticipo, por intento innecesario de obtención del saldo del documento relacionado.
+2) Reforzamiento a la copia de configuraciones de contabilización de nóminas, para aclarar si es posible o no tener varios registros a la vez en los distintos tipos de configuración.
+3) Adición de columna UUID del CFDI, si existe, en consulta de documentos por ítem y asociado de negocios (cliente o proveedor).
+
+SIIE 3.2 294.8/ 2025-12-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección a la valuación de consumos de almacén relacionados con movimientos de activo fijo.
+
+================================================================================
+SIIE 3.2 294.7/ 2025-12-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de consumos de incidencias, que afectaba el cálculo de ISR retenido por salarios, en nóminas semanales de cambio de año calendario.
+2) Corrección a la obtención del siguiente número de nómina semanal cuando la primer nómina del año actual tiene el consecutivo de la última semana del año previo.
+
+================================================================================
+SIIE 3.2 294.6/ 2025-12-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de modificación de instrucciones de pago al reprogramar solicitudes de pago.
+
+================================================================================
+SIIE 3.2 294.5/ 2025-12-19
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Correción al obtener lista de precios.
+2) Adicción de comentario MODIFICADO al asunto de los contratos.
+
+================================================================================
+SIIE 3.2 294.4/ 2025-12-19
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de obtención de facturas autorizadas desde SWAP Services por semana de revisión.
+2) Adición de advertencias para obtención o descarga de facturas autorizadas desde SWAP Services para períodos extensos o muchos documentos.
+3) Ajuste a validación de pagos en proceso en la creación de nuevas solicitudes de pago.
+
+================================================================================
 SIIE 3.2 294.3/ 2025-12-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -1211,15 +1211,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM fin_pay AS p " +
                                 "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
-                                "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " " +
-                                "AND p.fk_st_pay IN (" + 
-                                SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
-                                SModSysConsts.FINS_ST_PAY_EXEC + ", " + SModSysConsts.FINS_ST_PAY_EXEC_P + ", " +
-                                SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
-                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
-                                SModSysConsts.FINS_ST_PAY_RCPT + ", " + SModSysConsts.FINS_ST_PAY_RCPT_P + ", " +
-                                SModSysConsts.FINS_ST_PAY_IN_TREAS + ") ";
-                        sMsgAux = "¡El documento está asociado al menos a un pago que está en autorización o que ya fue operado!";
+                                "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " ";
+                        sMsgAux = "¡El documento está asociado al menos a una solicitud de pago o a un pago!";
                         break;
                     default:
                         sSql = "";
@@ -5145,8 +5138,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mmsConfig = new SDbMmsConfig();
                         mmsConfig.read(client.getSession(), mmsConfigKey);
 
-//                        emailsSet.add(mmsConfig.getEmail());
-                        emailsSet.add("claudio.pena@swaplicado.com.mx");
+                        emailsSet.add(mmsConfig.getEmail());
                     }
                 }
                 catch (java.lang.Exception e) {
@@ -5218,7 +5210,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         SMailSender sender = null;
                         Object images = null;
                         Date sentDate = null;
-                        STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                        STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate, isEdited);
                         toRecipients.clear();
                     }
                     catch (java.lang.Exception e) {
@@ -5264,7 +5256,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
                                         (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
-                                        toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                                        toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }
                     catch (Exception ex) {
@@ -5354,7 +5346,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         SMailSender sender = null;
                         Object images = null;
                         Date sentDate = null;
-                        STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                        STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }
                     catch (java.lang.Exception e) {
@@ -5400,7 +5392,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
                                         (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
-                                        toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate);
+                                        toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }
                     catch (Exception ex) {

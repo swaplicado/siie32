@@ -161,6 +161,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlSymbol.setForeground(new java.awt.Color(0, 102, 102));
         jlSymbol.setText("Símbolo de unidad: *");
         jlSymbol.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlSymbol);

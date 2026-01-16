@@ -49,17 +49,20 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibTimeUtils;
@@ -71,6 +74,7 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiField;
 import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
@@ -92,17 +96,22 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
-    protected static final int MODE_OFF = 0;
-    protected static final int MODE_ON = 1;
+    protected static final int OFF = 0;
+    protected static final int ON = 1;
+    protected static final int LIMIT_DAYS = 31; // 1 calendar month
+    protected static final int LIMIT_WEEKS = 4; // 1 lunar month
+    protected static final int LIMIT_DOWNLOADS = 250; // 0.25 k documents
+    protected static final int FUNC_SUB_AREA_CODES_PER_LINE = 15;
     
     protected String msCompanyName;
-    protected int mnSearchMode;
+    protected int mnShowingDocsMode;
     protected SGridPaneForm moDocumentsGrid;
     protected SDialogDpsFinder moDialogDpsFinder;
     protected ArrayList<SImportedDocument> maDocuments;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
-    protected String msUserFunctionalSubAreasCodes;
-    protected String msSyncUrlRetrieve;
+    protected String msUserFunctionalSubAreaCodes;
+    protected String msSyncUrlRetrieveByPeriod;
+    protected String msSyncUrlRetrieveByWeek;
     protected String msSyncUrlDownload;
     protected String msSyncToken;
     protected String msSyncApiKey;
@@ -182,11 +191,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkAllDocs = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsGrid = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jpDocumentsGrid1 = new javax.swing.JPanel();
+        jpDocumentsGrid11 = new javax.swing.JPanel();
+        jpDocumentsGrid111 = new javax.swing.JPanel();
         jlInvoiceUserNew = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        jpDocumentsGrid112 = new javax.swing.JPanel();
         jtfInvoiceUserNew = new javax.swing.JTextField();
+        jpDocumentsGrid12 = new javax.swing.JPanel();
+        jpDocumentsGrid121 = new javax.swing.JPanel();
+        jlProgress = new javax.swing.JLabel();
+        jpDocumentsGrid122 = new javax.swing.JPanel();
+        jProgressBar = new javax.swing.JProgressBar();
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
@@ -428,27 +443,50 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpDocumentsGrid.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+        jpDocumentsGrid1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDocumentsGrid11.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+
+        jpDocumentsGrid111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInvoiceUserNew.setText("Usr. factura:");
         jlInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jPanel2.add(jlInvoiceUserNew);
+        jpDocumentsGrid111.add(jlInvoiceUserNew);
 
-        jPanel1.add(jPanel2);
+        jpDocumentsGrid11.add(jpDocumentsGrid111);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDocumentsGrid112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfInvoiceUserNew.setEditable(false);
         jtfInvoiceUserNew.setText("user.name");
         jtfInvoiceUserNew.setFocusable(false);
         jtfInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jPanel3.add(jtfInvoiceUserNew);
+        jpDocumentsGrid112.add(jtfInvoiceUserNew);
 
-        jPanel1.add(jPanel3);
+        jpDocumentsGrid11.add(jpDocumentsGrid112);
 
-        jpDocumentsGrid.add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jpDocumentsGrid1.add(jpDocumentsGrid11, java.awt.BorderLayout.CENTER);
+
+        jpDocumentsGrid12.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+
+        jpDocumentsGrid121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlProgress.setText("Progreso...");
+        jlProgress.setPreferredSize(new java.awt.Dimension(200, 20));
+        jpDocumentsGrid121.add(jlProgress);
+
+        jpDocumentsGrid12.add(jpDocumentsGrid121);
+
+        jpDocumentsGrid122.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jProgressBar.setPreferredSize(new java.awt.Dimension(200, 20));
+        jpDocumentsGrid122.add(jProgressBar);
+
+        jpDocumentsGrid12.add(jpDocumentsGrid122);
+
+        jpDocumentsGrid1.add(jpDocumentsGrid12, java.awt.BorderLayout.EAST);
+
+        jpDocumentsGrid.add(jpDocumentsGrid1, java.awt.BorderLayout.SOUTH);
 
         jpDocuments.add(jpDocumentsGrid, java.awt.BorderLayout.CENTER);
 
@@ -735,9 +773,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabelPeriiod1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbChangePaymentRequiredDate;
     private javax.swing.JButton jbChangePaymentScheduledDate;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
@@ -765,10 +801,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jlPay;
     private javax.swing.JLabel jlPayExec;
     private javax.swing.JLabel jlPaySched;
+    private javax.swing.JLabel jlProgress;
     private javax.swing.JLabel jlReqPay;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid;
+    private javax.swing.JPanel jpDocumentsGrid1;
+    private javax.swing.JPanel jpDocumentsGrid11;
+    private javax.swing.JPanel jpDocumentsGrid111;
+    private javax.swing.JPanel jpDocumentsGrid112;
+    private javax.swing.JPanel jpDocumentsGrid12;
+    private javax.swing.JPanel jpDocumentsGrid121;
+    private javax.swing.JPanel jpDocumentsGrid122;
     private javax.swing.JPanel jpDocumentsProcessing;
     private javax.swing.JPanel jpDownload;
     private javax.swing.JPanel jpDownloadE;
@@ -879,7 +923,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_PURCHASE)));
         
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
-        mnSearchMode = MODE_OFF;
+        mnShowingDocsMode = OFF;
         
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
             @Override
@@ -910,21 +954,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Caso factura")); // col 15
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus factura"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Semana revisión factura", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha-hora revisión factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago")); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
                 
@@ -938,6 +983,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         jlStatus = new JLabel();
         jpCommandLeft.add(jlStatus);
+        clearProgress();
         
         moBoolExportPaymentRequestsOnClose = new SBeanFieldBoolean();
         moBoolExportPaymentRequestsOnClose.setText("Exportar solicitudes de pago al cerrar");
@@ -955,10 +1001,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsFunctionalAreas()) {
                 maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubAreas(miClient.getSession());
-                msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
+                msUserFunctionalSubAreaCodes = SDbFunctionalSubArea.composeFunctionalSubAreaCodes(maFunctionalSubAreas);
 
-                if (msUserFunctionalSubAreasCodes.isEmpty()) {
-                    msUserFunctionalSubAreasCodes = "¡NINGUNA!";
+                if (msUserFunctionalSubAreaCodes.isEmpty()) {
+                    msUserFunctionalSubAreaCodes = "¡NINGUNA!";
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no podrá ver ni procesar facturas autorizadas porque no tiene subáreas funcionales asignadas.");
                 }
             }
@@ -966,17 +1012,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) miClient.getSession().readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
                 maFunctionalSubAreas = new ArrayList<>();
                 maFunctionalSubAreas.add(functionalSubArea);
-                msUserFunctionalSubAreasCodes = functionalSubArea.getCode();
+                msUserFunctionalSubAreaCodes = functionalSubArea.getCode();
             }
             
-            jtfUserFuncSubAreas.setText(msUserFunctionalSubAreasCodes);
+            jtfUserFuncSubAreas.setText(msUserFunctionalSubAreaCodes);
             jtfUserFuncSubAreas.setCaretPosition(0);
-            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreasCodes);
+            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreaCodes);
             
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
             
-            msSyncUrlRetrieve = "";
+            msSyncUrlRetrieveByPeriod = "";
+            msSyncUrlRetrieveByWeek = "";
             msSyncToken = "";
             msSyncApiKey = "";
             mnSyncLimit = 0;
@@ -998,7 +1045,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
             
             // documents retreival service: /api/documents/filter-by-date-and-type/?start_date=<start_date>&end_date=<end_date>&document_type=<document_type>; date format: yyyy-mm-dd; document type format: 0 (raw integer)
-            msSyncUrlRetrieve = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByPeriod = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByWeek = msSyncUrlRetrieveByPeriod.substring(0, msSyncUrlRetrieveByPeriod.indexOf("?") + 1);
             
             // documents download service: /api/documents/download-docs-zip/
             msSyncUrlDownload = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC_DWNLD, SSwapConsts.CFG_ATT_URL); // complementar la URL
@@ -1032,60 +1080,81 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbShowDocs.requestFocusInWindow();
     }
     
+    private void disableFieldsOfSearchBy() {
+        moRadSearchByPeriod.setEnabled(false);
+        moDatePeriodStart.setEditable(false);
+        moDatePeriodEnd.setEditable(false);
+        
+        moRadSearchByWeek.setEnabled(false);
+        moCalWeekYear.setEditable(false);
+        moCalWeekStart.setEditable(false);
+        moCalWeekEnd.setEditable(false);
+        
+        moBoolExcludeRecorded.setEnabled(false);
+        
+        jbShowDocs.setEnabled(false);
+    }
+    
     private void enableFieldsOfSearchBy() {
-        boolean isSearchModeOff = mnSearchMode == MODE_OFF;
+        boolean isShowingDocsModeOff = mnShowingDocsMode == OFF;
         
         boolean isSearchByPeriod = moRadSearchByPeriod.isSelected();
-        moDatePeriodStart.setEditable(isSearchModeOff && isSearchByPeriod);
-        moDatePeriodEnd.setEditable(isSearchModeOff && isSearchByPeriod);
+        moDatePeriodStart.setEditable(isShowingDocsModeOff && isSearchByPeriod);
+        moDatePeriodEnd.setEditable(isShowingDocsModeOff && isSearchByPeriod);
         
         boolean isSearchByWeek = moRadSearchByWeek.isSelected();
-        moCalWeekYear.setEditable(isSearchModeOff && isSearchByWeek);
-        moCalWeekStart.setEditable(isSearchModeOff && isSearchByWeek);
-        moCalWeekEnd.setEditable(isSearchModeOff && isSearchByWeek);
+        moCalWeekYear.setEditable(isShowingDocsModeOff && isSearchByWeek);
+        moCalWeekStart.setEditable(isShowingDocsModeOff && isSearchByWeek);
+        moCalWeekEnd.setEditable(isShowingDocsModeOff && isSearchByWeek);
     }
     
     private void enableFieldsOfDocMode() {
-        boolean isSearchModeOn = mnSearchMode == MODE_ON;
+        boolean isShowingDocsModeOn = mnShowingDocsMode == ON;
         
         boolean isDocModeType = moRadDocModeType.isSelected();
-        moKeyDocModeType.setEditable(isSearchModeOn && isDocModeType);
+        moKeyDocModeType.setEditable(isShowingDocsModeOn && isDocModeType);
+        if (!isDocModeType) {
+            moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
+        }
 
         boolean isDocModeCase = moRadDocModeCase.isSelected();
-        moKeyDocModeCase.setEditable(isSearchModeOn && isDocModeCase);
+        moKeyDocModeCase.setEditable(isShowingDocsModeOn && isDocModeCase);
+        if (!isDocModeCase) {
+            moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
+        }
     }
     
-    private void enableFieldsForSearch(final boolean enableSearchModeOn) {
-        mnSearchMode = enableSearchModeOn ? MODE_ON : MODE_OFF;
+    private void enableFieldsForShowingDocs(final boolean setShowingDocsModeOn) {
+        mnShowingDocsMode = setShowingDocsModeOn ? ON : OFF;
         
         // START OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
         
-        if (!enableSearchModeOn) {
+        if (!setShowingDocsModeOn) {
             moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
             moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
         }
         
         // END OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
         
-        moRadSearchByPeriod.setEnabled(!enableSearchModeOn);
-        moRadSearchByWeek.setEnabled(false/*!enableSearchModeOn*/);
+        moRadSearchByPeriod.setEnabled(!setShowingDocsModeOn);
+        moRadSearchByWeek.setEnabled(!setShowingDocsModeOn);
         enableFieldsOfSearchBy();
         
-        moRadDocModeType.setEnabled(enableSearchModeOn);
-        moRadDocModeCase.setEnabled(enableSearchModeOn);
+        moRadDocModeType.setEnabled(setShowingDocsModeOn);
+        moRadDocModeCase.setEnabled(setShowingDocsModeOn);
         enableFieldsOfDocMode();
         
-        moBoolExcludeRecorded.setEnabled(!enableSearchModeOn);
+        moBoolExcludeRecorded.setEnabled(!setShowingDocsModeOn);
         
-        jbShowDocs.setEnabled(!enableSearchModeOn);
-        jbClearDocs.setEnabled(enableSearchModeOn);
+        jbShowDocs.setEnabled(!setShowingDocsModeOn);
+        jbClearDocs.setEnabled(setShowingDocsModeOn);
         
-        jbSelectRemainingDocs.setEnabled(enableSearchModeOn);
-        jbSelectAllDocs.setEnabled(enableSearchModeOn);
-        jbDeselectAllDocs.setEnabled(enableSearchModeOn);
+        jbSelectRemainingDocs.setEnabled(setShowingDocsModeOn);
+        jbSelectAllDocs.setEnabled(setShowingDocsModeOn);
+        jbDeselectAllDocs.setEnabled(setShowingDocsModeOn);
         
-        jbDownloadSelectedDocs.setEnabled(enableSearchModeOn);
-        jbLinkAllDocs.setEnabled(enableSearchModeOn);
+        jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
+        jbLinkAllDocs.setEnabled(setShowingDocsModeOn);
     }
     
     private void exportPaymentRequestsIfNeeded() {
@@ -1178,24 +1247,306 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void initProgress() {
+        jlProgress.setText("Preparando la petición...");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(true);
+    }
+    
+    private void startProgress() {
+        jlProgress.setText("Recuperando facturas...");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(true);
+        jProgressBar.setIndeterminate(false);
+    }
+    
+    private void clearProgress() {
+        jlProgress.setText("");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(false);
+    }
+    
+    private String formatFunctionalSubAreasCodes() {
+        String formatedCodes = "";
+        String[] codes = msUserFunctionalSubAreaCodes.split(", ");
+        
+        for (int i = 0; i < codes.length; i++) {
+            String br = "";
+            
+            if (i > 0 && (i % FUNC_SUB_AREA_CODES_PER_LINE == 0)) {
+                br = "\n" + SLibUtils.textRepeat(" ", 3); // indent of 3 blank spaces
+            }
+            
+            formatedCodes += (formatedCodes.isEmpty() ? "" : ", ") + br + codes[i];
+        }
+        
+        return formatedCodes;
+    }
+    
+    private void processShowDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
+        int countRetreived = 0;
+        int countElegible = 0;
+        int countShown = 0;
+        int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+        Exception exception = null;
+        
+        try {
+            try (InputStream is = connection.getInputStream()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(is);
+
+                if (root.isArray()) {
+                    startProgress();
+                            
+                    for (JsonNode docNode : root) {
+                        callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
+
+                        JsonNode companyNode = docNode.path("company");
+
+                        if (companyNode.get("external_id").asInt() == companyId &&
+                                docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
+                                docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+                            countElegible++;
+
+                            int externalDocumentId = docNode.get("id").asInt();
+
+                            JsonNode functionalAreaNode = docNode.path("functional_area");
+                            int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
+
+                            if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
+                                int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
+
+                                SImportedDocument document = new SImportedDocument();
+
+                                document.ExternalDocumentId = externalDocumentId;
+                                document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
+
+                                if (!moBoolExcludeRecorded.isSelected() || !document.isRecorded()) {
+
+                                    if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
+                                        document.ExternalDocumentUuid = docNode.path("uuid").asText();
+                                    }
+                                    else {
+                                        document.ExternalDocumentUuid = "";
+                                    }
+
+                                    JsonNode partnerNode = docNode.path("partner");
+                                    document.BizPartnerId = partnerNode.get("external_id").asInt();
+                                    document.BizPartner = partnerNode.get("full_name").asText();
+
+                                    document.NumberSeries = docNode.get("series").asText();
+                                    document.Number = docNode.get("number").asText();
+
+                                    if (document.NumberSeries.isEmpty() && document.Number.isEmpty() && document.ExternalDocumentUuid.isEmpty()) {
+                                        document.Number = docNode.get("folio").asText();
+                                    }
+
+                                    document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
+
+                                    JsonNode referencesNode = docNode.path("references");
+                                    if (referencesNode.isArray()) {
+                                        ArrayList<SImportedDocument.Reference> references = new ArrayList<>();
+
+                                        for (JsonNode referenceNode : referencesNode) {
+                                            int referenceType = referenceNode.get("document_ref_type").asInt();
+                                            String reference = referenceNode.get("reference").asText();
+                                            SImportUtils.DpsKey dpsKey = SImportUtils.createDpsKey(referenceNode.get("external_id").asText()); // e.g., "2025_1"
+
+                                            references.add(new SImportedDocument.Reference(referenceType, reference, dpsKey));
+                                        }
+
+                                        if (!references.isEmpty()) {
+                                            document.References = references.toArray(new SImportedDocument.Reference[0]);
+
+                                            document.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
+                                            document.ReferencesAsText = document.composeReferences();
+                                        }
+                                    }
+
+                                    document.Description = docNode.get("notes").asText();
+
+                                    document.FunctionalSubAreaId = functionalSubAreaId;
+                                    document.FunctionalSubArea = functionalAreaNode.get("name").asText();
+
+                                    document.FiscalUseCode = docNode.get("fiscal_use").asText();
+
+                                    document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
+
+                                    JsonNode currencyNode = docNode.path("currency");
+                                    document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
+                                    document.CurrencyCode = currencyNode.get("code").asText();
+
+                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
+                                    double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
+                                    double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
+                                    String requiredPaymentDateAsText = docNode.has("payment_date") ? docNode.get("payment_date").asText() : "";
+                                    Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
+
+                                    if (requiredPaymentDate == null && requiredPaymentPct == 0) {
+                                        document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;
+                                        document.RequiredPaymentAmount = 0;
+                                        document.RequiredPaymentPct = 0;
+                                        document.RequiredPaymentDate = null;
+                                        document.IsRequiredPaymentLoc = false;
+                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    }
+                                    else {
+                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_IS_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
+                                        document.RequiredPaymentAmount = requiredPaymentAmount;
+                                        document.RequiredPaymentPct = requiredPaymentPct;
+                                        document.RequiredPaymentDate = requiredPaymentDate;
+                                        document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
+                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    }
+
+                                    if (document.ExternalDocumentId == 4246) {
+                                        System.out.println("El 4246");
+                                    }
+
+                                    String revisionDatetimeAsText = docNode.has("date_week_revision") ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
+                                    Date revisionDatetime = docNode.path("date_week_revision").isNull() || revisionDatetimeAsText == null || revisionDatetimeAsText.isEmpty() || revisionDatetimeAsText.equals("null") ? null : SSwapUtils.SwapDatetimeMicrosecsTimeZoneFormat.parse(revisionDatetimeAsText.replaceFirst("(\\.\\d{3})\\d+", "$1")); // trunc microsecontds to milliseconds
+
+                                    document.RevisionYear = docNode.get("year_week_revision").asInt();
+                                    document.RevisionWeek = docNode.get("number_week_revision").asInt();
+                                    document.RevisionDatetime = revisionDatetime;
+                                    document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
+                                    document.ProcessingTypeCode = SImportedDocument.ProcTypes.get(document.ProcessingTypeId);
+                                    document.StatusId = 0;
+                                    document.Status = "";
+                                    document.Download = false;
+                                    document.AlreadyDownloaded = countOfImports > 0;
+
+                                    maDocuments.add(document);
+                                    countShown++;
+                                }
+                            }
+                            /* 2025-11-19, Sergio Flores: Uncomment fot debugging purposes:
+                            else {
+                                System.out.println("Documento no elegible: ID externo = " + externalDocumentId + "; ID subárea funcional = " + functionalSubAreaId + ".");
+                            }
+                            */
+                        }
+                    }
+                }
+                
+                callback.onProgress(100);
+                enableFieldsForShowingDocs(true);
+
+                String range = "";
+
+                if (moRadSearchByPeriod.isSelected()) {
+                    range = (SLibTimeUtils.isSameDate(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) ?
+                            ("Día:\n- " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue())) :
+                            ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDatePeriodEnd.getValue())));
+                }
+                else if (moRadSearchByWeek.isSelected()) {
+                    range = "Año:\n- " + moCalWeekYear.getValue() + "\n" +
+                            (Objects.equals(moCalWeekStart.getValue(), moCalWeekEnd.getValue()) ?
+                            ("Semana:\n- " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue())) :
+                            ("Semana:\n- de la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue()) + " a la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekEnd.getValue())));
+                }
+
+                String message = "Resumen de la búsqueda de facturas autorizadas en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
+                        + "Empresa actual:\n- " + msCompanyName + ".\n"
+                        + "Subáreas funcionales del usuario actual:\n- " + formatFunctionalSubAreasCodes() + ".\n"
+                        + range + ".\n\n";
+
+                message += "Búsqueda de facturas autorizadas:\n";
+
+                if (countRetreived == 0) {
+                    message += "- ¡No se encontraron facturas autorizadas!";
+
+                    miClient.showMsgBoxWarning(message);
+                }
+                else {
+                    if (countRetreived != countElegible) {
+                        message += "- Facturas autorizadas totales: " + countRetreived + ";\n"; // this case should not happen
+                    }
+
+                    message += "- Facturas autorizadas de la empresa actual: " + countElegible + ";\n"
+                            + "- Facturas autorizadas elegibles al usuario actual: " + countShown + ".";
+
+                    miClient.showMsgBoxInformation(message);
+                }
+
+                itemStateChangedDocType(true);
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+            handleShowException(e);
+        }
+        finally {
+            mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
+            
+            if (exception != null) {
+                throw exception;
+            }
+        }
+    }
+    
     private void actionPerformedShowDocs() {
-        SGuiValidation validation = SGuiUtils.validateDateRange(moDatePeriodStart, moDatePeriodEnd);
+        SGuiValidation validation = null;
+        String capacityLimit = "Por eficiencia en el procesamiento de su petición, la consulta está restringida máximo a ";
+        
+        if (moRadSearchByPeriod.isSelected()) {
+            validation = SGuiUtils.validateDateRange(moDatePeriodStart, moDatePeriodEnd);
+            
+            if (validation.isValid()) {
+                if (SLibTimeUtils.countPeriodDays(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) > LIMIT_DAYS) {
+                    validation.setMessage(capacityLimit + LIMIT_DAYS + " días.");
+                    validation.setComponent(moDatePeriodStart.getComponent());
+                }
+            }
+        }
+        else if (moRadSearchByWeek.isSelected()) {
+            for (SGuiField field : new SGuiField[] { moCalWeekYear, moCalWeekStart, moCalWeekEnd }) {
+                validation = field.validateField();
+                if (!validation.isValid()) {
+                    break;
+                }
+            }
+            
+            if (validation.isValid()) {
+                if (moCalWeekStart.getValue() > moCalWeekEnd.getValue()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moCalWeekStart.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + moCalWeekEnd.getFieldName() + "'.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+                else if (moCalWeekEnd.getValue() - moCalWeekStart.getValue() + 1 > LIMIT_WEEKS) {
+                    validation.setMessage(capacityLimit + LIMIT_WEEKS + " semanas.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+            }
+        }
         
         if (SGuiUtils.computeValidation(miClient, validation)) {
             try {
                 mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
-                SGuiUtils.setCursorWait(miClient);
                 
-                enableFieldsForSearch(true);
-                
-                int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+                disableFieldsOfSearchBy();
                 
                 String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-                String urlQuery = msSyncUrlRetrieve;
+                String urlQuery = "";
                 
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                if (moRadSearchByPeriod.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByPeriod;
+
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                }
+                else if (moRadSearchByWeek.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByWeek
+                            + "year_revision=" + moCalWeekYear.getValue()
+                            + "&week_revision_start=" + moCalWeekStart.getValue()
+                            + "&week_revision_end=" + moCalWeekEnd.getValue()
+                            + "&document_type=" + SSwapConsts.TXN_DOC_TYPE_INVOICE;
+                }
                 
                 urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
 
@@ -1219,178 +1570,34 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
 
                 connection.setDoInput(true); // true is already the default value!
+                initProgress();
                 
-                int countRetreived = 0;
-                int countElegible = 0;
-                int countShown = 0;
+                SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        processShowDocs(connection, progress -> {
+                            publish(progress);
+                        });
+                        return null;
+                    }
+                    
+                    @Override
+                    protected void process(List<Integer> chunks) {
+                        int latest = chunks.get(chunks.size() - 1);
+                        jProgressBar.setValue(latest);   // runs on EDT
+                    }
+
+                    @Override
+                    protected void done() {
+                        clearProgress();
+                    }
+                };
                 
-                try (InputStream is = connection.getInputStream()) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode root = mapper.readTree(is);
-
-                    if (root.isArray()) {
-                        for (JsonNode docNode : root) {
-                            countRetreived++;
-                            JsonNode companyNode = docNode.path("company");
-
-                            if (companyNode.get("external_id").asInt() == companyId &&
-                                    docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
-                                    docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
-                                countElegible++;
-                                
-                                int externalDocumentId = docNode.get("id").asInt();
-                                
-                                JsonNode functionalAreaNode = docNode.path("functional_area");
-                                int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
-                                
-                                if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
-                                    int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
-
-                                    SImportedDocument document = new SImportedDocument();
-
-                                    document.ExternalDocumentId = externalDocumentId;
-                                    document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
-                                    
-                                    if (!moBoolExcludeRecorded.isSelected() || !document.isRecorded()) {
-                                        
-                                        if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
-                                            document.ExternalDocumentUuid = docNode.path("uuid").asText();
-                                        }
-                                        else {
-                                            document.ExternalDocumentUuid = "";
-                                        }
-
-                                        JsonNode partnerNode = docNode.path("partner");
-                                        document.BizPartnerId = partnerNode.get("external_id").asInt();
-                                        document.BizPartner = partnerNode.get("full_name").asText();
-
-                                        document.NumberSeries = docNode.get("series").asText();
-                                        document.Number = docNode.get("number").asText();
-
-                                        if (document.NumberSeries.isEmpty() && document.Number.isEmpty() && document.ExternalDocumentUuid.isEmpty()) {
-                                            document.Number = docNode.get("folio").asText();
-                                        }
-
-                                        document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
-
-                                        JsonNode referencesNode = docNode.path("references");
-                                        if (referencesNode.isArray()) {
-                                            ArrayList<SImportedDocument.Reference> references = new ArrayList<>();
-
-                                            for (JsonNode referenceNode : referencesNode) {
-                                                int referenceType = referenceNode.get("document_ref_type").asInt();
-                                                String reference = referenceNode.get("reference").asText();
-                                                SImportUtils.DpsKey dpsKey = SImportUtils.createDpsKey(referenceNode.get("external_id").asText()); // e.g., "2025_1"
-
-                                                references.add(new SImportedDocument.Reference(referenceType, reference, dpsKey));
-                                            }
-
-                                            if (!references.isEmpty()) {
-                                                document.References = references.toArray(new SImportedDocument.Reference[0]);
-
-                                                document.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
-                                                document.ReferencesAsText = document.composeReferences();
-                                            }
-                                        }
-
-                                        document.Description = docNode.get("notes").asText();
-
-                                        document.FunctionalSubAreaId = functionalSubAreaId;
-                                        document.FunctionalSubArea = functionalAreaNode.get("name").asText();
-
-                                        document.FiscalUseCode = docNode.get("fiscal_use").asText();
-
-                                        document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
-
-                                        JsonNode currencyNode = docNode.path("currency");
-                                        document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
-                                        document.CurrencyCode = currencyNode.get("code").asText();
-
-                                        int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
-                                        double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
-                                        double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
-                                        String requiredPaymentDateAsText = docNode.get("payment_date").asText();
-                                        Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
-
-                                        if (requiredPaymentDate == null && requiredPaymentPct == 0) {
-                                            document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;
-                                            document.RequiredPaymentAmount = 0;
-                                            document.RequiredPaymentPct = 0;
-                                            document.RequiredPaymentDate = null;
-                                            document.IsRequiredPaymentLoc = false;
-                                            document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
-                                        }
-                                        else {
-                                            document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_IS_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
-                                            document.RequiredPaymentAmount = requiredPaymentAmount;
-                                            document.RequiredPaymentPct = requiredPaymentPct;
-                                            document.RequiredPaymentDate = requiredPaymentDate;
-                                            document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
-                                            document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
-                                        }
-
-                                        String revisionDateAsText = docNode.has("date_week_revision") && !docNode.path("date_week_revision").isNull() ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
-                                        Date revisionDate = revisionDateAsText == null || revisionDateAsText.isEmpty() || revisionDateAsText.equals("null") ? document.Date : SLibUtils.IsoFormatDate.parse(revisionDateAsText);
-
-                                        document.RevisionYear = SLibTimeUtils.digestYear(revisionDate)[0];
-                                        document.RevisionWeek = docNode.get("number_week_revision").asInt();
-                                        document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
-                                        document.ProcessingTypeCode = SImportedDocument.ProcTypes.get(document.ProcessingTypeId);
-                                        document.StatusId = 0;
-                                        document.Status = "";
-                                        document.Download = false;
-                                        document.AlreadyDownloaded = countOfImports > 0;
-
-                                        maDocuments.add(document);
-                                        countShown++;
-                                    }
-                                }
-                                /* 2025-11-19, Sergio Flores: Uncomment fot debugging purposes:
-                                else {
-                                    System.out.println("Documento no elegible: ID externo = " + externalDocumentId + "; ID subárea funcional = " + functionalSubAreaId + ".");
-                                }
-                                */
-                            }
-                        }
-                    }
-                    
-                    String message = "Resumen de la búsqueda de facturas autorizadas en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
-                            + "Empresa actual:\n- " + msCompanyName + ".\n"
-                            + "Subáreas funcionales del usuario actual:\n- " + msUserFunctionalSubAreasCodes + ".\n"
-                            + (SLibTimeUtils.isSameDate(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) ?
-                            ("Día:\n- " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue())) :
-                            ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDatePeriodEnd.getValue()))) + ".\n\n";
-                    
-                    message += "Búsqueda de facturas autorizadas:\n";
-                    
-                    if (countRetreived == 0) {
-                        message += "- ¡No se encontraron facturas autorizadas!";
-                        
-                        miClient.showMsgBoxWarning(message);
-                    }
-                    else {
-                        if (countRetreived != countElegible) {
-                            message += "- Facturas autorizadas totales: " + countRetreived + ";\n"; // this case should not happen
-                        }
-                        
-                        message += "- Facturas autorizadas de la empresa actual: " + countElegible + ";\n"
-                                + "- Facturas autorizadas elegibles al usuario actual: " + countShown + ".";
-                        
-                        miClient.showMsgBoxInformation(message);
-                    }
-
-                    itemStateChangedDocType();
-                }
-            }
-            catch (MalformedURLException e) {
-                handleShowException(e);
+                worker.execute();
             }
             catch (Exception e) {
                 handleShowException(e);
-            }
-            finally {
-                mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
-                SGuiUtils.setCursorDefault(miClient);
             }
         }
     }
@@ -1404,10 +1611,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moDocumentsGrid.populateGrid(new Vector<>());
             renderCurrentDocument();
 
-            enableFieldsForSearch(false);
+            enableFieldsForShowingDocs(false);
 
-            moDatePeriodStart.getComponent().requestFocusInWindow();
             jlStatus.setText("");
+            clearProgress();
+            
+            if (moRadSearchByPeriod.isSelected()) {
+                moDatePeriodStart.getComponent().requestFocusInWindow();
+            }
+            else if (moRadSearchByWeek.isSelected()) {
+                ((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField().requestFocusInWindow();
+            }
         }
         catch (Exception e) {
             System.err.println(e);
@@ -1464,6 +1678,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         if (documents.isEmpty()) {
             miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga.");
+        }
+        else if (documents.size() > LIMIT_DOWNLOADS && miClient.showMsgBoxConfirm("Se recomienda descargar los archivos en bloques no mayores a " + LIMIT_DOWNLOADS + " facturas autorizadas.\n"
+                + "Sin embargo, puede intentar descargar las " + documents.size() + " facturas autorizadas seleccionadas.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+            miClient.showMsgBoxWarning("Se sugiere seleccionar hasta " + LIMIT_DOWNLOADS + " facturas autorizadas para realizar la descarga.");
         }
         else {
             try {
@@ -1662,7 +1880,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int index = moDocumentsGrid.getTable().getSelectedRow();
 
                                     maDocuments.remove(document);
-                                    itemStateChangedDocType(); // reload documents grid
+                                    itemStateChangedDocType(false); // reload documents grid
 
                                     moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
 
@@ -2224,12 +2442,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents) {
+    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGridTable) {
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
+        
+        if (focusDocumentsGridTable) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
         
         jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
     }
@@ -2240,12 +2462,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void itemStateChangedDocMode() {
         enableFieldsOfDocMode();
+        
+        if (moRadDocModeType.isSelected()) {
+            itemStateChangedDocType(false);
+        }
+        else if (moRadDocModeCase.isSelected()) {
+            itemStateChangedDocCase(false);
+        }
     }
     
-    private void itemStateChangedDocType() {
+    private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
         if (moKeyDocModeType.isEnabled()) {
             if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ALL) {
-                populateDocumentsGrid(maDocuments);
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
             else {
                 ArrayList<SImportedDocument> documents = new ArrayList<>();
@@ -2265,15 +2494,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents);
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
         }
     }
     
-    private void itemStateChangedDocCase() {
+    private void itemStateChangedDocCase(final boolean focusDocumentsGridTable) {
         if (moKeyDocModeCase.isEnabled()) {
             if (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_ALL) {
-                populateDocumentsGrid(maDocuments);
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
             else {
                 Integer processingTypeId = null;
@@ -2302,7 +2531,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents);
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
         }
     }
@@ -2534,10 +2763,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SBeanFieldKey field = (SBeanFieldKey) e.getSource();
                 
                 if (field == moKeyDocModeType) {
-                    itemStateChangedDocType();
+                    itemStateChangedDocType(false);
                 }
                 else if (field == moKeyDocModeCase) {
-                    itemStateChangedDocCase();
+                    itemStateChangedDocCase(false);
                 }
             }
         }

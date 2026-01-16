@@ -4517,6 +4517,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             else {
                                 // check business partner:
                                 
+                                if (moBizPartner.getPkBizPartnerId() == miClient.getSession().getConfigCompany().getCompanyId()) {
+                                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlBizPartner.getText() + "'.\n"
+                                            + "El receptor del CFDI no puede ser la misma empresa de esta sesión de usuario.");
+                                    mbFormSettingsOk = goAhead = false;
+                                    actionCancel();
+                                }
+                                
                                 if (isBizPartnerBlocked(moBizPartner.getPkBizPartnerId())) {
                                     miClient.showMsgBoxWarning(SLibConstants.MSG_INF_BP_BLOCKED);
                                     mbFormSettingsOk = goAhead = false;

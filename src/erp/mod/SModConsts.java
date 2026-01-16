@@ -356,6 +356,7 @@ public abstract class SModConsts {
     public static final int FIN_REP_CUS_ACC_USR = 2013494;
     public static final int FIN_PAY = 2013496;
     public static final int FIN_PAY_ETY = 2013497;
+    public static final int FIN_PAY_REP = 2013498;
     public static final int FIN_PAY_LAY_BANK = 2013498;
     public static final int FIN_PAY_FILE = 2013499;
 
