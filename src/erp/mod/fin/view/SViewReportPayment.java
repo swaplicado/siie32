@@ -69,7 +69,6 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
         jrbDateApp = new JRadioButton("Solicitud");
         jrbDateApp.setToolTipText("Filtrar por la fecha de la solicitud de pago");
 
-//        mbAppliesDateRequired = false;
         mbAppliesDateRequired = mnGridSubtype == SLibConsts.UNDEFINED || mnGridSubtype == SModSysConsts.FINS_ST_PAY_REJC;
 
         if (mbAppliesDateRequired) {
@@ -210,32 +209,51 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             default:
                 // nothing
         }
-        
-       msSql = "SELECT "
+                
+        msSql = "SELECT "
             + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
             + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
             + "v.dt_req AS FechaRequeridaPago, "
-            + "ve.ety_tp, v.b_sys, v.b_del, v.fk_usr_ins, v.fk_usr_upd, v.fk_usr_ins AS f_usr_ins, v.fk_usr_upd AS f_usr_upd, "
-            + "CASE WHEN ve.ety_tp = 'P' THEN 'Pago a documento' ELSE 'Anticipo' END AS tipoPago, ce.cur_key AS Moneda, " 
-            + "SUM(ve.des_pay_app_ety_cur) AS montoTotal, COUNT(*) AS numeroPagos, " 
-            + "CASE WHEN ve.ety_tp = 'A' THEN 'ANTICIPO' ELSE COALESCE( SUBSTRING_INDEX(GROUP_CONCAT( ety.concept ORDER BY ve.des_pay_app_ety_cur DESC ),',', 1 ), 'ANTICIPO') END AS conceptoPrincipal, "
-            + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) " 
-            + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code " 
-            + "FROM fin_pay AS v " 
-            + "INNER JOIN fin_pay_ety AS ve ON v.id_pay = ve.id_pay " 
-            + "LEFT JOIN trn_dps_ety AS ety ON ve.fk_doc_year_n = ety.id_year AND ve.fk_doc_doc_n  = ety.id_doc " 
-            + "INNER JOIN erp.bpsu_bp AS b ON v.fk_ben = b.id_bp " 
-            + "INNER JOIN erp.cfgu_cur AS ce ON ve.fk_ety_cur = ce.id_cur " 
+            + "ve.ety_tp, "
+            + "v.b_sys, v.b_del, v.fk_usr_ins, v.fk_usr_upd, "
+            + "v.fk_usr_ins AS f_usr_ins, v.fk_usr_upd AS f_usr_upd, "
+            + "CASE "
+            + "WHEN ve.ety_tp = 'P' THEN 'Pago a documento' "
+            + "ELSE 'Anticipo' "
+            + "END AS tipoPago, "
+            + "ce.cur_key AS Moneda, "
+            + "SUM(ve.des_pay_app_ety_cur) AS montoTotal, "
+            + "COUNT(*) AS numeroPagos, "
+            + "CASE "
+            + "WHEN ve.ety_tp = 'A' THEN 'ANTICIPO' "
+            + "ELSE COALESCE( ( "
+            + "SELECT SUBSTRING_INDEX( "
+            + "GROUP_CONCAT(e.concept ORDER BY ve.des_pay_app_ety_cur DESC), ',', 1 ) "
+            + "FROM trn_dps_ety e "
+            + "WHERE e.id_year = ve.fk_doc_year_n "
+            + "AND e.id_doc = ve.fk_doc_doc_n "
+            + "), 'ANTICIPO') "
+            + "END AS conceptoPrincipal, "
+            + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
+            + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code "
+            + "FROM fin_pay AS v "
+            + "INNER JOIN fin_pay_ety AS ve ON v.id_pay = ve.id_pay "
+            + "INNER JOIN erp.bpsu_bp AS b ON v.fk_ben = b.id_bp "
+            + "INNER JOIN erp.cfgu_cur AS ce ON ve.fk_ety_cur = ce.id_cur "
             + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "GROUP BY b.bp, v.dt_req, ve.ety_tp, ce.cur_key " 
-            + "ORDER BY b.bp, ce.cur_key, " 
-            + "CASE " 
-            + "WHEN ve.ety_tp = 'P' THEN 1 " 
-            + "WHEN ve.ety_tp = 'A' THEN 2 " 
-            + "ELSE 3 " 
+            + "GROUP BY "
+            + "b.bp, v.dt_req, ve.ety_tp, ce.cur_key "
+            + "ORDER BY "
+            + "b.bp, ce.cur_key, "
+            + "CASE "
+            + "WHEN ve.ety_tp = 'P' THEN 1 "
+            + "WHEN ve.ety_tp = 'A' THEN 2 "
+            + "ELSE 3 "
             + "END";
+        
     }
 
+        
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
