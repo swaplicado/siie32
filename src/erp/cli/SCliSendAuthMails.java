@@ -8,7 +8,6 @@ package erp.cli;
 import erp.SClientApi;
 import erp.SParamsApp;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.utils.SDpsGoogleCloudUtils;
 import erp.mod.cfg.swap.utils.SFileData;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
@@ -83,8 +82,8 @@ public class SCliSendAuthMails {
                 int idYear = resultSet.getInt("d.id_year");
                 int idDoc = resultSet.getInt("d.id_doc");
                 File oPdf = SAuthorizationUtils.sendAutomaticProviderAuthornMails(client, new int[] { idYear, idDoc });
-                SFileData oFileData = new SFileData(idYear, idDoc, dbCompany.getDbName(), resultSet.getTimestamp("d.ts_edit"));
-                mFiles.put(oFileData, oPdf);
+//                SFileData oFileData = new SFileData(idYear, idDoc, dbCompany.getDbName(), resultSet.getTimestamp("d.ts_edit")); // descomentar para envio aut.
+//                mFiles.put(oFileData, oPdf); // descomentar para envio aut.
             }
             catch (Exception ex) {
                 Logger.getLogger(SCliSendAuthMails.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,7 +91,7 @@ public class SCliSendAuthMails {
         }
         
         // Envío de PDF de OCs a Google Cloud Storage
-        SDpsGoogleCloudUtils.uploadFiles(session, mFiles);
+        // SDpsGoogleCloudUtils.uploadFiles(session, mFiles); // descomentar para envio aut.
     }
     
     private static SClientApi createClientApi(SGuiSession session, int userId) {

@@ -2121,7 +2121,7 @@ public abstract class SAuthorizationUtils {
      */
     public static File sendAutomaticProviderAuthornMails(final SClientInterface client, final int[] pkDps) throws Exception {
         if (SLibUtils.parseInt(SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND)) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_MAIL_SEND_ACT) {
-            boolean returnPdfFile = true;
+            boolean returnPdfFile = false; // se pone en true para envio automático desde tasks
             return STrnUtilities.sendDpsOrder(client, pkDps, false, returnPdfFile);
         }
         
@@ -2212,7 +2212,10 @@ public abstract class SAuthorizationUtils {
                             sent = true; 
                             System.out.println("Enviado a autorización con éxito.");
                         }
-                        else System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                        else {
+                            System.out.println(result.path("status_code").asInt() + " " + result.path("error").asText());
+                            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, responseJson);
+                        } 
                     }
                 }
             }

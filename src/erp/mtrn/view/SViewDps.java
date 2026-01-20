@@ -40,6 +40,8 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.form.SDialogPdfViewer;
+import erp.mod.cfg.swap.form.SDocument;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
@@ -57,6 +59,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryIogEntryTransfer;
 import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
+import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
@@ -143,10 +146,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbPrintContractKgAsTon;
     private javax.swing.JButton jbPrintContractMoves;
     private javax.swing.JButton jbPrintOrderGoods;
-    private javax.swing.JButton jbGetXml;
-    private javax.swing.JButton jbGetPdf;
+    private javax.swing.JButton jbShowCfdiXml;
+    private javax.swing.JButton jbGetCfdiXml;
+    private javax.swing.JButton jbShowDocPdf;
+    private javax.swing.JButton jbGetDocPdf;
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
-    private javax.swing.JButton jbShowCfdi;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbValidateCfdi;
     private javax.swing.JButton jbGetCfdiStatus;
@@ -165,7 +169,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebViewAuthComments;
     private javax.swing.JButton jbAuthWebDownloadSupportFiles;
     private javax.swing.JButton jbAuthWebClearSupportFiles;
-    private javax.swing.JButton jbAuthWebAnullAuth;
+    private javax.swing.JButton jbAuthWebAnnullAuth;
     private javax.swing.JFileChooser moAuthWebFileChooser;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -182,6 +186,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private erp.mod.cfg.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private java.text.DecimalFormat moUsQuantityFormat;
 
     private boolean mbIsCategoryPur;
@@ -424,26 +429,31 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintOrderGoods.addActionListener(this);
         jbPrintOrderGoods.setToolTipText("Imprimir orden de salida de almacén");
 
-        jbGetXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
-        jbGetXml.setPreferredSize(new Dimension(23, 23));
-        jbGetXml.addActionListener(this);
-        jbGetXml.setToolTipText("Obtener XML del comprobante");
+        jbShowCfdiXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon-file-xml.png")));
+        jbShowCfdiXml.setPreferredSize(new Dimension(23, 23)); 
+        jbShowCfdiXml.addActionListener(this);
+        jbShowCfdiXml.setToolTipText("Ver XML del CFDI del comprobante");
         
-        jbGetPdf = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
-        jbGetPdf.setPreferredSize(new Dimension(23, 23));
-        jbGetPdf.addActionListener(this);
-        jbGetPdf.setToolTipText("Obtener PDF del comprobante");
+        jbGetCfdiXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
+        jbGetCfdiXml.setPreferredSize(new Dimension(23, 23));
+        jbGetCfdiXml.addActionListener(this);
+        jbGetCfdiXml.setToolTipText("Obtener XML del CFDI del comprobante");
+        
+        jbShowDocPdf = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
+        jbShowDocPdf.setPreferredSize(new Dimension(23, 23)); 
+        jbShowDocPdf.addActionListener(this);
+        jbShowDocPdf.setToolTipText("Ver PDF del comprobante");
+        
+        jbGetDocPdf = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
+        jbGetDocPdf.setPreferredSize(new Dimension(23, 23));
+        jbGetDocPdf.addActionListener(this);
+        jbGetDocPdf.setToolTipText("Obtener PDF del comprobante");
         
         jbGetAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL));
         jbGetAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbGetAcknowledgmentCancellation.addActionListener(this);
         jbGetAcknowledgmentCancellation.setToolTipText("Obtener XML del acuse de cancelación del CFDI");
 
-        jbShowCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
-        jbShowCfdi.setPreferredSize(new Dimension(23, 23)); 
-        jbShowCfdi.addActionListener(this);
-        jbShowCfdi.setToolTipText("Mostrar CFDI del comprobante");
-        
         jbSignXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN));
         jbSignXml.setPreferredSize(new Dimension(23, 23));
         jbSignXml.addActionListener(this);
@@ -522,10 +532,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebClearSupportFiles.addActionListener(this);
             jbAuthWebClearSupportFiles.setToolTipText("Eliminar archivos de soporte de la orden");
 
-            jbAuthWebAnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif")));
-            jbAuthWebAnullAuth.setPreferredSize(new Dimension(23, 23));
-            jbAuthWebAnullAuth.addActionListener(this);
-            jbAuthWebAnullAuth.setToolTipText("Anular autorización de la orden en app web");
+            jbAuthWebAnnullAuth = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_down_red.jpg")));
+            jbAuthWebAnnullAuth.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebAnnullAuth.addActionListener(this);
+            jbAuthWebAnnullAuth.setToolTipText("Anular autorización de la orden en app web");
         }
         
         moTabFilterUser = new STabFilterUsers(miClient, this);
@@ -599,7 +609,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthWebViewAuthComments);
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
             addTaskBarUpperComponent(jbAuthWebClearSupportFiles);
-            addTaskBarUpperComponent(jbAuthWebAnullAuth);
+            addTaskBarUpperComponent(jbAuthWebAnnullAuth);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -611,9 +621,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbPrintContractMoves);
         addTaskBarLowerComponent(jbPrintOrderGoods);
         addTaskBarLowerSeparator();
-        addTaskBarLowerComponent(jbShowCfdi);
-        addTaskBarLowerComponent(jbGetXml);
-        addTaskBarLowerComponent(jbGetPdf);
+        addTaskBarLowerComponent(jbShowCfdiXml);
+        addTaskBarLowerComponent(jbGetCfdiXml);
+        addTaskBarLowerComponent(jbShowDocPdf);
+        addTaskBarLowerComponent(jbGetDocPdf);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbRestoreCfdStamped);
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
@@ -664,9 +675,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintContractKgAsTon.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
-        jbGetXml.setEnabled(mbIsDoc || mbIsDocAdj);
-        jbGetPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
-        jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbShowCfdiXml.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbGetCfdiXml.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbShowDocPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
+        jbGetDocPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
@@ -684,7 +696,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthComments.setEnabled(true);
             jbAuthWebDownloadSupportFiles.setEnabled(true);
             jbAuthWebClearSupportFiles.setEnabled(true);
-            jbAuthWebAnullAuth.setEnabled(true);
+            jbAuthWebAnnullAuth.setEnabled(true);
         }
 
         STableField[] aoKeyFields = new STableField[2];
@@ -837,7 +849,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "d.ts_close", "Cierre surtido", STableConstants.WIDTH_DATE_TIME);
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Folio ped.", STableConstants.WIDTH_DOC_NUM);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Pedidos", STableConstants.WIDTH_DOC_NUM);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rper", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rbkc_code", "Centro contable", STableConstants.WIDTH_CODE_COB);
@@ -1691,7 +1703,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                                 + "<p>ROUTING NUMBER: 121000358</p>"
                                                 + "<p>WIRE: 026009593</p>"
                                                 + "<br>"
-                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>PLEASE SEND CHECKS TO CALIFORNIA ADRESS 251 SOUTH LAKE AVENUE SUITE 800 PASADENA, CA 91101 USA</p>"
                                                 + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
                                         );
                                 }
@@ -2271,7 +2283,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                                 + "<p>ROUTING NUMBER: 121000358</p>"
                                                 + "<p>WIRE: 026009593</p>"
                                                 + "<br>"
-                                                + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                                + "<p>PLEASE SEND CHECKS TO CALIFORNIA ADRESS 251 SOUTH LAKE AVENUE SUITE 800 PASADENA, CA 91101 USA</p>"
                                                 + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>"
                                         );
                                 }
@@ -2840,13 +2852,25 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
     }
-
-    private void actionGetXml() {
-        if (jbGetXml.isEnabled()) {
+    
+    private void actionShowCfdiXml() {
+        if (jbShowCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    SCfdUtils.downloadXmlCfd(miClient, cfd);
+                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+
+    private void actionGetCfdiXml() {
+        if (jbGetCfdiXml.isEnabled()) {
+            if (isRowSelected()) {
+                try {
+                    SViewDps.getCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2855,11 +2879,28 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionGetPdf() {
-        if (jbGetPdf.isEnabled()) {
+    private void actionShowDocPdf() {
+        if (jbShowDocPdf.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SCfdUtils.downloadXmlPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (moDialogPdfViewer == null) {
+                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
+                    }
+                    
+                    SViewDps.showDocPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moDialogPdfViewer);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void actionGetDocPdf() {
+        if (jbGetDocPdf.isEnabled()) {
+            if (isRowSelected()) {
+                try {
+                    SViewDps.getDocPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2874,26 +2915,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 try {
                     SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                     SCfdUtils.printCfdCancelAck(miClient, cfd, 0, SDataConstantsPrint.PRINT_MODE_VIEWER);
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
-                }
-            }
-        }
-    }
-    
-    private void actionShowCfdi() {
-        if(jbShowCfdi.isEnabled()) {
-            if (isRowSelected()) {
-                try {
-                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                    }
-                    else {
-                        SCfdRenderer renderer = new SCfdRenderer(miClient);
-                        renderer.showCfdi(cfd.getDocXml());
-                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -3282,9 +3303,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionAuthWebAnullAuth() {
+    private void actionAuthWebAnnullAuth() {
          try {
-            if (jbAuthWebAnullAuth.isEnabled()) {
+            if (jbAuthWebAnnullAuth.isEnabled()) {
                 if (isRowSelected()) {
                     SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
                     fileProcess.read(miClient.getSession(), (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
@@ -3460,13 +3481,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "    '')))) AS user_in_turn, ";
         }
         
+        String sqlOrders = mbIsDoc ? (
+                "SELECT GROUP_CONCAT(DISTINCT CONCAT(ord.num_ser, IF(ord.num_ser = '', '', '-'), ord.num) ORDER BY ord.num_ser, ord.num SEPARATOR '; ' ) "
+                + "FROM trn_dps_dps_supply AS dds "
+                + "INNER JOIN trn_dps AS ord ON ord.id_year = dds.id_src_year AND ord.id_doc = dds.id_src_doc "
+                + "WHERE NOT ord.b_del AND ord.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND dds.id_des_year = d.id_year AND dds.id_des_doc = d.id_doc") : "";
+        
         msSql += "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT f.code FROM cfgu_func AS f WHERE d.fid_func = f.id_func) AS f_func_code, " +
                 "(SELECT fs.code FROM cfgu_func_sub AS fs WHERE d.fid_func_sub = fs.id_func_sub) AS f_func_sub_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
-                "(SELECT CONCAT(dps_src.num_ser, IF(length(dps_src.num_ser) = 0, '', '-'), dps_src.num) " +
-                "FROM trn_dps AS dps_src INNER JOIN trn_dps_dps_supply AS spl ON dps_src.id_doc = spl.id_src_doc AND dps_src.id_year = spl.id_src_year " +
-                "WHERE spl.id_des_doc = d.id_doc AND dps_src.id_year = d.id_year AND dps_src.b_del = 0 LIMIT 1) AS f_ord_num, " +
+                "(" + (!sqlOrders.isEmpty() ? sqlOrders : "''") + ") AS f_ord_num, " +
                 "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
                 "(SELECT CONCAT(mo.id_year, '-', mo.num) FROM mfg_ord AS mo WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
@@ -3697,17 +3722,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbPrintPhotoInvoice) {
                     actionPrintPhotoInvoice();
                 }
-                else if (button == jbGetXml) {
-                    actionGetXml();
+                else if (button == jbShowCfdiXml) {
+                    actionShowCfdiXml();
                 }
-                else if (button == jbGetPdf) {
-                    actionGetPdf();
+                else if (button == jbGetCfdiXml) {
+                    actionGetCfdiXml();
+                }
+                else if (button == jbShowDocPdf) {
+                    actionShowDocPdf();
+                }
+                else if (button == jbGetDocPdf) {
+                    actionGetDocPdf();
                 }
                 else if (button == jbPrintAcknowledgmentCancellation) {
                     actionPrintAcknowledgmentCancellation();
-                }
-                else if (button == jbShowCfdi) {
-                    actionShowCfdi();
                 }
                 else if (button == jbGetAcknowledgmentCancellation) {
                     actionGetAcknowledgmentCancellation();
@@ -3754,8 +3782,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbAuthWebClearSupportFiles) {
                     actionAuthWebClearSupportFiles();
                 }
-                else if (button == jbAuthWebAnullAuth) {
-                    actionAuthWebAnullAuth();
+                else if (button == jbAuthWebAnnullAuth) {
+                    actionAuthWebAnnullAuth();
                 }
             }
         }
@@ -3765,5 +3793,80 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         finally {
             miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
+    }
+    
+    /**
+     * Retrieve and show CFDI's XML.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
+
+        if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+        }
+        else {
+            SCfdRenderer renderer = new SCfdRenderer(client);
+            renderer.showCfd(cfd.getDocXml());
+        }
+    }
+    
+    /**
+     * Retrieve and allow to save CFDI's XML.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void getCfdiXml(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
+        SCfdUtils.downloadXmlCfd(client, cfd);
+    }
+    
+    /**
+     * Retrive and show document's PDF.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @param dialogPdfViewer PDF viewer.
+     * @throws Exception 
+     */
+    public static void showDocPdf(final SClientInterface client, final int[] dpsKey, final SDialogPdfViewer dialogPdfViewer) throws Exception {
+        File pdf = SCfdUtils.getXmlPdfInTempFile(client, dpsKey);
+
+        if (pdf != null) {
+            String folio = SThinDps.readDpsNumber(dpsKey, client.getSession().getStatement());
+            String issuer = SThinDps.readDpsBizPartner(dpsKey, client.getSession().getStatement());
+
+            SDocument document = new SDocument() {
+
+                @Override
+                public String getFolio() {
+                    return folio;
+                }
+
+                @Override
+                public String getIssuer() {
+                    return issuer;
+                }
+            };
+
+            dialogPdfViewer.setPdf(document, pdf);
+            dialogPdfViewer.setVisible(true);
+        }
+        else {
+            client.showMsgBoxWarning("El documento no tiene archivo PDF.");
+        }
+    }
+    
+    /**
+     * Retrive and allow to save document's PDF.
+     * This method is barely needed, but declared for consistence with rest of show/get methods.
+     * @param client GUI client.
+     * @param dpsKey Document's primary key.
+     * @throws Exception 
+     */
+    public static void getDocPdf(final SClientInterface client, final int[] dpsKey) throws Exception {
+        SCfdUtils.downloadXmlPdf(client, dpsKey);
     }
 }

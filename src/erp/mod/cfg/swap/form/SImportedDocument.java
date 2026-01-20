@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.form;
 
 import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -32,7 +33,9 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -51,16 +54,56 @@ import sa.lib.gui.SGuiSession;
  */
 public class SImportedDocument implements SGridRow, Serializable, Comparable<SImportedDocument> {
     
-    public static final int PAYMENT_DEFN_NOT_REQ = 0; // pago no requerido
-    public static final int PAYMENT_DEFN_BY_AMT = 1; // pago definido por monto
-    public static final int PAYMENT_DEFN_BY_PCT = 2; // pago definido por porcentaje
+    public static final int DOC_TYPE_ALL = 0;
+    public static final int DOC_TYPE_ASSETS = 1;
+    public static final int DOC_TYPE_EXPENSES = 2;
     
-    public static final String EXC_DOC_NOT_PROCESSED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
-    public static final String EXC_DOC_ALREADY_RECORDED_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
+    public static final int DOC_CASE_ALL = 0;
+    public static final int DOC_CASE_STANDARD = 1;
+    public static final int DOC_CASE_FRUIT_FREIGHT = 2;
+    public static final int DOC_CASE_FRUIT_PURCHASE = 3;
+    
+    public static final int PROC_TYPE_STANDARD = 0; // NA
+    public static final int PROC_TYPE_FRUIT_FREIGHT = 11;
+    public static final int PROC_TYPE_FRUIT_PURCHASE = 12;
+    
+    /** Document types. */
+    public static final HashMap<Integer, String> DocTypes = new HashMap<>();
+    /** Document cases. */
+    public static final HashMap<Integer, String> DocCases = new HashMap<>();
+    /** Processing types (in SWAP Services). */
+    public static final HashMap<Integer, String> ProcTypes = new HashMap<>();
+    
+    static {
+        DocTypes.put(DOC_TYPE_ALL, "Todas");
+        DocTypes.put(DOC_TYPE_ASSETS, "Activo fijo");
+        DocTypes.put(DOC_TYPE_EXPENSES, "Compras y gastos");
+        
+        DocCases.put(DOC_CASE_ALL, "Todas");
+        DocCases.put(DOC_CASE_STANDARD, "Estándar");
+        DocCases.put(DOC_CASE_FRUIT_FREIGHT, "Fletes fruta");
+        DocCases.put(DOC_CASE_FRUIT_PURCHASE, "Compras fruta");
+        
+        ProcTypes.put(PROC_TYPE_STANDARD, "STD");
+        ProcTypes.put(PROC_TYPE_FRUIT_FREIGHT, "FRF");
+        ProcTypes.put(PROC_TYPE_FRUIT_PURCHASE, "FRC");
+    }
+    
+    public static final int PAY_IS_NOT_REQ = 0; // pago no requerido
+    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
+    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
+    
+    // Exception messages:
+    
+    public static final String EXC_DOC_NOT_RECORDED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
+    public static final String EXC_DOC_ALREADY_RECORDED_IN_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
 
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
-    public static final String EXC_PAY_NOT_REGISTERED = "Este documento no tiene solicitud de pago.";
-    public static final String EXC_PAY_ALREADY_REGISTERED_ = "Este documento ya tiene solicitud de pago: ";
+    public static final String EXC_PAY_NOT_REQUESTED = "Este documento no tiene solicitud de pago.";
+    public static final String EXC_PAY_ALREADY_REQUESTED_IN_ = "Este documento ya tiene solicitud de pago: ";
+    
+    private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
+    private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
     
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
@@ -85,12 +128,17 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public Date RequiredPaymentDateNew;
     public boolean IsRequiredPaymentLoc;
     public String RequiredPaymentNotes;
+    public int RevisionYear;
+    public int RevisionWeek;
+    public Date RevisionDatetime;
+    public int ProcessingTypeId;
+    public String ProcessingTypeCode;
     public int StatusId;
     public String Status;
     public boolean Download;
     public boolean AlreadyDownloaded;
     
-    public SDbSwapDataProcessing.ProcessedDps ProcessedDps;
+    public ProcessedDps ProcessedDps;
     public SDbSwapDataProcessing SwapDataProcessing;
     public SDbPayment Payment;
     
@@ -113,13 +161,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Total = 0;
         CurrencyId = 0;
         CurrencyCode = "";
-        RequiredPaymentDefinition = PAYMENT_DEFN_NOT_REQ;
+        RequiredPaymentDefinition = PAY_IS_NOT_REQ;
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
         RequiredPaymentDate = null;
         RequiredPaymentDateNew = null;
         IsRequiredPaymentLoc = false;
         RequiredPaymentNotes = "";
+        RevisionYear = 0;
+        RevisionWeek = 0;
+        RevisionDatetime = null;
+        ProcessingTypeId = 0;
+        ProcessingTypeCode = "";
         StatusId = 0;
         Status = "";
         Download = false;
@@ -133,11 +186,19 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get folio of documents in format series-number.
+     * Get folio of document in format series-number.
      * @return 
      */
     public String getFolio() {
-        return NumberSeries + (NumberSeries.isEmpty() ? "" : "-") + Number;
+        return SDocumentUtils.composeFolio(NumberSeries, Number, ExternalDocumentUuid);
+    }
+    
+    /**
+     * Get revision year and week in format yyyy-ww.
+     * @return 
+     */
+    public String getRevisionYearWeek() {
+        return SLibUtils.DecimalFormatCalendarYear.format(RevisionYear) + "-" + SLibUtils.DecimalFormatCalendarWeek.format(RevisionWeek);
     }
 
     /**
@@ -173,7 +234,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public double getRequiredPaymentAmount() {
-        return RequiredPaymentDefinition == PAYMENT_DEFN_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
+        return RequiredPaymentDefinition == PAY_DEF_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
     }
     
     /**
@@ -201,10 +262,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Check if document is processed.
+     * Check if document is registered.
      * @return 
      */
-    public boolean isProcessed() {
+    public boolean isRecorded() {
         return ProcessedDps != null && ProcessedDps.getDpsKey() != null && ProcessedDps.SwapDataProcessingId != 0 && SwapDataProcessing != null;
     }
     
@@ -245,8 +306,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         String refPrefix = "";
         
         switch (refDocType) {
-            case SSwapConsts.TXN_DOC_TYPE_ORDER:
-                refPrefix = SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE;
+            case SSwapConsts.TXN_REF_TYPE_ORDER:
+                refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + refDocType + ".)");
@@ -305,11 +366,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
         SDbPayment payment = null;
         
-        if (RequiredPaymentDefinition == PAYMENT_DEFN_NOT_REQ) {
+        if (RequiredPaymentDefinition == PAY_IS_NOT_REQ) {
             throw new Exception("Este documento carece de la indicación de requerir un pago.");
         }
-        else if (validateIsProcessed && !isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        else if (validateIsProcessed && !isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
@@ -338,92 +399,40 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             
             if (payment == null) {
                 Date date = session.getCurrentDate();
-                double exchangeRate = getExchangeRate(session, this, date);
+                
+                // throw exception if exchange rate is not available:
+                double exchangeRate = SDocumentUtils.getExchangeRate(session, CurrencyId, date);
 
-                // create payment:
+                // create & prepare payment and its single one payment entry:
 
                 payment = new SDbPayment();
+                
+                SDbPaymentEntry singleEntry = new SDbPaymentEntry();
+                payment.getChildEntries().add(singleEntry);
+                
+                payment.processPaymentAtApplication(session, getRequiredPaymentAmount(), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, Total);
 
                 //payment.setPkPaymentId(...);
+                payment.setPaymentType(SDbPayment.TYPE_REQUEST);
                 payment.setSeries("");
                 payment.setNumber(0);
                 payment.setDateApplication(date);
                 payment.setDateRequired(getRequiredPaymentDateEffective());
                 payment.setDateSchedule_n(null);
                 payment.setDateExecution_n(null);
-
-                double paymentAmount;
-                double paymentExchangeRate;
-                int paymentCurrencyId;
-
-                double entryConversionRate;
-
-                /*
-                Payment cases:
-
-                1. currency == local + is_payment_local == true | false
-                    payment data:
-                        currency: local
-                        computation: required payment
-                        exchange rate: 1
-
-                2. currency <> local + is_payment_local == true
-                    payment data:
-                        currency: local
-                        computation: required payment * applicable exchange rate
-                        exchange rate: 1
-
-                3. currency <> local + is_payment_local == false
-                    payment data:
-                        currency: local
-                        computation: required payment
-                        exchange rate: applicable exchange rate
-                */
-
-                boolean isLocalCurrency = session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }); // convenience variable
-                
-                if (isLocalCurrency) {
-                    // payment case 1:
-                    paymentAmount = getRequiredPaymentAmount();
-                    paymentExchangeRate = 1;
-                    paymentCurrencyId = CurrencyId;
-
-                    entryConversionRate = 1; // currencies conversion: from local to local
-                }
-                else {
-                    if (IsRequiredPaymentLoc) {
-                        // payment case 2:
-                        paymentAmount = SLibUtils.roundAmount(getRequiredPaymentAmount() * exchangeRate);
-                        paymentExchangeRate = 1;
-                        paymentCurrencyId = session.getSessionCustom().getLocalCurrencyKey()[0];
-
-                        entryConversionRate = 1 / exchangeRate; // currencies conversion: from local to foreign
-                    }
-                    else {
-                        // payment case 3:
-                        paymentAmount = getRequiredPaymentAmount();
-                        paymentExchangeRate = exchangeRate;
-                        paymentCurrencyId = CurrencyId;
-
-                        entryConversionRate = 1; // currencies conversion: from foreign to the same foreign
-                    }
-                }
-
-                payment.setPaymentCy(paymentAmount);
-                payment.setPaymentExchangeRateApplication(paymentExchangeRate);
-                payment.setPaymentApplication(SLibUtils.roundAmount(paymentAmount * paymentExchangeRate));
-                payment.setPaymentExchangeRate(payment.getPaymentExchangeRateApplication()); // same value "at application"!
-                payment.setPayment(payment.getPaymentApplication()); // same value "at application"!
+                // ...
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
                 payment.setPriority(SDbPayment.PRIORITY_NORMAL);
                 payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "-"); // "-" means no comments
                 payment.setNotesAuthorization(!Description.isEmpty() ? Description : "-"); // "-" means no comments
                 payment.setNotesAuthorizationFlow("");
                 payment.setReceiptPaymentRequired(dps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+                payment.setRescheduled(false);
+                payment.setExecutedManually(false);
                 payment.setDeleted(false);
                 payment.setSystem(true);
                 payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
-                payment.setFkCurrencyId(paymentCurrencyId);
+                //payment.setFkCurrencyId(...); // set in SDbPayment.processPaymentCy()
                 payment.setFkBeneficiaryId(BizPartnerId);
                 payment.setFkFunctionalAreaId(dps.getFkFunctionalAreaId());
                 payment.setFkFunctionalSubareaId(dps.getFkFunctionalSubAreaId());
@@ -432,41 +441,30 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setFkBeneficiaryBankBizParterBranchId_n(0);
                 payment.setFkBeneficiaryBankAccountCashId_n(0);
                 payment.setFkUserScheduleId(SUtilConsts.USR_NA_ID);
+                payment.setFkUserRescheduleId(SUtilConsts.USR_NA_ID);
                 payment.setFkUserExecutiondId(SUtilConsts.USR_NA_ID);
                 //payment.setFkUserInsertId(...);
                 //payment.setFkUserUpdateId(...);
-                //payment.setTsUserScheduledId(...);
+                //payment.setTsUserScheduled(...);
+                //payment.setTsUserRescheduled(...);
                 //payment.setTsUserExecuted(...);
                 //payment.setTsUserInsert(...);
                 //payment.setTsUserUpdate(...);
 
                 payment.setDbmsStatus((String) session.readField(SModConsts.FINS_ST_PAY, new int[] { payment.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
+                //payment.setDbmsBeneficiary(...);
+                //payment.setDbmsDataCurrency(...);
 
-                // create payment entry:
-
-                SDbPaymentEntry paymentEntry = new SDbPaymentEntry();
+                // prepare payment entry:
 
                 //paymentEntry.setPkPaymentId(...);
                 //paymentEntry.setPkEntryId(...);
-                paymentEntry.setEntryType(SDbPaymentEntry.ENTRY_TYPE_PAYMENT);
-                paymentEntry.setEntryPaymentCy(payment.getPaymentCy());
-                paymentEntry.setEntryPaymentApplication(payment.getPaymentApplication());
-                paymentEntry.setConversionRateApplication(entryConversionRate);
-                paymentEntry.setDestinyPaymentApplicationEntryCy(getRequiredPaymentAmount());
-                paymentEntry.setEntryPayment(paymentEntry.getEntryPaymentApplication()); // same value "at application"!
-                paymentEntry.setConversionRate(paymentEntry.getConversionRateApplication()); // same value "at application"!
-                paymentEntry.setDestinyPaymentEntryCy(paymentEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
-                paymentEntry.setInstallment(1);
-                paymentEntry.setDocBalancePreviousApplicationCy(Total);
-                paymentEntry.setDocBalanceUnpaidApplicationCy_r(SLibUtils.roundAmount(Total - paymentEntry.getEntryPaymentCy()));
-                paymentEntry.setDocBalancePreviousCy(paymentEntry.getDocBalancePreviousApplicationCy()); // same value "at application"!
-                paymentEntry.setDocBalanceUnpaidCy_r(paymentEntry.getDocBalanceUnpaidApplicationCy_r()); // same value "at application"!
-                paymentEntry.setFkDocYearId_n(dps.getPkYearId());
-                paymentEntry.setFkDocDocId_n(dps.getPkDocId());
-                paymentEntry.setFkEntryCurrencyId(CurrencyId);
-                paymentEntry.setFkPaymentRequestId_n(0);
-
-                payment.getChildEntries().add(paymentEntry);
+                singleEntry.setEntryType(SDbPaymentEntry.TYPE_PAYMENT);
+                //...
+                singleEntry.setFkDocYearId_n(dps.getPkYearId());
+                singleEntry.setFkDocDocId_n(dps.getPkDocId());
+                //paymentEntry.setFkEntryCurrencyId(...); // set in SDbPayment.processPaymentCy()
+                singleEntry.setFkPaymentRequestId_n(0);
 
                 Exception exception = null;
                 
@@ -496,19 +494,22 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Link document to given DPS, and optionally create its payment request.
      * @param session GUI session.
-     * @param dpsKey DPS primary key.
-     * @param createPaymentRequest Create-payment-request flag.
      * @param docFilesDownloadSrvUrl URL of document files download service.
+     * @param dpsKey DPS primary key.
+     * @param allowLaterInvoice Allow linking an invoice wichi is issued later.
+     * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
+     * @param createPaymentRequest Create-payment-request flag.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final int[] dpsKey, final boolean createPaymentRequest, final String docFilesDownloadSrvUrl) throws Exception {
+    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final boolean createPaymentRequest, final boolean allowLaterInvoice, final boolean allowGreaterInvoice) throws Exception {
         boolean linked = false;
+        String prefix = "No se pudo realizar la vinculación:\n";
         
         // Validate linkage:
         
-        if (isProcessed()) {
-            throw new Exception(EXC_DOC_ALREADY_RECORDED_ + ProcessedDps.composeRecord() + ".");
+        if (isRecorded()) {
+            throw new Exception(prefix + EXC_DOC_ALREADY_RECORDED_IN_ + ProcessedDps.composeRecord() + ".");
         }
         else {
             // Read DPS in its "thin" version:
@@ -519,41 +520,43 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             // Validate DPS:
             
             if (dps.getDbmsRecordKey() == null) {
-                throw new Exception("La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
+                throw new Exception(prefix + "La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
             }
             else if (BizPartnerId != dps.getFkBizPartnerId_r()) {
-                // match required:
-                throw new Exception("El asociado de negocios de este documento, "
-                        + "'" + BizPartner + "' (ID = " + BizPartnerId + "), "
-                        + "es distinto al de la factura a vincular "
-                        + "'" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
+                // business partner does not match:
+                throw new Exception(prefix + "El asociado de negocios de este documento, '" + BizPartner + "' (ID = " + BizPartnerId + "), "
+                        + "es distinto al de la factura a vincular '" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
             }
             else if (CurrencyId != dps.getFkCurrencyId()) {
-                // match required:
-                throw new Exception("La moneda de este documento, "
-                        + CurrencyCode + ", "
-                        + "es distinta a la de la factura a vincular, "
-                        + dps.getDbmsCurrencyCode() + ".");
+                // currency does not match:
+                throw new Exception(prefix + "La moneda de este documento, " + CurrencyCode + ", "
+                        + "es distinta a la de la factura a vincular, " + dps.getDbmsCurrencyCode() + ".");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
-                    Math.abs(Total - dps.getTotalCy_r()) >= 1 ||
-                    Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm("Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + "\n"
-                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)) {
-                // match required:
-                throw new Exception("El total de este documento, "
-                        + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
-                        + "es distinto al de la factura a vincular, "
-                        + "$ " + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
+                    (Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm(
+                            "Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION) ||
+                    (Math.abs(Total - dps.getTotalCy_r()) >= 1 && (Total > dps.getTotalCy_r()) || !allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
+                            "El total de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                /*
+                total does not match AND
+                (absolute difference is < $1 AND user doesn't accept) OR
+                (absolute difference is >= $1 AND (this total is > document's OR no greater invoices allowed OR user user doesn't accept))
+                */
+                throw new Exception(prefix + "El total de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
+                        + "es distinto al de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
-            else if (!SLibTimeUtils.isSameDate(Date, dps.getDate())) {
+            else if ((!allowLaterInvoice && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
+                    (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la factura a vincular, "
+                            + SLibUtils.DateFormatDate.format(dps.getDate()) + ", es posterior a la de este documento, " + SLibUtils.DateFormatDate.format(Date) + ".\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 // match required:
-                throw new Exception("La fecha de este documento, "
-                        + SLibUtils.DateFormatDate.format(Date) + ", "
-                        + "es distinta a la de la factura a vincular, "
-                        + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
+                throw new Exception(prefix + "La fecha de este documento, " + SLibUtils.DateFormatDate.format(Date) + ", "
+                        + "es distinta a la de la factura a vincular, " + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
-                String msgChooseOtherInvoice = "Favor de elegir otra factura para vincularla a este documento.";
+                String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
                 // check folio number: it must match its counterpart in document, in DPS it is allways available:
 
@@ -581,7 +584,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                         // match required:
                         msgError = " ni UUID,\n"
-                                + "y el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
+                                + "mientras que el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
                     }
                     else {
                         // UUID available, attempt to find similitudes:
@@ -596,7 +599,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         }
                         else {
                             // match required:
-                            msgError = msgConfirm + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
+                            msgError = msgTopic + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
                                     + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
                         }
                     }
@@ -605,11 +608,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 // processs folio number validation:
 
                 if (!msgError.isEmpty()) {
-                    throw new Exception(msgError);
+                    throw new Exception(prefix + msgError);
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "Aún así es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
                             + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                         throw new Exception(msgChooseOtherInvoice);
                     }
@@ -648,11 +651,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 // processs folio series validation:
 
                 if (!msgError.isEmpty()) {
-                    throw new Exception(msgError);
+                    throw new Exception(prefix + msgError);
                 }
                 else if (!msgConfirm.isEmpty()) {
                     if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "De cualquier manera es posible vinclular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
                             + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                         throw new Exception(msgChooseOtherInvoice);
                     }
@@ -669,7 +672,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 int recNumberId = (Integer) recKey[4];
                 String recCompanyBranchCode = SDataRecord.getCompanyBranchCode(dps.getDbmsRecordKey(), session.getStatement());
 
-                ProcessedDps = new SDbSwapDataProcessing.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), 
+                ProcessedDps = new SImportedDocument.ProcessedDps(0, dps.getPkYearId(), dps.getPkDocId(), dps.getDpsNumber(), dps.getDate(), dps.getTotalCy_r(), dps.getDbmsCurrencyCode(), 
                         recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode, 
                         dps.getFkUserNewId(), dps.getDbmsUserNew(), dps.getThinCfd() != null, dps.getThinPdf() != null);
 
@@ -735,7 +738,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                             cfd.setTimestamp(dps.getDate());
 
                             if (cfd.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
+                                throw new Exception(prefix + SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro CFD.)");
                             }
                             
                             ProcessedDps.HasCfd = true;
@@ -754,7 +757,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                             pdf.setPkDocId(dps.getPkDocId());
 
                             if (pdf.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
+                                throw new Exception(prefix + SLibConstants.MSG_ERR_DB_REG_SAVE_DEP + "\n(Registro PDF.)");
                             }
                             
                             ProcessedDps.HasPdf = true;
@@ -776,8 +779,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public boolean unlink(final SGuiSession session) throws Exception {
         boolean unlinked = false;
         
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else {
             // check if payment can be deleted:
@@ -830,7 +833,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     public void retrieveProcessing(final SGuiSession session, final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
-        ProcessedDps = SDbSwapDataProcessing.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
+        ProcessedDps = SImportedDocument.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
 
         if (ProcessedDps != null) {
             SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
@@ -847,11 +850,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     private boolean validatePaymentRequestCreation() throws Exception {
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (isPaymentRequested()) {
-            throw new Exception(EXC_PAY_ALREADY_REGISTERED_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
+            throw new Exception(EXC_PAY_ALREADY_REQUESTED_IN_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
         }
         else if (!isPaymentRequestDataAvailable()) {
             throw new Exception(EXC_PAY_NOT_REQUESTABLE);
@@ -892,11 +895,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @throws Exception 
      */
     private boolean validateRequiredPaymentDateChanging() throws Exception {
-        if (!isProcessed()) {
-            throw new Exception(EXC_DOC_NOT_PROCESSED);
+        if (!isRecorded()) {
+            throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (!isPaymentRequested()) {
-            throw new Exception(EXC_PAY_NOT_REGISTERED);
+            throw new Exception(EXC_PAY_NOT_REQUESTED);
         }
         else if (!Payment.isExportable()) {
             throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "' o '" + SDbPayment.ST_SCHED + "'.");
@@ -929,11 +932,15 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dateNew = pickDate(session);
 
         if (dateNew != null) {
-            if (dateNew.before(session.getSystemDate())) {
-                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior al día de hoy '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
+            dateNew = SLibTimeUtils.convertToDateOnly(dateNew);
+            
+            String message = "La nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior ";
+            
+            if (dateNew.before(SLibTimeUtils.convertToDateOnly(session.getSystemDate()))) {
+                throw new Exception(message + "al día de hoy, " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
             }
-            else if (dateNew.before(Date)) {
-                throw new Exception("La fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
+            else if (dateNew.before(SLibTimeUtils.convertToDateOnly(Date))) {
+                throw new Exception(message + "a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
             }
             
             if (isPaymentRequested()) {
@@ -993,7 +1000,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setDateDocLapsing_n(
         //dps.setDateDocDelivery_n(
         dps.setNumberSeries(NumberSeries);
-        dps.setNumber(Number);
+        dps.setNumber(!Number.isEmpty() ? Number : SDocumentUtils.getUuidFirstSegment(ExternalDocumentUuid));
         //dps.setNumberReference(
         //dps.setCommissionsReference(
         //dps.setConditionsPayment(
@@ -1026,9 +1033,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setPayments(
         //dps.setPaymentMethod(
         //dps.setPaymentAccount(
-        if (order != null) {
-            dps.setAccountingTag(order.getAccountingTag());
-        }
+        dps.setAccountingTag(order != null ? order.getAccountingTag() : "");
         //dps.setAutomaticAuthorizationRejection(
         //dps.setIsPublic(
         //dps.setIsLinked(
@@ -1053,27 +1058,39 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
         dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
         dps.setFkDpsAnnulationTypeId(SModSysConsts.TRNU_TP_DPS_ANN_NA);
-        if (order != null) {
-            dps.setFkDpsNatureId(order.getFkDpsNatureId());
-        }
+        dps.setFkDpsNatureId(order != null ? order.getFkDpsNatureId() : SDataConstantsSys.TRNU_DPS_NAT_DEF);
         dps.setFkCompanyBranchId(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranchId());
         dps.setFkFunctionalAreaId(functionalSubArea.getFkFunctionalAreaId());
         dps.setFkFunctionalSubAreaId(functionalSubArea.getPkFunctionalSubAreaId());
-        dps.setFkBizPartnerId_r(bizPartner.getPkBizPartnerId());
-        dps.setFkBizPartnerBranchId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
-        dps.setFkBizPartnerBranchAddressId(bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
-        //dps.setFkBizPartnerAltId_r(
-        //dps.setFkBizPartnerBranchAltId(
-        //dps.setFkBizPartnerBranchAddressAltId(
-        //dps.setFkBizPartnerAddresseeId_n(
-        //dps.setFkAddresseeBizPartnerId_nr(
-        //dps.setFkAddresseeBizPartnerBranchId_n(
-        //dps.setFkAddresseeBizPartnerBranchAddressId_n(
+        if (order != null) {
+            dps.setFkBizPartnerId_r(order.getFkBizPartnerId_r());
+            dps.setFkBizPartnerBranchId(order.getFkBizPartnerBranchId());
+            dps.setFkBizPartnerBranchAddressId(order.getFkBizPartnerBranchAddressId());
+            dps.setFkBizPartnerAltId_r(order.getFkBizPartnerAltId_r());
+            dps.setFkBizPartnerBranchAltId(order.getFkBizPartnerBranchAltId());
+            dps.setFkBizPartnerBranchAddressAltId(order.getFkBizPartnerBranchAddressAltId());
+            dps.setFkBizPartnerAddresseeId_n(order.getFkBizPartnerAddresseeId_n());
+            dps.setFkAddresseeBizPartnerId_nr(order.getFkAddresseeBizPartnerId_nr());
+            dps.setFkAddresseeBizPartnerBranchId_n(order.getFkAddresseeBizPartnerBranchId_n());
+            dps.setFkAddresseeBizPartnerBranchAddressId_n(order.getFkAddresseeBizPartnerBranchAddressId_n());
+        }
+        else {
+            dps.setFkBizPartnerId_r(bizPartner.getPkBizPartnerId());
+            dps.setFkBizPartnerBranchId(bizPartner.getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+            dps.setFkBizPartnerBranchAddressId(bizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial().getPkAddressId());
+            //dps.setFkBizPartnerAltId_r(
+            //dps.setFkBizPartnerBranchAltId(
+            //dps.setFkBizPartnerBranchAddressAltId(
+            //dps.setFkBizPartnerAddresseeId_n(
+            //dps.setFkAddresseeBizPartnerId_nr(
+            //dps.setFkAddresseeBizPartnerBranchId_n(
+            //dps.setFkAddresseeBizPartnerBranchAddressId_n(
+        }
         //dps.setFkContactBizPartnerBranchId_n(
         //dps.setFkContactContactId_n(
         //dps.setFkTaxIdentityEmisorTypeId(
         //dps.setFkTaxIdentityReceptorTypeId(
-        dps.setFkLanguajeId(bizPartner.getDbmsCategorySettingsSup().getFkLanguageId_n());
+        dps.setFkLanguajeId(order != null ? order.getFkLanguajeId() : bizPartner.getDbmsCategorySettingsSup().getFkLanguageId_n());
         dps.setFkCurrencyId(CurrencyId);
         //dps.setFkSalesAgentId_n(
         //dps.setFkSalesAgentBizPartnerId_n(
@@ -1114,126 +1131,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         return dps;
     }
-    
-    @Override
-    public Object getRowValueAt(int col) {
-        Object value = null;
-        
-        switch (col) {
-            case 0:
-                value = BizPartner;
-                break;
-            case 1:
-                value = getFolio();
-                break;
-            case 2:
-                value = Date;
-                break;
-            case 3:
-                value = ReferencesAsText;
-                break;
-            case 4:
-                value = Description;
-                break;
-            case 5:
-                value = Total;
-                break;
-            case 6:
-                value = CurrencyCode;
-                break;
-            case 7:
-                value = Download;
-                break;
-            case 8:
-                value = AlreadyDownloaded;
-                break;
-            case 9:
-                value = isProcessed();
-                break;
-            case 10:
-                value = !isProcessed() ? "" : ProcessedDps.composeRecord();
-                break;
-            case 11:
-                value = !isProcessed() ? false : ProcessedDps.HasCfd;
-                break;
-            case 12:
-                value = !isProcessed() ? false : ProcessedDps.HasPdf;
-                break;
-            case 13:
-                value = Status;
-                break;
-            case 14:
-                value = FunctionalSubArea;
-                break;
-            case 15:
-                value = FiscalUseCode;
-                break;
-            case 16:
-                value = getRequiredPaymentAmount();
-                break;
-            case 17:
-                value = CurrencyCode;
-                break;
-            case 18:
-                value = getRequiredPaymentPct();
-                break;
-            case 19:
-                value = RequiredPaymentDate;
-                break;
-            case 20:
-                value = RequiredPaymentDateNew;
-                break;
-            case 21:
-                value = IsRequiredPaymentLoc;
-                break;
-            case 22:
-                value = RequiredPaymentNotes;
-                break;
-            case 23:
-                value = isPaymentRequested() ? Payment.getFolio() : null;
-                break;
-            case 24:
-                value = isPaymentRequested() ? Payment.getDateApplication() : null;
-                break;
-            case 25:
-                value = ExternalDocumentId;
-                break;
-            case 26:
-                value = ExternalDocumentUuid;
-                break;
-            default:
-                // nothing
-        }
-        
-        return value;
-    }
-
-    @Override
-    public void setRowValueAt(Object value, int col) {
-        switch (col) {
-            case 7:
-                Download = (Boolean) value;
-                break;
-            default:
-                // nothing
-        }
-    }
-    
-    @Override
-    public String toString() {
-        return BizPartner + "; " // allways available
-                + getFolio() + "; " // allways available
-                + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
-                + "$ " + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
-                + (!FunctionalSubArea.isEmpty() ? "; " + FunctionalSubArea : "") // may not be available
-                + (ExternalDocumentId != 0 ? "; ID " + ExternalDocumentId : "") // may not be available
-                + ".";
-    }
-
-    @Override
-    public int compareTo(SImportedDocument o) {
-        return this.toString().compareTo(o.toString());
-    }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -1269,30 +1166,271 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public void setRowEdited(boolean edited) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void setRowValueAt(Object value, int col) {
+        switch (col) {
+            case 7:
+                Download = (Boolean) value;
+                break;
+            default:
+                // nothing
+        }
+    }
+    
+    @Override
+    public Object getRowValueAt(int col) {
+        Object value = null;
+        
+        switch (col) {
+            case 0:
+                value = BizPartner;
+                break;
+            case 1:
+                value = getFolio();
+                break;
+            case 2:
+                value = Date;
+                break;
+            case 3:
+                value = ReferencesAsText;
+                break;
+            case 4:
+                value = Description;
+                break;
+            case 5:
+                value = Total;
+                break;
+            case 6:
+                value = CurrencyCode;
+                break;
+            case 7:
+                value = Download;
+                break;
+            case 8:
+                value = AlreadyDownloaded;
+                break;
+            case 9:
+                value = isRecorded();
+                break;
+            case 10:
+                value = !isRecorded() ? null : ProcessedDps.composeRecord();
+                break;
+            case 11:
+                value = !isRecorded() ? false : ProcessedDps.HasCfd;
+                break;
+            case 12:
+                value = !isRecorded() ? false : ProcessedDps.HasPdf;
+                break;
+            case 13:
+                value = FunctionalSubArea;
+                break;
+            case 14:
+                value = FiscalUseCode;
+                break;
+            case 15:
+                value = ProcessingTypeCode;
+                break;
+            case 16:
+                value = getRevisionYearWeek();
+                break;
+            case 17:
+                value = RevisionDatetime;
+                break;
+            case 18:
+                value = getRequiredPaymentAmount();
+                break;
+            case 19:
+                value = CurrencyCode;
+                break;
+            case 20:
+                value = getRequiredPaymentPct();
+                break;
+            case 21:
+                value = RequiredPaymentDate;
+                break;
+            case 22:
+                value = RequiredPaymentDateNew;
+                break;
+            case 23:
+                value = IsRequiredPaymentLoc;
+                break;
+            case 24:
+                value = RequiredPaymentNotes;
+                break;
+            case 25:
+                value = !isPaymentRequested() ? null : Payment.getFolio();
+                break;
+            case 26:
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                break;
+            case 27:
+                value = ExternalDocumentId;
+                break;
+            case 28:
+                value = ExternalDocumentUuid;
+                break;
+            case 29:
+                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
+                break;
+            case 30:
+                value = !isRecorded() ? null : ProcessedDps.DpsDate;
+                break;
+            case 31:
+                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
+                break;
+            case 32:
+                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                break;
+            case 33:
+                String string = null;
+                if (isRecorded()) {
+                    boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
+                    boolean isCurrencyOk = CurrencyCode.equals(ProcessedDps.DpsCurrencyCode);
+                    
+                    if (isTotalOk && isCurrencyOk) {
+                        string = "OK";
+                    }
+                    else {
+                        if (!isTotalOk) {
+                            string = "Dif. total: " + SLibUtils.getDecimalFormatAmount().format(ProcessedDps.DpsTotalCy - Total);
+                        }
+                        if (!isCurrencyOk) {
+                            string = (string == null ? "" : string + "; ") + "Dif. moneda: " + ProcessedDps.DpsCurrencyCode;
+                        }
+                    }
+                }
+                value = string;
+                break;
+            default:
+                // nothing
+        }
+        
+        return value;
+    }
+
+    @Override
+    public int compareTo(SImportedDocument o) {
+        return this.toString().compareTo(o.toString());
+    }
+    
+    @Override
+    public String toString() {
+        return "Emisor: " + BizPartner + "; " // allways available
+                + "Folio: " + getFolio() + "; " // allways available
+                + "Fecha: " + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
+                + "Total: $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
+                + (!FunctionalSubArea.isEmpty() ? "; Subárea funcional: " + FunctionalSubArea : "") // may not be available
+                + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
+                + ".";
+    }
     
     /**
-     * Get exchange rate in desired date, if available.
-     * @param session GUI session.
-     * @param importedDocument Imported document.
-     * @param date Desired date.
-     * @return
-     * @throws Exception
+     * Create prepared statement to get Processed DPS from SWAP processed data by its external ID.
+     * @param statement DB statement.
+     * @return A prepared statment with these columns: id_swap_data_prc, dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @throws Exception 
      */
-    public static double getExchangeRate(final SGuiSession session, final SImportedDocument importedDocument, final Date date) throws Exception {
-        double exchangeRate = 0;
-
-        if (session.getSessionCustom().isLocalCurrency(new int[] { importedDocument.CurrencyId })) {
-            exchangeRate = 1;
-        }
-        else {
-            exchangeRate = SDataUtilities.obtainExchangeRate((SClientInterface) session.getClient(), importedDocument.CurrencyId, date);
-
-            if (exchangeRate == 0) {
-                throw new Exception("No se ha capturado el tipo de cambio " + session.getSessionCustom().getLocalCurrencyCode() + "/" + importedDocument.CurrencyCode + " para el día " + SLibUtils.DateFormatDate.format(date) + ".");
+    public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final Statement statement) throws Exception {
+        String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, "
+                + "sdp.fk_dps_year_n AS dps_id_year, sdp.fk_dps_doc_n AS dps_id_doc, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS dps_folio, d.dt AS dps_date, d.tot_cur_r AS dps_tot_cur, c.cur_key AS dps_cur_code, "
+                + "r.id_year AS rec_id_year, r.id_per AS rec_id_per, r.id_bkc AS rec_id_bkc, r.id_tp_rec AS rec_id_tp_rec, r.id_num AS rec_id_num, cob.code AS rec_cob_code, "
+                + "un.id_usr, un.usr, cfd.id_cfd, pdf.doc_pdf_name "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
+                + "d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON "
+                + "c.id_cur = d.fid_cur "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_REC) + " AS dr ON "
+                + "dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r ON "
+                + "r.id_year = dr.fid_rec_year AND r.id_per = dr.fid_rec_per AND r.id_bkc = dr.fid_rec_bkc AND r.id_tp_rec = dr.fid_rec_tp_rec AND r.id_num = dr.fid_rec_num "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON "
+                + "cob.id_bpb = r.fid_cob "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON "
+                + "un.id_usr = d.fid_usr_new "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON "
+                + "cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
+                + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDbName(statement.getConnection()) + "." + SModConsts.TablesMap.get(SModConsts.TRN_PDF) + " AS pdf ON "
+                + "pdf.id_year = d.id_year AND pdf.id_doc = d.id_doc "
+                + "WHERE NOT sdp.b_del AND sdp.data_type = ? AND sdp.txn_cat = ? AND sdp.ext_data_id = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
+     * Get Processed DPS from SWAP processed data, if any, by its external ID.
+     * @param preparedStatement Prepared statement.
+     * @param dataType Constants DATA_TYPE...: INV = invoice; DB = debit note; CN = credit note.
+     * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
+     * @param externalId External ID.
+     * @return A Processed DPS if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SImportedDocument.ProcessedDps getProcessedDpsByExternalId(final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+        SImportedDocument.ProcessedDps processedDps = null;
+        
+        preparedStatement.setString(1, dataType);
+        preparedStatement.setInt(2, txnCategory);
+        preparedStatement.setInt(3, externalId);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                processedDps = new SImportedDocument.ProcessedDps(resultSet.getInt("id_swap_data_prc"), resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), resultSet.getString("dps_folio"), resultSet.getDate("dps_date"), resultSet.getDouble("dps_tot_cur"), resultSet.getString("dps_cur_code"), 
+                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"), 
+                        resultSet.getInt("un.id_usr"), resultSet.getString("un.usr"), resultSet.getInt("id_cfd") != 0, resultSet.getString("doc_pdf_name") != null);
             }
         }
         
-        return exchangeRate;
+        return processedDps;
+    }
+    
+    /**
+     * Create prepared statement to get Processed DPS from Payable or Receivable Accounts by its own document data.
+     * @param statement DB statement.
+     * @param dpsTypeKey Key of DPS type: (category, class & type).
+     * @return A prepared statment with these columns: dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @throws Exception 
+     */
+    public static PreparedStatement createPrepStatementToGetDpsKeyByDocData(final Statement statement, final int[] dpsTypeKey) throws Exception {
+        String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                + "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " "
+                + "AND d.fid_bp_r = ? AND d.dt = ? AND d.num_ser = ? AND d.num = ? AND d.tot_cur_r = ? AND d.fid_cur = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
+     * Get DPS primary key from Payable or Receivable Accounts, if any, by its own document data.
+     * @param preparedStatement Prepared statement.
+     * @param bizPartnerId Document's ID of business partner.
+     * @param date Document's date.
+     * @param numberSeries Document's folio series.
+     * @param number Document's folio number.
+     * @param total Document's net total.
+     * @param currencyId Document's ID of currency.
+     * @return A DPS primary key if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static int[] getDpsKeyByDocData(final PreparedStatement preparedStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
+        int[] dpsKey = null;
+        
+        preparedStatement.setInt(1, bizPartnerId);
+        preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
+        preparedStatement.setString(3, numberSeries);
+        preparedStatement.setString(4, number);
+        preparedStatement.setDouble(5, total);
+        preparedStatement.setInt(6, currencyId);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                dpsKey = new int[] { resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc") };
+            }
+        }
+        
+        return dpsKey;
     }
     
     /**
@@ -1329,7 +1467,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Number = resultSet.getString("d.num");
                 importedDocument.Date = resultSet.getDate("d.dt");
                 String referencesAsText = resultSet.getString("sdp.dps_refs");
-                importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_DOC_TYPE_ORDER;
+                importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_REF_TYPE_ORDER;
                 importedDocument.ReferencesAsText = referencesAsText;
                 importedDocument.Description = resultSet.getString("sdp.dps_descrip");
                 importedDocument.FunctionalSubAreaId = resultSet.getInt("d.fid_func_sub");
@@ -1339,13 +1477,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Total = resultSet.getDouble("d.tot_cur_r");
                 importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
                 importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
-                importedDocument.RequiredPaymentDefinition = PAYMENT_DEFN_NOT_REQ;
+                importedDocument.RequiredPaymentDefinition = PAY_IS_NOT_REQ;
                 importedDocument.RequiredPaymentAmount = 0;
                 importedDocument.RequiredPaymentPct = 0;
                 importedDocument.RequiredPaymentDate = null;
                 importedDocument.RequiredPaymentDateNew = null;
                 importedDocument.IsRequiredPaymentLoc = false;
                 importedDocument.RequiredPaymentNotes = "";
+                importedDocument.RevisionYear = 0;
+                importedDocument.RevisionWeek = 0;
+                importedDocument.RevisionDatetime = null;
+                importedDocument.ProcessingTypeId = 0;
+                importedDocument.ProcessingTypeCode = "";
                 importedDocument.StatusId = 0;
                 importedDocument.Status = "";
                 importedDocument.Download = false;
@@ -1360,6 +1503,80 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         return importedDocument;
+    }
+    
+    /**
+     * In memory Processed DPS.
+     */
+    public static class ProcessedDps implements Serializable {
+        
+        public int SwapDataProcessingId;
+        public int DpsYearId;
+        public int DpsDocId;
+        public String DpsFolio;
+        public Date DpsDate;
+        public double DpsTotalCy;
+        public String DpsCurrencyCode;
+        public int RecYearId;
+        public int RecPeriodId;
+        public int RecBookkeepingCenterId;
+        public String RecRecordTypeId;
+        public int RecNumberId;
+        public String RecCompanyBranchCode;
+        public int UserNewId;
+        public String UserNew;
+        public boolean HasCfd;
+        public boolean HasPdf;
+        
+        public ProcessedDps(final int swapDataProcessingId, final int dpsYearId, final int dpsDocId, final String dpsFolio, final Date dpsDate, final double dpsTotalCy, final String dpsCurrencyCode, 
+                final int recYearId, final int recPeriodId, final int recBookkeepingCenterId, final String recRecordTypeId, final int recNumberId, final String recCompanyBranchCode, 
+                final int userNewId, final String userNew, final boolean hasCfd, final boolean hasPdf) {
+            SwapDataProcessingId = swapDataProcessingId;
+            DpsYearId = dpsYearId;
+            DpsDocId = dpsDocId;
+            DpsFolio = dpsFolio;
+            DpsDate = dpsDate;
+            DpsTotalCy = dpsTotalCy;
+            DpsCurrencyCode = dpsCurrencyCode;
+            RecYearId = recYearId;
+            RecPeriodId = recPeriodId;
+            RecBookkeepingCenterId = recBookkeepingCenterId;
+            RecRecordTypeId = recRecordTypeId;
+            RecNumberId = recNumberId;
+            RecCompanyBranchCode = recCompanyBranchCode;
+            UserNewId = userNewId;
+            UserNew = userNew;
+            HasCfd = hasCfd;
+            HasPdf = hasPdf;
+        }
+        
+        public int[] getDpsKey() {
+            int[] key = null;
+            
+            if (DpsYearId != 0 && DpsDocId != 0) {
+                key = new int[] { DpsYearId, DpsDocId };
+            }
+            
+            return key;
+        }
+        
+        public Object[] getRecordKey() {
+            Object[] key = null;
+            
+            if (RecYearId != 0 && RecPeriodId != 0 && RecBookkeepingCenterId != 0 && !RecRecordTypeId.isEmpty() && RecNumberId != 0) {
+                key = new Object[] { RecYearId, RecPeriodId, RecBookkeepingCenterId, RecRecordTypeId, RecNumberId };
+            }
+            
+            return key;
+        }
+        
+        public String composeRecord() {
+            return RecYearId + "-" +
+                    RecPeriodFormat.format(RecPeriodId) + " " +
+                    RecCompanyBranchCode + " " +
+                    RecRecordTypeId + "-" +
+                    RecNumberFormat.format(RecNumberId);
+        }
     }
     
     public static class Reference implements Serializable {

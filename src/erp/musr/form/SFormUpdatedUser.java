@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SFormUpdatedUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener{
     

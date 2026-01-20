@@ -71,7 +71,7 @@ public class SDpsGoogleCloudUtils {
                         fileData.getIdYear() + "_" + fileData.getIdDoc()
                 );
 
-                if (lastSync == null || fileData.getLastUpdate().after(lastSync)) {
+                if (lastSync == null || fileData.getLastUpdate() == null || fileData.getLastUpdate().after(lastSync)) {
                     SDataDps oDps = new SDataDps();
                     oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
                     File pdf = new File("temp", fileData.getFileName());

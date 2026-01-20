@@ -19,10 +19,12 @@ public abstract class SHttpConsts {
     public static final int RSC_SUCC_NO_AUTH_INFO = 203;
     public static final int RSC_SUCC_NO_CONTENT = 204;
     public static final int RSC_ERR_BAD_REQUEST = 400;
+    public static final int RSC_ERR_SERVER = 500;
     
     // HTTP Methods:
     
     public static final String METHOD_GET = "GET";
+    public static final String METHOD_PATCH = "PATCH";
     public static final String METHOD_POST = "POST";
     public static final String METHOD_PUT = "PUT";
 }

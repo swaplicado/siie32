@@ -20,7 +20,7 @@ import redis.clients.jedis.params.ClientKillParams;
 
 /**
  *
- * @author Adrián Alejandro Avilés
+ * @author Adrián Avilés
  */
 public class SFormRedisSessions extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
      

@@ -249,6 +249,7 @@ public class SDbSyncLog extends SDbRegistryUser {
             entry.setPkSyncLogId(mnPkSyncLogId);
             entry.setTsSync(mtTsUser); // sync as well the sync entry!
             entry.setAuxDatabase(msAuxDatabase);
+            entry.setRegistryNew(true); // En este registro en específico no habrá actualización
             entry.save(session);
         }
 

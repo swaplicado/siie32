@@ -8,11 +8,11 @@ package erp.mod.cfg.swap.form;
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
-import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
@@ -26,9 +26,12 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
+import erp.mod.cfg.swap.utils.SDataRejectResource;
+import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.trn.db.SDbSwapDataProcessing;
@@ -46,17 +49,20 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.lib.SLibTimeUtils;
@@ -68,11 +74,14 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiField;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiOptionPicker;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldBoolean;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
 
@@ -87,13 +96,22 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
+    protected static final int OFF = 0;
+    protected static final int ON = 1;
+    protected static final int LIMIT_DAYS = 31; // 1 calendar month
+    protected static final int LIMIT_WEEKS = 4; // 1 lunar month
+    protected static final int LIMIT_DOWNLOADS = 250; // 0.25 k documents
+    protected static final int FUNC_SUB_AREA_CODES_PER_LINE = 15;
+    
     protected String msCompanyName;
+    protected int mnShowingDocsMode;
     protected SGridPaneForm moDocumentsGrid;
     protected SDialogDpsFinder moDialogDpsFinder;
     protected ArrayList<SImportedDocument> maDocuments;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
-    protected String msUserFunctionalSubAreasCodes;
-    protected String msSyncUrlRetrieve;
+    protected String msUserFunctionalSubAreaCodes;
+    protected String msSyncUrlRetrieveByPeriod;
+    protected String msSyncUrlRetrieveByWeek;
     protected String msSyncUrlDownload;
     protected String msSyncToken;
     protected String msSyncApiKey;
@@ -103,8 +121,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected PreparedStatement moPrepStatToGetDpsKeyByDocData;
     protected JLabel jlStatus;
     protected SBeanFieldBoolean moBoolExportPaymentRequestsOnClose;
+    protected boolean mbAllowLinkGreaterInvoices;
+    
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
+    protected SDialogPdfViewer moDialogPdfViewer;
     
     /**
      * Creates new form SDialogImportDocuments
@@ -125,7 +146,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bgView = new javax.swing.ButtonGroup();
+        bgSearchBy = new javax.swing.ButtonGroup();
+        bgDocMode = new javax.swing.ButtonGroup();
         jpDownload = new javax.swing.JPanel();
         jpDownloadW = new javax.swing.JPanel();
         jpDownloadW1 = new javax.swing.JPanel();
@@ -133,11 +155,21 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfUserName = new javax.swing.JTextField();
         jtfUserFuncSubAreas = new javax.swing.JTextField();
         jpDownloadW2 = new javax.swing.JPanel();
-        jlDateStart = new javax.swing.JLabel();
-        moDateStart = new sa.lib.gui.bean.SBeanFieldDate();
+        moRadSearchByPeriod = new sa.lib.gui.bean.SBeanFieldRadio();
+        moDatePeriodStart = new sa.lib.gui.bean.SBeanFieldDate();
+        jLabelPeriiod1 = new javax.swing.JLabel();
+        moDatePeriodEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        moRadDocModeType = new sa.lib.gui.bean.SBeanFieldRadio();
+        moKeyDocModeType = new sa.lib.gui.bean.SBeanFieldKey();
         jpDownloadW3 = new javax.swing.JPanel();
-        jlDateEnd = new javax.swing.JLabel();
-        moDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        moRadSearchByWeek = new sa.lib.gui.bean.SBeanFieldRadio();
+        moCalWeekYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
+        jlLabelWeek1 = new javax.swing.JLabel();
+        moCalWeekStart = new sa.lib.gui.bean.SBeanFieldCalendarWeek();
+        jlLabelWeek2 = new javax.swing.JLabel();
+        moCalWeekEnd = new sa.lib.gui.bean.SBeanFieldCalendarWeek();
+        moRadDocModeCase = new sa.lib.gui.bean.SBeanFieldRadio();
+        moKeyDocModeCase = new sa.lib.gui.bean.SBeanFieldKey();
         jpDownloadE = new javax.swing.JPanel();
         jpDownloadE1 = new javax.swing.JPanel();
         jbShowDocs = new javax.swing.JButton();
@@ -152,20 +184,24 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jLabel22 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
         jpDownloadE3 = new javax.swing.JPanel();
-        moRadViewAll = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadViewAssets = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadViewExpenses = new sa.lib.gui.bean.SBeanFieldRadio();
+        moBoolExcludeRecorded = new sa.lib.gui.bean.SBeanFieldBoolean();
         jLabel31 = new javax.swing.JLabel();
         jbDeselectAllDocs = new javax.swing.JButton();
         jLabel32 = new javax.swing.JLabel();
         jbLinkAllDocs = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsGrid = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jpDocumentsGrid1 = new javax.swing.JPanel();
+        jpDocumentsGrid11 = new javax.swing.JPanel();
+        jpDocumentsGrid111 = new javax.swing.JPanel();
         jlInvoiceUserNew = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        jpDocumentsGrid112 = new javax.swing.JPanel();
         jtfInvoiceUserNew = new javax.swing.JTextField();
+        jpDocumentsGrid12 = new javax.swing.JPanel();
+        jpDocumentsGrid121 = new javax.swing.JPanel();
+        jlProgress = new javax.swing.JLabel();
+        jpDocumentsGrid122 = new javax.swing.JPanel();
+        jProgressBar = new javax.swing.JProgressBar();
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
@@ -177,42 +213,45 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpProcessingN4 = new javax.swing.JPanel();
         jbUnlinkInvoice = new javax.swing.JButton();
         jpProcessingN5 = new javax.swing.JPanel();
-        jlInvoice = new javax.swing.JLabel();
+        jbRejectInvoice = new javax.swing.JButton();
         jpProcessingN6 = new javax.swing.JPanel();
+        jlInvoice = new javax.swing.JLabel();
+        jbViewInvoicePdf = new javax.swing.JButton();
+        jpProcessingN7 = new javax.swing.JPanel();
         jtfInvoice = new javax.swing.JTextField();
         jbViewInvoice = new javax.swing.JButton();
         jbViewOrder = new javax.swing.JButton();
-        jpProcessingN7 = new javax.swing.JPanel();
+        jpProcessingN8 = new javax.swing.JPanel();
         jtfRecord = new javax.swing.JTextField();
         jbViewRecord = new javax.swing.JButton();
-        jpProcessingN8 = new javax.swing.JPanel();
-        jlReqPay = new javax.swing.JLabel();
         jpProcessingN9 = new javax.swing.JPanel();
+        jlReqPay = new javax.swing.JLabel();
+        jpProcessingN10 = new javax.swing.JPanel();
         jtfReqPayAmount = new javax.swing.JTextField();
         jtfReqPayAmountPct = new javax.swing.JTextField();
-        jpProcessingN10 = new javax.swing.JPanel();
+        jpProcessingN11 = new javax.swing.JPanel();
         jtfReqPayReqDate = new javax.swing.JTextField();
         jbChangeRequiredPaymentDate = new javax.swing.JButton();
-        jpProcessingN11 = new javax.swing.JPanel();
-        jbRequestPayment = new javax.swing.JButton();
-        jpProcessingN19 = new javax.swing.JPanel();
-        jlPay = new javax.swing.JLabel();
         jpProcessingN12 = new javax.swing.JPanel();
+        jbRequestPayment = new javax.swing.JButton();
+        jpProcessingN13 = new javax.swing.JPanel();
+        jlPay = new javax.swing.JLabel();
+        jpProcessingN14 = new javax.swing.JPanel();
         jtfPayFolio = new javax.swing.JTextField();
         jtfPayDate = new javax.swing.JTextField();
-        jpProcessingN13 = new javax.swing.JPanel();
+        jpProcessingN15 = new javax.swing.JPanel();
         jtfPayReqDate = new javax.swing.JTextField();
         jbChangePaymentRequiredDate = new javax.swing.JButton();
-        jpProcessingN14 = new javax.swing.JPanel();
-        jtfPayStatus = new javax.swing.JTextField();
-        jpProcessingN15 = new javax.swing.JPanel();
-        jlPaySched = new javax.swing.JLabel();
         jpProcessingN16 = new javax.swing.JPanel();
+        jtfPayStatus = new javax.swing.JTextField();
+        jpProcessingN17 = new javax.swing.JPanel();
+        jlPaySched = new javax.swing.JLabel();
+        jpProcessingN18 = new javax.swing.JPanel();
         jtfPaySchedDate = new javax.swing.JTextField();
         jbChangePaymentScheduledDate = new javax.swing.JButton();
-        jpProcessingN17 = new javax.swing.JPanel();
+        jpProcessingN19 = new javax.swing.JPanel();
         jlPayExec = new javax.swing.JLabel();
-        jpProcessingN18 = new javax.swing.JPanel();
+        jpProcessingN20 = new javax.swing.JPanel();
         jtfPayExecDate = new javax.swing.JTextField();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -224,49 +263,104 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de facturas autorizadas:"));
         jpDownload.setLayout(new java.awt.BorderLayout());
 
-        jpDownloadW.setLayout(new java.awt.GridLayout(3, 1, 0, 2));
+        jpDownloadW.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
         jpDownloadW1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUser.setText("Usuario:");
-        jlUser.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlUser.setPreferredSize(new java.awt.Dimension(75, 21));
         jpDownloadW1.add(jlUser);
 
         jtfUserName.setEditable(false);
         jtfUserName.setText("user.name");
+        jtfUserName.setToolTipText("Usuario actual");
         jtfUserName.setFocusable(false);
-        jtfUserName.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfUserName.setPreferredSize(new java.awt.Dimension(103, 21));
         jpDownloadW1.add(jtfUserName);
 
         jtfUserFuncSubAreas.setEditable(false);
         jtfUserFuncSubAreas.setText("FUNC. AREAS");
+        jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales");
         jtfUserFuncSubAreas.setFocusable(false);
-        jtfUserFuncSubAreas.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfUserFuncSubAreas.setPreferredSize(new java.awt.Dimension(313, 21));
         jpDownloadW1.add(jtfUserFuncSubAreas);
 
         jpDownloadW.add(jpDownloadW1);
 
         jpDownloadW2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateStart.setText("Fecha inicial:*");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpDownloadW2.add(jlDateStart);
-        jpDownloadW2.add(moDateStart);
+        bgSearchBy.add(moRadSearchByPeriod);
+        moRadSearchByPeriod.setText("Período:");
+        moRadSearchByPeriod.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadW2.add(moRadSearchByPeriod);
+
+        moDatePeriodStart.setToolTipText("Fecha inicial");
+        moDatePeriodStart.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadW2.add(moDatePeriodStart);
+
+        jLabelPeriiod1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelPeriiod1.setText("−");
+        jLabelPeriiod1.setPreferredSize(new java.awt.Dimension(15, 21));
+        jpDownloadW2.add(jLabelPeriiod1);
+
+        moDatePeriodEnd.setToolTipText("Fecha final");
+        moDatePeriodEnd.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadW2.add(moDatePeriodEnd);
+
+        bgDocMode.add(moRadDocModeType);
+        moRadDocModeType.setText("Tipo:");
+        moRadDocModeType.setPreferredSize(new java.awt.Dimension(65, 21));
+        jpDownloadW2.add(moRadDocModeType);
+
+        moKeyDocModeType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos", "Activo fijo", "Compras y gastos" }));
+        moKeyDocModeType.setPreferredSize(new java.awt.Dimension(115, 21));
+        jpDownloadW2.add(moKeyDocModeType);
 
         jpDownloadW.add(jpDownloadW2);
 
         jpDownloadW3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateEnd.setText("Fecha final:*");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpDownloadW3.add(jlDateEnd);
-        jpDownloadW3.add(moDateEnd);
+        bgSearchBy.add(moRadSearchByWeek);
+        moRadSearchByWeek.setText("Semana:");
+        moRadSearchByWeek.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadW3.add(moRadSearchByWeek);
+
+        moCalWeekYear.setToolTipText("Año");
+        moCalWeekYear.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadW3.add(moCalWeekYear);
+
+        jlLabelWeek1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlLabelWeek1.setText(":");
+        jlLabelWeek1.setPreferredSize(new java.awt.Dimension(21, 21));
+        jpDownloadW3.add(jlLabelWeek1);
+
+        moCalWeekStart.setToolTipText("Semana inicial");
+        moCalWeekStart.setPreferredSize(new java.awt.Dimension(50, 21));
+        jpDownloadW3.add(moCalWeekStart);
+
+        jlLabelWeek2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlLabelWeek2.setText("−");
+        jlLabelWeek2.setPreferredSize(new java.awt.Dimension(15, 21));
+        jpDownloadW3.add(jlLabelWeek2);
+
+        moCalWeekEnd.setToolTipText("Semana final");
+        moCalWeekEnd.setPreferredSize(new java.awt.Dimension(50, 21));
+        jpDownloadW3.add(moCalWeekEnd);
+
+        bgDocMode.add(moRadDocModeCase);
+        moRadDocModeCase.setText("Caso:");
+        moRadDocModeCase.setPreferredSize(new java.awt.Dimension(65, 21));
+        jpDownloadW3.add(moRadDocModeCase);
+
+        moKeyDocModeCase.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos", "Estándar", "Fletes fruta", "Compras fruta" }));
+        moKeyDocModeCase.setPreferredSize(new java.awt.Dimension(115, 21));
+        jpDownloadW3.add(moKeyDocModeCase);
 
         jpDownloadW.add(jpDownloadW3);
 
         jpDownload.add(jpDownloadW, java.awt.BorderLayout.WEST);
 
-        jpDownloadE.setLayout(new java.awt.GridLayout(3, 1, 0, 2));
+        jpDownloadE.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
         jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -275,7 +369,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbShowDocs.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbShowDocs);
 
-        jLabel11.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel11.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel11);
 
         jbSelectRemainingDocs.setText("Seleccionar restantes");
@@ -283,7 +377,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectRemainingDocs.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbSelectRemainingDocs);
 
-        jLabel12.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel12.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel12);
 
         jbDownloadSelectedDocs.setText("Descargar seleccionadas");
@@ -300,7 +394,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbClearDocs.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbClearDocs);
 
-        jLabel21.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel21.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel21);
 
         jbSelectAllDocs.setText("Seleccionar todas");
@@ -308,7 +402,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbSelectAllDocs);
 
-        jLabel22.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel22);
 
         jLabel23.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -318,25 +412,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        bgView.add(moRadViewAll);
-        moRadViewAll.setText("Todas");
-        moRadViewAll.setToolTipText("Ver todas las facturas autorizadas");
-        moRadViewAll.setPreferredSize(new java.awt.Dimension(60, 23));
-        jpDownloadE3.add(moRadViewAll);
+        moBoolExcludeRecorded.setText("Excluir contabilizadas");
+        moBoolExcludeRecorded.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(moBoolExcludeRecorded);
 
-        bgView.add(moRadViewAssets);
-        moRadViewAssets.setText("Activos");
-        moRadViewAssets.setToolTipText("Ver solo facturas autorizadas de activos fijos");
-        moRadViewAssets.setPreferredSize(new java.awt.Dimension(65, 23));
-        jpDownloadE3.add(moRadViewAssets);
-
-        bgView.add(moRadViewExpenses);
-        moRadViewExpenses.setText("Gastos/compras");
-        moRadViewExpenses.setToolTipText("Ver solo facturas autorizadas de gastos y compras");
-        moRadViewExpenses.setPreferredSize(new java.awt.Dimension(110, 23));
-        jpDownloadE3.add(moRadViewExpenses);
-
-        jLabel31.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel31.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel31);
 
         jbDeselectAllDocs.setText("Deseleccionar todas");
@@ -344,7 +424,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbDeselectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE3.add(jbDeselectAllDocs);
 
-        jLabel32.setPreferredSize(new java.awt.Dimension(15, 23));
+        jLabel32.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel32);
 
         jbLinkAllDocs.setText("Vincular todas");
@@ -363,36 +443,60 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpDocumentsGrid.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+        jpDocumentsGrid1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDocumentsGrid11.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+
+        jpDocumentsGrid111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlInvoiceUserNew.setText("Usr. factura:");
         jlInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jPanel2.add(jlInvoiceUserNew);
+        jpDocumentsGrid111.add(jlInvoiceUserNew);
 
-        jPanel1.add(jPanel2);
+        jpDocumentsGrid11.add(jpDocumentsGrid111);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpDocumentsGrid112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfInvoiceUserNew.setEditable(false);
         jtfInvoiceUserNew.setText("user.name");
         jtfInvoiceUserNew.setFocusable(false);
         jtfInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jPanel3.add(jtfInvoiceUserNew);
+        jpDocumentsGrid112.add(jtfInvoiceUserNew);
 
-        jPanel1.add(jPanel3);
+        jpDocumentsGrid11.add(jpDocumentsGrid112);
 
-        jpDocumentsGrid.add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jpDocumentsGrid1.add(jpDocumentsGrid11, java.awt.BorderLayout.CENTER);
+
+        jpDocumentsGrid12.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+
+        jpDocumentsGrid121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlProgress.setText("Progreso...");
+        jlProgress.setPreferredSize(new java.awt.Dimension(200, 20));
+        jpDocumentsGrid121.add(jlProgress);
+
+        jpDocumentsGrid12.add(jpDocumentsGrid121);
+
+        jpDocumentsGrid122.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jProgressBar.setPreferredSize(new java.awt.Dimension(200, 20));
+        jpDocumentsGrid122.add(jProgressBar);
+
+        jpDocumentsGrid12.add(jpDocumentsGrid122);
+
+        jpDocumentsGrid1.add(jpDocumentsGrid12, java.awt.BorderLayout.EAST);
+
+        jpDocumentsGrid.add(jpDocumentsGrid1, java.awt.BorderLayout.SOUTH);
 
         jpDocuments.add(jpDocumentsGrid, java.awt.BorderLayout.CENTER);
 
         jpDocumentsProcessing.setLayout(new java.awt.BorderLayout());
 
-        jpProcessingN.setLayout(new java.awt.GridLayout(19, 1, 0, 2));
+        jpProcessingN.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbImportInvoiceFromCfdi.setForeground(java.awt.Color.blue);
         jbImportInvoiceFromCfdi.setText("Importar CFDI");
         jbImportInvoiceFromCfdi.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbImportInvoiceFromCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -402,6 +506,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbCreateInvoiceFromScratch.setForeground(java.awt.Color.blue);
         jbCreateInvoiceFromScratch.setText("Crear factura");
         jbCreateInvoiceFromScratch.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbCreateInvoiceFromScratch.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -411,6 +516,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbLinkInvoice.setForeground(java.awt.Color.blue);
         jbLinkInvoice.setText("Vincular factura");
         jbLinkInvoice.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbLinkInvoice.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -420,6 +526,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbUnlinkInvoice.setForeground(java.awt.Color.red);
         jbUnlinkInvoice.setText("Desvincular factura");
         jbUnlinkInvoice.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbUnlinkInvoice.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -429,59 +536,74 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlInvoice.setText("Factura:");
-        jlInvoice.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpProcessingN5.add(jlInvoice);
+        jbRejectInvoice.setForeground(java.awt.Color.red);
+        jbRejectInvoice.setText("Rechazar factura");
+        jbRejectInvoice.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRejectInvoice.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN5.add(jbRejectInvoice);
 
         jpProcessingN.add(jpProcessingN5);
 
         jpProcessingN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlInvoice.setText("Factura:");
+        jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
+        jpProcessingN6.add(jlInvoice);
+
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setToolTipText("Ver PDF de la factura...");
+        jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN6.add(jbViewInvoicePdf);
+
+        jpProcessingN.add(jpProcessingN6);
+
+        jpProcessingN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfInvoice.setEditable(false);
         jtfInvoice.setText("ABC-000000");
         jtfInvoice.setToolTipText("Factura");
         jtfInvoice.setFocusable(false);
         jtfInvoice.setPreferredSize(new java.awt.Dimension(95, 23));
-        jpProcessingN6.add(jtfInvoice);
+        jpProcessingN7.add(jtfInvoice);
 
         jbViewInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbViewInvoice.setToolTipText("Ver factura...");
         jbViewInvoice.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN6.add(jbViewInvoice);
+        jpProcessingN7.add(jbViewInvoice);
 
         jbViewOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_seek.gif"))); // NOI18N
         jbViewOrder.setToolTipText("Ver pedido de la factura...");
         jbViewOrder.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN6.add(jbViewOrder);
+        jpProcessingN7.add(jbViewOrder);
 
-        jpProcessingN.add(jpProcessingN6);
+        jpProcessingN.add(jpProcessingN7);
 
-        jpProcessingN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfRecord.setEditable(false);
         jtfRecord.setText("2001-01 SUC C-000000");
         jtfRecord.setToolTipText("Póliza contable de la factura");
         jtfRecord.setFocusable(false);
         jtfRecord.setPreferredSize(new java.awt.Dimension(122, 23));
-        jpProcessingN7.add(jtfRecord);
+        jpProcessingN8.add(jtfRecord);
 
         jbViewRecord.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
         jbViewRecord.setToolTipText("Ver póliza contable de la factura...");
         jbViewRecord.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN7.add(jbViewRecord);
-
-        jpProcessingN.add(jpProcessingN7);
-
-        jpProcessingN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlReqPay.setText("Pago requerido:");
-        jlReqPay.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpProcessingN8.add(jlReqPay);
+        jpProcessingN8.add(jbViewRecord);
 
         jpProcessingN.add(jpProcessingN8);
 
         jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlReqPay.setText("Pago requerido:");
+        jlReqPay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN9.add(jlReqPay);
+
+        jpProcessingN.add(jpProcessingN9);
+
+        jpProcessingN10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfReqPayAmount.setEditable(false);
         jtfReqPayAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -489,7 +611,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfReqPayAmount.setToolTipText("Pago requerido");
         jtfReqPayAmount.setFocusable(false);
         jtfReqPayAmount.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN9.add(jtfReqPayAmount);
+        jpProcessingN10.add(jtfReqPayAmount);
 
         jtfReqPayAmountPct.setEditable(false);
         jtfReqPayAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -497,11 +619,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfReqPayAmountPct.setToolTipText("Porcentaje de pago requerido");
         jtfReqPayAmountPct.setFocusable(false);
         jtfReqPayAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpProcessingN9.add(jtfReqPayAmountPct);
+        jpProcessingN10.add(jtfReqPayAmountPct);
 
-        jpProcessingN.add(jpProcessingN9);
+        jpProcessingN.add(jpProcessingN10);
 
-        jpProcessingN10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfReqPayReqDate.setEditable(false);
         jtfReqPayReqDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -509,41 +631,41 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfReqPayReqDate.setToolTipText("Fecha requerida de pago");
         jtfReqPayReqDate.setFocusable(false);
         jtfReqPayReqDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN10.add(jtfReqPayReqDate);
+        jpProcessingN11.add(jtfReqPayReqDate);
 
         jbChangeRequiredPaymentDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangeRequiredPaymentDate.setToolTipText("Cambiar fecha requerida de pago...");
         jbChangeRequiredPaymentDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN10.add(jbChangeRequiredPaymentDate);
+        jpProcessingN11.add(jbChangeRequiredPaymentDate);
 
-        jpProcessingN.add(jpProcessingN10);
+        jpProcessingN.add(jpProcessingN11);
 
-        jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbRequestPayment.setText("Solicitar pago");
         jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN11.add(jbRequestPayment);
+        jpProcessingN12.add(jbRequestPayment);
 
-        jpProcessingN.add(jpProcessingN11);
+        jpProcessingN.add(jpProcessingN12);
 
-        jpProcessingN19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPay.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlPay.setText("Solicitud de pago:");
-        jlPay.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpProcessingN19.add(jlPay);
+        jlPay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN13.add(jlPay);
 
-        jpProcessingN.add(jpProcessingN19);
+        jpProcessingN.add(jpProcessingN13);
 
-        jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayFolio.setEditable(false);
         jtfPayFolio.setText("P-000000");
         jtfPayFolio.setToolTipText("Folio de solicitud de pago");
         jtfPayFolio.setFocusable(false);
         jtfPayFolio.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpProcessingN12.add(jtfPayFolio);
+        jpProcessingN14.add(jtfPayFolio);
 
         jtfPayDate.setEditable(false);
         jtfPayDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -551,11 +673,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayDate.setToolTipText("Fecha de solicitud de pago");
         jtfPayDate.setFocusable(false);
         jtfPayDate.setPreferredSize(new java.awt.Dimension(70, 23));
-        jpProcessingN12.add(jtfPayDate);
+        jpProcessingN14.add(jtfPayDate);
 
-        jpProcessingN.add(jpProcessingN12);
+        jpProcessingN.add(jpProcessingN14);
 
-        jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayReqDate.setEditable(false);
         jtfPayReqDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -563,35 +685,35 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayReqDate.setToolTipText("Fecha requerida de pago en solicitud de pago");
         jtfPayReqDate.setFocusable(false);
         jtfPayReqDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN13.add(jtfPayReqDate);
+        jpProcessingN15.add(jtfPayReqDate);
 
         jbChangePaymentRequiredDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangePaymentRequiredDate.setToolTipText("Cambiar fecha requerida de pago en solicitud de pago...");
         jbChangePaymentRequiredDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN13.add(jbChangePaymentRequiredDate);
+        jpProcessingN15.add(jbChangePaymentRequiredDate);
 
-        jpProcessingN.add(jpProcessingN13);
+        jpProcessingN.add(jpProcessingN15);
 
-        jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayStatus.setEditable(false);
         jtfPayStatus.setText("STATUS");
         jtfPayStatus.setToolTipText("Estatus de solicitud de pago");
         jtfPayStatus.setFocusable(false);
         jtfPayStatus.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN14.add(jtfPayStatus);
+        jpProcessingN16.add(jtfPayStatus);
 
-        jpProcessingN.add(jpProcessingN14);
+        jpProcessingN.add(jpProcessingN16);
 
-        jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaySched.setText("Programación del pago:");
-        jlPaySched.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpProcessingN15.add(jlPaySched);
+        jlPaySched.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN17.add(jlPaySched);
 
-        jpProcessingN.add(jpProcessingN15);
+        jpProcessingN.add(jpProcessingN17);
 
-        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPaySchedDate.setEditable(false);
         jtfPaySchedDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -599,24 +721,24 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPaySchedDate.setToolTipText("Fecha de programación del pago");
         jtfPaySchedDate.setFocusable(false);
         jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN16.add(jtfPaySchedDate);
+        jpProcessingN18.add(jtfPaySchedDate);
 
         jbChangePaymentScheduledDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangePaymentScheduledDate.setToolTipText("Cambiar fecha de programación del pago...");
         jbChangePaymentScheduledDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN16.add(jbChangePaymentScheduledDate);
+        jpProcessingN18.add(jbChangePaymentScheduledDate);
 
-        jpProcessingN.add(jpProcessingN16);
+        jpProcessingN.add(jpProcessingN18);
 
-        jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayExec.setText("Operación del pago:");
-        jlPayExec.setPreferredSize(new java.awt.Dimension(125, 23));
-        jpProcessingN17.add(jlPayExec);
+        jlPayExec.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN19.add(jlPayExec);
 
-        jpProcessingN.add(jpProcessingN17);
+        jpProcessingN.add(jpProcessingN19);
 
-        jpProcessingN18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayExecDate.setEditable(false);
         jtfPayExecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -624,9 +746,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayExecDate.setToolTipText("Fecha de operación del pago");
         jtfPayExecDate.setFocusable(false);
         jtfPayExecDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN18.add(jtfPayExecDate);
+        jpProcessingN20.add(jtfPayExecDate);
 
-        jpProcessingN.add(jpProcessingN18);
+        jpProcessingN.add(jpProcessingN20);
 
         jpDocumentsProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
 
@@ -641,7 +763,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup bgView;
+    private javax.swing.ButtonGroup bgDocMode;
+    private javax.swing.ButtonGroup bgSearchBy;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel21;
@@ -649,9 +772,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JLabel jLabelPeriiod1;
+    private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbChangePaymentRequiredDate;
     private javax.swing.JButton jbChangePaymentScheduledDate;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
@@ -662,25 +784,35 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbImportInvoiceFromCfdi;
     private javax.swing.JButton jbLinkAllDocs;
     private javax.swing.JButton jbLinkInvoice;
+    private javax.swing.JButton jbRejectInvoice;
     private javax.swing.JButton jbRequestPayment;
     private javax.swing.JButton jbSelectAllDocs;
     private javax.swing.JButton jbSelectRemainingDocs;
     private javax.swing.JButton jbShowDocs;
     private javax.swing.JButton jbUnlinkInvoice;
     private javax.swing.JButton jbViewInvoice;
+    private javax.swing.JButton jbViewInvoicePdf;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JButton jbViewRecord;
-    private javax.swing.JLabel jlDateEnd;
-    private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlInvoice;
     private javax.swing.JLabel jlInvoiceUserNew;
+    private javax.swing.JLabel jlLabelWeek1;
+    private javax.swing.JLabel jlLabelWeek2;
     private javax.swing.JLabel jlPay;
     private javax.swing.JLabel jlPayExec;
     private javax.swing.JLabel jlPaySched;
+    private javax.swing.JLabel jlProgress;
     private javax.swing.JLabel jlReqPay;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid;
+    private javax.swing.JPanel jpDocumentsGrid1;
+    private javax.swing.JPanel jpDocumentsGrid11;
+    private javax.swing.JPanel jpDocumentsGrid111;
+    private javax.swing.JPanel jpDocumentsGrid112;
+    private javax.swing.JPanel jpDocumentsGrid12;
+    private javax.swing.JPanel jpDocumentsGrid121;
+    private javax.swing.JPanel jpDocumentsGrid122;
     private javax.swing.JPanel jpDocumentsProcessing;
     private javax.swing.JPanel jpDownload;
     private javax.swing.JPanel jpDownloadE;
@@ -704,6 +836,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JPanel jpProcessingN18;
     private javax.swing.JPanel jpProcessingN19;
     private javax.swing.JPanel jpProcessingN2;
+    private javax.swing.JPanel jpProcessingN20;
     private javax.swing.JPanel jpProcessingN3;
     private javax.swing.JPanel jpProcessingN4;
     private javax.swing.JPanel jpProcessingN5;
@@ -725,32 +858,72 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JTextField jtfReqPayReqDate;
     private javax.swing.JTextField jtfUserFuncSubAreas;
     private javax.swing.JTextField jtfUserName;
-    private sa.lib.gui.bean.SBeanFieldDate moDateEnd;
-    private sa.lib.gui.bean.SBeanFieldDate moDateStart;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadViewAll;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadViewAssets;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadViewExpenses;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolExcludeRecorded;
+    private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekEnd;
+    private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekStart;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moCalWeekYear;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePeriodEnd;
+    private sa.lib.gui.bean.SBeanFieldDate moDatePeriodStart;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDocModeCase;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDocModeType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDocModeCase;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDocModeType;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSearchByPeriod;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSearchByWeek;
     // End of variables declaration//GEN-END:variables
 
     /*
      * Private methods.
      */
     
+    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 670);
         
-        moDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
-        moDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd), true);
+        moRadSearchByPeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadSearchByPeriod.getText()), true);
+        moRadSearchByWeek.setBooleanSettings(SGuiUtils.getLabelName(moRadSearchByWeek.getText()), false);
+        moDatePeriodStart.setDateSettings(miClient, moDatePeriodStart.getToolTipText(), true);
+        moDatePeriodEnd.setDateSettings(miClient, moDatePeriodEnd.getToolTipText(), true);
+        moCalWeekYear.setCalendarSettings(moCalWeekYear.getToolTipText());
+        moCalWeekStart.setCalendarSettings(moCalWeekStart.getToolTipText());
+        moCalWeekEnd.setCalendarSettings(moCalWeekEnd.getToolTipText());
+        moRadDocModeType.setBooleanSettings(SGuiUtils.getLabelName(moRadDocModeType.getText()), true);
+        moRadDocModeCase.setBooleanSettings(SGuiUtils.getLabelName(moRadDocModeCase.getText()), false);
+        moKeyDocModeType.setKeySettings(miClient, SGuiUtils.getLabelName(moRadDocModeType.getText()), false);
+        moKeyDocModeCase.setKeySettings(miClient, SGuiUtils.getLabelName(moRadDocModeCase.getText()), false);
+        moBoolExcludeRecorded.setBooleanSettings(SGuiUtils.getLabelName(moBoolExcludeRecorded.getText()), false);
+        
+        moFields.addField(moRadSearchByPeriod);
+        moFields.addField(moRadSearchByWeek);
+        moFields.addField(moDatePeriodStart);
+        moFields.addField(moDatePeriodEnd);
+        moFields.addField(moCalWeekYear);
+        moFields.addField(moCalWeekStart);
+        moFields.addField(moCalWeekEnd);
+        moFields.addField(moRadDocModeType);
+        moFields.addField(moRadDocModeCase);
+        moFields.addField(moKeyDocModeType);
+        moFields.addField(moKeyDocModeCase);
+        moFields.addField(moBoolExcludeRecorded);
+        moFields.setFormButton(jbShowDocs);
         
         jbSave.setEnabled(false);
         jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
         jbCancel.setPreferredSize(new Dimension(75, 23));
         
-        moFields.addField(moDateStart);
-        moFields.addField(moDateEnd);
-        moFields.setFormButton(jbShowDocs);
+        moKeyDocModeType.removeAllItems();
+        moKeyDocModeType.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_TYPE_ALL }, SImportedDocument.DocTypes.get(SImportedDocument.DOC_TYPE_ALL)));
+        moKeyDocModeType.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_TYPE_ASSETS }, SImportedDocument.DocTypes.get(SImportedDocument.DOC_TYPE_ASSETS)));
+        moKeyDocModeType.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_TYPE_EXPENSES }, SImportedDocument.DocTypes.get(SImportedDocument.DOC_TYPE_EXPENSES)));
+        
+        moKeyDocModeCase.removeAllItems();
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_ALL }, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_ALL)));
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_STANDARD}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_STANDARD)));
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_FREIGHT}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_FREIGHT)));
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_PURCHASE)));
         
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
+        mnShowingDocsMode = OFF;
         
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
             @Override
@@ -778,21 +951,28 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable ", 150)); // col 10
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "XML en factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "PDF en factura"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Estatus factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI factura"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Caso factura")); // col 15
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Semana revisión factura", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha-hora revisión factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido")); // col 15
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %")); // col 20
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 25
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES));
-
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
+                
                 return gridColumnsForm;
             }
         };
@@ -803,12 +983,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         jlStatus = new JLabel();
         jpCommandLeft.add(jlStatus);
+        clearProgress();
         
         moBoolExportPaymentRequestsOnClose = new SBeanFieldBoolean();
         moBoolExportPaymentRequestsOnClose.setText("Exportar solicitudes de pago al cerrar");
         moBoolExportPaymentRequestsOnClose.setPreferredSize(new Dimension(250, 23));
         ((FlowLayout) jpCommandCenter.getLayout()).setAlignment(FlowLayout.RIGHT);
         jpCommandCenter.add(moBoolExportPaymentRequestsOnClose);
+        
+        mbAllowLinkGreaterInvoices = miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_LINK_INV_GREATER);
         
         jtfUserName.setText(miClient.getSession().getUser().getName());
         jtfUserName.setCaretPosition(0);
@@ -818,10 +1001,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsFunctionalAreas()) {
                 maFunctionalSubAreas = SDbFunctionalSubArea.readUserFunctionalSubAreas(miClient.getSession());
-                msUserFunctionalSubAreasCodes = SDbFunctionalSubArea.composeFunctionalSubAreasCodes(maFunctionalSubAreas);
+                msUserFunctionalSubAreaCodes = SDbFunctionalSubArea.composeFunctionalSubAreaCodes(maFunctionalSubAreas);
 
-                if (msUserFunctionalSubAreasCodes.isEmpty()) {
-                    msUserFunctionalSubAreasCodes = "¡NINGUNA!";
+                if (msUserFunctionalSubAreaCodes.isEmpty()) {
+                    msUserFunctionalSubAreaCodes = "¡NINGUNA!";
                     miClient.showMsgBoxWarning("El usuario '" + miClient.getSession().getUser().getName() + "' no podrá ver ni procesar facturas autorizadas porque no tiene subáreas funcionales asignadas.");
                 }
             }
@@ -829,17 +1012,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) miClient.getSession().readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
                 maFunctionalSubAreas = new ArrayList<>();
                 maFunctionalSubAreas.add(functionalSubArea);
-                msUserFunctionalSubAreasCodes = functionalSubArea.getCode();
+                msUserFunctionalSubAreaCodes = functionalSubArea.getCode();
             }
             
-            jtfUserFuncSubAreas.setText(msUserFunctionalSubAreasCodes);
+            jtfUserFuncSubAreas.setText(msUserFunctionalSubAreaCodes);
             jtfUserFuncSubAreas.setCaretPosition(0);
-            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreasCodes);
+            jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreaCodes);
             
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
             
-            msSyncUrlRetrieve = "";
+            msSyncUrlRetrieveByPeriod = "";
+            msSyncUrlRetrieveByWeek = "";
             msSyncToken = "";
             msSyncApiKey = "";
             mnSyncLimit = 0;
@@ -861,7 +1045,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             msSyncApiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
             
             // documents retreival service: /api/documents/filter-by-date-and-type/?start_date=<start_date>&end_date=<end_date>&document_type=<document_type>; date format: yyyy-mm-dd; document type format: 0 (raw integer)
-            msSyncUrlRetrieve = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByPeriod = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_URL); // complementar la URL
+            msSyncUrlRetrieveByWeek = msSyncUrlRetrieveByPeriod.substring(0, msSyncUrlRetrieveByPeriod.indexOf("?") + 1);
             
             // documents download service: /api/documents/download-docs-zip/
             msSyncUrlDownload = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC_DWNLD, SSwapConsts.CFG_ATT_URL); // complementar la URL
@@ -878,9 +1063,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             // Instanciar prepared statements:
             
-            moPrepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession());
-            moPrepStatToGetProcessedDpsByExternalId = SDbSwapDataProcessing.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession());
-            moPrepStatToGetDpsKeyByDocData = SDbSwapDataProcessing.createPrepStatementToGetDpsKeyByDocData(miClient.getSession(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
+            moPrepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession().getStatement());
+            moPrepStatToGetProcessedDpsByExternalId = SImportedDocument.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession().getStatement());
+            moPrepStatToGetDpsKeyByDocData = SImportedDocument.createPrepStatementToGetDpsKeyByDocData(miClient.getSession().getStatement(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -895,33 +1080,81 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbShowDocs.requestFocusInWindow();
     }
     
-    private void enableDownloadFields(final boolean isInvokedToClearDocs) {
-        moDateStart.setEditable(isInvokedToClearDocs);
-        moDateEnd.setEditable(isInvokedToClearDocs);
+    private void disableFieldsOfSearchBy() {
+        moRadSearchByPeriod.setEnabled(false);
+        moDatePeriodStart.setEditable(false);
+        moDatePeriodEnd.setEditable(false);
         
-        jbShowDocs.setEnabled(isInvokedToClearDocs);
-        jbClearDocs.setEnabled(!isInvokedToClearDocs);
+        moRadSearchByWeek.setEnabled(false);
+        moCalWeekYear.setEditable(false);
+        moCalWeekStart.setEditable(false);
+        moCalWeekEnd.setEditable(false);
         
-        jbSelectRemainingDocs.setEnabled(!isInvokedToClearDocs);
-        jbSelectAllDocs.setEnabled(!isInvokedToClearDocs);
-        jbDeselectAllDocs.setEnabled(!isInvokedToClearDocs);
+        moBoolExcludeRecorded.setEnabled(false);
         
-        jbDownloadSelectedDocs.setEnabled(!isInvokedToClearDocs);
+        jbShowDocs.setEnabled(false);
+    }
+    
+    private void enableFieldsOfSearchBy() {
+        boolean isShowingDocsModeOff = mnShowingDocsMode == OFF;
         
-        jbLinkAllDocs.setEnabled(!isInvokedToClearDocs);
+        boolean isSearchByPeriod = moRadSearchByPeriod.isSelected();
+        moDatePeriodStart.setEditable(isShowingDocsModeOff && isSearchByPeriod);
+        moDatePeriodEnd.setEditable(isShowingDocsModeOff && isSearchByPeriod);
         
-        moRadViewAll.setEnabled(!isInvokedToClearDocs);
-        moRadViewAssets.setEnabled(!isInvokedToClearDocs);
-        moRadViewExpenses.setEnabled(!isInvokedToClearDocs);
+        boolean isSearchByWeek = moRadSearchByWeek.isSelected();
+        moCalWeekYear.setEditable(isShowingDocsModeOff && isSearchByWeek);
+        moCalWeekStart.setEditable(isShowingDocsModeOff && isSearchByWeek);
+        moCalWeekEnd.setEditable(isShowingDocsModeOff && isSearchByWeek);
+    }
+    
+    private void enableFieldsOfDocMode() {
+        boolean isShowingDocsModeOn = mnShowingDocsMode == ON;
         
-        // item-state-chage events free section if mbDocumentsBeingUpdated is true:
-        
-        if (isInvokedToClearDocs) {
-            bgView.clearSelection();
+        boolean isDocModeType = moRadDocModeType.isSelected();
+        moKeyDocModeType.setEditable(isShowingDocsModeOn && isDocModeType);
+        if (!isDocModeType) {
+            moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
         }
-        else {
-            bgView.setSelected(moRadViewAll.getModel(), true);
+
+        boolean isDocModeCase = moRadDocModeCase.isSelected();
+        moKeyDocModeCase.setEditable(isShowingDocsModeOn && isDocModeCase);
+        if (!isDocModeCase) {
+            moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
         }
+    }
+    
+    private void enableFieldsForShowingDocs(final boolean setShowingDocsModeOn) {
+        mnShowingDocsMode = setShowingDocsModeOn ? ON : OFF;
+        
+        // START OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
+        
+        if (!setShowingDocsModeOn) {
+            moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
+            moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
+        }
+        
+        // END OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
+        
+        moRadSearchByPeriod.setEnabled(!setShowingDocsModeOn);
+        moRadSearchByWeek.setEnabled(!setShowingDocsModeOn);
+        enableFieldsOfSearchBy();
+        
+        moRadDocModeType.setEnabled(setShowingDocsModeOn);
+        moRadDocModeCase.setEnabled(setShowingDocsModeOn);
+        enableFieldsOfDocMode();
+        
+        moBoolExcludeRecorded.setEnabled(!setShowingDocsModeOn);
+        
+        jbShowDocs.setEnabled(!setShowingDocsModeOn);
+        jbClearDocs.setEnabled(setShowingDocsModeOn);
+        
+        jbSelectRemainingDocs.setEnabled(setShowingDocsModeOn);
+        jbSelectAllDocs.setEnabled(setShowingDocsModeOn);
+        jbDeselectAllDocs.setEnabled(setShowingDocsModeOn);
+        
+        jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
+        jbLinkAllDocs.setEnabled(setShowingDocsModeOn);
     }
     
     private void exportPaymentRequestsIfNeeded() {
@@ -953,47 +1186,367 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private boolean isDocumentAlreadyRecorded(final SImportedDocument document) throws Exception {
-        boolean isRegistered = document.isProcessed();
+        boolean isRecorded = document.isRecorded();
         
-        if (!isRegistered) {
-            int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+        if (!isRecorded) {
+            int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
             if (dpsKey != null) {
-                isRegistered = true;
+                isRecorded = true;
 
                 String dpsNumber = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
 
                 if (miClient.showMsgBoxConfirm("Se encontró la factura " + SSwapConsts.SIIE + " '" + dpsNumber + "', ¿desea vincularla a esta factura autorizada?") == JOptionPane.YES_OPTION) {
-                    if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
-                        int row = moDocumentsGrid.getTable().getSelectedRow();
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
+                        int index = moDocumentsGrid.getTable().getSelectedRow();
                         moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(row);
+                        moDocumentsGrid.setSelectedGridRow(index);
                     }
                 }
             }
         }
         
-        return isRegistered;
+        return isRecorded;
+    }
+    
+    private SDataDps readOrderAndPrepareDialogDpsFinder(final SImportedDocument document) throws Exception {
+        SDataDps order = null;
+        boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
+
+        if (linkToOrder) {
+            int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
+
+            if (orderKey != null) {
+                order = new SDataDps();
+                if (order.read(orderKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Orden de compra PK " + SLibUtils.textKey(orderKey) + ".)");
+                }
+            }
+        }
+
+        // prepare DPS finder dialog:
+
+        if (linkToOrder && order == null && moDialogDpsFinder == null) {
+            moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
+        }
+        
+        return order;
+    }
+    
+    private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
+        if (dpsKey != null) {
+            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false)) {
+                int index = moDocumentsGrid.getTable().getSelectedRow();
+                moDocumentsGrid.renderGridRows();
+                moDocumentsGrid.setSelectedGridRow(index);
+
+                if (document.isPaymentRequested()) {
+                    mbExportPaymentRequests = true;
+                }
+            }
+        }
+    }
+    
+    private void initProgress() {
+        jlProgress.setText("Preparando la petición...");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(true);
+    }
+    
+    private void startProgress() {
+        jlProgress.setText("Recuperando facturas...");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(true);
+        jProgressBar.setIndeterminate(false);
+    }
+    
+    private void clearProgress() {
+        jlProgress.setText("");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(false);
+    }
+    
+    private String formatFunctionalSubAreasCodes() {
+        String formatedCodes = "";
+        String[] codes = msUserFunctionalSubAreaCodes.split(", ");
+        
+        for (int i = 0; i < codes.length; i++) {
+            String br = "";
+            
+            if (i > 0 && (i % FUNC_SUB_AREA_CODES_PER_LINE == 0)) {
+                br = "\n" + SLibUtils.textRepeat(" ", 3); // indent of 3 blank spaces
+            }
+            
+            formatedCodes += (formatedCodes.isEmpty() ? "" : ", ") + br + codes[i];
+        }
+        
+        return formatedCodes;
+    }
+    
+    private void processShowDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
+        int countRetreived = 0;
+        int countElegible = 0;
+        int countShown = 0;
+        int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+        Exception exception = null;
+        
+        try {
+            try (InputStream is = connection.getInputStream()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(is);
+
+                if (root.isArray()) {
+                    startProgress();
+                            
+                    for (JsonNode docNode : root) {
+                        callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
+
+                        JsonNode companyNode = docNode.path("company");
+
+                        if (companyNode.get("external_id").asInt() == companyId &&
+                                docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
+                                docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+                            countElegible++;
+
+                            int externalDocumentId = docNode.get("id").asInt();
+
+                            JsonNode functionalAreaNode = docNode.path("functional_area");
+                            int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
+
+                            if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
+                                int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
+
+                                SImportedDocument document = new SImportedDocument();
+
+                                document.ExternalDocumentId = externalDocumentId;
+                                document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
+
+                                if (!moBoolExcludeRecorded.isSelected() || !document.isRecorded()) {
+
+                                    if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
+                                        document.ExternalDocumentUuid = docNode.path("uuid").asText();
+                                    }
+                                    else {
+                                        document.ExternalDocumentUuid = "";
+                                    }
+
+                                    JsonNode partnerNode = docNode.path("partner");
+                                    document.BizPartnerId = partnerNode.get("external_id").asInt();
+                                    document.BizPartner = partnerNode.get("full_name").asText();
+
+                                    document.NumberSeries = docNode.get("series").asText();
+                                    document.Number = docNode.get("number").asText();
+
+                                    if (document.NumberSeries.isEmpty() && document.Number.isEmpty() && document.ExternalDocumentUuid.isEmpty()) {
+                                        document.Number = docNode.get("folio").asText();
+                                    }
+
+                                    document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
+
+                                    JsonNode referencesNode = docNode.path("references");
+                                    if (referencesNode.isArray()) {
+                                        ArrayList<SImportedDocument.Reference> references = new ArrayList<>();
+
+                                        for (JsonNode referenceNode : referencesNode) {
+                                            int referenceType = referenceNode.get("document_ref_type").asInt();
+                                            String reference = referenceNode.get("reference").asText();
+                                            SImportUtils.DpsKey dpsKey = SImportUtils.createDpsKey(referenceNode.get("external_id").asText()); // e.g., "2025_1"
+
+                                            references.add(new SImportedDocument.Reference(referenceType, reference, dpsKey));
+                                        }
+
+                                        if (!references.isEmpty()) {
+                                            document.References = references.toArray(new SImportedDocument.Reference[0]);
+
+                                            document.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
+                                            document.ReferencesAsText = document.composeReferences();
+                                        }
+                                    }
+
+                                    document.Description = docNode.get("notes").asText();
+
+                                    document.FunctionalSubAreaId = functionalSubAreaId;
+                                    document.FunctionalSubArea = functionalAreaNode.get("name").asText();
+
+                                    document.FiscalUseCode = docNode.get("fiscal_use").asText();
+
+                                    document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
+
+                                    JsonNode currencyNode = docNode.path("currency");
+                                    document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
+                                    document.CurrencyCode = currencyNode.get("code").asText();
+
+                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
+                                    double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
+                                    double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
+                                    String requiredPaymentDateAsText = docNode.has("payment_date") ? docNode.get("payment_date").asText() : "";
+                                    Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
+
+                                    if (requiredPaymentDate == null && requiredPaymentPct == 0) {
+                                        document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;
+                                        document.RequiredPaymentAmount = 0;
+                                        document.RequiredPaymentPct = 0;
+                                        document.RequiredPaymentDate = null;
+                                        document.IsRequiredPaymentLoc = false;
+                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    }
+                                    else {
+                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_IS_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
+                                        document.RequiredPaymentAmount = requiredPaymentAmount;
+                                        document.RequiredPaymentPct = requiredPaymentPct;
+                                        document.RequiredPaymentDate = requiredPaymentDate;
+                                        document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
+                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    }
+
+                                    if (document.ExternalDocumentId == 4246) {
+                                        System.out.println("El 4246");
+                                    }
+
+                                    String revisionDatetimeAsText = docNode.has("date_week_revision") ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
+                                    Date revisionDatetime = docNode.path("date_week_revision").isNull() || revisionDatetimeAsText == null || revisionDatetimeAsText.isEmpty() || revisionDatetimeAsText.equals("null") ? null : SSwapUtils.SwapDatetimeMicrosecsTimeZoneFormat.parse(revisionDatetimeAsText.replaceFirst("(\\.\\d{3})\\d+", "$1")); // trunc microsecontds to milliseconds
+
+                                    document.RevisionYear = docNode.get("year_week_revision").asInt();
+                                    document.RevisionWeek = docNode.get("number_week_revision").asInt();
+                                    document.RevisionDatetime = revisionDatetime;
+                                    document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
+                                    document.ProcessingTypeCode = SImportedDocument.ProcTypes.get(document.ProcessingTypeId);
+                                    document.StatusId = 0;
+                                    document.Status = "";
+                                    document.Download = false;
+                                    document.AlreadyDownloaded = countOfImports > 0;
+
+                                    maDocuments.add(document);
+                                    countShown++;
+                                }
+                            }
+                            /* 2025-11-19, Sergio Flores: Uncomment fot debugging purposes:
+                            else {
+                                System.out.println("Documento no elegible: ID externo = " + externalDocumentId + "; ID subárea funcional = " + functionalSubAreaId + ".");
+                            }
+                            */
+                        }
+                    }
+                }
+                
+                callback.onProgress(100);
+                enableFieldsForShowingDocs(true);
+
+                String range = "";
+
+                if (moRadSearchByPeriod.isSelected()) {
+                    range = (SLibTimeUtils.isSameDate(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) ?
+                            ("Día:\n- " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue())) :
+                            ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDatePeriodStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDatePeriodEnd.getValue())));
+                }
+                else if (moRadSearchByWeek.isSelected()) {
+                    range = "Año:\n- " + moCalWeekYear.getValue() + "\n" +
+                            (Objects.equals(moCalWeekStart.getValue(), moCalWeekEnd.getValue()) ?
+                            ("Semana:\n- " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue())) :
+                            ("Semana:\n- de la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekStart.getValue()) + " a la " + SLibUtils.DecimalFormatCalendarWeek.format(moCalWeekEnd.getValue())));
+                }
+
+                String message = "Resumen de la búsqueda de facturas autorizadas en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
+                        + "Empresa actual:\n- " + msCompanyName + ".\n"
+                        + "Subáreas funcionales del usuario actual:\n- " + formatFunctionalSubAreasCodes() + ".\n"
+                        + range + ".\n\n";
+
+                message += "Búsqueda de facturas autorizadas:\n";
+
+                if (countRetreived == 0) {
+                    message += "- ¡No se encontraron facturas autorizadas!";
+
+                    miClient.showMsgBoxWarning(message);
+                }
+                else {
+                    if (countRetreived != countElegible) {
+                        message += "- Facturas autorizadas totales: " + countRetreived + ";\n"; // this case should not happen
+                    }
+
+                    message += "- Facturas autorizadas de la empresa actual: " + countElegible + ";\n"
+                            + "- Facturas autorizadas elegibles al usuario actual: " + countShown + ".";
+
+                    miClient.showMsgBoxInformation(message);
+                }
+
+                itemStateChangedDocType(true);
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+            handleShowException(e);
+        }
+        finally {
+            mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
+            
+            if (exception != null) {
+                throw exception;
+            }
+        }
     }
     
     private void actionPerformedShowDocs() {
-        SGuiValidation validation = SGuiUtils.validateDateRange(moDateStart, moDateEnd);
+        SGuiValidation validation = null;
+        String capacityLimit = "Por eficiencia en el procesamiento de su petición, la consulta está restringida máximo a ";
+        
+        if (moRadSearchByPeriod.isSelected()) {
+            validation = SGuiUtils.validateDateRange(moDatePeriodStart, moDatePeriodEnd);
+            
+            if (validation.isValid()) {
+                if (SLibTimeUtils.countPeriodDays(moDatePeriodStart.getValue(), moDatePeriodEnd.getValue()) > LIMIT_DAYS) {
+                    validation.setMessage(capacityLimit + LIMIT_DAYS + " días.");
+                    validation.setComponent(moDatePeriodStart.getComponent());
+                }
+            }
+        }
+        else if (moRadSearchByWeek.isSelected()) {
+            for (SGuiField field : new SGuiField[] { moCalWeekYear, moCalWeekStart, moCalWeekEnd }) {
+                validation = field.validateField();
+                if (!validation.isValid()) {
+                    break;
+                }
+            }
+            
+            if (validation.isValid()) {
+                if (moCalWeekStart.getValue() > moCalWeekEnd.getValue()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moCalWeekStart.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "'" + moCalWeekEnd.getFieldName() + "'.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+                else if (moCalWeekEnd.getValue() - moCalWeekStart.getValue() + 1 > LIMIT_WEEKS) {
+                    validation.setMessage(capacityLimit + LIMIT_WEEKS + " semanas.");
+                    validation.setComponent(((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField());
+                }
+            }
+        }
         
         if (SGuiUtils.computeValidation(miClient, validation)) {
             try {
                 mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
-                SGuiUtils.setCursorWait(miClient);
                 
-                enableDownloadFields(false);
-                
-                int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+                disableFieldsOfSearchBy();
                 
                 String charset = java.nio.charset.StandardCharsets.UTF_8.name();
-                String urlQuery = msSyncUrlRetrieve;
+                String urlQuery = "";
                 
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDateStart.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDateEnd.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                if (moRadSearchByPeriod.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByPeriod;
+
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                }
+                else if (moRadSearchByWeek.isSelected()) {
+                    urlQuery = msSyncUrlRetrieveByWeek
+                            + "year_revision=" + moCalWeekYear.getValue()
+                            + "&week_revision_start=" + moCalWeekStart.getValue()
+                            + "&week_revision_end=" + moCalWeekEnd.getValue()
+                            + "&document_type=" + SSwapConsts.TXN_DOC_TYPE_INVOICE;
+                }
                 
                 urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
 
@@ -1017,158 +1570,34 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
 
                 connection.setDoInput(true); // true is already the default value!
+                initProgress();
                 
-                int countRetreived = 0;
-                int countElegible = 0;
-                int countShown = 0;
+                SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        processShowDocs(connection, progress -> {
+                            publish(progress);
+                        });
+                        return null;
+                    }
+                    
+                    @Override
+                    protected void process(List<Integer> chunks) {
+                        int latest = chunks.get(chunks.size() - 1);
+                        jProgressBar.setValue(latest);   // runs on EDT
+                    }
+
+                    @Override
+                    protected void done() {
+                        clearProgress();
+                    }
+                };
                 
-                try (InputStream is = connection.getInputStream()) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode root = mapper.readTree(is);
-
-                    if (root.isArray()) {
-                        for (JsonNode docNode : root) {
-                            countRetreived++;
-                            JsonNode companyNode = docNode.path("company");
-
-                            if (companyNode.get("external_id").asInt() == companyId &&
-                                    docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
-                                    docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
-                                countElegible++;
-                                
-                                JsonNode functionalAreaNode = docNode.path("functional_area");
-                                int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
-                                
-                                if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
-                                    int externalDocumentId = docNode.get("id").asInt();
-                                    int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
-
-                                    SImportedDocument document = new SImportedDocument();
-
-                                    document.ExternalDocumentId = externalDocumentId;
-                                    
-                                    if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
-                                        document.ExternalDocumentUuid = docNode.path("uuid").asText();
-                                    }
-                                    else {
-                                        document.ExternalDocumentUuid = "";
-                                    }
-
-                                    JsonNode partnerNode = docNode.path("partner");
-                                    document.BizPartnerId = partnerNode.get("external_id").asInt();
-                                    document.BizPartner = partnerNode.get("full_name").asText();
-                                    
-                                    document.NumberSeries = docNode.get("series").asText();
-                                    document.Number = docNode.get("number").asText();
-                                    document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
-                                    
-                                    JsonNode referencesNode = docNode.path("references");
-                                    if (referencesNode.isArray()) {
-                                        ArrayList<SImportedDocument.Reference> references = new ArrayList<>();
-                                        
-                                        for (JsonNode referenceNode : referencesNode) {
-                                            int referenceType = referenceNode.get("document_ref_type").asInt();
-                                            String reference = referenceNode.get("reference").asText();
-                                            SImportUtils.DpsKey dpsKey = SImportUtils.createDpsKey(referenceNode.get("external_id").asText()); // e.g., "2025_1"
-                                            
-                                            references.add(new SImportedDocument.Reference(referenceType, reference, dpsKey));
-                                        }
-
-                                        if (!references.isEmpty()) {
-                                            document.References = references.toArray(new SImportedDocument.Reference[0]);
-                                            
-                                            document.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
-                                            document.ReferencesAsText = document.composeReferences();
-                                        }
-                                    }
-
-                                    document.Description = docNode.get("notes").asText();
-                                    
-                                    document.FunctionalSubAreaId = functionalSubAreaId;
-                                    document.FunctionalSubArea = functionalAreaNode.get("name").asText();
-
-                                    document.FiscalUseCode = docNode.get("fiscal_use").asText();
-                                    
-                                    document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
-                                    
-                                    JsonNode currencyNode = docNode.path("currency");
-                                    document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
-                                    document.CurrencyCode = currencyNode.get("code").asText();
-
-                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAYMENT_DEFN_NOT_REQ;
-                                    double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
-                                    double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
-                                    String requiredPaymentDateAsText = docNode.get("payment_date").asText();
-                                    Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
-
-                                    if (requiredPaymentDate == null && requiredPaymentPct == 0) {
-                                        document.RequiredPaymentDefinition = SImportedDocument.PAYMENT_DEFN_NOT_REQ;
-                                        document.RequiredPaymentAmount = 0;
-                                        document.RequiredPaymentPct = 0;
-                                        document.RequiredPaymentDate = null;
-                                        document.IsRequiredPaymentLoc = false;
-                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
-                                    }
-                                    else {
-                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAYMENT_DEFN_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAYMENT_DEFN_BY_PCT : SImportedDocument.PAYMENT_DEFN_BY_AMT);
-                                        document.RequiredPaymentAmount = requiredPaymentAmount;
-                                        document.RequiredPaymentPct = requiredPaymentPct;
-                                        document.RequiredPaymentDate = requiredPaymentDate;
-                                        document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
-                                        document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
-                                    }
-
-                                    document.StatusId = 0;
-                                    document.Status = "";
-                                    document.Download = false;
-                                    document.AlreadyDownloaded = countOfImports > 0;
-                                    
-                                    document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
-
-                                    maDocuments.add(document);
-                                    countShown++;
-                                }
-                            }
-                        }
-                    }
-                    
-                    String message = "Resumen de la búsqueda de facturas autorizadas en " + SSwapConsts.PURCHASE_PORTAL + ":\n\n"
-                            + "Empresa:\n- " + msCompanyName + ".\n"
-                            + "Áreas funcionales:\n- " + msUserFunctionalSubAreasCodes + ".\n"
-                            + (SLibTimeUtils.isSameDate(moDateStart.getValue(), moDateEnd.getValue()) ?
-                            ("Día:\n- " + SLibUtils.DateFormatDate.format(moDateStart.getValue())) :
-                            ("Período:\n- del " + SLibUtils.DateFormatDate.format(moDateStart.getValue()) + " al " + SLibUtils.DateFormatDate.format(moDateEnd.getValue()))) + ".\n\n";
-                    
-                    message += "Búsqueda de facturas autorizadas:\n";
-                    
-                    if (countRetreived == 0) {
-                        message += "- ¡No se encontraron facturas autorizadas!";
-                        
-                        miClient.showMsgBoxWarning(message);
-                    }
-                    else {
-                        if (countRetreived != countElegible) {
-                            message += "- Facturas autorizadas totales: " + countRetreived + ";\n"; // this case should not happen
-                        }
-                        
-                        message += "- Facturas autorizadas de la empresa actual: " + countElegible + ";\n"
-                                + "- Facturas autorizadas elegibles al usuario actual: " + countShown + ".";
-                        
-                        miClient.showMsgBoxInformation(message);
-                    }
-
-                    itemStateChangedViewAll();
-                }
-            }
-            catch (MalformedURLException e) {
-                handleShowException(e);
+                worker.execute();
             }
             catch (Exception e) {
                 handleShowException(e);
-            }
-            finally {
-                mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
-                SGuiUtils.setCursorDefault(miClient);
             }
         }
     }
@@ -1182,10 +1611,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moDocumentsGrid.populateGrid(new Vector<>());
             renderCurrentDocument();
 
-            enableDownloadFields(true);
+            enableFieldsForShowingDocs(false);
 
-            moDateStart.getComponent().requestFocusInWindow();
             jlStatus.setText("");
+            clearProgress();
+            
+            if (moRadSearchByPeriod.isSelected()) {
+                moDatePeriodStart.getComponent().requestFocusInWindow();
+            }
+            else if (moRadSearchByWeek.isSelected()) {
+                ((JSpinner.NumberEditor) moCalWeekStart.getEditor()).getTextField().requestFocusInWindow();
+            }
         }
         catch (Exception e) {
             System.err.println(e);
@@ -1206,9 +1642,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
         }
         
-        int row = moDocumentsGrid.getTable().getSelectedRow();
+        int index = moDocumentsGrid.getTable().getSelectedRow();
         moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(row);
+        moDocumentsGrid.setSelectedGridRow(index);
     }
     
     private void actionPerformedSelectAllDocs() {
@@ -1216,9 +1652,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             ((SImportedDocument) row).Download = true;
         }
         
-        int row = moDocumentsGrid.getTable().getSelectedRow();
+        int index = moDocumentsGrid.getTable().getSelectedRow();
         moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(row);
+        moDocumentsGrid.setSelectedGridRow(index);
     }
     
     private void actionPerformedDeselectAllDocs() {
@@ -1226,9 +1662,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             ((SImportedDocument) row).Download = false;
         }
         
-        int row = moDocumentsGrid.getTable().getSelectedRow();
+        int index = moDocumentsGrid.getTable().getSelectedRow();
         moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(row);
+        moDocumentsGrid.setSelectedGridRow(index);
     }
     
     private void actionPerformedDownloadSelectedDocs() {
@@ -1242,6 +1678,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         if (documents.isEmpty()) {
             miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga.");
+        }
+        else if (documents.size() > LIMIT_DOWNLOADS && miClient.showMsgBoxConfirm("Se recomienda descargar los archivos en bloques no mayores a " + LIMIT_DOWNLOADS + " facturas autorizadas.\n"
+                + "Sin embargo, puede intentar descargar las " + documents.size() + " facturas autorizadas seleccionadas.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+            miClient.showMsgBoxWarning("Se sugiere seleccionar hasta " + LIMIT_DOWNLOADS + " facturas autorizadas para realizar la descarga.");
         }
         else {
             try {
@@ -1260,9 +1700,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                int row = moDocumentsGrid.getTable().getSelectedRow();
+                int index = moDocumentsGrid.getTable().getSelectedRow();
                 moDocumentsGrid.renderGridRows();
-                moDocumentsGrid.setSelectedGridRow(row);
+                moDocumentsGrid.setSelectedGridRow(index);
 
                 String zipPath = zipFile.getAbsolutePath();
                 System.out.println("ZIP saved to: " + zipPath);
@@ -1296,12 +1736,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
                     SImportedDocument document = (SImportedDocument) row;
 
-                    if (!document.isProcessed()) {
+                    if (!document.isRecorded()) {
                         unlinked++;
-                        int[] dpsKey = SDbSwapDataProcessing.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+                        int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
-                            if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
                                 newlyLinked++;
                             }
                         }
@@ -1363,13 +1803,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_ + document.ProcessedDps.composeRecord() + ".");
+                if (document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
                         SGuiParams params = new SGuiParams();
-                        params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDateEnd.getValue())[0]);
+                        params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDatePeriodEnd.getValue())[0]);
                         params.getParamsMap().put(SGuiConsts.PARAM_BPR, document.BizPartnerId);
 
                         SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_TRN_N, SModConsts.MOD_TRN_PUR_N).getOptionPicker(SModConsts.TRN_DPS, SDataConstantsSys.TRNX_TP_DPS_DOC, params);
@@ -1379,11 +1819,80 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                             int[] dpsKey = (int[]) picker.getOption();
 
-                            if (document.link(miClient.getSession(), dpsKey, false, msSyncUrlDownload)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, true, mbAllowLinkGreaterInvoices)) {
                                 int index = moDocumentsGrid.getTable().getSelectedRow();
                                 moDocumentsGrid.renderGridRows();
                                 moDocumentsGrid.setSelectedGridRow(index);
                             }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedRejectInvoice() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                
+                if (document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
+                }
+                else {
+                    String confirm = "Será posible rechazar la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ", solamente si no está contabilizada.\n"
+                            + "IMPORTANTE: ¡Considere que el rechazo de una factura autorizada es una acción que no se puede revertir!\n"
+                            + SGuiConsts.MSG_CNF_CONT;
+                    
+                    if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                        if (!isDocumentAlreadyRecorded(document)) {
+                            SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
+                            
+                            if (rejectData != null) {
+                                confirm = "Se rechazará la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ",\n"
+                                        + "por el usuario: " + rejectData.User + ",\n"
+                                        + "con los siguientes comentarios:\n"
+                                        + "\"" + rejectData.Notes + "\"\n"
+                                        + SGuiConsts.MSG_CNF_CONT;
+
+                                if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                    SDataRejectResource data = new SDataRejectResource();
+
+                                    data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
+                                    data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
+                                    data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_INVOICE;
+                                    data.external_resource_id = "" + document.ExternalDocumentId;
+                                    data.external_resource_uuid = document.ExternalDocumentUuid; // UUID (not required in SWAP Services!)
+                                    data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
+                                    data.external_user_id = rejectData.UserId;
+                                    data.notes = rejectData.Notes;
+
+                                    SServicesUtils.requestRejectResource(miClient.getSession(), data);
+
+                                    int index = moDocumentsGrid.getTable().getSelectedRow();
+
+                                    maDocuments.remove(document);
+                                    itemStateChangedDocType(false); // reload documents grid
+
+                                    moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
+
+                                    miClient.showMsgBoxInformation("La factura originalmente autorizada '" + document.getFolio() + "' de " + document.BizPartner + " acaba de ser rechazada.");
+                                }
+                            }
+                            else {
+                                miClient.showMsgBoxWarning("Para proceder es necesario especificar los comentarios de rechazo.");
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("La factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + " no se puede rechazar porque ya está contabilizada.");
                         }
                     }
                 }
@@ -1404,8 +1913,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (!document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_PROCESSED);
+                if (!document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_NOT_RECORDED);
                 }
                 else {
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea desvincular la factura " + SSwapConsts.SIIE + " de esta factura autorizada?\n(IMPORTANTE: Esta acción no se puede revertir.)") == JOptionPane.YES_OPTION) {
@@ -1433,8 +1942,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_ + document.ProcessedDps.composeRecord() + ".");
+                if (document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
@@ -1446,7 +1955,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                                // throw exception if exchanga rate is not available:
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
                             }
                             
                             // validate business partner:
@@ -1471,53 +1981,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 else {
                                     // retrieve order, if available:
 
-                                    SDataDps order = null;
-                                    boolean linkToOrder = document.References != null && document.References.length > 0 && document.ReferencesType == SSwapConsts.TXN_DOC_TYPE_ORDER;
+                                    SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                                    boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
-                                    if (linkToOrder) {
-                                        int[] orderKey = null;
-                                        SImportUtils.DpsKey orderDpsKey = document.References[0].createDpsKey();
-
-                                        if (orderDpsKey != null) {
-                                            orderKey = orderDpsKey.asKey();
-                                        }
-                                        else {
-                                            SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(document.References[0].Reference, SSwapConsts.TXN_DOC_REF_TYPE_ORDER_CODE);
-
-                                            if (orderDpsFolio != null) {
-                                                orderKey = SDataUtilities.obtainDpsKey((SClientInterface) miClient, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
-                                            }
-                                        }
-
-                                        if (orderKey != null) {
-                                            order = new SDataDps();
-                                            if (order.read(orderKey, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                                                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Orden de compra PK " + SLibUtils.textKey(orderKey) + ".)");
-                                            }
-                                        }
-                                    }
-
-                                    // prepare DPS finder dialog:
-
-                                    if (linkToOrder && order == null && moDialogDpsFinder == null) {
-                                        moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-                                    }
-
-                                    // import CFDI:
+                                    // import CFDI (dialog DPS Finder should be previously prepared):
 
                                     int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
-
-                                    if (dpsKey != null) {
-                                        if (document.link(miClient.getSession(), dpsKey, true, msSyncUrlDownload)) {
-                                            int index = moDocumentsGrid.getTable().getSelectedRow();
-                                            moDocumentsGrid.renderGridRows();
-                                            moDocumentsGrid.setSelectedGridRow(index);
-
-                                            if (document.isPaymentRequested()) {
-                                                mbExportPaymentRequests = true;
-                                            }
-                                        }
-                                    }
+                                    linkAndProcessNewDps(document, dpsKey);
                                 }
                             }
                         }
@@ -1540,8 +2010,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_ + document.ProcessedDps.composeRecord() + ".");
+                if (document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
@@ -1552,7 +2022,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SImportedDocument.getExchangeRate(miClient.getSession(), document, miClient.getSession().getCurrentDate());
+                                // throw exception if exchanga rate is not available:
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
                             }
                             
                             // validate business partner:
@@ -1575,42 +2046,56 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             else {
                                 // retrieve order, if available:
 
-                                SDataDps order = null;
-                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_DOC_TYPE_ORDER);
+                                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
-                                if (linkToOrder) {
-                                    int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
-
-                                    if (orderKey != null) {
-                                        order = new SDataDps();
-                                        order.read(orderKey, miClient.getSession().getStatement());
-                                    }
-                                }
-
-                                // prepare DPS finder dialog:
-
-                                if (linkToOrder && order == null && moDialogDpsFinder == null) {
-                                    moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-                                }
-
-                                // create CFDI:
+                                // create CFDI (dialog DPS Finder should be previously prepared):
 
                                 int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
-
-                                if (dpsKey != null) {
-                                    if (document.link(miClient.getSession(), dpsKey, true, msSyncUrlDownload)) {
-                                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                                        moDocumentsGrid.renderGridRows();
-                                        moDocumentsGrid.setSelectedGridRow(index);
-
-                                        if (document.isPaymentRequested()) {
-                                            mbExportPaymentRequests = true;
-                                        }
-                                    }
-                                }
+                                linkAndProcessNewDps(document, dpsKey);
                             }
                         }
                     }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedViewInvoicePdf() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ExternalDocumentId, SFileUtilities.pdf);
+                
+                if (pdf == null) {
+                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
+
+                    if (files == null || files.length != 2) {
+                        throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+                    }
+                    else if (files[SImportUtils.CFDI_PDF] == null) {
+                        throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+                    }
+                    else {
+                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF]);
+                    }
+                }
+                
+                if (pdf != null) {
+                    if (moDialogPdfViewer == null) {
+                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                    }
+
+                    moDialogPdfViewer.setPdf(new SDocumentInfo(document), pdf);
+                    moDialogPdfViewer.setVisible(true);
                 }
             }
         }
@@ -1629,8 +2114,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (!document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_PROCESSED);
+                if (!document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_NOT_RECORDED);
                 }
                 else {
                     ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
@@ -1652,20 +2137,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                
-                if (!document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_PROCESSED);
+                int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
+
+                if (orderKey == null) {
+                    throw new Exception("La factura autorizada no está relacionada con ningún pedido.");
                 }
                 else {
-                    int[] orderKey = document.getFirstReferenceKey(miClient, SSwapConsts.TXN_DOC_TYPE_ORDER);
-                    
-                    if (orderKey == null) {
-                        throw new Exception("La factura autorizada no tiene pedido.");
-                    }
-                    else {
-                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
-                        ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
-                    }
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
                 }
             }
         }
@@ -1684,8 +2163,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (!document.isProcessed()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_PROCESSED);
+                if (!document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_NOT_RECORDED);
                 }
                 else {
                     ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_FIN).showForm(SDataConstants.FINX_REC_RO, document.ProcessedDps.getRecordKey());
@@ -1743,7 +2222,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             break;
                         default:
                             message += "Debido al estatus actual de la solicitud de pago, la '" + jtfReqPayReqDate.getToolTipText().toLowerCase() + "' no se puede modificar.";
-                    
                     }
                     
                     throw new Exception(message);
@@ -1785,7 +2263,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             + "para poder hacerlo el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "'.";
                     
                     if (document.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        message += "\nSin embargo su estatus es '" + SDbPayment.ST_SCHED + "', y se puede cambiar más bien la '" + jtfPaySchedDate.getToolTipText().toLowerCase() + "'.";
+                        message += "\nSin embargo, como su estatus ya es '" + SDbPayment.ST_SCHED + "', se puede cambiar más bien la '" + jtfPaySchedDate.getToolTipText().toLowerCase() + "'.";
                     }
                     
                     throw new Exception(message);
@@ -1855,7 +2333,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbImportInvoiceFromCfdi.setEnabled(false);
             jbCreateInvoiceFromScratch.setEnabled(false);
             jbLinkInvoice.setEnabled(false);
+            jbRejectInvoice.setEnabled(false);
             jbUnlinkInvoice.setEnabled(false);
+            jbViewInvoicePdf.setEnabled(false);
             jbViewInvoice.setEnabled(false);
             jbViewOrder.setEnabled(false);
             jbViewRecord.setEnabled(false);
@@ -1889,7 +2369,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbImportInvoiceFromCfdi.setEnabled(true);
             jbCreateInvoiceFromScratch.setEnabled(true);
             jbLinkInvoice.setEnabled(true);
+            jbRejectInvoice.setEnabled(true);
             jbUnlinkInvoice.setEnabled(true);
+            jbViewInvoicePdf.setEnabled(true);
             jbViewInvoice.setEnabled(true);
             jbViewOrder.setEnabled(true);
             jbViewRecord.setEnabled(true);
@@ -1898,7 +2380,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbChangePaymentRequiredDate.setEnabled(true);
             jbChangePaymentScheduledDate.setEnabled(true);
             
-            if (!document.isProcessed()) {
+            if (!document.isRecorded()) {
                 jtfInvoice.setText("");
                 jtfInvoice.setToolTipText(null);
                 jtfRecord.setText("");
@@ -1960,47 +2442,97 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents) {
+    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGridTable) {
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
         
+        if (focusDocumentsGridTable) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
+        
         jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
     }
     
-    private void itemStateChangedViewAll() {
-        if (moRadViewAll.isEnabled() && moRadViewAll.isSelected()) {
-            populateDocumentsGrid(maDocuments);
+    private void itemStateChangedSearchBy() {
+        enableFieldsOfSearchBy();
+    }
+    
+    private void itemStateChangedDocMode() {
+        enableFieldsOfDocMode();
+        
+        if (moRadDocModeType.isSelected()) {
+            itemStateChangedDocType(false);
+        }
+        else if (moRadDocModeCase.isSelected()) {
+            itemStateChangedDocCase(false);
         }
     }
     
-    private void itemStateChangedViewAssets() {
-        if (moRadViewAssets.isEnabled() && moRadViewAssets.isSelected()) {
-            ArrayList<SImportedDocument> documents = new ArrayList<>();
-
-            for (SImportedDocument document : maDocuments) {
-                if (DCfdi40Catalogs.ClavesUsoCfdiActivoFijo.contains(document.FiscalUseCode)) {
-                    documents.add(document);
-                }
+    private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
+        if (moKeyDocModeType.isEnabled()) {
+            if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ALL) {
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
+            else {
+                ArrayList<SImportedDocument> documents = new ArrayList<>();
 
-            populateDocumentsGrid(documents);
+                if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ASSETS) {
+                    for (SImportedDocument document : maDocuments) {
+                        if (DCfdi40Catalogs.ClavesUsoCfdiActivoFijo.contains(document.FiscalUseCode)) {
+                            documents.add(document);
+                        }
+                    }
+                }
+                else if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_EXPENSES) {
+                    for (SImportedDocument document : maDocuments) {
+                        if (!DCfdi40Catalogs.ClavesUsoCfdiActivoFijo.contains(document.FiscalUseCode)) {
+                            documents.add(document);
+                        }
+                    }
+                }
+
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
+            }
         }
     }
     
-    private void itemStateChangedViewExpenses() {
-        if (moRadViewExpenses.isEnabled() && moRadViewExpenses.isSelected()) {
-            ArrayList<SImportedDocument> documents = new ArrayList<>();
-
-            for (SImportedDocument document : maDocuments) {
-                if (!DCfdi40Catalogs.ClavesUsoCfdiActivoFijo.contains(document.FiscalUseCode)) {
-                    documents.add(document);
-                }
+    private void itemStateChangedDocCase(final boolean focusDocumentsGridTable) {
+        if (moKeyDocModeCase.isEnabled()) {
+            if (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_ALL) {
+                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
             }
+            else {
+                Integer processingTypeId = null;
+                
+                switch (moKeyDocModeCase.getValue()[0]) {
+                    case SImportedDocument.DOC_CASE_STANDARD:
+                        processingTypeId = SImportedDocument.PROC_TYPE_STANDARD;
+                        break;
+                    case SImportedDocument.DOC_CASE_FRUIT_FREIGHT:
+                        processingTypeId = SImportedDocument.PROC_TYPE_FRUIT_FREIGHT;
+                        break;
+                    case SImportedDocument.DOC_CASE_FRUIT_PURCHASE:
+                        processingTypeId = SImportedDocument.PROC_TYPE_FRUIT_PURCHASE;
+                        break;
+                    default:
+                        // nothing
+                }
+                
+                ArrayList<SImportedDocument> documents = new ArrayList<>();
 
-            populateDocumentsGrid(documents);
+                if (processingTypeId != null) {
+                    for (SImportedDocument document : maDocuments) {
+                        if (document.ProcessingTypeId == processingTypeId) {
+                            documents.add(document);
+                        }
+                    }
+                }
+
+                populateDocumentsGrid(documents, focusDocumentsGridTable);
+            }
         }
     }
     
@@ -2031,8 +2563,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         mbExportPaymentRequests = false;
         moBoolExportPaymentRequestsOnClose.setSelected(true);
         
-        moDateStart.setValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
-        moDateEnd.setValue(SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
+        Date date = miClient.getSession().getCurrentDate();
+        int week = SLibTimeUtils.getIsoWeekOfWeekBasedYear(date);
+        
+        bgSearchBy.setSelected(moRadSearchByPeriod.getModel(), true);
+        moDatePeriodStart.setValue(SLibTimeUtils.getBeginOfMonth(date));
+        moDatePeriodEnd.setValue(SLibTimeUtils.getEndOfMonth(date));
+        moCalWeekYear.setValue(miClient.getSession().getCurrentYear());
+        moCalWeekStart.setValue(week);
+        moCalWeekEnd.setValue(week);
+        
+        bgDocMode.setSelected(moRadDocModeType.getModel(), true);
         
         actionPerformedClearDocs();
         
@@ -2052,7 +2593,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbImportInvoiceFromCfdi.addActionListener(this);
         jbCreateInvoiceFromScratch.addActionListener(this);
         jbLinkInvoice.addActionListener(this);
+        jbRejectInvoice.addActionListener(this);
         jbUnlinkInvoice.addActionListener(this);
+        jbViewInvoicePdf.addActionListener(this);
         jbViewInvoice.addActionListener(this);
         jbViewOrder.addActionListener(this);
         jbViewRecord.addActionListener(this);
@@ -2061,9 +2604,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbChangePaymentRequiredDate.addActionListener(this);
         jbChangePaymentScheduledDate.addActionListener(this);
         
-        moRadViewAll.addItemListener(this);
-        moRadViewAssets.addItemListener(this);
-        moRadViewExpenses.addItemListener(this);
+        moRadSearchByPeriod.addItemListener(this);
+        moRadSearchByWeek.addItemListener(this);
+        moRadDocModeType.addItemListener(this);
+        moRadDocModeCase.addItemListener(this);
+        moKeyDocModeType.addItemListener(this);
+        moKeyDocModeCase.addItemListener(this);
     }
 
     @Override
@@ -2079,7 +2625,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbImportInvoiceFromCfdi.removeActionListener(this);
         jbCreateInvoiceFromScratch.removeActionListener(this);
         jbLinkInvoice.removeActionListener(this);
+        jbRejectInvoice.removeActionListener(this);
         jbUnlinkInvoice.removeActionListener(this);
+        jbViewInvoicePdf.removeActionListener(this);
         jbViewInvoice.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
         jbViewRecord.removeActionListener(this);
@@ -2088,9 +2636,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbChangePaymentRequiredDate.removeActionListener(this);
         jbChangePaymentScheduledDate.removeActionListener(this);
         
-        moRadViewAll.removeItemListener(this);
-        moRadViewAssets.removeItemListener(this);
-        moRadViewExpenses.removeItemListener(this);
+        moRadSearchByPeriod.removeItemListener(this);
+        moRadSearchByWeek.removeItemListener(this);
+        moRadDocModeType.removeItemListener(this);
+        moRadDocModeCase.removeItemListener(this);
+        moKeyDocModeType.removeItemListener(this);
+        moKeyDocModeCase.removeItemListener(this);
     }
 
     @Override
@@ -2155,8 +2706,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbLinkInvoice) {
                 actionPerformedLinkInvoice();
             }
+            else if (button == jbRejectInvoice) {
+                actionPerformedRejectInvoice();
+            }
             else if (button == jbUnlinkInvoice) {
                 actionPerformedUnlinkInvoice();
+            }
+            else if (button == jbViewInvoicePdf) {
+                actionPerformedViewInvoicePdf();
             }
             else if (button == jbViewInvoice) {
                 actionPerformedViewInvoice();
@@ -2191,17 +2748,26 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (!mbDocumentsBeingUpdated && e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
-            SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
+        if (!mbDocumentsBeingUpdated) {
+            if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+                SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
 
-            if (field == moRadViewAll) {
-                itemStateChangedViewAll();
+                if (field == moRadSearchByPeriod || field == moRadSearchByWeek) {
+                    itemStateChangedSearchBy();
+                }
+                else if (field == moRadDocModeType || field == moRadDocModeCase) {
+                    itemStateChangedDocMode();
+                }
             }
-            else if (field == moRadViewAssets) {
-                itemStateChangedViewAssets();
-            }
-            else if (field == moRadViewExpenses) {
-                itemStateChangedViewExpenses();
+            else if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+                SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+                
+                if (field == moKeyDocModeType) {
+                    itemStateChangedDocType(false);
+                }
+                else if (field == moKeyDocModeCase) {
+                    itemStateChangedDocCase(false);
+                }
             }
         }
     }

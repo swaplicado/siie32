@@ -5,7 +5,7 @@
 
 package erp.mod.fin.db;
 
-import erp.mod.fin.util.SImportPayments;
+import erp.mod.fin.utils.SImportPayments;
 import java.util.Vector;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;

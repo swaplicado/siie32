@@ -307,6 +307,7 @@ public abstract class SModConsts {
     public static final int FINU_TP_ADM_CPT = 2012511;
     public static final int FINU_TP_TAX_CPT = 2012512;
     public static final int FINU_TP_LAY_BANK = 2012513;
+    public static final int FINU_BANK_NB_DAY = 2012516;
     public static final int FINU_COST_GIC = 2012514;
 
     public static final int FIN_YEAR = 2013001;
@@ -355,6 +356,7 @@ public abstract class SModConsts {
     public static final int FIN_REP_CUS_ACC_USR = 2013494;
     public static final int FIN_PAY = 2013496;
     public static final int FIN_PAY_ETY = 2013497;
+    public static final int FIN_PAY_REP = 2013498;
     public static final int FIN_PAY_LAY_BANK = 2013498;
     public static final int FIN_PAY_FILE = 2013499;
 
@@ -1209,6 +1211,7 @@ public abstract class SModConsts {
         TablesMap.put(FINU_TP_ADM_CPT, "erp.finu_tp_adm_cpt");
         TablesMap.put(FINU_TP_TAX_CPT, "erp.finu_tp_tax_cpt");
         TablesMap.put(FINU_TP_LAY_BANK, "erp.finu_tp_lay_bank");
+        TablesMap.put(FINU_BANK_NB_DAY, "erp.finu_bank_nb_day");
         TablesMap.put(FINU_COST_GIC, "erp.finu_cost_gic");
 
         TablesMap.put(FIN_YEAR, "fin_year");

@@ -151,7 +151,7 @@ public abstract class SMaterialRequestEstimationUtils {
                             "</html>";
             
             try {
-                STrnUtilities.sendMail((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ, body, oProviderRow.getSubject(), lTo, lCc, lCco, sender, inlineImages, client.getSession().getCurrentDate());
+                STrnUtilities.sendMail((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_TRN_EST_REQ, body, oProviderRow.getSubject(), lTo, lCc, lCco, sender, inlineImages, client.getSession().getCurrentDate(), false);
             }
             catch (Exception ex) {
                 Logger.getLogger(SMaterialRequestEstimationUtils.class.getName()).log(Level.SEVERE, null, ex);

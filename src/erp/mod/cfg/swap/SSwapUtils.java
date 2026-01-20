@@ -6,13 +6,20 @@
 package erp.mod.cfg.swap;
 
 import erp.mod.SModSysConsts;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.Collectors;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Sergio Flores
  */
 public abstract class SSwapUtils {
+    
+    public static final SimpleDateFormat SwapDatetimeMicrosecsTimeZoneFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
     
     public static String translateSyncType(final SSyncType syncType, final String languageIso639) {
         String translation = "";
@@ -103,5 +110,174 @@ public abstract class SSwapUtils {
         }
         
         return currencyId;
+    }
+    
+    /**
+     * SOM Settings.
+     */
+    public static class SomSettings {
+        
+        /** Number of settings. */
+        private static final int SETTINGS = 8;
+        private static final int INPUT_CATEGORY_SETTINGS = 3;
+        
+        public boolean LinkUp;
+        public String DbmsHost;
+        public String DbmsPort;
+        public String DbName;
+        public String DbmsUser;
+        public String DbmsPswd;
+        public Date Start;
+        public int[] InputCategoryIds;
+        public int FunctionalSubAreaId;
+        public String CfdiUsage;
+        public int OwnerUserId;
+        
+        /**
+         * Create a new SOM Settings instance.
+         * @param configParamValue Configuration parameter value in format: link-up=0; host=host; port=port; db=db; user=user; pswd=pswd; start=yyyy-mm-dd; inp_ct:1,2,3=func_sub:1,usage:S01,owner:1
+         * @throws java.lang.Exception
+         */
+        public SomSettings(final String configParamValue) throws Exception {
+            reset();
+            
+            String[] values = configParamValue.replaceAll(" ", "").split(";");
+            
+            if (values.length != SETTINGS) {
+                throw new Exception("El número esperado de configuraciones SOM es " + SETTINGS + ", pero se " + (values.length == 1 ? "obtuvo 1" : "obtuvieron " + values.length) + ".");
+            }
+            else {
+                VALUES:
+                for (int index = 0; index < values.length; index++) {
+                    String[] keyValuePair = values[index].split("=");
+                    String key = keyValuePair[0];
+                    String value = keyValuePair[1];
+                    String config = "?";
+                    boolean isValid = false;
+
+                    switch (index) {
+                        case 0:
+                            config = "link-up";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                LinkUp = value.equals("1");
+                                if (!LinkUp) {
+                                    break VALUES; // abort processing, it's worthless
+                                }
+                            }
+                            break;
+                        case 1:
+                            config = "host";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                DbmsHost = value;
+                            }
+                            break;
+                        case 2:
+                            config = "port";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                DbmsPort = value;
+                            }
+                            break;
+                        case 3:
+                            config = "db";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                DbName = value;
+                            }
+                            break;
+                        case 4:
+                            config = "user";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                DbmsUser = value;
+                            }
+                            break;
+                        case 5:
+                            config = "pswd";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                DbmsPswd = value;
+                            }
+                            break;
+                        case 6:
+                            config = "start";
+                            if (isValid = key.equalsIgnoreCase(config)) {
+                                Start = SLibUtils.IsoFormatDate.parse(value);
+                            }
+                            break;
+                        case 7:
+                            config = "inp_ct";
+                            if (isValid = key.startsWith(config)) {
+                                keyValuePair = key.split(":");
+                                String[] ids = keyValuePair[1].split(",");
+                                InputCategoryIds = Arrays.stream(ids).mapToInt(Integer::parseInt).toArray();
+
+                                String[] valuesInpCt = value.split(",");
+
+                                if (valuesInpCt.length != INPUT_CATEGORY_SETTINGS) {
+                                    throw new Exception("El número esperado de configuraciones Categoría de Insumo SOM es " + INPUT_CATEGORY_SETTINGS + ", pero se " + (valuesInpCt.length == 1 ? "obtuvo 1" : "obtuvieron " + valuesInpCt.length) + ".");
+                                }
+                                else {
+                                    for (int indexInpCt = 0; indexInpCt < valuesInpCt.length; indexInpCt++) {
+                                        keyValuePair = valuesInpCt[indexInpCt].split(":");
+                                        String keyInpCt = keyValuePair[0];
+                                        String valueInpCt = keyValuePair[1];
+                                        String configInpCt = "?";
+                                        boolean isValidInpCt = false;
+                                        
+                                        switch (indexInpCt) {
+                                            case 0:
+                                                configInpCt = "func_sub";
+                                                if (isValidInpCt = keyInpCt.equalsIgnoreCase(configInpCt)) {
+                                                    FunctionalSubAreaId = SLibUtils.parseInt(valueInpCt);
+                                                }
+                                                break;
+                                            case 1:
+                                                configInpCt = "usage";
+                                                if (isValidInpCt = keyInpCt.equalsIgnoreCase(configInpCt)) {
+                                                    CfdiUsage = valueInpCt;
+                                                }
+                                                break;
+                                            case 2:
+                                                configInpCt = "owner";
+                                                if (isValidInpCt = keyInpCt.equalsIgnoreCase(configInpCt)) {
+                                                    OwnerUserId = SLibUtils.parseInt(valueInpCt);
+                                                }
+                                                break;
+                                            default:
+                                                // nothing
+                                        }
+                                        
+                                        if (!isValidInpCt) {
+                                            throw new Exception("Configuración Categoría Insumo SOM inválida en la posición " + (indexInpCt + 1) + ": '" + keyInpCt + "' en vez de '" + configInpCt + "'.");
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            // nothing
+                    }
+
+                    if (!isValid) {
+                        throw new Exception("Configuración SOM inválida en la posición " + (index + 1) + ": '" + key + "' en vez de '" + config + "'.");
+                    }
+                }
+            }
+        }
+        
+        private void reset() {
+            LinkUp = false;
+            DbmsHost = "";
+            DbmsPort = "";
+            DbName = "";
+            DbmsUser = "";
+            DbmsPswd = "";
+            Start = null;
+            InputCategoryIds = null;
+            FunctionalSubAreaId = 0;
+            CfdiUsage = "";
+            OwnerUserId = 0;
+        }
+        
+        public String getInputCategoryIdsAsText() {
+            return Arrays.stream(InputCategoryIds).mapToObj(String::valueOf).collect(Collectors.joining(", "));
+        }
     }
 }

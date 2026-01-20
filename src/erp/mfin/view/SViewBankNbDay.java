@@ -15,6 +15,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mfin.data.SDataBankNbDay;
 import erp.mfin.form.SFormCopyBankNbDays;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
@@ -25,7 +26,7 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés, Sergio Flores
  */
 public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.event.ActionListener{
 
@@ -57,7 +58,7 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
         addTaskBarUpperComponent(jbCopyNbDays);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[7];
+        STableColumn[] aoTableColumns = new STableColumn[8];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.id_bank_nb_day");
@@ -67,7 +68,8 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "b.nb_day", "Fecha", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.name", "Nombre", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.name", "Nombre", 250);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_nb_day_type", "Tipo día inhábil", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "b.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -122,13 +124,19 @@ public class SViewBankNbDay extends erp.lib.table.STableTab implements java.awt.
             }
         }
         
-        msSql = "SELECT b.id_bank_nb_day, b.nb_day, b.name, b.b_del, b.ts_new, b.ts_edit, un.usr, ue.usr " +
+        msSql = "SELECT b.id_bank_nb_day, b.name, " +
+                "b.nb_day, IF(b.nb_type = '" + SDataBankNbDay.TYPE_OFFICIAL_BANK + "', '" + SDataBankNbDay.DESC_TYPE_OFFICIAL_BANK + "', '" + SDataBankNbDay.DESC_TYPE_BANK_ONLY + "') AS _nb_day_type, " +
+                "b.b_del, b.ts_new, b.ts_edit, b.ts_del, " +
+                "un.usr, ue.usr, ud.usr " +
                 "FROM erp.finu_bank_nb_day AS b " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "b.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " +
                 "b.fid_usr_edit = ue.id_usr " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere);
+                "INNER JOIN erp.usru_usr AS ud ON " +
+                "b.fid_usr_del = ud.id_usr " +
+                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
+                "ORDER BY b.nb_day, b.name, b.id_bank_nb_day ";
     }
     
     @Override

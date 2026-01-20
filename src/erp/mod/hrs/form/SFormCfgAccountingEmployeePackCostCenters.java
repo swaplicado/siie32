@@ -169,10 +169,19 @@ public class SFormCfgAccountingEmployeePackCostCenters extends SBeanForm {
 
         removeAllListeners();
         reloadCatalogues();
+        
+        int employeeId = moRegistry.getPkEmployeeId();
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.setSystem(false); // all editable registries are non-system
+            
+            if (employeeId != 0) {
+                // registry is being copied:
+                miClient.showMsgBoxInformation("IMPORTANTE:\n"
+                        + "Considere que el empleado '" + miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { employeeId }, SDbRegistry.FIELD_NAME) + "' ya tiene al menos otra configuración de contabilización.\n"
+                        + "Para evitar resultados inesperados al contabilizar las nóminas de este empleado,\n"
+                        + "¡valide cuidadosamente que el período de vigencia de esta nueva configuración sea el requerido!");
+            }
             
             moRegistry.setDateStart(miClient.getSession().getCurrentDate());
             
@@ -182,8 +191,8 @@ public class SFormCfgAccountingEmployeePackCostCenters extends SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
-        moKeyEmployee.setValue(new int[] { moRegistry.getPkEmployeeId()});
-        moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId()});
+        moKeyEmployee.setValue(new int[] { employeeId });
+        moKeyPackCostCenters.setValue(new int[] { moRegistry.getFkPackCostCentersId() });
         moDateStart.setValue(moRegistry.getDateStart());
         moDateEnd_n.setValue(moRegistry.getDateEnd_n());
         

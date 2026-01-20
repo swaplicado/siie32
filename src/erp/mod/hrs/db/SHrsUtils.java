@@ -97,6 +97,8 @@ public abstract class SHrsUtils {
         SModSysConsts.HRSS_TP_REC_SCHE_OTH
     };
     
+    protected static final int MAX_WEEK_NUM_IN_1ST_PERIOD = 7;
+    
     /**
      * Check if given type of recuitment schema is for wages.
      * @param recruitmentSchemaType
@@ -2799,7 +2801,8 @@ public abstract class SHrsUtils {
 
         String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-                + "WHERE per_year = " + year + " AND fk_tp_pay = " + paymentType + " AND NOT b_del"
+                + "WHERE NOT b_del AND per_year = " + year + " AND fk_tp_pay = " + paymentType + " "
+                + (paymentType == SModSysConsts.HRSS_TP_PAY_WEE ? "AND NOT (per = 1 AND num > " + MAX_WEEK_NUM_IN_1ST_PERIOD + ") " : "") // prevent from including last week of previous year
                 + (payrollSheetType != SModSysConsts.HRSS_TP_PAY_SHT_EXT ? " AND fk_tp_pay_sht = " + payrollSheetType : "") + ";";
 
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {

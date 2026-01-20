@@ -63,11 +63,12 @@ public class STrnDBDocuments {
      * @param idDoc
      * @param withFileURL
      * @param oStatement
+     * @param dbName
      * 
      * 
      * @return ArrayList<SWebDpsFile> 
      */
-    public ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc, final boolean withFileURL, Statement oStatement) {
+    public ArrayList<SWebDpsFile> getDpsFiles(final int idYear, final int idDoc, final boolean withFileURL, Statement oStatement, String dbName) {
         try {
             Connection conn;
             Statement st;
@@ -103,16 +104,16 @@ public class STrnDBDocuments {
                     "        ELSE '' " + 
                     "    END AS f_etys " + 
                     "FROM " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
+                    "    " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
                     "        INNER JOIN " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE) + " AS f ON fdps.id_sup_file = f.id_sup_file " +
+                    "    " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE) + " AS f ON fdps.id_sup_file = f.id_sup_file " +
                     "        LEFT JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON f.fid_bp_n = bp.id_bp " +
                     "        LEFT JOIN " +
                     "    (SELECT  " +
                     "        id_sup_file, COUNT(*) AS count, id_ety " +
                     "     FROM " +
-                    "        " + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS_ETY) + " " +
+                    "        " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS_ETY) + " " +
                     "     WHERE " +
                     "        id_year = " + idYear + " " +
                     "        AND id_doc = " + idDoc + " " +

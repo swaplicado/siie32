@@ -13,12 +13,16 @@ public abstract class SSwapConsts {
 
     public static int SIIE_EXT_SYS_ID = 1;
     public static final String SIIE = "SIIE";
+    public static final String SIIE_USER_AGENT = "SIIE/3.2";
+    public static final String SWAP = "SWAP";
     public static final String SWAP_SERVICES = "SWAP Services";
     public static final String PURCHASE_PORTAL = "Portal de Compras";
     
     public static final int TIME_30_SEC = 60 * 1000; // 30 segundos en milisegundos
     public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
     public static final int TIME_180_SEC = 180 * 1000; // 180 segundos en milisegundos
+    
+    public static final int SINCE_YEAR = 2025; 
     
     /*
      * SWAP Services.
@@ -78,7 +82,12 @@ public abstract class SSwapConsts {
     public static final int TXN_DOC_TYPE_ORDER = 22;
     public static final int TXN_DOC_TYPE_INVOICE = 41;
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
-    public static final String TXN_DOC_REF_TYPE_ORDER_CODE = "OC";
+    public static final int TXN_REF_TYPE_ORDER = 22;
+    public static final int TXN_REF_TYPE_SCALE_IN = 91;
+    /** Órden de compra. */
+    public static final String TXN_REF_TYPE_ORDER_CODE = "OC";
+    /** Boleto de báscula (de entrada). */
+    public static final String TXN_REF_TYPE_SCALE_IN_CODE = "BB";
     
     /*
      * Sistema de Autorizaciones:
@@ -108,7 +117,7 @@ public abstract class SSwapConsts {
     /**
      * Separator for transaction reference from document-type code.
      */
-    public static final String SEPARATOR_DOC_REF = "/";
+    public static final String SEPARATOR_REF = "/";
 
     /**
      * Longitud de UUID.

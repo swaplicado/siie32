@@ -245,12 +245,14 @@ public class SHrsEmployee {
             }
         }
         
+        int yearOfPayrollStart = SLibTimeUtils.digestYear(payroll.getDateStart())[0];
+        int yearOfPayrollEnd = SLibTimeUtils.digestYear(payroll.getDateEnd())[0];
+        Date endOfYearOfPayrollEnd = SLibTimeUtils.getEndOfYear(payroll.getDateEnd());
+        
+        Date yearStart = yearOfPayrollStart == yearOfPayrollEnd ? SLibTimeUtils.getBeginOfYear(payroll.getDateStart()) : payroll.getDateStart();
+        Date yearEnd = payroll.getDateEnd().before(endOfYearOfPayrollEnd) ? payroll.getDateEnd() : endOfYearOfPayrollEnd;
+        
         int daysIncapacityNotPaidAnnual = 0;
-        Date payrollStart = payroll.getDateStart();
-        Date payrollEnd = payroll.getDateEnd();
-        Date endOfYear = SLibTimeUtils.getEndOfYear(payrollEnd);
-        Date yearStart = SLibTimeUtils.getBeginOfYear(payrollStart);
-        Date yearEnd = payrollEnd.before(endOfYear) ? payrollEnd : endOfYear;
         
         for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptions) { // consumptions in year
             if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), yearStart, yearEnd)) {

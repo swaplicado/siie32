@@ -17,12 +17,20 @@ import java.util.Date;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés, Sergio Flores
  */
 public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final String TYPE_OFFICIAL_BANK = "O";
+    public static final String TYPE_BANK_ONLY = "B";
+    
+    public static final String DESC_TYPE_OFFICIAL_BANK = "Oficial y bancario";
+    public static final String DESC_TYPE_BANK_ONLY = "Bancario solamente";
+    
     protected int mnPkBankNonBizDayId;
     protected java.lang.String msName;
     protected java.util.Date mtNonBizDay;
+    protected java.lang.String msNonBizType;
     protected boolean mbIsCanEdit;
     protected boolean mbIsCanDelete;
     protected boolean mbIsDeleted;
@@ -41,6 +49,7 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
     public void setPkBankNonBizDayId(int n) { mnPkBankNonBizDayId = n; }
     public void setName(java.lang.String s) { msName = s; }
     public void setNonBizDay(java.util.Date t) { mtNonBizDay = t; }
+    public void setNonBizType(java.lang.String s) { msNonBizType = s; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
@@ -54,6 +63,7 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
     public int getPkBankNonBizDayId() { return mnPkBankNonBizDayId; }
     public java.lang.String getName() { return msName; }
     public java.util.Date getNonBizDay() { return mtNonBizDay; }
+    public java.lang.String getNonBizType() { return msNonBizType; }
     public boolean getIsCanEdit() { return mbIsCanEdit; }
     public boolean getIsCanDelete() { return mbIsCanDelete; }
     public boolean getIsDeleted() { return mbIsDeleted; }
@@ -63,8 +73,6 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
-
-    
     
     @Override
     public void setPrimaryKey(Object pk) {
@@ -83,6 +91,7 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
         mnPkBankNonBizDayId = 0;
         msName = "";
         mtNonBizDay = null;
+        msNonBizType = "";
         mbIsCanEdit = false;
         mbIsCanDelete = false;
         mbIsDeleted = false;
@@ -113,6 +122,7 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
                 mnPkBankNonBizDayId = resultSet.getInt("id_bank_nb_day");
                 msName = resultSet.getString("name");
                 mtNonBizDay = resultSet.getDate("nb_day");
+                msNonBizType = resultSet.getString("nb_type");
                 mbIsCanEdit = resultSet.getBoolean("b_can_edit");
                 mbIsCanDelete = resultSet.getBoolean("b_can_del");
                 mbIsDeleted = resultSet.getBoolean("b_del");
@@ -150,10 +160,12 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.finu_bank_nb_day_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?) }");
             callableStatement.setInt(nParam++, mnPkBankNonBizDayId);
             callableStatement.setString(nParam++, msName);
             callableStatement.setDate(nParam++, new java.sql.Date(mtNonBizDay.getTime()));
+            callableStatement.setString(nParam++, msNonBizType);
             callableStatement.setBoolean(nParam++, mbIsCanEdit);
             callableStatement.setBoolean(nParam++, mbIsCanDelete);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
@@ -188,9 +200,17 @@ public class SDataBankNbDay extends erp.lib.data.SDataRegistry implements java.i
         return mtUserEditTs;
     }
     
-    public static boolean existBankNbDayInYear(Statement statement, int pkYearId) throws SQLException {
-        String mySql = "SELECT * FROM erp.finu_bank_nb_day WHERE YEAR(nb_day) = " + pkYearId + " AND NOT b_del;";
-        ResultSet resultSet = statement.executeQuery(mySql);
-        return resultSet.next();
+    public static boolean existBankNbDaysInYear(Statement statement, int pkYearId) throws SQLException {
+        boolean exist = false;
+        
+        String mySql = "SELECT COUNT(*) "
+                + "FROM erp.finu_bank_nb_day "
+                + "WHERE YEAR(nb_day) = " + pkYearId + " AND NOT b_del;";
+        try (ResultSet resultSet = statement.executeQuery(mySql)) {
+            if (resultSet.next()) {
+                exist = resultSet.getInt(1) > 0;
+            }
+        }
+        return exist;
     }
 }

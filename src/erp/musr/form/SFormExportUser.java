@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author SW, Edwin Carmona
+ * @author Adrián Avilés, Edwin Carmona
  */
 public class SFormExportUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 

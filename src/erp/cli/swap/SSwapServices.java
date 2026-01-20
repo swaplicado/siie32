@@ -44,6 +44,9 @@ public class SSwapServices {
             
             responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_PAYMENT, false, SExportUtils.EXPORT_MODE_SILENT);
             SExportUtils.processResponses(client.getSession(), responses, 0, 0);
+            
+            responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_REF_SCALE_TICKET, false, SExportUtils.EXPORT_MODE_SILENT);
+            SExportUtils.processResponses(client.getSession(), responses, 0, 0);
         }
         catch (Exception e) {
             System.err.println(e);

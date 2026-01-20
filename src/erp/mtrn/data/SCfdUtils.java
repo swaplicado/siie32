@@ -116,7 +116,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -5765,7 +5765,12 @@ public abstract class SCfdUtils implements Serializable {
     
     public static void downloadXmlPdf(final SClientInterface client, final int[] pk) throws Exception {
         SDataPdf pdf = (SDataPdf) SDataUtilities.readRegistry(client, SDataConstants.TRN_PDF, pk, SLibConstants.EXEC_MODE_SILENT);
-        pdf.downloadPdfFile(client);
+        
+        if (pdf == null) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del PDF del comprobante.");
+        }
+        
+        pdf.downloadPdfFile(client, SDataPdf.MODE_CUST_DIR);
     }
     
     public static void getXmlCfds(final SClientInterface client, final HashSet<SDataCfd> cfds) throws Exception {
@@ -5798,6 +5803,11 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
+    public static File getXmlPdfInTempFile(final SClientInterface client, final int[] pk) throws Exception {
+        SDataPdf pdf = (SDataPdf) SDataUtilities.readRegistry(client, SDataConstants.TRN_PDF, pk, SLibConstants.EXEC_MODE_SILENT);
+        return pdf == null ? null : pdf.downloadPdfFile(client, SDataPdf.MODE_TEMP_DIR);
+    }
+    
     public static void getAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");

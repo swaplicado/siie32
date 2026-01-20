@@ -104,7 +104,6 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
-import erp.mod.fin.form.SDialogChoseAccountingCustomReport;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
@@ -116,6 +115,7 @@ import erp.mod.fin.form.SDialogRepMovsFileCvs;
 import erp.mod.fin.form.SDialogRepMovsIncExp;
 import erp.mod.fin.form.SDialogRepTaxPending;
 import erp.mod.fin.form.SDialogValuationBalances;
+import erp.mod.fin.form.SPickerAccountingCustomReport;
 import erp.mod.fin.view.SViewPaymentStatus;
 import erp.mod.trn.form.SDialogRepContributionMargin;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
@@ -236,6 +236,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiAccRecPaymentsInAuth;
     private javax.swing.JMenuItem jmiAccRecPaymentsRejc;
     private javax.swing.JMenuItem jmiAccRecPaymentsSched;
+    private javax.swing.JMenuItem jmiAccRecPaymentsSchedReport;
     private javax.swing.JMenuItem jmiAccRecPaymentsInTreas;
     private javax.swing.JMenuItem jmiAccRecPaymentsInTreasDetail;
     private javax.swing.JMenuItem jmiAccRecPaymentsExec;
@@ -633,6 +634,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
         jmiAccRecPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
         jmiAccRecPaymentsSched = new JMenuItem("Solicitudes de pago autorizadas");
+        jmiAccRecPaymentsSchedReport = new JMenuItem("Consulta solicitudes de pago");
         jmiAccRecPaymentsInTreas = new JMenuItem("Pagos en tesorería");
         jmiAccRecPaymentsInTreasDetail = new JMenuItem("Pagos en tesorería a detalle");
         jmiAccRecPaymentsExec = new JMenuItem("Pagos operados");
@@ -665,6 +667,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinAccRec.add(jmiAccRecPaymentsInAuth);
         jmFinAccRec.add(jmiAccRecPaymentsRejc);
         jmFinAccRec.add(jmiAccRecPaymentsSched);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsSchedReport);
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiAccRecPaymentsInTreas);
         jmFinAccRec.add(jmiAccRecPaymentsInTreasDetail);
@@ -1026,6 +1030,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsInAuth.addActionListener(this);
         jmiAccRecPaymentsRejc.addActionListener(this);
         jmiAccRecPaymentsSched.addActionListener(this);
+        jmiAccRecPaymentsSchedReport.addActionListener(this);
         jmiAccRecPaymentsInTreas.addActionListener(this);
         jmiAccRecPaymentsInTreasDetail.addActionListener(this);
         jmiAccRecPaymentsExec.addActionListener(this);
@@ -2309,12 +2314,12 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.FINX_REC_DPS, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiRecAccCus) {
-                SDialogChoseAccountingCustomReport dialog = new SDialogChoseAccountingCustomReport((SGuiClient) miClient);
-                dialog.setVisible(true);
-                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    int subType = (int) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_ID);
+                SPickerAccountingCustomReport picker = new SPickerAccountingCustomReport((SGuiClient) miClient);
+                picker.setVisible(true);
+                if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    int subType = (int) picker.getValue(SPickerAccountingCustomReport.PARAM_REP_ID);
                     SGuiParams params = new SGuiParams();
-                    params.getParamsMap().put(subType, ((String) dialog.getValue(SDialogChoseAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
+                    params.getParamsMap().put(subType, ((String) picker.getValue(SPickerAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
                     miClient.getSession().showView(SModConsts.FINX_REP_CUS_ACC, subType, params);
                 }
             }
@@ -2337,7 +2342,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.TRN_CTR);
             }
             else if (item == jmiAccRecPaymentRequests) {
-                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConstants.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.FIN_PAY, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiAccRecPaymentsInAuth) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_IN_AUTH, null);
@@ -2347,6 +2352,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiAccRecPaymentsSched) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_SCHED, null);
+            }
+            else if (item == jmiAccRecPaymentsSchedReport) {
+                miClient.getSession().showView(SModConsts.FIN_PAY_REP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiAccRecPaymentsInTreas) {
                 miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, null);

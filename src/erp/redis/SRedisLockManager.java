@@ -12,7 +12,7 @@ import sa.lib.srv.redis.SRedisLockManagerInterface;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SRedisLockManager implements SRedisLockManagerInterface{
 

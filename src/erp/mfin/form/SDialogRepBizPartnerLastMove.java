@@ -24,7 +24,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SDialogRepBizPartnerLastMove extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener{
 

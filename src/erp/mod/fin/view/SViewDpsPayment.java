@@ -8,11 +8,11 @@ package erp.mod.fin.view;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibTimeUtilities;
 import erp.mod.SModConsts;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -27,9 +27,11 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewDpsPayment extends SGridPaneView {
+    
+    private static final int COL_INSTALLMENT = 11;
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     
@@ -49,38 +51,50 @@ public class SViewDpsPayment extends SGridPaneView {
     @Override
     public void computeGridData() {
         try {
-            Object filter;
             int period[] = null;
-            int pk[] = null;
-            int count = 0;
+            
             if (moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD) != null) {
-                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+                SGuiDate filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
                 if (filter != null) {
-                    period = SLibTimeUtilities.digestYearMonth((SGuiDate) filter);
+                    period = SLibTimeUtilities.digestYearMonth(filter);
                 }
             }
-            for (SGridRow row : moModel.getGridRows()) {
-                if (!SLibUtils.compareKeys(row.getRowPrimaryKey(), pk)) {
-                    pk = row.getRowPrimaryKey();
-                    
-                    String sql = "SELECT COUNT(*) FROM fin_rec_ety " +
-                            "WHERE fid_tp_acc_mov = 16 " +
-                            "AND fid_cl_acc_mov = 1 " +
-                            "AND fid_cls_acc_mov = 1 " +
-                            "AND fid_ct_sys_mov_xxx = 4 " +
-                            "AND fid_tp_sys_mov_xxx = 2 " +
-                            "AND id_year <= " + period[0] + " AND id_per < " + period[1] + " " +
-                            "AND fid_dps_year_n = " + row.getRowPrimaryKey()[0] + " " +
-                            "AND fid_dps_doc_n = " + row.getRowPrimaryKey()[1];
-                    ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        count = resultSet.getInt(1);
+            
+            String sql = "SELECT COUNT(*) AS _entries "
+                    + "FROM fin_rec AS r "
+                    + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
+                    + "WHERE NOT r.b_del AND NOT re.b_del "
+                    + "AND re.fid_tp_acc_mov = 16 "
+                    + "AND re.fid_cl_acc_mov = 1 "
+                    + "AND re.fid_cls_acc_mov = 1 "
+                    + "AND re.fid_ct_sys_mov_xxx = 4 "
+                    + "AND re.fid_tp_sys_mov_xxx = 2 "
+                    + "AND re.fid_dps_year_n = ? AND re.fid_dps_doc_n = ? "
+                    + "AND (r.id_year < ? OR (r.id_year = ? AND r.id_per <= ?));";
+            
+            try (PreparedStatement preparedStatement = miClient.getSession().getStatement().getConnection().prepareStatement(sql)) {
+                for (SGridRow row : moModel.getGridRows()) {
+                    int entries = 0;
+                    int[] key = row.getRowPrimaryKey(); // convenience variable
+
+                    if (key.length == moPaneSettings.getPrimaryKeyLength() && key[0] != 0 && key[1] != 0) {
+                        preparedStatement.setInt(1, key[0]); // document's year
+                        preparedStatement.setInt(2, key[0]); // document's ID
+                        preparedStatement.setInt(3, period[0]); // record's year
+                        preparedStatement.setInt(4, period[0]); // record's year
+                        preparedStatement.setInt(5, period[1]); // record's month
+
+                        ResultSet resultSet = preparedStatement.executeQuery();
+                        if (resultSet.next()) {
+                            entries = resultSet.getInt("_entries");
+                        }
                     }
+
+                    row.setRowValueAt(entries, COL_INSTALLMENT); // installment!
                 }
-                row.setRowValueAt(count + 1, 10);
-                count++;
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             miClient.showMsgBoxError(e.getMessage());
         }
     }
@@ -109,10 +123,10 @@ public class SViewDpsPayment extends SGridPaneView {
         msSql = "SELECT " +
                 "d.id_year AS " + SDbConsts.FIELD_ID + "1, " +
                 "d.id_doc AS " + SDbConsts.FIELD_ID + "2, " +
-                "' ' AS " + SDbConsts.FIELD_CODE + ", " +
-                "' ' AS " + SDbConsts.FIELD_NAME + ", " +
-                "'' AS parc, " +
-                "b.id_bp, b.bp, b.fiscal_id, bc.bp_key, bpb.bpb, re.ref, SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, dt.code, cb.code, " +
+                "'' AS " + SDbConsts.FIELD_CODE + ", " +
+                "'' AS " + SDbConsts.FIELD_NAME + ", " +
+                "0 AS f_installment, " + // this value will be set in method computeGridData() after query is processed!
+                "b.id_bp, b.bp, b.fiscal_id, bc.bp_key, bpb.bpb, re.ref, SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, dt.code, dn.code, cb.code, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.num_ref, d.dt, SUM(d.stot_r) AS f_stot, " +
                 "SUM(d.tax_charged_r) AS f_tax_charged, SUM(d.tax_retained_r) AS f_tax_retained, SUM(d.tot_r) AS f_tot, " +
                 "c.uuid, " +
@@ -131,11 +145,12 @@ public class SViewDpsPayment extends SGridPaneView {
                 "INNER JOIN erp.bpsu_bpb AS bpb ON re.fid_bpb_n = bpb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = 2 " +
                 "LEFT JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
-                "lEFT JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                "LEFT JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                "LEFT JOIN erp.trnu_dps_nat AS dn ON d.fid_dps_nat = dn.id_dps_nat " +
                 "LEFT JOIN trn_cfd AS c ON d.id_year = c.fid_dps_year_n AND d.id_doc = c.fid_dps_doc_n " +
                 "LEFT JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                 "LEFT JOIN erp.bpsu_bp AS agt ON d.fid_sal_agt_n = agt.id_bp " +
-                "GROUP BY b.id_bp, b.bp, bc.bp_key, d.num_ser, d.num, re.ts_new, d.dt, re.ref, re.debit, re.credit, dt.code, cb.code, d.stot_r, d.tax_charged_r, d.tax_retained_r, " +
+                "GROUP BY b.id_bp, b.bp, bc.bp_key, d.num_ser, d.num, re.ts_new, d.dt, re.ref, re.debit, re.credit, dt.code, dn.code, cb.code, d.stot_r, d.tax_charged_r, d.tax_retained_r, " +
                 "d.tot_r, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, re.concept, bkc.code, cob.code " +
                 "ORDER BY b.bp, bc.bp_key, b.id_bp, re.ref, re.debit, re.credit, dt.code, " +
                 "cb.code, d.num_ser, d.num, d.dt, d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, r.dt, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, re.concept, bkc.code, cob.code;";
@@ -155,8 +170,9 @@ public class SViewDpsPayment extends SGridPaneView {
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_num", "Folio doc.", 75));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "d.num_ref", "Referencia doc.", 50));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "cb.code", "Sucursal empresa", 35));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "uuid", "UUID"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "parc", "Parcialidad"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dn.code", "Naturaleza doc."));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "c.uuid", "UUID doc.", 225));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_installment", "Parcialidad"));
         column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_stot", "Subtotal $");
         column.setSumApplying(true);
         columns.add(column);

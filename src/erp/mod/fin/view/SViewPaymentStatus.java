@@ -184,17 +184,18 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
                 + "CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.dt_sched_n, "
                 + "v.dt_exec_n, "
-                + "v.pay_cur, "   
-                + "c.cur_key, "   
-                + "v.pay_exc_rate, "   
-                + "v.pay, "   
-                + "v.dt_req, " 
-                + "v.nts, "   
+                + "v.pay_app_cur, "
+                + "c.cur_key, "
+                + "v.pay_exc_rate, "
+                + "v.pay, "
+                + "v.dt_req, "
+                + "v.nts, "
+                + "v.nts_auth, "
                 + "f.name AS _func, "
                 + "fs.name AS _func_sub, "
                 + "sp.name AS _status, "
-                + (mbIsDetailed 
-                ? "ve.ety_pay_cur, "
+                + (mbIsDetailed ?
+                "ve.ety_pay_app_cur, "
                 + "ve.ety_pay, "
                 + "ve.conv_rate, "
                 + "ve.des_pay_ety_cur, "
@@ -202,9 +203,8 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
                 + "ve.doc_bal_prev_cur, "
                 + "ve.doc_bal_unpd_cur_r, "
                 + "ce.cur_key AS _ety_cur_key, "
-                + "IF(ve.ety_tp = '" + SDbPaymentEntry.ENTRY_TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_PAYMENT + "') AS _ety_tp, "
-                + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps, "
-                : "")
+                + "IF(ve.ety_tp = '" + SDbPaymentEntry.TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_PAYMENT + "') AS _ety_tp, "
+                + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps, " : "")
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -258,7 +258,7 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, SDbConsts.FIELD_NAME, "Beneficiario pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sched_n", "Fecha programada pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_exec_n", "Fecha operación pago"));
-        SGridColumnView column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pay_cur", "Monto pago $");
+        SGridColumnView column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "pay_app_cur", "Monto pago $");
         column.setSumApplying(true);
         gridColumnsViews.add(column);
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "cur_key", "Moneda pago"));
@@ -270,6 +270,8 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "_ety_cur_key", "Moneda a pagar"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "_dps", "Documento pago"));
         }
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nts", "Instrucciones pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nts_auth", "Notas para autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_status", "Estatus"));

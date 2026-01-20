@@ -17,7 +17,7 @@ import redis.clients.jedis.Jedis;
 
 /**
  *
- * @author SW
+ * @author Adrián Avilés
  */
 public class SFormRedisSessionLocks extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 

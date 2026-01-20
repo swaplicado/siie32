@@ -39,5 +39,4 @@ public abstract class SJsonUtils {
         
         return json.replaceAll("\\s+", "");
     }
-    
 }

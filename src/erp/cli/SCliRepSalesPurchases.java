@@ -32,9 +32,9 @@ import sa.lib.mail.SMailSender;
 import sa.lib.mail.SMailUtils;
 
 /**
+ * Envía el reporte de ventas Ítem - cliente los días entre semana y fines de semana solo que haya habido ventas.
  *
  * @author Isabel Servín
- * Envía el reporte de ventas Ítem - cliente los días entre semana y fines de semana solo que haya habido ventas.
  */
 public class SCliRepSalesPurchases {
     public static final String ERR_ARGS_INVALID = "Argumentos inválidos.";

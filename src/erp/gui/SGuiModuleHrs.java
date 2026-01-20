@@ -84,8 +84,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgAccPackCostCentersCostCenters;
     private javax.swing.JMenuItem jmiCfgAccPackExpenses;
     private javax.swing.JMenuItem jmiCfgAccPackExpensesItems;
-    private javax.swing.JMenuItem jmiCfgAccExpenseTypeAccounts;
     private javax.swing.JMenuItem jmiCfgAccExpenseTypes;
+    private javax.swing.JMenuItem jmiCfgAccExpenseTypeAccounts;
     private javax.swing.JMenu jmCfgBkkEarning;
     private javax.swing.JMenuItem jmiCfgBkkEarningGlobal;
     private javax.swing.JMenuItem jmiCfgBkkEarningDepartament;
@@ -251,8 +251,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAccPackCostCentersCostCenters = new JMenuItem("Paquetes de centros de costos y centros de costos");
         jmiCfgAccPackExpenses = new JMenuItem("Paquetes de gastos");
         jmiCfgAccPackExpensesItems = new JMenuItem("Paquetes de gastos e ítems");
-        jmiCfgAccExpenseTypeAccounts = new JMenuItem("Contabilización de tipos de gasto");
         jmiCfgAccExpenseTypes = new JMenuItem("Tipos de gasto");
+        jmiCfgAccExpenseTypeAccounts = new JMenuItem("Contabilización de tipos de gasto");
         jmCfgBkkEarning = new JMenu("Contabilización de percepciones");
         jmiCfgBkkEarningGlobal = new JMenuItem("Percepciones globales");
         jmiCfgBkkEarningDepartament = new JMenuItem("Percepciones por departamento");
@@ -301,8 +301,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfgAcc.add(jmiCfgAccPackExpenses);
         jmCfgAcc.add(jmiCfgAccPackExpensesItems);
         jmCfgAcc.addSeparator();
-        jmCfgAcc.add(jmiCfgAccExpenseTypeAccounts);
         jmCfgAcc.add(jmiCfgAccExpenseTypes);
+        jmCfgAcc.add(jmiCfgAccExpenseTypeAccounts);
         jmCfg.add(jmCfgAcc);
         jmCfgBkkEarning.add(jmiCfgBkkEarningGlobal);
         jmCfgBkkEarning.add(jmiCfgBkkEarningDepartament);
@@ -585,8 +585,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAccPackCostCentersCostCenters.addActionListener(this);
         jmiCfgAccPackExpenses.addActionListener(this);
         jmiCfgAccPackExpensesItems.addActionListener(this);
-        jmiCfgAccExpenseTypeAccounts.addActionListener(this);
         jmiCfgAccExpenseTypes.addActionListener(this);
+        jmiCfgAccExpenseTypeAccounts.addActionListener(this);
         jmiCfgBkkEarningGlobal.addActionListener(this);
         jmiCfgBkkEarningDepartament.addActionListener(this);
         jmiCfgBkkEarningEmployee.addActionListener(this);
@@ -727,8 +727,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgAccPackCostCentersCostCenters.setEnabled(true);
         jmiCfgAccPackExpenses.setEnabled(true);
         jmiCfgAccPackExpensesItems.setEnabled(true);
-        jmiCfgAccExpenseTypeAccounts.setEnabled(true);
         jmiCfgAccExpenseTypes.setEnabled(true);
+        jmiCfgAccExpenseTypeAccounts.setEnabled(true);
         jmCfgBkkEarning.setEnabled(mnParamPayrollAccProcess == SHrsConsts.CFG_ACC_PROCESS_ORIGINAL);
         jmiCfgBkkEarningGlobal.setEnabled(true);
         jmiCfgBkkEarningDepartament.setEnabled(true);
@@ -1158,11 +1158,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgAccPackExpensesItems) {
                 miClient.getSession().showView(SModConsts.HRSU_PACK_EXP_ITEM, 0, null);
             }
-            else if (item == jmiCfgAccExpenseTypeAccounts) {
-                miClient.getSession().showView(SModConsts.HRS_TP_EXP_ACC, 0, null);
-            }
             else if (item == jmiCfgAccExpenseTypes) {
                 miClient.getSession().showView(SModConsts.HRSU_TP_EXP, 0, null);
+            }
+            else if (item == jmiCfgAccExpenseTypeAccounts) {
+                miClient.getSession().showView(SModConsts.HRS_TP_EXP_ACC, 0, null);
             }
             else if (item == jmiCfgBkkEarningGlobal) {
                 miClient.getSession().showView(SModConsts.HRS_ACC_EAR, SModSysConsts.HRSS_TP_ACC_GBL, null);

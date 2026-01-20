@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  * 
  */
 public abstract class SDataConstantsSys {
@@ -144,6 +144,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
     public static final String CFG_PARAM_SWAP_SERVICES_CONFIG = "SWAP_SERVICES_CONFIG";
     public static final String CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG = "SWAP_SERVICES_AUTH_CONFIG";
+    public static final String CFG_PARAM_SWAP_SOM = "SWAP_SOM";
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";
     public static final String CFG_PARAM_SIIE_PURP_DPS_NAT = "SIIE_PURP_DPS_NAT";
     public static final String CFG_PARAM_SIIE_PURP_CFD_USE = "SIIE_PURP_CFD_USE";
@@ -316,7 +317,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_DOC_EST_CLO = 103056;
     public static final int PRV_PUR_DOC_ORD_CLO = 103057;
-    public static final int PRV_PUR_INIT = 103061;
+    public static final int PRV_PUR_INIT = 103081;
+    public static final int PRV_PUR_LINK_INV_GREATER = 103091;
     public static final int PRV_PUR_SCA_CFG = 103101;
     public static final int PRV_PUR_SCA_TIC = 103102;
     public static final int PRV_PUR_SCA_TIC_REP = 103106;
