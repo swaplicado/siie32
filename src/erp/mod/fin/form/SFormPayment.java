@@ -895,7 +895,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyBeneficiary, SModConsts.BPSU_BP, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyBeneficiary, SModConsts.BPSU_BP, SDataConstantsSys.BPSS_CT_BP_SUP, null);
         miClient.getSession().populateCatalogue(moKeyCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEntryCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
         

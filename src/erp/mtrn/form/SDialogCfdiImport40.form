@@ -571,7 +571,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbSelectPurchaseOrderEntry">
+                            <Component class="javax.swing.JButton" name="jbPickPurchaseOrderEntries">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir partidas OC"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -579,7 +579,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel1">
+                            <Component class="javax.swing.JLabel" name="jlDummy1">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[140, 23]"/>
@@ -611,16 +611,15 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JButton" name="jbSelectPurchaseOrderEntry1">
+                            <Component class="javax.swing.JButton" name="jbProcessAsService">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Procesar servicio"/>
-                                <Property name="enabled" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[140, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel4">
+                            <Component class="javax.swing.JLabel" name="jlDummy2">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[35, 23]"/>
