@@ -17,6 +17,7 @@ import cfd.ver40.DElementConcepto;
 import cfd.ver40.DElementConceptoImpuestoRetencion;
 import cfd.ver40.DElementConceptoImpuestoTraslado;
 import cfd.ver40.DElementConceptoImpuestos;
+import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -24,6 +25,7 @@ import erp.form.SFormOptionPicker;
 import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
@@ -57,6 +59,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +81,8 @@ import sa.lib.gui.SGuiUtils;
  * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
+    
+    private final String CODE_UNIT_SERVICE = "E48|XUN";
     
     private static final int ITEM_MAIN = 1;
     private static final int ITEM_REF = 2;
@@ -187,13 +192,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jlIsItemNameEditable = new javax.swing.JLabel();
         jpCfdiConceptPurchaseOrder = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
-        jbSelectPurchaseOrderEntry = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        jbPickPurchaseOrderEntries = new javax.swing.JButton();
+        jlDummy1 = new javax.swing.JLabel();
         jlPoBefore = new javax.swing.JLabel();
         jlPoAfter = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
-        jbSelectPurchaseOrderEntry1 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        jbProcessAsService = new javax.swing.JButton();
+        jlDummy2 = new javax.swing.JLabel();
         jlPoOriginalQuantity = new javax.swing.JLabel();
         jtfPoOriginalQuantity = new javax.swing.JTextField();
         jPanel9 = new javax.swing.JPanel();
@@ -455,12 +460,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbSelectPurchaseOrderEntry.setText("Elegir partidas OC");
-        jbSelectPurchaseOrderEntry.setPreferredSize(new java.awt.Dimension(140, 23));
-        jPanel7.add(jbSelectPurchaseOrderEntry);
+        jbPickPurchaseOrderEntries.setText("Elegir partidas OC");
+        jbPickPurchaseOrderEntries.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel7.add(jbPickPurchaseOrderEntries);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(140, 23));
-        jPanel7.add(jLabel1);
+        jlDummy1.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel7.add(jlDummy1);
 
         jlPoBefore.setText("Antes:");
         jlPoBefore.setPreferredSize(new java.awt.Dimension(135, 23));
@@ -474,13 +479,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbSelectPurchaseOrderEntry1.setText("Procesar servicio");
-        jbSelectPurchaseOrderEntry1.setEnabled(false);
-        jbSelectPurchaseOrderEntry1.setPreferredSize(new java.awt.Dimension(140, 23));
-        jPanel14.add(jbSelectPurchaseOrderEntry1);
+        jbProcessAsService.setText("Procesar servicio");
+        jbProcessAsService.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel14.add(jbProcessAsService);
 
-        jLabel4.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel14.add(jLabel4);
+        jlDummy2.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel14.add(jlDummy2);
 
         jlPoOriginalQuantity.setText(" Cant. original:");
         jlPoOriginalQuantity.setMinimumSize(new java.awt.Dimension(125, 16));
@@ -838,7 +842,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectCostCenter.addActionListener(this);
         jbSelectReferenceItem.addActionListener(this);
         
-        jbSelectPurchaseOrderEntry.addActionListener(this);
+        jbPickPurchaseOrderEntries.addActionListener(this);
+        jbProcessAsService.addActionListener(this);
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -891,7 +896,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectOpsType.setEnabled(false);
         jbSelectCostCenter.setEnabled(false);
         jbSelectReferenceItem.setEnabled(false); 
-        jbSelectPurchaseOrderEntry.setEnabled(isWithPurchaseOrder());
+        jbPickPurchaseOrderEntries.setEnabled(isWithPurchaseOrder());
+        jbProcessAsService.setEnabled(isWithPurchaseOrder());
         
         jtfPurchaseOrderNumber.setEditable(isWithPurchaseOrder());
         jtfPurchaseOrderDate.setEditable(isWithPurchaseOrder());
@@ -926,6 +932,81 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         return moPurchaseOrder != null;
     }
     
+    private boolean canShowPurchaseOrderDialog(int formType, SRowCfdiImport40 rowCfdiImport) {
+        boolean canShowDialog = false;
+        
+        switch (formType) {
+            case SRowCfdiImport40.LINK_1_ON_1:
+                canShowDialog = true;
+                break;
+                
+            case SRowCfdiImport40.LINK_AS_SERVICE:
+                try {
+                    String unitCode = rowCfdiImport.getConcepto().getAttClaveUnidad().getString();
+
+                    if (unitCode.equalsIgnoreCase(DCfdi40Catalogs.ClaveUnidadServicio) || unitCode.equals(DCfdi40Catalogs.ClaveUnidadUnidad)) {
+                        String message = "";
+                        boolean confirmToProceedWithUnitUnits = false;
+                        boolean hasPurchaseOrderServiceUnits = false;
+                        
+                        if (unitCode.equals(DCfdi40Catalogs.ClaveUnidadUnidad)) {
+                            message += "El concepto del CFDI seleccionado tiene la ClaveUnidad '" + DCfdi40Catalogs.ClaveUnidadUnidad + "'.";
+                            confirmToProceedWithUnitUnits = true;
+                        }
+
+                        String sql = "SELECT cu.code FROM trn_dps_ety AS de " +
+                                "INNER JOIN erp.itmu_unit AS u ON de.fid_orig_unit = u.id_unit " +
+                                "INNER JOIN erp.itms_cfd_unit AS cu ON u.fid_cfd_unit = cu.id_cfd_unit " +
+                                "WHERE de.id_year = " + moPurchaseOrder.getPkYearId() + " AND de.id_doc = " + moPurchaseOrder.getPkDocId() + " " +
+                                "AND cu.code in ('" + DCfdi40Catalogs.ClaveUnidadServicio + "', '" + DCfdi40Catalogs.ClaveUnidadUnidad + "');";
+                        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                            int unitUnitsCount = 0;
+                            
+                            while (resultSet.next()) {
+                                hasPurchaseOrderServiceUnits = true;
+                                
+                                if (resultSet.getString(1).equals(DCfdi40Catalogs.ClaveUnidadUnidad)) {
+                                    unitUnitsCount++;
+                                }
+                            }
+                            
+                            if (unitUnitsCount > 0) {
+                                message += (message.isEmpty() ? "" : "\n") + (unitUnitsCount == 1 ? "Una partida de la OC tiene" : (unitUnitsCount + " partidas de la OC tienen")) + " la ClaveUnidad '" + DCfdi40Catalogs.ClaveUnidadUnidad + "'.";
+                                confirmToProceedWithUnitUnits = true;
+                            }
+                        }
+
+                        if (hasPurchaseOrderServiceUnits) {
+                            if (confirmToProceedWithUnitUnits) {
+                                message += "\n" + SLibConstants.MSG_CNF_MSG_CONT;
+                                canShowDialog = miClient.showMsgBoxConfirm(message) == JOptionPane.OK_OPTION;
+                            }
+                            else {
+                                canShowDialog = true;
+                            }
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("La OC seleccionada no se puede procesar como servicio porque no tiene partidas con la ClaveUnidad "
+                                    + "'" + DCfdi40Catalogs.ClaveUnidadServicio + "' o '" + DCfdi40Catalogs.ClaveUnidadUnidad + "'.");
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("El concepto del CFDI seleccionado no se puede procesar como servicio porque su ClaveUnidad, '" + unitCode + "', no es "
+                                + "'" + DCfdi40Catalogs.ClaveUnidadServicio + "' ni '" + DCfdi40Catalogs.ClaveUnidadUnidad + "'.");
+                    }
+                }
+                catch (SQLException e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                break;
+                
+            default:
+                // nothing
+        }
+        
+        return canShowDialog;
+    }
+    
     /**
      * Asigna los valores del comprobante CFDI a la forma para realizar el empate de los conceptos con los conceptos del CFDI.
      * @param comprobante CFDI.
@@ -949,7 +1030,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfChargedTaxes.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()));
         jtfRetainedTaxes.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble()));
         jtfTotal.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getAttTotal().getDouble()));
-
+        
         jtfRfcEmisor.setCaretPosition(0); 
         jtfNameEmisor.setCaretPosition(0);
         jtfInvoiceCfdi.setCaretPosition(0);
@@ -986,7 +1067,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
         
         if (isWithPurchaseOrder()) {
-            // Ya existe una orden de compra:
+            // Ya existe una OC:
             
             moBizPartnerReceptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moPurchaseOrder.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
             
@@ -1001,7 +1082,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             moFieldFunctionalSubArea.setKey(new int[] { moPurchaseOrder.getFkFunctionalSubAreaId() });
         }
         else {
-            // No existe una orden de compra:
+            // No existe una OC:
             
             int bizPartnerIdReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", 0); 
             
@@ -1072,7 +1153,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 int linkIndex = 0;
                 int cantSameItem = 0;
                 ArrayList<SDataEntryDpsDpsLink> arrDpsLink = (ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK_ALL);
-                // se hace un barrido a las parttidas de la orden de compra y se cuentan cuantas tienen el mismo ítem
+            
+                // se hace un barrido a las parttidas de la OC y se cuentan cuantas tienen el mismo ítem
                 for (int i = 0; i < arrDpsLink.size(); i++) {
                     SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(i);
                     if (dpsLink.getItemId() == item.getPkItemId()) {
@@ -1461,8 +1543,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     @SuppressWarnings("unchecked")
-    private void actionSelectPurchaseOrderEntry() {
-        if (jbSelectPurchaseOrderEntry.isEnabled()) {
+    private void actionPickPurchaseOrderEntries(int formType) {
+        if (jbPickPurchaseOrderEntries.isEnabled()) {
             int selectedRow = moConceptTablePane.getTable().getSelectedRow();
             
             if (selectedRow == -1) {
@@ -1476,38 +1558,42 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
                 
                 if (moDialogCfdiPurchaseOrder == null) {
-                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient, SDialogCfdiPurchaseOrder40.FORM_TYPE_SELEC_MULTIPLE);
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
                 }
+                
                 setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
+                moDialogCfdiPurchaseOrder.setFormType(formType);
                 
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINKED, rowCfdiImport.getImportedEntryDpsDpsLinks());
-                moDialogCfdiPurchaseOrder.setFormVisible(true);
-                
-                if (moDialogCfdiPurchaseOrder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    rowCfdiImport.getImportedEntryDpsDpsLinks().clear();
-                    rowCfdiImport.getImportedEntryDpsDpsLinks().addAll((ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK)); 
-                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_FACTOR_CONV));
-                    setMatchDataByPurchaseOrder(rowCfdiImport, (ArrayList<SDataDpsEntry>) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
-                    
-                    if (moPurchaseOrder != null) {
-                        setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                if (canShowPurchaseOrderDialog(formType, rowCfdiImport)) {
+                    moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINKED, rowCfdiImport.getImportedEntryDpsDpsLinks());
+                    moDialogCfdiPurchaseOrder.setFormVisible(true);
+
+                    if (moDialogCfdiPurchaseOrder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        rowCfdiImport.getImportedEntryDpsDpsLinks().clear();
+                        rowCfdiImport.getImportedEntryDpsDpsLinks().addAll((ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK)); 
+                        rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_FACTOR_CONV));
+                        rowCfdiImport.setCfdLinkType(formType);
+                        setMatchDataByPurchaseOrder(rowCfdiImport, (ArrayList<SDataDpsEntry>) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
+
+                        if (moPurchaseOrder != null) {
+                            setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                        }
+                        else {
+                            setSiieTaxes(rowCfdiImport, 0, 0);
+                        }
+                        
+                        rowCfdiImport.prepareTableRow();
+                        moConceptTablePane.renderTableRows();
+                        moConceptTablePane.setTableRowSelection(selectedRow);
+                        setPurchaseOrderPanelValues();
+                        validateTaxes(rowCfdiImport);
                     }
-                    else {
-                        setSiieTaxes(rowCfdiImport, 0, 0);
-                    }
-                    rowCfdiImport.prepareTableRow();
-                    moConceptTablePane.renderTableRows();
-                    moConceptTablePane.setTableRowSelection(selectedRow);
-                    setPurchaseOrderPanelValues();
-                    validateTaxes(rowCfdiImport);
                 }
             }
         }
     }
     
     private void setDialogCfdiPurchaseOrderCfdiRow(SRowCfdiImport40 rowCfdiImport) {
-        moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient, SDialogCfdiPurchaseOrder40.FORM_TYPE_SELEC_MULTIPLE);
-        
         moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
                 
         HashMap<String, Double> purchaseOrderEntries = new HashMap<>(); // key: PK of entry of purchase order as a String; value: total quantity already assigned from entry
@@ -1526,15 +1612,16 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     else {
                         quantityToLink += entryDpsDpsLink.getQuantityToLink();
                     }
+                    
                     purchaseOrderEntries.put(key, quantityToLink);
                 }
             }
         }
-
+        
         moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
         moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
     }
-
+    
     private void updateNameItem() {
         if (((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow()).getItem().getDbmsDataItemGeneric().getIsItemNameEditable()) {
             String concept = ((String) moConceptTablePane.getSelectedTableRow().getValues().get(COL_ITEM_NAME)); 
@@ -1566,8 +1653,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel;
     private javax.swing.JPanel jPanel1;
@@ -1589,12 +1674,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private javax.swing.JButton jbCopyRow;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbPasteRow;
+    private javax.swing.JButton jbPickPurchaseOrderEntries;
     private javax.swing.JButton jbPickTaxRegion;
+    private javax.swing.JButton jbProcessAsService;
     private javax.swing.JButton jbSelectCostCenter;
     private javax.swing.JButton jbSelectItem;
     private javax.swing.JButton jbSelectOpsType;
-    private javax.swing.JButton jbSelectPurchaseOrderEntry;
-    private javax.swing.JButton jbSelectPurchaseOrderEntry1;
     private javax.swing.JButton jbSelectReferenceItem;
     private javax.swing.JButton jbSelectTaxRegion;
     private javax.swing.JButton jbSelectUnit;
@@ -1606,6 +1691,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private javax.swing.JLabel jlDateCfdi;
     private javax.swing.JLabel jlDiscountDoc;
     private javax.swing.JLabel jlDpsNature;
+    private javax.swing.JLabel jlDummy1;
+    private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlFunctionalSubArea;
     private javax.swing.JLabel jlInvoiceCfdi;
@@ -1741,7 +1828,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                                             SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(trasladado.get(i).getAttTasaOCuota().getDouble())) &&
                                             dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
                                         
-                                        newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(trasladado.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        if (rowCfdiImport.isLinkedAsService()) {
+                                            newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(SLibUtils.round(newDpsEntry.getOriginalPriceUnitaryCy() * trasladado.get(i).getAttTasaOCuota().getDouble(), SErpConsts.VAL_QTY_MAX_DECS));
+                                        }
+                                        else {
+                                            newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(trasladado.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        }
+                                        
                                         rowCfdiImport.addTaxChargedMatched(trasladado.get(i)); 
                                     }
                                 }
@@ -1767,7 +1860,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                                             SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(retencion.get(i).getAttTasaOCuota().getDouble())) &&
                                             dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
 
-                                        newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(retencion.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        if (rowCfdiImport.isLinkedAsService()) {
+                                            newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(SLibUtils.round(newDpsEntry.getOriginalPriceUnitaryCy() * retencion.get(i).getAttTasaOCuota().getDouble(), SErpConsts.VAL_PRC_UNT_MAX_DECS));
+                                        }
+                                        else {
+                                            newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(retencion.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        }
+                                        
                                         rowCfdiImport.addTaxRetainedMatched(retencion.get(i));
                                     }
                                 }
@@ -1859,7 +1958,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     private void validateTaxes(SRowCfdiImport40 rowCfdiImport) {
         boolean showMessage = false;
-        String message = "No corresponden los impuestos con la orden de compra:\n";
+        String message = "No corresponden los impuestos con la OC:\n";
         DElementConcepto concepto = rowCfdiImport.getConcepto();
         if (concepto.getEltOpcConceptoImpuestos() != null) {
             if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
@@ -1900,7 +1999,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int [] { dpsEntry.getFkItemId() }, SLibConstants.EXEC_MODE_SILENT);
             rowCfdiImport.setItem(item);
 
-            // si se requiere, se asigna el ítem de referencia de la partida de la orden o el predefinido del ítem principal:
+            // si se requiere, se asigna el ítem de referencia de la partida de la OC o el predefinido del ítem principal:
             if (rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired()) {
                 int itemReferenceId;
 
@@ -1970,7 +2069,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             jlIsItemNameEditable.setText(rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemNameEditable() ? "El concepto es editable" : "El concepto no es editable");
         }
         else {
-            jlIsItemNameEditable.setText("El renglón aun no tiene asignado un ítem");
+            jlIsItemNameEditable.setText("El renglón aún no tiene asignado un ítem");
         }
     }
     
@@ -2060,7 +2159,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     }
                 }
                 
-                if (!validation.getIsError()) {
+                if (!validation.getIsError() && !row.isLinkedAsService()) {
                     double cantConcept = row.getConcepto().getAttCantidad().getDouble();
                     double convFact = row.getConvFactor();
                     double toLink = 0;
@@ -2107,7 +2206,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     break;
                 }
                 else if (row.getConvFactor() == 0.0) {
-                    validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
+                    validation.setMessage(rowMsg + "no tiene especificado un factor de conversión.");
                     break;
                 }
                 else {
@@ -2460,8 +2559,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             else if (button == jbSelectReferenceItem) {
                 actionSelectItem(ITEM_REF);
             }
-            else if (button == jbSelectPurchaseOrderEntry) {
-                actionSelectPurchaseOrderEntry();
+            else if (button == jbPickPurchaseOrderEntries) {
+                actionPickPurchaseOrderEntries(SRowCfdiImport40.LINK_1_ON_1);
+            }
+            else if (button == jbProcessAsService) {
+                actionPickPurchaseOrderEntries(SRowCfdiImport40.LINK_AS_SERVICE);
             }
         }
     }
