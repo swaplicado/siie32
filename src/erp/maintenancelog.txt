@@ -21,7 +21,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 294.11/ 2026-01-12
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Cambio de la dirección de la empresa en saporis internacional
+1) Cambio del domicilio de la empresa en Saporis Internacional en el formato personalizado de impresión de facturas.
 
 ================================================================================
 SIIE 3.2 294.10/ 2026-01-02
