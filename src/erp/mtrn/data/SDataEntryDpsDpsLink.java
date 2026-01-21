@@ -29,6 +29,8 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     
     protected boolean mbAuxEntryPriceNeeded;
     protected SGuiDpsEntryPrice moAuxSGuiDpsEntryPrice;
+    protected double mdAuxAmountToLink;
+    protected boolean mbAuxIsLinkedAsService;
     
     protected final boolean mbIsSelectedReq;
 
@@ -56,6 +58,8 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
    
     public void setAuxIsEntryPriceNeeded(boolean b) { mbAuxEntryPriceNeeded = b; }
     public void setAuxSGuiDpsEntryPrice(SGuiDpsEntryPrice d) { moAuxSGuiDpsEntryPrice = d; }
+    public void setAuxAmountToLink(double d) { mdAuxAmountToLink = d; }
+    public void setAuxIsLinkedAsService(boolean b) { mbAuxIsLinkedAsService = b; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -75,6 +79,9 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     
     public boolean getAuxIsEntryPriceNeeded() { return mbAuxEntryPriceNeeded; }
     public SGuiDpsEntryPrice getAuxSGuiDpsEntryPrice() { return moAuxSGuiDpsEntryPrice; }
+    public double getAuxAmountToLink() { return mdAuxAmountToLink; }
+    public boolean getAuxIsLinkedAsService() { return mbAuxIsLinkedAsService; }
+    
     public double getQuantityToBeLinked() { return mdQuantity - mdQuantityLinked - mdQuantityLinkedActual; }
 
     public int[] getDpsEntryKey() { return new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }; }
@@ -95,7 +102,11 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mdSurplusPercentage = 0;
         mnItemId = 0;
         mnUnitId = 0;
+        
+        mbAuxEntryPriceNeeded = false;
         moAuxSGuiDpsEntryPrice = null;
+        mdAuxAmountToLink = 0;
+        mbAuxIsLinkedAsService = false;
     }
 
     @Override

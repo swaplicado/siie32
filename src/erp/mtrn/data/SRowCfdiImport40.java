@@ -26,6 +26,9 @@ import sa.lib.SLibUtils;
  * @author Isabel Servín, Sergio Flores
  */
 public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
+
+    public static final int LINK_1_ON_1 = 1;
+    public static final int LINK_AS_SERVICE = 2;
     
     private final SClientInterface miClient;
     private final cfd.ver40.DElementConcepto moConcepto;
@@ -48,6 +51,9 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     private HashSet<cfd.ver40.DElementConceptoImpuestoTraslado> moTaxChargedMatched;
     private HashSet<cfd.ver40.DElementConceptoImpuestoRetencion> moTaxRetainedMatched;
     
+    private int mnCfdLinkType; 
+    private double mdLinkedPercentage;
+    
     /**
      * 
      * @param client Cliente GUI.
@@ -69,6 +75,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public void setTaxRegion(final SDataTaxRegion o) { moTaxRegion = o; }
     public void setCostCenter(final SDataCostCenter o) { moCostCenter = o; }
     public void setOperationTypePk(final int i) { mnOperationTypePk = i; }
+    public void setCfdLinkType(final int i) { mnCfdLinkType = i; }
     
     public ArrayList<SDataDpsEntry> getNewDpsEntries() { return moNewDpsEntries; } 
     public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
@@ -78,6 +85,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public SDataTaxRegion getTaxRegion() { return moTaxRegion; }
     public SDataCostCenter getCostCenter() { return moCostCenter; }
     public int getOperationTypePk() { return mnOperationTypePk; }
+    public int getCfdLinkType() { return mnCfdLinkType; }
     public ArrayList<SDataEntryDpsDpsLink> getImportedEntryDpsDpsLinks() { return moImportedEntryDpsDpsLinks; }
     public ArrayList<SDataDpsEntry> getImportedDpsEntries() { return moImportedDpsEntries; }
     
@@ -147,6 +155,16 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         return SLibUtils.round((moConcepto.getAttCantidad().getDouble() * moConcepto.getAttValorUnitario().getDouble()) / getEquivalentQuantity(), SErpConsts.VAL_QTY_MAX_DECS);
     }
     
+    public double getServicePriceUnitary(SDataDpsEntry importedDps) {
+        /* Se toma el subtotal ya que en los servicios solo se puede vincular partidas con cantidad 1, por lo que es equivalente a tomar el precio unitario 
+            pero se contempla la posibilidad de un descuento */
+        return importedDps != null ? SLibUtils.round(importedDps.getSubtotalCy_r() * mdLinkedPercentage, SErpConsts.VAL_QTY_MAX_DECS) : getPriceUnitary();
+    }
+    
+    public boolean isLinkedAsService() {
+        return mnCfdLinkType == LINK_AS_SERVICE;
+    }
+    
     /**
      * Asigna Asigna todos los valores de la clase.
      * @param item
@@ -195,7 +213,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moNewDpsEntries.clear();
         
         if (moImportedDpsEntries.isEmpty()) {
-            SDataDpsEntry moNewDpsEntry = createNewDpsEntry();
+            SDataDpsEntry moNewDpsEntry = createNewDpsEntry(null);
             moNewDpsEntry.setOriginalQuantity(getEquivalentQuantity());
             
             moNewDpsEntry.setFkCostCenterId_n(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX());
@@ -204,8 +222,12 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
             moNewDpsEntries.add(moNewDpsEntry);
         }
         else {
+            if (isLinkedAsService()) {
+                mdLinkedPercentage = STrnDpsUtilities.calculateLinkedServicePct(moImportedDpsEntries, moConcepto.getAttValorUnitario().getDouble());
+            }
+            
             for (SDataDpsEntry importedDps : moImportedDpsEntries) {
-                SDataDpsEntry moNewDpsEntry = createNewDpsEntry();
+                SDataDpsEntry moNewDpsEntry = createNewDpsEntry(importedDps);
                 SDataEntryDpsDpsLink entryDpsDpsLink = null;
                 for (SDataEntryDpsDpsLink dpsLink : moImportedEntryDpsDpsLinks) {
                     if (SLibUtils.compareKeys(dpsLink.getDpsEntryKey(), (int[]) importedDps.getPrimaryKey())) {
@@ -227,7 +249,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         }
     }
     
-    private SDataDpsEntry createNewDpsEntry() {
+    private SDataDpsEntry createNewDpsEntry(SDataDpsEntry importedDps) {
         SDataDpsEntry moNewDpsEntry = new SDataDpsEntry();
         
         /*
@@ -278,8 +300,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moDpsEntry.setPriceUnitaryRealCy_r(...);
         moDpsEntry.setCommissionsCy_r(...);
         */
-        moNewDpsEntry.setOriginalPriceUnitaryCy(getPriceUnitary());
-        moNewDpsEntry.setOriginalPriceUnitarySystemCy(getPriceUnitary());
+        moNewDpsEntry.setOriginalPriceUnitaryCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
+        moNewDpsEntry.setOriginalPriceUnitarySystemCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
         //moDpsEntry.setOriginalDiscountUnitaryCy(moConcepto.getAttDescuento().getDouble());
         //moDpsEntry.setOriginalDiscountUnitarySystemCy(moConcepto.getAttDescuento().getDouble());
         /*
@@ -337,6 +359,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moNewDpsEntry.setDbmsOriginalUnitSymbol(moUnit == null ? "" : moUnit.getSymbol());
         moNewDpsEntry.setDbmsTaxRegion(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion());
         moNewDpsEntry.setDbmsItemRef_n(moItemReference == null ? "" : moItemReference.getItem()); 
+        
+        moNewDpsEntry.setAuxIsLinkedAsService(isLinkedAsService());
         
         return moNewDpsEntry;
     }

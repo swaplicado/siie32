@@ -213,6 +213,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdAuxOriginalQuantityOld;
     protected int mnAuxFkUnitOld;
     protected int mnAuxFkOriginalUnitOld;
+    protected boolean mbAuxIsLinkedAsService;
     
     /**
      * Overrides java.lang.Object.clone() function.
@@ -576,13 +577,15 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setAuxOriginalQuantityOld(double n) { mdAuxOriginalQuantityOld = n; }
     public void setAuxFkUnitOld(int i) { mnAuxFkUnitOld = i; }
     public void setAuxFkOriginalUnitOld(int i) { mnAuxFkOriginalUnitOld = i; }
+    public void setAuxIsLinkedAsService(boolean b) { mbAuxIsLinkedAsService = b; }
     
     public int getAuxFkItemOld() { return mnAuxFkItemOld; }
     public double getAuxQuantityOld() { return mdAuxQuantityOld; }
     public double getAuxOriginalQuantityOld() { return mdAuxOriginalQuantityOld; }
     public int getAuxFkUnitOld() { return mnAuxFkUnitOld; }
     public int getAuxFkOriginalUnitOld() { return mnAuxFkOriginalUnitOld; }
-
+    public boolean getAuxIsLinkedAsService() { return mbAuxIsLinkedAsService; }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = ((int[]) pk)[0];
@@ -777,6 +780,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdAuxOriginalQuantityOld = 0;
         mnAuxFkUnitOld = 0;
         mnAuxFkOriginalUnitOld = 0;
+        mbAuxIsLinkedAsService = false;
     }
 
     @Override
@@ -1894,8 +1898,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         }
 
         for (SDataDpsDpsLink link : mvDbmsDpsLinksAsDestiny) {
-            link.setOriginalQuantity(mdOriginalQuantity);
-            link.setQuantity(SLibUtilities.round(link.getOriginalQuantity() * dFactQty, nDecsQty));
+            link.setOriginalQuantity(mbAuxIsLinkedAsService ? 0 : mdOriginalQuantity);
+            link.setQuantity(mbAuxIsLinkedAsService ? 0 : SLibUtilities.round(link.getOriginalQuantity() * dFactQty, nDecsQty));
         }
 
         for (SDataDpsDpsAdjustment adjustment : mvDbmsDpsAdjustmentsAsDps) {

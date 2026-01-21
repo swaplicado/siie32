@@ -5,14 +5,17 @@
  */
 package erp.mtrn.data;
 
+import erp.SErpConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -106,7 +109,7 @@ public abstract class STrnDpsUtilities {
      * @return 
      * @throws Exception 
      */
-    public static boolean IsSourceOrderSupplied(final SClientInterface client, final SDataDps dps, final SDataDpsEntry entry) throws Exception {
+    public static boolean isSourceOrderSupplied(final SClientInterface client, final SDataDps dps, final SDataDpsEntry entry) throws Exception {
         double totalQtySupplied = 0;    
         
         totalQtySupplied = obtainEntryTotalQuantitySupplied(client, new int[] { entry.getPkYearId(), entry.getPkDocId(), entry.getPkEntryId() });
@@ -165,5 +168,89 @@ public abstract class STrnDpsUtilities {
             }
         }
         return authorized;
+    }
+    
+    public static double obtainDpsAmountSupplied(final SClientInterface client, final int[] dpsKey) throws Exception {
+        double amount = 0;
+        
+        String sql = "SELECT SUM(dde.tot_cur_r) "
+                + "FROM trn_dps_dps_supply AS dds "
+                + "INNER JOIN trn_dps_ety AS sde ON dds.id_des_year = sde.id_year AND dds.id_des_doc = sde.id_doc AND dds.id_des_ety = sde.id_ety "
+                + "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc "
+                + "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety "
+                + "WHERE NOT sde.b_del AND NOT dd.b_del AND NOT dde.b_del "
+                + "AND dds.id_src_year = " + dpsKey[0] + " AND dds.id_src_doc = " + dpsKey[1] + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                amount = resultSet.getDouble(1);
+            }
+        }
+        
+        return amount;
+    }
+    
+    /**
+     * Devuelve el monto surtido de una partida de un DPS.
+     * @param client GUI client.
+     * @param dpsEtyKey
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static double obtainDpsEntryAmountSupplied(final SClientInterface client, final int[] dpsEtyKey) throws Exception {
+        double amount = 0;
+        
+        String sql = "SELECT SUM(dde.tot_cur_r) "
+                + "FROM trn_dps_dps_supply AS dds "
+                + "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc "
+                + "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety "
+                + "WHERE NOT dd.b_del AND NOT dde.b_del "
+                + "AND dds.id_src_year = " + dpsEtyKey[0] + " AND dds.id_src_doc = " + dpsEtyKey[1] + " AND dds.id_src_ety = " + dpsEtyKey[2] + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                amount = resultSet.getDouble(1);
+            }
+        }
+        
+        return amount;
+    }
+    
+    /**
+     * Devuelve true si el DPS Entry tiene surtidos como servicio.
+     * @param client GUI client.
+     * @param dpsEtyKey
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static boolean isDpsEntrySuppliedAsService(final SClientInterface client, final int[] dpsEtyKey) throws Exception {
+        boolean suppliedAsService = false;
+        
+        String sql = "SELECT SUM(dds.qty) "
+                + "FROM trn_dps_dps_supply AS dds "
+                + "INNER JOIN trn_dps AS dd ON dds.id_des_year = dd.id_year AND dds.id_des_doc = dd.id_doc "
+                + "INNER JOIN trn_dps_ety AS dde ON dds.id_des_year = dde.id_year AND dds.id_des_doc = dde.id_doc AND dds.id_des_ety = dde.id_ety "
+                + "WHERE NOT dd.b_del AND NOT dde.b_del "
+                + "AND dds.id_src_year = " + dpsEtyKey[0] + " AND dds.id_src_doc = " + dpsEtyKey[1] + " AND dds.id_src_ety = " + dpsEtyKey[2] + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                suppliedAsService = resultSet.getDouble(1) == 0d;
+            }
+        }
+        
+        return suppliedAsService;
+    }
+    
+    /**
+     * Devuelve el cálculo del porcentaje de vinculación para un servicio.
+     * @param dpsEntries
+     * @param priceUnitary
+     * @return 
+     */
+    public static double calculateLinkedServicePct(final ArrayList<SDataDpsEntry> dpsEntries, final double priceUnitary) {
+        double sumPricesUnitary = 0;
+        sumPricesUnitary = dpsEntries.stream().map((importedDps) -> importedDps.getOriginalPriceUnitaryCy()).reduce(sumPricesUnitary, (accumulator, _item) -> accumulator + _item);
+        return SLibUtils.round(priceUnitary / sumPricesUnitary, SErpConsts.VAL_QTY_MAX_DECS);
     }
 }
