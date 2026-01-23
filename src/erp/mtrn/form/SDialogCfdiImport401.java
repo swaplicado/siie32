@@ -306,7 +306,7 @@ public class SDialogCfdiImport401 extends javax.swing.JDialog implements java.aw
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(52, 23));
         jPanel12.add(jtfPaymentType);
 
-        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewInvoicePdf.setToolTipText("Ver PDF del CFDI...");
         jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel12.add(jbViewInvoicePdf);
@@ -1529,7 +1529,7 @@ public class SDialogCfdiImport401 extends javax.swing.JDialog implements java.aw
                 SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
                 
                 if (moDialogCfdiPurchaseOrder == null) {
-                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient, SDialogCfdiPurchaseOrder40.FORM_TYPE_SELEC_MULTIPLE);
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
                 }
                 setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
                 
@@ -1559,7 +1559,7 @@ public class SDialogCfdiImport401 extends javax.swing.JDialog implements java.aw
     }
     
     private void setDialogCfdiPurchaseOrderCfdiRow(SRowCfdiImport40 rowCfdiImport) {
-        moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient, SDialogCfdiPurchaseOrder40.FORM_TYPE_SELEC_MULTIPLE);
+        moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
         
         moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
                 

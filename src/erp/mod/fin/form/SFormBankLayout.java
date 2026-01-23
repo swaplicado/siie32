@@ -1353,6 +1353,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moPickerPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
             moPickerPayments.setLayoutDueDate(moDateDateDue.getValue());
             moPickerPayments.reloadCatalogues();
+            
             isForPayments = false;
         }
         catch (Exception e) {
@@ -1577,7 +1578,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moCellEditorOptionsAgreementReference.setElements(mltAgreementsReferences);
             }
             
+            if (moKeyBankLayoutCurrency.getSelectedIndex() > 0 && moKeyDpsCurrency.getSelectedIndex() > 0) {
+                moPickerPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
+            }
+            
+            moPickerPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
+            moPickerPayments.setLayoutDueDate(moDateDateDue.getValue());
             moPickerPayments.reloadCatalogues();
+            
             isForPayments = false;
         }
         catch (Exception e) {

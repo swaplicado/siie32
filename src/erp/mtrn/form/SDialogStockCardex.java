@@ -29,6 +29,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.SLibTimeConsts;
 import sa.lib.db.SDbRegistry;
 
 /**
@@ -98,8 +99,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         jPanel9 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         jtfYear = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jbShowPrevYear = new javax.swing.JButton();
+        jbShowNextYear = new javax.swing.JButton();
         jPanel16 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
@@ -259,15 +260,15 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         jtfYear.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel9.add(jtfYear);
 
-        jButton1.setText("+");
-        jButton1.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jButton1.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel9.add(jButton1);
+        jbShowPrevYear.setText("-");
+        jbShowPrevYear.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbShowPrevYear.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jbShowPrevYear);
 
-        jButton2.setText("-");
-        jButton2.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jButton2.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel9.add(jButton2);
+        jbShowNextYear.setText("+");
+        jbShowNextYear.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbShowNextYear.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jbShowNextYear);
 
         jPanel5.add(jPanel9);
 
@@ -462,6 +463,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         moPaneStockMoves.getTable().getTableHeader().setReorderingAllowed(false);
 
         jbClose.addActionListener(this);
+        jbShowPrevYear.addActionListener(this);
+        jbShowNextYear.addActionListener(this);
         jbSeek.addActionListener(this);
         jbRefresh.addActionListener(this);
         jbExportCsv.addActionListener(this);
@@ -632,8 +635,6 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -651,6 +652,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     private javax.swing.JButton jbExportCsv;
     private javax.swing.JButton jbRefresh;
     private javax.swing.JButton jbSeek;
+    private javax.swing.JButton jbShowNextYear;
+    private javax.swing.JButton jbShowPrevYear;
     private javax.swing.JLabel jlDateCutOff;
     private javax.swing.JLabel jlIn;
     private javax.swing.JLabel jlItem;
@@ -687,6 +690,20 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     public void focusSeek() {
         if (jtfSeek.isEnabled()) {
             jtfSeek.requestFocus();
+        }
+    }
+
+    public void actionShowPrevYear() {
+        if (mnParamYear > SLibTimeConsts.YEAR_MIN) {
+            jtfYear.setText(miClient.getSessionXXX().getFormatters().getYearFormat().format(--mnParamYear));
+            actionRefresh();
+        }
+    }
+
+    public void actionShowNextYear() {
+        if (mnParamYear < SLibTimeConsts.YEAR_MAX) {
+            jtfYear.setText(miClient.getSessionXXX().getFormatters().getYearFormat().format(++mnParamYear));
+            actionRefresh();
         }
     }
 
@@ -792,6 +809,10 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
             jtfMaintUser.setCaretPosition(0);
         }
         
+        boolean allowChangeYear = mnParamYear >= SLibTimeConsts.YEAR_MIN && mnParamYear <= SLibTimeConsts.YEAR_MAX;
+        jbShowPrevYear.setEnabled(allowChangeYear);
+        jbShowNextYear.setEnabled(allowChangeYear);
+        
         setDecimals();
         showStockMoves();
     }
@@ -825,6 +846,12 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
 
             if (button == jbClose) {
                 actionClose();
+            }
+            if (button == jbShowPrevYear) {
+                actionShowPrevYear();
+            }
+            if (button == jbShowNextYear) {
+                actionShowNextYear();
             }
             else if (button == jbSeek) {
                 actionSeek();
