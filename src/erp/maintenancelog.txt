@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 294.14/ 2026-01-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Integración de cambios de Isabel Danae GARCÍA SERVÍN para el procesamiento de partidas de CFDI de compras como servicios.
+2) Corrección a la omisión del pase de parámetros de monedas en el diálogo de búsqueda de solicitudes de pagos cuando se trata de anticipos.
+3) Habilitación de cambio de año en el filtro de consulta del diálogo del cárdex de almacén.
+
+================================================================================
 SIIE 3.2 294.13/ 2026-01-16
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
@@ -21,7 +29,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 294.11/ 2026-01-12
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Cambio de la dirección de la empresa en saporis internacional
+1) Cambio del domicilio de la empresa en Saporis Internacional en el formato personalizado de impresión de facturas.
 
 ================================================================================
 SIIE 3.2 294.10/ 2026-01-02

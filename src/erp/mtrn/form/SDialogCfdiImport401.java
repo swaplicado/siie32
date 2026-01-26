@@ -1,0 +1,2574 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * SDialogCfdiImport40.java
+ *
+ * Created on 28/07/2022, 02:14:00 PM
+ */
+
+package erp.mtrn.form;
+
+import cfd.ver40.DCfdi40Catalogs;
+import cfd.ver40.DElementConcepto;
+import cfd.ver40.DElementConceptoImpuestoRetencion;
+import cfd.ver40.DElementConceptoImpuestoTraslado;
+import cfd.ver40.DElementConceptoImpuestos;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.form.SFormOptionPicker;
+import erp.form.SFormOptionPickerItems;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STablePane;
+import erp.mbps.data.SDataBizPartner;
+import erp.mfin.data.SDataCostCenter;
+import erp.mfin.data.SDataTax;
+import erp.mfin.data.SDataTaxRegion;
+import erp.mitm.data.SDataItem;
+import erp.mitm.data.SDataMatchingItemBizPartnerConcept;
+import erp.mitm.data.SDataUnit;
+import erp.mitm.data.SItemUtilities;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.bps.db.SBpsUtils;
+import erp.mod.cfg.swap.form.SDialogPdfViewer;
+import erp.mod.cfg.swap.form.SDocumentInfo;
+import erp.mod.cfg.swap.form.SDocumentUtils;
+import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataDpsCfd;
+import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataDpsEntryTax;
+import erp.mtrn.data.SDataDpsEntryTaxRow;
+import erp.mtrn.data.SDataEntryDpsDpsLink;
+import erp.mtrn.data.SRowCfdiImport40;
+import erp.mtrn.data.SRowCfdiTaxImport40;
+import erp.mtrn.data.STrnDpsUtilities;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
+import sa.lib.grid.SGridRow;
+import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiUtils;
+
+/**
+ * Diálogo para importar CFDI 4.0 tipo "I" en un nuevo DPS.
+ * 
+ * @author Isabel Servín, Sergio Flores
+ */
+public class SDialogCfdiImport401 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
+    
+    private static final int ITEM_MAIN = 1;
+    private static final int ITEM_REF = 2;
+    
+    private static final int COL_ITEM_NAME = 8;
+    private static final int COL_FACT_CONV = 11;
+    
+    private final erp.client.SClientInterface miClient;
+    private int mnFormResult;
+    private boolean mbFirstTime;
+    private java.util.Vector<SFormField> mvFields;
+    private erp.lib.table.STablePane moConceptTablePane; 
+    private erp.lib.table.STablePane moCfdiTaxesTablePane; 
+    private erp.lib.table.STablePane moSiieTaxesTablePane; 
+
+    private cfd.ver40.DElementComprobante moComprobante;
+    private final SDataDps moPurchaseOrder;
+    private SDataDps moNewDps;
+    private SDataBizPartner moBizPartnerEmisor;
+    private SDataBizPartner moBizPartnerReceptor;
+    private SFormOptionPickerItems moPickerItems;
+    private SFormOptionPicker moPickerUnit;
+    private SFormOptionPicker moPickerTaxRegion;
+    private SFormOptionPicker moPickerCostCenter;
+
+    private SFormField moFieldTaxRegion;
+    private SFormField moFieldDpsNature;
+    private SFormField moFieldFunctionalSubArea;
+    private SFormOptionPicker moPickerOpsType;
+    private File moCfdiFile;
+    private File moPdfFile;
+    private SDocumentInfo moDocumentInfo;
+    private int mnCfdiCurrencyId;
+    private SDialogPdfViewer moDialogPdfViewer;
+    private SDialogCfdiPurchaseOrder40 moDialogCfdiPurchaseOrder;
+    
+    SRowCfdiImport40 moRowCfdiCopy;
+
+    /** Creates new form SDialogDpsLink
+     * @param client
+     * @param purchaseOrder
+     * @param cfdiFile
+     * @param pdfFile
+     * @param documentInfo
+     */
+    public SDialogCfdiImport401(erp.client.SClientInterface client, SDataDps purchaseOrder, File cfdiFile, File pdfFile, SDocumentInfo documentInfo) {
+        super(client.getFrame(), true);
+        miClient = client;
+        moPurchaseOrder = purchaseOrder;
+        moCfdiFile = cfdiFile;
+        moPdfFile = pdfFile;
+        moDocumentInfo = documentInfo;
+        
+        initComponents();
+        initComponentsExtra();
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jpCfdiImport = new javax.swing.JPanel();
+        jpCfdiData = new javax.swing.JPanel();
+        jpCfdiHeader = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jlNameEmisor = new javax.swing.JLabel();
+        jtfNameEmisor = new javax.swing.JTextField();
+        jlRfcEmisor = new javax.swing.JLabel();
+        jtfRfcEmisor = new javax.swing.JTextField();
+        jPanel12 = new javax.swing.JPanel();
+        jlInvoiceCfdi = new javax.swing.JLabel();
+        jtfInvoiceCfdi = new javax.swing.JTextField();
+        jtfPaymentType = new javax.swing.JTextField();
+        jbViewInvoicePdf = new javax.swing.JButton();
+        jlDateCfdi = new javax.swing.JLabel();
+        jtfDateCfdi = new javax.swing.JTextField();
+        jpImportAdditionalData = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jlTaxRegion = new javax.swing.JLabel();
+        jcbTaxRegion = new javax.swing.JComboBox();
+        jbPickTaxRegion = new javax.swing.JButton();
+        jPanel13 = new javax.swing.JPanel();
+        jlPurchaseOrderNumber = new javax.swing.JLabel();
+        jtfPurchaseOrderNumber = new javax.swing.JTextField();
+        jlPurchaseOrderDate = new javax.swing.JLabel();
+        jtfPurchaseOrderDate = new javax.swing.JTextField();
+        jbViewPurchaseOrder = new javax.swing.JButton();
+        jpCfdiConcepts = new javax.swing.JPanel();
+        jpCfdiConceptsGrid = new javax.swing.JPanel();
+        jpCfdiConceptsGridCommands = new javax.swing.JPanel();
+        jbCopyRow = new javax.swing.JButton();
+        jbPasteRow = new javax.swing.JButton();
+        jtfCopyRowInfo = new javax.swing.JTextField();
+        jlDpsNature = new javax.swing.JLabel();
+        jcbDpsNature = new javax.swing.JComboBox();
+        jlFunctionalSubArea = new javax.swing.JLabel();
+        jcbFunctionalSubArea = new javax.swing.JComboBox();
+        jpCfdiConceptsData = new javax.swing.JPanel();
+        jpCfdiConceptsDataNorth = new javax.swing.JPanel();
+        jpCfdiConceptSetup = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jbSelectItem = new javax.swing.JButton();
+        jbSelectOpsType = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
+        jbSelectUnit = new javax.swing.JButton();
+        jbSelectCostCenter = new javax.swing.JButton();
+        jPanel16 = new javax.swing.JPanel();
+        jbSelectTaxRegion = new javax.swing.JButton();
+        jbSelectReferenceItem = new javax.swing.JButton();
+        jPanel17 = new javax.swing.JPanel();
+        jlIsItemNameEditable = new javax.swing.JLabel();
+        jpCfdiConceptPurchaseOrder = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jbSelectPurchaseOrderEntry = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jlPoBefore = new javax.swing.JLabel();
+        jlPoAfter = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
+        jbSelectPurchaseOrderEntry1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jlPoOriginalQuantity = new javax.swing.JLabel();
+        jtfPoOriginalQuantity = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
+        jlPoEntry = new javax.swing.JLabel();
+        jtfPoEntry = new javax.swing.JTextField();
+        jlPoProcessedQuantity = new javax.swing.JLabel();
+        jtfPoProcessedQuantity = new javax.swing.JTextField();
+        jtfPoProcessedQuantityCurrent = new javax.swing.JTextField();
+        jPanel10 = new javax.swing.JPanel();
+        jlPoSurplusPct = new javax.swing.JLabel();
+        jtfPoSurplusPct = new javax.swing.JTextField();
+        jlPoPendingQuantity = new javax.swing.JLabel();
+        jtfPoPendingQuantity = new javax.swing.JTextField();
+        jtfPoPendingQuantityCurrent = new javax.swing.JTextField();
+        jpCfdiConceptsDataCenter = new javax.swing.JPanel();
+        jpCfdiConceptTaxes = new javax.swing.JPanel();
+        jpCfdiTaxes = new javax.swing.JPanel();
+        jpSiieTaxes = new javax.swing.JPanel();
+        jpCfdiTotal = new javax.swing.JPanel();
+        jPanel = new javax.swing.JPanel();
+        jlCurrency = new javax.swing.JLabel();
+        jtfCurrency = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jlSubtotal = new javax.swing.JLabel();
+        jtfSubtotal = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jlExchangeRate = new javax.swing.JLabel();
+        jtfExchangeRate = new javax.swing.JTextField();
+        jlChargedTaxes = new javax.swing.JLabel();
+        jtfChargedTaxes = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        jlProvSubtotal = new javax.swing.JLabel();
+        jtfProvSubtotal = new javax.swing.JTextField();
+        jlRetainedTaxes = new javax.swing.JLabel();
+        jtfRetainedTaxes = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jlDiscountDoc = new javax.swing.JLabel();
+        jtfDiscountDoc = new javax.swing.JTextField();
+        jlTotal = new javax.swing.JLabel();
+        jtfTotal = new javax.swing.JTextField();
+        jpControls = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Vinculación de documento de compras-ventas");
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
+
+        jpCfdiImport.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpCfdiImport.setLayout(new java.awt.BorderLayout());
+
+        jpCfdiData.setLayout(new java.awt.BorderLayout());
+
+        jpCfdiHeader.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos generales del CFDI:"));
+        jpCfdiHeader.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNameEmisor.setText("Emisor:");
+        jlNameEmisor.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel6.add(jlNameEmisor);
+
+        jtfNameEmisor.setEditable(false);
+        jtfNameEmisor.setFocusable(false);
+        jtfNameEmisor.setPreferredSize(new java.awt.Dimension(265, 23));
+        jPanel6.add(jtfNameEmisor);
+
+        jlRfcEmisor.setText("  RFC:");
+        jlRfcEmisor.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel6.add(jlRfcEmisor);
+
+        jtfRfcEmisor.setEditable(false);
+        jtfRfcEmisor.setFocusable(false);
+        jtfRfcEmisor.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel6.add(jtfRfcEmisor);
+
+        jpCfdiHeader.add(jPanel6);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlInvoiceCfdi.setText("Folio CFDI:");
+        jlInvoiceCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel12.add(jlInvoiceCfdi);
+
+        jtfInvoiceCfdi.setEditable(false);
+        jtfInvoiceCfdi.setFocusable(false);
+        jtfInvoiceCfdi.setPreferredSize(new java.awt.Dimension(180, 23));
+        jPanel12.add(jtfInvoiceCfdi);
+
+        jtfPaymentType.setEditable(false);
+        jtfPaymentType.setToolTipText("Método pago");
+        jtfPaymentType.setFocusable(false);
+        jtfPaymentType.setPreferredSize(new java.awt.Dimension(52, 23));
+        jPanel12.add(jtfPaymentType);
+
+        jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
+        jbViewInvoicePdf.setToolTipText("Ver PDF del CFDI...");
+        jbViewInvoicePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jbViewInvoicePdf);
+
+        jlDateCfdi.setText("  Fecha CFDI:");
+        jlDateCfdi.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel12.add(jlDateCfdi);
+
+        jtfDateCfdi.setEditable(false);
+        jtfDateCfdi.setFocusable(false);
+        jtfDateCfdi.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel12.add(jtfDateCfdi);
+
+        jpCfdiHeader.add(jPanel12);
+
+        jpCfdiData.add(jpCfdiHeader, java.awt.BorderLayout.CENTER);
+
+        jpImportAdditionalData.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales de importación:"));
+        jpImportAdditionalData.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTaxRegion.setText("Región impuestos:*");
+        jlTaxRegion.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlTaxRegion);
+
+        jcbTaxRegion.setPreferredSize(new java.awt.Dimension(275, 23));
+        jPanel8.add(jcbTaxRegion);
+
+        jbPickTaxRegion.setText("...");
+        jbPickTaxRegion.setToolTipText("Seleccionar región de impuestos...");
+        jbPickTaxRegion.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel8.add(jbPickTaxRegion);
+
+        jpImportAdditionalData.add(jPanel8);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPurchaseOrderNumber.setText("Folio OC:");
+        jlPurchaseOrderNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlPurchaseOrderNumber);
+
+        jtfPurchaseOrderNumber.setEditable(false);
+        jtfPurchaseOrderNumber.setEnabled(false);
+        jtfPurchaseOrderNumber.setFocusable(false);
+        jtfPurchaseOrderNumber.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel13.add(jtfPurchaseOrderNumber);
+
+        jlPurchaseOrderDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPurchaseOrderDate.setText("  Fecha OC:");
+        jlPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel13.add(jlPurchaseOrderDate);
+
+        jtfPurchaseOrderDate.setEditable(false);
+        jtfPurchaseOrderDate.setEnabled(false);
+        jtfPurchaseOrderDate.setFocusable(false);
+        jtfPurchaseOrderDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel13.add(jtfPurchaseOrderDate);
+
+        jbViewPurchaseOrder.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbViewPurchaseOrder.setToolTipText("Ver OC de la factura...");
+        jbViewPurchaseOrder.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel13.add(jbViewPurchaseOrder);
+
+        jpImportAdditionalData.add(jPanel13);
+
+        jpCfdiData.add(jpImportAdditionalData, java.awt.BorderLayout.EAST);
+
+        jpCfdiImport.add(jpCfdiData, java.awt.BorderLayout.NORTH);
+
+        jpCfdiConcepts.setBorder(javax.swing.BorderFactory.createTitledBorder("Conceptos del CFDI:"));
+        jpCfdiConcepts.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jpCfdiConceptsGrid.setName(""); // NOI18N
+        jpCfdiConceptsGrid.setLayout(new java.awt.BorderLayout(0, 5));
+
+        jpCfdiConceptsGridCommands.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbCopyRow.setText("Copiar datos del renglón");
+        jbCopyRow.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpCfdiConceptsGridCommands.add(jbCopyRow);
+
+        jbPasteRow.setText("Pegar datos del renglón");
+        jbPasteRow.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpCfdiConceptsGridCommands.add(jbPasteRow);
+
+        jtfCopyRowInfo.setEditable(false);
+        jtfCopyRowInfo.setFocusable(false);
+        jtfCopyRowInfo.setPreferredSize(new java.awt.Dimension(175, 23));
+        jpCfdiConceptsGridCommands.add(jtfCopyRowInfo);
+
+        jlDpsNature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDpsNature.setText("Naturaleza doc.:*");
+        jlDpsNature.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCfdiConceptsGridCommands.add(jlDpsNature);
+
+        jcbDpsNature.setEnabled(false);
+        jcbDpsNature.setPreferredSize(new java.awt.Dimension(140, 23));
+        jpCfdiConceptsGridCommands.add(jcbDpsNature);
+
+        jlFunctionalSubArea.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlFunctionalSubArea.setText("Área funcional:*");
+        jlFunctionalSubArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpCfdiConceptsGridCommands.add(jlFunctionalSubArea);
+
+        jcbFunctionalSubArea.setEnabled(false);
+        jcbFunctionalSubArea.setPreferredSize(new java.awt.Dimension(140, 23));
+        jpCfdiConceptsGridCommands.add(jcbFunctionalSubArea);
+
+        jpCfdiConceptsGrid.add(jpCfdiConceptsGridCommands, java.awt.BorderLayout.SOUTH);
+
+        jpCfdiConcepts.add(jpCfdiConceptsGrid, java.awt.BorderLayout.CENTER);
+
+        jpCfdiConceptsData.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jpCfdiConceptsData.setPreferredSize(new java.awt.Dimension(100, 275));
+        jpCfdiConceptsData.setLayout(new java.awt.BorderLayout());
+
+        jpCfdiConceptsDataNorth.setLayout(new java.awt.BorderLayout());
+
+        jpCfdiConceptSetup.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de importación del concepto seleccionado del CFDI:"));
+        jpCfdiConceptSetup.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbSelectItem.setText("Elegir ítem");
+        jbSelectItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel11.add(jbSelectItem);
+
+        jbSelectOpsType.setText("Elegir tipo operación");
+        jbSelectOpsType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel11.add(jbSelectOpsType);
+
+        jpCfdiConceptSetup.add(jPanel11);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbSelectUnit.setText("Elegir unidad");
+        jbSelectUnit.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jbSelectUnit);
+
+        jbSelectCostCenter.setText("Elegir centro costo");
+        jbSelectCostCenter.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jbSelectCostCenter);
+
+        jpCfdiConceptSetup.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbSelectTaxRegion.setText("Elegir región impuestos");
+        jbSelectTaxRegion.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbSelectTaxRegion.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jbSelectTaxRegion);
+
+        jbSelectReferenceItem.setText("Elegir ítem referencia");
+        jbSelectReferenceItem.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbSelectReferenceItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jbSelectReferenceItem);
+
+        jpCfdiConceptSetup.add(jPanel16);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel17.add(jlIsItemNameEditable);
+
+        jpCfdiConceptSetup.add(jPanel17);
+
+        jpCfdiConceptsDataNorth.add(jpCfdiConceptSetup, java.awt.BorderLayout.CENTER);
+
+        jpCfdiConceptPurchaseOrder.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas de la OC del concepto del CFDI:"));
+        jpCfdiConceptPurchaseOrder.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbSelectPurchaseOrderEntry.setText("Elegir partidas OC");
+        jbSelectPurchaseOrderEntry.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel7.add(jbSelectPurchaseOrderEntry);
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel7.add(jLabel1);
+
+        jlPoBefore.setText("Antes:");
+        jlPoBefore.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel7.add(jlPoBefore);
+
+        jlPoAfter.setText("Ahora:");
+        jlPoAfter.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel7.add(jlPoAfter);
+
+        jpCfdiConceptPurchaseOrder.add(jPanel7);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbSelectPurchaseOrderEntry1.setText("Procesar servicio");
+        jbSelectPurchaseOrderEntry1.setEnabled(false);
+        jbSelectPurchaseOrderEntry1.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel14.add(jbSelectPurchaseOrderEntry1);
+
+        jLabel4.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel14.add(jLabel4);
+
+        jlPoOriginalQuantity.setText(" Cant. original:");
+        jlPoOriginalQuantity.setMinimumSize(new java.awt.Dimension(125, 16));
+        jlPoOriginalQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlPoOriginalQuantity);
+
+        jtfPoOriginalQuantity.setEditable(false);
+        jtfPoOriginalQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoOriginalQuantity.setText("999,999,999.9999");
+        jtfPoOriginalQuantity.setFocusable(false);
+        jtfPoOriginalQuantity.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel14.add(jtfPoOriginalQuantity);
+
+        jpCfdiConceptPurchaseOrder.add(jPanel14);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPoEntry.setText("No. de partida:");
+        jlPoEntry.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlPoEntry);
+
+        jtfPoEntry.setEditable(false);
+        jtfPoEntry.setText("1");
+        jtfPoEntry.setFocusable(false);
+        jtfPoEntry.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel9.add(jtfPoEntry);
+
+        jlPoProcessedQuantity.setText(" Cant. procesada:");
+        jlPoProcessedQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlPoProcessedQuantity);
+
+        jtfPoProcessedQuantity.setEditable(false);
+        jtfPoProcessedQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoProcessedQuantity.setText("999,999,999.9999");
+        jtfPoProcessedQuantity.setFocusable(false);
+        jtfPoProcessedQuantity.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel9.add(jtfPoProcessedQuantity);
+
+        jtfPoProcessedQuantityCurrent.setEditable(false);
+        jtfPoProcessedQuantityCurrent.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoProcessedQuantityCurrent.setText("999,999,999.9999");
+        jtfPoProcessedQuantityCurrent.setFocusable(false);
+        jtfPoProcessedQuantityCurrent.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel9.add(jtfPoProcessedQuantityCurrent);
+
+        jpCfdiConceptPurchaseOrder.add(jPanel9);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPoSurplusPct.setText("% excedente:");
+        jlPoSurplusPct.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlPoSurplusPct);
+
+        jtfPoSurplusPct.setEditable(false);
+        jtfPoSurplusPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoSurplusPct.setText("0.0000%");
+        jtfPoSurplusPct.setFocusable(false);
+        jtfPoSurplusPct.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel10.add(jtfPoSurplusPct);
+
+        jlPoPendingQuantity.setText(" Cant. pendiente:");
+        jlPoPendingQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlPoPendingQuantity);
+
+        jtfPoPendingQuantity.setEditable(false);
+        jtfPoPendingQuantity.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoPendingQuantity.setText("999,999,999.9999");
+        jtfPoPendingQuantity.setFocusable(false);
+        jtfPoPendingQuantity.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel10.add(jtfPoPendingQuantity);
+
+        jtfPoPendingQuantityCurrent.setEditable(false);
+        jtfPoPendingQuantityCurrent.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPoPendingQuantityCurrent.setText("999,999,999.9999");
+        jtfPoPendingQuantityCurrent.setFocusable(false);
+        jtfPoPendingQuantityCurrent.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel10.add(jtfPoPendingQuantityCurrent);
+
+        jpCfdiConceptPurchaseOrder.add(jPanel10);
+
+        jpCfdiConceptsDataNorth.add(jpCfdiConceptPurchaseOrder, java.awt.BorderLayout.EAST);
+
+        jpCfdiConceptsData.add(jpCfdiConceptsDataNorth, java.awt.BorderLayout.NORTH);
+
+        jpCfdiConceptsDataCenter.setLayout(new java.awt.BorderLayout());
+
+        jpCfdiConceptTaxes.setLayout(new java.awt.GridLayout(1, 2));
+
+        jpCfdiTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos del concepto del CFDI:"));
+        jpCfdiTaxes.setLayout(new java.awt.BorderLayout());
+        jpCfdiConceptTaxes.add(jpCfdiTaxes);
+
+        jpSiieTaxes.setBorder(javax.swing.BorderFactory.createTitledBorder("Impuestos de la partida de la factura:"));
+        jpSiieTaxes.setLayout(new java.awt.BorderLayout());
+        jpCfdiConceptTaxes.add(jpSiieTaxes);
+
+        jpCfdiConceptsDataCenter.add(jpCfdiConceptTaxes, java.awt.BorderLayout.CENTER);
+
+        jpCfdiTotal.setBorder(javax.swing.BorderFactory.createTitledBorder("Total del CFDI:"));
+        jpCfdiTotal.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCurrency.setText("Moneda:");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel.add(jlCurrency);
+
+        jtfCurrency.setEditable(false);
+        jtfCurrency.setText("TEXT");
+        jtfCurrency.setFocusable(false);
+        jtfCurrency.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel.add(jtfCurrency);
+
+        jLabel6.setPreferredSize(new java.awt.Dimension(55, 25));
+        jPanel.add(jLabel6);
+
+        jlSubtotal.setText("  Subtotal:");
+        jlSubtotal.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel.add(jlSubtotal);
+
+        jtfSubtotal.setEditable(false);
+        jtfSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfSubtotal.setText("999,999,999.99");
+        jtfSubtotal.setFocusable(false);
+        jtfSubtotal.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel.add(jtfSubtotal);
+
+        jpCfdiTotal.add(jPanel);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlExchangeRate.setText("Tipo de cambio:");
+        jlExchangeRate.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel1.add(jlExchangeRate);
+
+        jtfExchangeRate.setEditable(false);
+        jtfExchangeRate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfExchangeRate.setText("999.9999");
+        jtfExchangeRate.setFocusable(false);
+        jtfExchangeRate.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel1.add(jtfExchangeRate);
+
+        jlChargedTaxes.setText("  Imptos. trasladados:");
+        jlChargedTaxes.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel1.add(jlChargedTaxes);
+
+        jtfChargedTaxes.setEditable(false);
+        jtfChargedTaxes.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfChargedTaxes.setText("999,999,999.99");
+        jtfChargedTaxes.setFocusable(false);
+        jtfChargedTaxes.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel1.add(jtfChargedTaxes);
+
+        jpCfdiTotal.add(jPanel1);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlProvSubtotal.setText("Subtotal provisional:");
+        jlProvSubtotal.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel3.add(jlProvSubtotal);
+
+        jtfProvSubtotal.setEditable(false);
+        jtfProvSubtotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfProvSubtotal.setText("999,999,999.99");
+        jtfProvSubtotal.setFocusable(false);
+        jtfProvSubtotal.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel3.add(jtfProvSubtotal);
+
+        jlRetainedTaxes.setText("  Imptos. retenidos:");
+        jlRetainedTaxes.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel3.add(jlRetainedTaxes);
+
+        jtfRetainedTaxes.setEditable(false);
+        jtfRetainedTaxes.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfRetainedTaxes.setText("999,999,999.99");
+        jtfRetainedTaxes.setFocusable(false);
+        jtfRetainedTaxes.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel3.add(jtfRetainedTaxes);
+
+        jpCfdiTotal.add(jPanel3);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDiscountDoc.setText("Descuento:");
+        jlDiscountDoc.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel4.add(jlDiscountDoc);
+
+        jtfDiscountDoc.setEditable(false);
+        jtfDiscountDoc.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfDiscountDoc.setText("999,999,999.99");
+        jtfDiscountDoc.setFocusable(false);
+        jtfDiscountDoc.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel4.add(jtfDiscountDoc);
+
+        jlTotal.setText("  Total:");
+        jlTotal.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel4.add(jlTotal);
+
+        jtfTotal.setEditable(false);
+        jtfTotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfTotal.setText("999,999,999.99");
+        jtfTotal.setFocusable(false);
+        jtfTotal.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel4.add(jtfTotal);
+
+        jpCfdiTotal.add(jPanel4);
+
+        jpCfdiConceptsDataCenter.add(jpCfdiTotal, java.awt.BorderLayout.EAST);
+
+        jpCfdiConceptsData.add(jpCfdiConceptsDataCenter, java.awt.BorderLayout.CENTER);
+
+        jpCfdiConcepts.add(jpCfdiConceptsData, java.awt.BorderLayout.SOUTH);
+
+        jpCfdiImport.add(jpCfdiConcepts, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpCfdiImport, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jpControls.add(jbCancel);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(1040, 709));
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        windowActivated();
+    }//GEN-LAST:event_formWindowActivated
+
+    private void windowActivated() {
+        if (mbFirstTime) {
+            mbFirstTime = false;
+            moConceptTablePane.getTable().requestFocus();
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void initComponentsExtra() {
+        mnFormResult = 0;
+        mbFirstTime = true;
+        
+        // Tabla general (conceptos):
+        
+        int i = 0;
+        STableColumnForm[] columns;
+        
+        moConceptTablePane = new STablePane(miClient);
+        jpCfdiConceptsGrid.add(moConceptTablePane, BorderLayout.CENTER);
+       
+        columns = new STableColumnForm[24];
+        // CFDI:
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. identificación", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Descripción", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "ProdServ", STableConstants.WIDTH_ITEM_KEY);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
+        columns[i].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
+        columns[i++].setCellRenderer(SGridUtils.CellRendererValue8D);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_NUM_SMALLINT);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad SAT", STableConstants.WIDTH_VALUE);
+        // SIIE:
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem", STableConstants.WIDTH_ITEM_KEY);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+        columns[i++].setEditable(true);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "ProdServ SAT", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad ítem", STableConstants.WIDTH_NUM_SMALLINT);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Factor conversión", STableConstants.WIDTH_QUANTITY_2X);
+        columns[i].setCellRenderer(SGridUtils.CellRendererValue8D);
+        columns[i++].setEditable(true);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad equivalente", STableConstants.WIDTH_QUANTITY_2X);
+        columns[i++].setCellRenderer(SGridUtils.CellRendererValue8D);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_NUM_SMALLINT);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad SAT", STableConstants.WIDTH_VALUE);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Región impuestos", 150);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo operación", STableConstants.WIDTH_ITEM);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave centro costo", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", STableConstants.WIDTH_ACCOUNT);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia", STableConstants.WIDTH_ITEM_KEY);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia", 250);
+        // CFDI (complemento):
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor unitario $", STableConstants.WIDTH_QUANTITY_2X);
+        columns[i++].setCellRenderer(SGridUtils.CellRendererValue8D);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Importe $", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(SGridUtils.CellRendererValue2D);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Descuento $", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(SGridUtils.CellRendererValue2D);
+        
+        for (i = 0; i < columns.length; i++) {
+            moConceptTablePane.addTableColumn(columns[i]);
+        }
+        
+        // Tabla impuestos CFDI
+        
+        int j = 0;
+        STableColumnForm[] taxColumns;
+        
+        moCfdiTaxesTablePane = new STablePane(miClient);
+        jpCfdiTaxes.add(moCfdiTaxesTablePane, BorderLayout.CENTER);
+
+        taxColumns = new STableColumnForm[4];
+        taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto", STableConstants.WIDTH_VALUE);
+        taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto (SAT)", STableConstants.WIDTH_VALUE);
+        taxColumns[j++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tasa o cuota", STableConstants.WIDTH_NUM_INTEGER);
+        taxColumns[j] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Factor", STableConstants.WIDTH_VALUE);
+        
+        for (j = 0; j < taxColumns.length; j++) {
+            moCfdiTaxesTablePane.addTableColumn(taxColumns[j]);
+        }
+        
+        // Tabla impuestos SIIE:
+        
+        int k = 0;
+        STableColumnForm[] taxSiieColumns;
+        
+        moSiieTaxesTablePane = new STablePane(miClient);
+        jpSiieTaxes.add(moSiieTaxesTablePane, BorderLayout.CENTER);
+
+        taxSiieColumns = new STableColumnForm[9];
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Impuesto", 200);
+        taxSiieColumns[k] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Tasa", STableConstants.WIDTH_PERCENTAGE);
+        taxSiieColumns[k++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
+        taxSiieColumns[k] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor u.", STableConstants.WIDTH_VALUE_UNITARY);
+        taxSiieColumns[k++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Valor", STableConstants.WIDTH_VALUE);
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Monto $", STableConstants.WIDTH_VALUE);
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Monto mon $", STableConstants.WIDTH_VALUE);
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto", 150);
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cálculo impuesto", 150);
+        taxSiieColumns[k++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Aplicación impuesto", 150);
+        for (k = 0; k < taxSiieColumns.length; k++) {
+            moSiieTaxesTablePane.addTableColumn(taxSiieColumns[k]);
+        }
+        
+        // Listeners:
+        
+        jbOk.addActionListener(this);
+        jbCancel.addActionListener(this);
+        
+        jbViewInvoicePdf.addActionListener(this);
+        jbPickTaxRegion.addActionListener(this);
+        jbViewPurchaseOrder.addActionListener(this);
+        
+        jbCopyRow.addActionListener(this);
+        jbPasteRow.addActionListener(this);
+        
+        jbSelectItem.addActionListener(this);
+        jbSelectUnit.addActionListener(this);
+        jbSelectTaxRegion.addActionListener(this);
+        jbSelectOpsType.addActionListener(this); 
+        jbSelectCostCenter.addActionListener(this);
+        jbSelectReferenceItem.addActionListener(this);
+        
+        jbSelectPurchaseOrderEntry.addActionListener(this);
+        
+        AbstractAction actionOk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { actionOk(); }
+        };
+
+        SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+
+        AbstractAction actionCancel = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { actionCancel(); }
+        };
+
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        
+        // Field con la información de la región de impuestos
+        
+        moFieldTaxRegion = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbTaxRegion, jlTaxRegion);
+        moFieldTaxRegion.setPickerButton(jbPickTaxRegion);
+        moFieldDpsNature = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbDpsNature, jlDpsNature);
+        moFieldFunctionalSubArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFunctionalSubArea, jlFunctionalSubArea);
+        
+        mvFields = new Vector<>();
+        //mvFields.add(moFieldTaxRegion); is not a DPS header field!
+        mvFields.add(moFieldDpsNature);
+        mvFields.add(moFieldFunctionalSubArea);
+        
+        SFormUtilities.populateComboBox(miClient, jcbTaxRegion, SDataConstants.FINU_TAX_REG);
+        SFormUtilities.populateComboBox(miClient, jcbDpsNature, SDataConstants.TRNU_DPS_NAT);
+        
+        if (!isApplingFunctionalAreas()) {
+            SFormUtilities.populateComboBox(miClient, jcbFunctionalSubArea, SModConsts.CFGU_FUNC_SUB); // load all functional sub-areas, "non-applying" inclusive
+        }
+        else {
+            SFormUtilities.populateComboBox(miClient, jcbFunctionalSubArea, SModConsts.CFGU_FUNC_SUB, new int[] { miClient.getSessionXXX().getUser().getPkUserId() }); // load only user-asigned functional sub-areas, "non-applying" may not be included
+        }
+        
+        // Activar o desactivar componentes:
+        
+        jbViewInvoicePdf.setEnabled(isWithInvoicePdf());
+        jcbTaxRegion.setEnabled(!isWithPurchaseOrder());
+        jbPickTaxRegion.setEnabled(!isWithPurchaseOrder());
+        jbViewPurchaseOrder.setEnabled(isWithPurchaseOrder());
+        jcbDpsNature.setEnabled(!isWithPurchaseOrder());
+        jcbFunctionalSubArea.setEnabled(!isWithPurchaseOrder() && isApplingFunctionalAreas());
+        
+        jbCopyRow.setEnabled(!isWithPurchaseOrder());
+        jbPasteRow.setEnabled(false);
+        jbSelectItem.setEnabled(!isWithPurchaseOrder());
+        jbSelectUnit.setEnabled(false);
+        jbSelectTaxRegion.setEnabled(false);
+        jbSelectOpsType.setEnabled(false);
+        jbSelectCostCenter.setEnabled(false);
+        jbSelectReferenceItem.setEnabled(false); 
+        jbSelectPurchaseOrderEntry.setEnabled(isWithPurchaseOrder());
+        
+        jtfPurchaseOrderNumber.setEditable(isWithPurchaseOrder());
+        jtfPurchaseOrderDate.setEditable(isWithPurchaseOrder());
+        jlPurchaseOrderNumber.setEnabled(isWithPurchaseOrder());
+        jlPurchaseOrderDate.setEnabled(isWithPurchaseOrder());
+        jlPoEntry.setEnabled(isWithPurchaseOrder());
+        jlPoSurplusPct.setEnabled(isWithPurchaseOrder());
+        jlPoOriginalQuantity.setEnabled(isWithPurchaseOrder());
+        jlPoProcessedQuantity.setEnabled(isWithPurchaseOrder());
+        jlPoPendingQuantity.setEnabled(isWithPurchaseOrder());
+        jlPoBefore.setEnabled(isWithPurchaseOrder());
+        jlPoAfter.setEnabled(isWithPurchaseOrder());
+        
+        // Borrar texto de las casillas:
+        
+        jtfPoEntry.setText("");
+        jtfPoSurplusPct.setText("");
+        jtfPoOriginalQuantity.setText("");
+        jtfPoProcessedQuantity.setText("");
+        jtfPoPendingQuantity.setText("");
+        jtfPoProcessedQuantityCurrent.setText("");
+        jtfPoPendingQuantityCurrent.setText("");
+        
+        moRowCfdiCopy = null;
+    }
+    
+    private boolean isApplingFunctionalAreas() {
+        return miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
+    }
+    
+    private boolean isWithInvoicePdf() {
+        return moPdfFile != null;
+    }
+    
+    private boolean isWithPurchaseOrder() {
+        return moPurchaseOrder != null;
+    }
+    
+    /**
+     * Asigna los valores del comprobante CFDI a la forma para realizar el empate de los conceptos con los conceptos del CFDI.
+     * @param comprobante CFDI.
+     */
+    public void setComprobante(cfd.ver40.DElementComprobante comprobante) {
+        moComprobante = comprobante;
+        
+        jtfRfcEmisor.setText(comprobante.getEltEmisor().getAttRfc().getString());
+        jtfNameEmisor.setText(comprobante.getEltEmisor().getAttNombre().getString());
+        jtfInvoiceCfdi.setText(comprobante.getAttSerie().getString().isEmpty() && comprobante.getAttFolio().getString().isEmpty() ?
+                "SIN FOLIO" : !comprobante.getAttSerie().getString().isEmpty() ?
+                comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString() :
+                comprobante.getAttFolio().getString());
+        jtfPaymentType.setText(comprobante.getAttMetodoPago().getString());
+        jtfDateCfdi.setText(SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        jtfCurrency.setText(comprobante.getAttMoneda().getString());
+        jtfExchangeRate.setText(SLibUtils.getDecimalFormatExchangeRate().format(comprobante.getAttTipoCambio().getDouble() == 0 ? 1 : comprobante.getAttTipoCambio().getDouble()));
+        jtfProvSubtotal.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getAttSubTotal().getDouble()));
+        jtfDiscountDoc.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getAttDescuento().getDouble()));
+        jtfSubtotal.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getAttSubTotal().getDouble() - comprobante.getAttDescuento().getDouble()));
+        jtfChargedTaxes.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()));
+        jtfRetainedTaxes.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble()));
+        jtfTotal.setText(SLibUtils.getDecimalFormatAmount().format(comprobante.getAttTotal().getDouble()));
+
+        jtfRfcEmisor.setCaretPosition(0); 
+        jtfNameEmisor.setCaretPosition(0);
+        jtfInvoiceCfdi.setCaretPosition(0);
+        jtfPaymentType.setCaretPosition(0);
+        jtfDateCfdi.setCaretPosition(0);
+        jtfCurrency.setCaretPosition(0);
+        jtfExchangeRate.setCaretPosition(0);
+        jtfProvSubtotal.setCaretPosition(0);
+        jtfDiscountDoc.setCaretPosition(0);
+        jtfSubtotal.setCaretPosition(0);
+        jtfChargedTaxes.setCaretPosition(0);
+        jtfRetainedTaxes.setCaretPosition(0);
+        jtfTotal.setCaretPosition(0);
+        
+        int bizPartnerIdEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltEmisor().getAttRfc().getString(), "", SDataConstantsSys.BPSS_CT_BP_SUP);
+        moBizPartnerEmisor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerIdEmisor }, SLibConstants.EXEC_MODE_SILENT);
+        
+        if (moBizPartnerEmisor.getDbmsBizPartnerBranches() != null) {
+            SFormUtilities.locateComboBoxItem(jcbTaxRegion, new int[] { moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getFkTaxRegionId_n() != 0 ? 
+                    moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n() });          
+        } 
+        
+        try {
+            String sql = "SELECT id_cur FROM erp.cfgu_cur WHERE cur_key = '" + moComprobante.getAttMoneda().getString() + "';";
+            
+            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    mnCfdiCurrencyId = resultSet.getInt(1);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
+        if (isWithPurchaseOrder()) {
+            // Ya existe una orden de compra:
+            
+            moBizPartnerReceptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { moPurchaseOrder.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+            
+            String folio = moPurchaseOrder.getComprobanteSerie().isEmpty() ? moPurchaseOrder.getComprobanteFolio() : moPurchaseOrder.getComprobanteSerie() + "-" + moPurchaseOrder.getComprobanteFolio();
+            jtfPurchaseOrderNumber.setText(folio);
+            jtfPurchaseOrderDate.setText(SLibUtils.DbmsDateFormatDate.format(moPurchaseOrder.getDate()));
+
+            jtfPurchaseOrderNumber.setCaretPosition(0);
+            jtfPurchaseOrderDate.setCaretPosition(0);
+            
+            moFieldDpsNature.setKey(new int[] { moPurchaseOrder.getFkDpsNatureId() });
+            moFieldFunctionalSubArea.setKey(new int[] { moPurchaseOrder.getFkFunctionalSubAreaId() });
+        }
+        else {
+            // No existe una orden de compra:
+            
+            int bizPartnerIdReceptor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), comprobante.getEltReceptor().getAttRfc().getString(), "", 0); 
+            
+            moBizPartnerReceptor = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerIdReceptor }, SLibConstants.EXEC_MODE_SILENT);
+            
+            moFieldDpsNature.setKey(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
+            
+            if (!isApplingFunctionalAreas()) {
+                moFieldFunctionalSubArea.setKey(new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
+            }
+            else {
+                if (jcbFunctionalSubArea.getItemCount() == 2) {
+                    jcbFunctionalSubArea.setSelectedIndex(1);
+                }
+            }
+        }
+        
+        populateTables();
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void loadPredefinedMatchedData(SRowCfdiImport40 rowCfdiImport) { // Carga los datos empatados con anterioridad.
+        /*
+        Se busca si ya hay datos de empate para el No. de identificación y el ID. del emisor,
+        si se obtiene un 0 significa que no hay datos de empate anteriores.
+        */
+        
+        DElementConcepto concepto = rowCfdiImport.getConcepto();
+        int matchId = SItemUtilities.getMatchItemBizPartnerId(miClient, concepto.getAttNoIdentificacion().getString(), concepto.getAttClaveProdServ().getString(), moBizPartnerEmisor.getPkBizPartnerId());
+        
+        if (matchId != 0) {
+            // Se cargan los datos del empate anterior:
+            
+            SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
+            match.read(matchId, miClient.getSession().getStatement());
+            
+            SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { match.getFkItemId() }, SLibConstants.EXEC_MODE_SILENT);
+            SDataItem itemReference = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { match.getFkItemReferenceId_n() }, SLibConstants.EXEC_MODE_SILENT);
+            SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int [] { match.getFkUnitId() }, SLibConstants.EXEC_MODE_SILENT);
+            SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, new int [] { match.getFkTaxRegionId() }, SLibConstants.EXEC_MODE_SILENT);
+            SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new String[] { match.getFkCostCenterId_n() }, SLibConstants.EXEC_MODE_SILENT);
+           
+            // Se asignan los valores:
+            rowCfdiImport.setItem(item);
+            
+            if (item.getDbmsDataItemGeneric().getIsItemReferenceRequired() && itemReference == null) {
+                itemReference = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { item.getDbmsFkDefaultItemRefId_n() }, SLibConstants.EXEC_MODE_SILENT);
+            }
+            rowCfdiImport.setItemReference(itemReference);
+            
+            rowCfdiImport.setUnit(unit);
+            rowCfdiImport.setTaxRegion(taxRegion);
+            rowCfdiImport.setCostCenter(costCenter);
+            rowCfdiImport.setConvFactor(match.getFactorConversion());
+            rowCfdiImport.setOperationTypePk(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+            
+            rowCfdiImport.prepareTableRow();
+            setSiieTaxes(rowCfdiImport, 0, 0);
+            
+            // Buscar partida de la OC si es que esta existe 
+            /* XXX se comenta al cambiarse la forma de vinculación de las OC
+            if (moPurchaseOrder != null) {
+                if (moDialogCfdiPurchaseOrder == null) {
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
+                }
+                setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
+                
+                int linkIndex = 0;
+                int cantSameItem = 0;
+                ArrayList<SDataEntryDpsDpsLink> arrDpsLink = (ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK_ALL);
+                // se hace un barrido a las parttidas de la orden de compra y se cuentan cuantas tienen el mismo ítem
+                for (int i = 0; i < arrDpsLink.size(); i++) {
+                    SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(i);
+                    if (dpsLink.getItemId() == item.getPkItemId()) {
+                        cantSameItem++;
+                        linkIndex = i;
+                    }
+                }
+                // se procede hacer el proceso de vinculación sólo si hay una sola partida con el ítem de la factura
+                if (cantSameItem == 1) {
+                    boolean link = false;
+                    double cantConcepto = rowCfdiImport.getConcepto().getAttCantidad().getDouble();
+                    SDataEntryDpsDpsLink dpsLink = arrDpsLink.get(linkIndex);
+                    SDataDpsEntry dpsEty = moPurchaseOrder.getDbmsDpsEntry(arrDpsLink.get(linkIndex).getDpsEntryKey());
+                    
+                    double cantAVincular;
+                    
+                    // si la cantidad del concepto de la factura es menor o igual a la cantidad de la OC
+                    if (cantConcepto <= dpsEty.getOriginalQuantity()) {
+                        cantAVincular = cantConcepto;
+                    }
+                    else {
+                        cantAVincular = dpsEty.getOriginalQuantity();
+                    }
+                    
+                    // la cantidad a vincular debe ser menor de la cantidad pendiente de vincular
+                    if (cantAVincular <= dpsLink.getQuantityToBeLinked()) { 
+                        dpsLink.setQuantityToLink(cantAVincular);
+                        link = true;
+                    }
+                    
+                    if (link) {
+                        rowCfdiImport.getImportedEntryDpsDpsLinks().add(dpsLink);
+                        setMatchDataByPurchaseOrder(rowCfdiImport, dpsEty);
+                        setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                        validateTaxes(rowCfdiImport);
+                    }
+                }
+                rowCfdiImport.prepareTableRow();
+            }
+            */
+        }
+    }
+
+    private void populateTables() {
+        moConceptTablePane.createTable(this);
+        
+        for (int i = 0; i < moComprobante.getEltConceptos().getEltConceptos().size(); i++) {
+            SRowCfdiImport40 row = new SRowCfdiImport40(miClient, moComprobante.getEltConceptos().getEltConceptos().get(i), i + 1);
+            loadPredefinedMatchedData(row);
+            moConceptTablePane.addTableRow(row);
+        }
+        
+        moConceptTablePane.renderTableRows();
+        moConceptTablePane.setTableRowSelection(0);
+        moConceptTablePane.getTable().getColumnModel().getColumn(COL_FACT_CONV).setCellEditor(moConceptTablePane.getTable().getDefaultEditor(Number.class));
+        moConceptTablePane.getTable().getColumnModel().getColumn(COL_ITEM_NAME).setCellEditor(moConceptTablePane.getTable().getDefaultEditor(Number.class));
+        moConceptTablePane.getTable().getColumnModel().getColumn(COL_FACT_CONV).getCellEditor().addCellEditorListener(this);
+        moConceptTablePane.getTable().getColumnModel().getColumn(COL_ITEM_NAME).getCellEditor().addCellEditorListener(this);
+        moConceptTablePane.getTable().getTableHeader().setReorderingAllowed(false);
+        
+        setCfdiTaxesTableValues(0);
+        setSiieTaxesTableValues((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow());
+        setPurchaseOrderPanelValues();
+    }
+       
+    private void actionOk() {
+        SFormValidation validation = validateForm();
+                
+        if (!validation.getIsError()) {
+            moNewDps = createAndRefreshDps();
+        }
+        else { 
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            
+            moConceptTablePane.setTableRowSelection((int) validation.getComplement()); // complement is row validating
+            if (!validation.getMessage().isEmpty()) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+    }
+
+    private void actionCancel() {
+        mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+        setVisible(false);
+    }
+
+    private void actionCopyRow() {
+        if (jbCopyRow.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                moRowCfdiCopy = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                jbPasteRow.setEnabled(true);
+                jtfCopyRowInfo.setText("(Datos del renglón #" + (selectedRow + 1) + " copiados)");
+            }
+        }
+    }
+    
+    private void actionPasteRow() {
+        if (jbPasteRow.isEnabled() && moRowCfdiCopy != null) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                
+                rowCfdiImport.setItem(moRowCfdiCopy.getItem());
+                rowCfdiImport.setItemReference(moRowCfdiCopy.getItemReference());
+                rowCfdiImport.setUnit(moRowCfdiCopy.getUnit());
+                rowCfdiImport.setTaxRegion(moRowCfdiCopy.getTaxRegion()); 
+                rowCfdiImport.setCostCenter(moRowCfdiCopy.getCostCenter());
+                rowCfdiImport.setConvFactor(moRowCfdiCopy.getConvFactor());
+                rowCfdiImport.setOperationTypePk(moRowCfdiCopy.getOperationTypePk());
+                rowCfdiImport.prepareTableRow();
+                
+                moConceptTablePane.renderTableRows();
+                moConceptTablePane.setTableRowSelection(selectedRow);
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+                
+                moRowCfdiCopy = null;
+                jbPasteRow.setEnabled(false);
+                jtfCopyRowInfo.setText(""); 
+            }
+        }
+    }
+    
+    private void actionViewInvoicePdf() {
+        if (isWithInvoicePdf()) {
+            if (moDialogPdfViewer == null) {
+                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
+            }
+
+            moDialogPdfViewer.setPdf(moDocumentInfo, moPdfFile);
+            moDialogPdfViewer.setVisible(true);
+        }
+    }
+    
+    private void actionPickTaxRegion() {
+        miClient.pickOption(SDataConstants.FINU_TAX_REG, moFieldTaxRegion, null);
+    }
+
+    private void actionViewPurchaseOrder() {
+        if (isWithPurchaseOrder()) {
+            miClient.getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+            miClient.getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, moPurchaseOrder.getPrimaryKey());
+        }
+    }
+    
+    /**
+     * 
+     * @param choiceOfItem Indica el ítem deseado: ITEM_MAIN or ITEM_REF.
+     */
+    private void actionSelectItem(int choiceOfItem) { 
+        if (choiceOfItem == ITEM_MAIN ? jbSelectItem.isEnabled() : jbSelectReferenceItem.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else if (jcbTaxRegion.getSelectedIndex() <= 0) {
+                jcbTaxRegion.requestFocus();
+                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlTaxRegion) + "'.");
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+
+                if (moPickerItems == null) {
+                    moPickerItems = SFormOptionPickerItems.createOptionPicker(miClient, SDataConstants.ITMX_ITEM_IOG, moPickerItems);
+                }
+
+                moPickerItems.formReset();
+
+                if (choiceOfItem == ITEM_MAIN) {
+                    moPickerItems.setFilterKey(SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
+                }
+
+                moPickerItems.formRefreshOptionPane();
+                moPickerItems.setSelectedPrimaryKey(rowCfdiImport.getItem() != null ? new int [] { rowCfdiImport.getItem().getPkItemId() } : null);
+                moPickerItems.setFormVisible(true); 
+
+                if (moPickerItems.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, (int[]) moPickerItems.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                    if (choiceOfItem == ITEM_MAIN) {
+                        rowCfdiImport.setItem(item);
+
+                        // se busca si el ítem principal requiere un ítem de refefencia, de ser así, se asigna:
+                        if (rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired()) {
+                            SDataItem itemReference = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { rowCfdiImport.getItem().getDbmsFkDefaultItemRefId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                            rowCfdiImport.setItemReference(itemReference);
+                        }
+                        else {
+                            rowCfdiImport.setItemReference(null);
+                        }
+
+                        // se asigna la unidad del ítem principal:
+                        rowCfdiImport.setUnit(item.getDbmsDataUnit());
+
+                        // se asigna la región de impuestos seleccionada:
+                        SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, ((SFormComponentItem) jcbTaxRegion.getSelectedItem()).getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        rowCfdiImport.setTaxRegion(taxRegion);
+
+                        // se asigna tipo de operación por defecto:
+                        if (rowCfdiImport.getOperationTypePk() == 0) {
+                            rowCfdiImport.setOperationTypePk(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+                        }
+
+                        // se obtiene y se asigna el centro de costo definido para el ítem principal:
+                        rowCfdiImport.setCostCenter(getCostCenterByItem(item));
+                    }
+                    else {
+                        // es ítem de referencia:
+                        rowCfdiImport.setItemReference(item);
+                    }
+
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                }
+
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+            }
+        }
+    }
+
+    private void actionSelectUnit() {
+        if (jbSelectUnit.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {    
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                SDataItem item = rowCfdiImport.getItem();
+                
+                if (moPickerUnit == null) {
+                    moPickerUnit = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.ITMU_UNIT, moPickerUnit);
+                }
+                
+                moPickerUnit.formReset();
+                moPickerUnit.setFilterKey(new int[] { item.getDbmsDataItemGeneric().getFkUnitTypeId() });
+                moPickerUnit.formRefreshOptionPane();
+                moPickerUnit.setSelectedPrimaryKey(rowCfdiImport.getUnit() != null ? new int [] { rowCfdiImport.getUnit().getPkUnitId() } : null);
+                moPickerUnit.setFormVisible(true); 
+
+                if (moPickerUnit.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, moPickerUnit.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                    rowCfdiImport.setUnit(unit);
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                }
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+            }
+        }
+    }
+
+    private void actionSelectTaxesRegion() {
+        if (jbSelectTaxRegion.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                
+                if (moPickerTaxRegion == null) {
+                    moPickerTaxRegion = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.FINU_TAX_REG, moPickerTaxRegion);
+                }
+                
+                moPickerTaxRegion.formReset();
+                moPickerTaxRegion.formRefreshOptionPane();
+                moPickerTaxRegion.setSelectedPrimaryKey(moFieldTaxRegion.getKey());
+                moPickerTaxRegion.setFormVisible(true); 
+
+                if (moPickerTaxRegion.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, moPickerTaxRegion.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                    rowCfdiImport.setTaxRegion(taxRegion);
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                }
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+            }
+        }
+    }
+    
+    private void actionSelectOpsType() {
+        if (jbSelectOpsType.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                
+                if (moPickerOpsType == null) {
+                    moPickerOpsType = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.TRNX_OPE_TYPE, moPickerOpsType);
+                }
+                
+                moPickerOpsType.formReset();
+                moPickerOpsType.setFilterKey(SDataConstantsSys.TRNX_TP_DPS_DOC);
+                moPickerOpsType.formRefreshOptionPane();
+                moPickerOpsType.setFormVisible(true);
+                
+                if (moPickerOpsType.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    Object[] keyObject = (Object[]) moPickerOpsType.getSelectedPrimaryKey();
+                    Long key = (Long) keyObject[0];
+                    
+                    rowCfdiImport.setOperationTypePk(key.intValue());
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                }
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+            }
+        }
+    }
+    
+    private void actionSelectCostCenter() {
+        if (jbSelectCostCenter.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                
+                if (moPickerCostCenter == null) {        
+                    moPickerCostCenter = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.FIN_CC, moPickerCostCenter);
+                }
+                
+                moPickerCostCenter.formReset();
+                moPickerCostCenter.formRefreshOptionPane();
+                
+                try {
+                    moPickerCostCenter.setSelectedPrimaryKey(SDataUtilities.obtainCostCenterItem(miClient.getSession(), rowCfdiImport.getItem().getPkItemId()));
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
+                
+                moPickerCostCenter.setFormVisible(true); 
+
+                if (moPickerCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, moPickerCostCenter.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                    
+                    rowCfdiImport.setCostCenter(costCenter);
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                }
+                
+                if (moPurchaseOrder != null) {
+                    setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                }
+                else {
+                    setSiieTaxes(rowCfdiImport, 0, 0);
+                }
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void actionSelectPurchaseOrderEntry() {
+        if (jbSelectPurchaseOrderEntry.isEnabled()) {
+            int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else if (jcbTaxRegion.getSelectedIndex() <= 0) {
+                jcbTaxRegion.requestFocus();
+                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlTaxRegion) + "'.");
+            }
+            else {
+                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+                
+                if (moDialogCfdiPurchaseOrder == null) {
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
+                }
+                setDialogCfdiPurchaseOrderCfdiRow(rowCfdiImport);
+                
+                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINKED, rowCfdiImport.getImportedEntryDpsDpsLinks());
+                moDialogCfdiPurchaseOrder.setFormVisible(true);
+                
+                if (moDialogCfdiPurchaseOrder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    rowCfdiImport.getImportedEntryDpsDpsLinks().clear();
+                    rowCfdiImport.getImportedEntryDpsDpsLinks().addAll((ArrayList<SDataEntryDpsDpsLink>) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ENTRY_DPS_DPS_LINK)); 
+                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_FACTOR_CONV));
+                    setMatchDataByPurchaseOrder(rowCfdiImport, (ArrayList<SDataDpsEntry>) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
+                    
+                    if (moPurchaseOrder != null) {
+                        setSiieTaxes(rowCfdiImport, moPurchaseOrder.getFkTaxIdentityEmisorTypeId(), moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+                    }
+                    else {
+                        setSiieTaxes(rowCfdiImport, 0, 0);
+                    }
+                    rowCfdiImport.prepareTableRow();
+                    moConceptTablePane.renderTableRows();
+                    moConceptTablePane.setTableRowSelection(selectedRow);
+                    setPurchaseOrderPanelValues();
+                    validateTaxes(rowCfdiImport);
+                }
+            }
+        }
+    }
+    
+    private void setDialogCfdiPurchaseOrderCfdiRow(SRowCfdiImport40 rowCfdiImport) {
+        moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder40(miClient);
+        
+        moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
+                
+        HashMap<String, Double> purchaseOrderEntries = new HashMap<>(); // key: PK of entry of purchase order as a String; value: total quantity already assigned from entry
+
+        for (SGridRow row : moConceptTablePane.getTableModel().getTableRows()) {
+            SRowCfdiImport40 rci = (SRowCfdiImport40) row; // variable de conveniencia
+
+            if (rci != rowCfdiImport && !rci.getImportedEntryDpsDpsLinks().isEmpty()) {
+                for (SDataEntryDpsDpsLink entryDpsDpsLink : rci.getImportedEntryDpsDpsLinks()) {
+                    String key = SLibUtils.textKey(entryDpsDpsLink.getDpsEntryKey());
+                    Double quantityToLink = purchaseOrderEntries.get(key);
+
+                    if (quantityToLink == null) {
+                        quantityToLink = entryDpsDpsLink.getQuantityToLink();
+                    }
+                    else {
+                        quantityToLink += entryDpsDpsLink.getQuantityToLink();
+                    }
+                    purchaseOrderEntries.put(key, quantityToLink);
+                }
+            }
+        }
+
+        moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
+        moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder40.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
+    }
+
+    private void updateNameItem() {
+        if (((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow()).getItem().getDbmsDataItemGeneric().getIsItemNameEditable()) {
+            String concept = ((String) moConceptTablePane.getSelectedTableRow().getValues().get(COL_ITEM_NAME)); 
+            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SFormDpsEntry.CONCEPT_LENGTH_MAX);
+            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+            row.getItem().setItem(concept);
+            for (SDataDpsEntry entry : row.getNewDpsEntries()) {
+                entry.setConcept(concept);
+            }
+            row.prepareTableRow();
+        }
+        else {
+            miClient.showMsgBoxInformation("El concepto que esta tratando modificar no es editable.");
+        }
+        
+        int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+        moConceptTablePane.renderTableRows();
+        moConceptTablePane.setTableRowSelection(selectedRow);
+    }
+    
+    private void updateConversionFactor() { 
+        SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+        row.setConvFactor((double) moConceptTablePane.getSelectedTableRow().getValues().get(COL_FACT_CONV));
+        row.prepareTableRow();
+        
+        int selectedRow = moConceptTablePane.getTable().getSelectedRow();
+        moConceptTablePane.renderTableRows();
+        moConceptTablePane.setTableRowSelection(selectedRow);
+    }
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCopyRow;
+    private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbPasteRow;
+    private javax.swing.JButton jbPickTaxRegion;
+    private javax.swing.JButton jbSelectCostCenter;
+    private javax.swing.JButton jbSelectItem;
+    private javax.swing.JButton jbSelectOpsType;
+    private javax.swing.JButton jbSelectPurchaseOrderEntry;
+    private javax.swing.JButton jbSelectPurchaseOrderEntry1;
+    private javax.swing.JButton jbSelectReferenceItem;
+    private javax.swing.JButton jbSelectTaxRegion;
+    private javax.swing.JButton jbSelectUnit;
+    private javax.swing.JButton jbViewInvoicePdf;
+    private javax.swing.JButton jbViewPurchaseOrder;
+    private javax.swing.JComboBox jcbDpsNature;
+    private javax.swing.JComboBox jcbFunctionalSubArea;
+    private javax.swing.JComboBox jcbTaxRegion;
+    private javax.swing.JLabel jlChargedTaxes;
+    private javax.swing.JLabel jlCurrency;
+    private javax.swing.JLabel jlDateCfdi;
+    private javax.swing.JLabel jlDiscountDoc;
+    private javax.swing.JLabel jlDpsNature;
+    private javax.swing.JLabel jlExchangeRate;
+    private javax.swing.JLabel jlFunctionalSubArea;
+    private javax.swing.JLabel jlInvoiceCfdi;
+    private javax.swing.JLabel jlIsItemNameEditable;
+    private javax.swing.JLabel jlNameEmisor;
+    private javax.swing.JLabel jlPoAfter;
+    private javax.swing.JLabel jlPoBefore;
+    private javax.swing.JLabel jlPoEntry;
+    private javax.swing.JLabel jlPoOriginalQuantity;
+    private javax.swing.JLabel jlPoPendingQuantity;
+    private javax.swing.JLabel jlPoProcessedQuantity;
+    private javax.swing.JLabel jlPoSurplusPct;
+    private javax.swing.JLabel jlProvSubtotal;
+    private javax.swing.JLabel jlPurchaseOrderDate;
+    private javax.swing.JLabel jlPurchaseOrderNumber;
+    private javax.swing.JLabel jlRetainedTaxes;
+    private javax.swing.JLabel jlRfcEmisor;
+    private javax.swing.JLabel jlSubtotal;
+    private javax.swing.JLabel jlTaxRegion;
+    private javax.swing.JLabel jlTotal;
+    private javax.swing.JPanel jpCfdiConceptPurchaseOrder;
+    private javax.swing.JPanel jpCfdiConceptSetup;
+    private javax.swing.JPanel jpCfdiConceptTaxes;
+    private javax.swing.JPanel jpCfdiConcepts;
+    private javax.swing.JPanel jpCfdiConceptsData;
+    private javax.swing.JPanel jpCfdiConceptsDataCenter;
+    private javax.swing.JPanel jpCfdiConceptsDataNorth;
+    private javax.swing.JPanel jpCfdiConceptsGrid;
+    private javax.swing.JPanel jpCfdiConceptsGridCommands;
+    private javax.swing.JPanel jpCfdiData;
+    private javax.swing.JPanel jpCfdiHeader;
+    private javax.swing.JPanel jpCfdiImport;
+    private javax.swing.JPanel jpCfdiTaxes;
+    private javax.swing.JPanel jpCfdiTotal;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpImportAdditionalData;
+    private javax.swing.JPanel jpSiieTaxes;
+    private javax.swing.JTextField jtfChargedTaxes;
+    private javax.swing.JTextField jtfCopyRowInfo;
+    private javax.swing.JTextField jtfCurrency;
+    private javax.swing.JTextField jtfDateCfdi;
+    private javax.swing.JTextField jtfDiscountDoc;
+    private javax.swing.JTextField jtfExchangeRate;
+    private javax.swing.JTextField jtfInvoiceCfdi;
+    private javax.swing.JTextField jtfNameEmisor;
+    private javax.swing.JTextField jtfPaymentType;
+    private javax.swing.JTextField jtfPoEntry;
+    private javax.swing.JTextField jtfPoOriginalQuantity;
+    private javax.swing.JTextField jtfPoPendingQuantity;
+    private javax.swing.JTextField jtfPoPendingQuantityCurrent;
+    private javax.swing.JTextField jtfPoProcessedQuantity;
+    private javax.swing.JTextField jtfPoProcessedQuantityCurrent;
+    private javax.swing.JTextField jtfPoSurplusPct;
+    private javax.swing.JTextField jtfProvSubtotal;
+    private javax.swing.JTextField jtfPurchaseOrderDate;
+    private javax.swing.JTextField jtfPurchaseOrderNumber;
+    private javax.swing.JTextField jtfRetainedTaxes;
+    private javax.swing.JTextField jtfRfcEmisor;
+    private javax.swing.JTextField jtfSubtotal;
+    private javax.swing.JTextField jtfTotal;
+    // End of variables declaration//GEN-END:variables
+
+    public void setFormVisible(final boolean visible) {
+        setVisible(visible);
+    }
+
+    private void setCfdiTaxesTableValues(final int selectedRow) { 
+        moCfdiTaxesTablePane.createTable();
+        moCfdiTaxesTablePane.clearTableRows();
+        
+        cfd.ver40.DElementConceptoImpuestos oImpuestos = moComprobante.getEltConceptos().getEltConceptos().get(selectedRow).getEltOpcConceptoImpuestos();
+        if (oImpuestos != null) {
+            if (oImpuestos.getEltOpcImpuestosTrasladados() != null) {
+                for (int i = 0; i < oImpuestos.getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados().size(); i++) {
+                    moCfdiTaxesTablePane.addTableRow(new SRowCfdiTaxImport40(oImpuestos, SModSysConsts.FINS_TP_TAX_CHARGED, i));
+                }
+            }
+            if (oImpuestos.getEltOpcImpuestosRetenciones() != null) {
+                for (int i = 0; i < oImpuestos.getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().size(); i++) {
+                    moCfdiTaxesTablePane.addTableRow(new SRowCfdiTaxImport40(oImpuestos, SModSysConsts.FINS_TP_TAX_RETAINED, i));
+                }
+            }
+            
+            moCfdiTaxesTablePane.renderTableRows();
+            moCfdiTaxesTablePane.setTableRowSelection(0);
+        }
+    }
+    
+    private void setEnabledButtons(final SRowCfdiImport40 rowCfdiImport) { 
+        if (rowCfdiImport != null) {
+            if (!isWithPurchaseOrder()) {
+                jbSelectUnit.setEnabled(rowCfdiImport.getItem() != null);
+                jbSelectTaxRegion.setEnabled(rowCfdiImport.getItem() != null); 
+                jbSelectOpsType.setEnabled(rowCfdiImport.getItem() != null); 
+            }
+            
+            jbSelectCostCenter.setEnabled(rowCfdiImport.getItem() != null);
+            jbSelectReferenceItem.setEnabled(rowCfdiImport.getItem() != null && rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired());
+        }
+        else {
+            jbSelectUnit.setEnabled(false);
+            jbSelectTaxRegion.setEnabled(false); 
+            jbSelectOpsType.setEnabled(false); 
+            
+            jbSelectCostCenter.setEnabled(false);
+            jbSelectReferenceItem.setEnabled(false);
+        }    
+    }
+    
+    private void setSiieTaxes(final SRowCfdiImport40 rowCfdiImport, int taxIdyEmir, int taxIdyRecr) {
+        try {
+            rowCfdiImport.refreshDpsEntries();
+            calculateTotalDpsEntry(rowCfdiImport, taxIdyEmir, taxIdyRecr); 
+            setSiieTaxesTableValues(rowCfdiImport);
+            
+            DElementConceptoImpuestos impuestos = rowCfdiImport.getConcepto().getEltOpcConceptoImpuestos();
+            
+            if (impuestos != null) {
+                if (impuestos.getEltOpcImpuestosTrasladados() != null) {
+                    ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> trasladado = impuestos.getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                    
+                    for (int i = 0; trasladado.size() > i; i++) { 
+                        SDataTax tax = SCfdUtils.obtainTaxCharged(miClient, trasladado.get(i));
+                        
+                        if (tax != null) {
+                            int cantDpsEntries = rowCfdiImport.getNewDpsEntries().size();
+                            for (SDataDpsEntry newDpsEntry : rowCfdiImport.getNewDpsEntries()) {
+                                for(int j = 0; j < newDpsEntry.getDbmsEntryTaxes().size(); j++) {
+                                    SDataDpsEntryTax dpsEntryTax = newDpsEntry.getDbmsEntryTaxes().get(j);
+
+                                    if (dpsEntryTax.getPkTaxBasicId() == tax.getPkTaxBasicId() &&
+                                            dpsEntryTax.getPkTaxId() == tax.getPkTaxId() &&
+                                            SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(trasladado.get(i).getAttTasaOCuota().getDouble())) &&
+                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                        
+                                        newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(trasladado.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        rowCfdiImport.addTaxChargedMatched(trasladado.get(i)); 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (impuestos.getEltOpcImpuestosRetenciones() != null) {
+                    ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retencion = impuestos.getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                    
+                    for (int i = 0; retencion.size() > i ; i++) {                
+                        SDataTax tax = SCfdUtils.obtainTaxRetained(miClient, retencion.get(i));
+                        
+                        if (tax != null) {
+                            int cantDpsEntries = rowCfdiImport.getNewDpsEntries().size();
+                            for (SDataDpsEntry newDpsEntry : rowCfdiImport.getNewDpsEntries()) {
+                                for (int j = 0; j < newDpsEntry.getDbmsEntryTaxes().size(); j++) {
+                                    SDataDpsEntryTax dpsEntryTax = newDpsEntry.getDbmsEntryTaxes().get(j);
+
+                                    if (dpsEntryTax.getPkTaxBasicId() == tax.getPkTaxBasicId() &&
+                                            dpsEntryTax.getPkTaxId() == tax.getPkTaxId() &&
+                                            SLibUtils.DecimalFormatPercentage4D.format(dpsEntryTax.getPercentage()).equals(SLibUtils.DecimalFormatPercentage4D.format(retencion.get(i).getAttTasaOCuota().getDouble())) &&
+                                            dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_RETAINED) {
+
+                                        newDpsEntry.getDbmsEntryTaxes().get(j).setTaxCy(retencion.get(i).getAttImporte().getDouble() / cantDpsEntries);
+                                        rowCfdiImport.addTaxRetainedMatched(retencion.get(i));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    private void calculateTotalDpsEntry(final SRowCfdiImport40 rowCfdiImport, int taxIdyEmir, int taxIdyRecr) {
+        rowCfdiImport.calculateTotalDpsEntries(
+                moComprobante.getAttFecha().getDatetime(), 
+                taxIdyEmir == 0 ? moBizPartnerEmisor.getFkTaxIdentityId() : taxIdyEmir,
+                taxIdyRecr == 0 ? moBizPartnerReceptor.getFkTaxIdentityId() : taxIdyRecr, 
+                miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { mnCfdiCurrencyId }) ? 1.0 : moComprobante.getAttTipoCambio().getDouble());
+    }
+    
+    private void setSiieTaxesTableValues(final SRowCfdiImport40 rowCfdiImport) { 
+        moSiieTaxesTablePane.createTable();
+        moSiieTaxesTablePane.clearTableRows();
+        
+        if (!rowCfdiImport.getNewDpsEntries().isEmpty()) {
+            for (SDataDpsEntry dpsEntry : rowCfdiImport.getNewDpsEntries()) {
+                for (int tax = 0; tax < dpsEntry.getDbmsEntryTaxes().size(); tax++) {
+                    SDataDpsEntryTax entryTax = dpsEntry.getDbmsEntryTaxes().get(tax);
+                    boolean found = false;
+                    for (int row = 0; row < moSiieTaxesTablePane.getTableModelRowCount(); row++) {
+                        SDataDpsEntryTaxRow taxRow = (SDataDpsEntryTaxRow) moSiieTaxesTablePane.getTableRow(row);
+                        if (entryTax.getPkTaxBasicId() == taxRow.getDpsEntryTax().getPkTaxBasicId() &&
+                                entryTax.getPkTaxId() == taxRow.getDpsEntryTax().getPkTaxId() &&
+                                entryTax.getFkTaxTypeId() == taxRow.getDpsEntryTax().getFkTaxTypeId()) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        moSiieTaxesTablePane.addTableRow(new SDataDpsEntryTaxRow(entryTax));
+                    }
+                }
+            }
+        }
+        
+        moSiieTaxesTablePane.renderTableRows();
+        moSiieTaxesTablePane.setTableRowSelection(0);
+    }
+    
+    private void setPurchaseOrderPanelValues() {
+        jtfPoEntry.setText("");
+        jtfPoSurplusPct.setText("");
+        
+        jtfPoOriginalQuantity.setText("");
+        jtfPoProcessedQuantity.setText("");
+        jtfPoPendingQuantity.setText("");
+        
+        jtfPoProcessedQuantityCurrent.setText("");
+        jtfPoPendingQuantityCurrent.setText("");
+        
+        SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
+        
+        if (!rowCfdiImport.getImportedEntryDpsDpsLinks().isEmpty()) {
+            SDataEntryDpsDpsLink entryDpsDpsLink = rowCfdiImport.getImportedEntryDpsDpsLinks().get(0);
+            
+            jtfPoEntry.setText(SLibUtils.DecimalFormatValue0D.format(entryDpsDpsLink.getSortingPosition()));
+            jtfPoSurplusPct.setText(SLibUtils.DecimalFormatPercentage2D.format(entryDpsDpsLink.getSurplusPercentage()));
+
+            jtfPoOriginalQuantity.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantity()));
+            jtfPoProcessedQuantity.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantityLinked()));
+            jtfPoPendingQuantity.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantity() - entryDpsDpsLink.getQuantityLinked()));
+            
+            double processedQuantityCurrent = 0;
+            for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                SRowCfdiImport40 auxRowCfdiImport = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+                
+                if (!auxRowCfdiImport.getImportedEntryDpsDpsLinks().isEmpty()) {
+                    if (SLibUtils.compareKeys(entryDpsDpsLink.getDpsEntryKey(), auxRowCfdiImport.getImportedEntryDpsDpsLinks().get(0).getDpsEntryKey())) {
+                        processedQuantityCurrent += auxRowCfdiImport.getImportedEntryDpsDpsLinks().get(0).getQuantityToLink();
+                    } 
+                }
+            }
+            
+            jtfPoProcessedQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantityLinked() + processedQuantityCurrent));
+            jtfPoPendingQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantity() - entryDpsDpsLink.getQuantityLinked() - processedQuantityCurrent)); 
+        }
+    }
+    
+    private void validateTaxes(SRowCfdiImport40 rowCfdiImport) {
+        boolean showMessage = false;
+        String message = "No corresponden los impuestos con la orden de compra:\n";
+        DElementConcepto concepto = rowCfdiImport.getConcepto();
+        if (concepto.getEltOpcConceptoImpuestos() != null) {
+            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
+                ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                TAXES:
+                for (DElementConceptoImpuestoTraslado traslado : traslados) {
+                    if (!rowCfdiImport.getTaxChargedMatched().contains(traslado)) {
+                        message += "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
+                                + "Tipo: trasladado. \n"
+                                + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
+                                + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".";
+                        showMessage = true;
+                    }
+                }
+            }
+
+            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                TAXES:
+                for (DElementConceptoImpuestoRetencion retencion : retenciones) {
+                    if (!rowCfdiImport.getTaxRetainedMatched().contains(retencion)) { 
+                        message += "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
+                                + "Tipo: retenido. \n"
+                                + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
+                                + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".";
+                        showMessage = true;
+                    }
+                }
+            }
+        }
+        if (showMessage) {
+            miClient.showMsgBoxWarning(message);
+        }
+    }
+    
+    private void setMatchDataByPurchaseOrder(SRowCfdiImport40 rowCfdiImport, ArrayList<SDataDpsEntry> dpsEntries) {
+        for (SDataDpsEntry dpsEntry : dpsEntries) {
+            SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int [] { dpsEntry.getFkItemId() }, SLibConstants.EXEC_MODE_SILENT);
+            rowCfdiImport.setItem(item);
+
+            // si se requiere, se asigna el ítem de referencia de la partida de la orden o el predefinido del ítem principal:
+            if (rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired()) {
+                int itemReferenceId;
+
+                if (dpsEntry.getFkItemRefId_n() != 0) {
+                    itemReferenceId = dpsEntry.getFkItemRefId_n();
+                }
+                else {
+                    itemReferenceId = rowCfdiImport.getItem().getDbmsFkDefaultItemRefId_n();
+                }
+
+                SDataItem itemReference = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { itemReferenceId }, SLibConstants.EXEC_MODE_SILENT);
+                rowCfdiImport.setItemReference(itemReference);
+            }
+            else {
+                rowCfdiImport.setItemReference(null);
+            }
+
+            // se asigna la unidad que viene en la partida del pedido:
+            SDataUnit unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int [] { dpsEntry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
+            rowCfdiImport.setUnit(unit);
+
+            // se asigna la región de impuestos de la partida del pedido:
+            SDataTaxRegion taxRegion = (SDataTaxRegion) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX_REG, new int[] { dpsEntry.getFkTaxRegionId() }, SLibConstants.EXEC_MODE_SILENT);
+            rowCfdiImport.setTaxRegion(taxRegion);
+
+            // se asigna el centro de costo de la partida del pedido o el predefinido del ítem principal:
+            SDataCostCenter costCenter;
+
+            if (!dpsEntry.getFkCostCenterId_n().isEmpty()) {
+                costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new String[] { dpsEntry.getFkCostCenterId_n() }, SLibConstants.EXEC_MODE_SILENT);
+            }
+            else {
+                costCenter = getCostCenterByItem(item);
+            }
+
+            rowCfdiImport.setCostCenter(costCenter);
+
+            // se asigna tipo de operación por defecto:
+            if (rowCfdiImport.getOperationTypePk() == 0) {
+                rowCfdiImport.setOperationTypePk(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+            }
+        }
+        
+        rowCfdiImport.getImportedDpsEntries().clear();
+        rowCfdiImport.getImportedDpsEntries().addAll(dpsEntries);
+    }
+    
+    private SDataCostCenter getCostCenterByItem(final SDataItem item) {
+        SDataCostCenter costCenter = null;
+        
+        try {
+            String costCenterId = SDataUtilities.obtainCostCenterItem(miClient.getSession(), item.getPkItemId());
+            
+            if (!costCenterId.isEmpty()) {
+                costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new String[] { costCenterId }, SLibConstants.EXEC_MODE_SILENT);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
+        return costCenter;
+    }
+    
+    private void setIsItemNameEditable(SRowCfdiImport40 rowCfdiImport) {
+        if (rowCfdiImport != null && rowCfdiImport.getItem() != null) {
+            jlIsItemNameEditable.setText(rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemNameEditable() ? "El concepto es editable" : "El concepto no es editable");
+        }
+        else {
+            jlIsItemNameEditable.setText("El renglón aun no tiene asignado un ítem");
+        }
+    }
+    
+    private SFormValidation validateForm() {
+        SFormValidation validation = new SFormValidation();
+        int rowValidating = 0;
+        ArrayList<LinkedQuantity> arrLinkedQuantity = new ArrayList<>();
+        
+        for (int i = 0; i < mvFields.size(); i++) {
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(mvFields.get(i).getComponent());
+                break;
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            if (isWithPurchaseOrder()) {
+                if (jcbDpsNature.getSelectedIndex() <= 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDpsNature) + "'.");
+                    validation.setComponent(jcbDpsNature); // useless but for consistence: component is disabled!
+                }
+                else if (jcbFunctionalSubArea.getSelectedIndex() <= 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFunctionalSubArea) + "'.");
+                    validation.setComponent(jcbFunctionalSubArea); // useless but for consistence: component is disabled!
+                }
+                
+                for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                    SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+                    if (!row.getImportedEntryDpsDpsLinks().isEmpty()) {
+                        for (int j = 0; j < row.getImportedEntryDpsDpsLinks().size(); j++) {
+                            int[] dpsKey = row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey();
+                            boolean found = false;
+                            for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                                if (SLibUtils.compareKeys(linkedQ.dpsKey, dpsKey)) {
+                                    found = true;
+                                    linkedQ.quantity += row.getImportedEntryDpsDpsLinks().get(j).getQuantityToLink();
+                                }
+                            }
+                            if (!found) {
+                                LinkedQuantity linkedQ = new LinkedQuantity(dpsKey, row.getImportedEntryDpsDpsLinks().get(j).getQuantityToLink());
+                                arrLinkedQuantity.add(linkedQ);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        ROWS:
+        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+            rowValidating = i;
+            
+            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i); // variable de conveniencia
+            DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
+            String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") + concepto.getAttDescripcion().getString();
+            String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
+            
+            if (isWithPurchaseOrder()) {
+                if (row.getImportedEntryDpsDpsLinks().isEmpty()) {
+                    validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+                    break;
+                }
+                else {
+                    for (SDataEntryDpsDpsLink entryDpsDpsLink : row.getImportedEntryDpsDpsLinks()) {
+                        try {
+                            double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                            for (LinkedQuantity linkedQ : arrLinkedQuantity) {
+                                if (SLibUtils.compareKeys(linkedQ.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
+                                    if (totalsupplied > linkedQ.quantity) {
+                                        String message = "Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                                "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQ.quantity ? "mayor o " : "") + "igual a " + 
+                                                SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene surtidos previos.\n" + 
+                                                "¿Está seguro que desea hacer caso omiso y continuar?";
+                                        if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
+                                            validation.setMessage("La cantidad a vincular debería ser al menos " + SLibUtils.getDecimalFormatQuantity().format(linkedQ.quantity) + ".");
+                                        }
+                                        break ROWS;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                }
+                
+                if (!validation.getIsError()) {
+                    double cantConcept = row.getConcepto().getAttCantidad().getDouble();
+                    double convFact = row.getConvFactor();
+                    double toLink = 0;
+                    toLink = SLibUtils.round(row.getImportedEntryDpsDpsLinks().stream().map((entryDpsDpsLink) -> entryDpsDpsLink.getQuantityToLink()).reduce(toLink, (accumulator, _item) -> accumulator + _item), 4);
+                    double totConcept = SLibUtils.round(cantConcept * convFact, 4);
+                    if (totConcept < toLink) {
+                        validation.setMessage(rowMsg + "tiene vinculada una cantidad mayor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
+                    }
+                    else if (totConcept > toLink) {
+                        validation.setMessage(rowMsg + "tiene vinculada una cantidad menor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
+                    }
+                }
+            }
+            
+            if (row.getItem() == null) {
+                validation.setMessage(rowMsg + "no tiene asignado un ítem.");
+                break;
+            }
+            else {
+                boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
+                
+                if (isItemRefReq && row.getItemReference() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
+                    break;
+                }
+                else if (isItemRefReq && row.getItemReference().getPkItemId() == row.getItem().getPkItemId()) {
+                    validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                    break;
+                }
+                else if (row.getUnit() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una unidad.");
+                    break;
+                }
+                else if (row.getTaxRegion() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
+                    break;
+                }
+                else if (row.getOperationTypePk() == 0) {
+                    validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
+                    break;
+                }
+                else if (row.getCostCenter() == null) {
+                    validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
+                    break;
+                }
+                else if (row.getConvFactor() == 0.0) {
+                    validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
+                    break;
+                }
+                else {
+                    if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
+                        ArrayList<SDataDpsEntry> invoiceEntries = row.getNewDpsEntries(); // variable de conveniencia
+                        ArrayList<SDataDpsEntry> orderEntries = row.getImportedDpsEntries(); // variable de conveniencia
+                        
+                        if (invoiceEntries.size() == orderEntries.size()) {
+                            for (int j = 0; j < invoiceEntries.size(); j++) {
+                                if (invoiceEntries.get(j).getSubtotalCy_r() > orderEntries.get(j).getSubtotalCy_r()) {
+                                    validation.setMessage(rowMsg + "tiene un importe mayor ($" + SLibUtils.getDecimalFormatAmount().format(invoiceEntries.get(j).getSubtotalCy_r()) + ") "
+                                            + "que el de la partida de la OC elegida ($" + SLibUtils.getDecimalFormatAmount().format(orderEntries.get(j).getSubtotalCy_r()) + ").");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!validation.getIsError()) {
+                        if (concepto.getEltOpcConceptoImpuestos() != null) {
+                            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
+                                ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                                TAXES:
+                                for (DElementConceptoImpuestoTraslado traslado : traslados) {
+                                    if (!row.getTaxChargedMatched().contains(traslado)) {
+                                        validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
+                                                + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
+                                                + "Tipo: trasladado. \n"
+                                                + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
+                                                + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".");
+                                        break ROWS;
+                                    }
+                                }
+                            }
+
+                            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                                ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                                TAXES:
+                                for (DElementConceptoImpuestoRetencion retencion : retenciones) {
+                                    if (!row.getTaxRetainedMatched().contains(retencion)) { 
+                                        validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
+                                                + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
+                                                + "Tipo: retenido. \n"
+                                                + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
+                                                + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".");
+                                        break ROWS;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                rowValidating = i;
+                
+                SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i); // variable de conveniencia
+                DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
+                String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
+                        concepto.getAttDescripcion().getString();
+                String rowMsg = "El factor de conversión del renglón #" + (i + 1) + ", concepto \"" + descripcion + "\", ";
+                
+                if (isWithPurchaseOrder() && row.getConvFactor() != 1) {
+                    if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
+                            + "pero está asignado a una partida de la OC.\n"
+                            + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                        validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
+                        break;
+                    }
+                }
+                
+                if (!validation.getIsError()) {
+                    if (row.getClaveUnidadCfdi().equals(row.getClaveUnidadSiie())) {
+                        if (row.getConvFactor() != 1) {
+                            if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
+                                    + "pero las unidades SAT del concepto y del ítem seleccionado son iguales.\n"
+                                    + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        if (row.getConvFactor() == 1) {
+                            if (miClient.showMsgBoxConfirm(rowMsg + "es igual a 1.0,\n"
+                                    + "pero las unidades SAT del concepto y del ítem seleccionado son diferentes.\n"
+                                    + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " diferente a 1.0.");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        validation.setComplement(rowValidating);
+        
+        return validation;
+    }
+
+    private void refreshDps(final SDataDps dps) {
+        if (dps.getIsRegistryNew()) {
+            dps.setPkYearId(SLibTimeUtilities.digestYear(moComprobante.getAttFecha().getDatetime())[0]);
+            dps.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        }
+        else {
+            dps.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        }
+        
+        String uuid = "";
+        cfd.ver40.DElementTimbreFiscalDigital tfd = moComprobante.getEltOpcComplementoTimbreFiscalDigital();
+        if (tfd != null) {
+            uuid = tfd.getAttUUID().getString();
+        }
+        
+        Date date = SLibTimeUtils.convertToDateOnly(moComprobante.getAttFecha().getDatetime());
+        boolean isCash = moComprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PUE);
+        boolean isLocalCurrency = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { mnCfdiCurrencyId });
+
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.setNumberSeries(moComprobante.getAttSerie() != null ? moComprobante.getAttSerie().getString() : "");
+        dps.setNumber(moComprobante.getAttFolio() != null ? !moComprobante.getAttFolio().getString().isEmpty() ? moComprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
+        dps.setNumberReference(isWithPurchaseOrder() ? moPurchaseOrder.getNumberReference() : "");
+        
+        dps.setDaysOfCredit(isCash ? 0 : isWithPurchaseOrder() ? moPurchaseOrder.getDaysOfCredit() : moBizPartnerReceptor.getDbmsCategorySettingsSup().getDaysOfCredit());
+        dps.setIsDiscountDocApplying(moComprobante.getAttDescuento().getDouble() != 0);
+        dps.setIsDiscountDocPercentage(false);
+        dps.setDiscountDocPercentage(0);
+        
+        dps.setExchangeRate(isLocalCurrency ? 1.0 : moComprobante.getAttTipoCambio().getDouble());
+        dps.setExchangeRateSystem(isLocalCurrency ? 1.0 : moComprobante.getAttTipoCambio().getDouble());
+        
+        dps.setSubtotalProvisionalCy_r(moComprobante.getAttSubTotal().getDouble());
+        dps.setDiscountDocCy_r(moComprobante.getAttDescuento() == null ? 0 : moComprobante.getAttDescuento().getDouble());
+        dps.setSubtotalCy_r(dps.getSubtotalProvisionalCy_r() - dps.getDiscountDocCy_r());
+        dps.setTaxChargedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
+        dps.setTaxRetainedCy_r(moComprobante.getEltOpcImpuestos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : moComprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
+        dps.setTotalCy_r(moComprobante.getAttTotal().getDouble());
+        
+        dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
+        dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
+        dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
+        dps.setFkPaymentTypeId(isCash ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA); // XXX remove ASAP (Sergio Flores, 2017-08-09)!
+        
+        dps.setFkDpsNatureId(isWithPurchaseOrder() ? moPurchaseOrder.getFkDpsNatureId() : moFieldDpsNature.getKeyAsIntArray()[0]);
+        dps.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
+        
+        if (isWithPurchaseOrder()) {
+            dps.setFkFunctionalAreaId(moPurchaseOrder.getFkFunctionalAreaId());
+            dps.setFkFunctionalSubAreaId(moPurchaseOrder.getFkFunctionalSubAreaId());
+            dps.setFkTaxIdentityEmisorTypeId(moPurchaseOrder.getFkTaxIdentityEmisorTypeId());
+            dps.setFkTaxIdentityReceptorTypeId(moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
+        }
+        else {
+            if (!isApplingFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
+                dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+            }
+            else {
+                SFormComponentItem item = (SFormComponentItem) jcbFunctionalSubArea.getSelectedItem();
+                dps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
+                dps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
+            }
+        }
+        
+        dps.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
+        dps.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkBizPartnerAltId_r(moBizPartnerEmisor.getPkBizPartnerId()); 
+        dps.setFkBizPartnerBranchAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkTaxIdentityEmisorTypeId(moBizPartnerEmisor.getFkTaxIdentityId());
+        dps.setFkTaxIdentityReceptorTypeId(moBizPartnerReceptor.getFkTaxIdentityId());
+        
+        dps.setFkLanguajeId(isWithPurchaseOrder() ? moPurchaseOrder.getFkLanguajeId() : (moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? miClient.getSessionXXX().getParamsErp().getFkLanguageId() : moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
+        dps.setFkCurrencyId(mnCfdiCurrencyId);
+        
+        dps.setAuxKeepDpsData(true);
+        dps.setAuxKeepExchangeRate(true); 
+        dps.setAuxFileXml(moCfdiFile);
+        
+        dps.getDbmsDpsEntries().clear();
+        
+        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+            if (isWithPurchaseOrder()) {
+                if (row.getNewDpsEntries().size() == row.getImportedDpsEntries().size()) {
+                    for (int j = 0; j < row.getNewDpsEntries().size(); j++) {
+                        row.getNewDpsEntries().get(j).setConcept(moPurchaseOrder.getDbmsDpsEntry(row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey()).getConcept());
+                    }
+                }
+            }
+            dps.getDbmsDpsEntries().addAll(row.getNewDpsEntries());
+            saveItemMatchBizPartner(row);
+        }
+        
+        try {
+            dps.calculateTotal(miClient); 
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
+        setFormVisible(false);
+    }
+    
+    private SDataDps createAndRefreshDps() {
+        SDataDps dps = new SDataDps();
+        Date date = SLibTimeUtils.convertToDateOnly(miClient.getSessionXXX().getWorkingDate());
+
+        dps.setPkYearId(miClient.getSessionXXX().getWorkingYear());
+        dps.setPkDocId(0);
+        
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.resetRecord();
+        dps.setIsRecordAutomatic(true);
+
+        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+
+        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
+        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
+        
+        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
+        
+        SDataDpsCfd dpsCfd = dps.getDbmsDataDpsCfd();
+
+        if (dpsCfd == null) {
+            dpsCfd = new SDataDpsCfd();
+            dps.setDbmsDataDpsCfd(dpsCfd);
+        }
+
+        dpsCfd.setIsRegistryNew(true); // force entries to be treated as new
+        
+        refreshDps(dps);
+
+        return dps;
+    }
+
+    private void saveItemMatchBizPartner(SRowCfdiImport40 rowCfdiImport) {
+        try {
+            SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
+            
+            int key = SItemUtilities.getMatchItemBizPartnerId(miClient, 
+                rowCfdiImport.getConcepto().getAttNoIdentificacion().getString(), 
+                rowCfdiImport.getConcepto().getAttClaveProdServ().getString(),
+                moBizPartnerEmisor.getPkBizPartnerId(), 
+                rowCfdiImport.getItem().getPkItemId());
+            
+            if (key == 0) {
+                match.setConceptKey(rowCfdiImport.getConcepto().getAttNoIdentificacion().getString());
+                match.setConceptProductService(rowCfdiImport.getConcepto().getAttClaveProdServ().getString());
+                match.setFactorConversion(rowCfdiImport.getConvFactor());
+                match.setUses(1);
+                match.setUseFirst(miClient.getSession().getSystemDate());
+                match.setUseLast(miClient.getSession().getSystemDate());
+                match.setIsDeleted(false);
+                match.setFkBizPartnerId(moBizPartnerEmisor.getPkBizPartnerId());
+                match.setFkItemId(rowCfdiImport.getItem().getPkItemId());
+                match.setFkUnitId(rowCfdiImport.getUnit().getPkUnitId());
+                match.setFkTaxRegionId(rowCfdiImport.getTaxRegion().getPkTaxRegionId());
+                match.setFkItemReferenceId_n(rowCfdiImport.getItemReference() == null ? 0 : rowCfdiImport.getItemReference().getPkItemId());
+                match.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                match.setFkCostCenterId_n(rowCfdiImport.getCostCenter() == null ? "" : rowCfdiImport.getCostCenter().getPkCostCenterIdXXX());
+            }
+            else {
+                match.read(key, miClient.getSession().getStatement());
+                match.setFactorConversion(rowCfdiImport.getConvFactor());
+                match.setUses(match.getUses() + 1);
+                match.setUseLast(miClient.getSession().getSystemDate());
+                match.setFkUnitId(rowCfdiImport.getUnit().getPkUnitId());
+                match.setFkTaxRegionId(rowCfdiImport.getTaxRegion().getPkTaxRegionId());
+                match.setFkItemReferenceId_n(rowCfdiImport.getItemReference() == null ? 0 : rowCfdiImport.getItemReference().getPkItemId());
+                match.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                match.setFkCostCenterId_n(rowCfdiImport.getCostCenter() == null ? "" : rowCfdiImport.getCostCenter().getPkCostCenterIdXXX());
+            }
+            
+            match.save(miClient.getSession().getStatement().getConnection());
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+    }
+    
+    /**
+     * Devuelve el nuevo DPS renderizado.
+     * @return 
+     */
+    public SDataDps getNewDps() {
+        return moNewDps;
+    }
+    
+    @Override
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+
+            if (button == jbOk) {
+                actionOk();
+            }
+            else if (button == jbCancel) {
+                actionCancel();
+            }
+            else if (button == jbViewInvoicePdf) {
+                actionViewInvoicePdf();
+            }
+            else if (button == jbPickTaxRegion) {
+                actionPickTaxRegion();
+            }
+            else if (button == jbViewPurchaseOrder) {
+                actionViewPurchaseOrder();
+            }
+            else if (button == jbCopyRow) {
+                actionCopyRow();
+            }
+            else if (button == jbPasteRow) {
+                actionPasteRow();
+            }
+            else if (button == jbSelectItem) {
+                actionSelectItem(ITEM_MAIN);
+            }
+            else if (button == jbSelectUnit) {
+                actionSelectUnit();
+            }
+            else if (button == jbSelectTaxRegion) {
+                actionSelectTaxesRegion();
+            }
+            else if (button == jbSelectOpsType) {
+                actionSelectOpsType();
+            }
+            else if (button == jbSelectCostCenter) {
+                actionSelectCostCenter();
+            }
+            else if (button == jbSelectReferenceItem) {
+                actionSelectItem(ITEM_REF);
+            }
+            else if (button == jbSelectPurchaseOrderEntry) {
+                actionSelectPurchaseOrderEntry();
+            }
+        }
+    }
+    
+    @Override
+    public void valueChanged(ListSelectionEvent e) { 
+        if (!e.getValueIsAdjusting()) {
+            if (moConceptTablePane.getTable().getSelectedRow() > -1) {
+                setCfdiTaxesTableValues(moConceptTablePane.getTable().getSelectedRow());
+                setSiieTaxesTableValues((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow());
+                
+                if (isWithPurchaseOrder()) {
+                    setPurchaseOrderPanelValues();
+                }
+                
+                setEnabledButtons((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow());
+                setIsItemNameEditable((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow());
+            }
+            else {
+                setEnabledButtons(null);
+            }
+        }
+    }
+
+    @Override
+    public void editingStopped(ChangeEvent e) {
+        if (moConceptTablePane.getTable().getSelectedColumn() == COL_ITEM_NAME) {
+            updateNameItem();
+        }
+        else if (moConceptTablePane.getTable().getSelectedColumn() == COL_FACT_CONV) {
+            updateConversionFactor();
+        }
+    }
+
+    @Override
+    public void editingCanceled(ChangeEvent e) {
+        // nothing
+    }
+
+    public static class LinkedQuantity {
+        int[] dpsKey;
+        double quantity;
+
+        public LinkedQuantity(int[] dpsKey, double quantity) {
+            this.dpsKey = dpsKey;
+            this.quantity = quantity;
+        }
+    }
+}
