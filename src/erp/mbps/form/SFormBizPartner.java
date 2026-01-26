@@ -3198,8 +3198,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         
         if (!validation.getIsError()) {
             String fiscalId = jtfFiscalId.getText().trim();
-            String alternativeId = jftAlternativeId.getText().trim();
             int fiscalIdLength = moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER ? DCfdConsts.LEN_RFC_PER : DCfdConsts.LEN_RFC_ORG;
+            String fiscalFrgId = jtfFiscalFrgId.getText().trim();
+            String alternativeId = jftAlternativeId.getText().trim();
             
             int[] countryKey = (int[]) moPanelBizPartnerBranch.getValue(SDataConstants.LOCU_CTY);
             boolean isForeign = countryKey != null && countryKey[0] != 0 && !miClient.getSession().getSessionCustom().isLocalCountry(countryKey);
@@ -3238,6 +3239,21 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFiscalId);
                 validation.setMessage("El '" + getTitle() + "' es extranjero, por lo que el valor del campo '" + jlFiscalId.getText() + "' debe ser " + DCfdConsts.RFC_GEN_INT + ".");
+            }
+            else if (!isForeign && fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfFiscalId);
+                validation.setMessage("El '" + getTitle() + "' es nacional, por lo que el valor del campo '" + jlFiscalId.getText() + "' no puede ser " + DCfdConsts.RFC_GEN_INT + ".");
+            }
+            else if (isForeign && fiscalFrgId.isEmpty()) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfFiscalFrgId);
+                validation.setMessage("El '" + getTitle() + "' es extranjero, por lo que el valor del campo '" + jlFiscalFrgId.getText() + "' no puede dejarse vacío.");
+            }
+            else if (!isForeign && !fiscalFrgId.isEmpty()) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfFiscalFrgId);
+                validation.setMessage("El '" + getTitle() + "' es nacional, por lo que el valor del campo '" + jlFiscalFrgId.getText() + "' debe dejarse vacío.");
             }
             else if (!alternativeId.isEmpty() && alternativeId.length() != DCfdConsts.LEN_CURP) {
                 validation.setTabbedPaneIndex(TAB_MAIN);

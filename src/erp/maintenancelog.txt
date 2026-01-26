@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 294.15/ 2026-01-26
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Obtención de ítems cuando no hay ítems de referencia al exportarse referencias de pedidos de compra (OC) a SWAP Services.
+2) Reforzamiento de validaciones de captura de RFC genérico extranjero y ID fiscal para asociados de negocios nacionales y extranjeros.
+
+================================================================================
 SIIE 3.2 294.14/ 2026-01-23
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
