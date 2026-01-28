@@ -61,6 +61,8 @@ import sa.lib.mail.SMailUtils;
  */
 public abstract class SExportDataUtils {
     
+    private static final int MAX_CONCEPTS = 5;
+    
     /**
      * Obtiene el nombre de la tabla de la bitácora de sincronización solicitada.
      * 
@@ -1688,14 +1690,27 @@ public abstract class SExportDataUtils {
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
                 
                 String sqlConcepts = "SELECT "
+                        + "DISTINCT t.item_key, t.item "
+                        + "FROM ("
+                        + "SELECT "
                         + "DISTINCT ir.item_key, ir.item "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS ir ON ir.id_item = de.fid_item_ref_n "
                         + "WHERE "
                         + "NOT de.b_del AND de.id_year = ? AND de.id_doc = ? "
+                        + "UNION "
+                        + "SELECT "
+                        + "DISTINCT i.item_key, i.item "
+                        + "FROM "
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = de.fid_item "
+                        + "WHERE "
+                        + "NOT de.b_del AND de.id_year = ? AND de.id_doc = ? AND de.fid_item_ref_n IS NULL "
                         + "ORDER BY "
-                        + "ir.item_key, ir.item;";
+                        + "item_key, item "
+                        + "LIMIT " + MAX_CONCEPTS + ") AS t "
+                        + "ORDER BY t.item_key, t.item;";
                 
                 String sqlCostCenters = "SELECT "
                         + "DISTINCT cc.id_cc, cc.cc "
@@ -1781,10 +1796,12 @@ public abstract class SExportDataUtils {
                     String concepts = "";
                     prepStatConcepts.setInt(1, dpsYear);
                     prepStatConcepts.setInt(2, dpsDoc);
+                    prepStatConcepts.setInt(3, dpsYear);
+                    prepStatConcepts.setInt(4, dpsDoc);
                     
                     try (ResultSet resultSetAux = prepStatConcepts.executeQuery()) {
                         while (resultSetAux.next()) {
-                            concepts += (concepts.isEmpty() ? "" : ";") + resultSetAux.getString("ir.item_key") + " - " + resultSetAux.getString("ir.item");
+                            concepts += (concepts.isEmpty() ? "" : ";") + resultSetAux.getString("t.item_key") + " - " + resultSetAux.getString("t.item");
                         }
                     }
                     

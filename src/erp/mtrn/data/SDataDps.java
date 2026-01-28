@@ -1211,7 +1211,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         sSql = "SELECT COUNT(*) AS f_count " +
                                 "FROM fin_pay AS p " +
                                 "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
-                                "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " ";
+                                "WHERE NOT p.b_del AND p.fk_st_pay NOT IN (" + SModSysConsts.FINS_ST_PAY_CANC + ", " + SModSysConsts.FINS_ST_PAY_CANC_P + ") " +
+                                "AND pe.fk_doc_year_n = " + mnPkYearId + " AND pe.fk_doc_doc_n = " + mnPkDocId + " ";
                         sMsgAux = "¡El documento está asociado al menos a una solicitud de pago o a un pago!";
                         break;
                     default:
