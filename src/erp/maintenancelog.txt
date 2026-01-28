@@ -780,7 +780,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 282.8/ 2025-08-12
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección del campo localidad en el predial rustico, campos en SIIE diferentes (locality = localidad , county = municipo)
+1) Corrección del campo localidad en el predial rústico, campos en SIIE diferentes (locality = localidad , county = municipo)
 
 ================================================================================
 SIIE 3.2 282.7/ 2025-08-05
@@ -821,8 +821,8 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 282.2/ 2025-07-21
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección columna RFC en el impuesto predial rustico.
-2) Adición de CP en el impuesto predial rustico.
+1) Corrección columna RFC en el impuesto predial rústico.
+2) Adición de CP en el impuesto predial rústico.
 3) Corrección de variables en la exportación y renombramiento en la consultas de bizParther en la vista de actualización de datos.
 4) Funcionalidad de modificación de contratos, solo se envié correo se se modifica precio, moneda, unidad, cantidad o ítem.
 5) Correción de Uso de CFDI para notas de crédito.
@@ -837,13 +837,13 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 282.0/ 2025-07-18
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Exportación de usuarios y proveedores a servicio externo considerando renglones de Logs
+1) Exportación de usuarios y proveedores a servicio externo considerando renglones de bitácoras.
 
 ================================================================================
 SIIE 3.2 280.4/ 2025-07-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
--Validación de fecha de facturas asociadas a ordenes de compra relacionadas con los movimientos de almacén.
+1) Validación de fecha de facturas asociadas a pedidos de compras relacionadas con los movimientos de almacén.
 
 ================================================================================
 SIIE 3.2 280.3/ 2025-07-16
@@ -856,14 +856,14 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 280.2/ 2025-07-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Corrección de llave foránea nula en usuario de mantenimiento en diogs de ajuste de valuación.
+1) Corrección de llave foránea nula en usuario de mantenimiento en DIOG de ajuste de valuación.
 
 ================================================================================
 SIIE 3.2 280.1/ 2025-07-15
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Creación de la vista de actualización de datos de proveedores y actualización de datos de proveedores (Datos fiscales)
-2) Forma de actualización  de datos de proveedores (Datos fiscales)
+1) Creación de la vista de actualización de datos de proveedores y actualización de datos de proveedores (Datos fiscales).
+2) Forma de actualización  de datos de proveedores (Datos fiscales).
 
 ================================================================================
 SIIE 3.2 280.0/ 2025-07-14
@@ -877,7 +877,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 278.1/ 2025-07-11
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Cambio de campo en certificados de calidad fk_datasheet_template
+1) Cambio de campo en certificados de calidad fk_datasheet_template.
 
 ================================================================================
 SIIE 3.2 278.0/ 2025-07-04
@@ -936,7 +936,7 @@ SIIE 3.2 274.1/ 2025-06-16
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Modificación del % de acidez en la vista de DPS después del timbrado, junto con la información de comercialización.
-2) Cambio en el formato de impresión de OC para mostrar la leyenda "(No definido)" cuando algún dato fiscal se encuentre en blanco.
+2) Cambio en el formato de impresión de pedidos de compras para mostrar la leyenda "(No definido)" cuando algún dato fiscal se encuentre en blanco.
 3) Se elimina la constante "SModSysConsts.TRNX_MAT_REQ_FOLL_PUR_CLOSED" y es reemplazada por "SUtilConsts.ACTION_CLOSE" para lo referente a la vista de seguimiento de RM.
 4) Se quita la recarga de las vistas al momento de abrir la vista del cardex de documentos de las RM. 
 
@@ -949,7 +949,6 @@ Jhonatan Claudio PEÑA HERNANDEZ
 ================================================================================
 SIIE 3.2 273.4/ 2025-06-11
 Edwin Omar CARMONA FIGUEROA
-
 --------------------------------------------------------------------------------
 1) Refactorización de código en valuación de consumos de inventarios, después de inspección.
 
@@ -957,9 +956,9 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 273.3/ 2025-06-10
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Corrección de vista de impuesto predial rustico (Agrupador por documento)
-2) Corrección en pólizas contables al momento de importar los cheques
-3) Adición de acrónimo para AETH en la impresión de contratos (Configuración para que otras empresas no vean lo mismo que AETH)
+1) Corrección de vista de impuesto predial rústico (Agrupador por documento).
+2) Corrección en pólizas contables al momento de importar los cheques.
+3) Adición de acrónimo para AETH en la impresión de contratos (configuración para que otras empresas no vean lo mismo que AETH).
 
 ================================================================================
 SIIE 3.2 273.2/ 2025-06-10
@@ -971,7 +970,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 273.1/ 2025-06-09
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) En importación de Requisiciones de materiales a Dps se valida longitud del concepto de la partida, en 
+1) En importación de Requisiciones de materiales a DPS se valida longitud del concepto de la partida, en 
     caso de ser muy extenso se agrega una nota a la partida con el concepto completo.
 
 ================================================================================
@@ -1064,8 +1063,8 @@ Jhonatan Claudio PEÑA HERNANDEZ
 SIIE 3.2 272.4/ 2025-05-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para ordenes de compra.
-2) Se agregan los "Datos fiscales" en la impresión de ordenes de compra.
+1) Se agregan los campos de captura de "Datos fiscales" en la forma de captura de DPS, habilitados únicamente para pedidos de compras.
+2) Se agregan los "Datos fiscales" en la impresión de pedidos de compras.
 
 ================================================================================
 SIIE 3.2 272.3/ 2025-05-08
@@ -1142,7 +1141,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 270.9/ 2025-04-28
 Jhonatan Claudio PEÑA HERNANDEZ/ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Plantilla para reporte SISub e ICSOE
+1) Plantilla para reporte SISub e ICSOE.
 2) Inhabilitar la captura de la acidez cuando no se trate de un documento de ventas en la captura de DPS.
 
 ================================================================================
@@ -1186,7 +1185,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Adición de campo de texto para mostrar ID de registros en la formas de captura de línea de ítems, ítem genérico, grupo de ítems, familia de ítems y unidades de medida.
 2) Refactorización de controles y consulta en vista de documentos cuando la autorización web está disponible,
-    porque esta funcionalidad sólo aplica para órdenes de compra, y estando habilitada en la configuración de la empresase, afectaba innecesariamente la creación de comandos e adiciones a las consultas de cualquier tipo de documento.
+    porque esta funcionalidad sólo aplica para órdenes de compra, y estando habilitada en la configuración de la empresase, afectaba innecesariamente la creación de comandos y adiciones a las consultas de cualquier tipo de documento.
 3) Corrección a la validación de captura de carrotanques, porque no se validaba el largo del texto de carrotanques, y además se solicitaba erróneamente ítem en la partida aún cuando ya hubiera uno seleccionado.
 
 ================================================================================
@@ -1214,7 +1213,7 @@ SIIE 3.2 269.1/ 2025-04-14
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Cambio de nombre del campo "Repositorio contable" por "Referencia contable" y habilitación del campo cuando la cuenta de mayor tenga asignada cuentas especiales de corto plazo.
-2) Refactorización general de menús y vistas.
+2) Refactorización general de menús y vistas de RM.
 
 ================================================================================
 SIIE 3.2 269.0/ 2025-04-09
@@ -1222,7 +1221,7 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Creación del catálogo de carrotanques y se agregó a la forma de captura de partidas de DPS.
 2) Adición del porcentaje de acidez en la forma de captura de partidas de DPS.
-3) Adición de las etiquetas contables en la forma de captura de DPS.
+3) Adición de las etiquetas contables en la forma de captura de DPS (p. ej., OPEX).
 4) Creación de consultas y reportes correspondientes al porcentaje de acidez y a las etiquetas contables.
 
 ================================================================================
@@ -1230,7 +1229,7 @@ SIIE 3.2 267.12/ 2025-04-08
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Modificaciones en la valuación de consumos de inventario para mejorar el desempeño y evitar errores.
-2) Corrección en la consulta de configuraciones de cuentas contables vs items.
+2) Corrección en la consulta de configuraciones de cuentas contables vs. items.
 
 ================================================================================
 SIIE 3.2 267.11/ 2025-04-07
@@ -1260,7 +1259,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 267.7/ 2025-04-02
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Corrección mensaje de error y validación al capturar la fecha del cambio de puesto
+1) Corrección mensaje de error y validación al capturar la fecha del cambio de puesto.
 
 ================================================================================
 SIIE 3.5 267.6/ 2025-04-02
@@ -1373,14 +1372,14 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 263.13/ 2025-03-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Validación de segregaciones en eliminación de RM
-2) Eliminación de encabezado de segregaciones cuando la suma de los renglones da 0
+1) Validación de segregaciones en eliminación de RM.
+2) Eliminación de encabezado de segregaciones cuando la suma de los renglones da 0.
 
 ================================================================================
 SIIE 3.2 263.12/ 2025-03-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Ajuste de unidades y llave foránea de unidad en valuación de consumos
+1) Ajuste de unidades y llave foránea de unidad en valuación de consumos.
 
 ================================================================================
 SIIE 3.2 263.10/ 2025-02-27
@@ -1414,7 +1413,7 @@ SIIE 3.2 263.6/ 2025-02-18
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega botón de reinicio de proceso de autorización en vista de DPS, bajo las condiciones
-    de funcionalidad activa y tipos de documento
+    de funcionalidad activa y tipos de documento.
 
 ================================================================================
 SIIE 3.2 263.5/ 2025-02-17
@@ -1427,7 +1426,7 @@ Isabel Danae GARCÍA SERVÍN
 SIIE 3.2 263.4/ 2025-02-17
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Corrección impresión de contratos cuando este tiene varias partidas eliminadas
+1) Corrección impresión de contratos cuando este tiene varias partidas eliminadas.
 
 ================================================================================
 SIIE 3.2 263.3/ 2025-02-13
@@ -1446,7 +1445,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 263.1/ 2025-02-10
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Se toma el usuario de la tabla de dps cuando el documento está autorizado (AppLink)
+1) Se toma el usuario de la tabla de DPS cuando el documento está autorizado (AppLink).
 2) Se agrega columna de usuario en turno en vista de pedidos cuando está activo el complemento de autorizaciones web.
 3) Se agrega prioridad en obtención de documentos para su autorización.
 
@@ -1468,18 +1467,18 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 262.2/ 2025-02-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Corrección a la valuación de consumos por la actualización de costo y valor de salidas de stock
+1) Corrección a la valuación de consumos por la actualización de costo y valor de salidas de stock.
 
 ================================================================================
 SIIE 3.2 262.1/ 2025-02-05 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Corrección facturas de anticipo por campo tipo de exportación
+1) Corrección facturas de anticipo por campo tipo de exportación.
 
 ================================================================================
 SIIE 3.2 262.0/ 2025-02-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios..
+1) Se agrega timestamp y usuario de última sincronización a la vista de usuarios.
 
 ================================================================================
 SIIE 3.2 261.3/ 2025-01-29
