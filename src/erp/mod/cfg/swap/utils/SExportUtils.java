@@ -721,6 +721,28 @@ public abstract class SExportUtils {
     }
     
     /**
+     * Leer obtener pago en modalidad simplificada para acceder a sus datos elementales para procesarse en sincronizaciones.
+     * @param database Base de datos de la empresa en la que existe el pago.
+     * @param paymentId ID del pago.
+     * @return
+     * @throws SQLException 
+     */
+    private static BarePayment readBarePayment(final SGuiSession session, final String database, final int paymentId) throws SQLException {
+        BarePayment payment = null;
+        String sql = "SELECT fk_st_pay, fk_usr_upd "
+                + "FROM " + (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " "
+                + "WHERE id_pay = " + paymentId + ";";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                payment = new BarePayment(database, paymentId, resultSet.getInt("fk_st_pay"), resultSet.getInt("fk_usr_upd"));
+            }
+        }
+        
+        return payment;
+    }
+    
+    /**
      * Complementar el procesamiento de las partidas de la bitácora de sincronización, si el tipo de sincronización lo requiere.
      * 
      * @param session Sesión de usuario.
@@ -736,13 +758,15 @@ public abstract class SExportUtils {
             case PUR_PAYMENT_UPD:
                 // cambiar el estatus de los nuevos pagos recién enviados a SWAP Services para su autorización:
                 
+                SDbPayment payment = new SDbPayment(); // is a dummy instances, just for field update purmposes
+                
                 for (SDbSyncLogEntry entry : entries) {
                     int paymentId = SLibUtils.parseInt(entry.getReferenceId());
-                    SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { paymentId });
-                    int newStatusPaymentId = SDbPayment.getSettledStatusPaymentId(payment.getFkStatusPaymentId());
+                    BarePayment barePayment = readBarePayment(session, entry.getAuxDatabase(), paymentId);
+                    int newStatusPaymentId = SDbPayment.getSettledStatusPaymentId(barePayment.StatusId);
                     
                     if (newStatusPaymentId != 0) {
-                        Object valueToUpdate = new Object[] { newStatusPaymentId, payment.getFkUserUpdateId(), entry.getAuxDatabase() }; // nuevo estatus, usuario, base de datos:
+                        Object valueToUpdate = new Object[] { newStatusPaymentId, barePayment.UserId, entry.getAuxDatabase() }; // nuevo estatus, usuario, base de datos:
                         
                         payment.saveField(session.getStatement(), new int[] { SLibUtils.parseInt(entry.getReferenceId()) }, SDbPayment.FIELD_STATUS_PAYMENT, valueToUpdate);
                     }
@@ -1367,5 +1391,20 @@ public abstract class SExportUtils {
         }
         
         return companies.stream().mapToInt(Integer::intValue).toArray();
+    }
+    
+    private static class BarePayment {
+        
+        String Database;
+        int PaymentId;
+        int StatusId;
+        int UserId;
+        
+        public BarePayment(final String database, final int paymentId, final int statusId, final int userId) {
+            Database = database;
+            PaymentId = paymentId;
+            StatusId = statusId;
+            UserId = userId;
+        }
     }
 }

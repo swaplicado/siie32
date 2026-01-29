@@ -373,7 +373,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             
             if (jckShowFolioOrders.isSelected()) {
                 jasperPrint = SDataUtilities.fillReport(miClient,SDataConstantsSys.REP_FIN_BPS_ACC_MOV_ORD , map);
-            } else {
+            }
+            else {
                 jasperPrint = SDataUtilities.fillReport(miClient, jckShowPayDays.isSelected() ? SDataConstantsSys.REP_FIN_BPS_ACC_MOV_DAY : SDataConstantsSys.REP_FIN_BPS_ACC_MOV, map);
             }
             
