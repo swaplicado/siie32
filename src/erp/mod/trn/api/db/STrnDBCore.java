@@ -103,7 +103,17 @@ public class STrnDBCore {
             + "                    etys.id_year = dps.id_year "
             + "                        AND etys.id_doc = dps.id_doc "
             + "                        AND NOT etys.b_del), "
-            + "            '') AS ref_items, "
+            + "            (SELECT  "
+            + "                    GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
+            + "                            SEPARATOR '/ ') AS ref_items "
+            + "                FROM "
+            + "                    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " etys "
+            + "                        LEFT JOIN "
+            + "                    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " r_itm ON etys.fid_item = r_itm.id_item "
+            + "                WHERE "
+            + "                    etys.id_year = dps.id_year "
+            + "                        AND etys.id_doc = dps.id_doc "
+            + "                        AND NOT etys.b_del)) AS ref_items, "
             + "    COALESCE((SELECT  "
             + "                    GROUP_CONCAT(DISTINCT CONCAT(f_cc.id_cc, ' - ', f_cc.cc) "
             + "                            SEPARATOR '/ ') AS cecos "
@@ -379,7 +389,7 @@ public class STrnDBCore {
                     + "ORDER BY dps.dt ASC;";
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
 
             ArrayList<SWebDpsRow> lDocuments = new ArrayList<>();
@@ -449,7 +459,7 @@ public class STrnDBCore {
                     + "GROUP BY dps.id_year , dps.id_doc;";
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
 
             if (res.next()) {
@@ -624,7 +634,7 @@ public class STrnDBCore {
                     + "   AND dps.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsEty> lEties = new ArrayList<>();
             while (res.next()) {
@@ -686,7 +696,7 @@ public class STrnDBCore {
                     + "    AND nts.id_doc = " + idDoc + ";";
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebDpsNote> lNotes = new ArrayList<>();
             while (res.next()) {
@@ -765,7 +775,7 @@ public class STrnDBCore {
                                 + "LIMIT " + queryLimit + ";";
             
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebItemHistory> lHistory = new ArrayList<>();
             while (res.next()) {
@@ -853,7 +863,7 @@ public class STrnDBCore {
                     + "ORDER BY ts_usr_ins ASC, s.lev ASC, s.id_authorn_step ASC;";
 
             Statement st = oCconn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebAuthStep> lSteps = new ArrayList<>();
             while (res.next()) {
@@ -904,7 +914,7 @@ public class STrnDBCore {
                     + "NULL, NULL, NULL);";
 
             Statement stStatus = oCconn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryStatus);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryStatus);
             ResultSet resStatus = stStatus.executeQuery(queryStatus);
             if (resStatus.next()) {
                 oAuth.setIdAuthStatus(resStatus.getInt("auth_st"));
@@ -939,7 +949,7 @@ public class STrnDBCore {
                     + "        LIMIT 1);";
 
             Statement stUsersInTurn = oCconn.createStatement();
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryUsersInTurn);
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, queryUsersInTurn);
             ArrayList<Integer> lUsersInTurn = new ArrayList<>();
             ResultSet resUsersInTurn = stUsersInTurn.executeQuery(queryUsersInTurn);
             while (resUsersInTurn.next()) {

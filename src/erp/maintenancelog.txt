@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 294.18/ 2026-01-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportar comentarios de autorización de OC en Referencias de compras
+2) Concepto de referencia nunca vacío en OC, cuando no venga ítem de referencia se agrega ítem en sí
+
+================================================================================
 SIIE 3.2 294.17/ 2026-01-29
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Corrección a la lectura y escrigura de pagos al actualizar su estatus como complemento a la sincronización con SWAP Services.
+1) Corrección a la lectura y escritura de pagos al actualizar su estatus como complemento a la sincronización con SWAP Services.
 
 ================================================================================
 SIIE 3.2 294.16/ 2026-01-28

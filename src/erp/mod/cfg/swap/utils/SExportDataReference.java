@@ -94,4 +94,9 @@ public class SExportDataReference implements SExportData {
      * Indicador de borrada de la referencia.
      */
     public boolean is_deleted;
+    
+    /**
+     * Notas de autorización
+     */
+    public String auth_comments;
 }

@@ -287,7 +287,6 @@ public class STrnDBMaterialRequest {
                     "LIMIT 1;";
 
             Statement st = conn.createStatement();
-            System.out.println(query);
             ResultSet res = st.executeQuery(query);
 
             SWebMaterialRequest oMatReq = new SWebMaterialRequest();
@@ -598,7 +597,7 @@ public class STrnDBMaterialRequest {
             }
 
             Statement st = conn.createStatement();
-            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, etysQuery);
+//            Logger.getLogger(STrnDBMaterialRequest.class.getName()).log(Level.INFO, etysQuery);
             ArrayList<SWebMaterialRequestEty> etys = new ArrayList<>();
             ResultSet resEtys = st.executeQuery(etysQuery);
             SWebMaterialRequestEty oMatReqEty = null;

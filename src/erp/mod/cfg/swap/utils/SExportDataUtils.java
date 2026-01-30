@@ -50,30 +50,33 @@ import sa.lib.gui.SGuiSession;
 import sa.lib.mail.SMailUtils;
 
 /**
-/**
- * Utilidades para obtener datos para exportación a SWAP Services en formato JSON.
- * 
- * Esta clase contiene métodos para consultar la base de datos y generar 
- * estructuras JSON usando Jackson, facilitando la integración y exportación de 
+ * /**
+ * Utilidades para obtener datos para exportación a SWAP Services en formato
+ * JSON.
+ *
+ * Esta clase contiene métodos para consultar la base de datos y generar
+ * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
- * 
+ *
  * @author Sergio Flores
  */
 public abstract class SExportDataUtils {
-    
+
     private static final int MAX_CONCEPTS = 5;
-    
+
     /**
-     * Obtiene el nombre de la tabla de la bitácora de sincronización solicitada.
-     * 
+     * Obtiene el nombre de la tabla de la bitácora de sincronización
+     * solicitada.
+     *
      * @param syncType Tipo de sincronización.
-     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
+     * @param database Nombre de la base de datos de empresa: solamente
+     * requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
      * @return Nombre de la tabla de la bitácora de sincronización solicitada.
      * @throws Exception Si algún parámetro es inválido.
      */
     private static String getSqlTableSyncLog(final SSyncType syncType, final String database) throws Exception {
         String table = "";
-        
+
         switch (syncType) {
             case USER:
             case PARTNER_SUPPLIER:
@@ -82,7 +85,7 @@ public abstract class SExportDataUtils {
             case AUTH_JOB_TITLE:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
-                
+
             case FUNCTIONAL_AREA:
             case PUR_ORDER:
             case PUR_ORDER_FILE:
@@ -92,17 +95,17 @@ public abstract class SExportDataUtils {
             case PUR_PAYMENT_UPD:
                 table = (database.isEmpty() ? "" : database + ".") + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG);
                 break;
-                
+
             default:
                 throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
-        
+
         return table;
     }
 
     /**
      * Obtiene consulta base SQL para socios de negocios proveedores.
-     * 
+     *
      * @return consulta base SQL.
      */
     private static String getSqlQueryBasePartnerSuppliers() {
@@ -118,34 +121,36 @@ public abstract class SExportDataUtils {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB_ADD) + " AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SUtilConsts.BRA_ADD_ID + " "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS cty ON cty.id_cty = bba.fid_cty_n "
                 + "LEFT OUTER JOIN ("
-                    + "SELECT bul.id_bp, bul.ts_usr_upd "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bul "
-                    + "INNER JOIN ("
-                        + "SELECT bulx.id_bp, MAX(bulx.id_log) AS id_log "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bulx "
-                        + "GROUP BY bulx.id_bp "
-                        + "ORDER BY bulx.id_bp"
-                    + ") AS t ON t.id_bp = bul.id_bp AND t.id_log = bul.id_log "
-                    + "ORDER BY bul.id_bp"
+                + "SELECT bul.id_bp, bul.ts_usr_upd "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bul "
+                + "INNER JOIN ("
+                + "SELECT bulx.id_bp, MAX(bulx.id_log) AS id_log "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bulx "
+                + "GROUP BY bulx.id_bp "
+                + "ORDER BY bulx.id_bp"
+                + ") AS t ON t.id_bp = bul.id_bp AND t.id_log = bul.id_log "
+                + "ORDER BY bul.id_bp"
                 + ") AS tbul ON tbul.id_bp = b.id_bp ";
     }
 
     /**
-     * Obtiene subconsulta SQL para recuperar registros previamente sincronizados.
-     * 
+     * Obtiene subconsulta SQL para recuperar registros previamente
+     * sincronizados.
+     *
      * @param syncType Tipo de sincronización.
-     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
+     * @param database Nombre de la base de datos de empresa: solamente
+     * requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
      * @return Subconsulta SQL.
      * @throws Excepton Si algún parámetro es inválido.
      */
     private static String getSqlSubQuerySyncedRegistries(final SSyncType syncType, final String database) throws Exception {
         String table = getSqlTableSyncLog(syncType, database);
-        boolean sortAsUnsigned = syncType == SSyncType.USER || 
-                syncType == SSyncType.PARTNER_SUPPLIER || 
-                syncType == SSyncType.PARTNER_CUSTOMER || 
-                syncType == SSyncType.AUTH_JOB_TITLE || 
-                syncType == SSyncType.FUNCTIONAL_AREA;
-        
+        boolean sortAsUnsigned = syncType == SSyncType.USER
+                || syncType == SSyncType.PARTNER_SUPPLIER
+                || syncType == SSyncType.PARTNER_CUSTOMER
+                || syncType == SSyncType.AUTH_JOB_TITLE
+                || syncType == SSyncType.FUNCTIONAL_AREA;
+
         return "SELECT "
                 + "DISTINCT sle.reference_id "
                 + "FROM "
@@ -159,18 +164,20 @@ public abstract class SExportDataUtils {
     }
 
     /**
-     * Obtiene la fecha de la última sincronización exitosa para el tipo de sincronización indicado.
-     * 
+     * Obtiene la fecha de la última sincronización exitosa para el tipo de
+     * sincronización indicado.
+     *
      * @param statement Statement para ejecutar la consulta.
      * @param syncType Tipo de sincronización.
-     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
+     * @param database Nombre de la base de datos de empresa: solamente
+     * requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
      * @return Fecha de la última sincronización exitosa, o null si no existe.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static Date getLastSyncDatetime(final Statement statement, final SSyncType syncType, final String database) throws SQLException, Exception {
         Date datetime = null;
         String table = getSqlTableSyncLog(syncType, database);
-        
+
         String sql = "SELECT "
                 + "id_sync_log, TIMESTAMPADD(HOUR, -1, ts_usr) AS _last_sync " // timestamp of server device! (minus one hour)
                 + "FROM "
@@ -181,28 +188,32 @@ public abstract class SExportDataUtils {
                 + "ORDER BY "
                 + "id_sync_log DESC " // primero el registro más nuevo
                 + "LIMIT 1;";
-        
+
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
                 datetime = resultSet.getTimestamp("_last_sync");
             }
         }
-        
+
         return datetime;
     }
 
     /**
-     * Marcar la última entrada en bitácora de sincronización con estatus "CREADA" como "OK" para indicar la culminación del proceso de sincronización.
-     * 
+     * Marcar la última entrada en bitácora de sincronización con estatus
+     * "CREADA" como "OK" para indicar la culminación del proceso de
+     * sincronización.
+     *
      * @param statement Statement para ejecutar la consulta.
      * @param syncType Tipo de sincronización.
-     * @param firstRequestDatetime Fecha-hora de la primer petición en el dispositivo cliente del conjunto actual de iteraciones de sincronización.
-     * @param database Nombre de la base de datos de empresa: solamente requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
+     * @param firstRequestDatetime Fecha-hora de la primer petición en el
+     * dispositivo cliente del conjunto actual de iteraciones de sincronización.
+     * @param database Nombre de la base de datos de empresa: solamente
+     * requerida para SModConsts.CFG_COM_SYNC_LOG, en otro caso se descarta.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     public static void markLastSyncCreatedAsOk(final Statement statement, final SSyncType syncType, final Date firstRequestDatetime, final String database) throws SQLException, Exception {
         String table = getSqlTableSyncLog(syncType, database);
-        
+
         String sql = "SELECT "
                 + "MAX(id_sync_log) "
                 + "FROM "
@@ -211,7 +222,7 @@ public abstract class SExportDataUtils {
                 + "response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "' "
                 + "AND sync_type = '" + syncType + "' "
                 + "AND request_timestamp >= '" + SLibUtils.DbmsDateFormatDatetime.format(firstRequestDatetime) + "';";
-        
+
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
                 int syncLogId = resultSet.getInt(1);
@@ -225,9 +236,10 @@ public abstract class SExportDataUtils {
             }
         }
     }
-    
+
     /**
      * Exportación de archivos de pedidos de compras.
+     *
      * @param session Sesión de usuario.
      * @throws SQLException Si ocurre un error en la consulta.
      * @throws SQLException Si ocurre un error.
@@ -246,9 +258,8 @@ public abstract class SExportDataUtils {
                 String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER_FILE, database);
                 ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
-                
+
                 // eliminar intentos erróneos previos de procesamiento de archivos de OC:
-                
                 String sqlDelete = "DELETE le FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS le "
                         + "INNER JOIN (SELECT "
@@ -260,11 +271,10 @@ public abstract class SExportDataUtils {
                         + "le.response_body LIKE '%error%' "
                         + "AND l.sync_type IN ('" + SSyncType.PUR_ORDER + "' , '" + SSyncType.PUR_ORDER_FILE + "') "
                         + "ORDER BY le.reference_id) AS err ON err.reference_id = le.reference_id;";
-                
-                statement.execute(sqlDelete);
-                
-                // procesamiento de archivos de OC:
 
+                statement.execute(sqlDelete);
+
+                // procesamiento de archivos de OC:
                 String sql = "SELECT "
                         + "d.id_year, d.id_doc, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd "
@@ -284,7 +294,7 @@ public abstract class SExportDataUtils {
                         + "AND d.b_authorn "
                         + "AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " "
                         + "AND da.fid_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_AUTH + ") "
-//                        + ") AND MONTH(d.dt) >= 10 " // Se comenta para forzar sincronización en caso de reporte de archivos faltantes
+                        //                        + ") AND MONTH(d.dt) >= 10 " // Se comenta para forzar sincronización en caso de reporte de archivos faltantes
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER_FILE, database) + ")) "
                         + (lastSyncDatetime == null ? "" : " OR ("
                                 + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
@@ -360,18 +370,18 @@ public abstract class SExportDataUtils {
 
     /**
      * Consulta los usuarios, y los prepara para la exportación.
-     * 
+     *
      * @param session Sesión de usuario.
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfUsersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(u.id_usr, CHAR)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.USER, "");
-            
+
             String sqlConfig = "";
             if (lastSyncDatetime != null) {
                 HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
@@ -385,12 +395,12 @@ public abstract class SExportDataUtils {
                             + "WHERE "
                             + "ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'";
                 }
-                
+
                 if (!sqlConfig.isEmpty()) {
                     sqlConfig += " ORDER BY id_usr";
                 }
             }
-            
+
             String sql = "SELECT "
                     + "u.id_usr, u.usr, u.email, u.b_act, u.b_del, u.fid_bp_n, "
                     + "b.bp, b.lastname, b.firstname "
@@ -401,52 +411,49 @@ public abstract class SExportDataUtils {
                     + "((NOT u.b_del AND (b.b_del IS NULL OR NOT b.b_del)) "
                     + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.USER, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR (b.ts_edit IS NOT NULL AND b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')"
-                        + (sqlConfig.isEmpty() ? "" : " OR u.id_usr IN (" + sqlConfig + ")") + ")")
+                            + "OR (b.ts_edit IS NOT NULL AND b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')"
+                            + (sqlConfig.isEmpty() ? "" : " OR u.id_usr IN (" + sqlConfig + ")") + ")")
                     + ") "
                     + "AND u.usr <> '' AND u.email <> '' "
                     + "ORDER BY "
                     + "u.id_usr;";
-            
+
             ResultSet resultSet = statement.executeQuery(sql);
-            
+
             while (resultSet.next()) {
                 int userId = resultSet.getInt("u.id_usr");
                 String username = resultSet.getString("u.usr");
                 String email = resultSet.getString("u.email");
-                
+
                 // validar que el usuario tenga nombre y correo:
-                
                 if (username.isEmpty() || !SMailUtils.isValidEmail(email)) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                             "Usuario omitido (nombre de usuario vacío o correo inválido): ID = {0}; username = {1}; email = {2}.",
-                            new Object[] { userId, username, email });
+                            new Object[]{userId, username, email});
                     continue; // omitir usuario inválido
                 }
-                
+
                 // validar que el usuario tenga nombre(s) y apellido(s):
-                
                 String firstName = resultSet.getString("b.firstname");
                 if (resultSet.wasNull()) {
                     firstName = "";
                 }
-                
+
                 String lastName = resultSet.getString("b.lastname");
                 if (resultSet.wasNull()) {
                     lastName = "";
                 }
-                
+
                 if (firstName.isEmpty() || lastName.isEmpty()) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                             "Usuario omitido (nombre(s) o apellido(s) vacíos): ID = {0}; username = {1}; last_name = {2}; first_name = {3}.",
-                            new Object[] { userId, username, lastName, firstName });
+                            new Object[]{userId, username, lastName, firstName});
                     continue; // omitir usuario inválido
                 }
 
                 // crear e inicializar el objeto para exportación de datos:
-                
                 SExportDataUser user = new SExportDataUser();
-                
+
                 user.username = username;
                 user.email = email;
                 user.password = SExportUtils.generateSecurePassword();
@@ -457,9 +464,9 @@ public abstract class SExportDataUtils {
                 boolean purchaserAgent = false;
                 ArrayList<Integer> roles = SUserUtils.getUserRoles(session, userId);
                 ArrayList<Integer> companies = SUserUtils.getUserAccesibleCompanies(session, userId);
-                
+
                 HashSet<Integer> groups = new HashSet<>();
-                
+
                 for (Integer role : roles) {
                     if (role == SSwapConsts.ROL_PURCHASER_AGENT) {
                         purchaserAgent = true;
@@ -469,7 +476,7 @@ public abstract class SExportDataUtils {
                         groups.add(role);
                     }
                 }
-                
+
                 SExportDataUser.Attributes attributes = new SExportDataUser.Attributes();
                 attributes.full_name = SJsonUtils.sanitizeJson(firstName + " " + lastName);
                 attributes.user_type = SSwapConsts.USER_TYPE_INTERNAL;
@@ -478,7 +485,7 @@ public abstract class SExportDataUtils {
                 attributes.is_deleted = resultSet.getBoolean("u.b_del");
                 attributes.external_id = userId;
                 user.attributes = attributes;
-                
+
                 user.groups = groups.stream().mapToInt(Integer::intValue).toArray();
 
                 user.companies = companies.stream().mapToInt(Integer::intValue).toArray();
@@ -487,10 +494,10 @@ public abstract class SExportDataUtils {
                 ArrayList<SExportDataUser.FunctionalArea> functionalAreas = new ArrayList<>();
                 for (int[] functionalSubArea : functionalSubAreas) {
                     SExportDataUser.FunctionalArea functionalArea = new SExportDataUser.FunctionalArea();
-                    
+
                     functionalArea.external_company_id = functionalSubArea[0];
                     functionalArea.external_id = functionalSubArea[1];
-                    
+
                     functionalAreas.add(functionalArea);
                 }
                 user.functional_areas = functionalAreas.toArray(new SExportDataUser.FunctionalArea[0]);
@@ -501,10 +508,11 @@ public abstract class SExportDataUtils {
 
         return users;
     }
-    
+
     /**
-     * Crea usuario para socio de negocios proveedor a partir de un conjunto de datos previamente abierto.
-     * 
+     * Crea usuario para socio de negocios proveedor a partir de un conjunto de
+     * datos previamente abierto.
+     *
      * @param resultSet Conjunto de datos previamente abierto.
      * @param rfcPattern RFC regex pattern.
      * @return Usuario para socio de negocios proveedor.
@@ -512,21 +520,21 @@ public abstract class SExportDataUtils {
      */
     private static SExportDataUser createUserForPartnerSupplier(final ResultSet resultSet, final Pattern rfcPattern) throws SQLException {
         int partnerId = resultSet.getInt("b.id_bp");
-        
+
         String username;
         String fullName = SJsonUtils.sanitizeJson(resultSet.getString("b.bp"));
         String fiscalId = SJsonUtils.sanitizeJson(resultSet.getString("b.fiscal_id"));
         String foreignFiscalId = SJsonUtils.sanitizeJson(resultSet.getString("b.fiscal_frg_id"));
-        
+
         String countryCode = SJsonUtils.sanitizeJson(resultSet.getString("cty.cty_code")); // ¡NO MOVER! ¡Debe ser la sentencia previa al siguiente "if"!
 
         if (resultSet.wasNull() || countryCode.equals(DCfdi40Catalogs.ClavePaísMex)) { // ¿el código de país es nulo o igual a "MEX"?
             // proveedor nacional:
-            
+
             if (!rfcPattern.matcher(fiscalId).matches()) {
                 Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                         "Socio de negocios omitido (RFC inválido): ID = {0}; name = {1}; RFC = {2}.",
-                        new Object[] { partnerId, fullName, fiscalId});
+                        new Object[]{partnerId, fullName, fiscalId});
                 return null; // regresar null para omitir usuario inválido
             }
 
@@ -541,7 +549,7 @@ public abstract class SExportDataUtils {
             if (foreignFiscalId.isEmpty()) {
                 Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                         "Socio de negocios omitido (ID fiscal extranjero vacío): ID = {0}; name = {1}; fiscal ID = {2}.",
-                        new Object[] { partnerId, fullName, "<blank>"});
+                        new Object[]{partnerId, fullName, "<blank>"});
                 return null; // regresar null para omitir usuario inválido
             }
 
@@ -552,10 +560,10 @@ public abstract class SExportDataUtils {
         if (username.isEmpty() || username.contains(" ")) {
             Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                     "Socio de negocios omitido (nombre de usuario vacío o inválido): ID = {0}; name = {1}; username = {2}.",
-                    new Object[] { partnerId, fullName, username.isEmpty() ? "<blank>" : username});
+                    new Object[]{partnerId, fullName, username.isEmpty() ? "<blank>" : username});
             return null; // regresar null para omitir usuario inválido
         }
-        
+
         String tradeName = SJsonUtils.sanitizeJson(resultSet.getString("b.bp_comm"));
         String lastName = SJsonUtils.sanitizeJson(resultSet.getString("b.lastname"));
         String firstName = SJsonUtils.sanitizeJson(resultSet.getString("b.firstname"));
@@ -567,10 +575,10 @@ public abstract class SExportDataUtils {
         if (!email.isEmpty() && !SMailUtils.isValidEmail(email)) {
             Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                     "Socio de negocios omitido (correo inválido): ID = {0}; name = {1}; email = {2}.",
-                    new Object[] { partnerId, fullName, email});
+                    new Object[]{partnerId, fullName, email});
             return null; // regresar null para omitir usuario inválido
         }
-        
+
         SExportDataUser user = new SExportDataUser();
 
         user.username = username;
@@ -598,7 +606,7 @@ public abstract class SExportDataUtils {
         user.attributes = attributes;
 
         SExportDataUser.Partner partner = new SExportDataUser.Partner();
-        
+
         partner.is_vendor = true;
         partner.fiscal_id = fiscalId;
         partner.foreign_fiscal_id = foreignFiscalId;
@@ -613,34 +621,36 @@ public abstract class SExportDataUtils {
         partner.external_id = attributes.external_id;
         user.partner = partner;
 
-        user.groups = new int[] { SSwapConsts.ROL_SUPPLIER };
+        user.groups = new int[]{SSwapConsts.ROL_SUPPLIER};
 
         return user;
     }
 
     /**
      * Verifica si el socio de negocios es compañía en SWAP Services.
-     * 
+     *
      * @param session Sesión de usuario.
      * @param bizPartnerId ID del socio de negocios.
-     * @return 
+     * @return
      */
     public static boolean isCompany(final SGuiSession session, final int bizPartnerId) {
         boolean isCompany = false;
         int[] companies = (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES);
-        
+
         for (int id : companies) {
             if (id == bizPartnerId) {
                 isCompany = true;
                 break;
             }
         }
-        
+
         return isCompany;
     }
+
     /**
-     * Consulta los socios de negocios proveedores de pedidos de compras del Portal de Proveedores de AETH, y los prepara para la exportación.
-     * 
+     * Consulta los socios de negocios proveedores de pedidos de compras del
+     * Portal de Proveedores de AETH, y los prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de socios de negocios proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
@@ -649,13 +659,13 @@ public abstract class SExportDataUtils {
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
         int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String database = "erp_aeth";
             String referenceId = "CONVERT(b.id_bp, CHAR) ";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PARTNER_SUPPLIER, "");
             Pattern rfcPattern = DCfdUtils.createRfcPattern();
-            
+
             String sql = getSqlQueryBasePartnerSuppliers()
                     + "WHERE "
                     + "b.id_bp IN ("
@@ -839,12 +849,12 @@ public abstract class SExportDataUtils {
                     //+ "AND b.b_sup AND b.fiscal_id <> '' AND b.fiscal_id <> '" + DCfdConsts.RFC_GEN_NAC + "' "
                     + "ORDER BY "
                     + "b.id_bp;";
-            
+
             ResultSet resultSet = statement.executeQuery(sql);
-            
+
             while (resultSet.next()) {
                 SExportDataUser user = createUserForPartnerSupplier(resultSet, rfcPattern);
-                
+
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
                     user.companies = companies;
@@ -857,8 +867,9 @@ public abstract class SExportDataUtils {
     }
 
     /**
-     * Consulta los socios de negocios proveedores, y los prepara para la exportación.
-     * 
+     * Consulta los socios de negocios proveedores, y los prepara para la
+     * exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de socios de negocios proveedores exportables.
      * @throws SQLException Si ocurre un error en la consulta.
@@ -866,32 +877,32 @@ public abstract class SExportDataUtils {
     private static ArrayList<SExportData> getListOfPartnerSuppliersToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> users = new ArrayList<>();
         int[] companies = SExportUtils.getLinkedUpSwapCompanies(session);
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(b.id_bp, CHAR)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PARTNER_SUPPLIER, "");
             Pattern rfcPattern = DCfdUtils.createRfcPattern();
-            
+
             String companiesToExclude = SExportUtils.getSwapCompaniesForSqlQuery(session); // excluir los socios que son las empresas en SWAP Services
-            
+
             String sql = getSqlQueryBasePartnerSuppliers()
                     + "WHERE "
                     + "(b.id_bp NOT IN (" + companiesToExclude + ") AND "
                     + "((NOT b.b_del AND NOT bc.b_del) "
                     + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PARTNER_SUPPLIER, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
+                            + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
                     + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) " // exclude general public and non established partners
                     + "ORDER BY "
                     + "b.id_bp;";
-            
+
             ResultSet resultSet = statement.executeQuery(sql);
-            
+
             while (resultSet.next()) {
                 SExportDataUser user = createUserForPartnerSupplier(resultSet, rfcPattern);
-                
+
                 if (user != null) {
                     // el usuario del socio de negocios proveedor no fue omitido:
                     user.companies = companies;
@@ -905,25 +916,24 @@ public abstract class SExportDataUtils {
 
     /**
      * Consulta los usuarios, y los prepara para la exportación.
-     * 
+     *
      * @param session Sesión de usuario.
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfAuthActorsToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> actors = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String userReferenceId = "CONCAT('" + SExportDataAuthActor.ACTOR_CODE_PREFIX_USER + "-', u.id_usr)";
             String supplierReferenceId = "CONCAT('" + SExportDataAuthActor.ACTOR_CODE_PREFIX_SUPPLIER + "-', b.id_bp)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AUTH_ACTOR, "");
-            
+
             /*
              * Explicación de la consulta unida para obtener los actores para el Sistema de Autorizaciones:
              * 1. Obtener los usuarios con socio de negocios que tengan cualquiera de los roles afines a "Comprador".
              * 2. Obtener los proveedores.
              */
-            
             String sql = "SELECT "
                     + "u.id_usr AS _external_id, '" + SExportDataAuthActor.ACTOR_TYPE_USER + "' AS _actor_type_id, 0 AS _is_vendor, 0 AS _is_customer, "
                     + "'" + SExportDataAuthActor.ENTITY_TYPE_PER + "' AS _entity_type, "
@@ -938,8 +948,8 @@ public abstract class SExportDataUtils {
                     + "((NOT u.b_del AND NOT b.b_del AND (e.b_del IS NULL OR NOT e.b_del)) "
                     + "AND " + userReferenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AUTH_ACTOR, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (u.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR (e.ts_usr_upd IS NOT NULL AND e.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
+                            + "OR b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (e.ts_usr_upd IS NOT NULL AND e.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
                     + "AND u.sync_settings LIKE '%" + SSyncRoles.COMPRADOR + "%' AND u.usr <> '' AND u.email <> '' "
                     + "UNION "
@@ -958,14 +968,14 @@ public abstract class SExportDataUtils {
                     + "((NOT b.b_del AND NOT bc.b_del) "
                     + "AND " + supplierReferenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AUTH_ACTOR, "") + "))"
                     + (lastSyncDatetime == null ? "" : " OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR (bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
+                            + "OR (bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))")
                     + ") "
                     + "AND b.b_sup AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) AND bbc.email_01 <> '' " // exclude general public and non established partners and partners without email
                     + "ORDER BY "
                     + "_external_id;";
 
             ResultSet resultSet = statement.executeQuery(sql);
-            
+
             while (resultSet.next()) {
                 int externalId = resultSet.getInt("_external_id");
                 int actorTypeId = resultSet.getInt("_actor_type_id");
@@ -974,25 +984,22 @@ public abstract class SExportDataUtils {
                 String[] emails = SMailUtils.sanitizeEmails(resultSet.getString("_email")).split(";");
                 String email = emails.length > 0 ? emails[0] : "";
                 String phone = resultSet.getString("_phone");
-                
+
                 // validar que el usuario tenga nombre y correo:
-                
                 if (fullName.isEmpty() || !SMailUtils.isValidEmail(email)) {
                     Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                             "Actor omitido (nombre vacío o correo inválido): ID = {0}; tipo = {1}, código = {2}; full name = {3}; email = {4}.",
-                            new Object[] { externalId, actorTypeId, code, fullName, email });
+                            new Object[]{externalId, actorTypeId, code, fullName, email});
                     continue; // omitir usuario inválido
                 }
-                
+
                 // validar que el usuario tenga nombre(s) y apellido(s):
-                
                 String firstName = SJsonUtils.sanitizeJson(resultSet.getString("_first_name"));
                 String lastName = SJsonUtils.sanitizeJson(resultSet.getString("_last_name"));
-                
+
                 // crear e inicializar el objeto para exportación de datos:
-                
                 SExportDataAuthActor actor = new SExportDataAuthActor();
-                
+
                 actor.external_id = externalId;
                 actor.actor_type_id = actorTypeId;
                 actor.is_vendor = resultSet.getBoolean("_is_vendor");
@@ -1005,18 +1012,18 @@ public abstract class SExportDataUtils {
                 actor.email = email;
                 actor.phone = phone;
                 actor.is_deleted = resultSet.getBoolean("_is_deleted");
-                
+
                 actor.companies = null;
-                
+
                 int jobTitleId = resultSet.getInt("_job_title_id");
-                
+
                 if (!resultSet.wasNull()) {
                     SExportDataAuthActor.OrgElement jobTitle = new SExportDataAuthActor.OrgElement();
-                    
+
                     jobTitle.element_type_id = SExportDataAuthActor.ORG_ELEMENT_TYPE_JOB_TITLE;
                     jobTitle.external_id = jobTitleId;
-                    
-                    actor.org_elements = new SExportDataAuthActor.OrgElement[] { jobTitle };
+
+                    actor.org_elements = new SExportDataAuthActor.OrgElement[]{jobTitle};
                 }
 
                 actors.add(actor);
@@ -1028,14 +1035,14 @@ public abstract class SExportDataUtils {
 
     /**
      * Consulta los puestos laborales, y los prepara para la exportación.
-     * 
+     *
      * @param session Sesión de usuario.
      * @return Lista de puesos laborales.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfAuthJobTitlesToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> functionalAreas = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(p.id_pos, CHAR)";
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AUTH_JOB_TITLE, "");
@@ -1057,7 +1064,7 @@ public abstract class SExportDataUtils {
 
             while (resultSet.next()) {
                 // crear e inicializar el objeto para exportación de datos:
-                
+
                 int externalId = resultSet.getInt("external_id");
                 String code = SJsonUtils.sanitizeJson(resultSet.getString("code"));
                 String name = SJsonUtils.sanitizeJson(resultSet.getString("name"));
@@ -1073,32 +1080,32 @@ public abstract class SExportDataUtils {
                 functionalAreas.add(orgElement);
             }
         }
-        
+
         return functionalAreas;
     }
 
     /**
-     * Consulta las áreas funcionales de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
-     * 
+     * Consulta las áreas funcionales de todas las empresas configuradas para
+     * SWAP Services, y los prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de usuarios exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfFunctionalAreasToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> functionalAreas = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer áreas funcionales de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONVERT(fs.id_func_sub, CHAR)";
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.FUNCTIONAL_AREA, database);
-                
+
                 String sql = "SELECT "
                         + "fs.id_func_sub AS external_id, "
                         + "fs.code AS code, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS name, fs.b_del OR f.b_del AS is_deleted "
@@ -1109,18 +1116,18 @@ public abstract class SExportDataUtils {
                         + "((NOT fs.b_del AND NOT f.b_del) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.FUNCTIONAL_AREA, database) + "))"
                         + (lastSyncDatetime == null ? "" : " OR (fs.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                            + "OR f.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                                + "OR f.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
                         + "ORDER BY "
                         + "fs.id_func_sub;";
 
                 ResultSet resultSet = statement.executeQuery(sql);
-                
+
                 while (resultSet.next()) {
                     // crear e inicializar el objeto para exportación de datos:
-                    
+
                     SExportDataFunctionalArea functionalArea = new SExportDataFunctionalArea();
-                    
+
                     functionalArea.code = SJsonUtils.sanitizeJson(resultSet.getString("code"));
                     functionalArea.name = SJsonUtils.sanitizeJson(resultSet.getString("name"));
                     functionalArea.is_deleted = resultSet.getBoolean("is_deleted");
@@ -1131,13 +1138,14 @@ public abstract class SExportDataUtils {
                 }
             }
         }
-        
+
         return functionalAreas;
     }
-    
+
     /**
-     * Consulta los pedidos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
-     * 
+     * Consulta los pedidos de compras de todas las empresas configuradas para
+     * SWAP Services, y los prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @param idYear
      * @param idDoc
@@ -1146,12 +1154,12 @@ public abstract class SExportDataUtils {
      * @return Lista de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session, final int idYear, final int idDoc, 
-                                                                        final boolean uploadOcPDF, final boolean withJsonData) throws SQLException, Exception {
+    public static ArrayList<SExportData> getListOfPurchaseOrdersToExport(final SGuiSession session, final int idYear, final int idDoc,
+            final boolean uploadOcPDF, final boolean withJsonData) throws SQLException, Exception {
         ArrayList<SExportData> lDps = new ArrayList<>();
         String sBucketName = CloudStorageManager.getBucketName();
         String sProjectID = CloudStorageManager.getProjectID();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
             HashMap<Integer, String> databasesMap;
@@ -1169,12 +1177,11 @@ public abstract class SExportDataUtils {
             else {
                 databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
             }
-            
+
             STrnDBDocuments oDocCore = new STrnDBDocuments();
             String rms = "";
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
@@ -1221,7 +1228,7 @@ public abstract class SExportDataUtils {
                         + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
                         + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
                         + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " ";
-                
+
                 // Agregar filtro específico de documento si se proporcionó
                 if (idYear > 0 && idDoc > 0) {
                     sql += "AND d.id_year = " + idYear + " AND d.id_doc = " + idDoc + " ";
@@ -1233,9 +1240,9 @@ public abstract class SExportDataUtils {
                             + "AND d.b_authorn AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + ") "
                             + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER, database) + "))"
                             + (lastSyncDatetime == null ? "" : " OR ("
-                            + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                            + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                            + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                                    + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                    + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                                    + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                             + ")";
                 }
                 sql += ";";
@@ -1265,14 +1272,14 @@ public abstract class SExportDataUtils {
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     rms = resultSet.getString("_rms");
-                    
+
                     if (resultSet.getInt("d.fid_st_dps_authorn") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
                         oDpsExport.authz_authorization = SSwapConsts.AUTHZ_STATUS_OK;
                     }
                     else if (resultSet.getInt("d.fid_st_dps_authorn") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
                         oDpsExport.authz_authorization = SSwapConsts.AUTHZ_STATUS_REJECTED;
                     }
-                    
+
                     // PDF de la OC:
                     if (uploadOcPDF) {
                         SDbComSyncLogEntry oLogEty = SExportDpsFileUtils.getLastSynchronization(
@@ -1292,8 +1299,7 @@ public abstract class SExportDataUtils {
                                 oFile.project_id = sProjectID;
                                 oContainer.file.add(oFile);
                             }
-                        }
-                        // Si no existe en la bitácora de siie, se sube
+                        } // Si no existe en la bitácora de siie, se sube
                         else {
                             Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "PDF de OC No existe. "
                                     + "Sincronizando: " + oDpsExport.id_year + "_" + oDpsExport.id_doc);
@@ -1313,8 +1319,7 @@ public abstract class SExportDataUtils {
                                         if (oFile.filename_storage.isEmpty()) {
                                             Logger.getLogger(SExportUtils.class.getName()).log(Level.WARNING, "filename_storage de OC vacío, se omite. "
                                                     + "" + oDpsExport.id_year + "_" + oDpsExport.id_doc);
-                                        }
-                                        else {
+                                        } else {
                                             oFile.filename_original = oFile.filename_storage;
                                             oFile.title = "PDF de la OC";
                                             oFile.bucket_name = sBucketName;
@@ -1331,8 +1336,7 @@ public abstract class SExportDataUtils {
                                     try {
                                         // guardar encabezado de log de archivos:
                                         SDpsGoogleCloudUtils.saveSyncLogs(session, l, false);
-                                    }
-                                    catch (Exception e) {
+                                    } catch (Exception e) {
                                         Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, "No se pudieron guardar los logs de sincronización de archivos de OC.", e);
                                     }
                                 }
@@ -1343,7 +1347,7 @@ public abstract class SExportDataUtils {
                             }
                         }
                     }
-                    
+
                     // documentos (archivos de cotizaciones)
                     boolean withUrl = false;
                     ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(oDpsExport.id_year, oDpsExport.id_doc, withUrl, statement.getConnection().createStatement(), database);
@@ -1356,14 +1360,14 @@ public abstract class SExportDataUtils {
                         else {
                             oDpsFileExport.title = "Evidencia de cotización";
                             oDpsFileExport.filename_original = oDpsFile.getoWebFile().getUserFileName() != null && !oDpsFile.getoWebFile().getUserFileName().isEmpty()
-                                                                ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
+                                    ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
                             oDpsFileExport.bucket_name = sBucketName;
                             oDpsFileExport.project_id = sProjectID;
 
                             oContainer.file.add(oDpsFileExport);
                         }
                     }
-                    
+
                     // documentos (archivos de requisiciones)
                     String fileName;
                     String[] idsRms;
@@ -1389,33 +1393,34 @@ public abstract class SExportDataUtils {
                             }
                         }
                     }
-                    
+
                     oContainer.document = oDpsExport;
-                    
+
                     lDps.add(oContainer);
                 }
             }
         }
-        
+
         SShareData oSD = new SShareData();
         boolean withUrl = false;
         for (SExportData oDps : lDps) {
             SExportDataDpsContainer wDps = (SExportDataDpsContainer) oDps;
             if (withJsonData || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_OK || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_REJECTED) {
-                wDps.document.document_json = oSD.getDpsByPk(wDps.document.id_year, 
-                                                        wDps.document.id_doc, 
-                                                        wDps.document.company, 
-                                                        withUrl,
-                                                        session);
+                wDps.document.document_json = oSD.getDpsByPk(wDps.document.id_year,
+                        wDps.document.id_doc,
+                        wDps.document.company,
+                        withUrl,
+                        session);
             }
         }
-        
+
         return lDps;
     }
 
     /**
-     * Consulta las referencias de pedidos de compras del Portal de Proveedores de AETH, y las prepara para la exportación.
-     * 
+     * Consulta las referencias de pedidos de compras del Portal de Proveedores
+     * de AETH, y las prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de referencias de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
@@ -1423,14 +1428,13 @@ public abstract class SExportDataUtils {
     @Deprecated
     private static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExportAeth(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 if (companyId != 2852) {
                     continue;
@@ -1439,7 +1443,7 @@ public abstract class SExportDataUtils {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))"; // código de tipo de referencia + '/' + referencia
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
-                
+
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.ts_edit, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func, fs.name AS _func_sub, t.fid_bp_r, b.bp "
@@ -1624,11 +1628,11 @@ public abstract class SExportDataUtils {
 
                 while (resultSet.next()) {
                     String txnReference;
-                    
+
                     txnReference = resultSet.getString("t.num_ser");
                     txnReference += (txnReference.isEmpty() ? "" : "-") + resultSet.getString("t.num");
                     txnReference = SSwapConsts.TXN_REF_TYPE_ORDER_CODE + SSwapConsts.SEPARATOR_REF + txnReference; // código de tipo de referencia + '/' + referencia
-                    
+
                     SExportDataReference reference = new SExportDataReference();
 
                     reference.external_company_id = companyId;
@@ -1656,22 +1660,22 @@ public abstract class SExportDataUtils {
     }
 
     /**
-     * Consulta las referencias de pedidos de compras de todas las empresas configuradas para SWAP Services, y las prepara para la exportación.
-     * 
+     * Consulta las referencias de pedidos de compras de todas las empresas
+     * configuradas para SWAP Services, y las prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de referencias de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 /*
                  * Explicación de la consulta para obtener las referencias de transacciones de órdenes de compras:
@@ -1684,11 +1688,11 @@ public abstract class SExportDataUtils {
                  *    - contando el total de sus partidas y las que ya están totalmente enlazadas;
                  *    - recuperando solamente pedidos con partidas pendientes de enlazar.
                  */
-                
+
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))"; // código de tipo de referencia + '/' + referencia
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
-                
+
                 String sqlConcepts = "SELECT "
                         + "DISTINCT t.item_key, t.item "
                         + "FROM ("
@@ -1711,7 +1715,7 @@ public abstract class SExportDataUtils {
                         + "item_key, item "
                         + "LIMIT " + MAX_CONCEPTS + ") AS t "
                         + "ORDER BY t.item_key, t.item;";
-                
+
                 String sqlCostCenters = "SELECT "
                         + "DISTINCT cc.id_cc, cc.cc "
                         + "FROM "
@@ -1721,15 +1725,15 @@ public abstract class SExportDataUtils {
                         + "NOT de.b_del AND de.id_year = ? AND de.id_doc = ? "
                         + "ORDER BY "
                         + "cc.id_cc, cc.cc;";
-                
+
                 PreparedStatement prepStatConcepts = session.getStatement().getConnection().prepareStatement(sqlConcepts);
                 PreparedStatement prepStatCostProfitCenters = session.getStatement().getConnection().prepareStatement(sqlCostCenters);
-                
+
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, "
                         + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_authorn, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_bp_r, b.bp, t.fid_usr_new, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
-                        + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked "
+                        + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked, COALESCE(dpsau.nts, '') AS authz_nts "
                         + "FROM ("
                         + "SELECT "
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
@@ -1766,13 +1770,21 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = t.id_year AND dcfd.id_doc = t.id_doc "
+                        + "LEFT JOIN (SELECT  "
+                        + "    MAX(da.id_authorn), da.id_year, da.id_doc, da.nts "
+                        + "FROM "
+                        + "     " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " AS da "
+                        + "WHERE "
+                        + "    NOT b_del "
+                        + "GROUP BY id_year , id_doc "
+                        + "ORDER BY id_year DESC , id_doc DESC) AS dpsau ON t.id_year = dpsau.id_year AND t.id_doc = dpsau.id_doc "
                         + "WHERE ("
                         + "((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND t.b_authorn AND NOT t.b_link) "
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
                         + (lastSyncDatetime == null ? "" : " OR ("
-                        + "(t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (t.b_del OR t.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                        + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                        + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                                + "(t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND (t.b_del OR t.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                                + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
                         + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) " // exclude orders from general public and non established partners
                         + "GROUP BY "
@@ -1788,33 +1800,33 @@ public abstract class SExportDataUtils {
                 while (resultSet.next()) {
                     int dpsYear = resultSet.getInt("t.id_year");
                     int dpsDoc = resultSet.getInt("t.id_doc");
-                    
+
                     String txnReference = resultSet.getString("t.num_ser");
                     txnReference += (txnReference.isEmpty() ? "" : "-") + resultSet.getString("t.num");
                     txnReference = SSwapConsts.TXN_REF_TYPE_ORDER_CODE + SSwapConsts.SEPARATOR_REF + txnReference; // código de tipo de referencia + '/' + referencia
-                    
+
                     String concepts = "";
                     prepStatConcepts.setInt(1, dpsYear);
                     prepStatConcepts.setInt(2, dpsDoc);
                     prepStatConcepts.setInt(3, dpsYear);
                     prepStatConcepts.setInt(4, dpsDoc);
-                    
+
                     try (ResultSet resultSetAux = prepStatConcepts.executeQuery()) {
                         while (resultSetAux.next()) {
                             concepts += (concepts.isEmpty() ? "" : ";") + resultSetAux.getString("t.item_key") + " - " + resultSetAux.getString("t.item");
                         }
                     }
-                    
+
                     String costProfitCenters = "";
                     prepStatCostProfitCenters.setInt(1, dpsYear);
                     prepStatCostProfitCenters.setInt(2, dpsDoc);
-                    
+
                     try (ResultSet resultSetAux = prepStatCostProfitCenters.executeQuery()) {
                         while (resultSetAux.next()) {
                             costProfitCenters += (costProfitCenters.isEmpty() ? "" : ";") + resultSetAux.getString("cc.id_cc") + " - " + resultSetAux.getString("cc.cc");
                         }
                     }
-                    
+
                     SExportDataReference reference = new SExportDataReference();
 
                     reference.external_id = dpsYear + "_" + dpsDoc;
@@ -1833,6 +1845,7 @@ public abstract class SExportDataUtils {
                     reference.cost_profit_centers = costProfitCenters;
                     reference.owner_id = resultSet.getInt("t.fid_usr_new");
                     reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
+                    reference.auth_comments = resultSet.getString("authz_nts");
 
                     references.add(reference);
                 }
@@ -1841,32 +1854,32 @@ public abstract class SExportDataUtils {
 
         return references;
     }
-    
+
     /**
-     * Consulta las referencias de boletos de báscula de todas las empresas configuradas para SWAP Services, y las prepara para la exportación.
-     * 
+     * Consulta las referencias de boletos de báscula de todas las empresas
+     * configuradas para SWAP Services, y las prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de referencias de boletos de báscula exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfRefsOfScaleTicketsToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 String swapSomParamValue = SCfgUtils.getParamValue(statement, SDataConstantsSys.CFG_PARAM_SWAP_SOM, database);
                 SSwapUtils.SomSettings somSettings = new SSwapUtils.SomSettings(swapSomParamValue);
-                
+
                 if (somSettings.LinkUp) {
                     // SOM link up for this company!
-                    
+
                     Exception somException = null;
                     SDbDatabase somDatabase = new SDbDatabase(SDbConsts.DBMS_MYSQL);
                     if (somDatabase.connect(somSettings.DbmsHost, somSettings.DbmsPort, somSettings.DbName, somSettings.DbmsUser, somSettings.DbmsPswd) == SDbConsts.CONNECTION_OK) {
@@ -1874,15 +1887,15 @@ public abstract class SExportDataUtils {
                             try (Statement somStatement = somDatabase.getConnection().createStatement()) {
                                 String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_SCALE_IN_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(s.code, '-', t.num))"; // código de tipo de referencia + '/' + referencia
                                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_SCALE_TICKET, database);
-                                
+
                                 String syncedRegistries = "";
-                                
+
                                 try (ResultSet resultSet = statement.executeQuery(getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_SCALE_TICKET, database))) {
                                     while (resultSet.next()) {
                                         syncedRegistries += (syncedRegistries.isEmpty() ? "" : ", ") + "'" + resultSet.getString(1) + "'";
                                     }
                                 }
-                                
+
                                 if (syncedRegistries.isEmpty()) {
                                     syncedRegistries = "''";
                                 }
@@ -1899,7 +1912,7 @@ public abstract class SExportDataUtils {
                                         + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) "
                                         + "AND " + referenceId + " NOT IN (" + syncedRegistries + "))"
                                         + (lastSyncDatetime == null ? "" : " OR ("
-                                        + "t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                                                + "t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                                         + ") "
                                         + "AND t.dt >= '" + SLibUtils.DbmsDateFormatDate.format(somSettings.Start) + "' "
                                         + "ORDER BY s.code, t.num, t.id_tic;";
@@ -1910,7 +1923,7 @@ public abstract class SExportDataUtils {
                                     String concepts = "CHOFER: " + somResultSet.getString("t.drv") + "; "
                                             + "PLACAS: " + somResultSet.getString("t.pla") + "; "
                                             + somResultSet.getString("i.name") + " " + SLibUtils.DecimalFormatInteger.format(somResultSet.getDouble("t.qty")) + " " + somResultSet.getString("u.code");
-                                    
+
                                     SExportDataReference reference = new SExportDataReference();
 
                                     reference.external_id = "" + somResultSet.getInt("t.id_tic");
@@ -1941,11 +1954,11 @@ public abstract class SExportDataUtils {
                             somDatabase.disconnect();
                         }
                     }
-                    
+
                     if (somException != null) {
                         throw somException;
                     }
-                    
+
                     break; // only one processing is required
                 }
             }
@@ -1953,12 +1966,15 @@ public abstract class SExportDataUtils {
 
         return references;
     }
-    
+
     /**
-     * Consulta los pagos de compras de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
-     * Exporta pagos en los estatus "nuevo" y "operado (en proceso)":
-     * a) los pagos "nuevo" solo tienen una partida a manera de "solicitud de pago": un solo pago a un documento o un solo anticipo;
-     * b) los pagos "operado (en proceso)" pueden tener varias partidas: uno o más pagos a documentos o uno o más anticipos.
+     * Consulta los pagos de compras de todas las empresas configuradas para
+     * SWAP Services, y los prepara para la exportación. Exporta pagos en los
+     * estatus "nuevo" y "operado (en proceso)": a) los pagos "nuevo" solo
+     * tienen una partida a manera de "solicitud de pago": un solo pago a un
+     * documento o un solo anticipo; b) los pagos "operado (en proceso)" pueden
+     * tener varias partidas: uno o más pagos a documentos o uno o más
+     * anticipos.
      *
      * @param session Sesión de usuario.
      * @return Lista de pagos de compras exportables.
@@ -1966,18 +1982,18 @@ public abstract class SExportDataUtils {
      */
     private static ArrayList<SExportData> getListOfPurchasePaymentsToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> payments = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 String referenceId = "CONVERT(p.id_pay, CHAR)";
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT, database);
-                
+
                 String sql = "SELECT DISTINCT " // XXX TO-DO: "DISTINCT" no debería ser necesario, se encontró un registro de procesamiento de datos de SWAP Services para el documento PK 2025-14514!!!
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
@@ -2023,17 +2039,17 @@ public abstract class SExportDataUtils {
                 int currentPaymentId = 0;
                 SExportDataPayment currentPayment = null;
                 HashMap<SExportDataPayment, ArrayList<SExportDataPaymentEntry>> paymentEntriesMap = new HashMap<>();
-                
+
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 while (resultSet.next()) {
                     // payment:
-                    
+
                     int paymentId = resultSet.getInt("p.id_pay");
-                    
+
                     if (currentPaymentId != paymentId) {
                         currentPaymentId = paymentId;
-                        
+
                         currentPayment = new SExportDataPayment();
 
                         currentPayment.company = companyId;
@@ -2058,7 +2074,7 @@ public abstract class SExportDataUtils {
                         currentPayment.priority = resultSet.getInt("p.priority");
                         currentPayment.notes = resultSet.getString("p.nts");
                         currentPayment.is_receipt_payment_req = resultSet.getBoolean("p.b_rcpt_pay_req") ? 1 : 0;
-                        
+
                         int oldStatusPaymentId = resultSet.getInt("p.fk_st_pay");
                         currentPayment.payment_status = SDbPayment.getSettledStatusPaymentId(oldStatusPaymentId);
                         currentPayment.authz_authorization_id = SSwapConsts.AUTHZ_STATUS_PENDING;
@@ -2077,14 +2093,13 @@ public abstract class SExportDataUtils {
 
                         //currentPayment.sched_user = null;
                         //currentPayment.sched_at = null;
-                        
                         if (oldStatusPaymentId == SModSysConsts.FINS_ST_PAY_EXEC_P) {
                             currentPayment.exec_user = resultSet.getInt("p.fk_usr_exec");
                             currentPayment.exec_at = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.ts_usr_exec"));
                         }
-                        
+
                         currentPayment.is_deleted = resultSet.getBoolean("p.b_del") ? 1 : 0;
-                        
+
                         if (((SClientInterface) session.getClient()).isDev()) {
                             currentPayment.user_id = 60; // slopez
                         }
@@ -2094,7 +2109,6 @@ public abstract class SExportDataUtils {
                     }
 
                     // payment entry:
-
                     SExportDataPaymentEntry paymentEntry = new SExportDataPaymentEntry();
 
                     paymentEntry.entry_type = resultSet.getString("pe.ety_tp");
@@ -2112,9 +2126,9 @@ public abstract class SExportDataUtils {
                     paymentEntry.document_bal_unpd_app = SExportUtils.FormatStdAmount.format(resultSet.getDouble("pe.doc_bal_unpd_app_cur_r"));
                     paymentEntry.document_bal_prev_exec = paymentEntry.document_bal_prev_app; // same value "at application"!
                     paymentEntry.document_bal_unpd_exec = paymentEntry.document_bal_unpd_app; // same value "at application"!
-                    
+
                     int externalId = resultSet.getInt("sdp.ext_data_id");
-                    
+
                     if (resultSet.wasNull() || paymentEntry.entry_type.equals(SDbPaymentEntry.TYPE_ADVANCE)) {
                         paymentEntry.document_n_id = null;
                         paymentEntry.document_uuid = null;
@@ -2125,15 +2139,15 @@ public abstract class SExportDataUtils {
                     }
                     else {
                         String uuid = resultSet.getString("_cfd_uuid");
-                        
+
                         if (resultSet.wasNull() || uuid.isEmpty()) {
                             uuid = resultSet.getString("sdp.ext_data_uuid");
-                            
+
                             if (resultSet.wasNull()) {
                                 uuid = "";
                             }
                         }
-                        
+
                         paymentEntry.document_n_id = externalId;
                         paymentEntry.document_uuid = uuid;
                         paymentEntry.document_folio = resultSet.getString("_dps_folio");
@@ -2141,23 +2155,23 @@ public abstract class SExportDataUtils {
                         paymentEntry.document_currency = resultSet.getString("_dps_cur_key");
                         paymentEntry.document_amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("d.tot_cur_r"));
                     }
-                    
+
                     ArrayList<SExportDataPaymentEntry> entries = paymentEntriesMap.get(currentPayment);
-                    
+
                     if (entries == null) {
                         entries = new ArrayList<>();
                         paymentEntriesMap.put(currentPayment, entries);
                     }
-                    
+
                     entries.add(paymentEntry);
                 }
-                
+
                 for (SExportDataPayment payment : paymentEntriesMap.keySet()) {
                     SRequestPaymentsBody.Payment data = new SRequestPaymentsBody.Payment();
 
                     data.payment = payment;
                     data.entries = (SExportDataPaymentEntry[]) paymentEntriesMap.get(payment).toArray(new SExportDataPaymentEntry[0]);
-                    data.files = new SExportDataFile[] { };
+                    data.files = new SExportDataFile[]{};
 
                     payments.add(data);
                 }
@@ -2168,37 +2182,37 @@ public abstract class SExportDataUtils {
     }
 
     /**
-     * Consulta los pagos de compras por actualizar de todas las empresas configuradas para SWAP Services, y los prepara para la exportación.
-     * 
+     * Consulta los pagos de compras por actualizar de todas las empresas
+     * configuradas para SWAP Services, y los prepara para la exportación.
+     *
      * @param session Sesión de usuario.
      * @return Lista de pagos de compras por actualizar exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
     private static ArrayList<SExportData> getListOfPurchasePaymentUpdatesToExport(final SGuiSession session) throws SQLException, Exception {
         ArrayList<SExportData> payments = new ArrayList<>();
-        
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-            
+
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-            String statesToUpdateAllways =
-                    SModSysConsts.FINS_ST_PAY_REJC_P + ", "
+            String statesToUpdateAllways
+                    = SModSysConsts.FINS_ST_PAY_REJC_P + ", "
                     + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
                     //+ SModSysConsts.FINS_ST_PAY_OPER_P + ", " // no aplica, se exporta como nuevo pago
                     + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " // exportar como "eliminado", se integra a un nuevo pago
                     + SModSysConsts.FINS_ST_PAY_RCPT_P + ", "
                     //+ SModSysConsts.FINS_ST_PAY_BLOC_P + ", " // no aplica
                     + SModSysConsts.FINS_ST_PAY_CANC_P; // exportar como "eliminado"
-            
+
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
-            
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
                 /* ¡conservar este bloque por consistencia con las demás consultas, pero en esta funcionalidad NO se necesita!
-                String referenceId = "CONVERT(p.id_pay, CHAR)";
-                Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_UPD, database);
-                */
-                
+                 String referenceId = "CONVERT(p.id_pay, CHAR)";
+                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_PAYMENT_UPD, database);
+                 */
+
                 String sql = "SELECT "
                         // payment:
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
@@ -2211,10 +2225,10 @@ public abstract class SExportDataUtils {
                         + "WHERE ("
                         + "(/*NOT p.b_del AND */p.fk_st_pay IN (" + statesToUpdateAllways + ")) " // exportar todos los pagos actualizables, incluso los eliminados
                         /* ¡conservar este bloque por consistencia con las demás consultas, pero en esta funcionalidad NO se necesita!
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + ") AND "
-                        + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
-                        */
+                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + "))"
+                         + (lastSyncDatetime == null ? "" : " OR (" + referenceId + " IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT_UPD, database) + ") AND "
+                         + "(p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' AND p.b_del))")
+                         */
                         + ") "
                         + " "
                         + "ORDER BY "
@@ -2224,27 +2238,27 @@ public abstract class SExportDataUtils {
 
                 while (resultSet.next()) {
                     // payment:
-                    
+
                     SExportDataPaymentUpdate paymentUpdate = new SExportDataPaymentUpdate();
 
                     paymentUpdate.company = companyId;
-                    
+
                     int paymentId = resultSet.getInt("p.id_pay");
-                    
+
                     paymentUpdate.payment_id = paymentId;
-                    
+
                     int oldStatusPaymentId = resultSet.getInt("p.fk_st_pay");
-                    
+
                     switch (oldStatusPaymentId) {
                         case SModSysConsts.FINS_ST_PAY_SCHED_P:
                             Date dateScheduled = resultSet.getDate("p.dt_sched_n");
                             if (!resultSet.wasNull()) {
                                 boolean isSchedule = resultSet.getTimestamp("p.ts_usr_upd").equals(resultSet.getTimestamp("p.ts_usr_sched")); // both TS of update and schedule are the same when payment was scheduled!
-                                
+
                                 paymentUpdate.sched_date_n = SLibUtils.DbmsDateFormatDate.format(dateScheduled);
                                 paymentUpdate.sched_user = resultSet.getInt("p.fk_usr_sched");
                                 paymentUpdate.sched_at = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.ts_usr_sched"));
-                                
+
                                 if (isSchedule) {
                                     // only if payment is scheduled, excluding a reschedule, export as well authorization data (that happens to be the same as the corresponding schedule data!):
                                     paymentUpdate.authorized_by = resultSet.getInt("p.fk_usr_upd");
@@ -2254,38 +2268,38 @@ public abstract class SExportDataUtils {
                             else {
                                 Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
                                         "Pago omitido (fecha programación nula): ID = {0}.",
-                                        new Object[] { paymentId });
+                                        new Object[]{paymentId});
                                 continue; // omitir pago inconsistente
                             }
                             break;
-                            
+
                         case SModSysConsts.FINS_ST_PAY_REJC_P:
                             // if payment is rejected, export as well authorization data (that happens to be the same as the corresponding schedule data!):
                             paymentUpdate.authorized_by = resultSet.getInt("p.fk_usr_upd");
                             paymentUpdate.authorized_at = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.ts_usr_upd"));
                             break;
-                            
+
                         //case SModSysConsts.FINS_ST_PAY_OPER_P:
                         case SModSysConsts.FINS_ST_PAY_SUBR_P:
                         case SModSysConsts.FINS_ST_PAY_RCPT_P:
                         //case SModSysConsts.FINS_ST_PAY_BLOC_P:
                         case SModSysConsts.FINS_ST_PAY_CANC_P:
                             break;
-                            
+
                         default:
-                            // nothing
+                        // nothing
                     }
-                    
+
                     int newStatusPaymentId = SDbPayment.getSettledStatusPaymentId(oldStatusPaymentId);
-                    
+
                     if (newStatusPaymentId != 0) {
                         paymentUpdate.payment_status = newStatusPaymentId;
                     }
-                    
+
                     boolean exportAsDeleted = SDbPayment.exportStatusPaymentAsDeleted(oldStatusPaymentId);
-                    
+
                     paymentUpdate.is_deleted = exportAsDeleted || resultSet.getBoolean("p.b_del") ? 1 : 0;
-                    
+
                     if (paymentUpdate.is_deleted == 1) {
                         paymentUpdate.deleted_by = resultSet.getInt("p.fk_usr_upd");
                     }
@@ -2299,7 +2313,8 @@ public abstract class SExportDataUtils {
     }
 
     /**
-     * Obtiene la lista de usuarios o proveedores a exportar según el tipo de sincronización.
+     * Obtiene la lista de usuarios o proveedores a exportar según el tipo de
+     * sincronización.
      *
      * @param session Sesión de usuario.
      * @param syncType Tipo de sincronización.
@@ -2308,12 +2323,12 @@ public abstract class SExportDataUtils {
      */
     public static ArrayList<SExportData> getDataToExport(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
         ArrayList<SExportData> data = null;
-        
+
         switch (syncType) {
             case USER:
                 data = getListOfUsersToExport(session);
                 break;
-                
+
             case PARTNER_SUPPLIER:
                 if (((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfPartnerSuppliersToExportAeth(session);
@@ -2322,29 +2337,29 @@ public abstract class SExportDataUtils {
                     data = getListOfPartnerSuppliersToExport(session);
                 }
                 break;
-                
+
             case PARTNER_CUSTOMER:
                 break;
-                
+
             case AUTH_ACTOR:
                 data = getListOfAuthActorsToExport(session);
                 break;
-                
+
             case AUTH_JOB_TITLE:
                 data = getListOfAuthJobTitlesToExport(session);
                 break;
-                
+
             case FUNCTIONAL_AREA:
                 data = getListOfFunctionalAreasToExport(session);
                 break;
-                
+
             case PUR_ORDER:
                 exportPurchaseOrdersFiles(session);
                 boolean uploadPdf = true;
                 boolean withJsonData = false;
                 data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf, withJsonData);
                 break;
-                
+
             case PUR_REF_ORDER:
                 if (((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfRefsOfPurchaseOrderToExportAeth(session);
@@ -2353,36 +2368,37 @@ public abstract class SExportDataUtils {
                     data = getListOfRefsOfPurchaseOrderToExport(session);
                 }
                 break;
-                
+
             case PUR_REF_SCALE_TICKET:
                 data = getListOfRefsOfScaleTicketsToExport(session);
                 break;
-                
+
             case PUR_PAYMENT:
                 data = getListOfPurchasePaymentsToExport(session);
                 break;
-                
+
             case PUR_PAYMENT_UPD:
                 data = getListOfPurchasePaymentUpdatesToExport(session);
                 break;
-                
+
             default:
                 throw new IllegalArgumentException(SExportUtils.ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
         }
-        
+
         return data;
     }
 
     /**
      * Obtiene un proveedor específico por su ID fiscal.
-     * 
+     *
      * @param statement Objeto Statement para ejecutar la consulta.
      * @param fiscalId ID fiscal del proveedor a buscar.
-     * @return Un objeto <code>SExportDataUser</code> con los datos del proveedor, o <code>null</code> si no se encuentra.
+     * @return Un objeto <code>SExportDataUser</code> con los datos del
+     * proveedor, o <code>null</code> si no se encuentra.
      */
     public static SExportDataUser getSupplierByFiscalId(final Statement statement, final String fiscalId) {
         SExportDataUser user = null;
-        
+
         String sql = getSqlQueryBasePartnerSuppliers()
                 + "WHERE "
                 + "b.fiscal_id = '" + fiscalId + "' "
@@ -2401,12 +2417,13 @@ public abstract class SExportDataUtils {
             e.printStackTrace();
             Logger.getLogger(SExportUtils.class.getName()).log(Level.SEVERE, null, e);
         }
-        
+
         return user;
     }
-    
+
     /**
      * Update status of authorizable resource.
+     *
      * @param statement
      * @param companyDbName
      * @param resourceType
@@ -2416,23 +2433,23 @@ public abstract class SExportDataUtils {
      * @param notes
      * @param newAmount
      * @param newDate
-     * @return 
+     * @return
      */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final String companyDbName, final int resourceType, final String resourceId, final int authStatusId, 
+    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final String companyDbName, final int resourceType, final String resourceId, final int authStatusId,
             final int userId, final String notes, final double newAmount, final String newDate) {
         SResourceStatusResponse oResponse;
-        
+
         try {
             oResponse = new SResourceStatusResponse();
             String sTable = "";
             String sWhere = "";
             String sUpdate = "";
             String sSecondQuery = "";
-            
+
             switch (resourceType) {
                 case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
                     sTable = SModConsts.TablesMap.get(SModConsts.FIN_PAY);
-                    
+
                     switch (authStatusId) {
                         case SSwapConsts.AUTHZ_STATUS_OK:
                             sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
@@ -2451,14 +2468,14 @@ public abstract class SExportDataUtils {
                                 sUpdate += "dt_sched_n = dt_req, ";
                             }
                             break;
-                            
+
                         case SSwapConsts.AUTHZ_STATUS_REJECTED:
-                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_REJC_P  + ", "
+                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_REJC_P + ", "
                                     + "dt_sched_n = NULL, "
                                     + "fk_usr_sched = " + SUtilConsts.USR_NA_ID + ", "
                                     + "ts_usr_sched = NOW(), "; // XXX se puede actualizar este TS o no en el rechazo, por lo pronto se deja
                             break;
-                            
+
                         default:
                             oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
                             oResponse.message = "El tipo de estatus de autorización es desconocido (" + authStatusId + ").";
@@ -2466,11 +2483,11 @@ public abstract class SExportDataUtils {
 
                             return oResponse;
                     }
-                    
+
                     sUpdate += "nts_auth_flow = '" + SLibUtils.textToSql(notes) + "', "
                             + "fk_usr_upd = " + userId + ", "
                             + "ts_usr_upd = NOW() ";
-                    
+
                     sWhere = "WHERE id_pay = " + resourceId;
                     break;
 
@@ -2527,13 +2544,13 @@ public abstract class SExportDataUtils {
 
         return oResponse;
     }
-    
+
     public static class BankAccount {
-        
+
         public String BankName;
         public String BankFiscalId;
         public String BankAccount;
-        
+
         public BankAccount(final ResultSet resultSet, final String colName, final String colFiscalId, final String colFiscalFrgId, final String colAccount, final String colAccountStd) throws SQLException {
             BankName = resultSet.getString(colName);
             BankFiscalId = "";
@@ -2544,12 +2561,12 @@ public abstract class SExportDataUtils {
             }
             else {
                 // note that remaining data cannot be null:
-                
+
                 BankFiscalId = resultSet.getString(colFiscalFrgId); // check first foreign fiscal ID
                 if (BankFiscalId.isEmpty()) {
                     BankFiscalId = resultSet.getString(colFiscalId);
                 }
-                
+
                 BankAccount = resultSet.getString(colAccountStd); // check first standard account number (ClaBE)
                 if (BankAccount.isEmpty()) {
                     BankAccount = resultSet.getString(colAccount);
