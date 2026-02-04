@@ -120,13 +120,13 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Sergio Flores, Edwin Carmona, Adrian Aviles
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 294.19"; // release date: 2026-02-04
+    public static final String APP_RELEASE = "3.2 294.20"; // release date: 2026-02-04
 
     public static final String APP_COPYRIGHT = "2007-2026";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
