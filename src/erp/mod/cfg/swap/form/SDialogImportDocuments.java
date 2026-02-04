@@ -972,6 +972,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha vencimiento factura"));
                 
                 return gridColumnsForm;
             }
@@ -1347,6 +1348,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     }
 
                                     document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
+                                    
+                                    String dueDateAsText = docNode.has("due_date") && !docNode.path("due_date").isNull() ? docNode.get("due_date").asText() : "";
+                                    document.DueDate = dueDateAsText == null || dueDateAsText.isEmpty() || dueDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(dueDateAsText);
 
                                     JsonNode referencesNode = docNode.path("references");
                                     if (referencesNode.isArray()) {
@@ -1384,8 +1388,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
                                     double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
                                     double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
-                                    String requiredPaymentDateAsText = docNode.has("payment_date") ? docNode.get("payment_date").asText() : "";
-                                    Date requiredPaymentDate = docNode.path("payment_date").isNull() || requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
+                                    String requiredPaymentDateAsText = docNode.has("payment_date") && !docNode.path("payment_date").isNull() ? docNode.get("payment_date").asText() : "";
+                                    Date requiredPaymentDate = requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
 
                                     if (requiredPaymentDate == null && requiredPaymentPct == 0) {
                                         document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;

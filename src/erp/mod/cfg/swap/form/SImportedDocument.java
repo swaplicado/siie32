@@ -112,6 +112,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public String NumberSeries;
     public String Number;
     public Date Date;
+    public Date DueDate;
     public int ReferencesType;
     public String ReferencesAsText;
     public String Description;
@@ -152,6 +153,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         NumberSeries = "";
         Number = "";
         Date = null;
+        DueDate = null;
         ReferencesType = 0;
         ReferencesAsText = "";
         Description = "";
@@ -243,6 +245,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     public Date getRequiredPaymentDateEffective() {
         return RequiredPaymentDateNew != null ? RequiredPaymentDateNew : RequiredPaymentDate;
+    }
+    
+    /**
+     * Get effective required payment date.
+     * @return 
+     */
+    public Date getDueDateEffective() {
+        return DueDate != null ? DueDate : getRequiredPaymentDateEffective();
     }
     
     /**
@@ -986,7 +996,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         int year = SLibTimeUtils.digestYear(Date)[0];
         SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
         SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
-        Date dueDate = getRequiredPaymentDateEffective();
+        Date dueDate = DueDate != null ? DueDate : getRequiredPaymentDateEffective();
         
         SDataDps dps = new SDataDps();
         
@@ -1301,6 +1311,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     }
                 }
                 value = string;
+                break;
+            case 34:
+                value = DueDate;
                 break;
             default:
                 // nothing

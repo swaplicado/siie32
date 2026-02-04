@@ -1151,56 +1151,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
-            /*
-            FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
-            miClient.getFileChooser().repaint();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
-            miClient.getFileChooser().setFileFilter(filter);
-            
-            SDataDps purchaseOrderDps = null; 
-
-            if (linkToOrder) {
-                moDialogDpsFinder.formReset();
-                moDialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, getDpsClassPreviousKey());
-                moDialogDpsFinder.setVisible(true);
-
-                if (moDialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    purchaseOrderDps = (SDataDps) moDialogDpsFinder.getValue(SDataConstants.TRN_DPS);
-                }
-            }
-
-            try {
-                if (!linkToOrder || (linkToOrder && purchaseOrderDps != null)) {
-                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        File file = miClient.getFileChooser().getSelectedFile();
-                        
-                        if (file.getName().toLowerCase().contains(".xml")) {
-                            SCfdRenderer renderer = new SCfdRenderer(miClient);
-                            SDataDps dpsRendered = renderer.renderCfdi(file, purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-                            
-                            if (dpsRendered != null) {
-                                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false }); // document type key, is imported
-                                miClient.getGuiModule(mnModule).setAuxRegistry(dpsRendered);
-                                
-                                if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
-                                    SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
-                                }
-                            }
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
-                                    + "(Archivo proporcionado: '" + file.getName() + "')");
-                        }
-                    }
-                    
-                    miClient.getFileChooser().resetChoosableFileFilters();
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(this, e);
-            }
-            */
         }
     }
     
