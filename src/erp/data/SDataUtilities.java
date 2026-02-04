@@ -222,7 +222,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public abstract class SDataUtilities {
 
@@ -1790,7 +1790,7 @@ public abstract class SDataUtilities {
     @SuppressWarnings("unchecked")
     public static SParamsItemPriceList obtainItemPrice(erp.client.SClientInterface client, int pnBizPartnerId, int pnBizPartnerBranchId, int pnBizPartnerCategoryId, int pnBizPartnerTypeId,
         int pnDpsCategoryId, java.util.Date ptDateDoc, int pnItemId, int pnFkCurrencyId) throws java.lang.Exception {
- 
+
         String sql = "";
         ResultSet resultSet = null;
 
@@ -1806,7 +1806,7 @@ public abstract class SDataUtilities {
             "lc.id_link = " + SModSysConsts.BPSS_LINK_CUS_MKT_TP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
             "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' " + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
             "INNER JOIN mkt_cfg_cus AS cc ON " +
-            "lc.id_ref_1 = cc.fid_tp_cus AND cc.b_del = 0 AND cc.id_cus = " + pnBizPartnerId + " AND lc.id_ref_2 = " + pnBizPartnerBranchId + " " +
+            "lc.id_ref_1 = cc.fid_tp_cus AND cc.b_del = 0 AND cc.id_cus = " + pnBizPartnerId + " " +
             "INNER JOIN mkt_plist_price AS p ON " +
             "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
             "INNER JOIN erp.cfgu_cur AS c ON " +
@@ -1824,7 +1824,7 @@ public abstract class SDataUtilities {
             "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' " + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
             "INNER JOIN erp.bpsu_bp_ct AS cc ON " +
             "cc.b_del = 0 AND cc.id_ct_bp = " + pnBizPartnerCategoryId + " AND " +
-            "cc.id_bp = " + pnBizPartnerId + " AND lc.id_ref_2 = " + pnBizPartnerBranchId + " " + 
+            "cc.id_bp = " + pnBizPartnerId + " " +
             "INNER JOIN mkt_plist_price AS p ON " +
             "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
             "INNER JOIN erp.cfgu_cur AS c ON " +
@@ -1839,7 +1839,7 @@ public abstract class SDataUtilities {
             "INNER JOIN mkt_plist AS l ON " +
             "lc.id_link = " + SModSysConsts.BPSS_LINK_BP + " AND lc.fid_plist = l.id_plist AND lc.b_del = 0 AND l.b_del = 0 AND " +
             "lc.id_dt_start <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(ptDateDoc) + "' AND " +
-            "lc.id_ref_1 = " + pnBizPartnerId + " AND lc.id_ref_2 = " + pnBizPartnerBranchId + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
+            "lc.id_ref_1 = " + pnBizPartnerId + " AND l.fid_ct_dps = " + pnDpsCategoryId + " " +
             "INNER JOIN mkt_plist_price AS p ON " +
             "l.id_plist = p.id_plist AND p.id_item = " + pnItemId + " " +
             "INNER JOIN erp.cfgu_cur AS c ON " +
