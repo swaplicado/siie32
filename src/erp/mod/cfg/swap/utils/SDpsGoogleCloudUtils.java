@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbDatabase;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -40,26 +42,31 @@ public class SDpsGoogleCloudUtils {
      * @param fileData Metadatos del archivo a procesar
      * @param oPdfFile
      * @param forceUpload
+     * @param sDbName
      * @return SDbComSyncLogEntry con el resultado del procesamiento, o null si no se requiere logging
      */
-    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData, File oPdfFile, final boolean forceUpload) {
+    public static SDbComSyncLogEntry processSingleRecord(final SGuiSession session, final SFileData fileData, File oPdfFile, final boolean forceUpload, final String sDbName) {
         SDbComSyncLogEntry logEntry = new SDbComSyncLogEntry();
         logEntry.setReferenceId(fileData.getIdYear() + "_" + fileData.getIdDoc());
         logEntry.setAuxDatabase(fileData.getDbName());
 
         CloudStorageFile gcsFile = null;
         boolean shouldLog = false;
+        SDbDatabase oDb = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+        if (sDbName != null && !sDbName.isEmpty()) {
+            oDb.connect(session.getDatabase().getDbHost(), session.getDatabase().getDbPort(), sDbName, session.getDatabase().getUserName(), session.getDatabase().getUserPassword());
+        }
 
         try {
             // 1. Verificar si el archivo existe en GCS
             if (!CloudStorageManager.storagedFileExists(fileData.getFileName()) || forceUpload) {
                 // Subir si no existe en GCS
                 SDataDps oDps = new SDataDps();
-                oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
+                oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                 File pdf;
                 if (oPdfFile == null) {
                     pdf = new File("temp", fileData.getFileName());
-                    STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                    STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                 }
                 else {
                     pdf = oPdfFile;
@@ -79,11 +86,11 @@ public class SDpsGoogleCloudUtils {
 
                 if (lastSync == null || fileData.getLastUpdate() == null || fileData.getLastUpdate().after(lastSync)) {
                     SDataDps oDps = new SDataDps();
-                    oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, session.getDatabase().getConnection().createStatement());
+                    oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                     File pdf;
                     if (oPdfFile == null) {
                         pdf = new File("temp", fileData.getFileName());
-                        STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                        STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                     }
                     else {
                         pdf = oPdfFile;
@@ -144,8 +151,9 @@ public class SDpsGoogleCloudUtils {
      * BD).
      * @param mFiles Mapa de archivos a subir: llave = {@link SFileData}, valor
      * = archivo físico.
+     * @param sDbName
      */
-    public static void uploadFiles(final SGuiSession session, HashMap<SFileData, File> mFiles) {
+    public static void uploadFiles(final SGuiSession session, HashMap<SFileData, File> mFiles, final String sDbName) {
         try {
             ObjectMapper objectMapper = new ObjectMapper(); // Convierte objetos en JSON
             ArrayList<SDbSyncLogEntry> lLogs = new ArrayList<>(); // Lista de logs a guardar
@@ -155,7 +163,7 @@ public class SDpsGoogleCloudUtils {
             for (Map.Entry<SFileData, File> entrySet : mFiles.entrySet()) {
                 SFileData fileData = entrySet.getKey();   // Metadatos del archivo
                 File file = entrySet.getValue();          // Archivo físico en el sistema
-                SDbComSyncLogEntry logEntry = SDpsGoogleCloudUtils.processSingleRecord(session, fileData, file, false);
+                SDbComSyncLogEntry logEntry = SDpsGoogleCloudUtils.processSingleRecord(session, fileData, file, false, sDbName);
                 lLogs.add(logEntry);
 
             }
@@ -169,14 +177,14 @@ public class SDpsGoogleCloudUtils {
         }
     }
 
-    public static void uploadFiles(final SGuiSession session, ArrayList<SFileData> lFiles) {
+    public static void uploadFiles(final SGuiSession session, ArrayList<SFileData> lFiles, final String sDbName) {
         try {
             ArrayList<SDbSyncLogEntry> lLogs = new ArrayList<>(); // Lista de logs a guardar
             boolean hasErrors = false; // Bandera para saber si hubo algún error en el lote
 
             // Recorre todos los archivos que se desean subir
             for (SFileData fileData : lFiles) {
-                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData, null, false);
+                SDbComSyncLogEntry logEntry = processSingleRecord(session, fileData, null, false, sDbName);
                 
                 if (logEntry != null) {
                     lLogs.add(logEntry);

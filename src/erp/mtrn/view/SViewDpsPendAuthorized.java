@@ -640,8 +640,8 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                         }
                         else {
                             try {
-                                
-                                STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                String sDbName = null;
+                                STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER, sDbName);
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);

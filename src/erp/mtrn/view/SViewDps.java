@@ -40,10 +40,10 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.utils.SDataRejectResource;
-import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocument;
+import erp.mod.cfg.swap.utils.SDataRejectResource;
+import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
@@ -1654,7 +1654,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             try {
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 
-                                STrnUtilities.createReportOrder(miClient, null, dps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                String sDbName = null;
+                                STrnUtilities.createReportOrder(miClient, null, dps, SDataConstantsPrint.PRINT_MODE_VIEWER, sDbName);
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);
@@ -2234,7 +2235,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             try {
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 
-                                STrnUtilities.createReportOrder(miClient, null, dps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                String sDbName = null;
+                                STrnUtilities.createReportOrder(miClient, null, dps, SDataConstantsPrint.PRINT_MODE_VIEWER, sDbName);
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);

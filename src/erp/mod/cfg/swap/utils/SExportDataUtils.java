@@ -320,14 +320,14 @@ public abstract class SExportDataUtils {
                         // comparacion de last update para actualizar el archivo
                         if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true, database);
                             lLogFiles.add(oLogEty);
                         }
                         else {
                             oFd = mapper.readValue(oLogEty.getResponseBody(), SFileData.class);
                             if (!CloudStorageManager.storagedFileExists(oFd.getFileName())) {
                                 oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
-                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true);
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true, database);
                                 lLogFiles.add(oLogEty);
                             }
                         }
@@ -338,7 +338,7 @@ public abstract class SExportDataUtils {
                                     oDpsExport.id_doc,
                                     database,
                                     resultSet.getTimestamp("_last_upd"));
-                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
+                            oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false, database);
                             if (oLogEty != null) {
                                 int responseCode = Integer.parseInt(oLogEty.getResponseCode());
                                 if (responseCode == SHttpConsts.RSC_SUCC_OK || responseCode == SHttpConsts.RSC_SUCC_CREATED) {
@@ -1308,7 +1308,7 @@ public abstract class SExportDataUtils {
                                         oDpsExport.id_doc,
                                         database,
                                         null);
-                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false);
+                                oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFileData, null, false, database);
                                 if (oLogEty != null) {
                                     if (Integer.parseInt(oLogEty.getResponseCode()) == 200
                                             || Integer.parseInt(oLogEty.getResponseCode()) == 201) {

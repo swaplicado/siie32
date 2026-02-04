@@ -82,6 +82,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.db.SDbDatabase;
 import sa.lib.gui.SGuiClient;
 import sa.lib.mail.SMail;
 import sa.lib.mail.SMailConsts;
@@ -104,6 +105,8 @@ public abstract class STrnUtilities {
     
     /** Map of payroll subject hints for mailing. Content: key = payroll ID; value = subject hint for mailing. */
     private static final HashMap<Integer, String> PayrollSubjectHintsMap = new HashMap<>();
+    
+    private static final HashMap<String, String> mapCompanyImgDirectory = new HashMap<>();
 
     /**
      * @return Production order status set as comma separated values where stock moves are allowed.
@@ -2170,8 +2173,9 @@ public abstract class STrnUtilities {
 
                 if (canSend) {
                     pdf = new File("temp", oDps.getNumberSeries() + (oDps.getNumberSeries().isEmpty() ? "" : "_") + oDps.getNumber() + ".pdf");
-
-                    createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                    
+                    String sDbName = null;
+                    createReportOrder(client, pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
 
                     mail.getAttachments().add(pdf);
                     mail.send();
@@ -2824,7 +2828,7 @@ public abstract class STrnUtilities {
         }
     }
     
-    public static void createReportOrder(final SClientInterface client, final File file, final SDataDps dps, final int pnPrintMode) {
+    public static void createReportOrder(final SClientInterface client, final File file, final SDataDps dps, final int pnPrintMode, final String dbName) {
         Cursor cursor = null;
         String sUserBuyer;
         String sUserAuthorize;
@@ -2965,12 +2969,36 @@ public abstract class STrnUtilities {
             map.put("sTaxRegimeRec", taxRegimeRec);
             map.put("sCfdiUsage", cfdiUsage);
 
-            if (client.isGui()) {
+            if (client.isGui() && (dbName == null || dbName.isEmpty())) {
                 jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             }
             else {
                 SSessionServer.createUserSignaturesIntoPurchaseOrderReportParams(map);
-                jasperPrint = SSessionServer.createJasperPrint(SDataConstantsSys.REP_TRN_DPS_ORDER, map, client.getSession().getDatabase().getConnection());
+                SDbDatabase oDb;
+                if (dbName != null && !dbName.isEmpty()) {
+                    oDb = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+                    oDb.connect(client.getSession().getDatabase().getDbHost(), 
+                                client.getSession().getDatabase().getDbPort(), 
+                                dbName,
+                                client.getSession().getDatabase().getUserName(), 
+                                client.getSession().getDatabase().getUserPassword());
+                    
+                    if (mapCompanyImgDirectory.containsKey(dbName)) {
+                        map.put("sImageDir", mapCompanyImgDirectory.get(dbName));
+                    }
+                    else {
+                        String sql = "SELECT img_dir FROM cfg_param_co LIMIT 1 ";
+                        ResultSet resultSet = oDb.getConnection().createStatement().executeQuery(sql);
+                        if (resultSet.next()) {
+                            map.put("sImageDir", resultSet.getString("img_dir"));
+                        }
+                    }
+                }
+                else {
+                    oDb = client.getSession().getDatabase();
+                }
+                
+                jasperPrint = SSessionServer.createJasperPrint(SDataConstantsSys.REP_TRN_DPS_ORDER, map, oDb.getConnection());
             }
             
             switch (pnPrintMode) {
