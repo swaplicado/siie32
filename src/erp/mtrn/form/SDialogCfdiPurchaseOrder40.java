@@ -891,19 +891,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                     }
                 
                     if (!validation.getIsError()) {
-                        if (entryDpsDpsLink.getSurplusPercentage() == 0) {
-                            // No surplus allowed:
-                            /* XXX comentado debido a que esta validación pasa a nivel de captura
-                            if (entryDpsDpsLink.getQuantityToLink() > entryDpsDpsLink.getQuantityToBeLinked()) {
-                                validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
-                                        "la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_LINK).getColumnTitle() + "', " +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entryDpsDpsLink.getQuantityToLink()) + " " + entryDpsDpsLink.getUnitSymbol() + ", " +
-                                        "no puede ser mayor a la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_BE_LINKED).getColumnTitle() + "', " +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entryDpsDpsLink.getQuantityToBeLinked()) + " " + entryDpsDpsLink.getUnitSymbol() + ".");
-                            }
-                            */
-                        }
-                        else {
+                        if (entryDpsDpsLink.getSurplusPercentage() != 0) {
                             // Surplus allowed:
 
                             double totalSurplus = entryDpsDpsLink.getQuantity() * (1d + entryDpsDpsLink.getSurplusPercentage());

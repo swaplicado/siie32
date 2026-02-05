@@ -5,6 +5,7 @@
 package erp.mod.fin.db;
 
 import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SFinBalanceTax;
 import erp.mod.SModConsts;
@@ -14,8 +15,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -467,5 +473,34 @@ public abstract class SFinUtils {
         }
         
         return taxBalances;
+    }
+    
+    /**
+     * Get from configuration parameters the list, as a map, of the yearly last payment dates.
+     * @param session GUI session.
+     * @return
+     * @throws Exception 
+     */
+    public static HashMap<Integer, Date> getLastPaymentDays(final SGuiSession session) throws Exception {
+        HashMap<Integer, Date> daysMap = new HashMap<>();
+        String json = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_FIN_PAY_CFG);
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonConfig = (JSONObject) jsonParser.parse(json);
+        JSONArray array = (JSONArray) jsonConfig.get("last_pay_days");
+
+        for (Object element : array) {
+            JSONObject jsonObject = (JSONObject) element;
+            
+            for (Object entry : jsonObject.entrySet()) {
+                if (entry instanceof Map.Entry) {
+                    Map.Entry<?, ?> e = (Map.Entry<?, ?>) entry;
+                    String key = e.getKey().toString();
+                    String value = e.getValue().toString();
+                    daysMap.put(SLibUtils.parseInt(key), SLibUtils.IsoFormatDate.parse(value));
+                }
+            }
+        }
+        
+        return daysMap;
     }
 }

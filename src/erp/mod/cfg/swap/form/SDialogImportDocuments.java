@@ -973,6 +973,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha vencimiento factura"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo definición pago requerido"));
                 
                 return gridColumnsForm;
             }
@@ -1198,7 +1199,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 String dpsNumber = SThinDps.readDpsNumber(dpsKey, miClient.getSession().getStatement());
 
                 if (miClient.showMsgBoxConfirm("Se encontró la factura " + SSwapConsts.SIIE + " '" + dpsNumber + "', ¿desea vincularla a esta factura autorizada?") == JOptionPane.YES_OPTION) {
-                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
                         int index = moDocumentsGrid.getTable().getSelectedRow();
                         moDocumentsGrid.renderGridRows();
                         moDocumentsGrid.setSelectedGridRow(index);
@@ -1236,7 +1237,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
         if (dpsKey != null) {
-            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false)) {
+            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
                 int index = moDocumentsGrid.getTable().getSelectedRow();
                 moDocumentsGrid.renderGridRows();
                 moDocumentsGrid.setSelectedGridRow(index);
@@ -1256,8 +1257,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jProgressBar.setIndeterminate(true);
     }
     
-    private void startProgress() {
-        jlProgress.setText("Recuperando facturas...");
+    private void startProgress(final int docs) {
+        jlProgress.setText("Procesando " + (docs == 1 ? "1 factura" : docs + " facturas") + "...");
         
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
@@ -1302,7 +1303,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 JsonNode root = mapper.readTree(is);
 
                 if (root.isArray()) {
-                    startProgress();
+                    startProgress(root.size());
                             
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
@@ -1385,14 +1386,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
                                     document.CurrencyCode = currencyNode.get("code").asText();
 
-                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_IS_NOT_REQ;
+                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_NOT_REQ;
                                     double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
                                     double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
                                     String requiredPaymentDateAsText = docNode.has("payment_date") && !docNode.path("payment_date").isNull() ? docNode.get("payment_date").asText() : "";
                                     Date requiredPaymentDate = requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
 
                                     if (requiredPaymentDate == null && requiredPaymentPct == 0) {
-                                        document.RequiredPaymentDefinition = SImportedDocument.PAY_IS_NOT_REQ;
+                                        document.RequiredPaymentDefinition = SImportedDocument.PAY_NOT_REQ;
                                         document.RequiredPaymentAmount = 0;
                                         document.RequiredPaymentPct = 0;
                                         document.RequiredPaymentDate = null;
@@ -1400,7 +1401,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                         document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
                                     }
                                     else {
-                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_IS_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
+                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
                                         document.RequiredPaymentAmount = requiredPaymentAmount;
                                         document.RequiredPaymentPct = requiredPaymentPct;
                                         document.RequiredPaymentDate = requiredPaymentDate;
@@ -1745,7 +1746,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
-                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false, SImportedDocument.MATCH_PAY_TP_REQUIRED)) {
                                 newlyLinked++;
                             }
                         }
@@ -1823,7 +1824,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                             int[] dpsKey = (int[]) picker.getOption();
 
-                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, true, mbAllowLinkGreaterInvoices)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, true, mbAllowLinkGreaterInvoices, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
                                 int index = moDocumentsGrid.getTable().getSelectedRow();
                                 moDocumentsGrid.renderGridRows();
                                 moDocumentsGrid.setSelectedGridRow(index);
@@ -1952,8 +1953,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
                         if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                            // no branch selected in current user session:
-                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
+                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
                         }
                         else {
                             // validate availability of exchange rate, if needed:
@@ -1990,7 +1990,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     // import CFDI (dialog DPS Finder should be previously prepared):
 
-                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getRequiredPaymentDateEffective());
+                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getDueDateEffective());
                                     linkAndProcessNewDps(document, dpsKey);
                                 }
                             }
@@ -2020,7 +2020,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 else {
                     if (!isDocumentAlreadyRecorded(document)) {
                         if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no se ha seleccionado una sucursal de la empresa en la sesión de usuario
+                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
                         }
                         else {
                             // validate availability of exchange rate, if needed:

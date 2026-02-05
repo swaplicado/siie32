@@ -9,11 +9,15 @@ import erp.client.SClientInterface;
 import erp.mod.SModConsts;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.db.SFinUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SPanelDps;
 import java.awt.BorderLayout;
+import java.util.Date;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
@@ -45,6 +49,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private SDataDps moDps;
     private SPanelDps moPanelDps;
     private int mnFormCase;
+    private HashMap<Integer, Date> moLastPaymentDaysMap;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -373,6 +378,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moPanelDps = new SPanelDps((SClientInterface) miClient);
         jpDocument.remove(jlPanelDps); 
         jpDocument.add(moPanelDps, BorderLayout.NORTH);
+        
+        try {
+            moLastPaymentDaysMap = SFinUtils.getLastPaymentDays(miClient.getSession());
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     public void setFormCase(int formCase) throws Exception {
@@ -404,6 +416,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
+        
+        moDateNewDate.setFieldName(SGuiUtils.getLabelName(jlDateNewDate)); // update field name of "new date" component
         
         mnFormCase = formCase;
     }
@@ -536,18 +550,39 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             }
             
             if (validation.isValid()) {
-                if (mnFormCase == CASE_MARK_AS_PAID) {
-                    if (!SLibUtils.compareAmount(moRegistry.getOldPaymentCy(), moCurPaymentCy.getField().getValue())) {
-                        String confirm = "¿Está seguro que el valor del campo '" + moCurPaymentCy.getField().getFieldName() + "' haya cambiado de "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(moRegistry.getOldPaymentCy()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + " a "
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(moCurPaymentCy.getField().getValue()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + "?";
-                        
-                        if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
-                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moCurPaymentCy.getField().getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL
-                                + "$" + SLibUtils.getDecimalFormatAmount().format(moCurPaymentCy.getField().getValue()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + ".");
-                            validation.setComponent(moCurPaymentCy.getField().getComponent());
+                switch (mnFormCase) {
+                    case CASE_REACTIVATE:
+                    case CASE_RESCHEDULE:
+                    case CASE_CHANGE_CURRENCY:
+                        int paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        Date lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " " + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", "
+                                    + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
                         }
-                    }
+                        break;
+
+                    case CASE_MARK_AS_PAID:
+                        if (!SLibUtils.compareAmount(moRegistry.getOldPaymentCy(), moCurPaymentCy.getField().getValue())) {
+                            String confirm = "¿Está seguro que el valor del campo '" + moCurPaymentCy.getField().getFieldName() + "' haya cambiado de "
+                                    + "$" + SLibUtils.getDecimalFormatAmount().format(moRegistry.getOldPaymentCy()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + " a "
+                                    + "$" + SLibUtils.getDecimalFormatAmount().format(moCurPaymentCy.getField().getValue()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + "?";
+
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moCurPaymentCy.getField().getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL
+                                    + "$" + SLibUtils.getDecimalFormatAmount().format(moCurPaymentCy.getField().getValue()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(moCurPaymentCy.getCurrencyKey()) + ".");
+                                validation.setComponent(moCurPaymentCy.getField().getComponent());
+                            }
+                        }
+                        break;
+
+                    default:
+                        throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
             }
         }

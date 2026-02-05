@@ -67,12 +67,22 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final int PROC_TYPE_FRUIT_FREIGHT = 11;
     public static final int PROC_TYPE_FRUIT_PURCHASE = 12;
     
+    public static final int PAY_NOT_REQ = 0; // pago no requerido
+    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
+    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
+    
+    public static final int MATCH_PAY_TP_OMIT = 0; // coincidencia de tipo de pago: omitir
+    public static final int MATCH_PAY_TP_REQUIRED = 1; // coincidencia de tipo de pago: requerida
+    public static final int MATCH_PAY_TP_CONFIRM_ON_FAIL = 2; // coincidencia de tipo de pago: confirmar cuando no corresponda
+    
     /** Document types. */
     public static final HashMap<Integer, String> DocTypes = new HashMap<>();
     /** Document cases. */
     public static final HashMap<Integer, String> DocCases = new HashMap<>();
     /** Processing types (in SWAP Services). */
     public static final HashMap<Integer, String> ProcTypes = new HashMap<>();
+    /** Payment definition options. */
+    public static final HashMap<Integer, String> PayDefinitions = new HashMap<>();
     
     static {
         DocTypes.put(DOC_TYPE_ALL, "Todas");
@@ -87,11 +97,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         ProcTypes.put(PROC_TYPE_STANDARD, "STD");
         ProcTypes.put(PROC_TYPE_FRUIT_FREIGHT, "FRF");
         ProcTypes.put(PROC_TYPE_FRUIT_PURCHASE, "FRC");
+        
+        PayDefinitions.put(PAY_NOT_REQ, "No requerido");
+        PayDefinitions.put(PAY_DEF_BY_AMT, "Por monto ($)");
+        PayDefinitions.put(PAY_DEF_BY_PCT, "Por porcentaje (%)");
     }
-    
-    public static final int PAY_IS_NOT_REQ = 0; // pago no requerido
-    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
-    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
     
     // Exception messages:
     
@@ -163,7 +173,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Total = 0;
         CurrencyId = 0;
         CurrencyCode = "";
-        RequiredPaymentDefinition = PAY_IS_NOT_REQ;
+        RequiredPaymentDefinition = PAY_NOT_REQ;
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
         RequiredPaymentDate = null;
@@ -224,10 +234,19 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
+     * Get effective total, either from given DPS, if available, otherwise from this imported document.
+     * @param dps Document, can be <code>null</code>.
+     * @return 
+     */
+    private double getTotalEffective(final SThinDps dps) {
+        return dps != null ? dps.getTotalCy_r() : Total;
+    }
+    
+    /**
      * Ger required payment percentage of document as a double between 0 and 1.
      * @return 
      */
-    public double getRequiredPaymentPct() {
+    private double getRequiredPaymentPct() {
         return RequiredPaymentPct / 100;
     }
     
@@ -235,8 +254,31 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Ger required payment amount of document, directly defined or indirectly from required payment percentage.
      * @return 
      */
-    public double getRequiredPaymentAmount() {
-        return RequiredPaymentDefinition == PAY_DEF_BY_AMT ? RequiredPaymentAmount : (Total * getRequiredPaymentPct());
+    private double getRequiredPaymentAmount(final SThinDps dps) {
+        double amount = 0;
+        
+        switch (RequiredPaymentDefinition) {
+            case PAY_NOT_REQ:
+                break;
+            case PAY_DEF_BY_AMT:
+                amount = RequiredPaymentAmount;
+                break;
+            case PAY_DEF_BY_PCT:
+                amount = getTotalEffective(dps) * getRequiredPaymentPct();
+                break;
+            default:
+                // nothing
+        }
+        
+        return amount;
+    }
+    
+    /**
+     * Ger required payment amount of document, directly defined or indirectly from required payment percentage.
+     * @return 
+     */
+    private double getRequiredPaymentAmount() {
+        return getRequiredPaymentAmount(null);
     }
     
     /**
@@ -376,16 +418,22 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
         SDbPayment payment = null;
         
-        if (RequiredPaymentDefinition == PAY_IS_NOT_REQ) {
+        if (RequiredPaymentDefinition == PAY_NOT_REQ) {
             throw new Exception("Este documento carece de la indicación de requerir un pago.");
         }
         else if (validateIsProcessed && !isRecorded()) {
             throw new Exception(EXC_DOC_NOT_RECORDED);
         }
+        else if (dps == null) {
+            throw new Exception("No se proporcionó ninguna factura para generar el pago.");
+        }
+        else if (!SLibUtils.compareKeys(ProcessedDps.getDpsKey(), (int[]) dps.getPrimaryKey())) {
+            throw new Exception("La factura vinculada a este documento (PK = " + SLibUtils.textKey(ProcessedDps.getDpsKey()) + ") es distinta a la factura proporcionada para generar el pago (PK = " + SLibUtils.textKey((int[]) dps.getPrimaryKey()) + ").");
+        }
         else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
         }
-        else if (getRequiredPaymentAmount() == 0) {
+        else if (getRequiredPaymentAmount(dps) == 0) {
             throw new Exception("Este documento no tiene monto requerido de pago.");
         }
         else if (getRequiredPaymentPct() == 0) {
@@ -393,12 +441,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         else if (getRequiredPaymentPct() > 1) {
             throw new Exception("Este documento tiene un porcentaje requerido de pago mayor a 100%.");
-        }
-        else if (dps == null) {
-            throw new Exception("No se proporcionó ninguna factura para generar el pago.");
-        }
-        else if (!SLibUtils.compareKeys(ProcessedDps.getDpsKey(), (int[]) dps.getPrimaryKey())) {
-            throw new Exception("La factura vinculada a este documento (PK = " + SLibUtils.textKey(ProcessedDps.getDpsKey()) + ") es distinta a la factura proporcionada para generar el pago (PK = " + SLibUtils.textKey((int[]) dps.getPrimaryKey()) + ").");
         }
         else {
             // check if first payment request already exists:
@@ -420,7 +462,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 SDbPaymentEntry singleEntry = new SDbPaymentEntry();
                 payment.getChildEntries().add(singleEntry);
                 
-                payment.processPaymentAtApplication(session, getRequiredPaymentAmount(), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, Total);
+                payment.processPaymentAtApplication(session, getRequiredPaymentAmount(dps), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, getTotalEffective(dps));
 
                 //payment.setPkPaymentId(...);
                 payment.setPaymentType(SDbPayment.TYPE_REQUEST);
@@ -503,16 +545,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     /**
      * Link document to given DPS, and optionally create its payment request.
+     * Intenged to be used in GUI context.
      * @param session GUI session.
      * @param docFilesDownloadSrvUrl URL of document files download service.
      * @param dpsKey DPS primary key.
      * @param allowLaterInvoice Allow linking an invoice wichi is issued later.
      * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
      * @param createPaymentRequest Create-payment-request flag.
+     * @param paymentTypeMatchigPolicy Payment type matching policy: MATCH_PAY_TP...
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final boolean createPaymentRequest, final boolean allowLaterInvoice, final boolean allowGreaterInvoice) throws Exception {
+    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final boolean createPaymentRequest, final boolean allowLaterInvoice, final boolean allowGreaterInvoice, final int paymentTypeMatchigPolicy) throws Exception {
         boolean linked = false;
         String prefix = "No se pudo realizar la vinculación:\n";
         
@@ -526,6 +570,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             
             SThinDps dps = new SThinDps();
             dps.read(dpsKey, session.getStatement());
+            
+            Date dueDate = getDueDateEffective();
             
             // Validate DPS:
             
@@ -541,6 +587,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 // currency does not match:
                 throw new Exception(prefix + "La moneda de este documento, " + CurrencyCode + ", "
                         + "es distinta a la de la factura a vincular, " + dps.getDbmsCurrencyCode() + ".");
+            }
+            else if ((dueDate != null && dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CREDIT) && (paymentTypeMatchigPolicy == MATCH_PAY_TP_REQUIRED || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONFIRM_ON_FAIL &&
+                    session.getClient().showMsgBoxConfirm("Este documento es de crédito, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de crédito.");
+            }
+            else if ((dueDate == null && dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CASH) && (paymentTypeMatchigPolicy == MATCH_PAY_TP_REQUIRED || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONFIRM_ON_FAIL &&
+                    session.getClient().showMsgBoxConfirm("Este documento es de contado, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de contado.");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
                     (Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm(
@@ -996,7 +1052,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         int year = SLibTimeUtils.digestYear(Date)[0];
         SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
         SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
-        Date dueDate = DueDate != null ? DueDate : getRequiredPaymentDateEffective();
+        Date dueDate = getDueDateEffective();
         
         SDataDps dps = new SDataDps();
         
@@ -1315,6 +1371,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             case 34:
                 value = DueDate;
                 break;
+            case 35:
+                value = PayDefinitions.get(RequiredPaymentDefinition);
+                break;
             default:
                 // nothing
         }
@@ -1490,7 +1549,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Total = resultSet.getDouble("d.tot_cur_r");
                 importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
                 importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
-                importedDocument.RequiredPaymentDefinition = PAY_IS_NOT_REQ;
+                importedDocument.RequiredPaymentDefinition = PAY_NOT_REQ;
                 importedDocument.RequiredPaymentAmount = 0;
                 importedDocument.RequiredPaymentPct = 0;
                 importedDocument.RequiredPaymentDate = null;

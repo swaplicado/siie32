@@ -85,8 +85,6 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
     
-    private final String CODE_UNIT_SERVICE = "E48|XUN";
-    
     private static final int ITEM_MAIN = 1;
     private static final int ITEM_REF = 2;
     

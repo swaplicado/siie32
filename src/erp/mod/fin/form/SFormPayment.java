@@ -17,6 +17,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.db.SFinUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogPickerDps;
 import erp.mtrn.form.SPanelDps;
@@ -28,8 +29,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
+import java.util.Date;
+import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import sa.gui.util.SUtilConsts;
@@ -57,6 +61,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private SPanelDps moPanelDps;
     private SDialogPickerDps moDialogDpsPicker;
     private boolean mbCanEdit;
+    private HashMap<Integer, Date> moLastPaymentDaysMap;
     
     /**
      * Creates new form SFormPayment2
@@ -522,6 +527,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
+        
+        try {
+            moLastPaymentDaysMap = SFinUtils.getLastPaymentDays(miClient.getSession());
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     private void enablePayComponets(boolean enable) {
@@ -1100,6 +1112,19 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             else if (moDps != null && moDpsBalance != null && moCurPaymentCy.getField().getValue() > moDpsBalance.BalanceNetCy) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moCurPaymentCy.getField().getFieldName() + "':\n" + composeDpsBalanceNetWarning());
                 validation.setComponent(moCurPaymentCy.getField().getComponent());
+            }
+            else {
+                int paymentYear = SLibTimeUtils.digestYear(moDateRequired.getValue())[0];
+                Date lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+                
+                if (lastPaymentDay != null && moDateRequired.getValue().after(lastPaymentDay)) {
+                    String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateRequired.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", "
+                            + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                    if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateRequired.getFieldName() + "'.");
+                        validation.setComponent(moDateRequired.getComponent());
+                    }
+                }
             }
         }
         
