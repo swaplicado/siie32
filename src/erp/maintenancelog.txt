@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 294.21/ 2026-02-05
+SIIE 3.2 295.0/ 2026-02-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Incorporación de la fecha de vencimiento en el procesamiento y contabilización de facturas importadas desde SWAP Services.
