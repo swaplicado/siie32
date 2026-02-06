@@ -28,7 +28,6 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static final String DATA_TYPE_RP = "RP"; // receipt of payment
     
     private static final int LEN_REFS = 100;
-    private static final int LEN_DESCRIP = 100;
     
     protected int mnPkSwapDataProcessingId;
     protected String msDataType;
@@ -64,7 +63,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public void setExternalDataUuid(String s) { msExternalDataUuid = s; }
     public void setExternalDataAuthorizationHistory(String s) { msExternalDataAuthorizationHistory = s; }
     public void setDpsReferences(String s) { msDpsReferences = s.length() <= LEN_REFS ? s : s.substring(0, LEN_REFS); }
-    public void setDpsDescription(String s) { msDpsDescription = s.length() <= LEN_DESCRIP ? s : s.substring(0, LEN_DESCRIP); }
+    public void setDpsDescription(String s) { msDpsDescription = s; }
     public void setDpsPaymentLocal(boolean b) { mbDpsPaymentLocal = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }

@@ -1,10 +1,11 @@
 ================================================================================
-SIIE 3.2 295.0/ 2026-02-05
+SIIE 3.2 295.0/ 2026-02-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Incorporación de la fecha de vencimiento en el procesamiento y contabilización de facturas importadas desde SWAP Services.
 2) Consideración del monto total de la facturas contabilizadas cuando se vinculan a facturas importadas desde SWAP Services, al solicitarse el pago, por si el monto de la primera es distinto al de la segunda.
 3) Implementación de la configuración en parámetros de sistema y de la validación mediante confirmación del último día de pago de cada año contra la fecha requerida de pago en la gestión de solicitudes de pago.
+4) Habilitación de guardado de textos extensos de la descripción de facturas importadas en los registros de procesamiento de datos de SWAP Services.
 
 ================================================================================
 SIIE 3.2 294.20/ 2026-02-04
