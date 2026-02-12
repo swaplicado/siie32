@@ -99,4 +99,9 @@ public class SExportDataReference implements SExportData {
      * Notas de autorización
      */
     public String auth_comments;
+    
+    /**
+     * Etiqueta contable
+     */
+    public String account_tag;
 }

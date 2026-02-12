@@ -1730,13 +1730,13 @@ public abstract class SExportDataUtils {
                 PreparedStatement prepStatCostProfitCenters = session.getStatement().getConnection().prepareStatement(sqlCostCenters);
 
                 String sql = "SELECT "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, "
+                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.acc_tag, "
                         + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_authorn, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_bp_r, b.bp, t.fid_usr_new, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked, COALESCE(dpsau.nts, '') AS authz_nts "
                         + "FROM ("
                         + "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, d.fid_usr_new, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty, "
@@ -1846,6 +1846,7 @@ public abstract class SExportDataUtils {
                     reference.owner_id = resultSet.getInt("t.fid_usr_new");
                     reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
                     reference.auth_comments = resultSet.getString("authz_nts");
+                    reference.account_tag = resultSet.getString("t.acc_tag");
 
                     references.add(reference);
                 }
