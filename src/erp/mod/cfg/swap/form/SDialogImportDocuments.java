@@ -1375,6 +1375,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     }
 
                                     document.Description = docNode.get("notes").asText();
+                                    document.AccountingTag = docNode.has("account_tag") && !docNode.path("account_tag").isNull() ? docNode.get("account_tag").asText() : "";
 
                                     document.FunctionalSubAreaId = functionalSubAreaId;
                                     document.FunctionalSubArea = functionalAreaNode.get("name").asText();
