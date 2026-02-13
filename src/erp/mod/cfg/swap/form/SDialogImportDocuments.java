@@ -1375,6 +1375,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     }
 
                                     document.Description = docNode.get("notes").asText();
+                                    document.AccountingTag = docNode.has("account_tag") && !docNode.path("account_tag").isNull() ? docNode.get("account_tag").asText() : "";
 
                                     document.FunctionalSubAreaId = functionalSubAreaId;
                                     document.FunctionalSubArea = functionalAreaNode.get("name").asText();
@@ -1991,7 +1992,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     // import CFDI (dialog DPS Finder should be previously prepared):
 
-                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document.getDueDateEffective());
+                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
                                     linkAndProcessNewDps(document, dpsKey);
                                 }
                             }

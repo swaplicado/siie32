@@ -126,6 +126,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int ReferencesType;
     public String ReferencesAsText;
     public String Description;
+    public String AccountingTag;
     public int FunctionalSubAreaId;
     public String FunctionalSubArea;
     public String FiscalUseCode;
@@ -167,6 +168,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         ReferencesType = 0;
         ReferencesAsText = "";
         Description = "";
+        AccountingTag = "";
         FunctionalSubAreaId = 0;
         FunctionalSubArea = "";
         FiscalUseCode = "";
@@ -1099,7 +1101,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setPayments(
         //dps.setPaymentMethod(
         //dps.setPaymentAccount(
-        dps.setAccountingTag(order != null ? order.getAccountingTag() : "");
+        dps.setAccountingTag(AccountingTag);
         //dps.setAutomaticAuthorizationRejection(
         //dps.setIsPublic(
         //dps.setIsLinked(
@@ -1374,6 +1376,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             case 35:
                 value = PayDefinitions.get(RequiredPaymentDefinition);
                 break;
+            case 36:
+                value = AccountingTag;
+                break;
             default:
                 // nothing
         }
@@ -1515,7 +1520,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         SImportedDocument importedDocument = null;
         
         String sql = "SELECT sdp.ext_data_id, sdp.ext_data_uuid, sdp.dps_refs, sdp.dps_descrip, "
-                + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.fid_func, d.fid_func_sub, "
+                + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.acc_tag, d.fid_func, d.fid_func_sub, "
                 + "CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS _func_sub, "
                 + "b.id_bp, b.bp, c.id_cur, c.cur_key, dc.cfd_use "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
@@ -1542,6 +1547,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.ReferencesType = referencesAsText.isEmpty() ? 0 : SSwapConsts.TXN_REF_TYPE_ORDER;
                 importedDocument.ReferencesAsText = referencesAsText;
                 importedDocument.Description = resultSet.getString("sdp.dps_descrip");
+                importedDocument.AccountingTag = resultSet.getString("d.acc_tag");
                 importedDocument.FunctionalSubAreaId = resultSet.getInt("d.fid_func_sub");
                 importedDocument.FunctionalSubArea = resultSet.getString("_func_sub");
                 String fiscalUseCode = resultSet.getString("dc.cfd_use"); // can be null

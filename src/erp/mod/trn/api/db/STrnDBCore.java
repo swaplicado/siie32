@@ -291,6 +291,7 @@ public class STrnDBCore {
                     + "                WHERE "
                     + "                    steps1.b_del "
                     + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "                        AND steps1.fk_usr_step = " + idSessionUser + " "
                     + "                        AND (steps1.b_authorn OR steps1.b_reject) "
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
@@ -358,6 +359,7 @@ public class STrnDBCore {
                         + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
                         + "WHERE "
                         + "    NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                        + "        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                         + "        AND steps1.res_pk_n1_n = dps.id_year "
                         + "        AND steps1.res_pk_n2_n = dps.id_doc ";
                 if (statusFilter == -1) {
@@ -369,6 +371,7 @@ public class STrnDBCore {
                             + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
                             + "        WHERE "
                             + "            NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                            + "                AND step2.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                             + "                AND step2.res_pk_n1_n = dps.id_year "
                             + "                AND step2.res_pk_n2_n = dps.id_doc "
                             + "                AND NOT step2.b_authorn "
@@ -447,6 +450,7 @@ public class STrnDBCore {
                     + "                WHERE "
                     + "                    steps1.b_del "
                     + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "                        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
                     + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
                     + "     cfd.*, "
@@ -833,7 +837,8 @@ public class STrnDBCore {
             int authorizationType = tableName == SModConsts.TRN_DPS ? SAuthorizationUtils.AUTH_TYPE_DPS : SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 
             // Construcción dinámica de la consulta según la tabla y claves primarias:
-            String whereClause = "s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
+            String whereClause = "s.fk_tp_authorn = " + authorizationType + " "
+                    + "AND s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
             if (tableName == SModConsts.TRN_DPS) {
                 whereClause += "AND s.res_pk_n1_n = " + idPrimaryKey1 + " AND s.res_pk_n2_n = " + idPrimaryKey2 + " ";
             } else if (tableName == SModConsts.TRN_MAT_REQ) {
@@ -930,6 +935,7 @@ public class STrnDBCore {
                     + "WHERE "
                     + "    NOT steps1.b_del "
                     + "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "        AND steps1.fk_tp_authorn = " + authorizationType + " "
                     + "        AND steps1.res_pk_n1_n = " + idPrimaryKey1 + " "
                     + (tableName == SModConsts.TRN_DPS ? "AND steps1.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "        AND NOT steps1.b_authorn "
@@ -941,6 +947,7 @@ public class STrnDBCore {
                     + "        WHERE "
                     + "            NOT step2.b_del "
                     + "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "                AND step2.fk_tp_authorn = " + authorizationType + " "
                     + "                AND step2.res_pk_n1_n = " + idPrimaryKey1 + " "
                     + (tableName == SModConsts.TRN_DPS ? "AND step2.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "                AND NOT step2.b_authorn "

@@ -48,6 +48,7 @@ import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.swap.utils.SServicesUtils;
+import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -3479,6 +3480,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsAuthWebAvailable) {
             msSql += "IF ((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stp WHERE "
                     + "     NOT stp.b_del AND stp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "     AND stp.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND stp.res_pk_n1_n = d.id_year AND stp.res_pk_n2_n = d.id_doc) > 0,"
                     + "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
                     + "    COALESCE((SELECT GROUP_CONCAT(usr SEPARATOR ',') "
@@ -3487,12 +3489,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
                     + "    WHERE "
                     + "        NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND steps1.res_pk_n1_n = d.id_year AND steps1.res_pk_n2_n = d.id_doc "
                     + "        AND NOT steps1.b_authorn AND steps1.b_reject AND steps1.lev = (SELECT step2.lev "
                     + "    FROM "
                     + "        cfgu_authorn_step AS step2 "
                     + "    WHERE "
                     + "        NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND step2.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND step2.res_pk_n1_n = d.id_year AND step2.res_pk_n2_n = d.id_doc "
                     + "        AND NOT step2.b_authorn AND step2.b_reject "
                     + "    ORDER BY step2.lev DESC "
@@ -3506,6 +3510,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
                     + "    WHERE "
                     + "        NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND steps1.res_pk_n1_n = d.id_year AND steps1.res_pk_n2_n = d.id_doc "
                     + "        AND NOT steps1.b_authorn AND NOT steps1.b_reject "
                     + "        AND steps1.lev = (SELECT step2.lev "
@@ -3513,12 +3518,25 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        cfgu_authorn_step AS step2 "
                     + "    WHERE "
                     + "        NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND step2.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND step2.res_pk_n1_n = d.id_year AND step2.res_pk_n2_n = d.id_doc "
                     + "        AND NOT step2.b_authorn AND NOT step2.b_reject "
                     + "    ORDER BY step2.lev ASC "
                     + "    LIMIT 1)), "
-                    + "    '')))),"
-                    + "'N/D') AS user_in_turn, ";
+                    + "    '')))), "
+                    + "COALESCE((SELECT  "
+                    + "    ug.usr "
+                    + "FROM "
+                    + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS gstp "
+                    + "        LEFT JOIN "
+                    + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ug ON gstp.fk_usr_step = ug.id_usr "
+                    + "WHERE "
+                    + "    NOT gstp.b_del "
+                    + "        AND gstp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND gstp.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + " "
+                    + "        AND gstp.res_pk_n1_n = d.id_year "
+                    + "        AND gstp.res_pk_n2_n = d.id_doc "
+                    + "LIMIT 1), 'N/D')) AS user_in_turn, ";
         }
         
         String sqlOrders = mbIsDoc ? (
@@ -3673,7 +3691,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             msSql += "bp.id_bp, bpb.bpb, bpb.id_bpb ";
-        }  
+        }
+        
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+            SAuthDBUtils.refreshAuthMsAuthData(miClient.getSession(), msSql);
+        }
     }
 
     @Override
