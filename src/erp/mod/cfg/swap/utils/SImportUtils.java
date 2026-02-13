@@ -100,11 +100,11 @@ public abstract class SImportUtils {
      * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
      * @param linkToOrder Link-to-order flag.
      * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
-     * @param dueDateRequired Due date required. Can be <code>null</code>.
+     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
      * @return DPS key as <code>int[]</code> of new invoice created.
      * @throws java.lang.Exception
      */
-    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final Date dueDateRequired) throws Exception {
+    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
         SDataDps invoice = null;
         SDataDps order = null; 
 
@@ -154,9 +154,11 @@ public abstract class SImportUtils {
 
                         newDps.setAuxFilePdf(cfdiPdf);
                         
-                        if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && dueDateRequired != null) {
-                            newDps.setDaysOfCreditByDueDate(dueDateRequired);
+                        if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument != null && importedDocument.getDueDateEffective() != null) {
+                            newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
                         }
+                        
+                        newDps.setAccountingTag(importedDocument != null ? importedDocument.AccountingTag : (order != null ? order.getAccountingTag() : ""));
                         
                         client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
                         client.getGuiModule(module).setAuxRegistry(newDps);
@@ -201,7 +203,7 @@ public abstract class SImportUtils {
      * @param dpsPdf PDF DPS file. Can be <code>null</code>.
      * @param linkToOrder Link-to-order flag.
      * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
-     * @param importedDocument Documento importado.
+     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
      * @return DPS key as <code>int[]</code> of new invoice created.
      * @throws java.lang.Exception
      */

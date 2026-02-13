@@ -1,9 +1,13 @@
 ================================================================================
 SIIE 3.2 296.2/ 2026-02-13
 Edwin Omar CARMONA FIGUEROA
---------------------------------------------------------------------------------}
+--------------------------------------------------------------------------------
 1) Se agrega consulta a autorización de google en pedidos de compra para vista de DPS
 2) Se agrega consulta de historial de flujo para pedidos de compra que tengan autorización en Google
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Copiado de etiqueta contable a facturas desde el documento importado de SWAP Services.
 
 ================================================================================
 SIIE 3.2 296.1/ 2026-02-12
