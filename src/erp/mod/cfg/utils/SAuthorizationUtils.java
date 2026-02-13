@@ -105,6 +105,7 @@ public abstract class SAuthorizationUtils {
      */
     public static final int AUTH_TYPE_MAT_REQUEST = 1;
     public static final int AUTH_TYPE_DPS = 2;
+    public static final int AUTH_TYPE_GOOGLE_DPS = 3;
     
     /**
      * Constantes de acción sobre recursos
@@ -1649,6 +1650,10 @@ public abstract class SAuthorizationUtils {
                 break;
                 
             case AUTH_TYPE_DPS:
+                condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
+                break;
+                
+            case AUTH_TYPE_GOOGLE_DPS:
                 condPk = "res_pk_n1_n = " + ((int[]) pk)[0] + " AND res_pk_n2_n = " + ((int[]) pk)[1] + " ";
                 break;
         }

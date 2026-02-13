@@ -17,6 +17,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
@@ -396,6 +397,15 @@ public abstract class SServicesUtils {
         @Override
         public String toString() {
             String string = "";
+            String actionedAt = "";
+            if (CurrActionActionedAt != null && !CurrActionActionedAt.isEmpty()) {
+                OffsetDateTime offsetDateTime = OffsetDateTime.parse(CurrActionActionedAt);
+                Date oDate = Date.from(offsetDateTime.toInstant());
+                actionedAt = SLibUtils.DateFormatDatetime.format(oDate);
+            }
+            else {
+                actionedAt = "N/A";
+            }
             
             if (FlowId != 0) {
                 string += "FLUJO DE AUTORIZACIÓN:\n"
@@ -409,7 +419,7 @@ public abstract class SServicesUtils {
                 if (CurrActionActionedById != 0) {
                     string += "- Comentarios: \"" + CurrActionNotes + "\"\n"
                             + "- Ejecutada por: " + CurrActionActionedByName + "\n"
-                            + "- Ejecutada el : " + CurrActionActionedAt + "";
+                            + "- Ejecutada el : " + actionedAt + "";
                 }
                 else {
                     string += "- Responsable(s): " + (CurrActionAllActors.isEmpty() ? "?" : CurrActionAllActors) + "";
