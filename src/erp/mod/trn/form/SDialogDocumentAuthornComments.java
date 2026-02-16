@@ -4,13 +4,23 @@
  */
 package erp.mod.trn.form;
 
+import erp.client.SClientInterface;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STablePaneGrid;
+import erp.lib.table.STableRowCustom;
 import erp.mod.SModConsts;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.model.ActionHistory;
 import erp.mod.cfg.swap.model.FlowResponse;
-import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SRowDocumentAuthornComments;
+import erp.server.SServerConstants;
+import erp.server.SServerRequest;
+import erp.server.SServerResponse;
 import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -29,6 +39,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.srv.SSrvConsts;
 
 /**
  *
@@ -38,6 +49,8 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     
     protected SGridPaneForm moGridLogs;
     protected ArrayList<SRowDocumentAuthornComments> maRowsAuthComm;
+    private erp.lib.table.STablePaneGrid moPaneGrid;
+    private erp.lib.table.STableColumnForm[] maoTableColumnsDps = null;
     protected int mnRegistryType;
 
     /**
@@ -62,21 +75,11 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
-        jlNumber = new javax.swing.JLabel();
-        moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel12 = new javax.swing.JPanel();
-        jlBizPartner = new javax.swing.JLabel();
-        moTextBizPartner = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel8 = new javax.swing.JPanel();
-        jlItem = new javax.swing.JLabel();
-        moTextItemKey = new sa.lib.gui.bean.SBeanFieldText();
-        moTextItem = new sa.lib.gui.bean.SBeanFieldText();
+        jpDpsComents = new javax.swing.JPanel();
         jpAuthorizationRoute = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Comentarios de autorización");
+        setTitle("Historial de autorización");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -86,57 +89,17 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Partida apreciada:"));
-        jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
-
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlNumber.setText("Folio:");
-        jlNumber.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel9.add(jlNumber);
-
-        moTextNumber.setText("sBeanFieldText2");
-        moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel9.add(moTextNumber);
-
-        jPanel4.add(jPanel9);
-
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlBizPartner.setText("Cliente:");
-        jlBizPartner.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlBizPartner);
-
-        moTextBizPartner.setText("sBeanFieldText2");
-        moTextBizPartner.setPreferredSize(new java.awt.Dimension(340, 23));
-        jPanel12.add(moTextBizPartner);
-
-        jPanel4.add(jPanel12);
-
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlItem.setText("Ítem:");
-        jlItem.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel8.add(jlItem);
-
-        moTextItemKey.setText("sBeanFieldText2");
-        moTextItemKey.setPreferredSize(new java.awt.Dimension(90, 23));
-        jPanel8.add(moTextItemKey);
-
-        moTextItem.setText("sBeanFieldText2");
-        moTextItem.setPreferredSize(new java.awt.Dimension(244, 23));
-        jPanel8.add(moTextItem);
-
-        jPanel4.add(jPanel8);
-
-        jPanel2.add(jPanel4);
-
         jPanel3.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(100, 200));
+        jpDpsComents.setBorder(javax.swing.BorderFactory.createTitledBorder("Comentarios al enviar recurso a autorizar:"));
+        jpDpsComents.setPreferredSize(new java.awt.Dimension(100, 150));
+        jpDpsComents.setLayout(new java.awt.BorderLayout());
+        jPanel3.add(jpDpsComents, java.awt.BorderLayout.PAGE_START);
+
+        jpAuthorizationRoute.setBorder(javax.swing.BorderFactory.createTitledBorder("Flujo de autorización:"));
+        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(710, 200));
         jpAuthorizationRoute.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(jpAuthorizationRoute, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jpAuthorizationRoute, java.awt.BorderLayout.WEST);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -154,20 +117,10 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JLabel jlBizPartner;
-    private javax.swing.JLabel jlItem;
-    private javax.swing.JLabel jlNumber;
     private javax.swing.JPanel jpAuthorizationRoute;
-    private sa.lib.gui.bean.SBeanFieldText moTextBizPartner;
-    private sa.lib.gui.bean.SBeanFieldText moTextItem;
-    private sa.lib.gui.bean.SBeanFieldText moTextItemKey;
-    private sa.lib.gui.bean.SBeanFieldText moTextNumber;
+    private javax.swing.JPanel jpDpsComents;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -176,6 +129,16 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
         jbCancel.setVisible(false);
+        
+        int i = 0;
+
+        maoTableColumnsDps = new STableColumnForm[3];
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Fecha/hr envío", STableConstants.WIDTH_DATE_TIME);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usuario", STableConstants.WIDTH_USER);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Comentario", 600);
+        
+        moPaneGrid = new STablePaneGrid((SClientInterface) miClient);
+        jpDpsComents.add(moPaneGrid, BorderLayout.CENTER);
 
         moGridLogs = new SGridPaneForm(miClient, SModConsts.CFGX_AUTHORN_COMMENTS, SLibConsts.UNDEFINED, "Bitácora") {
             @Override
@@ -190,7 +153,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha movimiento"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nivel", 20));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 400));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 380));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Autorizado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Rechazado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario autorizado/rechazado"));
@@ -216,10 +179,62 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private void readSendsAuthAppWeb(int[] dpsPk) {
+        int i;
+        String sSql;
+        SServerRequest oRequest;
+        SServerResponse oResponse;
+        Vector<Vector<Object>> vData;
+
+        try {
+            moPaneGrid.clearTable();
+
+            // DPS links:
+
+            sSql = "SELECT tda.id_authorn, tda.ts_new, u.usr, IF(tda.nts = '', 'SIN COMENTARIOS', tda.nts) nts "
+                    + "FROM trn_dps_authorn AS tda "
+                    + "INNER JOIN erp.usru_usr AS u ON tda.fid_usr_new = u.id_usr "
+                    + "WHERE tda.id_year = " + dpsPk[0] + " AND tda.id_doc = " + dpsPk[1] + " "
+                    + "ORDER BY tda.id_authorn DESC;";
+
+            oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
+            oResponse = ((SClientInterface) miClient).getSessionXXX().request(oRequest);
+
+            if (oResponse.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                throw new Exception(oResponse.getMessage());
+            }
+            else {
+                for (i = 0; i < maoTableColumnsDps.length; i++) {
+                    moPaneGrid.addTableColumn(maoTableColumnsDps[i]);
+                }
+                moPaneGrid.createTable();
+
+                vData = (Vector<Vector<Object>>) oResponse.getPacket();
+
+                for (Vector<Object> data : vData) {
+                    STableRowCustom row = new STableRowCustom();
+
+                    for (i = 1; i < data.size(); i++) {     // index 0 is descarted, used only for ordering purpouses
+                        row.getValues().add(data.get(i));
+                    }
+
+                    moPaneGrid.addTableRow(row);
+                }
+                moPaneGrid.renderTableRows();
+                moPaneGrid.setTableRowSelection(0);
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+    
     private void readAuthComments(int[] dpsPk) {
         try {
             boolean hasGoogleAuthSteps = false;
             if (mnRegistryType == SModConsts.TRN_DPS) {
+                readSendsAuthAppWeb(dpsPk);
                 // Primero consultar si el documento tiene movimientos de autorización tipo DPS_GOOGLE:
                 hasGoogleAuthSteps = SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS , dpsPk);
             }

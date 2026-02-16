@@ -6,9 +6,9 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
-import erp.mod.cfg.swap.model.FlowResponse;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.model.FlowResponse;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -102,8 +102,9 @@ public class SAuthDBUtils {
      * 
      * @param session Sesión de la aplicación
      * @param query Consulta SQL para extraer los recursos a sincronizar
+     * @param isYear es true si es periodo consultado corresponde a un año de trabajo
      */
-    public static void refreshAuthMsAuthData(SGuiSession session, final String query) {
+    public static void refreshAuthMsAuthData(SGuiSession session, final String query, final boolean isYear) {
         try {
             List<String> resourceIds = extractResourceIds(session, query);
             if (resourceIds.isEmpty()) {
@@ -115,6 +116,10 @@ public class SAuthDBUtils {
             CacheEntry cached = CACHE.get(cacheKey);
             
             if (cached != null && !cached.isExpired()) {
+                return;
+            }
+            
+            if (isYear) {
                 return;
             }
 

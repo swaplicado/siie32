@@ -526,12 +526,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthLog = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")));
             jbAuthWebViewAuthLog.setPreferredSize(new Dimension(23, 23));
             jbAuthWebViewAuthLog.addActionListener(this);
-            jbAuthWebViewAuthLog.setToolTipText("Ver bitácora de autorización de la orden en app web");
+            jbAuthWebViewAuthLog.setToolTipText("Estatus de autorización");
 
             jbAuthWebViewAuthComments = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")));
             jbAuthWebViewAuthComments.setPreferredSize(new Dimension(23, 23));
             jbAuthWebViewAuthComments.addActionListener(this);
-            jbAuthWebViewAuthComments.setToolTipText("Ver comentarios de autorización de la orden en app web");
+            jbAuthWebViewAuthComments.setToolTipText("Ver historial de autorización de la orden en app web");
 
             jbAuthWebDownloadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
             jbAuthWebDownloadSupportFiles.setPreferredSize(new Dimension(23, 23));
@@ -3694,7 +3694,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         
         if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
-            SAuthDBUtils.refreshAuthMsAuthData(miClient.getSession(), msSql);
+            erp.lib.gui.SGuiDate oGuiDate = (erp.lib.gui.SGuiDate) moTabFilterDatePeriod.getDate();
+            boolean isByYear = oGuiDate.getDataType() == SLibConstants.GUI_DATE_AS_YEAR;
+            SAuthDBUtils.refreshAuthMsAuthData(miClient.getSession(), msSql, isByYear);
         }
     }
 
