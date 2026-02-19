@@ -1191,6 +1191,7 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "COALESCE(d.acc_tag, '') AS _acc_tag, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
@@ -1270,6 +1271,7 @@ public abstract class SExportDataUtils {
                     oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
+                    oDpsExport.account_tag = resultSet.getString("_acc_tag");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     rms = resultSet.getString("_rms");
 
@@ -1903,12 +1905,19 @@ public abstract class SExportDataUtils {
 
                                 String sql = "SELECT "
                                         + "t.id_tic, s.code, t.num, t.dt, i.name, t.qty, u.code, t.drv, t.pla, t.pla_cag, t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
-                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active "
+                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active,"
+                                        + "t.wei_des_gro_r AS _gross_weight, "
+                                        + "t.wei_des_net_r AS _net_weight, "
+                                        + "COALESCE(f.name, 'NA') AS _freight_origin, "
+                                        + "COALESCE(isrc.name, 'NA') AS _fruit_origin, "
+                                        + "COALESCE(p.name_trd, 'NA') AS _prod_name "
                                         + "FROM s_tic AS t "
                                         + "INNER JOIN su_sca AS s ON s.id_sca = t.fk_sca "
                                         + "INNER JOIN su_item AS i ON i.id_item = t.fk_item "
                                         + "INNER JOIN su_unit AS u ON u.id_unit = t.fk_unit "
                                         + "LEFT OUTER JOIN su_freight_orig AS f ON f.id_freight_orig = t.fk_freight_orig_n "
+                                        + "LEFT JOIN su_inp_src AS isrc ON isrc.id_inp_src = t.fk_inp_src "
+                                        + "LEFT JOIN su_prod AS p ON p.id_prod = t.fk_prod "
                                         + "WHERE ("
                                         + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) "
                                         + "AND " + referenceId + " NOT IN (" + syncedRegistries + "))"
@@ -1942,6 +1951,11 @@ public abstract class SExportDataUtils {
                                     reference.concepts = concepts;
                                     reference.cost_profit_centers = "";
                                     reference.owner_id = somSettings.OwnerUserId;
+                                    reference.gross_weight = somResultSet.getDouble("_gross_weight");
+                                    reference.net_weight = somResultSet.getDouble("_net_weight");
+                                    reference.purchase_origin_location = somResultSet.getString("_freight_origin");
+                                    reference.purchase_origin_zone = somResultSet.getString("_fruit_origin");
+                                    reference.productor_name = somResultSet.getString("_prod_name");
                                     reference.is_deleted = !somResultSet.getBoolean("_is_active");
 
                                     references.add(reference);

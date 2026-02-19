@@ -108,6 +108,11 @@ public class SExportDataDps implements SExportData {
     public String date;
     
     /**
+     * Etiqueta contable
+     */
+    public String account_tag;
+    
+    /**
      * Indicador de borrada del documento.
      */
     public boolean is_deleted;
