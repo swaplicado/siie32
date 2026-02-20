@@ -32,7 +32,8 @@ public abstract class SServicesUtils {
     
     public static final String URL_FORCE_REJECT_RESOURCE = "/api/force-reject-resource";
     public static final String URL_CANCEL_FLOW = "/api/cancel-flow";
-    public static final String URL_GET_RESOURCE_FLOW = "/get-resource-flow";
+    public static final String URL_GET_RESOURCE_FLOW_HISTORY = "/get-resource-flow";
+    public static final String URL_GET_FLOW_STATUS_BY_RESOURCE = "/get-flows-by-resources";
     
     private static SyncSettings getSyncSettings(final SGuiSession session, final ObjectMapper mapper, final String configParamKey, final String elementKey) throws Exception {
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), configParamKey));
@@ -226,7 +227,7 @@ public abstract class SServicesUtils {
         ObjectMapper mapper = new ObjectMapper();
         SyncSettings syncSettings = getSyncSettings(session, mapper, SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG, SSwapConsts.CFG_OBJ_AUTH_SRV);
         
-        syncSettings.Url += URL_GET_RESOURCE_FLOW;
+        syncSettings.Url += URL_GET_RESOURCE_FLOW_HISTORY;
         
         String urlQuery = "id_external_system=" + SSwapConsts.SIIE_EXT_SYS_ID + "&"
                 + "id_company=" + session.getConfigCompany().getCompanyId() + "&"

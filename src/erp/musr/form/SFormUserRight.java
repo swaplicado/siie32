@@ -132,6 +132,9 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jPanel13 = new javax.swing.JPanel();
         jchkRolePagador = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
+        jPanel17 = new javax.swing.JPanel();
+        jchkRoleAuthorizator = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jchkRoleAdministrador = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
@@ -316,7 +319,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jpRoles.setBorder(javax.swing.BorderFactory.createTitledBorder("Roles de sincronización:"));
         jpRoles.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -367,6 +370,18 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
         jPanel13.add(jLabel4);
 
         jPanel5.add(jPanel13);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jchkRoleAuthorizator.setText("Es Autorizador");
+        jchkRoleAuthorizator.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel17.add(jchkRoleAuthorizator);
+
+        jLabel6.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel6.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel17.add(jLabel6);
+
+        jPanel5.add(jPanel17);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -956,6 +971,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -964,6 +980,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
@@ -990,6 +1007,7 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
     private javax.swing.JButton jbModifyUserRole;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jchkRoleAdministrador;
+    private javax.swing.JCheckBox jchkRoleAuthorizator;
     private javax.swing.JCheckBox jchkRoleComprador;
     private javax.swing.JCheckBox jchkRoleCompradorRevisor;
     private javax.swing.JCheckBox jchkRoleContador;
@@ -1151,6 +1169,9 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
                     else if (role.equals("" + SSyncRoles.ADMINISTRADOR)) {
                         jchkRoleAdministrador.setSelected(true);
                     }
+                    else if (role.equals("" + SSyncRoles.AUTORIZADOR)) {
+                        jchkRoleAuthorizator.setSelected(true);
+                    }
                 }
             }
             catch (Exception e) {
@@ -1210,6 +1231,9 @@ public class SFormUserRight extends javax.swing.JDialog implements erp.lib.form.
             }
             if (jchkRoleAdministrador.isSelected()) {
                 roles.add("" + SSyncRoles.ADMINISTRADOR);
+            }
+            if (jchkRoleAuthorizator.isSelected()) {
+                roles.add("" + SSyncRoles.AUTORIZADOR);
             }
             
             moUser.setSyncSettingsRoles(roles);

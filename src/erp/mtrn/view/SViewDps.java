@@ -42,6 +42,7 @@ import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocument;
+import erp.mod.cfg.swap.utils.SAuthzUtils;
 import erp.mod.cfg.swap.utils.SDataRejectResource;
 import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
@@ -176,6 +177,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebDownloadSupportFiles;
     private javax.swing.JButton jbAuthWebClearSupportFiles;
     private javax.swing.JButton jbAuthWebAnnullAuth;
+    private javax.swing.JButton jbAuthWebForceCheckAuthStatus;
     private javax.swing.JFileChooser moAuthWebFileChooser;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -547,6 +549,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebAnnullAuth.setPreferredSize(new Dimension(23, 23));
             jbAuthWebAnnullAuth.addActionListener(this);
             jbAuthWebAnnullAuth.setToolTipText("Anular autorización de la orden en app web");
+            
+            jbAuthWebForceCheckAuthStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_doub_check.gif")));
+            jbAuthWebForceCheckAuthStatus.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebForceCheckAuthStatus.addActionListener(this);
+            jbAuthWebForceCheckAuthStatus.setToolTipText("Verificar estatus de autorización");
         }
         
         moTabFilterUser = new STabFilterUsers(miClient, this);
@@ -622,6 +629,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
             addTaskBarUpperComponent(jbAuthWebClearSupportFiles);
             addTaskBarUpperComponent(jbAuthWebAnnullAuth);
+            addTaskBarUpperComponent(jbAuthWebForceCheckAuthStatus);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -710,6 +718,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebDownloadSupportFiles.setEnabled(true);
             jbAuthWebClearSupportFiles.setEnabled(true);
             jbAuthWebAnnullAuth.setEnabled(true);
+            jbAuthWebForceCheckAuthStatus.setEnabled(true);
         }
 
         STableField[] aoKeyFields = new STableField[2];
@@ -3400,6 +3409,27 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionForceCheckAuth() {
+        if (jbAuthWebForceCheckAuthStatus.isEnabled()) {
+            if (! isRowSelected()) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                String statusResponse = SAuthzUtils.forceCheckAuthStatus(miClient.getSession(), 
+                                            SSwapConsts.RESOURCE_TYPE_PUR_ORDER, 
+                                            moTablePane.getSelectedTableRow().getPrimaryKey());
+                if (statusResponse != null && statusResponse.isEmpty()) {
+                    miClient.showMsgBoxInformation("Estado de autorización verificado");
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                }
+                else {
+                    miClient.showMsgBoxWarning(statusResponse);
+                }
+            }
+        }
+    }
+    
     public void publicActionPrint() {
         actionPrint(false);
     }
@@ -3851,6 +3881,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbAuthWebAnnullAuth) {
                     actionAuthWebAnnullAuth();
+                }
+                else if (button == jbAuthWebForceCheckAuthStatus) {
+                    actionForceCheckAuth();
                 }
             }
         }

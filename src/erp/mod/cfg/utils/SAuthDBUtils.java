@@ -10,6 +10,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.model.FlowResponse;
 import erp.mod.cfg.swap.utils.SExportUtils;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -188,11 +189,12 @@ public class SAuthDBUtils {
      * Realiza una petición HTTP POST al servicio externo.
      * 
      * @param session Sesión de la aplicación
+     * @param resourceType Tipo de recurso (ej: orden de compra)
      * @param resourceIds Lista de IDs de recursos a consultar
      * @return Nodo JSON con los detalles de los flujos, o null si hay error
      * @throws Exception Si ocurre un error en la comunicación con el servicio
      */
-    private static JsonNode fetchFlowDetailsFromMsAuth(SGuiSession session, final int resourceType, List<String> resourceIds) throws Exception {
+    public static JsonNode fetchFlowDetailsFromMsAuth(SGuiSession session, final int resourceType, List<String> resourceIds) throws Exception {
         System.out.println("Consultando autorizaciones en google...");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG));
@@ -201,7 +203,7 @@ public class SAuthDBUtils {
         String token = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AUTH_SRV, SSwapConsts.CFG_ATT_TOKEN);
         String apiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AUTH_SRV, SSwapConsts.CFG_ATT_API_KEY);
 
-        String url = baseUrl + "/get-flows-by-resources?id_resource_type=" + resourceType
+        String url = baseUrl + SServicesUtils.URL_GET_FLOW_STATUS_BY_RESOURCE + "?id_resource_type=" + resourceType
                 + "&id_external_system=1&id_company=" + session.getConfigCompany().getCompanyId() + "&all_data=0";
         String jsonBody = "{\"external_siie_ids\":\"" + String.join(";", resourceIds) + "\"}";
 
@@ -234,7 +236,7 @@ public class SAuthDBUtils {
         String token = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AUTH_SRV, SSwapConsts.CFG_ATT_TOKEN);
         String apiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AUTH_SRV, SSwapConsts.CFG_ATT_API_KEY);
 
-        String url = baseUrl + "/get-resource-flow?id_resource_type=" + resourceTypeId
+        String url = baseUrl + SServicesUtils.URL_GET_RESOURCE_FLOW_HISTORY + "?id_resource_type=" + resourceTypeId
                 + "&id_external_system=1"
                 + "&id_company=" + idCompany + ""
                 + "&siie_resource_id=" + idResource;
@@ -291,11 +293,28 @@ public class SAuthDBUtils {
      */
     private static int extractActorId(JsonNode flowDetail) {
         JsonNode actorsOfAction = flowDetail.get("last_turn_action").get("actors_of_action");
+        if (actorsOfAction == null) {
+            return DEFAULT_USER_ID;
+        }
         if (actorsOfAction.isArray() && actorsOfAction.size() > 0) {
             int userId = Integer.parseInt(actorsOfAction.get(0).get("external_id").asText());
             return validUserIds.containsKey(userId) ? userId : DEFAULT_USER_ID;
         }
         return DEFAULT_USER_ID;
+    }
+
+    /**
+     * Valida si un ID de usuario es válido según la lista cargada.
+     * Si no es válido, retorna el ID de usuario por defecto.
+     *
+     * @param session Sesión de la aplicación
+     * @param userId ID del usuario a validar
+     * @return ID del usuario válido o DEFAULT_USER_ID si no es válido
+     * @throws java.sql.SQLException Si ocurre un error al cargar los usuarios válidos
+     */
+    public static int isValidUserId(SGuiSession session, int userId) throws SQLException {
+        loadValidUserIds(session);
+        return validUserIds.containsKey(userId) ? userId : DEFAULT_USER_ID;
     }
 
     /**

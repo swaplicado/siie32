@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 296.4/ 2026-02-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega rol autorizador para portal de compras en permisos de usuarios.
+2) Se agrega botón de verificación de estatus de autorización en pedidos de compra.
+
+================================================================================
 SIIE 3.2 296.3/ 2026-02-19
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

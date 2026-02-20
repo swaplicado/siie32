@@ -14,5 +14,6 @@ public enum SSyncRoles {
     COMPRADOR_REVISOR,
     CONTADOR,
     PAGADOR,
-    ADMINISTRADOR
+    ADMINISTRADOR,
+    AUTORIZADOR
 }

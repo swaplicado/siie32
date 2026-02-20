@@ -181,6 +181,11 @@ public abstract class SSwapConsts {
     public static final int ROL_SUPPLIER = 5;
     
     /**
+     * Rol administrador.
+     */
+    public static final int ROL_AUTHORIZATOR = 6;
+    
+    /**
      * Rol Agente Comprador.
      */
     public static final int ROL_PURCHASER_AGENT = 12;

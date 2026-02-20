@@ -91,7 +91,8 @@ public class SAuthorizationsAPI {
                         if (isSwapServicesRequest) {
                             updateDpsAuthStatus(pk,
                                     SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
-                                    userId);
+                                    userId,
+                                    0);
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
                         }
                         if (! isSwapServicesRequest && SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
@@ -100,7 +101,8 @@ public class SAuthorizationsAPI {
                                 String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
                                 updateDpsAuthStatus(pk,
                                         SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN,
-                                        userId);
+                                        userId,
+                                        0);
                                 SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_DONE, "", "", "", ((int[]) pk), actionUserName, comments);
                                 //SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
                             }
@@ -201,7 +203,8 @@ public class SAuthorizationsAPI {
                             System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
                             updateDpsAuthStatus(pk,
                                     SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT,
-                                    userId);
+                                    userId,
+                                    0);
                             if (! isSwapServicesRequest) {
                                 SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
                             }
@@ -230,28 +233,35 @@ public class SAuthorizationsAPI {
         return res;
     }
     
-    private void updateDpsAuthStatus(Object pk, final int authAction, final int userId) {
+    private void updateDpsAuthStatus(Object pk, final int authAction, final int userId, final int authornStatus) {
         String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
                 + "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
                 + "fid_st_dps_authorn = " + authAction + ", "
                 + "fid_usr_authorn = " + userId + ", "
                 + "ts_authorn = NOW() "
                 + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + ";";
-        
-        String sqlDpsAuth = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
-                + "SET fid_st_authorn = " + 
-                (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN ? SDataConstantsSys.CFGS_ST_AUTHORN_AUTH : SDataConstantsSys.CFGS_ST_AUTHORN_REJ) + ",  "
-                + "fid_usr_edit = " + userId + ", "
-                + "ts_edit = NOW() "
-                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
 
         try {
             int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
-            int resAuth = oSession.getDatabase().getConnection().createStatement().executeUpdate(sqlDpsAuth);
+            this.updateDpsAuthornStatus(pk, 
+                                        authornStatus == 0 ? (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN ? 
+                                            SDataConstantsSys.CFGS_ST_AUTHORN_AUTH : 
+                                            SDataConstantsSys.CFGS_ST_AUTHORN_REJ) : authornStatus,
+                                        userId);
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void updateDpsAuthornStatus(final Object pk, final int idStatus, final int userId) throws SQLException {
+        String sqlDpsAuth = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
+                                + "SET fid_st_authorn = " + idStatus + ",  "
+                                + "fid_usr_edit = " + (userId == 0 ? oSession.getUser().getPkUserId() : userId) + ", "
+                                + "ts_edit = NOW() "
+                                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
+    
+        oSession.getDatabase().getConnection().createStatement().execute(sqlDpsAuth);
     }
 
     public boolean isAutorized(int pk) {
