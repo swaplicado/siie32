@@ -145,7 +145,7 @@ public class SAuthzUtils {
                 }
                 break;
 
-            case SSwapConsts.AUTHZ_STATUS_PENDING:
+            case SSwapConsts.AUTHZ_STATUS_IN_PROGRESS:
                 if (dpsData.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING) {
                     int idUser = session.getUser().getPkUserId();
                     String cancelNotes = "Cancelación de flujo desde siie por inconsistencia";
