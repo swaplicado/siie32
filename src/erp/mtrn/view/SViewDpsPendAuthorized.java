@@ -481,7 +481,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                                                 data.external_user_id = rejectData.UserId;
                                                 data.notes = rejectData.Notes;
                                                 
-                                                if (sendMail) {
+                                                if (dps.getIsAuthorized()) {
                                                     SServicesUtils.requestRejectResource(miClient.getSession(), data);
                                                 }
                                                 else {
