@@ -235,11 +235,15 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "), 'ANTICIPO') "
             + "END AS conceptoPrincipal, "
             + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
-            + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code "
+            + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
+            + "COALESCE(MAX(nat.dps_nat), 'S/DOC') AS nat "
             + "FROM fin_pay AS v "
             + "INNER JOIN fin_pay_ety AS ve ON v.id_pay = ve.id_pay "
             + "INNER JOIN erp.bpsu_bp AS b ON v.fk_ben = b.id_bp "
             + "INNER JOIN erp.cfgu_cur AS ce ON ve.fk_ety_cur = ce.id_cur "
+            + "LEFT JOIN trn_dps AS d ON d.id_doc = ve.fk_doc_doc_n AND d.id_year = ve.fk_doc_year_n "
+            + "LEFT JOIN erp.TRNU_DPS_NAT nat ON d.fid_dps_nat = nat.id_dps_nat "
+            + "LEFT JOIN trn_dps_ety ON e.id_year = ve.fk_doc_year_n AND e.id_doc = ve.fk_doc_doc_n"
             + (sql.isEmpty() ? "" : "WHERE " + sql)
             + "GROUP BY "
             + "b.bp, v.dt_req, ve.ety_tp, ce.cur_key "
@@ -266,6 +270,7 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda", "Moneda a pagar", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "FechaRequeridaPago", "Fecha requerida pago", 70));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "conceptoPrincipal", "Concepto mayor", 500));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc", 100));
        
 
         return gridColumnsViews;
