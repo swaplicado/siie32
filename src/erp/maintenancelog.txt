@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 296.5/ 2026-03-02
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Se agregan los campos "Cuenta pagadora" u "Cuenta beneficiaria" en el dialogo de solicitudes de pago autorizadas.
+2) Se agregan columnas "Cuenta pagadora" u "Cuenta beneficiaria" en la vista de pagos operados.
+
+================================================================================
+SIIE 3.2 296.3/ 2026-02-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportación de etiqueta contable en dps a portal de compras.
+2) Exportación de peso bruto, peso neto, origen de fruta, origen de flete y productor
+en referencias de boletos a portal de compras
+
+================================================================================
 SIIE 3.2 296.4/ 2026-02-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

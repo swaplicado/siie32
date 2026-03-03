@@ -62,7 +62,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -705,6 +705,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             Date date = (Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
                             double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), payment.getFkCurrencyId(), date);
                             double amount = (double) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
+                            int[] paymentBankId = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
+                            int[] benefBankId = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
                             SDbPaymentEntry singleEntry = payment.getSingleEntry();
 
                             payment.setAuxReloadEntries(false);
@@ -713,6 +715,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             payment.setDateExecution_n(date);
                             payment.setExecutedManually(true);
                             payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                            payment.setFkPayerCashBizPartnerBranchId_n(paymentBankId[0]);
+                            payment.setFkPayerCashAccountingCashId_n(paymentBankId[1]);
+                            payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankId[0]);
+                            payment.setFkBeneficiaryBankAccountCashId_n(benefBankId[1]);
 
                             payment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, singleEntry.getDocInstallment(), singleEntry.getDocBalancePreviousCy());
 

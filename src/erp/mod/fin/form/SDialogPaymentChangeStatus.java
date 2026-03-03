@@ -23,13 +23,14 @@ import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiItem;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -42,6 +43,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public final static int VALUE_DATE = 2;
     public final static int VALUE_CURRENCY = 3;
     public final static int VALUE_PRIORITY = 4;
+    public final static int VALUE_PAYMENT_BANK = 5;
+    public final static int VALUE_BENEFIT_BANK = 6;
     public final static int VALUE_NOTES = 11;
     public final static int VALUE_NOTES_AUTH = 12;
 
@@ -113,6 +116,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jlNotesAuthorization = new javax.swing.JLabel();
         moTextNotesAuthorization = new sa.lib.gui.bean.SBeanFieldText();
         jlNotesAuthorizationHint = new javax.swing.JLabel();
+        jPanelN3 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jlPaymentBank = new javax.swing.JLabel();
+        moKeyPaymentBank = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel2 = new javax.swing.JPanel();
+        jlBeneffBank = new javax.swing.JLabel();
+        moKeyBeneffBank = new sa.lib.gui.bean.SBeanFieldKey();
         jpDocument = new javax.swing.JPanel();
         jlPanelDps = new javax.swing.JLabel();
 
@@ -245,7 +255,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         jPanelN1.add(jPanel12);
 
-        jPayment.add(jPanelN1, java.awt.BorderLayout.CENTER);
+        jPayment.add(jPanelN1, java.awt.BorderLayout.PAGE_START);
 
         jPanelN2.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
 
@@ -285,7 +295,33 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
 
         jPanelN2.add(jPanel22);
 
-        jPayment.add(jPanelN2, java.awt.BorderLayout.SOUTH);
+        jPayment.add(jPanelN2, java.awt.BorderLayout.CENTER);
+
+        jPanelN3.setPreferredSize(new java.awt.Dimension(840, 33));
+        jPanelN3.setLayout(new java.awt.GridLayout(1, 0));
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlPaymentBank.setText("Cuenta pagadora:");
+        jPanel1.add(jlPaymentBank);
+        jlPaymentBank.getAccessibleContext().setAccessibleName("Cuenta pagadora:");
+
+        moKeyPaymentBank.setPreferredSize(new java.awt.Dimension(312, 23));
+        jPanel1.add(moKeyPaymentBank);
+
+        jPanelN3.add(jPanel1);
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlBeneffBank.setText("Cuenta beneficiaria:");
+        jPanel2.add(jlBeneffBank);
+
+        moKeyBeneffBank.setPreferredSize(new java.awt.Dimension(312, 23));
+        jPanel2.add(moKeyBeneffBank);
+
+        jPanelN3.add(jPanel2);
+
+        jPayment.add(jPanelN3, java.awt.BorderLayout.PAGE_END);
 
         jMain.add(jPayment, java.awt.BorderLayout.PAGE_START);
 
@@ -310,9 +346,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jMain;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel3;
@@ -324,8 +362,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanelN1;
     private javax.swing.JPanel jPanelN2;
+    private javax.swing.JPanel jPanelN3;
     private javax.swing.JPanel jPayment;
     private javax.swing.JCheckBox jchkIsSystem;
+    private javax.swing.JLabel jlBeneffBank;
     private javax.swing.JLabel jlBeneficiary;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDate;
@@ -336,6 +376,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JLabel jlNotesAuthorizationHint;
     private javax.swing.JLabel jlNotesHint;
     private javax.swing.JLabel jlPanelDps;
+    private javax.swing.JLabel jlPaymentBank;
     private javax.swing.JLabel jlPaymentCy;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPriority;
@@ -348,7 +389,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JTextField jtfStatus;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDate moDateNewDate;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyBeneffBank;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCurrency;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentBank;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPriority;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
     private sa.lib.gui.bean.SBeanFieldText moTextNotesAuthorization;
@@ -361,6 +404,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moCurPaymentCy.getField().setDecimalSettings(SGuiUtils.getLabelName(jlPaymentCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDateNewDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateNewDate), true);
         moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency), true);
+        moKeyPaymentBank.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentBank), true);
+        moKeyBeneffBank.setKeySettings(miClient, SGuiUtils.getLabelName(jlBeneffBank), true);
         moKeyPriority.setKeySettings(miClient, SGuiUtils.getLabelName(jlPriority), true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes), 100, 0);
         moTextNotes.setTextCaseType(SLibConsts.UNDEFINED);
@@ -435,7 +480,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     @Override
     @SuppressWarnings("unchecked")
     public void reloadCatalogues() {
+        SGuiParams currencyId = new SGuiParams(new int[] { moRegistry.getFkCurrencyId() });
+        SGuiParams partnerId = new SGuiParams(new int[] { moRegistry.getFkBeneficiaryId() });
         miClient.getSession().populateCatalogue(moKeyCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyPaymentBank, SModConsts.FIN_ACC_CASH, SModConsts.FINX_ACC_CASH_BANK, currencyId);
+        miClient.getSession().populateCatalogue(moKeyBeneffBank, SModConsts.BPSU_BANK_ACC, SLibConsts.UNDEFINED, partnerId);
         
         moKeyPriority.removeAllItems();
         moKeyPriority.addItem(new SGuiItem(new int[] { }, "- Prioridad -"));
@@ -476,13 +525,19 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
+                moKeyPriority.removeAll();
+                moKeyPaymentBank.removeAll();
                 reactivating = true;
                 rescheduling = true;
                 moDateNewDate.setValue(moRegistry.getDateRequired());
                 break;
                 
             case CASE_RESCHEDULE:
+                moKeyPriority.removeAll();
+                moKeyPaymentBank.removeAll();
             case CASE_CHANGE_CURRENCY:
+                moKeyPriority.removeAll();
+                moKeyPaymentBank.removeAll();
             case CASE_MARK_AS_PAID:
                 rescheduling = mnFormCase == CASE_RESCHEDULE;
                 changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
@@ -504,6 +559,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moCurPaymentCy.setCurrencyKey((int[]) singleEntry.getEntryCurrency().getPrimaryKey());
         
         moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
+        moKeyPaymentBank.setValue(new int[] { moRegistry.getFkPayerCashAccountingCashId_n() });
+        moKeyBeneffBank.setValue(new int[] { moRegistry.getFkBeneficiaryBankAccountCashId_n() });
         moKeyPriority.setValue(new int[] { moRegistry.getPriority() });
             
         moTextNotes.setValue(moRegistry.getNotes());
@@ -516,6 +573,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moCurPaymentCy.setEditable(markingAsPaid);
         moDateNewDate.setEditable(!changingCurrency);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
+        moKeyPaymentBank.setEditable(markingAsPaid);
+        moKeyBeneffBank.setEditable(markingAsPaid);
         moKeyPriority.setEditable(reactivating);
         moTextNotes.setEditable(reactivating || rescheduling);
         moTextNotesAuthorization.setEditable(reactivating);
@@ -579,6 +638,28 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                                 validation.setComponent(moCurPaymentCy.getField().getComponent());
                             }
                         }
+                        
+                        if ( moKeyPaymentBank.getValue().length == 0 && moKeyBeneffBank.getValue().length == 0) {
+                            String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyPaymentBank.getFieldName() + "\" y \"" + moKeyBeneffBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" " +  moKeyPaymentBank.getFieldName() + "\" y " + "\"" + moKeyBeneffBank.getFieldName() + "\"");
+                            }
+                        } else {
+                            if ( moKeyPaymentBank.getValue().length == 0 ) {
+                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyPaymentBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                                if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" " +  moKeyPaymentBank.getFieldName() + "\"");
+                                }
+                            }
+
+                            if ( moKeyBeneffBank.getValue().length == 0 ) {
+                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyBeneffBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                                if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" "+ moKeyBeneffBank.getFieldName() + "\"");
+                                }
+                            }
+                        }
+                        
                         break;
 
                     default:
@@ -612,6 +693,12 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 break;
             case VALUE_NOTES_AUTH:
                 value = moTextNotesAuthorization.getValue();
+                break;
+            case VALUE_PAYMENT_BANK:
+                value = moKeyPaymentBank.getValue();
+                break;
+            case VALUE_BENEFIT_BANK:
+                value = moKeyBeneffBank.getValue();
                 break;
             default:
                 // nothing
