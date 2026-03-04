@@ -1304,7 +1304,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdiMassiveValidationSal.setEnabled(hasRightMoveAccCash);
         jmiFinUuidSearch.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
 
-        jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
+        jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash || hasConfAccTag);
         jmRepTrialBal.setEnabled(hasRightRep);
         jmRepFinStat.setEnabled(hasRightRepStats);
         jmRepCashAccBal.setEnabled(hasRightRep || hasRightMoveAccCash);
@@ -1314,7 +1314,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepBizPartnerStat.setEnabled(hasRightRep);
         jmRepBizPartnerAccMovs.setEnabled(hasRightRep);
         jmiRepBizPartnerLedger.setEnabled(hasRightRep);
-        jmRepAccMovs.setEnabled(hasRightRep);
+        jmRepAccMovs.setEnabled(hasRightRep || hasConfAccTag);
+        jmiRepAccDpsAccTagCus.setEnabled(hasConfAccTag);
+        jmiRepAccDpsAccTagSup.setEnabled(hasConfAccTag);
+        jmiRepAccAccTagCus.setEnabled(hasConfAccTag);
+        jmiRepAccAccTagSup.setEnabled(hasConfAccTag);
         jmRepCashFlow.setEnabled(hasRightRep);
         jmRepAccIncExp.setEnabled(hasRightRep);
         jmiRepCashFlowExpected.setEnabled(hasRightRep);;
@@ -1328,10 +1332,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPrtChartOfAccounts.setEnabled(hasRightRep);
         jmiRepTaxesByConcept.setEnabled(hasRightRep);
         jmRepFiscal.setEnabled(hasRightRep);
-        jmiRepAccDpsAccTagCus.setEnabled(hasConfAccTag);
-        jmiRepAccDpsAccTagSup.setEnabled(hasConfAccTag);
-        jmiRepAccAccTagCus.setEnabled(hasConfAccTag);
-        jmiRepAccAccTagSup.setEnabled(hasConfAccTag);
+        jmiGlobalStatement.setEnabled(hasRightRep);
         
         // GUI configuration:
         
