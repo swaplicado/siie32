@@ -97,6 +97,7 @@ import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SDataScaleTicketDps;
 import erp.mtrn.data.SDataScaleTicketDpsEntry;
 import erp.mtrn.data.SDataSystemNotes;
+import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
 import erp.mtrn.data.SRowCfdRelatedDocs;
@@ -126,6 +127,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -6993,7 +6995,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDialogPickerDps = null;
             manDpsClassPreviousKey = null;
         }
-        else if (mbIsDpsOrder) {
+        else if (mbIsDpsOrder) { //*** aquixxx123
             moDialogPickerDps = moDialogPickerDpsForLink;
             manDpsClassPreviousKey = mbIsSales ? SDataConstantsSys.TRNS_CL_DPS_SAL_EST : SDataConstantsSys.TRNS_CL_DPS_PUR_EST;
         }
@@ -7025,27 +7027,47 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             mbIsNumberSeriesAvailable = false;
         }
         else {
-            // document number series defined by system:
-            
             jcbNumberSeries.setEditable(false);
             moFieldNumberSeries = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbNumberSeries, jlNumber);
-            moFieldNumberSeries.setIsSelectionItemApplying(false);  // combo box does not have label item
-            
-            // get available document number series from current company branch configuration:
+            moFieldNumberSeries.setIsSelectionItemApplying(false);
 
+            // get available document number series from current company branch configuration:
             if (miClient.getSessionXXX().getCurrentCompanyBranch() != null) {
                 componentItems = miClient.getSessionXXX().getCurrentCompanyBranch().getDnsForDps();
+                //  Get series from the usaur
+                ArrayList<SDataUserDnsDps> userDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
 
-                for (SFormComponentItem componentItem : componentItems) {
-                    if (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(), componentItem.getPrimaryKey())) {
-                        jcbNumberSeries.addItem(componentItem);
+                HashSet<String> allowedSeriesCodes = new HashSet<>();
+
+                for (SDataUserDnsDps userDns : userDnsDpss) {
+                    if (userDns.getDocumentNumberSeries() != null) {
+                        allowedSeriesCodes.add(userDns.getDocumentNumberSeries().getDocNumberSeries()
+                        );
                     }
                 }
-            }
 
-            mbIsNumberSeriesRequired = true;
-            mbIsNumberSeriesAvailable = jcbNumberSeries.getItemCount() > 0;
+                // If the user does not have series assigned, it displays all of them
+                boolean showAllSeries = allowedSeriesCodes.isEmpty();
+
+                for (SFormComponentItem componentItem : componentItems) {
+
+                    if (SLibUtilities.compareKeys(moDpsType.getPrimaryKey(),componentItem.getPrimaryKey())) {
+                        String seriesCode = componentItem.getItem();
+
+                        if (showAllSeries || allowedSeriesCodes.contains(seriesCode)) {
+                            jcbNumberSeries.addItem(componentItem);
+                        }
+                    }
+                }
+
+            if (jcbNumberSeries.getItemCount() > 0) {
+                jcbNumberSeries.setSelectedIndex(0);
+            }
         }
+
+        mbIsNumberSeriesRequired = true;
+        mbIsNumberSeriesAvailable = jcbNumberSeries.getItemCount() > 0;
+    }
 
         mvFields.insertElementAt(moFieldNumberSeries, index);
 
@@ -7065,7 +7087,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         mbResetingForm = false;
     }
-
+ 
     private void setBizPartner(int[] keyBizPartner, int[] keyBizPartnerBranch, int[] keyBizPartnerBranchAddress) {
         mbUpdatingForm = true;  // prevent item state change events to be processed
         

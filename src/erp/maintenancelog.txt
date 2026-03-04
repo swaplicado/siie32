@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 296.5/ 2026-03-02
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Se acotaron las series asignadas a los usuarios.
+2) Se agrego la columna de activo a las vistas de solicitudes de pago.
+3) se agrego la columna de activo a las vista de flujo de efectivo y el filtro por fecha programada
+
+================================================================================
 SIIE 3.2 296.4/ 2026-02-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
