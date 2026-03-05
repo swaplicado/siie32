@@ -54,7 +54,8 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
+ * 
  * @author Sergio Flores
  */
 public abstract class SImportUtils {

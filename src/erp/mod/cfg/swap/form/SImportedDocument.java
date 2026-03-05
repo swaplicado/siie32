@@ -21,6 +21,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SImportUtils;
+import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.trn.db.SDbSwapDataProcessing;
@@ -114,6 +115,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
     private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
+
+    private SServicesUtils.ConfigSettings ConfigSettings;
     
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
@@ -156,7 +159,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     public Reference[] References;
     
-    public SImportedDocument() {
+    public SImportedDocument(final SServicesUtils.ConfigSettings configSettings) {
+        ConfigSettings = configSettings;
+        
         ExternalDocumentId = 0;
         ExternalDocumentUuid = "";
         BizPartnerId = 0;
@@ -452,10 +457,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             // create and save payment request:
             
             if (payment == null) {
-                Date date = session.getCurrentDate();
-                
-                // throw exception if exchange rate is not available:
-                double exchangeRate = SDocumentUtils.getExchangeRate(session, CurrencyId, date);
+                boolean isAutoAuthReqPayReq = ConfigSettings.isAutoAuthReqPayReq(session.getUser().getPkUserId()); // check if payment request needs to be send to be authorized automatically
+                boolean isAutoAuthPayReq = ConfigSettings.isAutoAuthPayReq(ProcessingTypeId); // check if payment request will be authorized automatically
+                double exchangeRate = SDocumentUtils.getExchangeRate(session, CurrencyId, session.getCurrentDate()); // throws exception if exchange rate is unavailable
 
                 // create & prepare payment and its single one payment entry:
 
@@ -470,7 +474,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setPaymentType(SDbPayment.TYPE_REQUEST);
                 payment.setSeries("");
                 payment.setNumber(0);
-                payment.setDateApplication(date);
+                payment.setDateApplication(session.getCurrentDate());
                 payment.setDateRequired(getRequiredPaymentDateEffective());
                 payment.setDateSchedule_n(null);
                 payment.setDateExecution_n(null);
@@ -484,8 +488,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setRescheduled(false);
                 payment.setExecutedManually(false);
                 payment.setDeleted(false);
-                payment.setSystem(true);
-                payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
+                payment.setSystem(isAutoAuthReqPayReq); // system's payment requests are send automatically to be authorized, otherwise a user intervention is required
+                payment.setFkStatusPaymentId(isAutoAuthPayReq ? SModSysConsts.FINS_ST_PAY_SCHED : SModSysConsts.FINS_ST_PAY_NEW);
                 //payment.setFkCurrencyId(...); // set in SDbPayment.processPaymentCy()
                 payment.setFkBeneficiaryId(BizPartnerId);
                 payment.setFkFunctionalAreaId(dps.getFkFunctionalAreaId());
@@ -1199,6 +1203,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         return dps;
     }
+    
+    /*
+     * Implemented and overriden inherited methods
+     */
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -1402,6 +1410,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 + ".";
     }
     
+    /*
+     * Static methods and classes
+     */
+    
     /**
      * Create prepared statement to get Processed DPS from SWAP processed data by its external ID.
      * @param statement DB statement.
@@ -1535,7 +1547,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
-                importedDocument = new SImportedDocument();
+                importedDocument = new SImportedDocument(null);
                 importedDocument.ExternalDocumentId = resultSet.getInt("sdp.ext_data_id");
                 importedDocument.ExternalDocumentUuid = resultSet.getString("sdp.ext_data_uuid");
                 importedDocument.BizPartnerId = resultSet.getInt("b.id_bp");

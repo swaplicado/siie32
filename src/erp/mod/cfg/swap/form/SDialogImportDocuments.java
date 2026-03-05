@@ -107,6 +107,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected int mnShowingDocsMode;
     protected SGridPaneForm moDocumentsGrid;
     protected SDialogDpsFinder moDialogDpsFinder;
+    protected SServicesUtils.ConfigSettings moServicesConfigSettings;
     protected ArrayList<SImportedDocument> maDocuments;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
     protected String msUserFunctionalSubAreaCodes;
@@ -1000,6 +1001,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfUserName.setCaretPosition(0);
         
         try {
+            moServicesConfigSettings = SServicesUtils.getConfigSettings(miClient.getSession());
             maDocuments = new ArrayList<>();
             
             if (((SDataParamsCompany) miClient.getSession().getConfigCompany()).getIsFunctionalAreas()) {
@@ -1324,7 +1326,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
                                 int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_INV, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
 
-                                SImportedDocument document = new SImportedDocument();
+                                SImportedDocument document = new SImportedDocument(moServicesConfigSettings);
 
                                 document.ExternalDocumentId = externalDocumentId;
                                 document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
@@ -1409,10 +1411,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                         document.RequiredPaymentDate = requiredPaymentDate;
                                         document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
                                         document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
-                                    }
-
-                                    if (document.ExternalDocumentId == 4246) {
-                                        System.out.println("El 4246");
                                     }
 
                                     String revisionDatetimeAsText = docNode.has("date_week_revision") ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
@@ -1961,8 +1959,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                // throw exception if exchanga rate is not available:
-                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
                             }
                             
                             // validate business partner:
@@ -2028,8 +2025,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             // validate availability of exchange rate, if needed:
 
                             if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                // throw exception if exchanga rate is not available:
-                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate());
+                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
                             }
                             
                             // validate business partner:

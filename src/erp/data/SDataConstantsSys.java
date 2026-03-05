@@ -149,6 +149,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_FIN_PAY_CFG = "FIN_PAY_CFG";
     public static final String CFG_PARAM_SIIE_PURP_DPS_NAT = "SIIE_PURP_DPS_NAT";
     public static final String CFG_PARAM_SIIE_PURP_CFD_USE = "SIIE_PURP_CFD_USE";
+    public static final String CFG_PARAM_SIIE_CFG = "SIIE_CFG";
     public static final String CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE = "SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";

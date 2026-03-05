@@ -298,6 +298,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxCheckDpsLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
+    /** Imported Document from SWAP Services, just for reference purposes. */
     protected SImportedDocument moXtaImportedDocument;
     
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro

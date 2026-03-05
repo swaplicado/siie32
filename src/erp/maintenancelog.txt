@@ -1,11 +1,19 @@
 ================================================================================
-SIIE 3.2 296.7/ 2026-03-04
+SIIE 3.2 297.0b/ 2026-03-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Incorporación de funcionalidades para determinar mediante parámetro de configuración:
+- cuáles usuarios generan solicitudes de pago que se mandan en automático a autorizar al procesarse facturas desde SWAP Services;
+- cuáles tipos de procesamiento de documentos generan solicitudes de pago autorizadas en automático al procesarse facturas desde SWAP Services.
+
+================================================================================
+SIIE 3.2 295.7/ 2026-03-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Revisión a permisos sobre opciones de repotes del Módulo Finanzas, para desasociar el acceso al informe de situación general de los estados financieros.
 
 ================================================================================
-SIIE 3.2 296.5/ 2026-03-02
+SIIE 3.2 295.5/ 2026-03-02
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Se acotaron las series asignadas a los usuarios.
@@ -13,14 +21,14 @@ Jhonatan Claudio PEÑA HERNANDEZ
 3) se agrego la columna de activo a las vista de flujo de efectivo y el filtro por fecha programada
 
 ================================================================================
-SIIE 3.2 296.4/ 2026-02-20
+SIIE 3.2 295.4/ 2026-02-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega rol autorizador para portal de compras en permisos de usuarios.
 2) Se agrega botón de verificación de estatus de autorización en pedidos de compra.
 
 ================================================================================
-SIIE 3.2 296.3/ 2026-02-19
+SIIE 3.2 295.3/ 2026-02-19
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Exportación de etiqueta contable en dps a portal de compras.
@@ -28,7 +36,7 @@ Edwin Omar CARMONA FIGUEROA
 en referencias de boletos a portal de compras
 
 ================================================================================
-SIIE 3.2 296.2/ 2026-02-13
+SIIE 3.2 295.2/ 2026-02-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega consulta a autorización de google en pedidos de compra para vista de DPS.
@@ -40,7 +48,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 1) Copiado de etiqueta contable a facturas desde el documento importado de SWAP Services.
 
 ================================================================================
-SIIE 3.2 296.1/ 2026-02-12
+SIIE 3.2 295.1/ 2026-02-12
 Adrián Alejandro AVILÉS GÓMEZ 
 --------------------------------------------------------------------------------
 1) Se agregó el campo account_tag en la clase SExportDataReference para su sincronización con el sistema de transacciones
