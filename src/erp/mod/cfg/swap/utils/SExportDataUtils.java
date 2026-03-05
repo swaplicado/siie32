@@ -58,7 +58,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public abstract class SExportDataUtils {
 
@@ -2002,7 +2002,7 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
 
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-
+            
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
@@ -2180,13 +2180,64 @@ public abstract class SExportDataUtils {
 
                     entries.add(paymentEntry);
                 }
+                
+                HashSet<Integer> paymentIds = new HashSet<>();
+
+                for (SExportDataPayment payment : paymentEntriesMap.keySet()) {
+                    paymentIds.add(payment.payment_id);
+                }
+
+                HashMap<Integer, ArrayList<SExportDataFile>> paymentFilesMap = new HashMap<>();
+
+                if (!paymentIds.isEmpty()) {
+
+                    String ids = paymentIds.stream()
+                            .map(String::valueOf)
+                            .collect(java.util.stream.Collectors.joining(","));
+
+                    String sqlFiles = "SELECT id_pay, file_storage_name, file_name, filevault_id "
+                            + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_FILE) + " "
+                            + "WHERE id_pay IN (" + ids + ") "
+                            + "AND NOT b_del";
+
+                    ResultSet rsFiles = statement.executeQuery(sqlFiles);
+
+                    while (rsFiles.next()) {
+                        int payId = rsFiles.getInt("id_pay");
+
+                        SExportDataFile file = new SExportDataFile();
+
+                        file.filename_storage = rsFiles.getString("file_storage_name");
+                        file.filename_original = rsFiles.getString("file_name");
+
+                        file.url_storage = "#";
+                        file.url_database = "#";
+                        file.bucket_name = CloudStorageManager.getBucketName();
+
+                        ArrayList<SExportDataFile> files = paymentFilesMap.get(payId);
+
+                        if (files == null) {
+                            files = new ArrayList<>();
+                            paymentFilesMap.put(payId, files);
+                        }
+
+                        files.add(file);
+                    }
+                }
 
                 for (SExportDataPayment payment : paymentEntriesMap.keySet()) {
                     SRequestPaymentsBody.Payment data = new SRequestPaymentsBody.Payment();
 
                     data.payment = payment;
                     data.entries = (SExportDataPaymentEntry[]) paymentEntriesMap.get(payment).toArray(new SExportDataPaymentEntry[0]);
-                    data.files = new SExportDataFile[]{};
+                    ArrayList<SExportDataFile> files = paymentFilesMap.get(payment.payment_id);
+
+                    if (files == null) {
+                        data.files = new SExportDataFile[]{};
+                    }
+                    else {
+                        data.files = files.toArray(new SExportDataFile[0]);
+                    }
 
                     payments.add(data);
                 }

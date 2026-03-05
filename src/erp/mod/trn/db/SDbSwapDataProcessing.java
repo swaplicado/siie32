@@ -26,6 +26,7 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static final String DATA_TYPE_P = "P"; // payment
     public static final String DATA_TYPE_PR = "PR"; // payment receipt
     public static final String DATA_TYPE_RP = "RP"; // receipt of payment
+    public static final String DATA_TYPE_PRF = "PRF"; // proforma
     
     private static final int LEN_REFS = 100;
     

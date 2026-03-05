@@ -7,7 +7,7 @@ package erp.mod.cfg.swap;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public abstract class SSwapConsts {
 
@@ -84,6 +84,7 @@ public abstract class SSwapConsts {
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
     public static final int TXN_REF_TYPE_ORDER = 22;
     public static final int TXN_REF_TYPE_SCALE_IN = 91;
+    public static final int TXN_DOC_TYPE_PROFORMA = 52;
     /** Órden de compra. */
     public static final String TXN_REF_TYPE_ORDER_CODE = "OC";
     /** Boleto de báscula (de entrada). */

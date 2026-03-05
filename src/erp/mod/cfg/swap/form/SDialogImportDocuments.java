@@ -92,7 +92,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
@@ -1690,7 +1690,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         else {
             try {
-                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents);
+                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SImportUtils.TYPE_INVOICE);
                 File zipFile = files[SImportUtils.FILES_ZIP];
                 
                 for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
@@ -2075,7 +2075,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ExternalDocumentId, SFileUtilities.pdf);
+                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ExternalDocumentId, SFileUtilities.pdf, document.BizPartnerId);
                 
                 if (pdf == null) {
                     File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId);
@@ -2087,7 +2087,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
                     }
                     else {
-                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF]);
+                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF], document.BizPartnerId);
                     }
                 }
                 

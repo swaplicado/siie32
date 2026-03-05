@@ -861,7 +861,7 @@ public abstract class SExportUtils {
                     
                 case PUR_PAYMENT:
                 case PUR_PAYMENT_UPD:
-                    testHost = "http://192.168.7.43:8003"; // today host in César Orozco's (30/09/2025)
+                    testHost = "http://192.168.1.87:8003"; // today host in César Orozco's (30/09/2025)
                     break;
 
                 case AUTH_ACTOR:
