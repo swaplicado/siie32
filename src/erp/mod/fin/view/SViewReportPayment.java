@@ -243,7 +243,7 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "INNER JOIN erp.cfgu_cur AS ce ON ve.fk_ety_cur = ce.id_cur "
             + "LEFT JOIN trn_dps AS d ON d.id_doc = ve.fk_doc_doc_n AND d.id_year = ve.fk_doc_year_n "
             + "LEFT JOIN erp.TRNU_DPS_NAT nat ON d.fid_dps_nat = nat.id_dps_nat "
-            + "LEFT JOIN trn_dps_ety ON e.id_year = ve.fk_doc_year_n AND e.id_doc = ve.fk_doc_doc_n"
+            + "LEFT JOIN trn_dps_ety AS e ON e.id_year = ve.fk_doc_year_n AND e.id_doc = ve.fk_doc_doc_n "
             + (sql.isEmpty() ? "" : "WHERE " + sql)
             + "GROUP BY "
             + "b.bp, v.dt_req, ve.ety_tp, ce.cur_key "
