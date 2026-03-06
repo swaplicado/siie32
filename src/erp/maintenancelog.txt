@@ -1,5 +1,9 @@
 ================================================================================
 SIIE 3.2 297.0-b2/ 2026-03-06
+César Ivan OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Liberación de funcionalidad de importación de proformas desde SWAP Services.
+
 Adrián Alejandro AVILÉS GÓMEZ
 --------------------------------------------------------------------------------
 1) Fix, al guardar cuenta pagadora y beneficiaria si son campos null en el dialogo de solicitudes de pago autorizadas.
