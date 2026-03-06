@@ -705,8 +705,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             Date date = (Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
                             double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), payment.getFkCurrencyId(), date);
                             double amount = (double) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
-                            int[] paymentBankId = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
-                            int[] benefBankId = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
+                            int[] paymentBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
+                            int[] benefBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
                             SDbPaymentEntry singleEntry = payment.getSingleEntry();
 
                             payment.setAuxReloadEntries(false);
@@ -715,10 +715,24 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             payment.setDateExecution_n(date);
                             payment.setExecutedManually(true);
                             payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
-                            payment.setFkPayerCashBizPartnerBranchId_n(paymentBankId[0]);
-                            payment.setFkPayerCashAccountingCashId_n(paymentBankId[1]);
-                            payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankId[0]);
-                            payment.setFkBeneficiaryBankAccountCashId_n(benefBankId[1]);
+                            
+                            if (paymentBankKey != null) {
+                                payment.setFkPayerCashBizPartnerBranchId_n(paymentBankKey[0]);
+                                payment.setFkPayerCashAccountingCashId_n(paymentBankKey[1]);    
+                            }
+                            else {
+                                payment.setFkPayerCashBizPartnerBranchId_n(0);
+                                payment.setFkPayerCashAccountingCashId_n(0);
+                            }
+                            
+                            if (benefBankKey != null) {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankKey[0]);
+                                payment.setFkBeneficiaryBankAccountCashId_n(benefBankKey[1]);
+                            }
+                            else {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(0);
+                                payment.setFkBeneficiaryBankAccountCashId_n(0);
+                            }
 
                             payment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, singleEntry.getDocInstallment(), singleEntry.getDocBalancePreviousCy());
 
@@ -732,7 +746,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     else {
                         switch (status) {
                             case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
                                         + "Intente más tarde de favor.");
                                 break;
                             default:

@@ -527,14 +527,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             case CASE_REACTIVATE:
                 moKeyPriority.removeAll();
                 moKeyPaymentBank.removeAll();
+                
                 reactivating = true;
                 rescheduling = true;
                 moDateNewDate.setValue(moRegistry.getDateRequired());
                 break;
                 
             case CASE_RESCHEDULE:
-                moKeyPriority.removeAll();
-                moKeyPaymentBank.removeAll();
             case CASE_CHANGE_CURRENCY:
                 moKeyPriority.removeAll();
                 moKeyPaymentBank.removeAll();
@@ -639,23 +638,24 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                             }
                         }
                         
-                        if ( moKeyPaymentBank.getValue().length == 0 && moKeyBeneffBank.getValue().length == 0) {
-                            String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyPaymentBank.getFieldName() + "\" y \"" + moKeyBeneffBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                        if (moKeyPaymentBank.getSelectedIndex() <= 0 && moKeyBeneffBank.getSelectedIndex() <= 0) {
+                            String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + "\'" + moKeyPaymentBank.getFieldName() + "\' y \'" + moKeyBeneffBank.getFieldName() + "\'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
                             if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
-                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" " +  moKeyPaymentBank.getFieldName() + "\" y " + "\"" + moKeyBeneffBank.getFieldName() + "\"");
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\'" +  moKeyPaymentBank.getFieldName() + "\' y \'" + moKeyBeneffBank.getFieldName() + "\'");
                             }
-                        } else {
-                            if ( moKeyPaymentBank.getValue().length == 0 ) {
-                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyPaymentBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                        }
+                        else {
+                            if (moKeyPaymentBank.getSelectedIndex() <= 0) {
+                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + "\'" + moKeyPaymentBank.getFieldName() + "\'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
                                 if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" " +  moKeyPaymentBank.getFieldName() + "\"");
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\'" +  moKeyPaymentBank.getFieldName() + "\'");
                                 }
                             }
 
-                            if ( moKeyBeneffBank.getValue().length == 0 ) {
-                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + " \"" + moKeyBeneffBank.getFieldName() + "\" " + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
+                            if (moKeyBeneffBank.getSelectedIndex() <= 0) {
+                                String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + "\'" + moKeyBeneffBank.getFieldName() + "\'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
                                 if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\" "+ moKeyBeneffBank.getFieldName() + "\"");
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "\'" + moKeyBeneffBank.getFieldName() + "\'");
                                 }
                             }
                         }
@@ -695,10 +695,20 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 value = moTextNotesAuthorization.getValue();
                 break;
             case VALUE_PAYMENT_BANK:
-                value = moKeyPaymentBank.getValue();
+                if (moKeyPaymentBank.getSelectedIndex() > 0) {
+                    value = moKeyPaymentBank.getValue();
+                }
+                else {
+                    value = null;
+                }
                 break;
             case VALUE_BENEFIT_BANK:
-                value = moKeyBeneffBank.getValue();
+                if (moKeyBeneffBank.getSelectedIndex() > 0) {
+                    value = moKeyBeneffBank.getValue();
+                }
+                else {
+                    value = null;
+                }
                 break;
             default:
                 // nothing
