@@ -1,3 +1,8 @@
+SIIE 3.2 295.8/ 2026-03-06
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Fix, al guardar cuenta pagadora y beneficiaria si son campos null en el dialogo de solicitudes de pago autorizadas.
+
 ================================================================================
 SIIE 3.2 297.0b/ 2026-03-05
 Sergio Abraham FLORES GUTIÉRREZ
@@ -21,7 +26,22 @@ Jhonatan Claudio PEÑA HERNANDEZ
 3) se agrego la columna de activo a las vista de flujo de efectivo y el filtro por fecha programada
 
 ================================================================================
-SIIE 3.2 295.4/ 2026-02-20
+SIIE 3.2 296.5/ 2026-03-02
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Se agregan los campos "Cuenta pagadora" u "Cuenta beneficiaria" en el dialogo de solicitudes de pago autorizadas.
+2) Se agregan columnas "Cuenta pagadora" u "Cuenta beneficiaria" en la vista de pagos operados.
+
+================================================================================
+SIIE 3.2 296.3/ 2026-02-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportación de etiqueta contable en dps a portal de compras.
+2) Exportación de peso bruto, peso neto, origen de fruta, origen de flete y productor
+en referencias de boletos a portal de compras
+
+================================================================================
+SIIE 3.2 296.4/ 2026-02-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega rol autorizador para portal de compras en permisos de usuarios.

@@ -62,7 +62,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -708,6 +708,8 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                             Date date = (Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
                             double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), payment.getFkCurrencyId(), date);
                             double amount = (double) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
+                            int[] paymentBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
+                            int[] benefBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
                             SDbPaymentEntry singleEntry = payment.getSingleEntry();
 
                             payment.setAuxReloadEntries(false);
@@ -716,6 +718,24 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                             payment.setDateExecution_n(date);
                             payment.setExecutedManually(true);
                             payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                            
+                            if (paymentBankKey != null) {
+                                payment.setFkPayerCashBizPartnerBranchId_n(paymentBankKey[0]);
+                                payment.setFkPayerCashAccountingCashId_n(paymentBankKey[1]);    
+                            }
+                            else {
+                                payment.setFkPayerCashBizPartnerBranchId_n(0);
+                                payment.setFkPayerCashAccountingCashId_n(0);
+                            }
+                            
+                            if (benefBankKey != null) {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankKey[0]);
+                                payment.setFkBeneficiaryBankAccountCashId_n(benefBankKey[1]);
+                            }
+                            else {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(0);
+                                payment.setFkBeneficiaryBankAccountCashId_n(0);
+                            }
 
                             payment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, singleEntry.getDocInstallment(), singleEntry.getDocBalancePreviousCy());
 
@@ -729,7 +749,7 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                     else {
                         switch (status) {
                             case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
                                         + "Intente más tarde de favor.");
                                 break;
                             default:
