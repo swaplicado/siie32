@@ -5,17 +5,14 @@
  */
 package erp.mod.cfg.swap.form;
 
-import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
@@ -26,18 +23,12 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.form.SProformaInfo;
-import erp.mod.cfg.swap.utils.SDataRejectResource;
-import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
-import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.trn.db.SDbSwapDataProcessing;
-import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SThinDps;
 import erp.mtrn.form.SDialogDpsFinder;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -56,12 +47,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
@@ -75,15 +64,9 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
-import sa.lib.gui.SGuiField;
-import sa.lib.gui.SGuiItem;
-import sa.lib.gui.SGuiOptionPicker;
-import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldBoolean;
-import sa.lib.gui.bean.SBeanFieldKey;
-import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
@@ -106,7 +89,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     
     protected String msCompanyName;
     protected int mnShowingDocsMode;
-    protected SGridPaneForm moDocumentsGrid;
+    protected SGridPaneForm moProformasGrid;
     protected SDialogDpsFinder moDialogDpsFinder;
     protected ArrayList<SImportedProforma> maProformas;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
@@ -156,26 +139,29 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         jtfUserName = new javax.swing.JTextField();
         jtfUserFuncSubAreas = new javax.swing.JTextField();
         jpDownloadW2 = new javax.swing.JPanel();
-        jlInvoice1 = new javax.swing.JLabel();
+        jlPeriod = new javax.swing.JLabel();
         moDatePeriodStart = new sa.lib.gui.bean.SBeanFieldDate();
-        jLabelPeriiod1 = new javax.swing.JLabel();
+        jlPeriiod1 = new javax.swing.JLabel();
         moDatePeriodEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jpDownloadE = new javax.swing.JPanel();
         jpDownloadE1 = new javax.swing.JPanel();
-        jbShowDocs = new javax.swing.JButton();
+        jbShowProformas = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
-        jbSelectRemainingDocs = new javax.swing.JButton();
+        jbSelectRemainingProformas = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
-        jbDownloadSelectedDocs = new javax.swing.JButton();
+        jbDownloadSelectedProformas = new javax.swing.JButton();
         jpDownloadE2 = new javax.swing.JPanel();
-        jbClearDocs = new javax.swing.JButton();
+        jbClearProformas = new javax.swing.JButton();
         jLabel21 = new javax.swing.JLabel();
-        jbSelectAllDocs = new javax.swing.JButton();
+        jbSelectAllProformas = new javax.swing.JButton();
         jLabel22 = new javax.swing.JLabel();
-        jbDeselectAllDocs = new javax.swing.JButton();
+        jLabel2b3 = new javax.swing.JLabel();
         jpDownloadE3 = new javax.swing.JPanel();
+        jLabel3b1 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
+        jbDeselectAllProformas = new javax.swing.JButton();
         jLabel32 = new javax.swing.JLabel();
+        jLabel3b3 = new javax.swing.JLabel();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsGrid = new javax.swing.JPanel();
         jpDocumentsGrid1 = new javax.swing.JPanel();
@@ -192,9 +178,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
-        jlInvoice = new javax.swing.JLabel();
+        jlProforma = new javax.swing.JLabel();
         jpProcessingN2 = new javax.swing.JPanel();
-        jtfInvoice = new javax.swing.JTextField();
+        jtfProforma = new javax.swing.JTextField();
         jpProcessingN4 = new javax.swing.JPanel();
         jlReqPay = new javax.swing.JLabel();
         jpProcessingN5 = new javax.swing.JPanel();
@@ -266,19 +252,18 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpDownloadW2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoice1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlInvoice1.setText("Periodo:");
-        jlInvoice1.setPreferredSize(new java.awt.Dimension(122, 23));
-        jpDownloadW2.add(jlInvoice1);
+        jlPeriod.setText("Período:");
+        jlPeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpDownloadW2.add(jlPeriod);
 
         moDatePeriodStart.setToolTipText("Fecha inicial");
         moDatePeriodStart.setPreferredSize(new java.awt.Dimension(103, 21));
         jpDownloadW2.add(moDatePeriodStart);
 
-        jLabelPeriiod1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelPeriiod1.setText("−");
-        jLabelPeriiod1.setPreferredSize(new java.awt.Dimension(15, 21));
-        jpDownloadW2.add(jLabelPeriiod1);
+        jlPeriiod1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPeriiod1.setText("−");
+        jlPeriiod1.setPreferredSize(new java.awt.Dimension(15, 21));
+        jpDownloadW2.add(jlPeriiod1);
 
         moDatePeriodEnd.setToolTipText("Fecha final");
         moDatePeriodEnd.setPreferredSize(new java.awt.Dimension(103, 21));
@@ -292,61 +277,70 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbShowDocs.setLabel("Mostrar proformas");
-        jbShowDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbShowDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbShowDocs);
+        jbShowProformas.setLabel("Mostrar proformas");
+        jbShowProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbShowProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE1.add(jbShowProformas);
 
         jLabel11.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel11);
 
-        jbSelectRemainingDocs.setText("Seleccionar restantes");
-        jbSelectRemainingDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbSelectRemainingDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbSelectRemainingDocs);
+        jbSelectRemainingProformas.setText("Seleccionar restantes");
+        jbSelectRemainingProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSelectRemainingProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE1.add(jbSelectRemainingProformas);
 
         jLabel12.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel12);
 
-        jbDownloadSelectedDocs.setText("Descargar seleccionadas");
-        jbDownloadSelectedDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbDownloadSelectedDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbDownloadSelectedDocs);
+        jbDownloadSelectedProformas.setText("Descargar seleccionadas");
+        jbDownloadSelectedProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbDownloadSelectedProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE1.add(jbDownloadSelectedProformas);
 
         jpDownloadE.add(jpDownloadE1);
 
         jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbClearDocs.setLabel("Limpiar proformas");
-        jbClearDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbClearDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbClearDocs);
+        jbClearProformas.setLabel("Limpiar proformas");
+        jbClearProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbClearProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbClearProformas);
 
         jLabel21.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel21);
 
-        jbSelectAllDocs.setText("Seleccionar todas");
-        jbSelectAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbSelectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbSelectAllDocs);
+        jbSelectAllProformas.setText("Seleccionar todas");
+        jbSelectAllProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSelectAllProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbSelectAllProformas);
 
         jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel22);
 
-        jbDeselectAllDocs.setText("Deseleccionar todas");
-        jbDeselectAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbDeselectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbDeselectAllDocs);
+        jLabel2b3.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jLabel2b3);
 
         jpDownloadE.add(jpDownloadE2);
 
         jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
+        jLabel3b1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jLabel3b1);
+
         jLabel31.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel31);
 
+        jbDeselectAllProformas.setText("Deseleccionar todas");
+        jbDeselectAllProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbDeselectAllProformas.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jbDeselectAllProformas);
+
         jLabel32.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel32);
+
+        jLabel3b3.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jLabel3b3);
 
         jpDownloadE.add(jpDownloadE3);
 
@@ -413,26 +407,21 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlInvoice.setText("Proforma:");
-        jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
-        jpProcessingN1.add(jlInvoice);
+        jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlProforma.setText("Proforma:");
+        jlProforma.setPreferredSize(new java.awt.Dimension(122, 23));
+        jpProcessingN1.add(jlProforma);
 
         jpProcessingN.add(jpProcessingN1);
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfInvoice.setEditable(false);
-        jtfInvoice.setText("ABC-000000");
-        jtfInvoice.setToolTipText("Factura");
-        jtfInvoice.setFocusable(false);
-        jtfInvoice.setPreferredSize(new java.awt.Dimension(95, 23));
-        jtfInvoice.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfInvoiceActionPerformed(evt);
-            }
-        });
-        jpProcessingN2.add(jtfInvoice);
+        jtfProforma.setEditable(false);
+        jtfProforma.setText("ABC-000000");
+        jtfProforma.setToolTipText("Factura");
+        jtfProforma.setFocusable(false);
+        jtfProforma.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN2.add(jtfProforma);
 
         jpProcessingN.add(jpProcessingN2);
 
@@ -452,11 +441,6 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         jtfReqPayAmount.setToolTipText("Pago requerido");
         jtfReqPayAmount.setFocusable(false);
         jtfReqPayAmount.setPreferredSize(new java.awt.Dimension(105, 23));
-        jtfReqPayAmount.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfReqPayAmountActionPerformed(evt);
-            }
-        });
         jpProcessingN5.add(jtfReqPayAmount);
 
         jtfReqPayAmountPct.setEditable(false);
@@ -488,6 +472,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpProcessingN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jbRequestPayment.setForeground(java.awt.Color.blue);
         jbRequestPayment.setText("Solicitar pago");
         jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -622,14 +607,6 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jtfInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfInvoiceActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfInvoiceActionPerformed
-
-    private void jtfReqPayAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfReqPayAmountActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfReqPayAmountActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
@@ -638,26 +615,29 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel2b3;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabelPeriiod1;
+    private javax.swing.JLabel jLabel3b1;
+    private javax.swing.JLabel jLabel3b3;
     private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbChangePaymentRequiredDate;
     private javax.swing.JButton jbChangePaymentScheduledDate;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
-    private javax.swing.JButton jbClearDocs;
-    private javax.swing.JButton jbDeselectAllDocs;
-    private javax.swing.JButton jbDownloadSelectedDocs;
+    private javax.swing.JButton jbClearProformas;
+    private javax.swing.JButton jbDeselectAllProformas;
+    private javax.swing.JButton jbDownloadSelectedProformas;
     private javax.swing.JButton jbRequestPayment;
-    private javax.swing.JButton jbSelectAllDocs;
-    private javax.swing.JButton jbSelectRemainingDocs;
-    private javax.swing.JButton jbShowDocs;
-    private javax.swing.JLabel jlInvoice;
-    private javax.swing.JLabel jlInvoice1;
+    private javax.swing.JButton jbSelectAllProformas;
+    private javax.swing.JButton jbSelectRemainingProformas;
+    private javax.swing.JButton jbShowProformas;
     private javax.swing.JLabel jlInvoiceUserNew;
     private javax.swing.JLabel jlPay;
     private javax.swing.JLabel jlPayExec;
     private javax.swing.JLabel jlPaySched;
+    private javax.swing.JLabel jlPeriiod1;
+    private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlProforma;
     private javax.swing.JLabel jlProgress;
     private javax.swing.JLabel jlReqPay;
     private javax.swing.JLabel jlUser;
@@ -699,7 +679,6 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     private javax.swing.JPanel jpProcessingN7;
     private javax.swing.JPanel jpProcessingN8;
     private javax.swing.JPanel jpProcessingN9;
-    private javax.swing.JTextField jtfInvoice;
     private javax.swing.JTextField jtfInvoiceUserNew;
     private javax.swing.JTextField jtfPayDate;
     private javax.swing.JTextField jtfPayExecDate;
@@ -707,6 +686,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     private javax.swing.JTextField jtfPayReqDate;
     private javax.swing.JTextField jtfPaySchedDate;
     private javax.swing.JTextField jtfPayStatus;
+    private javax.swing.JTextField jtfProforma;
     private javax.swing.JTextField jtfReqPayAmount;
     private javax.swing.JTextField jtfReqPayAmountPct;
     private javax.swing.JTextField jtfReqPayReqDate;
@@ -729,7 +709,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         
         moFields.addField(moDatePeriodStart);
         moFields.addField(moDatePeriodEnd);
-        moFields.setFormButton(jbShowDocs);
+        moFields.setFormButton(jbShowProformas);
         
         jbSave.setEnabled(false);
         jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
@@ -738,7 +718,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
         mnShowingDocsMode = OFF;
         
-        moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Proformas", null) {
+        moProformasGrid = new SGridPaneForm(miClient, 0, 0, "Proformas", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -756,7 +736,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción proforma"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total proforma $")); // col 5
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda proforma"));
-                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargar", moDocumentsGrid.getTable().getDefaultEditor(Boolean.class));
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargar", moProformasGrid.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 gridColumnsForm.add(column);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargada (proforma)"));
@@ -778,9 +758,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
             }
         };
 
-        moDocumentsGrid.setForm(null);
-        moDocumentsGrid.setPaneFormOwner(null);
-        jpDocumentsGrid.add(moDocumentsGrid, BorderLayout.CENTER);
+        moProformasGrid.setForm(null);
+        moProformasGrid.setPaneFormOwner(null);
+        jpDocumentsGrid.add(moProformasGrid, BorderLayout.CENTER);
         
         jlStatus = new JLabel();
         jpCommandLeft.add(jlStatus);
@@ -878,15 +858,15 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         System.err.println(e);
         SLibUtils.showException(this, e);
         
-        actionPerformedClearDocs();
-        jbShowDocs.requestFocusInWindow();
+        actionPerformedClearProformas();
+        jbShowProformas.requestFocusInWindow();
     }
     
     private void disableFieldsOfSearchBy() {
         moDatePeriodStart.setEditable(false);
         moDatePeriodEnd.setEditable(false);
         
-        jbShowDocs.setEnabled(false);
+        jbShowProformas.setEnabled(false);
     }
     
     private void enableFieldsOfSearchBy() {
@@ -894,40 +874,33 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         
         moDatePeriodStart.setEditable(isShowingDocsModeOff);
         moDatePeriodEnd.setEditable(isShowingDocsModeOff);
-        
     }
     
-    private void enableFieldsOfDocMode() {
-        
-    }
-    
-    private void enableFieldsForShowingDocs(final boolean setShowingDocsModeOn) {
-        mnShowingDocsMode = setShowingDocsModeOn ? ON : OFF;
+    private void enableFieldsForShowingProforms(final boolean setShowingProformsModeOn) {
+        mnShowingDocsMode = setShowingProformsModeOn ? ON : OFF;
         
         // START OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
         
-        
         // END OF item-state-chage events free section if mbDocumentsBeingUpdated is true:
+        
         enableFieldsOfSearchBy();
         
-        enableFieldsOfDocMode();
+        jbShowProformas.setEnabled(!setShowingProformsModeOn);
+        jbClearProformas.setEnabled(setShowingProformsModeOn);
         
-        jbShowDocs.setEnabled(!setShowingDocsModeOn);
-        jbClearDocs.setEnabled(setShowingDocsModeOn);
+        jbSelectRemainingProformas.setEnabled(setShowingProformsModeOn);
+        jbSelectAllProformas.setEnabled(setShowingProformsModeOn);
+        jbDeselectAllProformas.setEnabled(setShowingProformsModeOn);
         
-        jbSelectRemainingDocs.setEnabled(setShowingDocsModeOn);
-        jbSelectAllDocs.setEnabled(setShowingDocsModeOn);
-        jbDeselectAllDocs.setEnabled(setShowingDocsModeOn);
-        
-        jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
+        jbDownloadSelectedProformas.setEnabled(setShowingProformsModeOn);
     }
     
     private void exportPaymentRequestsIfNeeded() {
         if (moBoolExportPaymentRequestsOnClose.isSelected()) {
             if (!mbExportPaymentRequests) {
-                for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-                    SImportedProforma document = (SImportedProforma) row;
-                    if (document.isPaymentRequested() && SLibUtils.belongsTo(document.Payment.getFkStatusPaymentId(), new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_SCHED_P })) {
+                for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
+                    SImportedProforma proforma = (SImportedProforma) row;
+                    if (proforma.isPaymentRequested() && SLibUtils.belongsTo(proforma.Payment.getFkStatusPaymentId(), new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_SCHED_P })) {
                         mbExportPaymentRequests = true;
                         break;
                     }
@@ -991,7 +964,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         return formatedCodes;
     }
     
-    private void processShowDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
+    private void processShowProforms(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
         int countRetreived = 0;
         int countElegible = 0;
         int countShown = 0;
@@ -1016,42 +989,41 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                                 docNode.get("document_type").asInt() == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                             countElegible++;
 
-                            int externalDocumentId = docNode.get("id").asInt();
+                            int externalProformaId = docNode.get("id").asInt();
 
                             JsonNode functionalAreaNode = docNode.path("functional_area");
                             int functionalSubAreaId = functionalAreaNode.get("external_id").asInt();
 
                             if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
-                                int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_PROF, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalDocumentId);
+                                int countOfImports = SImportUtils.countImports(moPrepStatToCountImports, SDbComImportLog.SYNC_TYPE_PUR_PROF, "" + SHttpConsts.RSC_SUCC_OK, miClient.getSession().getUser().getPkUserId(), "" + externalProformaId);
 
-                                SImportedProforma document = new SImportedProforma();
+                                SImportedProforma proforma = new SImportedProforma();
 
-                                document.ExternalDocumentId = externalDocumentId;
-                                document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedProformaByExternalId, SDbSwapDataProcessing.DATA_TYPE_PRF, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
-
+                                proforma.ExternalDocumentId = externalProformaId;
+                                proforma.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedProformaByExternalId, SDbSwapDataProcessing.DATA_TYPE_PRF, SDataConstantsSys.TRNS_CT_DPS_PUR, proforma.ExternalDocumentId);
 
                                 if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
-                                    document.ExternalDocumentUuid = docNode.path("uuid").asText();
+                                    proforma.ExternalDocumentUuid = docNode.path("uuid").asText();
                                 }
                                 else {
-                                    document.ExternalDocumentUuid = "";
+                                    proforma.ExternalDocumentUuid = "";
                                 }
 
                                 JsonNode partnerNode = docNode.path("partner");
-                                document.BizPartnerId = partnerNode.get("external_id").asInt();
-                                document.BizPartner = partnerNode.get("full_name").asText();
+                                proforma.BizPartnerId = partnerNode.get("external_id").asInt();
+                                proforma.BizPartner = partnerNode.get("full_name").asText();
 
-                                document.NumberSeries = docNode.get("series").asText();
-                                document.Number = docNode.get("number").asText();
+                                proforma.NumberSeries = docNode.get("series").asText();
+                                proforma.Number = docNode.get("number").asText();
 
-                                if (document.NumberSeries.isEmpty() && document.Number.isEmpty() && document.ExternalDocumentUuid.isEmpty()) {
-                                    document.Number = docNode.get("folio").asText();
+                                if (proforma.NumberSeries.isEmpty() && proforma.Number.isEmpty() && proforma.ExternalDocumentUuid.isEmpty()) {
+                                    proforma.Number = docNode.get("folio").asText();
                                 }
 
-                                document.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
+                                proforma.Date = SLibUtils.IsoFormatDate.parse(docNode.get("date").asText());
 
                                 String dueDateAsText = docNode.has("due_date") && !docNode.path("due_date").isNull() ? docNode.get("due_date").asText() : "";
-                                document.DueDate = dueDateAsText == null || dueDateAsText.isEmpty() || dueDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(dueDateAsText);
+                                proforma.DueDate = dueDateAsText == null || dueDateAsText.isEmpty() || dueDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(dueDateAsText);
 
                                 JsonNode referencesNode = docNode.path("references");
                                 if (referencesNode.isArray()) {
@@ -1066,25 +1038,25 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                                     }
 
                                     if (!references.isEmpty()) {
-                                        document.References = references.toArray(new SImportedProforma.Reference[0]);
+                                        proforma.References = references.toArray(new SImportedProforma.Reference[0]);
 
-                                        document.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
-                                        document.ReferencesAsText = document.composeReferences();
+                                        proforma.ReferencesType = references.get(0).ReferenceType; // PLEASE NOTE THAT: reference type will be that of the first reference!
+                                        proforma.ReferencesAsText = proforma.composeReferences();
                                     }
                                 }
 
-                                document.Description = docNode.get("notes").asText();
+                                proforma.Description = docNode.get("notes").asText();
 
-                                document.FunctionalSubAreaId = functionalSubAreaId;
-                                document.FunctionalSubArea = functionalAreaNode.get("name").asText();
+                                proforma.FunctionalSubAreaId = functionalSubAreaId;
+                                proforma.FunctionalSubArea = functionalAreaNode.get("name").asText();
 
-                                document.FiscalUseCode = docNode.get("fiscal_use").asText();
+                                proforma.FiscalUseCode = docNode.get("fiscal_use").asText();
 
-                                document.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
+                                proforma.Total = SLibUtils.parseDouble(docNode.get("amount").asText());
 
                                 JsonNode currencyNode = docNode.path("currency");
-                                document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
-                                document.CurrencyCode = currencyNode.get("code").asText();
+                                proforma.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
+                                proforma.CurrencyCode = currencyNode.get("code").asText();
 
                                 int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedProforma.PAY_NOT_REQ;
                                 double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
@@ -1093,38 +1065,38 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                                 Date requiredPaymentDate = requiredPaymentDateAsText == null || requiredPaymentDateAsText.isEmpty() || requiredPaymentDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(requiredPaymentDateAsText);
 
                                 if (requiredPaymentDate == null && requiredPaymentPct == 0) {
-                                    document.RequiredPaymentDefinition = SImportedProforma.PAY_NOT_REQ;
-                                    document.RequiredPaymentAmount = 0;
-                                    document.RequiredPaymentPct = 0;
-                                    document.RequiredPaymentDate = null;
-                                    document.IsRequiredPaymentLoc = false;
-                                    document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    proforma.RequiredPaymentDefinition = SImportedProforma.PAY_NOT_REQ;
+                                    proforma.RequiredPaymentAmount = 0;
+                                    proforma.RequiredPaymentPct = 0;
+                                    proforma.RequiredPaymentDate = null;
+                                    proforma.IsRequiredPaymentLoc = false;
+                                    proforma.RequiredPaymentNotes = docNode.get("payment_notes").asText();
                                 }
                                 else {
-                                    document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedProforma.PAY_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedProforma.PAY_DEF_BY_PCT : SImportedProforma.PAY_DEF_BY_AMT);
-                                    document.RequiredPaymentAmount = requiredPaymentAmount;
-                                    document.RequiredPaymentPct = requiredPaymentPct;
-                                    document.RequiredPaymentDate = requiredPaymentDate;
-                                    document.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
-                                    document.RequiredPaymentNotes = docNode.get("payment_notes").asText();
+                                    proforma.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedProforma.PAY_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedProforma.PAY_DEF_BY_PCT : SImportedProforma.PAY_DEF_BY_AMT);
+                                    proforma.RequiredPaymentAmount = requiredPaymentAmount;
+                                    proforma.RequiredPaymentPct = requiredPaymentPct;
+                                    proforma.RequiredPaymentDate = requiredPaymentDate;
+                                    proforma.IsRequiredPaymentLoc = docNode.get("is_payment_loc").asBoolean();
+                                    proforma.RequiredPaymentNotes = docNode.get("payment_notes").asText();
                                 }
 
-                                if (document.ExternalDocumentId == 4246) {
+                                if (proforma.ExternalDocumentId == 4246) {
                                     System.out.println("El 4246");
                                 }
 
                                 String revisionDatetimeAsText = docNode.has("date_week_revision") ? docNode.get("date_week_revision").asText() : docNode.get("authorized_at").asText();
                                 Date revisionDatetime = docNode.path("date_week_revision").isNull() || revisionDatetimeAsText == null || revisionDatetimeAsText.isEmpty() || revisionDatetimeAsText.equals("null") ? null : SSwapUtils.SwapDatetimeMicrosecsTimeZoneFormat.parse(revisionDatetimeAsText.replaceFirst("(\\.\\d{3})\\d+", "$1")); // trunc microsecontds to milliseconds
 
-                                document.RevisionDatetime = revisionDatetime;
-                                document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
-                                document.ProcessingTypeCode = SImportedProforma.ProcTypes.get(document.ProcessingTypeId);
-                                document.StatusId = 0;
-                                document.Status = "";
-                                document.Download = false;
-                                document.AlreadyDownloaded = countOfImports > 0;
+                                proforma.RevisionDatetime = revisionDatetime;
+                                proforma.ProcessingTypeId = docNode.get("processing_type_id").asInt();
+                                proforma.ProcessingTypeCode = SImportedProforma.ProcTypes.get(proforma.ProcessingTypeId);
+                                proforma.StatusId = 0;
+                                proforma.Status = "";
+                                proforma.Download = false;
+                                proforma.AlreadyDownloaded = countOfImports > 0;
 
-                                maProformas.add(document);
+                                maProformas.add(proforma);
                                 countShown++;
                                 
                             }
@@ -1138,7 +1110,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 }
                 
                 callback.onProgress(100);
-                enableFieldsForShowingDocs(true);
+                enableFieldsForShowingProforms(true);
 
                 String range = "";
 
@@ -1184,7 +1156,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void actionPerformedShowDocs() {
+    private void actionPerformedShowProformas() {
         SGuiValidation validation = null;
         String capacityLimit = "Por eficiencia en el procesamiento de su petición, la consulta está restringida máximo a ";
         
@@ -1241,7 +1213,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        processShowDocs(connection, progress -> {
+                        processShowProforms(connection, progress -> {
                             publish(progress);
                         });
                         return null;
@@ -1267,16 +1239,16 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void actionPerformedClearDocs() {
+    private void actionPerformedClearProformas() {
         try {
             mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
             
             maProformas.clear();
             
-            moDocumentsGrid.populateGrid(new Vector<>());
-            renderCurrentDocument();
+            moProformasGrid.populateGrid(new Vector<>());
+            renderCurrentProforma();
 
-            enableFieldsForShowingDocs(false);
+            enableFieldsForShowingProforms(false);
 
             jlStatus.setText("");
             clearProgress();
@@ -1292,8 +1264,8 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void actionPerformedSelectRemainingDocs() {
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+    private void actionPerformedSelectRemainingProformas() {
+        for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
             if (((SImportedProforma) row).AlreadyDownloaded) {
                 ((SImportedProforma) row).Download = false;
             }
@@ -1302,35 +1274,35 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
             }
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        int index = moProformasGrid.getTable().getSelectedRow();
+        moProformasGrid.renderGridRows();
+        moProformasGrid.setSelectedGridRow(index);
     }
     
-    private void actionPerformedSelectAllDocs() {
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+    private void actionPerformedSelectAllProformas() {
+        for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
             ((SImportedProforma) row).Download = true;
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        int index = moProformasGrid.getTable().getSelectedRow();
+        moProformasGrid.renderGridRows();
+        moProformasGrid.setSelectedGridRow(index);
     }
     
-    private void actionPerformedDeselectAllDocs() {
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+    private void actionPerformedDeselectAllProformas() {
+        for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
             ((SImportedProforma) row).Download = false;
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        int index = moProformasGrid.getTable().getSelectedRow();
+        moProformasGrid.renderGridRows();
+        moProformasGrid.setSelectedGridRow(index);
     }
     
-    private void actionPerformedDownloadSelectedDocs() {
+    private void actionPerformedDownloadSelectedProformas() {
         ArrayList<Integer> documents = new ArrayList<>();
         
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+        for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
             if (((SImportedProforma) row).Download) {
                 documents.add(((SImportedProforma) row).ExternalDocumentId);
             }
@@ -1348,7 +1320,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SImportUtils.TYPE_PROFORMA);
                 File zipFile = files[SImportUtils.FILES_ZIP];
                 
-                for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
                     if (((SImportedProforma) row).Download && !((SImportedProforma) row).AlreadyDownloaded) {
                         int externalId = ((SImportedProforma) row).ExternalDocumentId;
                         for (Integer document : documents) {
@@ -1360,9 +1332,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                     }
                 }
 
-                int index = moDocumentsGrid.getTable().getSelectedRow();
-                moDocumentsGrid.renderGridRows();
-                moDocumentsGrid.setSelectedGridRow(index);
+                int index = moProformasGrid.getTable().getSelectedRow();
+                moProformasGrid.renderGridRows();
+                moProformasGrid.setSelectedGridRow(index);
 
                 String zipPath = zipFile.getAbsolutePath();
                 System.out.println("ZIP saved to: " + zipPath);
@@ -1386,7 +1358,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     
     private void actionPerformedRequestPayment() {
         try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            SGridRow row = moProformasGrid.getSelectedGridRow();
             
             if (row == null) {
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
@@ -1395,9 +1367,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 SImportedProforma document = (SImportedProforma) row;
                 
                 if (document.requestPayment(miClient, msSyncUrlDownload)) {
-                    int index = moDocumentsGrid.getTable().getSelectedRow();
-                    moDocumentsGrid.renderGridRows();
-                    moDocumentsGrid.setSelectedGridRow(index);
+                    int index = moProformasGrid.getTable().getSelectedRow();
+                    moProformasGrid.renderGridRows();
+                    moProformasGrid.setSelectedGridRow(index);
                     
                     mbExportPaymentRequests = true;
                 }
@@ -1410,7 +1382,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     
     private void actionPerformedChangeRequiredPaymentDate() {
         try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            SGridRow row = moProformasGrid.getSelectedGridRow();
             
             if (row == null) {
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
@@ -1436,9 +1408,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
+                        int index = moProformasGrid.getTable().getSelectedRow();
+                        moProformasGrid.renderGridRows();
+                        moProformasGrid.setSelectedGridRow(index);
 
                         mbExportPaymentRequests = true;
                     }
@@ -1452,7 +1424,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     
     private void actionPerformedChangePaymentRequiredDate() {
         try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            SGridRow row = moProformasGrid.getSelectedGridRow();
             
             if (row == null) {
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
@@ -1478,9 +1450,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
+                        int index = moProformasGrid.getTable().getSelectedRow();
+                        moProformasGrid.renderGridRows();
+                        moProformasGrid.setSelectedGridRow(index);
 
                         mbExportPaymentRequests = true;
                     }
@@ -1494,7 +1466,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     
     private void actionPerformedChangePaymentScheduledDate() {
         try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            SGridRow row = moProformasGrid.getSelectedGridRow();
             
             if (row == null) {
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
@@ -1520,9 +1492,9 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
+                        int index = moProformasGrid.getTable().getSelectedRow();
+                        moProformasGrid.renderGridRows();
+                        moProformasGrid.setSelectedGridRow(index);
 
                         mbExportPaymentRequests = true;
                     }
@@ -1534,8 +1506,8 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void renderCurrentDocument() {
-        SGridRow row = moDocumentsGrid.getSelectedGridRow();
+    private void renderCurrentProforma() {
+        SGridRow row = moProformasGrid.getSelectedGridRow();
         
         if (row == null) {
             jbChangeRequiredPaymentDate.setEnabled(false);
@@ -1543,8 +1515,8 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
             jbChangePaymentRequiredDate.setEnabled(false);
             jbChangePaymentScheduledDate.setEnabled(false);
             
-            jtfInvoice.setText("");
-            jtfInvoice.setToolTipText(null);
+            jtfProforma.setText("");
+            jtfProforma.setToolTipText(null);
             
             jtfInvoiceUserNew.setText("");
             
@@ -1561,40 +1533,39 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
             
         }
         else {
-            SImportedProforma document = (SImportedProforma) row;
+            SImportedProforma proforma = (SImportedProforma) row;
             
             jbChangeRequiredPaymentDate.setEnabled(true);
             jbRequestPayment.setEnabled(true);
             jbChangePaymentRequiredDate.setEnabled(true);
             jbChangePaymentScheduledDate.setEnabled(true);
             
+            jtfProforma.setText(proforma.getFolio()); // show folio of current document as a visual indicator that is an invoice already linked!
+            jtfProforma.setToolTipText("Proforma: " + proforma.getFolio());
             
-            jtfInvoice.setText(document.getFolio()); // show folio of current document as a visual indicator that is an invoice already linked!
-            jtfInvoice.setToolTipText("Proforma: " + document.getFolio());
-            
-            if (document.ProcessedProforma != null){
-                jtfInvoiceUserNew.setText(document.ProcessedProforma.Usr);
+            if (proforma.ProcessedProforma != null){
+                jtfInvoiceUserNew.setText(proforma.ProcessedProforma.Usr);
             }
 
-            jtfInvoice.setCaretPosition(0);
+            jtfProforma.setCaretPosition(0);
             jtfInvoiceUserNew.setCaretPosition(0);
             
-            if (!document.isPaymentRequestDataAvailable()) {
+            if (!proforma.isPaymentRequestDataAvailable()) {
                 jtfReqPayAmount.setText("");
                 jtfReqPayAmountPct.setText("");
                 jtfReqPayReqDate.setText("");
             }
             else {
-                jtfReqPayAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.Total * document.RequiredPaymentPct / 100) + " " + document.CurrencyCode);
-                jtfReqPayAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.RequiredPaymentPct / 100));
-                jtfReqPayReqDate.setText(SLibUtils.GuiDateFormat.format(document.getRequiredPaymentDateEffective()));
+                jtfReqPayAmount.setText(SLibUtils.getDecimalFormatAmount().format(proforma.Total * proforma.RequiredPaymentPct / 100) + " " + proforma.CurrencyCode);
+                jtfReqPayAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(proforma.RequiredPaymentPct / 100));
+                jtfReqPayReqDate.setText(SLibUtils.GuiDateFormat.format(proforma.getRequiredPaymentDateEffective()));
                 
                 jtfReqPayAmount.setCaretPosition(0);
                 jtfReqPayAmountPct.setCaretPosition(0);
                 jtfReqPayReqDate.setCaretPosition(0);
             }
             
-            if (!document.isPaymentRequested()) {
+            if (!proforma.isPaymentRequested()) {
                 jtfPayFolio.setText("");
                 jtfPayDate.setText("");
                 jtfPayReqDate.setText("");
@@ -1603,12 +1574,12 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
                 jtfPayExecDate.setText("");
             }
             else {
-                jtfPayFolio.setText(document.Payment.getFolio());
-                jtfPayDate.setText(SLibUtils.DateFormatDate.format(document.Payment.getDateApplication()));
-                jtfPayReqDate.setText(SLibUtils.GuiDateFormat.format(document.Payment.getDateRequired()));
-                jtfPayStatus.setText(document.Payment.getDbmsStatus());
-                jtfPaySchedDate.setText(document.Payment.getDateSchedule_n() == null ? "ND" : SLibUtils.GuiDateFormat.format(document.Payment.getDateSchedule_n()));
-                jtfPayExecDate.setText(document.Payment.getDateExecution_n() == null ? "ND" : SLibUtils.GuiDateFormat.format(document.Payment.getDateExecution_n()));
+                jtfPayFolio.setText(proforma.Payment.getFolio());
+                jtfPayDate.setText(SLibUtils.DateFormatDate.format(proforma.Payment.getDateApplication()));
+                jtfPayReqDate.setText(SLibUtils.GuiDateFormat.format(proforma.Payment.getDateRequired()));
+                jtfPayStatus.setText(proforma.Payment.getDbmsStatus());
+                jtfPaySchedDate.setText(proforma.Payment.getDateSchedule_n() == null ? "ND" : SLibUtils.GuiDateFormat.format(proforma.Payment.getDateSchedule_n()));
+                jtfPayExecDate.setText(proforma.Payment.getDateExecution_n() == null ? "ND" : SLibUtils.GuiDateFormat.format(proforma.Payment.getDateExecution_n()));
                 
                 jtfPayFolio.setCaretPosition(0);
                 jtfPayDate.setCaretPosition(0);
@@ -1620,18 +1591,18 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
     }
     
-    private void populateDocumentsGrid(final ArrayList<SImportedProforma> documents, final boolean focusDocumentsGridTable) {
-        Collections.sort(documents);
+    private void populateProformasGrid(final ArrayList<SImportedProforma> proformas, final boolean focusProformasGridTable) {
+        Collections.sort(proformas);
 
-        moDocumentsGrid.populateGrid(new Vector<>(documents), this);
-        moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        moDocumentsGrid.setSelectedGridRow(0);
+        moProformasGrid.populateGrid(new Vector<>(proformas), this);
+        moProformasGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        moProformasGrid.setSelectedGridRow(0);
         
-        if (focusDocumentsGridTable) {
-            moDocumentsGrid.getTable().requestFocusInWindow();
+        if (focusProformasGridTable) {
+            moProformasGrid.getTable().requestFocusInWindow();
         }
         
-        jlStatus.setText("Proformas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maProformas.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
+        jlStatus.setText("Proformas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maProformas.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(proformas.size()));
     }
     
     private void itemStateChangedSearchBy() {
@@ -1639,7 +1610,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     }
     
     private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
-        populateDocumentsGrid(maProformas, focusDocumentsGridTable);
+        populateProformasGrid(maProformas, focusDocumentsGridTable);
     }
     
      
@@ -1676,19 +1647,19 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         moDatePeriodStart.setValue(SLibTimeUtils.getBeginOfMonth(date));
         moDatePeriodEnd.setValue(SLibTimeUtils.getEndOfMonth(date));
         
-        actionPerformedClearDocs();
+        actionPerformedClearProformas();
         
         addAllListeners();
     }
     
     @Override
     public void addAllListeners() {
-        jbShowDocs.addActionListener(this);
-        jbClearDocs.addActionListener(this);
-        jbSelectRemainingDocs.addActionListener(this);
-        jbSelectAllDocs.addActionListener(this);
-        jbDeselectAllDocs.addActionListener(this);
-        jbDownloadSelectedDocs.addActionListener(this);
+        jbShowProformas.addActionListener(this);
+        jbClearProformas.addActionListener(this);
+        jbSelectRemainingProformas.addActionListener(this);
+        jbSelectAllProformas.addActionListener(this);
+        jbDeselectAllProformas.addActionListener(this);
+        jbDownloadSelectedProformas.addActionListener(this);
         
         jbChangeRequiredPaymentDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
@@ -1699,12 +1670,12 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
     @Override
     public void removeAllListeners() {
-        jbShowDocs.removeActionListener(this);
-        jbClearDocs.removeActionListener(this);
-        jbSelectRemainingDocs.removeActionListener(this);
-        jbSelectAllDocs.removeActionListener(this);
-        jbDeselectAllDocs.removeActionListener(this);
-        jbDownloadSelectedDocs.removeActionListener(this);
+        jbShowProformas.removeActionListener(this);
+        jbClearProformas.removeActionListener(this);
+        jbSelectRemainingProformas.removeActionListener(this);
+        jbSelectAllProformas.removeActionListener(this);
+        jbDeselectAllProformas.removeActionListener(this);
+        jbDownloadSelectedProformas.removeActionListener(this);
         
         jbChangeRequiredPaymentDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
@@ -1745,23 +1716,23 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbShowDocs) {
-                actionPerformedShowDocs();
+            if (button == jbShowProformas) {
+                actionPerformedShowProformas();
             }
-            else if (button == jbClearDocs) {
-                actionPerformedClearDocs();
+            else if (button == jbClearProformas) {
+                actionPerformedClearProformas();
             }
-            else if (button == jbSelectRemainingDocs) {
-                actionPerformedSelectRemainingDocs();
+            else if (button == jbSelectRemainingProformas) {
+                actionPerformedSelectRemainingProformas();
             }
-            else if (button == jbSelectAllDocs) {
-                actionPerformedSelectAllDocs();
+            else if (button == jbSelectAllProformas) {
+                actionPerformedSelectAllProformas();
             }
-            else if (button == jbDeselectAllDocs) {
-                actionPerformedDeselectAllDocs();
+            else if (button == jbDeselectAllProformas) {
+                actionPerformedDeselectAllProformas();
             }
-            else if (button == jbDownloadSelectedDocs) {
-                actionPerformedDownloadSelectedDocs();
+            else if (button == jbDownloadSelectedProformas) {
+                actionPerformedDownloadSelectedProformas();
             }
             else if (button == jbRequestPayment) {
                 actionPerformedRequestPayment();
@@ -1781,33 +1752,12 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            renderCurrentDocument();
+            renderCurrentProforma();
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-//        if (!mbDocumentsBeingUpdated) {
-//            if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
-//                SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
-//
-//                if (field == moRadSearchByPeriod || field == moRadSearchByWeek) {
-//                    itemStateChangedSearchBy();
-//                }
-//                else if (field == moRadDocModeType || field == moRadDocModeCase) {
-//                    itemStateChangedDocMode();
-//                }
-//            }
-//            else if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
-//                SBeanFieldKey field = (SBeanFieldKey) e.getSource();
-//                
-//                if (field == moKeyDocModeType) {
-//                    itemStateChangedDocType(false);
-//                }
-//                else if (field == moKeyDocModeCase) {
-//                    itemStateChangedDocCase(false);
-//                }
-//            }
-//        }
-        }
+        
+    }
 }

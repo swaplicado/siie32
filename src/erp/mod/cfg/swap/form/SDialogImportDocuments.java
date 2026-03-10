@@ -183,7 +183,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jLabel21 = new javax.swing.JLabel();
         jbSelectAllDocs = new javax.swing.JButton();
         jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
+        jLabel2b3 = new javax.swing.JLabel();
         jpDownloadE3 = new javax.swing.JPanel();
         moBoolExcludeRecorded = new sa.lib.gui.bean.SBeanFieldBoolean();
         jLabel31 = new javax.swing.JLabel();
@@ -406,8 +406,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel22);
 
-        jLabel23.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jLabel23);
+        jLabel2b3.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jLabel2b3);
 
         jpDownloadE.add(jpDownloadE2);
 
@@ -770,7 +770,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel2b3;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabelPeriiod1;
