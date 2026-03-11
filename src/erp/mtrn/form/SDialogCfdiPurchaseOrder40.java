@@ -361,7 +361,7 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         //moTablePane.setDoubleClickAction(this, "actionDoubleClickOk");
         jpDocumentEntriesGrid.add(moTablePurchaseOrEntries, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[12];
+        columns = new STableColumnForm[14];
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Concepto", 250);
@@ -382,6 +382,9 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "% excedente", STableConstants.WIDTH_PERCENTAGE);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio $", STableConstants.WIDTH_VALUE_UNITARY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
 
         for (i = 0; i < columns.length; i++) {
             moTablePurchaseOrEntries.addTableColumn(columns[i]);
@@ -434,6 +437,8 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
         moTablePurchaseOrEntries.clearTableRows();
 
         if (moParamPurchaseOrder != null) {
+            String currencyCode = miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { moParamPurchaseOrder.getFkCurrencyId() });
+            
             for (SDataDpsEntry entry : moParamPurchaseOrder.getDbmsDpsEntries()) {
                 if (entry.isAccountable()) {
                     SDataEntryDpsDpsLink entryDpsDpsLink;
@@ -467,9 +472,13 @@ public class SDialogCfdiPurchaseOrder40 extends javax.swing.JDialog implements e
                     entryDpsDpsLink.setQuantityLinkedActual(linkedActual);
                     entryDpsDpsLink.setQuantityToLink(0);
                     entryDpsDpsLink.setSurplusPercentage(entry.getSurplusPercentage());
+                    entryDpsDpsLink.setPrice(entry.getPriceUnitaryCy());
+                    entryDpsDpsLink.setCurrencyCode(currencyCode);
                     entryDpsDpsLink.setItemId(entry.getFkItemId());
                     entryDpsDpsLink.setUnitId(entry.getFkOriginalUnitId());
+                    
                     entryDpsDpsLink.prepareTableRow();
+                    
                     entryDpsDpsLink.setAuxIsEntryPriceNeeded(!entry.getDbmsEntryPrices().isEmpty());
 
                     moTablePurchaseOrEntries.addTableRow(entryDpsDpsLink);
