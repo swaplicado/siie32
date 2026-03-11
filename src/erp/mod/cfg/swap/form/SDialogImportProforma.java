@@ -277,7 +277,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbShowProformas.setLabel("Mostrar proformas");
+        jbShowProformas.setText("Mostrar proformas");
         jbShowProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbShowProformas.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbShowProformas);
@@ -302,7 +302,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbClearProformas.setLabel("Limpiar proformas");
+        jbClearProformas.setText("Limpiar proformas");
         jbClearProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbClearProformas.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbClearProformas);
