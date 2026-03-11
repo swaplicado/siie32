@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 297.0-b4/ 2026-03-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de implementación de la interfaz java.io.Serializable en la subclase SServicesUtils.ConfigSettings, para resolver el error en el intercambio de documentos entre el Cliente y el Servidor SIIE.
+
+================================================================================
 SIIE 3.2 297.0-b3/ 2026-03-06
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
