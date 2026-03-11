@@ -17,6 +17,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -469,7 +470,7 @@ public abstract class SServicesUtils {
         }
     }
     
-    public static class ConfigSettings {
+    public static class ConfigSettings implements Serializable {
         
         private ArrayList<Integer> maAutoAuthReqPayReqUserIds;
         private ArrayList<Integer> maAutoAuthPayReqProcessingTypeIds;
