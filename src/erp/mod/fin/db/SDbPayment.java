@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SDbPayment extends SDbRegistryUser {
     
@@ -663,14 +663,22 @@ public class SDbPayment extends SDbRegistryUser {
             }
         }
         
-        for (SDbPaymentFile file : maFilesDeleted) {
-            file.delete(session);
+        if (! mbDeleted) {
+            for (SDbPaymentFile file : maFilesDeleted) {
+                file.delete(session);
+            }
+            
+            for (SDbPaymentFile file : maFiles) {
+                file.setPkPaymentId(mnPkPaymentId);
+                file.save(session);
+            }
         }
-        
-        for (SDbPaymentFile file : maFiles) {
-            file.setPkPaymentId(mnPkPaymentId);
-            file.save(session);
-        } 
+        else {
+            String sDeleteFiles = "UPDATE "
+                    + "" + SModConsts.TablesMap.get(SModConsts.FIN_PAY_FILE) + " "
+                    + "SET b_del = 1 " + getSqlWhere();
+            session.getStatement().execute(sDeleteFiles);
+        }
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;

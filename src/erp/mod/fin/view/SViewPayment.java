@@ -62,7 +62,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -860,7 +860,7 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
                 SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
-                miClient.getSession().notifySuscriptors(SModConsts.FIN_PAY);
+                miClient.getSession().notifySuscriptors(mnGridType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);

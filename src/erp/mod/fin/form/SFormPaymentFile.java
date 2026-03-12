@@ -6,12 +6,10 @@
 package erp.mod.fin.form;
 
 import erp.client.SClientInterface;
-import erp.data.SDataConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
-import erp.mtrn.form.SDialogPickerDps;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +35,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SFormPaymentFile extends SBeanForm implements ActionListener, ListSelectionListener {
     
@@ -52,15 +50,8 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private SGuiFields moFieldsEty;
     private SGridPaneForm moGridFiles;
     
-    private JButton jbSaveAndSend;
-    
     private boolean mbCanCapture;
-    private boolean mbIsCapturingFile;
     private boolean mbSendAuth;
-    
-    private int mnEditingSelectedIndex;
-    
-    private SDialogPickerDps moDialogDocDpsRelatedPickerPend;
 
     /**
      * Creates new form SFormPayment
@@ -423,10 +414,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 880, 550);
         
-        jbSaveAndSend = new JButton();
-        jbSaveAndSend.setText("Guardar y enviar");
-        jbSaveAndSend.setPreferredSize(new java.awt.Dimension(150, 23));
-        
         moFieldsEty = new SGuiFields();
         
         moKeyBeneficiary.setKeySettings(miClient, SGuiUtils.getLabelName(jlBeneficiary), true);
@@ -454,8 +441,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moFieldsEty.addField(moRadReport);
         moFieldsEty.addField(moRadInstallment);
         moFieldsEty.addField(moTextDescription);
-        
-        moDialogDocDpsRelatedPickerPend = new SDialogPickerDps((SClientInterface) miClient, SDataConstants.TRNX_DPS_PAY_PEND);
         
         moGridFiles = new SGridPaneForm(miClient, SModConsts.FIN_PAY_FILE, SLibConsts.UNDEFINED, "Archivos de soporte") {
             @Override
@@ -487,7 +472,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         
         jpCommandRight.remove(jbEdit);
         jpCommandRight.remove(jbReadInfo);
-        jbSaveAndSend.setEnabled(false);
     }
     
     private void populateGridFiles() {
@@ -563,7 +547,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             clearFileControls();
         }
         
-        mbIsCapturingFile = false;
         enableFileControls(false);
     }
     
@@ -584,7 +567,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
     
     private void actionEtyNew() {
         if (jbEtyNew.isEnabled()) {
-            mbIsCapturingFile = true;
             clearFileControls();
             enableFileControls(true);
         }
@@ -645,8 +627,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
                 
                 moGridFiles.setSelectedGridRow(moGridFiles.getModel().getRowCount() - 1);
                 
-                mbIsCapturingFile = false;
-                
                 valueChanged(null);
             }
             else {
@@ -660,7 +640,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         if (jbEtyCancel.isEnabled()) {
             clearFileControls();
             enableFileControls(false);
-            mbIsCapturingFile = false;
             populateGridFiles();
             valueChanged(null);
         }
@@ -723,10 +702,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             }
         }
     }
-
-    private void actionSaveAndSend() {
-    
-    }
     
     @Override
     public void addAllListeners() {
@@ -737,7 +712,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         jbFilePicker.addActionListener(this);
         jbUp.addActionListener(this);
         jbDown.addActionListener(this);
-        jbSaveAndSend.addActionListener(this);
     }
 
     @Override
@@ -749,7 +723,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         jbFilePicker.removeActionListener(this);
         jbUp.removeActionListener(this);
         jbDown.removeActionListener(this);
-        jbSaveAndSend.removeActionListener(this);
     }
 
     @Override
@@ -768,7 +741,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         moRegistry = (SDbPayment) registry;
         
         mbCanCapture = false;
-        mbIsCapturingFile = false;
         mbSendAuth = false;
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -875,9 +847,6 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             }
             else if (button == jbDown) {
                 actionDownRow();
-            }
-            else if (button == jbSaveAndSend) {
-                actionSaveAndSend();
             }
         }
     }

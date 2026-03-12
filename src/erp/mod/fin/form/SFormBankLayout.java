@@ -18,6 +18,7 @@ import erp.form.SDialogShowImportErrors;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableCellEditorOptions;
 import erp.lib.table.STableConstants;
+import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mcfg.data.SCfgUtils;
 import erp.mfin.data.SDataAccountCash;
@@ -71,6 +72,7 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -90,7 +92,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -271,7 +273,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateLayout.setText("Fecha apliación:");
+        jlDateLayout.setText("Fecha aplicación:");
         jlDateLayout.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel4.add(jlDateLayout);
         jPanel4.add(moDateDateLayout);
@@ -320,7 +322,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBankLayoutCurrency.setText("Moneda origen:*");
+        jlBankLayoutCurrency.setText("Moneda origen (cta):*");
         jlBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlBankLayoutCurrency);
 
@@ -410,7 +412,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDpsCurrency.setText("Moneda documentos:*");
+        jlDpsCurrency.setText("Moneda de los pagos:*");
         jlDpsCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel18.add(jlDpsCurrency);
 
@@ -1163,6 +1165,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
     private void validatePayments() throws Exception {
         int payments = 0;
+        String sPaymentDates = "";
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
             SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
             if (layoutBankPaymentRow.isForPayment()) {
@@ -1176,12 +1179,31 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
                     }
                 }
+                if (layoutBankPaymentRow.getLayoutBankPayment().getPaymentId() > 0) {
+                    SDbPayment oPayment = new SDbPayment();
+                    oPayment.read(miClient.getSession(), new int[] { layoutBankPaymentRow.getLayoutBankPayment().getPaymentId() });
+                    if (oPayment.getQueryResultId() == SDbConsts.READ_OK) {
+                        if (oPayment.getDateSchedule_n() != moCurrentRecord.getDate()) {
+                            sPaymentDates += "Folio: " + oPayment.getFolio() + ", Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + " \n";
+                        }
+                    }
+                }
             }
         }
 
         if (payments == 0) {
             if (miClient.showMsgBoxConfirm("¿Está seguro que no desea aplicar ningún pago?") != JOptionPane.YES_OPTION) {
                 throw new Exception("Se debería aplicar al menos un pago.");
+            }
+        }
+        else {
+            if (!sPaymentDates.isEmpty()) {
+                if (miClient.showMsgBoxConfirm("Los pagos\n"
+                        + " " + sPaymentDates + " "
+                        + "No tienen la misma fecha programada que la póliza seleccionada.\n"
+                        + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
+                    throw new Exception("Revise los pagos: \n " + sPaymentDates);
+                }
             }
         }
     }
@@ -1380,59 +1402,59 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             ArrayList<SRowPayments> paymentRows = moPickerPayments.getSelectedPayments();
             
             if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
-                for (SRowPayments pay : paymentRows) {
+                for (SRowPayments oPay : paymentRows) {
                     boolean found = false;
 
                     for (SGridRow row : moGridPayments.getModel().getGridRows()) {
-                        SLayoutBankRow layout = (SLayoutBankRow) row;
-                        if (layout.getDpsYearId() == pay.getIdYear() && layout.getDpsDocId() == pay.getIdDoc()) {
+                        SLayoutBankRow oLayoutRow = (SLayoutBankRow) row;
+                        if (oLayoutRow.getDpsYearId() == oPay.getIdYear() && oLayoutRow.getDpsDocId() == oPay.getIdDoc()) {
                             found = true;
-                            double balance = layout.getMoneyDpsBalance().getOriginalAmount();
-                            double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
-                            if (payment > balance) {
-                                payment = balance;
-                                pay.setAmount(payment);
+                            double dBalance = oLayoutRow.getMoneyDpsBalance().getOriginalAmount();
+                            double dPaymentAmount = SLibUtils.roundAmount(oLayoutRow.getMoneyPayment().getOriginalAmount() + oPay.getAmount());
+                            if (dPaymentAmount > dBalance) {
+                                dPaymentAmount = dBalance;
+                                oPay.setAmount(dPaymentAmount);
                             }
-                            layout.setForPayment(true);
-                            layout.getMoneyPayment().setOriginalAmount(payment);
-                            layout.setIsForExtPayment(true);
-                            layout.setReceptionPayReq(pay.getReceptionPayReq());
-                            layout.setFuncArea(pay.getFuncArea());
-                            layout.setFuncSubarea(pay.getFuncSubarea());
-                            layout.getPayments().add(pay);
+                            oLayoutRow.setForPayment(true);
+                            oLayoutRow.getMoneyPayment().setOriginalAmount(dPaymentAmount);
+                            oLayoutRow.setIsForExtPayment(true);
+                            oLayoutRow.setReceptionPayReq(oPay.getReceptionPayReq());
+                            oLayoutRow.setFuncArea(oPay.getFuncArea());
+                            oLayoutRow.setFuncSubarea(oPay.getFuncSubarea());
+                            oLayoutRow.getPayments().add(oPay);
                         }
                     }
 
                     if (!found) {
-                        warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el documento " + pay.getDocNum()+ " no está listado.\n" ;
+                        warn += "No se pudo agregar el pago " + oPay.getPayNum() + " debido a que el documento " + oPay.getDocNum()+ " no está listado.\n" ;
                         cantWarn++;
-                        notVinculed.add(pay);
+                        notVinculed.add(oPay);
                     }
                 }
             }
             else if (mnFormSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) {
-                for (SRowPayments pay : paymentRows) {
+                for (SRowPayments oPay : paymentRows) {
                     boolean found = false;
 
                     for (SGridRow row : moGridPayments.getModel().getGridRows()) {
-                        SLayoutBankRow layout = (SLayoutBankRow) row;
-                        if (layout.getBizPartnerId() == pay.getIdBeneficiary()) {
-                            double payment = SLibUtils.roundAmount(layout.getMoneyPayment().getOriginalAmount() + pay.getAmount());
+                        SLayoutBankRow oLayoutRow = (SLayoutBankRow) row;
+                        if (oLayoutRow.getBizPartnerId() == oPay.getIdBeneficiary()) {
+                            double dPaymentAmount = SLibUtils.roundAmount(oLayoutRow.getMoneyPayment().getOriginalAmount() + oPay.getAmountCurrencyToPay());
                             found = true;
-                            layout.setForPayment(true);
-                            layout.getMoneyPayment().setOriginalAmount(payment);
-                            layout.setIsForExtPayment(true);
-                            layout.setReceptionPayReq(pay.getReceptionPayReq());
-                            layout.setFuncArea(pay.getFuncArea());
-                            layout.setFuncSubarea(pay.getFuncSubarea());
-                            layout.getPayments().add(pay);
+                            oLayoutRow.setForPayment(true);
+                            oLayoutRow.getMoneyPayment().setOriginalAmount(dPaymentAmount);
+                            oLayoutRow.setIsForExtPayment(true);
+                            oLayoutRow.setReceptionPayReq(oPay.getReceptionPayReq());
+                            oLayoutRow.setFuncArea(oPay.getFuncArea());
+                            oLayoutRow.setFuncSubarea(oPay.getFuncSubarea());
+                            oLayoutRow.getPayments().add(oPay);
                         }
                     }
                     
                     if (!found) {
-                        warn += "No se pudo agregar el pago " + pay.getPayNum() + " debido a que el asociado de negocios " + pay.getBeneficiary()+ " no está listado.\n" ;
+                        warn += "No se pudo agregar el pago " + oPay.getPayNum() + " debido a que el asociado de negocios " + oPay.getBeneficiary()+ " no está listado.\n" ;
                         cantWarn++;
-                        notVinculed.add(pay);
+                        notVinculed.add(oPay);
                     }
                 }
             }
@@ -1458,13 +1480,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_GRID_ROW);
         }
         else {
-            SLayoutBankRow layout = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
-            moPickerPayments.addPayments(layout.getPayments());
-            layout.setForPayment(false);
-            layout.getMoneyPayment().setOriginalAmount(0);
-            layout.setIsForExtPayment(false);
-            layout.setReceptionPayReq(false);
-            layout.getPayments().clear();
+            SLayoutBankRow oLayoutRow = (SLayoutBankRow) moGridPayments.getSelectedGridRow();
+            moPickerPayments.addPayments(oLayoutRow.getPayments());
+            oLayoutRow.setForPayment(false);
+            oLayoutRow.getMoneyPayment().setOriginalAmount(0);
+            oLayoutRow.setIsForExtPayment(false);
+            oLayoutRow.setReceptionPayReq(false);
+            oLayoutRow.getPayments().clear();
             
             computeBalance();
             moGridPayments.renderGridRows();
@@ -2003,6 +2025,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankXmlRow.setReferenceRecord(layoutBankRowInGrid.getReferenceRecord());
                     layoutBankXmlRow.setObservations(layoutBankRowInGrid.getObservations());
                     layoutBankXmlRow.setEmail(layoutBankRowInGrid.getBeneficiaryEmail());
+                    if (layoutBankRowInGrid.getPayments() != null && ! layoutBankRowInGrid.getPayments().isEmpty()) {
+                        layoutBankXmlRow.setPaymentId(layoutBankRowInGrid.getPayments().get(0).getIdPayment());
+                    }
+                    else {
+                        layoutBankXmlRow.setPaymentId(0);
+                    }
                     
                     layoutBankXmlRows.add(layoutBankXmlRow);
                 }
@@ -2027,11 +2055,22 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private ArrayList<SDbPayment> createAuxNewPayments() {
         ArrayList<SDbPayment> newPays = new ArrayList<>();
+        HashMap<Integer, Boolean> lBps = new HashMap<>();
         
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
             boolean found = false;
             SLayoutBankRow row = (SLayoutBankRow) gridRow;
             if (!row.getPayments().isEmpty()) {
+                boolean isDomestic;
+                if (lBps.containsKey(row.getBizPartnerId())) {
+                    isDomestic = lBps.get(row.getBizPartnerId());
+                }
+                else {
+                    SDataBizPartner oBp = new SDataBizPartner();
+                    oBp.read(new int[] { row.getBizPartnerId() }, miClient.getSession().getStatement());
+                    isDomestic = oBp.isDomestic((SClientInterface) miClient);
+                    lBps.put(row.getBizPartnerId(), isDomestic);
+                }
                 for (SDbPayment pay : newPays) {
                     if (row.getBizPartnerId() == pay.getFkBeneficiaryId() &&
                             row.getBankAccPk()[0] == pay.getFkBeneficiaryBankBizParterBranchId_n() &&
@@ -2042,9 +2081,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         pay.setPayment(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                         pay.setPaymentApplication(SLibUtils.roundAmount(pay.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                         
-                        if (!pay.isReceiptPaymentRequired()) {
-                            pay.setReceiptPaymentRequired(row.getReceptionPayReq());
+                        if (! isDomestic) {
+                            pay.setReceiptPaymentRequired(false);
                         }
+                        else {
+                            if (!pay.isReceiptPaymentRequired()) {
+                                pay.setReceiptPaymentRequired(row.getReceptionPayReq());
+                            }
+                        }
+                        
                         pay.getChildEntries().add(createAuxNewPaymentEntry(row));
                         break;
                     }
@@ -2066,7 +2111,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     payment.setAuxOriginalAmount(row.getMoneyPayment().getOriginalAmount());
                     payment.setPayment(SLibUtils.roundAmount(payment.getAuxOriginalAmount() * moDecExchangeRate.getValue())); // siempre moneda local
                     payment.setPaymentWay(DCfdi40Catalogs.FDP_TRANSFERENCIA);
-                    payment.setReceiptPaymentRequired(row.getReceptionPayReq());
+                    payment.setReceiptPaymentRequired(! isDomestic ? false : row.getReceptionPayReq());
                     payment.setRescheduled(false);
                     payment.setExecutedManually(false);
                     payment.setSystem(true);
