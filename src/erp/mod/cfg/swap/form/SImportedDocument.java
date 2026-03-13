@@ -43,6 +43,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -61,12 +62,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     public static final int DOC_CASE_ALL = 0;
     public static final int DOC_CASE_STANDARD = 1;
-    public static final int DOC_CASE_FRUIT_FREIGHT = 2;
-    public static final int DOC_CASE_FRUIT_PURCHASE = 3;
+    public static final int DOC_CASE_RAW_MAT_FREIGHT = 2;
+    public static final int DOC_CASE_RAW_MAT_PURCHASE = 3;
     
-    public static final int PROC_TYPE_STANDARD = 0; // NA
-    public static final int PROC_TYPE_FRUIT_FREIGHT = 11;
-    public static final int PROC_TYPE_FRUIT_PURCHASE = 12;
+    public static final int PRC_TYPE_STANDARD = 0; // NA
+    public static final int PRC_TYPE_RAW_MAT_FREIGHT = 11;
+    public static final int PRC_TYPE_RAW_MAT_PURCHASE = 12;
     
     public static final int PAY_NOT_REQ = 0; // pago no requerido
     public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
@@ -92,12 +93,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         DocCases.put(DOC_CASE_ALL, "Todas");
         DocCases.put(DOC_CASE_STANDARD, "Estándar");
-        DocCases.put(DOC_CASE_FRUIT_FREIGHT, "Fletes fruta");
-        DocCases.put(DOC_CASE_FRUIT_PURCHASE, "Compras fruta");
+        DocCases.put(DOC_CASE_RAW_MAT_FREIGHT, "Fletes MP");
+        DocCases.put(DOC_CASE_RAW_MAT_PURCHASE, "Compras MP");
         
-        ProcTypes.put(PROC_TYPE_STANDARD, "STD");
-        ProcTypes.put(PROC_TYPE_FRUIT_FREIGHT, "FRF");
-        ProcTypes.put(PROC_TYPE_FRUIT_PURCHASE, "FRC");
+        ProcTypes.put(PRC_TYPE_STANDARD, "STD");
+        ProcTypes.put(PRC_TYPE_RAW_MAT_FREIGHT, "FLT-MP");
+        ProcTypes.put(PRC_TYPE_RAW_MAT_PURCHASE, "CPA-MP");
         
         PayDefinitions.put(PAY_NOT_REQ, "No requerido");
         PayDefinitions.put(PAY_DEF_BY_AMT, "Por monto ($)");
@@ -146,6 +147,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int RevisionYear;
     public int RevisionWeek;
     public Date RevisionDatetime;
+    public int Priority;
     public int ProcessingTypeId;
     public String ProcessingTypeCode;
     public int StatusId;
@@ -480,7 +482,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setDateExecution_n(null);
                 // ...
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
-                payment.setPriority(SDbPayment.PRIORITY_NORMAL);
+                payment.setPriority(Priority == SDbPayment.PRIORITY_URGENT ? SDbPayment.PRIORITY_URGENT : SDbPayment.PRIORITY_NORMAL);
                 payment.setNotes(!RequiredPaymentNotes.isEmpty() ? RequiredPaymentNotes : "-"); // "-" means no comments
                 payment.setNotesAuthorization(!Description.isEmpty() ? Description : "-"); // "-" means no comments
                 payment.setNotesAuthorizationFlow("");
@@ -1281,84 +1283,87 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = CurrencyCode;
                 break;
             case 7:
-                value = Download;
+                value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
                 break;
             case 8:
-                value = AlreadyDownloaded;
+                value = Download;
                 break;
             case 9:
-                value = isRecorded();
+                value = AlreadyDownloaded;
                 break;
             case 10:
-                value = !isRecorded() ? null : ProcessedDps.composeRecord();
+                value = isRecorded();
                 break;
             case 11:
-                value = !isRecorded() ? false : ProcessedDps.HasCfd;
+                value = !isRecorded() ? null : ProcessedDps.composeRecord();
                 break;
             case 12:
-                value = !isRecorded() ? false : ProcessedDps.HasPdf;
+                value = !isRecorded() ? false : ProcessedDps.HasCfd;
                 break;
             case 13:
-                value = FunctionalSubArea;
+                value = !isRecorded() ? false : ProcessedDps.HasPdf;
                 break;
             case 14:
-                value = FiscalUseCode;
+                value = FunctionalSubArea;
                 break;
             case 15:
-                value = ProcessingTypeCode;
+                value = FiscalUseCode;
                 break;
             case 16:
-                value = getRevisionYearWeek();
+                value = ProcessingTypeCode;
                 break;
             case 17:
-                value = RevisionDatetime;
+                value = getRevisionYearWeek();
                 break;
             case 18:
-                value = getRequiredPaymentAmount();
+                value = RevisionDatetime;
                 break;
             case 19:
-                value = CurrencyCode;
+                value = getRequiredPaymentAmount();
                 break;
             case 20:
-                value = getRequiredPaymentPct();
+                value = CurrencyCode;
                 break;
             case 21:
-                value = RequiredPaymentDate;
+                value = getRequiredPaymentPct();
                 break;
             case 22:
-                value = RequiredPaymentDateNew;
+                value = RequiredPaymentDate;
                 break;
             case 23:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 24:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 25:
-                value = !isPaymentRequested() ? null : Payment.getFolio();
+                value = RequiredPaymentNotes;
                 break;
             case 26:
-                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 27:
-                value = ExternalDocumentId;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 28:
-                value = ExternalDocumentUuid;
+                value = ExternalDocumentId;
                 break;
             case 29:
-                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
+                value = ExternalDocumentUuid;
                 break;
             case 30:
-                value = !isRecorded() ? null : ProcessedDps.DpsDate;
+                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
                 break;
             case 31:
-                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
+                value = !isRecorded() ? null : ProcessedDps.DpsDate;
                 break;
             case 32:
-                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
                 break;
             case 33:
+                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                break;
+            case 34:
                 String string = null;
                 if (isRecorded()) {
                     boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
@@ -1378,13 +1383,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 }
                 value = string;
                 break;
-            case 34:
+            case 35:
                 value = DueDate;
                 break;
-            case 35:
+            case 36:
                 value = PayDefinitions.get(RequiredPaymentDefinition);
                 break;
-            case 36:
+            case 37:
                 value = AccountingTag;
                 break;
             default:

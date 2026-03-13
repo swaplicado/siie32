@@ -762,7 +762,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
     private javax.swing.ButtonGroup bgSearchBy;
@@ -920,8 +919,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moKeyDocModeCase.removeAllItems();
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_ALL }, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_ALL)));
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_STANDARD}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_STANDARD)));
-        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_FREIGHT}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_FREIGHT)));
-        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_FRUIT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_FRUIT_PURCHASE)));
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT)));
+        moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE)));
         
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
         mnShowingDocsMode = OFF;
@@ -944,37 +943,38 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura $")); // col 5
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_ICON, "Urgente"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargar", moDocumentsGrid.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 gridColumnsForm.add(column);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Descargada (factura)"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizada (factura)"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable ", 150)); // col 10
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizada (factura)")); // col 10
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Póliza contable ", 150));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "XML en factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "PDF en factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Subárea funcional factura"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI factura"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Caso factura")); // col 15
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Uso CFDI factura")); // col 15
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Caso factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Semana revisión factura", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha-hora revisión factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75)); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido")); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio solicitud pago", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE")); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio factura SIIE", 75)); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Total factura SIIE $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda factura SIIE"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Validación factura SIIE", 150));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha vencimiento factura"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo definición pago requerido")); // col 35
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha vencimiento factura")); // col 35
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo definición pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Etiqueta contable"));
                 
                 return gridColumnsForm;
@@ -1419,6 +1419,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.RevisionYear = docNode.get("year_week_revision").asInt();
                                     document.RevisionWeek = docNode.get("number_week_revision").asInt();
                                     document.RevisionDatetime = revisionDatetime;
+                                    document.Priority = docNode.get("priority").asInt();
                                     document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
                                     document.ProcessingTypeCode = SImportedDocument.ProcTypes.get(document.ProcessingTypeId);
                                     document.StatusId = 0;
@@ -2511,13 +2512,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 switch (moKeyDocModeCase.getValue()[0]) {
                     case SImportedDocument.DOC_CASE_STANDARD:
-                        processingTypeId = SImportedDocument.PROC_TYPE_STANDARD;
+                        processingTypeId = SImportedDocument.PRC_TYPE_STANDARD;
                         break;
-                    case SImportedDocument.DOC_CASE_FRUIT_FREIGHT:
-                        processingTypeId = SImportedDocument.PROC_TYPE_FRUIT_FREIGHT;
+                    case SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT:
+                        processingTypeId = SImportedDocument.PRC_TYPE_RAW_MAT_FREIGHT;
                         break;
-                    case SImportedDocument.DOC_CASE_FRUIT_PURCHASE:
-                        processingTypeId = SImportedDocument.PROC_TYPE_FRUIT_PURCHASE;
+                    case SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE:
+                        processingTypeId = SImportedDocument.PRC_TYPE_RAW_MAT_PURCHASE;
                         break;
                     default:
                         // nothing

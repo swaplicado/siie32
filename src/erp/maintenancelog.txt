@@ -5,6 +5,12 @@ Edwin Omar CARMONA FIGUEROA
 1) Refactorización y corrección de pagos desde forma de captura hasta layouts
 
 ================================================================================
+SIIE 3.2 297.0-b6/ 2026-03-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Exhibicón de la condición de urgente de facturas importadas desde SWAP Services, y su consideración al generarse sus solicitudes de pago.
+
+================================================================================
 SIIE 3.2 297.0-b5/ 2026-03-11
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
