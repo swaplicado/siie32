@@ -581,6 +581,8 @@ public abstract class SModSysConsts {
     /** Used only as grid identifier! */
     public static final int FINX_LAY_BANK_QRY = 21;
     
+    public static final int FINX_ALL_PAYMENTS = 51;
+    
     /*
      * Transactions
      */

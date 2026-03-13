@@ -1,8 +1,9 @@
 ================================================================================
-SIIE 3.2 297.1/ 2026-03-12
+SIIE 3.2 297.1/ 2026-03-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización y corrección de pagos desde forma de captura hasta layouts
+2) Vista integral de solicitudes de pago. Para este subtipo se muestran todos los pagos de tipo 'R'
 
 ================================================================================
 SIIE 3.2 297.0-b6/ 2026-03-12

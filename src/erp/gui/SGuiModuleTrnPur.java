@@ -205,6 +205,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiAccPaymentsRcptDetail;
     private javax.swing.JMenuItem jmiAccPaymentsBloc;
     private javax.swing.JMenuItem jmiAccPaymentsCanc;
+    private javax.swing.JMenuItem jmiAccPaymentsAll;
     private javax.swing.JMenu jmRep;
     private javax.swing.JMenu jmRepStats;
     private javax.swing.JMenu jmRepQueries;
@@ -605,6 +606,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsRcptDetail = new JMenuItem("Pagos comprobados a detalle");
         jmiAccPaymentsBloc = new JMenuItem("Solicitudes de pago bloqueadas");
         jmiAccPaymentsCanc = new JMenuItem("Solicitudes de pago canceladas");
+        jmiAccPaymentsAll = new JMenuItem("Todas las solicitudes de pago");
         jmAccPend.add(jmiAccPend);
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentRequests);
@@ -627,6 +629,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmAccPend.addSeparator();
         jmAccPend.add(jmiAccPaymentsBloc);
         jmAccPend.add(jmiAccPaymentsCanc);
+        jmAccPend.addSeparator();
+        jmAccPend.add(jmiAccPaymentsAll);
 
         jmRep = new JMenu("Reportes");
         jmRepStats = new JMenu("Consultas de estadísticas de compras");
@@ -884,6 +888,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsRcptDetail.addActionListener(this);
         jmiAccPaymentsBloc.addActionListener(this);
         jmiAccPaymentsCanc.addActionListener(this);
+        jmiAccPaymentsAll.addActionListener(this);
         jmiRepTrnGlobal.addActionListener(this);
         jmiRepTrnByMonth.addActionListener(this);
         jmiRepTrnByItemGeneric.addActionListener(this);
@@ -1080,6 +1085,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsBloc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsCanc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentsAll.setEnabled(hasRightDocOrder || hasRightDocTransaction);
 
         jmRep.setEnabled(hasRightReports);
         jmiRepAccDpsAccTag.setEnabled(hasConfAccTag);
@@ -2140,6 +2146,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiAccPaymentsCanc) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_CANC, null);
+            }
+            else if (item == jmiAccPaymentsAll) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINX_ALL_PAYMENTS, null);
             }
             else if (item == jmiRepTrnGlobal) {
                 showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_TOT);

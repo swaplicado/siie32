@@ -68,7 +68,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private static final String SUGGESTION_SPEED_UP = "SUGERENCIA: Si urge acelerar la aplicación de esta modificación, haga clic en el botón ";
     
-    private JLabel jlDate;
     private JRadioButton jrbDateApp;
     private JRadioButton jrbDateReq;
     private JRadioButton jrbDateSched;
@@ -79,8 +78,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterCurrency;
     private SDialogPdfViewer moDialogPdfViewer;
-    
-    private boolean mbAppliesDateRequired;
     
     private JButton jbDocShowCfdiXml;
     private JButton jbDocGetCfdiXml;
@@ -117,14 +114,15 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             setRowButtonsEnabled(true, false, true, false, true);
             jtbFilterDeleted.setEnabled(true);
         }
+        else if (mnGridSubtype == SModSysConsts.FINX_ALL_PAYMENTS) {
+            jtbFilterDeleted.setEnabled(true);
+        }
         else {
             // payments monitoring:
             setRowButtonsEnabled(false);
             jtbFilterDeleted.setEnabled(false);
         }
         
-        
-        jlDate = new JLabel("Fecha:");
         jrbDateApp = new JRadioButton("Solicitud");
         jrbDateApp.setToolTipText("Filtrar por la fecha de la solicitud de pago");
 
@@ -190,15 +188,21 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
                 "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
         
-        if (SLibUtils.belongsTo(mnGridSubtype, new int[] { SLibConsts.UNDEFINED, SModSysConsts.FINS_ST_PAY_REJC, SModSysConsts.FINS_ST_PAY_SCHED, SModSysConsts.FINS_ST_PAY_CANC })) {
+        if (SLibUtils.belongsTo(mnGridSubtype, new int[] {
+                                                SLibConsts.UNDEFINED, 
+                                                SModSysConsts.FINS_ST_PAY_REJC, 
+                                                SModSysConsts.FINS_ST_PAY_SCHED, 
+                                                SModSysConsts.FINS_ST_PAY_CANC,
+                                                SModSysConsts.FINX_ALL_PAYMENTS
+                                            })) {
             mbAppliesFilterDatePeriod = true;
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
 //            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlDate);
 //            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateApp);
 //            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateApp);
-getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
-getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
         }
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
@@ -263,6 +267,12 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_CANC:
+                break;
+                
+            case SModSysConsts.FINX_ALL_PAYMENTS:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JLabel());
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
                 break;
                 
             default:
@@ -966,6 +976,10 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                         + SModSysConsts.FINS_ST_PAY_CANC + ", "
                         + SModSysConsts.FINS_ST_PAY_CANC_P + ") ";
                 break;
+                
+            case SModSysConsts.FINX_ALL_PAYMENTS:
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.pay_tp = 'R' ";
+                break;
 
             default:
         }
@@ -1065,11 +1079,12 @@ getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
                 + "ve.fk_ety_cur = ce.id_cur "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
-                + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "        + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
+                + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
-                + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
+                + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() 
+                    ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
                 + ", b.bp ";
-
     }
 
     @Override
