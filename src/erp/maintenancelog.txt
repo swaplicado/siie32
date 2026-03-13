@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 297.0-b7/ 2026-03-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a restricción de impresión de pedidos de compras sin autorizar, para ahora hacerlo mediante confirmación y asegurando que la impresión tenga la marca de agua con la leyenda "NO AUTORIZADO".
+
+================================================================================
 SIIE 3.2 297.0-b6/ 2026-03-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

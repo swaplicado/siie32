@@ -1606,11 +1606,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     
                     if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD })) {
                         // order:
+                        
+                        boolean print = true;
 
                         if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && !dps.getIsAuthorized()) {
-                            miClient.showMsgBoxWarning("No se puede imprimir el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
+                            print = miClient.showMsgBoxConfirm("El pedido '" + dps.getDpsNumber() + "' no está autorizado. Su estatus es '" + dps.getDbmsAuthorizationStatusName() + "'.\n"
+                                    + "De cualquier manera, ¿desea imprimirlo?") == JOptionPane.YES_OPTION;
                         }
-                        else {
+                        
+                        if (print) {
                             try {
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 

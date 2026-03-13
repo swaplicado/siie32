@@ -183,7 +183,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jLabel21 = new javax.swing.JLabel();
         jbSelectAllDocs = new javax.swing.JButton();
         jLabel22 = new javax.swing.JLabel();
-        jLabel2b3 = new javax.swing.JLabel();
+        jbRegisterAllDocs = new javax.swing.JButton();
         jpDownloadE3 = new javax.swing.JPanel();
         moBoolExcludeRecorded = new sa.lib.gui.bean.SBeanFieldBoolean();
         jLabel31 = new javax.swing.JLabel();
@@ -406,8 +406,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel22);
 
-        jLabel2b3.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jLabel2b3);
+        jbRegisterAllDocs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_mod_fin.png"))); // NOI18N
+        jbRegisterAllDocs.setText("Contabilizar todas");
+        jbRegisterAllDocs.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jbRegisterAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRegisterAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbRegisterAllDocs);
 
         jpDownloadE.add(jpDownloadE2);
 
@@ -769,7 +773,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel2b3;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabelPeriiod1;
@@ -784,6 +787,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbImportInvoiceFromCfdi;
     private javax.swing.JButton jbLinkAllDocs;
     private javax.swing.JButton jbLinkInvoice;
+    private javax.swing.JButton jbRegisterAllDocs;
     private javax.swing.JButton jbRejectInvoice;
     private javax.swing.JButton jbRequestPayment;
     private javax.swing.JButton jbSelectAllDocs;
@@ -1117,13 +1121,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         boolean isShowingDocsModeOn = mnShowingDocsMode == ON;
         
         boolean isDocModeType = moRadDocModeType.isSelected();
-        moKeyDocModeType.setEditable(isShowingDocsModeOn && isDocModeType);
+        moKeyDocModeType.setEnabled(isShowingDocsModeOn && isDocModeType);
         if (!isDocModeType) {
             moKeyDocModeType.setValue(new int[] { SImportedDocument.DOC_TYPE_ALL });
         }
 
         boolean isDocModeCase = moRadDocModeCase.isSelected();
-        moKeyDocModeCase.setEditable(isShowingDocsModeOn && isDocModeCase);
+        moKeyDocModeCase.setEnabled(isShowingDocsModeOn && isDocModeCase);
         if (!isDocModeCase) {
             moKeyDocModeCase.setValue(new int[] { SImportedDocument.DOC_CASE_ALL });
         }
@@ -1159,6 +1163,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbDeselectAllDocs.setEnabled(setShowingDocsModeOn);
         
         jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
+        jbRegisterAllDocs.setEnabled(setShowingDocsModeOn && isMassAccountingSupported());
         jbLinkAllDocs.setEnabled(setShowingDocsModeOn);
     }
     
@@ -1188,6 +1193,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
             }
         }
+    }
+    
+    private boolean isMassAccountingSupported() {
+//        return mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
+        return false;
     }
     
     private boolean isDocumentAlreadyRecorded(final SImportedDocument document) throws Exception {
@@ -1480,7 +1490,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     miClient.showMsgBoxInformation(message);
                 }
 
-                itemStateChangedDocType(true);
+                itemStateChangedDocType(true); // reloads documents grid
             }
         }
         catch (Exception e) {
@@ -1730,6 +1740,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void actionPerformedRegisterAllDocs() {
+        
+    }
+    
     private void actionPerformedLinkAllDocs() {
         try {
             if (moDocumentsGrid.getModel().getRowCount() == 0) {
@@ -1886,7 +1900,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int index = moDocumentsGrid.getTable().getSelectedRow();
 
                                     maDocuments.remove(document);
-                                    itemStateChangedDocType(false); // reload documents grid
+                                    itemStateChangedDocType(false); // reloads documents grid
 
                                     moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
 
@@ -2467,10 +2481,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         enableFieldsOfDocMode();
         
         if (moRadDocModeType.isSelected()) {
-            itemStateChangedDocType(false);
+            itemStateChangedDocType(false); // reloads documents grid
         }
         else if (moRadDocModeCase.isSelected()) {
-            itemStateChangedDocCase(false);
+            itemStateChangedDocCase(false); // reloads documents grid
         }
     }
     
@@ -2499,6 +2513,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                 populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
+            
+            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
         }
     }
     
@@ -2536,6 +2552,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                 populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
+            
+            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
         }
     }
     
@@ -2555,7 +2573,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             super.windowActivated();
         }
     }
-
+    
     @Override
     public void resetForm() {
         removeAllListeners();
@@ -2591,6 +2609,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAllDocs.addActionListener(this);
         jbDeselectAllDocs.addActionListener(this);
         jbDownloadSelectedDocs.addActionListener(this);
+        jbRegisterAllDocs.addActionListener(this);
         jbLinkAllDocs.addActionListener(this);
         
         jbImportInvoiceFromCfdi.addActionListener(this);
@@ -2623,6 +2642,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbSelectAllDocs.removeActionListener(this);
         jbDeselectAllDocs.removeActionListener(this);
         jbDownloadSelectedDocs.removeActionListener(this);
+        jbRegisterAllDocs.removeActionListener(this);
         jbLinkAllDocs.removeActionListener(this);
         
         jbImportInvoiceFromCfdi.removeActionListener(this);
@@ -2697,6 +2717,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbDownloadSelectedDocs) {
                 actionPerformedDownloadSelectedDocs();
             }
+            else if (button == jbRegisterAllDocs) {
+                actionPerformedRegisterAllDocs();
+            }
             else if (button == jbLinkAllDocs) {
                 actionPerformedLinkAllDocs();
             }
@@ -2766,10 +2789,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SBeanFieldKey field = (SBeanFieldKey) e.getSource();
                 
                 if (field == moKeyDocModeType) {
-                    itemStateChangedDocType(false);
+                    itemStateChangedDocType(false); // reloads documents grid
                 }
                 else if (field == moKeyDocModeCase) {
-                    itemStateChangedDocCase(false);
+                    itemStateChangedDocCase(false); // reloads documents grid
                 }
             }
         }
