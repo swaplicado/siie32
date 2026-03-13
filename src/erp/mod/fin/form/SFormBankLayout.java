@@ -1179,12 +1179,21 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
                     }
                 }
-                if (layoutBankPaymentRow.getLayoutBankPayment().getPaymentId() > 0) {
-                    SDbPayment oPayment = new SDbPayment();
-                    oPayment.read(miClient.getSession(), new int[] { layoutBankPaymentRow.getLayoutBankPayment().getPaymentId() });
-                    if (oPayment.getQueryResultId() == SDbConsts.READ_OK) {
-                        if (oPayment.getDateSchedule_n() != moCurrentRecord.getDate()) {
-                            sPaymentDates += "Folio: " + oPayment.getFolio() + ", Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + " \n";
+            }
+        }
+        
+        for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
+            SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
+            if (layoutBankPaymentRow.isForPayment()) {
+                payments++;
+                if (!isModeForTransfersOfPrepayments()) {
+                    if (layoutBankPaymentRow.getLayoutBankPayment().getPaymentId() > 0) {
+                        SDbPayment oPayment = new SDbPayment();
+                        oPayment.read(miClient.getSession(), new int[]{layoutBankPaymentRow.getLayoutBankPayment().getPaymentId()});
+                        if (oPayment.getQueryResultId() == SDbConsts.READ_OK) {
+                            if (oPayment.getDateSchedule_n() != moCurrentRecord.getDate()) {
+                                sPaymentDates += "Folio: " + oPayment.getFolio() + ", Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + " \n";
+                            }
                         }
                     }
                 }
