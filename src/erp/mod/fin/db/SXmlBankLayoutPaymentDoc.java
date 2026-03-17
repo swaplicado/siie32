@@ -10,7 +10,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona
  */
 public class SXmlBankLayoutPaymentDoc extends SXmlElement {
 
@@ -24,6 +24,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     public static final String ATT_LAY_ROW_REF_REC = "ReferenceRecord";
     public static final String ATT_LAY_ROW_OBS = "Observation";
     public static final String ATT_LAY_ROW_EMAIL = "Email";
+    public static final String ATT_LAY_ROW_PAY_ID = "PaymentId";
 
     protected SXmlAttribute moRowDpsYear;
     protected SXmlAttribute moRowDpsDoc;
@@ -34,6 +35,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     protected SXmlAttribute moRowReferenceRecord;
     protected SXmlAttribute moRowObservation;
     protected SXmlAttribute moRowEmail;
+    protected SXmlAttribute moRowPaymentId;
 
     public SXmlBankLayoutPaymentDoc() {
         super(NAME);
@@ -47,7 +49,8 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         moRowReferenceRecord = new SXmlAttribute(ATT_LAY_ROW_REF_REC);
         moRowObservation = new SXmlAttribute(ATT_LAY_ROW_OBS);
         moRowEmail = new SXmlAttribute(ATT_LAY_ROW_EMAIL);
-        
+        moRowPaymentId = new SXmlAttribute(ATT_LAY_ROW_PAY_ID);
+            
         mvXmlAttributes.add(moRowDpsYear);
         mvXmlAttributes.add(moRowDpsDoc);
         mvXmlAttributes.add(moRowAmount);
@@ -57,5 +60,6 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         mvXmlAttributes.add(moRowReferenceRecord);
         mvXmlAttributes.add(moRowObservation);
         mvXmlAttributes.add(moRowEmail);
+        mvXmlAttributes.add(moRowPaymentId);
     }
 }

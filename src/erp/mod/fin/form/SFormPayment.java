@@ -51,7 +51,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SFormPayment extends SBeanForm implements ActionListener, ItemListener, FocusListener {
     
@@ -62,6 +62,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private SDialogPickerDps moDialogDpsPicker;
     private boolean mbCanEdit;
     private HashMap<Integer, Date> moLastPaymentDaysMap;
+    private SDataBizPartner moBp;
     
     /**
      * Creates new form SFormPayment2
@@ -324,7 +325,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
         jpPayCenterRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurrency.setText("Moneda de pago:*");
+        jlCurrency.setText("Moneda del pago:*");
         jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
         jpPayCenterRow1.add(jlCurrency);
 
@@ -588,11 +589,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private double calculatePaymentCy() throws Exception {
         double paymentCy = 0;
         
-        // el pago es en moneda local
+        // la moneda del pago es local y se pagará en moneda local
         if (isLocalCurrency(moKeyCurrency.getValue()[0])) {
             paymentCy = moCurPaymentApplication.getField().getValue();
         }
-        // el pago es en moneda extranjera
+        // la moneda del pago o la moneda en que se pagará son extranjeras
         else {
             // la moneda de pago y a pagar son la misma
             if (SLibUtils.compareKeys(moKeyCurrency.getValue(), moKeyEntryCurrency.getValue())) {
@@ -631,9 +632,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     }
     
     private double calculateExchangeRateApplication() throws Exception {
-        double excRate;
+        double excRate = 0d;
         
-        // el pago es en moneda local
+        // si la moneda del pago es moneda local y se va a pagar en moneda local
         if (isLocalCurrency(moKeyCurrency.getValue()[0])) {
             excRate = 1d;
         }
@@ -706,6 +707,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private void clearDps() {
         moDps = null;
         moDpsBalance = null;
+        
+        moBp = null;
         
         moPanelDps.setDps(moDps, null);
         moTextDps.setText("");
@@ -823,9 +826,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         clearDps();
         
         if (moKeyBeneficiary.getSelectedIndex() > 0) {
-            SDataBizPartner bp = new SDataBizPartner();
-            bp.read(moKeyBeneficiary.getValue(), miClient.getSession().getStatement());
-            if (bp.isDomestic((SClientInterface) miClient)) {
+            moBp = new SDataBizPartner();
+            moBp.read(moKeyBeneficiary.getValue(), miClient.getSession().getStatement());
+            if (moBp.isDomestic((SClientInterface) miClient)) {
                 moKeyCurrency.setValue(miClient.getSession().getSessionCustom().getLocalCurrencyKey());
             }
         }
@@ -1027,12 +1030,19 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setDateSchedule_n(null);
         registry.setDateExecution_n(null);
         
+        // Monto del pago en la moneda de pago del día de creación de la solicitud de pago o del pago.
         registry.setPaymentApplicationCy(calculatePaymentCy());
         
+        //Tipo de cambio de la moneda de pago del día de creación de la solicitud de pago o del pago.
         registry.setPaymentExchangeRateApplication(calculateExchangeRateApplication());
+        
+        // Monto del pago en la moneda local del día de creación de la solicitud de pago o del pago.
         registry.setPaymentApplication(moCurPaymentApplication.getField().getValue());
         
+        // Tipo de cambio de la moneda del pago del día de operación del pago.
         registry.setPaymentExchangeRate(registry.getPaymentExchangeRateApplication()); // same value "at application"!
+        
+        // Monto del pago en la moneda local del día de operación del pago.
         registry.setPayment(registry.getPaymentApplication()); // same value "at application"!
         
         registry.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
@@ -1040,7 +1050,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setNotes(moTextNotes.getValue());
         registry.setNotesAuthorization(moTextNotesAuthorization.getValue());
         registry.setNotesAuthorizationFlow("");
-        registry.setReceiptPaymentRequired(moDps == null ? false : moDps.getFkPaymentTypeId() == SModSysConsts.TRNS_TP_PAY_CREDIT);
+        boolean isRecPayReq = false;
+        if (! moBp.isDomestic((SClientInterface) miClient)) {
+            isRecPayReq = false;
+        }
+        else {
+            isRecPayReq = moDps == null ? false : moDps.getFkPaymentTypeId() == SModSysConsts.TRNS_TP_PAY_CREDIT;
+        }
+        registry.setReceiptPaymentRequired(isRecPayReq);
         registry.setRescheduled(false);
         registry.setExecutedManually(false);
         registry.setDeleted(false);
@@ -1071,14 +1088,20 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         //entry.setPkEntryId(...);
         singleEntry.setEntryType(moRadTypePayment.isSelected() ? SDbPaymentEntry.TYPE_PAYMENT : SDbPaymentEntry.TYPE_ADVANCE);
         
+        // Monto de la partida en la moneda de pago del día de creación de la solicitud de pago o del pago.
         singleEntry.setEntryPaymentApplicationCy(registry.getPaymentApplicationCy());
-        
+        // Monto de la partida en la moneda local del día de creación de la solicitud de pago o del pago.
         singleEntry.setEntryPaymentApplication(moCurPaymentApplication.getField().getValue());
+        // Tasa de conversión (moneda de pago vs. moneda de la partida) del día de creación de la solicitud de pago o del pago.
         singleEntry.setConversionRateApplication(SLibUtils.round(moCurPaymentCy.getField().getValue() / registry.getPaymentApplicationCy(), 6));
+        // Monto de la partida en la moneda de la partida.del día de creación de la solicitud de pago o del pago.
         singleEntry.setDestinyPaymentApplicationEntryCy(moCurPaymentCy.getField().getValue());
         
+        // Monto de la partida en la moneda local del día de operación del pago.
         singleEntry.setEntryPayment(singleEntry.getEntryPaymentApplication()); // same value "at application"!
+        // Tasa de conversión (moneda de pago vs. moneda de la partida) del día de operación del pago.
         singleEntry.setConversionRate(singleEntry.getConversionRateApplication()); // same value "at application"!
+        // Monto de la partida en la moneda de la partida.del día de operación del pago.
         singleEntry.setDestinyPaymentEntryCy(singleEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
         
         singleEntry.setDocInstallment(moDps == null ? 0 : 1);

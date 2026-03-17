@@ -619,6 +619,9 @@ public class SModuleFin extends SGuiModule {
                     case SModSysConsts.FINS_ST_PAY_CANC:
                         title = "Solicitudes pago canceladas";
                         break;
+                    case SModSysConsts.FINX_ALL_PAYMENTS:
+                        title = "Todas las solicitudes de pago";
+                        break;
                     default:
                         // nothing
                 }

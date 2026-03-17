@@ -103,8 +103,8 @@ import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.cfg.swap.form.SDialogImportProforma;
+import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
@@ -248,6 +248,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiAccRecPaymentsRcptDetail;
     private javax.swing.JMenuItem jmiAccRecPaymentsBloc;
     private javax.swing.JMenuItem jmiAccRecPaymentsCanc;
+    private javax.swing.JMenuItem jmiAccRecPaymentsAll;
     private javax.swing.JMenuItem jmiFinImportProformas;
     private javax.swing.JSeparator jsFinCash;
     private javax.swing.JMenuItem jmiFinLayoutBank;
@@ -648,6 +649,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsRcptDetail = new JMenuItem("Pagos comprobados a detalle");
         jmiAccRecPaymentsBloc = new JMenuItem("Solicitudes de pago bloqueadas");
         jmiAccRecPaymentsCanc = new JMenuItem("Solicitudes de pago canceladas");
+        jmiAccRecPaymentsAll = new JMenuItem("Todas las solicitudes de pago");
         jmiFinImportProformas = new JMenuItem("Importación de proformas...");
         jsFinCash = new JPopupMenu.Separator();
         jmiFinLayoutBank = new JMenuItem("Layouts de transferencias");
@@ -686,6 +688,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiAccRecPaymentsBloc);
         jmFinAccRec.add(jmiAccRecPaymentsCanc);
+        jmFinAccRec.addSeparator();
+        jmFinAccRec.add(jmiAccRecPaymentsAll);
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiFinImportProformas);
 
@@ -1047,6 +1051,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsRcptDetail.addActionListener(this);
         jmiAccRecPaymentsBloc.addActionListener(this);
         jmiAccRecPaymentsCanc.addActionListener(this);
+        jmiAccRecPaymentsAll.addActionListener(this);
         jmiFinImportProformas.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
         jmiFinLayoutBankPending.addActionListener(this);
@@ -2394,6 +2399,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiAccRecPaymentsCanc) {
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_CANC, null);
+            }
+            else if (item == jmiAccRecPaymentsAll) {
+                miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINX_ALL_PAYMENTS, null);
             }
             else if(item == jmiFinImportProformas) {
                 if (moDialogImportProformas == null) {
