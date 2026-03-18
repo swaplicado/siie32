@@ -171,24 +171,18 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         moRadDocModeCase = new sa.lib.gui.bean.SBeanFieldRadio();
         moKeyDocModeCase = new sa.lib.gui.bean.SBeanFieldKey();
         jpDownloadE = new javax.swing.JPanel();
-        jpDownloadE1 = new javax.swing.JPanel();
-        jbShowDocs = new javax.swing.JButton();
-        jLabel11 = new javax.swing.JLabel();
-        jbSelectRemainingDocs = new javax.swing.JButton();
-        jLabel12 = new javax.swing.JLabel();
-        jbDownloadSelectedDocs = new javax.swing.JButton();
         jpDownloadE2 = new javax.swing.JPanel();
-        jbClearDocs = new javax.swing.JButton();
-        jLabel21 = new javax.swing.JLabel();
-        jbSelectAllDocs = new javax.swing.JButton();
-        jLabel22 = new javax.swing.JLabel();
-        jbRegisterAllDocs = new javax.swing.JButton();
+        sBeanFieldRadio1 = new sa.lib.gui.bean.SBeanFieldRadio();
+        sBeanFieldKey1 = new sa.lib.gui.bean.SBeanFieldKey();
         jpDownloadE3 = new javax.swing.JPanel();
-        moBoolExcludeRecorded = new sa.lib.gui.bean.SBeanFieldBoolean();
-        jLabel31 = new javax.swing.JLabel();
+        sBeanFieldRadio2 = new sa.lib.gui.bean.SBeanFieldRadio();
+        sBeanFieldKey2 = new sa.lib.gui.bean.SBeanFieldKey();
+        jpDownloadE1 = new javax.swing.JPanel();
+        sBeanFieldRadio3 = new sa.lib.gui.bean.SBeanFieldRadio();
+        jLabel11 = new javax.swing.JLabel();
         jbDeselectAllDocs = new javax.swing.JButton();
         jLabel32 = new javax.swing.JLabel();
-        jbLinkAllDocs = new javax.swing.JButton();
+        jbSelectAllDocs = new javax.swing.JButton();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsRendering = new javax.swing.JPanel();
         jpDocumentVouchers = new javax.swing.JPanel();
@@ -272,6 +266,8 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         jpProcessingN7 = new javax.swing.JPanel();
         jtfInvoice = new javax.swing.JTextField();
         jbViewOrder = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jTextField6 = new javax.swing.JTextField();
         jpProcessingN9 = new javax.swing.JPanel();
         sBeanFieldBoolean1 = new sa.lib.gui.bean.SBeanFieldBoolean();
         jpProcessingN10 = new javax.swing.JPanel();
@@ -284,14 +280,37 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         jtfReqPayReqDate = new javax.swing.JTextField();
         jbChangeRequiredPaymentDate = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jpProcessingN3 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         jpProcessingN4 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
         jpProcessingN5 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
         jpProcessingN8 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
         jpProcessingN12 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jpProcessingN16 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jTextField5 = new javax.swing.JTextField();
         jpProcessingN13 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
         jpProcessingN14 = new javax.swing.JPanel();
+        jtfReqPayAmount1 = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
         jpProcessingN15 = new javax.swing.JPanel();
+        jtfReqPayReqDate1 = new javax.swing.JTextField();
+        jbChangeRequiredPaymentDate2 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jbRequestPayment = new javax.swing.JButton();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -299,7 +318,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
             }
         });
 
-        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de facturas autorizadas:"));
+        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Procesamiento de facturas autorizadas:"));
         jpSettings.setLayout(new java.awt.BorderLayout());
 
         jpDownloadW.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
@@ -401,81 +420,48 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
 
         jpDownloadE.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
-        jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
-
-        jbShowDocs.setText("Mostrar facturas");
-        jbShowDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbShowDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbShowDocs);
-
-        jLabel11.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE1.add(jLabel11);
-
-        jbSelectRemainingDocs.setText("Seleccionar restantes");
-        jbSelectRemainingDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbSelectRemainingDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbSelectRemainingDocs);
-
-        jLabel12.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE1.add(jLabel12);
-
-        jbDownloadSelectedDocs.setText("Descargar seleccionadas");
-        jbDownloadSelectedDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbDownloadSelectedDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbDownloadSelectedDocs);
-
-        jpDownloadE.add(jpDownloadE1);
-
         jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbClearDocs.setText("Limpiar facturas");
-        jbClearDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbClearDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbClearDocs);
+        sBeanFieldRadio1.setText("Ver emisor:");
+        jpDownloadE2.add(sBeanFieldRadio1);
 
-        jLabel21.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE2.add(jLabel21);
-
-        jbSelectAllDocs.setText("Seleccionar todas");
-        jbSelectAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbSelectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbSelectAllDocs);
-
-        jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE2.add(jLabel22);
-
-        jbRegisterAllDocs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_mod_fin.png"))); // NOI18N
-        jbRegisterAllDocs.setText("Contabilizar todas");
-        jbRegisterAllDocs.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jbRegisterAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbRegisterAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbRegisterAllDocs);
+        sBeanFieldKey1.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpDownloadE2.add(sBeanFieldKey1);
 
         jpDownloadE.add(jpDownloadE2);
 
         jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        moBoolExcludeRecorded.setText("Excluir contabilizadas");
-        moBoolExcludeRecorded.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(moBoolExcludeRecorded);
+        sBeanFieldRadio2.setText("Ver concepto:");
+        jpDownloadE3.add(sBeanFieldRadio2);
 
-        jLabel31.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE3.add(jLabel31);
+        sBeanFieldKey2.setPreferredSize(new java.awt.Dimension(350, 23));
+        jpDownloadE3.add(sBeanFieldKey2);
+
+        jpDownloadE.add(jpDownloadE3);
+
+        jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        sBeanFieldRadio3.setText("Ver todos");
+        jpDownloadE1.add(sBeanFieldRadio3);
+
+        jLabel11.setPreferredSize(new java.awt.Dimension(30, 23));
+        jpDownloadE1.add(jLabel11);
 
         jbDeselectAllDocs.setText("Deseleccionar todas");
         jbDeselectAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbDeselectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(jbDeselectAllDocs);
+        jpDownloadE1.add(jbDeselectAllDocs);
 
         jLabel32.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE3.add(jLabel32);
+        jpDownloadE1.add(jLabel32);
 
-        jbLinkAllDocs.setText("Vincular todas");
-        jbLinkAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbLinkAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(jbLinkAllDocs);
+        jbSelectAllDocs.setText("Seleccionar todas");
+        jbSelectAllDocs.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSelectAllDocs.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE1.add(jbSelectAllDocs);
 
-        jpDownloadE.add(jpDownloadE3);
+        jpDownloadE.add(jpDownloadE1);
 
         jpSettings.add(jpDownloadE, java.awt.BorderLayout.EAST);
 
@@ -911,6 +897,16 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
 
         jpProcessingN.add(jpProcessingN7);
 
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jTextField6.setEditable(false);
+        jTextField6.setText("FTE PM + Compra semilla girasol alto oleico");
+        jTextField6.setFocusable(false);
+        jTextField6.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jTextField6);
+
+        jpProcessingN.add(jPanel4);
+
         jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         sBeanFieldBoolean1.setText("Pago requerido:");
@@ -970,31 +966,163 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         jpProcessingN.add(jpProcessingN11);
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel1.setText("Comprobantes:");
+        jLabel1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN2.add(jLabel1);
+
         jpProcessingN.add(jpProcessingN2);
 
         jpProcessingN3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel2.setText("Mostrados:");
+        jLabel2.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN3.add(jLabel2);
+
+        jTextField1.setEditable(false);
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jTextField1.setText("0");
+        jTextField1.setFocusable(false);
+        jTextField1.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpProcessingN3.add(jTextField1);
+
         jpProcessingN.add(jpProcessingN3);
 
         jpProcessingN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel3.setText("Registrables:");
+        jLabel3.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN4.add(jLabel3);
+
+        jTextField2.setEditable(false);
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jTextField2.setText("0");
+        jTextField2.setFocusable(false);
+        jTextField2.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpProcessingN4.add(jTextField2);
+
         jpProcessingN.add(jpProcessingN4);
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel4.setText("A registrar:");
+        jLabel4.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN5.add(jLabel4);
+
+        jTextField3.setEditable(false);
+        jTextField3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jTextField3.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jTextField3.setText("0");
+        jTextField3.setFocusable(false);
+        jTextField3.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpProcessingN5.add(jTextField3);
+
         jpProcessingN.add(jpProcessingN5);
 
         jpProcessingN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel5.setText("Solicitudes de pago:");
+        jLabel5.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN8.add(jLabel5);
+
         jpProcessingN.add(jpProcessingN8);
 
         jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel6.setText("Solicitables:");
+        jLabel6.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN12.add(jLabel6);
+
+        jTextField4.setEditable(false);
+        jTextField4.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jTextField4.setText("0");
+        jTextField4.setFocusable(false);
+        jTextField4.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpProcessingN12.add(jTextField4);
+
         jpProcessingN.add(jpProcessingN12);
 
+        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel9.setText("A solicitar:");
+        jLabel9.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpProcessingN16.add(jLabel9);
+
+        jTextField5.setEditable(false);
+        jTextField5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jTextField5.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jTextField5.setText("0");
+        jTextField5.setFocusable(false);
+        jTextField5.setPreferredSize(new java.awt.Dimension(65, 23));
+        jpProcessingN16.add(jTextField5);
+
+        jpProcessingN.add(jpProcessingN16);
+
         jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel7.setText("Total de pagos solicitados:");
+        jLabel7.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN13.add(jLabel7);
+
         jpProcessingN.add(jpProcessingN13);
 
         jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfReqPayAmount1.setEditable(false);
+        jtfReqPayAmount1.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfReqPayAmount1.setText("000,000,000.00 MXN");
+        jtfReqPayAmount1.setToolTipText("Pago requerido");
+        jtfReqPayAmount1.setFocusable(false);
+        jtfReqPayAmount1.setPreferredSize(new java.awt.Dimension(145, 23));
+        jpProcessingN14.add(jtfReqPayAmount1);
+
         jpProcessingN.add(jpProcessingN14);
 
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel10.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel10.setText("(Texto de ayuda de pagos)");
+        jLabel10.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel2.add(jLabel10);
+
+        jpProcessingN.add(jPanel2);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel8.setText("Nueva fecha requerida:");
+        jLabel8.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel1.add(jLabel8);
+
+        jpProcessingN.add(jPanel1);
+
         jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfReqPayReqDate1.setEditable(false);
+        jtfReqPayReqDate1.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfReqPayReqDate1.setText("dow 01/mon/2001");
+        jtfReqPayReqDate1.setToolTipText("Fecha requerida de pago");
+        jtfReqPayReqDate1.setFocusable(false);
+        jtfReqPayReqDate1.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpProcessingN15.add(jtfReqPayReqDate1);
+
+        jbChangeRequiredPaymentDate2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbChangeRequiredPaymentDate2.setToolTipText("Cambiar fecha requerida de pago...");
+        jbChangeRequiredPaymentDate2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN15.add(jbChangeRequiredPaymentDate2);
+
         jpProcessingN.add(jpProcessingN15);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbRequestPayment.setText("Asignar nueva fecha");
+        jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(jbRequestPayment);
+
+        jpProcessingN.add(jPanel3);
 
         jpDocumentsProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
 
@@ -1014,27 +1142,39 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
     private javax.swing.ButtonGroup bgSearchBy;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelPeriiod1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField jTextField6;
     private javax.swing.JButton jbAccPickAccount;
     private javax.swing.JButton jbAccPickCostCenter;
     private javax.swing.JButton jbAccPickItem;
     private javax.swing.JButton jbAccPickItemAux;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
     private javax.swing.JButton jbChangeRequiredPaymentDate1;
-    private javax.swing.JButton jbClearDocs;
+    private javax.swing.JButton jbChangeRequiredPaymentDate2;
     private javax.swing.JButton jbDeselectAllDocs;
-    private javax.swing.JButton jbDownloadSelectedDocs;
-    private javax.swing.JButton jbLinkAllDocs;
-    private javax.swing.JButton jbRegisterAllDocs;
+    private javax.swing.JButton jbRequestPayment;
     private javax.swing.JButton jbSelectAllDocs;
-    private javax.swing.JButton jbSelectRemainingDocs;
-    private javax.swing.JButton jbShowDocs;
     private javax.swing.JButton jbViewInvoicePdf;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JLabel jlAcc;
@@ -1094,6 +1234,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     private javax.swing.JPanel jpProcessingN13;
     private javax.swing.JPanel jpProcessingN14;
     private javax.swing.JPanel jpProcessingN15;
+    private javax.swing.JPanel jpProcessingN16;
     private javax.swing.JPanel jpProcessingN2;
     private javax.swing.JPanel jpProcessingN3;
     private javax.swing.JPanel jpProcessingN4;
@@ -1132,8 +1273,10 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     private javax.swing.JTextField jtfBolVersion;
     private javax.swing.JTextField jtfInvoice;
     private javax.swing.JTextField jtfReqPayAmount;
+    private javax.swing.JTextField jtfReqPayAmount1;
     private javax.swing.JTextField jtfReqPayAmountPct;
     private javax.swing.JTextField jtfReqPayReqDate;
+    private javax.swing.JTextField jtfReqPayReqDate1;
     private javax.swing.JTextField jtfSugAccount;
     private javax.swing.JTextField jtfSugCostCenter;
     private javax.swing.JTextField jtfSugItem;
@@ -1142,7 +1285,6 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     private javax.swing.JTextField jtfSugUnits;
     private javax.swing.JTextField jtfUserFuncSubAreas;
     private javax.swing.JTextField jtfUserName;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolExcludeRecorded;
     private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekEnd;
     private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekStart;
     private sa.lib.gui.bean.SBeanFieldCalendarYear moCalWeekYear;
@@ -1158,6 +1300,11 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     private sa.lib.gui.bean.SBeanFieldRadio moRadSearchByWeek;
     private sa.lib.gui.bean.SBeanFieldBoolean sBeanFieldBoolean1;
     private sa.lib.gui.bean.SBeanFieldDecimal sBeanFieldDecimal1;
+    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey1;
+    private sa.lib.gui.bean.SBeanFieldKey sBeanFieldKey2;
+    private sa.lib.gui.bean.SBeanFieldRadio sBeanFieldRadio1;
+    private sa.lib.gui.bean.SBeanFieldRadio sBeanFieldRadio2;
+    private sa.lib.gui.bean.SBeanFieldRadio sBeanFieldRadio3;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -1166,8 +1313,8 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     
     @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 1024, 670);
-        
+        SGuiUtils.setWindowBounds(this, 1024, 650);
+        /*
         moRadSearchByPeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadSearchByPeriod.getText()), true);
         moRadSearchByWeek.setBooleanSettings(SGuiUtils.getLabelName(moRadSearchByWeek.getText()), false);
         moDatePeriodStart.setDateSettings(miClient, moDatePeriodStart.getToolTipText(), true);
@@ -1194,7 +1341,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         moFields.addField(moKeyDocModeCase);
         moFields.addField(moBoolExcludeRecorded);
         moFields.setFormButton(jbShowDocs);
-        
+        */
         jbSave.setEnabled(false);
         jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
         jbCancel.setPreferredSize(new Dimension(75, 23));
@@ -1366,14 +1513,17 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     }
     
     private void handleShowException(final Exception e) {
+        /*
         System.err.println(e);
         SLibUtils.showException(this, e);
         
         actionPerformedClearDocs();
         jbShowDocs.requestFocusInWindow();
+        */
     }
     
     private void disableFieldsOfSearchBy() {
+        /*
         moRadSearchByPeriod.setEnabled(false);
         moDatePeriodStart.setEditable(false);
         moDatePeriodEnd.setEditable(false);
@@ -1386,6 +1536,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         moBoolExcludeRecorded.setEnabled(false);
         
         jbShowDocs.setEnabled(false);
+        */
     }
     
     private void enableFieldsOfSearchBy() {
@@ -1436,7 +1587,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         moRadDocModeType.setEnabled(setShowingDocsModeOn);
         moRadDocModeCase.setEnabled(setShowingDocsModeOn);
         enableFieldsOfDocMode();
-        
+        /*
         moBoolExcludeRecorded.setEnabled(!setShowingDocsModeOn);
         
         jbShowDocs.setEnabled(!setShowingDocsModeOn);
@@ -1449,6 +1600,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
         jbRegisterAllDocs.setEnabled(setShowingDocsModeOn && isMassAccountingSupported());
         jbLinkAllDocs.setEnabled(setShowingDocsModeOn);
+        */
     }
     
     private void exportPaymentRequestsIfNeeded() {
@@ -1630,7 +1782,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
                                 document.ExternalDocumentId = externalDocumentId;
                                 document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
 
-                                if (!moBoolExcludeRecorded.isSelected() || !document.isRecorded()) {
+                                if (/*!moBoolExcludeRecorded.isSelected() || */!document.isRecorded()) {
 
                                     if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
                                         document.ExternalDocumentUuid = docNode.path("uuid").asText();
@@ -2803,7 +2955,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
                 populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
             
-            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
+//            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
         }
     }
     
@@ -2842,7 +2994,7 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
                 populateDocumentsGrid(documents, focusDocumentsGridTable);
             }
             
-            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
+//            jbRegisterAllDocs.setEnabled(isMassAccountingSupported());
         }
     }
     
@@ -2892,14 +3044,14 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
     
     @Override
     public void addAllListeners() {
-        jbShowDocs.addActionListener(this);
-        jbClearDocs.addActionListener(this);
-        jbSelectRemainingDocs.addActionListener(this);
-        jbSelectAllDocs.addActionListener(this);
-        jbDeselectAllDocs.addActionListener(this);
-        jbDownloadSelectedDocs.addActionListener(this);
-        jbRegisterAllDocs.addActionListener(this);
-        jbLinkAllDocs.addActionListener(this);
+//        jbShowDocs.addActionListener(this);
+//        jbClearDocs.addActionListener(this);
+//        jbSelectRemainingDocs.addActionListener(this);
+//        jbSelectAllDocs.addActionListener(this);
+//        jbDeselectAllDocs.addActionListener(this);
+//        jbDownloadSelectedDocs.addActionListener(this);
+//        jbRegisterAllDocs.addActionListener(this);
+//        jbLinkAllDocs.addActionListener(this);
         
 //        jbImportInvoiceFromCfdi.addActionListener(this);
 //        jbCreateInvoiceFromScratch.addActionListener(this);
@@ -2925,14 +3077,14 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
 
     @Override
     public void removeAllListeners() {
-        jbShowDocs.removeActionListener(this);
-        jbClearDocs.removeActionListener(this);
-        jbSelectRemainingDocs.removeActionListener(this);
-        jbSelectAllDocs.removeActionListener(this);
-        jbDeselectAllDocs.removeActionListener(this);
-        jbDownloadSelectedDocs.removeActionListener(this);
-        jbRegisterAllDocs.removeActionListener(this);
-        jbLinkAllDocs.removeActionListener(this);
+//        jbShowDocs.removeActionListener(this);
+//        jbClearDocs.removeActionListener(this);
+//        jbSelectRemainingDocs.removeActionListener(this);
+//        jbSelectAllDocs.removeActionListener(this);
+//        jbDeselectAllDocs.removeActionListener(this);
+//        jbDownloadSelectedDocs.removeActionListener(this);
+//        jbRegisterAllDocs.removeActionListener(this);
+//        jbLinkAllDocs.removeActionListener(this);
         
 //        jbImportInvoiceFromCfdi.removeActionListener(this);
 //        jbCreateInvoiceFromScratch.removeActionListener(this);
@@ -2988,30 +3140,30 @@ public class SDialogMassAccount extends SBeanFormDialog implements ActionListene
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbShowDocs) {
-                actionPerformedShowDocs();
-            }
-            else if (button == jbClearDocs) {
-                actionPerformedClearDocs();
-            }
-            else if (button == jbSelectRemainingDocs) {
-                actionPerformedSelectRemainingDocs();
-            }
-            else if (button == jbSelectAllDocs) {
-                actionPerformedSelectAllDocs();
-            }
-            else if (button == jbDeselectAllDocs) {
-                actionPerformedDeselectAllDocs();
-            }
-            else if (button == jbDownloadSelectedDocs) {
-                actionPerformedDownloadSelectedDocs();
-            }
-            else if (button == jbRegisterAllDocs) {
-                actionPerformedRegisterAllDocs();
-            }
-            else if (button == jbLinkAllDocs) {
-                actionPerformedLinkAllDocs();
-            }
+//            if (button == jbShowDocs) {
+//                actionPerformedShowDocs();
+//            }
+//            else if (button == jbClearDocs) {
+//                actionPerformedClearDocs();
+//            }
+//            else if (button == jbSelectRemainingDocs) {
+//                actionPerformedSelectRemainingDocs();
+//            }
+//            else if (button == jbSelectAllDocs) {
+//                actionPerformedSelectAllDocs();
+//            }
+//            else if (button == jbDeselectAllDocs) {
+//                actionPerformedDeselectAllDocs();
+//            }
+//            else if (button == jbDownloadSelectedDocs) {
+//                actionPerformedDownloadSelectedDocs();
+//            }
+//            else if (button == jbRegisterAllDocs) {
+//                actionPerformedRegisterAllDocs();
+//            }
+//            else if (button == jbLinkAllDocs) {
+//                actionPerformedLinkAllDocs();
+//            }
 //            else if (button == jbImportInvoiceFromCfdi) {
 //                actionPerformedImportInvoiceFromCfdi();
 //            }
