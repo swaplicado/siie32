@@ -61,6 +61,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatStockConfigDns;
 
     private javax.swing.JMenu jmMenuDpsPurSup;
+    private javax.swing.JMenuItem jmiDpsPurOrderSupplyPend;
+    private javax.swing.JMenuItem jmiDpsPurOrderSupplyPendEty;
+    private javax.swing.JMenuItem jmiDpsPurOrderSupplied;
+    private javax.swing.JMenuItem jmiDpsPurOrderSuppliedEty;
     private javax.swing.JMenuItem jmiDpsPurSupplyPend;
     private javax.swing.JMenuItem jmiDpsPurSupplyPendEty;
     private javax.swing.JMenuItem jmiDpsPurSupplied;
@@ -404,12 +408,22 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatAccMatConsumptionSubentCCGrp.addActionListener(this);
 
         jmMenuDpsPurSup = new JMenu("Surts. compras");
+        jmiDpsPurOrderSupplyPend = new JMenuItem("Pedidos de compras sin factura por surtir");
+        jmiDpsPurOrderSupplyPendEty = new JMenuItem("Pedidos de compras sin factura por surtir a detalle");
+        jmiDpsPurOrderSupplied = new JMenuItem("Pedidos de compras sin factura surtidos");
+        jmiDpsPurOrderSuppliedEty = new JMenuItem("Pedidos de compras sin factura surtidos a detalle");
         jmiDpsPurSupplyPend = new JMenuItem("Compras por surtir");
         jmiDpsPurSupplyPendEty = new JMenuItem("Compras por surtir a detalle");
         jmiDpsPurSupplied = new JMenuItem("Compras surtidas");
         jmiDpsPurSuppliedEty = new JMenuItem("Compras surtidas a detalle");
         jmiDpsPurOrderSupplies = new JMenuItem("Pedidos de compras con surtidos");
         jmiDpsPurOrderSuppliesInvoice = new JMenuItem("Pedidos de compras a surtir con factura");
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSupplyPend);
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSupplyPendEty);
+        jmMenuDpsPurSup.addSeparator();
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSupplied);
+        jmMenuDpsPurSup.add(jmiDpsPurOrderSuppliedEty);
+        jmMenuDpsPurSup.addSeparator();
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPend);
         jmMenuDpsPurSup.add(jmiDpsPurSupplyPendEty);
         jmMenuDpsPurSup.addSeparator();
@@ -418,6 +432,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuDpsPurSup.addSeparator();
         jmMenuDpsPurSup.add(jmiDpsPurOrderSupplies);
         jmMenuDpsPurSup.add(jmiDpsPurOrderSuppliesInvoice);
+        jmiDpsPurOrderSupplyPend.addActionListener(this);
+        jmiDpsPurOrderSupplyPendEty.addActionListener(this);
+        jmiDpsPurOrderSupplied.addActionListener(this);
+        jmiDpsPurOrderSuppliedEty.addActionListener(this);
         jmiDpsPurSupplyPend.addActionListener(this);
         jmiDpsPurSupplyPendEty.addActionListener(this);
         jmiDpsPurSupplied.addActionListener(this);
@@ -1322,6 +1340,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     @Override
     public void showView(int viewType, int auxType01, int auxType02) {
         String title = "";
+        String auxTitle = "";
         String dpsCategory = STrnUtils.getDpsCategoryName(auxType01, SUtilConsts.NUM_PLR);
         Class viewClass = null;
 
@@ -1413,19 +1432,47 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    title = dpsCategory + " x surtir";
+                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
+                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
+                        auxTitle = "Pedidos compra sin fact";
+                    }
+                    else {
+                        auxTitle = dpsCategory;
+                    }
+                    title = auxTitle + " x surtir";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    title = dpsCategory + " x surtir (detalle)";
+                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
+                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
+                        auxTitle = "Pedidos compra sin fact";
+                    }
+                    else {
+                        auxTitle = dpsCategory;
+                    }
+                    title = auxTitle + " x surtir (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    title = dpsCategory + " surtidas";
+                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
+                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
+                        auxTitle = "Pedidos de compra sin fact surtidos";
+                    }
+                    else {
+                        auxTitle = dpsCategory + " surtidas";
+                    }
+                    title = auxTitle;
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED_ETY:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    title = dpsCategory + " surtidas (detalle)";
+                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
+                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
+                        auxTitle = "Pedidos de compra sin fact surtidos";
+                    }
+                    else {
+                        auxTitle = dpsCategory + " surtidas";
+                    }
+                    title = auxTitle + " (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_RETURN_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
@@ -1762,6 +1809,18 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiCatStockConfigDns) {
                 showView(SDataConstants.TRN_STK_CFG_DNS);
+            }
+            else if (item == jmiDpsPurOrderSupplyPend) {
+                showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiDpsPurOrderSupplyPendEty) {
+                showView(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiDpsPurOrderSupplied) {
+                showView(SDataConstants.TRNX_DPS_SUPPLIED, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiDpsPurOrderSuppliedEty) {
+                showView(SDataConstants.TRNX_DPS_SUPPLIED_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiDpsPurSupplyPend) {
                 showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1]);
