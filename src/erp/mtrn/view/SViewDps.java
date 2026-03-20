@@ -725,18 +725,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[51]; // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[53]; // extra columns for accounting record and CFD info
         }
         else if (mbIsOrd) {
             if (mbIsAuthWebAvailable) {
-                aoTableColumns = new STableColumn[49];
+                aoTableColumns = new STableColumn[51];
             }
             else {
-                aoTableColumns = new STableColumn[44];
+                aoTableColumns = new STableColumn[46];
             }
         }
         else {
-            aoTableColumns = new STableColumn[43];
+            aoTableColumns = new STableColumn[45];
         }
 
         i = 0;
@@ -859,6 +859,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza documento", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_sub_code", "Subárea funcional", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_pay_method", "Método pago", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_pay_way", "Forma pago", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_concept", "Concepto documento", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_mfg_ord", "Orden producción", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_copy", "Copia", STableConstants.WIDTH_BOOLEAN);
@@ -3501,6 +3503,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                "COALESCE(dc.pay_met, 'N/D') AS _pay_method, " +
+                "COALESCE(dc.pay_way, 'N/D') AS _pay_way, " +
                 (mbIsAuthWebAvailable ? "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, " +
                 "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SALES + ", 0) AS send, " +
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
@@ -3681,7 +3685,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 (mbIsAuthWebAvailable ? "LEFT OUTER JOIN trn_sup_file_dps AS fl ON d.id_year = fl.id_year AND d.id_doc = fl.id_doc " +
                 "LEFT OUTER JOIN trn_dps_authorn AS ah ON d.id_year = ah.id_year AND d.id_doc = ah.id_doc AND NOT ah.b_del " +
                 "LEFT OUTER JOIN erp.cfgs_st_authorn AS sah ON ah.fid_st_authorn = sah.id_st_authorn " : "") +
-                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
+                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " +
+                "LEFT OUTER JOIN trn_dps_cfd AS dc ON d.id_year = dc.id_year AND d.id_doc = dc.id_doc " +
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc " +
                 "LEFT OUTER JOIN erp.usru_usr AS xu ON x.fid_usr_prc = xu.id_usr ";

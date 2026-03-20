@@ -2417,6 +2417,7 @@ public class SDialogCfdiImport401 extends javax.swing.JDialog implements java.aw
             dps.setDbmsDataDpsCfd(dpsCfd);
         }
 
+        dpsCfd.setAuxComprobante40(moComprobante);
         dpsCfd.setIsRegistryNew(true); // force entries to be treated as new
         
         refreshDps(dps);

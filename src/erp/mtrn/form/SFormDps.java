@@ -13215,6 +13215,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldCfdiPaymentMethod.setFieldValue(moDps.getDbmsDataDpsCfd().getPaymentMethod());
         }
         
+        if (moDps.getDbmsDataDpsCfd() != null && moDps.getDbmsDataDpsCfd().getAuxComprobante40() != null) {
+            moComprobante40 = moDps.getDbmsDataDpsCfd().getAuxComprobante40();
+        }
+        
         moFieldFkProductionOrderId_n.setFieldValue(new int[] { moDps.getFkMfgYearId_n(), moDps.getFkMfgOrderId_n() });
         
         moFieldFkContactId_n.setFieldValue(new int[] { moDps.getFkContactBizPartnerBranchId_n(), moDps.getFkContactContactId_n() }); // setBizPartner() populates contact combobox for sales documents
@@ -13884,8 +13888,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             moDps.getDbmsDataCfd(), 
                             new File(msFileXmlJustLoaded), 
                             miClient.getSession().getUser().getPkUserId());
-
+                    
                     moDps.setDbmsDataCfd(cfd);
+                    
+                    if (((moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
+                            && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
+                            || (moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
+                            && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))
+                            && moComprobante40 != null) {
+                        if (moDps.getDbmsDataDpsCfd() == null) {
+                            SDataDpsCfd oDpsCfdAux = new SDataDpsCfd();
+                            oDpsCfdAux.setAuxComprobante40(moComprobante40);
+                            moDps.setDbmsDataDpsCfd(oDpsCfdAux);
+                        }
+                        else {
+                            moDps.getDbmsDataDpsCfd().setAuxComprobante40(moComprobante40);
+                        }
+                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);

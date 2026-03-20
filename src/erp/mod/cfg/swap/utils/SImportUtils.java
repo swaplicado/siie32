@@ -5,6 +5,7 @@
  */
 package erp.mod.cfg.swap.utils;
 
+import cfd.DCfdUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.SFileUtilities;
@@ -21,6 +22,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataDpsCfd;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
@@ -43,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -258,6 +261,28 @@ public abstract class SImportUtils {
                     newDps = importedDocument.createDps(client.getSession(), order);
                     newDps.setAuxFileXml(dpsXml);
                     newDps.setAuxFilePdf(dpsPdf);
+                    try {
+                        /**
+                         * Cuando el documento sea factura de compras o nc de compras y el archivo XML del DPS no sea nulo, 
+                         * se parsea el XML para obtener los datos fiscales del CFDI 4.0 y se asignan al objeto 
+                         * comprobante auxiliar del DPS, para que posteriormente se asignen en la clase SFormDps.
+                         */
+                        String sXml = new String(Files.readAllBytes(dpsXml.toPath()), "UTF-8");
+                        cfd.ver40.DElementComprobante oCfdi = DCfdUtils.getCfdi40(sXml);
+                        if (newDps.getDbmsDataDpsCfd() == null) {
+                            SDataDpsCfd oDpsCfd = new SDataDpsCfd();
+                            oDpsCfd.setAuxComprobante40(oCfdi);
+                            newDps.setDbmsDataDpsCfd(oDpsCfd);
+                        }
+                        else {
+                            newDps.getDbmsDataDpsCfd().setAuxComprobante40(oCfdi);
+                        }
+                    }
+                    catch (Exception e) {
+                        Logger.getLogger(SImportUtils.class.getName()).
+                                log(java.util.logging.Level.SEVERE, 
+                                "Error al parsear el CFDI del documento importado.", e);
+                    }
                 }
 
                 client.getGuiModule(module).setFormComplement(complement);

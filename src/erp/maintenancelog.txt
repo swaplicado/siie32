@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 297.5/ 2026-03-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan columnas con método de pago y forma de pago en vistas de facturas.
+2) Procesamiento de xml en importación para guardado de método de pago y forma de pago.
+3) Modificación de registro de dps para guardado de método de pago y forma de pago.
+
+================================================================================
 SIIE 3.2 297.4/ 2026-03-20
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
