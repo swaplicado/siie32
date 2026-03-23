@@ -1,5 +1,11 @@
 ================================================================================
 SIIE 3.2 297.5/ 2026-03-20
+Adrián Alejandro Avilés Gómez
+--------------------------------------------------------------------------------
+1) Permitir selección de año al solicitar el reporte de movimientos contables de un proveedor desde PC
+
+================================================================================
+SIIE 3.2 297.5/ 2026-03-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agregan columnas con método de pago y forma de pago en vistas de facturas.

@@ -20,7 +20,6 @@ import erp.mod.bps.db.SBpsUtils;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.Map;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -47,9 +46,8 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
 
     }
 
-    public byte[] generateReportPdf(int pkBizPartner, String sBd) throws Exception {
+    public byte[] generateReportPdf(int pkBizPartner, String sBd, int year) throws Exception {
         try {
-            int year = LocalDate.now().getYear();
             Map<String, Object> map = null;
             JasperPrint jasperPrint = null;
             SDataBizPartnerCategory bizPartnerCategory = null;
