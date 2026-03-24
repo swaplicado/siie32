@@ -722,8 +722,8 @@ public class SModuleTrn extends SGuiModule {
                 title = "Todas las requisiciones (reclasificación ctb.)";
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
                 break;
-            case SModConsts.TRNX_PUR_PROCESS:
-                title = "Proceso de compras";
+            case SModConsts.TRNX_MAT_REQ_PUR_PROC:
+                title = "Seguimiento proceso compras";
                 view = new SViewPurchasingProcess(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_STK_VAL:

@@ -17,6 +17,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.view.SViewFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -34,6 +35,7 @@ import javax.swing.JRadioButton;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
+import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.grid.SGridUtils;
@@ -54,14 +56,18 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
     private ButtonGroup bgDate;
     
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private SViewFilter moFilterFuncArea;
+    
+    private String sFilterInit;
+    private SGuiDate moFilterTimeInit;
     
     public SViewPurchasingProcess(SGuiClient client, int subType, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_MAT_REQ_PUR_PROC , subType, title, params);
-        initComponents();
+        initComponetsCustom();
     }
     
-    private void initComponents() {
-       setRowButtonsEnabled(true);
+    private void initComponetsCustom() {
+        setRowButtonsEnabled(true);
         
         jlDate = new JLabel("Fecha:");
         jrbDateReq = new JRadioButton("Requisición");
@@ -88,15 +94,22 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
 
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-
+        
+        moFilterFuncArea = new SViewFilter(miClient, this, SModConsts.CFGU_FUNC);
+        moFilterFuncArea.initFilter(null);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
+        
         jbRowNew.setEnabled(false);
         jbRowCopy.setEnabled(false);
         jbRowDisable.setEnabled(false);
         jbRowDelete.setEnabled(false);
         jbRowEdit.setEnabled(false);
         jtbFilterDeleted.setEnabled(false);
+        
+        sFilterInit = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue().toString();
+        moFilterTimeInit = new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime());
+        
     }
     
     /**
@@ -182,6 +195,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
             "    auth_status_oc VARCHAR(20),\n" +
             "    user_in_turn_oc VARCHAR(500),\n" +
             "    fecha_auth_oc DATETIME,\n" +
+            "    fid_func_oc INT,\n" +
             // Entradas Almacén
             "    entrada_almacen VARCHAR(50),\n" +
             // Facturas
@@ -223,7 +237,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                             "date_rm, fk_usr_ins_rm, fk_usr_upd_rm, ts_usr_ins_rm, ts_usr_upd_rm, " +
                             "f_usr_ins_rm, f_usr_upd_rm, auth_status_rm, " +
                             "id_year_oc, id_doc_oc, b_del_oc, folio_oc, date_oc, proveedor_oc, " +
-                            "auth_status_oc, user_in_turn_oc, fecha_auth_oc, " +
+                            "auth_status_oc, user_in_turn_oc, fecha_auth_oc, fid_func_oc, " +
                             "entrada_almacen, " +
                             "id_year_fac, id_doc_fac, b_del_fac, folio_fac, date_fac, " +
                             "auth_status_fac, user_in_turn_fac, fac_contabilizada, id_fac_pc, " +
@@ -379,6 +393,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                                 "       THEN oc.ts_authorn\n" +
                                 "    ELSE NULL\n" +
                                 "    END AS fecha_auth_oc,\n" +
+                                "    oc.fid_func AS fid_func_oc,\n" +
                                 "    \n" +
                                 /* ================= ENTRADAS ALMACEN ================= */
                                 "\n" +
@@ -753,7 +768,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                                     "folio_rm,fecha_envio_rm,date_rm,fk_usr_ins_rm,fk_usr_upd_rm,ts_usr_ins_rm,ts_usr_upd_rm," +
                                     "f_usr_ins_rm,f_usr_upd_rm,auth_status_rm," +
                                     "id_year_oc,id_doc_oc,b_del_oc,folio_oc,date_oc,proveedor_oc," +
-                                    "auth_status_oc,user_in_turn_oc,fecha_auth_oc," +
+                                    "auth_status_oc,user_in_turn_oc,fecha_auth_oc, fid_func_oc," +
                                     "id_fac_pc,folio_fac,date_fac,auth_status_fac,user_in_turn_fac,requiere_crp,num_crp,estatus_crp" +
                                     ") " +
                                     "SELECT " +
@@ -761,7 +776,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                                     "folio_rm,fecha_envio_rm,date_rm,fk_usr_ins_rm,fk_usr_upd_rm,ts_usr_ins_rm,ts_usr_upd_rm," +
                                     "f_usr_ins_rm,f_usr_upd_rm,auth_status_rm," +
                                     "id_year_oc,id_doc_oc,b_del_oc,folio_oc,date_oc,proveedor_oc," +
-                                    "auth_status_oc,user_in_turn_oc,fecha_auth_oc," +
+                                    "auth_status_oc,user_in_turn_oc,fecha_auth_oc,fid_func_oc," +
                                     documentId + ", " +
                                     (folioFac != null ? "'" + folioFac + "'" : "NULL") + ", " +
                                     (dateFac != null ? "'" + dateFac + "'" : "NULL") + ", " +
@@ -786,8 +801,16 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            miClient.showMsgBoxWarning(
+                    "Lamentablemente no se pudo consultar la información del sistema " + SSwapConsts.PURCHASE_PORTAL + ".\n" +
+                    "La información mostrada es la que tiene " + SSwapConsts.SIIE + " en este momento.\n" + 
+                    "Los datos que pueden faltar son:\n" +
+                    "* Facturas sin contabilizar.\n" +
+                    "* Estatus de autorización de las facturas.\n" +
+                    "* Comprobantes de recepción de pago."
+            );
         }
-        
+
         try (Statement stmt = miClient.getSession().getStatement()) {
 
             /*
@@ -937,7 +960,8 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         if (filter != null) {
             SGuiDate oFilter = (SGuiDate) filter;
             if (oFilter.getGuiType() == SGuiConsts.GUI_DATE_YEAR) {
-                miClient.showMsgBoxInformation("No se puede seleccionar mas de un mes");
+                miClient.showMsgBoxInformation("No se puede seleccionar mas de un mes.");
+                moFilterDatePeriod.initFilter(moFilterTimeInit);
                 return;
             }
 
@@ -949,7 +973,17 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                 where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("oc.dt", (SGuiDate) filter);
                 where = where.replaceFirst("^\\(", "").replaceFirst("\\)\\s*$", "");
             }
-            
+            moFilterTimeInit = new SGuiDate(oFilter.getGuiType(), oFilter.getTime());
+        }
+        
+        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue();
+        if (filter != null && !((String) filter).isEmpty()) {
+            if (sFilterInit.equals(filter.toString())) {
+                where += (where.isEmpty() ? "" : " AND ") + " ( oc.fid_func IN (" + filter + ") OR oc.fid_func IS NULL ) ";
+            }
+            else {
+                where += (where.isEmpty() ? "" : " AND ") + " oc.fid_func IN (" + filter + ") ";
+            }
         }
         
         try {

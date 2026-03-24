@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 297.8/ 2026-03-24
+Adrián Alejandro Avilés Gómez
+--------------------------------------------------------------------------------
+1) Agregado filtro de área funcional a pantalla de "Consulta del proceso de compras"
+2) Reasiganción de menú para pantalla "Consulta del proceso de compras"
+
+================================================================================
 SIIE 3.2 297.7/ 2026-03-24
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

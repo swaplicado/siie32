@@ -186,6 +186,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatMatConsumptionEnt;
     private javax.swing.JMenuItem jmiCatMatConsumptionSubent;
     private javax.swing.JMenuItem jmiReqMatConsumptionEntBudget;
+    private javax.swing.JMenuItem jmiReqPurchasingProcess;
     private javax.swing.JMenuItem jmiCatMatProvisionEnt;
     private javax.swing.JMenu jmMenuCatConfUsrEmpReq;
     private javax.swing.JMenuItem jmiCatUsersEntities;
@@ -724,6 +725,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll = new JMenuItem("Todas las requisiciones");
         jmiReqAllAcc = new JMenuItem("Todas las requisiciones (reclasificación contable)");
         jmiReqMatConsumptionEntBudget = new JMenuItem("Presupuestos de centros de consumo");
+        jmiReqPurchasingProcess = new JMenuItem("Seguimiento al proceso de compras");
         
         jmMenuReq.add(jmiReqPetNew);
         jmMenuReq.add(jmiReqPetTbAuth);
@@ -767,6 +769,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReqAll.add(jmiReqAllAcc);
         jmMenuReqAll.addSeparator();
         jmMenuReqAll.add(jmiReqMatConsumptionEntBudget);
+        jmMenuReqAll.addSeparator();
+        jmMenuReqAll.add(jmiReqPurchasingProcess);
         
         jmiReqAllConsEnt.addActionListener(this);
         jmiReqAllSupEnt.addActionListener(this);
@@ -799,6 +803,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.addActionListener(this);
         jmiReqAllAcc.addActionListener(this);
         jmiReqMatConsumptionEntBudget.addActionListener(this);
+        jmiReqPurchasingProcess.addActionListener(this);
                
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
@@ -1070,6 +1075,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllAcc.setEnabled(hasRightMatReqAcc);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
+        jmiReqPurchasingProcess.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         
         jmMenuStk.setEnabled(hasRightStock || hasRightValMatCons || hasRightStkCommPrice);
         jmiStkStock.setEnabled(hasRightStock);
@@ -2169,6 +2175,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReqMatConsumptionEntBudget) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_CONS_ENT_BUDGET, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiReqPurchasingProcess) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PUR_PROC, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiCatMatProvisionEnt) {
                 miClient.getSession().showView(SModConsts.TRN_MAT_PROV_ENT, SLibConstants.UNDEFINED, null);
