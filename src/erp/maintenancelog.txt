@@ -1,5 +1,11 @@
 ================================================================================
-SIIE 3.2 297.5/ 2026-03-20
+SIIE 3.2 297.7/ 2026-03-24
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Enviar notas al iniciarse autorización (si están disponibles) en envío automático de pagos.
+
+================================================================================
+SIIE 3.2 297.6/ 2026-03-20
 Adrián Alejandro Avilés Gómez
 --------------------------------------------------------------------------------
 1) Permitir selección de año al solicitar el reporte de movimientos contables de un proveedor desde PC
