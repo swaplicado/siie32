@@ -522,8 +522,13 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "dt.code AS f_dt_code, cb.code AS f_cb_code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
-                "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
-                "de.qty AS f_qty, " +
+                "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, ";
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
+            && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
+                // Si la vista es para pedidos de compra, fac_oc.id_year será nulo si no tiene factura relacionada
+                msSql += "COALESCE(fac_oc.id_year, 0) AS f_has_doc, ";
+        }
+        msSql += "de.qty AS f_qty, " +
                 "de.orig_qty AS f_orig_qty, " +
                 "COALESCE((SELECT SUM(ddd.qty) FROM trn_dps_dps_adj AS ddd, trn_dps_ety AS dae, trn_dps AS da WHERE " +
                 "ddd.id_dps_year = de.id_year AND ddd.id_dps_doc = de.id_doc AND ddd.id_dps_ety = de.id_ety AND " +
@@ -559,8 +564,21 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "de.b_del = 0 AND de.b_inv = 1 AND de.qty > 0 AND de.orig_qty > 0 " +
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
-                "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
-                "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
+                "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit ";
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
+                && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
+            msSql += "LEFT JOIN trn_dps_dps_supply AS dpss ON "
+                            + "de.id_year = dpss.id_src_year AND "
+                            + "de.id_doc = dpss.id_src_doc AND "
+                            + "de.id_ety = dpss.id_src_ety "
+                    + "LEFT JOIN trn_dps AS fac_oc ON "
+                            + "dpss.id_des_year = fac_oc.id_year AND "
+                            + "dpss.id_des_doc = fac_oc.id_doc AND "
+                            + "fac_oc.b_del = 0 AND "
+                            + "fac_oc.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND "
+                            + "fac_oc.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " ";
+        }
+        msSql += "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
                 "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
                 "dt.code, cb.code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol, uo.symbol, " +
@@ -568,6 +586,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
 
         if (mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND || mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY) {
             msSql += "HAVING (f_orig_qty - f_adj_orig_qty - f_sup_orig_qty) <> 0 AND d.b_close = 0 ";
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
+                && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
+                msSql += "AND f_has_doc = 0 ";
+            }
         }
         else {
             msSql += "HAVING (f_orig_qty - f_adj_orig_qty - f_sup_orig_qty) = 0 OR d.b_close = 1 ";

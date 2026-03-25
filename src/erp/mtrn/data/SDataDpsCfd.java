@@ -15,9 +15,12 @@ import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.xml.SXmlElement;
 
 /**
@@ -62,6 +65,9 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     protected String msCfdCceNumeroExportadorConfiable;
     protected String msCfdCceIncoterm;
     
+    protected cfd.ver33.DElementComprobante moAuxComprobante33;
+    protected cfd.ver40.DElementComprobante moAuxComprobante40;
+    
     protected STrnCfdRelatedDocs moCfdRelatedDocs; // ADVERTENCIA: La información de CFDI relacionados no está normalizada.
     protected ArrayList<String> maUuidRelacionados; // lista de UUID de CFDI relacionados según el tipo de relación de este registro
     
@@ -104,6 +110,9 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public void setCfdCceTotalUsd(String s) { msCfdCceTotalUsd = s; }
     public void setCfdCceNumeroExportadorConfiable(String s) { msCfdCceNumeroExportadorConfiable = s; }
     public void setCfdCceIncoterm(String s) { msCfdCceIncoterm = s; }
+
+    public void setAuxComprobante33(cfd.ver33.DElementComprobante o) { moAuxComprobante33 = o; }
+    public void setAuxComprobante40(cfd.ver40.DElementComprobante o) { moAuxComprobante40 = o; }
     
     public void setCfdRelatedDocs(STrnCfdRelatedDocs o) { moCfdRelatedDocs = o; }
 
@@ -141,6 +150,9 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
     public String getCfdCceTotalUsd() { return msCfdCceTotalUsd; }
     public String getCfdCceNumeroExportadorConfiable() { return msCfdCceNumeroExportadorConfiable; }
     public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
+
+    public cfd.ver33.DElementComprobante getAuxComprobante33() { return moAuxComprobante33; }
+    public cfd.ver40.DElementComprobante getAuxComprobante40() { return moAuxComprobante40; }
     
     public STrnCfdRelatedDocs getCfdRelatedDocs() { return moCfdRelatedDocs; }
     public ArrayList<String> getUuidRelacionados() { return maUuidRelacionados; }
@@ -466,11 +478,13 @@ public final class SDataDpsCfd extends erp.lib.data.SDataRegistry implements jav
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
-        catch (java.sql.SQLException e) {
+        catch (SQLException e) {
+            Logger.getLogger(SDataDpsCfd.class.getName()).log(Level.SEVERE, null, e);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }
         catch (Exception e) {
+            Logger.getLogger(SDataDpsCfd.class.getName()).log(Level.SEVERE, null, e);
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
             SLibUtilities.printOutException(this, e);
         }

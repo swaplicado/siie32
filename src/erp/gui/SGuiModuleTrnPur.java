@@ -169,6 +169,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAdjEntry;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
     private javax.swing.JMenu jmStkDvy;
+    private javax.swing.JMenuItem jmiStkDvyOrdPend;
+    private javax.swing.JMenuItem jmiStkDvyOrdPendEntry;
+    private javax.swing.JMenuItem jmiStkDvyOrdSupplied;
+    private javax.swing.JMenuItem jmiStkDvyOrdSuppliedEntry;
     private javax.swing.JMenuItem jmiStkDvyPend;
     private javax.swing.JMenuItem jmiStkDvyPendEntry;
     private javax.swing.JMenuItem jmiStkDvySupplied;
@@ -271,6 +275,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JSeparator jsRepContract;
     private javax.swing.JMenuItem jmiRepTrnUnitaryCosts;
     private javax.swing.JMenuItem jmiRepAccAccTag;
+    private javax.swing.JMenuItem jmiOrdersPurchasingProcess;
     
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
@@ -447,6 +452,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersUsr = new JMenuItem("Control de límite máximo mensual por usuario");
         jmiOrdersMailPending = new JMenuItem("Pedidos por enviar por correo-e");
         jmiOrdersMailSent = new JMenuItem("Pedidos enviados por correo-e");
+        jmiOrdersPurchasingProcess = new JMenuItem("Seguimiento al proceso de compras");
         jmOrd.add(jmiOrders);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersLinkPend);
@@ -473,6 +479,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersMailPending);
         jmOrd.add(jmiOrdersMailSent);
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersPurchasingProcess);
 
         jmDps = new JMenu("Facturas");
         jmiDpsDoc = new JMenuItem("Facturas de compras");
@@ -543,6 +551,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjDocAnn);
 
         jmStkDvy = new JMenu("Surtidos");
+        jmiStkDvyOrdPend = new JMenuItem("Pedidos de compras sin factura por surtir");
+        jmiStkDvyOrdPendEntry = new JMenuItem("Pedidos de compras sin factura por surtir a detalle");
+        jmiStkDvyOrdSupplied = new JMenuItem("Pedidos de compras sin factura surtidos");
+        jmiStkDvyOrdSuppliedEntry = new JMenuItem("Pedidos de compras sin factura surtidos a detalle");
         jmiStkDvyPend = new JMenuItem("Compras por surtir");
         jmiStkDvyPendEntry = new JMenuItem("Compras por surtir a detalle");
         jmiStkDvySupplied = new JMenuItem("Compras surtidas");
@@ -550,6 +562,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkDvyOrderSupply = new JMenuItem("Pedidos de compras con surtidos");
         jmiStkDvyDiog = new JMenuItem("Documentos de surtidos de compras");
         jmiStkDvyStatsConsumption = new JMenuItem("Estadísticas de consumo de compras");
+        jmStkDvy.add(jmiStkDvyOrdPend);
+        jmStkDvy.add(jmiStkDvyOrdPendEntry);
+        jmStkDvy.addSeparator();
+        jmStkDvy.add(jmiStkDvyOrdSupplied);
+        jmStkDvy.add(jmiStkDvyOrdSuppliedEntry);
+        jmStkDvy.addSeparator();
         jmStkDvy.add(jmiStkDvyPend);
         jmStkDvy.add(jmiStkDvyPendEntry);
         jmStkDvy.addSeparator();
@@ -829,6 +847,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersUsr.addActionListener(this);
         jmiOrdersMailPending.addActionListener(this);
         jmiOrdersMailSent.addActionListener(this);
+        jmiOrdersPurchasingProcess.addActionListener(this);
         jmiDpsDoc.addActionListener(this);
         jmiDpsEntry.addActionListener(this);
         jmiDpsEntryRef.addActionListener(this);
@@ -855,6 +874,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjEntry.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
+        jmiStkDvyOrdPend.addActionListener(this);
+        jmiStkDvyOrdPendEntry.addActionListener(this);
+        jmiStkDvyOrdSupplied.addActionListener(this);
+        jmiStkDvyOrdSuppliedEntry.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
         jmiStkDvyPendEntry.addActionListener(this);
         jmiStkDvySupplied.addActionListener(this);
@@ -1046,6 +1069,10 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
 
         jmStkDvy.setEnabled(hasRightInventoryIn);
+        jmiStkDvyOrdPend.setEnabled(hasRightInventoryIn);
+        jmiStkDvyOrdPendEntry.setEnabled(hasRightInventoryIn);
+        jmiStkDvyOrdSupplied.setEnabled(hasRightInventoryIn);
+        jmiStkDvyOrdSuppliedEntry.setEnabled(hasRightInventoryIn);
         jmiStkDvyPend.setEnabled(hasRightInventoryIn);
         jmiStkDvyPendEntry.setEnabled(hasRightInventoryIn);
         jmiStkDvySupplied.setEnabled(hasRightInventoryIn);
@@ -1963,6 +1990,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiOrdersMailSent) {
                 showView(SDataConstants.TRNX_DPS_SENT, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ORD);
             }
+            else if (item == jmiOrdersPurchasingProcess) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PUR_PROC, SLibConstants.UNDEFINED, null);
+            }
             else if (item == jmiDpsDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
             }
@@ -2050,6 +2080,18 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsAdjDocAnn) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_ADJ);
+            }
+            else if (item == jmiStkDvyOrdPend) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiStkDvyOrdPendEntry) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiStkDvyOrdSupplied) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+            }
+            else if (item == jmiStkDvyOrdSuppliedEntry) {
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiStkDvyPend) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1]);

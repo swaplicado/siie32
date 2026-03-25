@@ -4523,10 +4523,26 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oStatement.execute(sSql);
                 
                 if (moDbmsDataDpsCfd != null) {
+                    if (((this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
+                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
+                            || (this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
+                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))) {
+                        if (this.getComprobanteVersion().equals("" + DCfdConsts.CFDI_VER_40)) {
+                            // Cuando el documento sea factura de compras o nc de compras y
+                            // el objeto comprobante no sea nulo se actualizan los datos
+                            if (moDbmsDataDpsCfd.getAuxComprobante40() != null) {
+                                moDbmsDataDpsCfd.setPaymentMethod(moDbmsDataDpsCfd.getAuxComprobante40().getAttMetodoPago().getString());
+                                moDbmsDataDpsCfd.setPaymentWay(moDbmsDataDpsCfd.getAuxComprobante40().getAttFormaPago().getString());
+                                moDbmsDataDpsCfd.setTaxRegimeIssuing(moDbmsDataDpsCfd.getAuxComprobante40().getEltEmisor().getAttRegimenFiscal().getString());
+                                moDbmsDataDpsCfd.setTaxRegimeReceiver(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttRegimenFiscalReceptor().getString());
+                                moDbmsDataDpsCfd.setCfdiUsage(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttUsoCFDI().getString());
+                            }
+                        }
+                    }
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
                     moDbmsDataDpsCfd.setVersion(getComprobanteVersion());
-                    
+
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }

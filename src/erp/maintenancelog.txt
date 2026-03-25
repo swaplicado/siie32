@@ -1,4 +1,49 @@
 ================================================================================
+SIIE 3.2 297.8/ 2026-03-24
+Adrián Alejandro Avilés Gómez
+--------------------------------------------------------------------------------
+1) Agregado filtro de área funcional a pantalla de "Consulta del proceso de compras"
+2) Reasiganción de menú para pantalla "Consulta del proceso de compras"
+
+================================================================================
+SIIE 3.2 297.7/ 2026-03-24
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Enviar notas al iniciarse autorización (si están disponibles) en envío automático de pagos.
+
+================================================================================
+SIIE 3.2 297.6/ 2026-03-20
+Adrián Alejandro Avilés Gómez
+--------------------------------------------------------------------------------
+1) Permitir selección de año al solicitar el reporte de movimientos contables de un proveedor desde PC
+
+================================================================================
+SIIE 3.2 297.5/ 2026-03-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan columnas con método de pago y forma de pago en vistas de facturas.
+2) Procesamiento de xml en importación para guardado de método de pago y forma de pago.
+3) Modificación de registro de dps para guardado de método de pago y forma de pago.
+
+================================================================================
+SIIE 3.2 297.4/ 2026-03-20
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección de la consulta de solicitudes de pago
+================================================================================
+SIIE 3.2 297.3/ 2026-03-19
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Vista de monitoreo de pedidos de compras
+
+================================================================================
+SIIE 3.2 297.2/ 2026-03-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Vistas de pedidos de compra sin factura por surtir y surtidos.
+
+================================================================================
+SIIE 3.2 297.1/ 2026-03-13
 SIIE 3.2 297.0-b9/ 2026-03-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

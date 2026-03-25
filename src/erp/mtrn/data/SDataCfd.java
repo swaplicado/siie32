@@ -273,7 +273,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxRfcReceptor(java.lang.String s) { msAuxRfcReceptor = s; }
     public void setAuxTotalCy(double d) { mdAuxTotalCy = d; }
     public void setAuxIsSign(boolean b) { mbAuxIsSign = b; }
-    public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }    
+    public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
 
     /** To inform number series chosen for CFDI when processing CFDI payroll. */
     public void setExtraSeries(java.lang.String s) { msExtraSeries = s; }
