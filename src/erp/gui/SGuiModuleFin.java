@@ -103,7 +103,7 @@ import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mod.cfg.swap.form.SDialogImportProforma;
+import erp.mod.cfg.swap.form.SDialogImportProformas;
 import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
@@ -390,7 +390,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckWallet moFormCheckWallet;
     private erp.mfin.form.SFormCheckFormat moFormCheckFormat;
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
-    private erp.mod.cfg.swap.form.SDialogImportProforma moDialogImportProformas;
+    private erp.mod.cfg.swap.form.SDialogImportProformas moDialogImportProformas;
     private erp.mtrn.form.SFormCtr moFormCtr;
     private erp.mtrn.form.SDialogRepAccountTag moDialogRepAccTag;
 
@@ -2405,7 +2405,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if(item == jmiFinImportProformas) {
                 if (moDialogImportProformas == null) {
-                    moDialogImportProformas = new SDialogImportProforma((SGuiClient) miClient);
+                    moDialogImportProformas = new SDialogImportProformas((SGuiClient) miClient);
                 }
                 moDialogImportProformas.resetForm();
                 moDialogImportProformas.setVisible(true);

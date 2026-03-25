@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.json.accounting;
+package erp.mod.cfg.swap.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -19,4 +19,17 @@ public class Config {
 
     public List<Group> getGroups() { return groups; }
     public void setGroups(List<Group> groups) { this.groups = groups; }
+    
+    public Group getGroup(final String docType) {
+        Group group = null;
+        
+        for (Group g : groups) {
+            if (g.getDocType().equals(docType)) {
+                group = g;
+                break;
+            }
+        }
+        
+        return group;
+    }
 }

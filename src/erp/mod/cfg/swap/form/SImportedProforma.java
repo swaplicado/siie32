@@ -5,17 +5,10 @@
  */
 package erp.mod.cfg.swap.form;
 
-import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
-import erp.SClientUtils;
 import erp.client.SClientInterface;
-import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
-import erp.lib.SLibConstants;
-import erp.mbps.data.SDataBizPartner;
-import erp.mcfg.data.SDataParamsCompany;
-import erp.mfin.data.SDataRecord;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -26,19 +19,13 @@ import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.trn.db.SDbSwapDataProcessing;
-import erp.mtrn.data.SDataCfd;
-import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataPdf;
-import erp.mtrn.data.SThinDps;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
-import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -378,13 +365,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
          File[] externalFiles = null;
 
         if (ExternalDocumentId != 0) {
-
-            externalFiles = SImportUtils.downloadDocumentAllFilesInTempDir(
-                    session,
-                    urlDownload,
-                    ExternalDocumentId,
-                    SImportUtils.TYPE_PROFORMA
-            );
+            externalFiles = SImportUtils.downloadDocumentAllFilesInTempDir(session, urlDownload, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
             System.out.println("Files downloaded: " + (externalFiles != null ? externalFiles.length : 0));
 
@@ -681,9 +662,27 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             //swapDataProcessing.setDpsReferences(composeReferences());
             swapDataProcessing.setDpsDescription(Description);
             swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
+            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
+            swapDataProcessing.setPaymentRequired(false);
+            swapDataProcessing.setPaymentApplicationCy(0);
+            swapDataProcessing.setPaymentDateRequired_n(null);
+            swapDataProcessing.setAccMethod(SDbSwapDataProcessing.ACC_METHOD_MANUAL);
+            swapDataProcessing.setAccUserUnits(0);
+            swapDataProcessing.setAccSystemUnits(0);
             swapDataProcessing.setDeleted(false);
             swapDataProcessing.setSystem(false);
             swapDataProcessing.setFkPaymentId_n(payment.getPkPaymentId());
+            //swapDataProcessing.setFkPayCurrencyId_n(...);
+            //swapDataProcessing.setFkAccUserAccountId_n(...);
+            //swapDataProcessing.setFkAccUserCostCenterId_n(...);
+            //swapDataProcessing.setFkAccUserItemId_n(...);
+            //swapDataProcessing.setFkAccUserItemAuxId_n(...);
+            //swapDataProcessing.setFkAccUserUnitId_n(...);
+            //swapDataProcessing.setFkAccSystemAccountId_n(...);
+            //swapDataProcessing.setFkAccSystemCostCenterId_n(...);
+            //swapDataProcessing.setFkAccSystemItemId_n(...);
+            //swapDataProcessing.setFkAccSystemItemAuxId_n(...);
+            //swapDataProcessing.setFkAccSystemUnitId_n(...);
             //swapDataProcessing.setFkUserInsertId(...);
             //swapDataProcessing.setFkUserUpdateId(...);
             //swapDataProcessing.setTsUserInsert(...);
@@ -716,9 +715,27 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             //swapDataProcessing.setDpsReferences(composeReferences());
             swapDataProcessing.setDpsDescription(Description);
             swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
+            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
+            swapDataProcessing.setPaymentRequired(false);
+            swapDataProcessing.setPaymentApplicationCy(0);
+            swapDataProcessing.setPaymentDateRequired_n(null);
+            swapDataProcessing.setAccMethod(SDbSwapDataProcessing.ACC_METHOD_MANUAL);
+            swapDataProcessing.setAccUserUnits(0);
+            swapDataProcessing.setAccSystemUnits(0);
             swapDataProcessing.setDeleted(false);
             swapDataProcessing.setSystem(false);
             swapDataProcessing.setFkPaymentId_n(payment.getPkPaymentId());
+            //swapDataProcessing.setFkPayCurrencyId_n(...);
+            //swapDataProcessing.setFkAccUserAccountId_n(...);
+            //swapDataProcessing.setFkAccUserCostCenterId_n(...);
+            //swapDataProcessing.setFkAccUserItemId_n(...);
+            //swapDataProcessing.setFkAccUserItemAuxId_n(...);
+            //swapDataProcessing.setFkAccUserUnitId_n(...);
+            //swapDataProcessing.setFkAccSystemAccountId_n(...);
+            //swapDataProcessing.setFkAccSystemCostCenterId_n(...);
+            //swapDataProcessing.setFkAccSystemItemId_n(...);
+            //swapDataProcessing.setFkAccSystemItemAuxId_n(...);
+            //swapDataProcessing.setFkAccSystemUnitId_n(...);
             //swapDataProcessing.setFkUserInsertId(...);
             //swapDataProcessing.setFkUserUpdateId(...);
             //swapDataProcessing.setTsUserInsert(...);

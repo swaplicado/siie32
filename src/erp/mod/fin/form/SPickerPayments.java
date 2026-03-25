@@ -210,7 +210,7 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     "INNER JOIN erp.cfgu_cur AS cp ON p.fk_cur = cp.id_cur " +
                     "LEFT JOIN trn_dps AS d ON pe.fk_doc_year_n = d.id_year AND pe.fk_doc_doc_n = d.id_doc " +
                     "LEFT JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
-                    "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
+                    "WHERE NOT p.b_del AND p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
                     "AND p.fk_cur = " + mnCurrrencyLayout + " " + 
                     "AND pe.fk_ety_cur = " + mnCurPaymentDoc + " " + 
                     "AND pe.ety_tp = '" + entryTp + "' " +

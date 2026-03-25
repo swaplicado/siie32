@@ -77,14 +77,14 @@ public abstract class SSwapConsts {
     public static final String CFG_ATT_API_KEY = "api-key";
     public static final String CFG_ATT_LIMIT = "limit";
 
-    // SWAP Services constants:
+    // SWAP Services transaction constants:
     public static final int TXN_CAT_PURCHASE = 1;
     public static final int TXN_DOC_TYPE_ORDER = 22;
     public static final int TXN_DOC_TYPE_INVOICE = 41;
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
+    public static final int TXN_DOC_TYPE_PROFORMA = 52;
     public static final int TXN_REF_TYPE_ORDER = 22;
     public static final int TXN_REF_TYPE_SCALE_IN = 91;
-    public static final int TXN_DOC_TYPE_PROFORMA = 52;
     /** Órden de compra. */
     public static final String TXN_REF_TYPE_ORDER_CODE = "OC";
     /** Boleto de báscula (de entrada). */

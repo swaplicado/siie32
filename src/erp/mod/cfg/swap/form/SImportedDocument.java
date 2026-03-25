@@ -47,7 +47,6 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
-import sa.lib.gui.SGuiDatePicker;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -65,13 +64,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final int DOC_CASE_RAW_MAT_FREIGHT = 2;
     public static final int DOC_CASE_RAW_MAT_PURCHASE = 3;
     
-    public static final int PRC_TYPE_STANDARD = 0; // NA
-    public static final int PRC_TYPE_RAW_MAT_FREIGHT = 11;
-    public static final int PRC_TYPE_RAW_MAT_PURCHASE = 12;
-    
     public static final int PAY_NOT_REQ = 0; // pago no requerido
-    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
-    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
+    public static final int PAY_DEF_BY_AMT = 11; // pago definido por monto
+    public static final int PAY_DEF_BY_AMT_MAN = 12; // pago definido por monto (manual)
+    public static final int PAY_DEF_BY_PCT = 21; // pago definido por porcentaje
     
     public static final int MATCH_PAY_TP_OMIT = 0; // coincidencia de tipo de pago: omitir
     public static final int MATCH_PAY_TP_REQUIRED = 1; // coincidencia de tipo de pago: requerida
@@ -81,10 +77,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final HashMap<Integer, String> DocTypes = new HashMap<>();
     /** Document cases. */
     public static final HashMap<Integer, String> DocCases = new HashMap<>();
-    /** Processing types (in SWAP Services). */
-    public static final HashMap<Integer, String> ProcTypes = new HashMap<>();
     /** Payment definition options. */
     public static final HashMap<Integer, String> PayDefinitions = new HashMap<>();
+    
+    private static final int COL_DOWNLOAD = 8;
     
     static {
         DocTypes.put(DOC_TYPE_ALL, "Todas");
@@ -96,12 +92,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         DocCases.put(DOC_CASE_RAW_MAT_FREIGHT, "Fletes MP");
         DocCases.put(DOC_CASE_RAW_MAT_PURCHASE, "Compras MP");
         
-        ProcTypes.put(PRC_TYPE_STANDARD, "STD");
-        ProcTypes.put(PRC_TYPE_RAW_MAT_FREIGHT, "FLT-MP");
-        ProcTypes.put(PRC_TYPE_RAW_MAT_PURCHASE, "CPA-MP");
-        
         PayDefinitions.put(PAY_NOT_REQ, "No requerido");
         PayDefinitions.put(PAY_DEF_BY_AMT, "Por monto ($)");
+        PayDefinitions.put(PAY_DEF_BY_AMT_MAN, "Por monto manual ($)");
         PayDefinitions.put(PAY_DEF_BY_PCT, "Por porcentaje (%)");
     }
     
@@ -137,6 +130,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public double Total;
     public int CurrencyId;
     public String CurrencyCode;
+    public boolean RequirePayment;
     public int RequiredPaymentDefinition;
     public double RequiredPaymentAmount;
     public double RequiredPaymentPct;
@@ -148,6 +142,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int RevisionWeek;
     public Date RevisionDatetime;
     public int Priority;
+    /** Processing type ID defined in by constants SDbSwapDataProcessing.PROC_TYPE_... */
     public int ProcessingTypeId;
     public String ProcessingTypeCode;
     public int StatusId;
@@ -160,6 +155,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public SDbPayment Payment;
     
     public Reference[] References;
+    
+    public File[] AuxFiles;
     
     public SImportedDocument(final SServicesUtils.ConfigSettings configSettings) {
         ConfigSettings = configSettings;
@@ -182,6 +179,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Total = 0;
         CurrencyId = 0;
         CurrencyCode = "";
+        RequirePayment = false;
         RequiredPaymentDefinition = PAY_NOT_REQ;
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
@@ -192,6 +190,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         RevisionYear = 0;
         RevisionWeek = 0;
         RevisionDatetime = null;
+        Priority = 0;
         ProcessingTypeId = 0;
         ProcessingTypeCode = "";
         StatusId = 0;
@@ -204,6 +203,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Payment = null;
 
         References = null;
+        
+        AuxFiles = null;
     }
     
     /**
@@ -221,26 +222,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public String getRevisionYearWeek() {
         return SLibUtils.DecimalFormatCalendarYear.format(RevisionYear) + "-" + SLibUtils.DecimalFormatCalendarWeek.format(RevisionWeek);
     }
-
-    /**
-     * Pick a date.
-     * @param session GUI session.
-     * @return 
-     */
-    private Date pickDate(final SGuiSession session) {
-        Date date = null;
-        
-        SGuiDatePicker picker = session.getClient().getDatePicker();
-        picker.resetPicker();
-        picker.setOption(getRequiredPaymentDateEffective());
-        picker.setPickerVisible(true);
-
-        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-            date = picker.getOption();
-        }
-        
-        return date;
-    }
     
     /**
      * Get effective total, either from given DPS, if available, otherwise from this imported document.
@@ -255,21 +236,23 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Ger required payment percentage of document as a double between 0 and 1.
      * @return 
      */
-    private double getRequiredPaymentPct() {
+    public double getRequiredPaymentPct() {
         return RequiredPaymentPct / 100;
     }
     
     /**
      * Ger required payment amount of document, directly defined or indirectly from required payment percentage.
+     * @param dps Document.
      * @return 
      */
-    private double getRequiredPaymentAmount(final SThinDps dps) {
+    public double getRequiredPaymentAmount(final SThinDps dps) {
         double amount = 0;
         
         switch (RequiredPaymentDefinition) {
             case PAY_NOT_REQ:
                 break;
             case PAY_DEF_BY_AMT:
+            case PAY_DEF_BY_AMT_MAN:
                 amount = RequiredPaymentAmount;
                 break;
             case PAY_DEF_BY_PCT:
@@ -286,7 +269,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Ger required payment amount of document, directly defined or indirectly from required payment percentage.
      * @return 
      */
-    private double getRequiredPaymentAmount() {
+    public double getRequiredPaymentAmount() {
         return getRequiredPaymentAmount(null);
     }
     
@@ -607,16 +590,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de contado.");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
-                    (Math.abs(Total - dps.getTotalCy_r()) < 1 && session.getClient().showMsgBoxConfirm(
+                    (Math.abs(Total - dps.getTotalCy_r()) < 1d && session.getClient().showMsgBoxConfirm(
                             "Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION) ||
-                    (Math.abs(Total - dps.getTotalCy_r()) >= 1 && (Total > dps.getTotalCy_r()) || !allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
+                    (Math.abs(Total - dps.getTotalCy_r()) >= 1d && Total > dps.getTotalCy_r() && (!allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
                             "El total de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
-                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 /*
                 total does not match AND
-                (absolute difference is < $1 AND user doesn't accept) OR
-                (absolute difference is >= $1 AND (this total is > document's OR no greater invoices allowed OR user user doesn't accept))
+                (absolute difference is < $1.00 AND user doesn't accept) OR
+                (absolute difference is >= $1.00 AND this total is > document's AND (no greater invoices allowed OR user user doesn't accept))
                 */
                 throw new Exception(prefix + "El total de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
                         + "es distinto al de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
@@ -754,7 +737,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                 SDbPayment payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
 
-                if (createPaymentRequest && isPaymentRequestDataAvailable() && payment == null) {
+                if (createPaymentRequest && RequirePayment && isPaymentRequestDataAvailable() && payment == null) {
                     payment = createAndSavePaymentRequest(session, dps, false);
                 }
 
@@ -771,11 +754,29 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 swapDataProcessing.setDpsReferences(composeReferences());
                 swapDataProcessing.setDpsDescription(Description);
                 swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
+                swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
+                swapDataProcessing.setPaymentRequired(false);
+                swapDataProcessing.setPaymentApplicationCy(0);
+                swapDataProcessing.setPaymentDateRequired_n(null);
+                swapDataProcessing.setAccMethod(SDbSwapDataProcessing.ACC_METHOD_MANUAL);
+                swapDataProcessing.setAccUserUnits(0);
+                swapDataProcessing.setAccSystemUnits(0);
                 swapDataProcessing.setDeleted(false);
                 swapDataProcessing.setSystem(false);
                 swapDataProcessing.setFkDpsYearId_n(dps.getPkYearId());
                 swapDataProcessing.setFkDpsDocId_n(dps.getPkDocId());
                 swapDataProcessing.setFkPaymentId_n(payment == null ? 0 : payment.getPkPaymentId());
+                //swapDataProcessing.setFkPayCurrencyId_n(...);
+                //swapDataProcessing.setFkAccUserAccountId_n(...);
+                //swapDataProcessing.setFkAccUserCostCenterId_n(...);
+                //swapDataProcessing.setFkAccUserItemId_n(...);
+                //swapDataProcessing.setFkAccUserItemAuxId_n(...);
+                //swapDataProcessing.setFkAccUserUnitId_n(...);
+                //swapDataProcessing.setFkAccSystemAccountId_n(...);
+                //swapDataProcessing.setFkAccSystemCostCenterId_n(...);
+                //swapDataProcessing.setFkAccSystemItemId_n(...);
+                //swapDataProcessing.setFkAccSystemItemAuxId_n(...);
+                //swapDataProcessing.setFkAccSystemUnitId_n(...);
                 //swapDataProcessing.setFkUserInsertId(...);
                 //swapDataProcessing.setFkUserUpdateId(...);
                 //swapDataProcessing.setTsUserInsert(...);
@@ -796,7 +797,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 boolean attachPdf = dps.getThinPdf() == null;
                 
                 if (attachXml || attachPdf) {
-                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId);
+                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
                     
                     if (files != null && files.length == 2) {
                         if (attachXml && files[SImportUtils.CFDI_XML] != null) {
@@ -990,7 +991,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     public boolean changeRequiredPaymentDate(final SGuiSession session) throws Exception {
         boolean changed = false;
-        Date dateNew = null;
+        Date newDate = null;
         
         if (!isPaymentRequested()) {
             // payment request not yet created:
@@ -1003,33 +1004,33 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             validateRequiredPaymentDateChanging(); // thorws exception on validation failure
         }
 
-        dateNew = pickDate(session);
+        newDate = SDocumentUtils.pickDate(session, getRequiredPaymentDateEffective());
 
-        if (dateNew != null) {
-            dateNew = SLibTimeUtils.convertToDateOnly(dateNew);
+        if (newDate != null) {
+            newDate = SLibTimeUtils.convertToDateOnly(newDate);
             
-            String message = "La nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(dateNew) + ", no puede ser anterior ";
+            String message = "La nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(newDate) + ", no puede ser anterior ";
             
-            if (dateNew.before(SLibTimeUtils.convertToDateOnly(session.getSystemDate()))) {
+            if (newDate.before(SLibTimeUtils.convertToDateOnly(session.getSystemDate()))) {
                 throw new Exception(message + "al día de hoy, " + SLibUtils.DateFormatDate.format(session.getSystemDate()) + ".");
             }
-            else if (dateNew.before(SLibTimeUtils.convertToDateOnly(Date))) {
+            else if (newDate.before(SLibTimeUtils.convertToDateOnly(Date))) {
                 throw new Exception(message + "a la fecha del documento '" + getFolio() + "', " + SLibUtils.DateFormatDate.format(Date) + ".");
             }
             
             if (isPaymentRequested()) {
                 // make due date of document match the new required date:
-                SImportUtils.updateDpsDaysOfCreditByDueDate(session, ProcessedDps.getDpsKey(), dateNew);
+                SImportUtils.updateDpsDaysOfCreditByDueDate(session, ProcessedDps.getDpsKey(), newDate);
 
                 // update the new required date according to current status of payment:
                 
                 switch (Payment.getFkStatusPaymentId()) {
                     case SModSysConsts.FINS_ST_PAY_NEW:
-                        Payment.setDateRequired(dateNew);
+                        Payment.setDateRequired(newDate);
                         break;
                         
                     case SModSysConsts.FINS_ST_PAY_SCHED:
-                        Payment.setDateSchedule_n(dateNew);
+                        Payment.setDateSchedule_n(newDate);
                         Payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
                         Payment.setFkUserScheduleId(session.getUser().getPkUserId());
                         Payment.setTsUserSchedule(new Date());
@@ -1042,7 +1043,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 Payment.save(session);
             }
         
-            RequiredPaymentDateNew = SLibTimeUtils.isSameDate(RequiredPaymentDate, dateNew) ? null : dateNew;
+            RequiredPaymentDateNew = SLibTimeUtils.isSameDate(RequiredPaymentDate, newDate) ? null : newDate;
             
             changed = true;
         }
@@ -1206,6 +1207,33 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return dps;
     }
     
+    /**
+     * Get text of comparison of this document's total vs. total posted in accounting, if document is recorded.
+     * @return 
+     */
+    private String getTotalComparison() {
+        String string = "";
+        
+        if (isRecorded()) {
+            boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
+            boolean isCurrencyOk = CurrencyCode.equals(ProcessedDps.DpsCurrencyCode);
+
+            if (isTotalOk && isCurrencyOk) {
+                string = "OK";
+            }
+            else {
+                if (!isTotalOk) {
+                    string = "Dif. total: $" + SLibUtils.getDecimalFormatAmount().format(ProcessedDps.DpsTotalCy - Total);
+                }
+                if (!isCurrencyOk) {
+                    string = (string == null ? "" : string + "; ") + "Dif. moneda: " + ProcessedDps.DpsCurrencyCode;
+                }
+            }
+        }
+        
+        return string;
+    }
+    
     /*
      * Implemented and overriden inherited methods
      */
@@ -1248,8 +1276,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     @Override
     public void setRowValueAt(Object value, int col) {
         switch (col) {
-            case 7:
-                Download = (Boolean) value;
+            case COL_DOWNLOAD:
+                Download = (boolean) value;
                 break;
             default:
                 // nothing
@@ -1285,7 +1313,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             case 7:
                 value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
                 break;
-            case 8:
+            case COL_DOWNLOAD:
                 value = Download;
                 break;
             case 9:
@@ -1319,37 +1347,37 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = RevisionDatetime;
                 break;
             case 19:
-                value = getRequiredPaymentAmount();
+                value = RequirePayment;
                 break;
             case 20:
-                value = CurrencyCode;
+                value = getRequiredPaymentAmount();
                 break;
             case 21:
-                value = getRequiredPaymentPct();
+                value = CurrencyCode;
                 break;
             case 22:
-                value = RequiredPaymentDate;
+                value = getRequiredPaymentPct();
                 break;
             case 23:
-                value = RequiredPaymentDateNew;
+                value = RequiredPaymentDate;
                 break;
             case 24:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 25:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 26:
-                value = !isPaymentRequested() ? null : Payment.getFolio();
+                value = RequiredPaymentNotes;
                 break;
             case 27:
-                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                value = PayDefinitions.get(RequiredPaymentDefinition);
                 break;
             case 28:
-                value = ExternalDocumentId;
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 29:
-                value = ExternalDocumentUuid;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 30:
                 value = !isRecorded() ? null : ProcessedDps.DpsFolio;
@@ -1364,33 +1392,19 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
                 break;
             case 34:
-                String string = null;
-                if (isRecorded()) {
-                    boolean isTotalOk = SLibUtils.compareAmount(Total, ProcessedDps.DpsTotalCy);
-                    boolean isCurrencyOk = CurrencyCode.equals(ProcessedDps.DpsCurrencyCode);
-                    
-                    if (isTotalOk && isCurrencyOk) {
-                        string = "OK";
-                    }
-                    else {
-                        if (!isTotalOk) {
-                            string = "Dif. total: " + SLibUtils.getDecimalFormatAmount().format(ProcessedDps.DpsTotalCy - Total);
-                        }
-                        if (!isCurrencyOk) {
-                            string = (string == null ? "" : string + "; ") + "Dif. moneda: " + ProcessedDps.DpsCurrencyCode;
-                        }
-                    }
-                }
-                value = string;
+                value = !isRecorded() ? null : getTotalComparison();
                 break;
             case 35:
                 value = DueDate;
                 break;
             case 36:
-                value = PayDefinitions.get(RequiredPaymentDefinition);
+                value = AccountingTag;
                 break;
             case 37:
-                value = AccountingTag;
+                value = ExternalDocumentUuid;
+                break;
+            case 38:
+                value = ExternalDocumentId;
                 break;
             default:
                 // nothing

@@ -297,31 +297,31 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
 
         jPayment.add(jPanelN2, java.awt.BorderLayout.CENTER);
 
-        jPanelN3.setPreferredSize(new java.awt.Dimension(840, 33));
         jPanelN3.setLayout(new java.awt.GridLayout(1, 0));
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentBank.setText("Cuenta pagadora:");
+        jlPaymentBank.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel1.add(jlPaymentBank);
-        jlPaymentBank.getAccessibleContext().setAccessibleName("Cuenta pagadora:");
 
-        moKeyPaymentBank.setPreferredSize(new java.awt.Dimension(312, 23));
+        moKeyPaymentBank.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel1.add(moKeyPaymentBank);
 
         jPanelN3.add(jPanel1);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBeneffBank.setText("Cuenta beneficiaria:");
+        jlBeneffBank.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jlBeneffBank);
 
-        moKeyBeneffBank.setPreferredSize(new java.awt.Dimension(312, 23));
+        moKeyBeneffBank.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel2.add(moKeyBeneffBank);
 
         jPanelN3.add(jPanel2);
 
-        jPayment.add(jPanelN3, java.awt.BorderLayout.PAGE_END);
+        jPayment.add(jPanelN3, java.awt.BorderLayout.SOUTH);
 
         jMain.add(jPayment, java.awt.BorderLayout.PAGE_START);
 

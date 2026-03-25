@@ -76,9 +76,9 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Cesar Orozco
+ * @author Cesar Orozco, Sergio Flores
  */
-public class SDialogImportProforma extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
+public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
     protected static final int OFF = 0;
     protected static final int ON = 1;
@@ -115,7 +115,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
      * Creates new form SDialogImportDocuments
      * @param client GUI client.
      */
-    public SDialogImportProforma(SGuiClient client) {
+    public SDialogImportProformas(SGuiClient client) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Importación de proformas autorizadas");
         initComponents();
         initComponentsCustom();
@@ -418,7 +418,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
 
         jtfProforma.setEditable(false);
         jtfProforma.setText("ABC-000000");
-        jtfProforma.setToolTipText("Factura");
+        jtfProforma.setToolTipText("Proforma");
         jtfProforma.setFocusable(false);
         jtfProforma.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN2.add(jtfProforma);
@@ -932,7 +932,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
     }
     
     private void startProgress(final int docs) {
-        jlProgress.setText("Procesando " + (docs == 1 ? "1 factura" : docs + " proformas") + "...");
+        jlProgress.setText("Procesando " + (docs == 1 ? "1 proforma" : docs + " proformas") + "...");
         
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
@@ -1309,7 +1309,7 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
         
         if (documents.isEmpty()) {
-            miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga.");
+            miClient.showMsgBoxWarning("Se debe seleccionar al menos una proforma autorizada para realizar la descarga.");
         }
         else if (documents.size() > LIMIT_DOWNLOADS && miClient.showMsgBoxConfirm("Se recomienda descargar los archivos en bloques no mayores a " + LIMIT_DOWNLOADS + " proformas autorizadas.\n"
                 + "Sin embargo, puede intentar descargar las " + documents.size() + " proformas autorizadas seleccionadas.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
@@ -1317,38 +1317,41 @@ public class SDialogImportProforma extends SBeanFormDialog implements ActionList
         }
         else {
             try {
-                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SImportUtils.TYPE_PROFORMA);
-                File zipFile = files[SImportUtils.FILES_ZIP];
+                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SSwapConsts.TXN_DOC_TYPE_PROFORMA);
                 
-                for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
-                    if (((SImportedProforma) row).Download && !((SImportedProforma) row).AlreadyDownloaded) {
-                        int externalId = ((SImportedProforma) row).ExternalDocumentId;
-                        for (Integer document : documents) {
-                            if (externalId == document) {
-                                ((SImportedProforma) row).AlreadyDownloaded = true;
-                                break;
+                if (files != null) {
+                    File zipFile = files[SImportUtils.FILES_ZIP];
+
+                    for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
+                        if (((SImportedProforma) row).Download && !((SImportedProforma) row).AlreadyDownloaded) {
+                            int externalId = ((SImportedProforma) row).ExternalDocumentId;
+                            for (Integer document : documents) {
+                                if (externalId == document) {
+                                    ((SImportedProforma) row).AlreadyDownloaded = true;
+                                    break;
+                                }
                             }
                         }
                     }
+
+                    int index = moProformasGrid.getTable().getSelectedRow();
+                    moProformasGrid.renderGridRows();
+                    moProformasGrid.setSelectedGridRow(index);
+
+                    String zipPath = zipFile.getAbsolutePath();
+                    System.out.println("ZIP saved to: " + zipPath);
+
+                    String message;
+
+                    if (documents.size() == 1) {
+                        message = "La proforma autorizada seleccionada fue descargado en:\n";
+                    }
+                    else {
+                        message = "Las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " proformas autorizadas seleccionadas fueron descargadas en:\n";
+                    }
+
+                    miClient.showMsgBoxInformation(message + zipPath);
                 }
-
-                int index = moProformasGrid.getTable().getSelectedRow();
-                moProformasGrid.renderGridRows();
-                moProformasGrid.setSelectedGridRow(index);
-
-                String zipPath = zipFile.getAbsolutePath();
-                System.out.println("ZIP saved to: " + zipPath);
-                
-                String message;
-
-                if (documents.size() == 1) {
-                    message = "La factura autorizada seleccionada fue descargado en:\n";
-                }
-                else {
-                    message = "Las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " proformas autorizadas seleccionadas fueron descargadas en:\n";
-                }
-
-                miClient.showMsgBoxInformation(message + zipPath);
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);

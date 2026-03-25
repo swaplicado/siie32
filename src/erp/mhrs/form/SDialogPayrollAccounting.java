@@ -1624,7 +1624,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     
                     Employee employee = getEmployee(payrollAmount.EmployeeId);
                     
-                    if (msParamAccountingDynamicEmployeeMode.equals(SDataConstantsSys.CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP)) {
+                    if (msParamAccountingDynamicEmployeeMode.equals(SDataConstantsSys.CFGX_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP)) {
                         // Mode for concept for employee in dynamic accounting set to 'department':
                         
                         Department department = getDepartment(getEmployeeDepartmentId(payrollAmount.EmployeeId));

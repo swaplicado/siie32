@@ -10,6 +10,8 @@ import erp.client.SClientInterface;
 import erp.data.SDataUtilities;
 import java.util.Date;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiDatePicker;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -70,5 +72,27 @@ public abstract class SDocumentUtils {
         }
         
         return exchangeRate;
+    }
+    
+
+    /**
+     * Pick a date.
+     * @param session GUI session.
+     * @param currentDate Current date. Can be <code>null</code>.
+     * @return 
+     */
+    public static Date pickDate(final SGuiSession session, final Date currentDate) {
+        Date date = null;
+        
+        SGuiDatePicker picker = session.getClient().getDatePicker();
+        picker.resetPicker();
+        picker.setOption(currentDate);
+        picker.setPickerVisible(true);
+
+        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+            date = picker.getOption();
+        }
+        
+        return date;
     }
 }

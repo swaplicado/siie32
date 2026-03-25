@@ -1,5 +1,11 @@
 ================================================================================
-SIIE 3.2 297.1/ 2026-03-13
+SIIE 3.2 297.0-b9/ 2026-03-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al filtro de la consulta del diálogo seleccionador de pagos, para excluir pagos eliminados.
+
+================================================================================
+SIIE 3.2 297.0-b8/ 2026-03-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización y corrección de pagos desde forma de captura hasta layouts

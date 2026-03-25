@@ -60,24 +60,24 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SImportUtils {
     
-    private static final int MODE_DOCS_ALL_FILES_AS_ZIP = 1;
-    private static final int MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 2;
-    private static final int MODE_DOC_ALL_FILES_IN_TEMP_DIR = 3;
+    public static final int DOC_TYPE_INVOICE = 41;
+    public static final int DOC_TYPE_PROFORMA = 52;
     
-    private static final String DOWNLOAD_FILE_PREFIX = "facturas compras "; // keep final blank space!
-    private static final String DOWNLOAD_FILE_PROFORMA_PREFIX = "proformas ";
+    private static final String DOWNLOAD_FILE_INVOICE_PREFIX = "facturas compras "; // keep final blank space!
+    private static final String DOWNLOAD_FILE_PROFORMA_PREFIX = "proformas compras "; // keep final blank space!
     private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
     
     public static final int FILES_ZIP = 0;
     public static final int CFDI_XML = 0;
     public static final int CFDI_PDF = 1;
     
-    public static final int TYPE_INVOICE = 41;
-    public static final int TYPE_PROFORMA = 52;
-    
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
     public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
     public static final DecimalFormat FormatBizPartnerId = new DecimalFormat(SLibUtils.textRepeat("0", 6));
+    
+    private static final int DL_MODE_DOCS_ALL_FILES_AS_ZIP = 1;
+    private static final int DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR = 11;
+    private static final int DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 12;
     
     /**
      * Get file name without extension.
@@ -283,16 +283,27 @@ public abstract class SImportUtils {
     }
     
     /**
+     * Convert document into a new documents list.
+     * @param document External document ID whose XML & PDF files needs to be downloaded.
+     * @return 
+     */
+    public static ArrayList<Integer> convertIntoDocumentsList(final int document) {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(document);
+        return documents;
+    }
+    
+    /**
      * Download documents files.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
      * @param downloadMode Download mode.
      * @param documents List of external document IDs whose files needs to be downloaded.
-     * @param typeDocument type proforma or type document
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return 
      * @throws java.lang.Exception 
      */
-    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documents, final int typeDocument) throws Exception {
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documents, final int documentType) throws Exception {
         File[] files = null;
         File zipFile = null;
         Path tempDir = null;
@@ -348,7 +359,7 @@ public abstract class SImportUtils {
             String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
             
             switch (downloadMode) {
-                case MODE_DOCS_ALL_FILES_AS_ZIP:
+                case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
                     // ask for desired ZIP file:
                     
                     FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
@@ -356,11 +367,12 @@ public abstract class SImportUtils {
                     fileChooser.repaint();
                     fileChooser.setAcceptAllFileFilterUsed(false);
                     fileChooser.setFileFilter(filter);
-                    if (typeDocument == TYPE_PROFORMA) {
-                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_PROFORMA_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+                    
+                    if (documentType == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_INVOICE_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
                     }
-                    else if (typeDocument == TYPE_INVOICE) {
-                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+                    else if (documentType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_PROFORMA_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
                     }
 
                     if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -373,25 +385,22 @@ public abstract class SImportUtils {
                     }
                     break;
                     
-                case MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
+                case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
                     // set ZIP file in temporal directory:
+                    
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
                     System.out.println("Temporary directory created at: " + tempDir);
                     
-                    tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
+                    if (documentType == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+                        tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_INVOICE_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
+                    }
+                    else if (documentType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                        tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_PROFORMA_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
+                    }
+                    
                     zipFile = tempFile.toFile();
                     break;
-                    
-                case MODE_DOC_ALL_FILES_IN_TEMP_DIR:
-                    tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
-                    System.out.println("Temporary directory created at: " + tempDir);
-
-                    tempFile = Files.createFile(tempDir.resolve(
-                        (DOWNLOAD_FILE_PREFIX + FormatDatetime.format(new Date()))
-                        .replaceAll(" ", "_") + "." + SFileUtilities.zip));
-
-                    zipFile = tempFile.toFile();
-                    break;  
                     
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -417,20 +426,53 @@ public abstract class SImportUtils {
                 // finish processing:
 
                 switch (downloadMode) {
-                    case MODE_DOCS_ALL_FILES_AS_ZIP:
+                    case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
                         // log import downloads:
                         
                         System.out.println("Loging import downloads...");
                         
-                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documents, typeDocument);
+                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documents, documentType);
                         
                         files = new File[] { zipFile };
                         break;
 
-                    case MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                    case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
+                        // decompress to get aLL files:
+
+                        System.out.println("Extracting all files into temp directory...");
+
+                        ArrayList<File> extractedFiles = new ArrayList<>();
+
+                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                            ZipEntry entry;
+
+                            while ((entry = zis.getNextEntry()) != null) {
+
+                                File currentFile = new File(tempDir.toString(), entry.getName());
+                                currentFile.getParentFile().mkdirs();
+
+                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
+                                    int bytesRead;
+                                    byte[] buffer = new byte[8192];
+
+                                    while ((bytesRead = zis.read(buffer)) > 0) {
+                                        fos.write(buffer, 0, bytesRead);
+                                    }
+                                }
+
+                                extractedFiles.add(currentFile);
+
+                                zis.closeEntry();
+                            }
+                        }
+
+                        files = extractedFiles.toArray(new File[0]);
+                        break;    
+
+                    case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
                         // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
                         
-                        System.out.println("Extracting temporal files...");
+                        System.out.println("Extracting CFDI files into temp directory...");
                         
                         String xmlFileName = "";
                         File xmlFile = null;
@@ -488,38 +530,6 @@ public abstract class SImportUtils {
                         files = new File[] { xmlFile, pdfFile };
                         break;
                         
-                    case MODE_DOC_ALL_FILES_IN_TEMP_DIR:
-
-                        System.out.println("Extracting all files to temp directory...");
-
-                        ArrayList<File> extractedFiles = new ArrayList<>();
-
-                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
-                            ZipEntry entry;
-
-                            while ((entry = zis.getNextEntry()) != null) {
-
-                                File currentFile = new File(tempDir.toString(), entry.getName());
-                                currentFile.getParentFile().mkdirs();
-
-                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
-                                    int bytesRead;
-                                    byte[] buffer = new byte[8192];
-
-                                    while ((bytesRead = zis.read(buffer)) > 0) {
-                                        fos.write(buffer, 0, bytesRead);
-                                    }
-                                }
-
-                                extractedFiles.add(currentFile);
-
-                                zis.closeEntry();
-                            }
-                        }
-
-                        files = extractedFiles.toArray(new File[0]);
-                        break;    
-
                     default:
                         // nothing
                 }
@@ -538,7 +548,7 @@ public abstract class SImportUtils {
                 }
             }
             
-            if (downloadMode == MODE_DOCS_ALL_FILES_AS_ZIP) {
+            if (downloadMode == DL_MODE_DOCS_ALL_FILES_AS_ZIP) {
                 JFileChooser fileChooser = session.getClient().getFileChooser();
                 fileChooser.resetChoosableFileFilters();
                 fileChooser.setAcceptAllFileFilterUsed(true);
@@ -553,36 +563,46 @@ public abstract class SImportUtils {
     }
 
     /**
-     * Download documents all files as ZIP.
+     * Download documents' all files as ZIP.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
      * @param documents List of external document IDs whose files needs to be downloaded.
-     * @param typeDocument Type document(invoice, proforma).
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documents, final int typeDocument) throws Exception {
-        return downloadDocumentsFiles(session, serviceUrl, MODE_DOCS_ALL_FILES_AS_ZIP, documents, typeDocument);
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documents, final int documentType) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documents, documentType);
     }
 
+    /**
+     * Download document's all files into temporal directory.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param document External document ID whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document, final int documentType) throws Exception {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(document);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType);
+    }
+    
     /**
      * Download document XML & PDF files as ZIP.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
      * @param document External document ID whose XML & PDF files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 2 elements: the XML (at index 0) & PDF (at index 1) files.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document) throws Exception {
+    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
         documents.add(document);
-        return downloadDocumentsFiles(session, serviceUrl, MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, TYPE_INVOICE);
-    }
-    
-    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document, final int typeDocument) throws Exception {
-        ArrayList<Integer> documents = new ArrayList<>();
-        documents.add(document);
-        return downloadDocumentsFiles(session, serviceUrl, MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, typeDocument);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType);
     }
     
     /**
@@ -632,7 +652,7 @@ public abstract class SImportUtils {
      * @return Local temporal file.
      * @throws IOException 
      */
-    public static File createDocumentLocalTempFile(final int externalId, final int bizPartnerId,final String fileExtension) throws IOException {
+    private static File createDocumentLocalTempFile(final int externalId, final int bizPartnerId, final String fileExtension) throws IOException {
         File localTempDir = createDocumentsLocalTempDir(fileExtension);
         String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(externalId) + "." + fileExtension;
         
@@ -664,6 +684,7 @@ public abstract class SImportUtils {
      * @param externalId Document external ID.
      * @param fileExtension Extension of temporal file.
      * @param originalFile Document original file.
+     * @param bizPartnerId Business partner ID.
      * @return Just created document file from temporal directory.
      * @throws IOException 
      */
@@ -743,11 +764,11 @@ public abstract class SImportUtils {
         SDbComImportLog log = new SDbComImportLog();
         
         //log.setPkSyncLogId(...);
-        if (typeDocument == TYPE_PROFORMA){
-            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
-        }
-        else if (typeDocument == TYPE_INVOICE){
+        if (typeDocument == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
             log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+        }
+        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
         }
         //log.msRequestBodyFileName...
         log.setRequestTimestamp(requestDatetime);
