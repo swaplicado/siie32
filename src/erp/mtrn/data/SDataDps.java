@@ -6017,6 +6017,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     /**
+     * Create addenda for Hortifrut.
+     * @return Addenda.
+     * @throws java.lang.Exception
+     */
+    private cfd.ext.hortifrut.DElementAddendaClienteAdicional computeAddendaHortifrut() throws java.lang.Exception {
+        cfd.ext.hortifrut.DElementAddendaClienteAdicional addendaClienteAdicional = new cfd.ext.hortifrut.DElementAddendaClienteAdicional();
+        
+        addendaClienteAdicional.getEltOrdenCompra().setValue(moAuxCfdParams.getSorianaPedidoFolio());
+
+        return addendaClienteAdicional;
+    }
+
+    /**
      * Create CFDI addenda for AMECE 7.1 (e.g., Comercial City Fresko, S de RL de CV, (CCF), a.k.a., "La Comer").
      * <strong>WARNING:</strong> This method has a vulnerability: if multiple tax rates are present in document, there is no way to handle it.
      * It is assumed that all document entries have the same tax reate, if any, allways.
@@ -7050,11 +7063,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         // Create custom addendas when needed:
 
         try {
-            if (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
+            int addendaType = moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId();
+            if (addendaType != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
                 addenda = new cfd.ver4.DElementAddenda();
 
                 if (isDocumentSal() || isAdjustmentSal()) {
-                    switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
+                    switch (addendaType) {
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
@@ -7070,6 +7084,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
+                        case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaHortifrut());
+                            break;
+                        /* XXX 2026-03-25 (Sergio Flores): Not supported yet!
+                        case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaWaldos());
+                            break;
+                        */
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdPrcCfdIvaPorcentaje));
                             break;

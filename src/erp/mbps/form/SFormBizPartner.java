@@ -523,6 +523,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         jlBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel32.add(jlBizPartner);
 
+        jtfBizPartner.setToolTipText("Denominación o razón social completos, con régimen de capital");
         jtfBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel32.add(jtfBizPartner);
 

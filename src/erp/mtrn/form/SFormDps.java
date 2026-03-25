@@ -4839,6 +4839,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     // this addenda does not have any field as header
                     break;
                     
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                    // this addenda does not have any field in this tab
+                    break;
+                    
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
                     jlAddSorianaPedidoFolio.setEnabled(enableFields);
                     jtfAddSorianaPedidoFolio.setEnabled(enableFields);
@@ -4866,6 +4870,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     break;
                     
                 default:
+                    // nothing
             }
         }
     }
@@ -5049,8 +5054,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 // this addenda does not have any field as header
                 break;
             
+            case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                // this addenda does not have any field in this tab
+                break;
+
             case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
-                // this addenda does not have any field as header
+                String pedidoFolio = "";
+                
+                if (moDps.getDbmsDataAddenda() != null) {
+                    pedidoFolio = moDps.getDbmsDataAddenda().getSorianaPedidoFolio();
+                }
+                
+                moFieldAddSorianaPedidoFolio.setFieldValue(pedidoFolio);
+                
+                jlAddSorianaPedidoFolio.setEnabled(true);
                 break;
                     
             case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
@@ -5128,6 +5145,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
             case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
             case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
+            case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+            case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
                 break;
                 
             case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
@@ -6351,6 +6370,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
@@ -7444,7 +7465,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         params.setSorianaEntregaMercancía(moFieldAddSorianaEntregaMercancía.getInteger());
         params.setSorianaRemisiónFecha(moFieldAddSorianaRemisiónFecha.getDate());
         params.setSorianaRemisiónFolio(moFieldAddSorianaRemisiónFolio.getString());
-        params.setSorianaPedidoFolio(moFieldAddSorianaPedidoFolio.getString());
+        params.setSorianaPedidoFolio(moBizPartnerCategory.getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT ? moFieldNumberReference.getString() : moFieldAddSorianaPedidoFolio.getString());
         params.setSorianaBultoTipo(moFieldAddSorianaBultoTipo.getInteger());
         params.setSorianaBultoCantidad(moFieldAddSorianaBultoCantidad.getDouble());
         params.setSorianaNotaEntradaFolio(!jtfAddSorianaNotaEntradaFolio.isEnabled() ? "" : moFieldAddSorianaNotaEntradaFolio.getString());
@@ -11152,6 +11173,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
+                    
                     if (!validation.getIsError() && isCfdIntCommerceRequired()) {
                         if (moFieldCfdiCfdiUsage.getFieldValue().toString().compareTo(DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales) != 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiCfdiUsage.getText() + "': <" + DCfdi40Catalogs.ClaveUsoCfdiSinEfectosFiscales + ">.");
@@ -12855,6 +12877,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                         }
                                         break;
 
+                                    case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                                        if (moFieldNumberReference.getString().length() != cfd.ext.hortifrut.DElementOrdenCompra.LEN) {
+                                            validation.setMessage("La longitud del campo '" + jtfNumberReference.getToolTipText() + "' debe ser " + cfd.ext.hortifrut.DElementOrdenCompra.LEN + ".\n"
+                                                    + "(Este dato será usado como número de orden de compra en la addenda Hortifrut.)");
+                                            validation.setComponent(jtfNumberReference);
+                                        }
+                                        break;
+                                        
                                     case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
                                     case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
                                     case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
@@ -13012,6 +13042,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     
                                     for (STableRow row : moPaneGridCustomAcc.getGridRows()) {
                                         SDataDpsCustomAccEntry dpsCustomAccEntry = (SDataDpsCustomAccEntry) row.getData();
+                                        // XXX 2026-03-25 (Sergio Flores): This functionality is imcomplete!!!
                                     }
                                 }
                                 
@@ -13048,7 +13079,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                     }
-                    
                     /*
                      * IMPORTANT!: THIS IS THE VERY LAST BLOCK OF VALIDATIONS IN THIS SECTION!!!
                      */
@@ -13060,7 +13090,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             validation = validateCfdi40();
                         }
                     }
-                    // WARNING!: PLEASE DO NOT ADD ANY CODE AROUND THIS LINE!!!
+                    // WARNING!: DO NOT ADD ANY CODE AROUND THIS LINE!!!
                     if (!validation.getIsError()) {
                         // credit status of business partner:
 
@@ -13080,11 +13110,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                             if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK || response.getResultType() != SLibConstants.DB_CAN_SAVE_YES) {
                                 validation.setMessage(response.getMessage().isEmpty() ? SLibConstants.MSG_ERR_UTIL_UNKNOWN_ERR : response.getMessage());
-                            } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                        } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                    } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                            } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                        } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                    } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
                 /*
                  * WARNING!: This last validation is the only one allowed to be at the end of this method!!!
                  */
@@ -13092,13 +13122,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     if (jckIsDeleted.isSelected()) {
                         if (miClient.showMsgBoxConfirm("El documento está eliminado. Puede guardarlo de nuevo como eliminado o reactivarlo.\n¿Desea reactivar el documento?") == JOptionPane.YES_OPTION) {
                             jckIsDeleted.setSelected(false);
-                        } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                    } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-                } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-            } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-        } // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-        // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
-        return validation; // WARNING!: PLEASE DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                        } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                    } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+                } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+            } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+        } // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+        // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
+        return validation; // WARNING!: DO NOT ADD ANY CODE AFTER THIS LINE!!!
     }
        
     @Override
@@ -13196,13 +13226,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moImportedDocument = moDps.getXtaImportedDocument();
         jbViewImportedDocument.setEnabled(moImportedDocument != null);
         
-        // set business partner, set aswell business partner default preferences when document is new:
-
-        if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
-            setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
-        }
-        else if (moBizPartner != null) {
-            setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
+        if (moDps.getIsRegistryNew()) {
+            // set business partner, set aswell business partner default preferences when document is new:
+            
+            if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
+                setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+            }
+            else if (moBizPartner != null) {
+                setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
+            }
         }
         
         // check if payment way should be taken from document:
@@ -13841,11 +13873,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moDps.setFkAddresseeBizPartnerBranchAddressId_n(jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray()[1]);
                     
                 }
-                /* Validar si este bloque ya se puede descartar. Sergio Flores 2025-01-10.
-                else {
-                    moDps.setDbmsDataDpsCfd(dpsCfd);
-                }
-                */
                 
                 if ((!(mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) && !mbIsDpsInvoice)) {
                     dpsCfd.setExportation(DCfdi40Catalogs.ClaveExportacionNoAplica);
@@ -13891,10 +13918,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                     moDps.setDbmsDataCfd(cfd);
                     
-                    if (((moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
-                            && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
-                            || (moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
-                            && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))
+                    if (((moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
+                            || (moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0] && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))
                             && moComprobante40 != null) {
                         if (moDps.getDbmsDataDpsCfd() == null) {
                             SDataDpsCfd oDpsCfdAux = new SDataDpsCfd();

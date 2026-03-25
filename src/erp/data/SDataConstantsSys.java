@@ -582,6 +582,7 @@ public abstract class SDataConstantsSys {
     public static final int BPSS_TP_CFD_ADD_ELEKTRA = 6;
     public static final int BPSS_TP_CFD_ADD_WALDOS = 7;
     public static final int BPSS_TP_CFD_ADD_AMECE71 = 11;
+    public static final int BPSS_TP_CFD_ADD_HORTIFRUT = 21;
     
     public static final int BPSS_BPB_BANK_ACC_TEL = 10;
     public static final int BPSS_BPB_BANK_ACC_NUM = 11;
