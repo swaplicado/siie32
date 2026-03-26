@@ -50,6 +50,7 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private int[] manDataFilter;
     private String msFunctionalAreasIds;
 
@@ -256,11 +257,14 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
         
         String areasFilter = "";
         if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
+            if (mnSubFunctionalAreaId != SLibConstants.UNDEFINED) {
+                areasFilter = " AND d.fid_func_sub = " + mnSubFunctionalAreaId + " ";
+            }
+            else if (!msFunctionalAreasIds.isEmpty()) {
+                areasFilter = " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
             }
             else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                areasFilter = "";
             }
         }
 
@@ -340,12 +344,13 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);
@@ -390,6 +395,11 @@ public class SDialogRepDpsMoves extends javax.swing.JDialog implements erp.lib.f
 
         moFieldDateInitial.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
+        
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        renderFunctionalArea();
     }
 
     @Override

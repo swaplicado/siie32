@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class STrnFunctionalAreaUtils {
     
@@ -197,6 +197,56 @@ public class STrnFunctionalAreaUtils {
             }
         }
         
+        return new String[] { ids, codes };
+    }
+    
+    public static String[] getTextFilterOfFunctionalAreas(final SClientInterface client, int currentFunctionalAreaId, int currentSubFunctionalAreaId) {
+        String ids = "";
+        String codes = "";
+
+        if (!client.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
+            ids = "";
+            codes = "(ND)";
+        }
+        else if (currentFunctionalAreaId != SLibConstants.UNDEFINED && currentFunctionalAreaId != 0) {
+
+            String areaCode = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC, new int[] { currentFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE);
+
+            if (currentSubFunctionalAreaId != SLibConstants.UNDEFINED && currentSubFunctionalAreaId != 0) {
+                String subAreaCode = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC_SUB, new int[] { currentSubFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE);
+                ids = "" + currentFunctionalAreaId;
+                codes = areaCode + " / " + subAreaCode;
+            }
+            else {
+                ids = "" + currentFunctionalAreaId;
+                codes = areaCode;
+            }
+        }
+        else {
+            ArrayList<int[]> idsList = getUserFunctionalSubAreaIds(client);
+            if (idsList.isEmpty()) {
+                ids = "0";
+                codes = "(NINGUNA)";
+            }
+            else {
+                String areaCode = "";
+                String subCode = "";
+
+                for (int[] pair : idsList) {
+                    areaCode = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC, new int[] { pair[0] }, SLibConstants.DESCRIPTION_CODE);
+                    subCode = SDataReadDescriptions.getCatalogueDescription(client, SModConsts.CFGU_FUNC_SUB, new int[] { pair[1] }, SLibConstants.DESCRIPTION_CODE);
+
+                    if (!codes.isEmpty()) {
+                        codes += ", ";
+                        ids += ", ";
+                    }
+
+                    codes += areaCode + "/" + subCode;
+                    ids += pair[0];
+                }
+            }
+        }
+
         return new String[] { ids, codes };
     }
 }

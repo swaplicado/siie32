@@ -1051,7 +1051,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "urs.usr AS _usr_resched, "
                 + "ue.usr AS _usr_exec, "
                 + "(" + sqlOrders + ") AS _orders, "
-                + "COALESCE(nat.dps_nat, 'S/DOC') AS nat "
+                + "COALESCE(nat.code, 'S/DOC') AS nat "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS ve ON "
                 + "v.id_pay = ve.id_pay "
@@ -1082,8 +1082,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
-                + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() 
-                    ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
+                + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
                 + ", b.bp ";
     }
 

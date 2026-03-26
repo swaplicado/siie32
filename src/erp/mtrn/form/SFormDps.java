@@ -10515,10 +10515,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             renderDateMaturity();
         }
 
+        
+        
         mbUpdatingForm = false;
     }
 
     private void itemStateChangedFkCurrencyId(boolean calculateTotal) {
+        if (mbUpdatingForm || mbResetingForm) {
+            return;
+        }
         if (jcbFkCurrencyId.getSelectedIndex() <= 0 || isLocalCurrency()) {
             // Document in local currency:
 
@@ -13154,6 +13159,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
+        mbUpdatingForm = true; // 🔒 AGREGAR ESTA LÍNEA  
 
         moDps = (SDataDps) registry;
         mbNewRegistryAlreadySet = moDps.getIsRegistryNew() && moDps.getXtaImportedDocument() != null;

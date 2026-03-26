@@ -19,7 +19,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public abstract class SDataReadComponentItems {
 
@@ -220,21 +220,27 @@ public abstract class SDataReadComponentItems {
                 text = "área funcional";
                 break;
             case SModConsts.CFGU_FUNC_SUB:
-                /* Use of Object pk:
-                 * pk[0] = Filter: Array integer; user ID. It's optional, if is null inner join statement is unnecesary.
-                 */
                 lenPk = 1;
                 lenFk = 1;
-                sql = "SELECT fs.id_func_sub AS f_id_1, CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS f_item, fk_func AS f_fid_1 "
+
+                sql = "SELECT fs.id_func_sub AS f_id_1, "
+                        + "CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS f_item, "
+                        + "fk_func AS f_fid_1 "
                         + "FROM cfgu_func_sub AS fs "
-                        + "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func ";
-                if (pk != null) {
-                    sql += "INNER JOIN usr_usr_func_sub AS ufs ON "
-                            + "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + ((int[]) pk)[0] + " ";
+                        + "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func "
+                        + "INNER JOIN usr_usr_func_sub AS ufs ON "
+                        + "ufs.id_func_sub = fs.id_func_sub ";
+
+                if (pk != null && ((int[]) pk).length > 0) {
+                    sql += "AND ufs.id_usr = " + ((int[]) pk)[0] + " ";
                 }
+                else {
+                    sql += "AND 1 = 0 ";
+                }
+
                 sql += "WHERE NOT fs.b_del AND NOT f.b_del ";
                 sql += "ORDER BY f_item, f_id_1 ";
-                
+
                 text = "subárea funcional";
                 break;
             default:

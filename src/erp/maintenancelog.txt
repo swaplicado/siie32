@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 297.1/ 2026-03-26
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE.
+2) Adecuación de textos en las vistas de solicitudes de pagos con la naturaleza de documento.
+
+================================================================================
 SIIE 3.2 297.0-b18/ 2026-03-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

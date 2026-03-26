@@ -1299,7 +1299,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = CurrencyCode;
                 break;
             case 7:
-                value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
+//                value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
                 break;
             case COL_DOWNLOAD:
                 value = Download;

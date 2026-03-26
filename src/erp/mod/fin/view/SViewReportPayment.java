@@ -240,7 +240,7 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "END AS conceptoPrincipal, "
             + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
             + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
-            + "COALESCE(MAX(nat.dps_nat), 'S/DOC') AS nat "
+            + "COALESCE(MAX(nat.code), 'S/DOC') AS nat "
             + "FROM fin_pay AS v "
             + "INNER JOIN ( "
             + "SELECT id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n, "

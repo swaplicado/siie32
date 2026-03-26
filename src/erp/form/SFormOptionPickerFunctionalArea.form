@@ -33,7 +33,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Filtro de &#xe1;reas funcionales:"/>
+            <TitledBorder title="Filtro de &#xe1;reas funcionales y sub&#xe1;reas funcionales:"/>
           </Border>
         </Property>
       </Properties>
@@ -60,7 +60,7 @@
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="jckAllFunctionalAreas">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Todas las &#xe1;reas funcionales asignadas"/>
+                <Property name="text" type="java.lang.String" value="Todas las &#xe1;reas funcionales y sub&#xe1;reas funcionales asignadas"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[300, 23]"/>
                 </Property>
@@ -101,6 +101,52 @@
                   </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="jbFunctionalArea">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="..."/>
+                    <Property name="toolTipText" type="java.lang.String" value="Seleccionar..."/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[23, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel3">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlSubFunctionalArea">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Sub&#xe1;rea funcional:"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="jcbSubFunctionalArea">
+                  <Properties>
+                    <Property name="maximumRowCount" type="int" value="12"/>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                      <StringArray count="4">
+                        <StringItem index="0" value="Item 1"/>
+                        <StringItem index="1" value="Item 2"/>
+                        <StringItem index="2" value="Item 3"/>
+                        <StringItem index="3" value="Item 4"/>
+                      </StringArray>
+                    </Property>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[350, 23]"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jcbSubFunctionalAreaKeyPressed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="jbSubFunctionalArea">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="..."/>
                     <Property name="toolTipText" type="java.lang.String" value="Seleccionar..."/>

@@ -28,7 +28,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public abstract class SDataReadTableRows {
 
@@ -117,31 +117,44 @@ public abstract class SDataReadTableRows {
                 sSql += "ORDER BY f.name, f.code, f.id_func ";
                 
                 break;
-
+                
             case SModConsts.CFGU_FUNC_SUB:
-                aoPkFields = new STableField[1];
-                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "fs.id_func_sub");
+             aoPkFields = new STableField[1];
+             aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "fs.id_func_sub");
 
-                i = 0;
-                aoQueryFields = new STableField[4];
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_code");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_name");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_sub_name");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_sub_code");
-                
-                sSql = "SELECT fs.id_func, fs.name AS _func_sub_name, fs.code AS _func_sub_code, "
-                        + "f.id_func, f.name AS _func_name, f.code AS _func_code "
-                        + "FROM cfgu_func_sub AS fs "
-                        + "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func ";
-                if (filterKey != null) {
-                    sSql += "INNER JOIN usr_usr_func_sub AS ufs ON "
-                            + "ufs.id_func_sub = fs.id_func_sub AND ufs.id_usr = " + ((int[]) filterKey)[0] + " ";
-                }
-                sSql += "WHERE NOT fs.b_del AND NOT f.b_del ";
-                sSql += "ORDER BY f.code, f.name, f.id_func, fs.name, fs.code, fs.id_func_sub ";
-                
-                break;
+             i = 0;
+             aoQueryFields = new STableField[4];
+             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_code");
+             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_name");
+             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_sub_name");
+             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_func_sub_code");
 
+             sSql = "SELECT fs.id_func_sub, fs.name AS _func_sub_name, fs.code AS _func_sub_code, "
+                     + "f.id_func, f.name AS _func_name, f.code AS _func_code "
+                     + "FROM cfgu_func_sub AS fs "
+                     + "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func "
+                     + "INNER JOIN usr_usr_func_sub AS ufs ON ufs.id_func_sub = fs.id_func_sub "
+                     + "WHERE NOT fs.b_del AND NOT f.b_del ";
+
+             if (filterKey != null) {
+
+                 int[] key = (int[]) filterKey;
+
+                 int userId = key[key.length - 1];
+                 sSql += "AND ufs.id_usr = " + userId + " ";
+
+                 if (key.length == 2) {
+                     int areaId = key[0];
+                     if (areaId != 0) {
+                         sSql += "AND fs.fk_func = " + areaId + " ";
+                     }
+                 }
+             }
+
+             sSql += "ORDER BY f.code, f.name, fs.name, fs.code, fs.id_func_sub ";
+
+    break;
+                    
             case SDataConstants.CFGU_LAN:
                 aoPkFields = new STableField[1];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_lan");
