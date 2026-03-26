@@ -8,6 +8,7 @@ package erp.mod.cfg.swap.form;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.account.Case;
 import erp.mod.cfg.swap.account.Config;
 import erp.mod.cfg.swap.account.Group;
@@ -479,7 +480,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 value = ImportedDocument.RequiredPaymentNotes;
                 break;
             case 26:
-                value = SImportedDocument.PayDefinitions.get(ImportedDocument.RequiredPaymentDefinition);
+                value = SSwapConsts.PayDefinitions.get(ImportedDocument.RequiredPaymentDefinition);
                 break;
             case 27:
                 value = ImportedDocument.DueDate;

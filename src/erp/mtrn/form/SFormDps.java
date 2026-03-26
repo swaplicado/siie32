@@ -13226,15 +13226,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moImportedDocument = moDps.getXtaImportedDocument();
         jbViewImportedDocument.setEnabled(moImportedDocument != null);
         
-        if (moDps.getIsRegistryNew()) {
-            // set business partner, set aswell business partner default preferences when document is new:
-            
-            if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
-                setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
-            }
-            else if (moBizPartner != null) {
-                setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
-            }
+        // set business partner, set aswell business partner default preferences when document is new:
+
+        if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
+            setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
+        }
+        else if (moBizPartner != null) {
+            setBizPartner((int[]) moBizPartner.getPrimaryKey(), (int[]) moBizPartnerBranch.getPrimaryKey(), (int[]) moBizPartnerBranchAddress.getPrimaryKey());
         }
         
         // check if payment way should be taken from document:

@@ -64,11 +64,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final int DOC_CASE_RAW_MAT_FREIGHT = 2;
     public static final int DOC_CASE_RAW_MAT_PURCHASE = 3;
     
-    public static final int PAY_NOT_REQ = 0; // pago no requerido
-    public static final int PAY_DEF_BY_AMT = 11; // pago definido por monto
-    public static final int PAY_DEF_BY_AMT_MAN = 12; // pago definido por monto (manual)
-    public static final int PAY_DEF_BY_PCT = 21; // pago definido por porcentaje
-    
     public static final int MATCH_PAY_TP_OMIT = 0; // coincidencia de tipo de pago: omitir
     public static final int MATCH_PAY_TP_REQUIRED = 1; // coincidencia de tipo de pago: requerida
     public static final int MATCH_PAY_TP_CONFIRM_ON_FAIL = 2; // coincidencia de tipo de pago: confirmar cuando no corresponda
@@ -77,8 +72,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final HashMap<Integer, String> DocTypes = new HashMap<>();
     /** Document cases. */
     public static final HashMap<Integer, String> DocCases = new HashMap<>();
-    /** Payment definition options. */
-    public static final HashMap<Integer, String> PayDefinitions = new HashMap<>();
     
     private static final int COL_DOWNLOAD = 8;
     
@@ -91,11 +84,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         DocCases.put(DOC_CASE_STANDARD, "Estándar");
         DocCases.put(DOC_CASE_RAW_MAT_FREIGHT, "Fletes MP");
         DocCases.put(DOC_CASE_RAW_MAT_PURCHASE, "Compras MP");
-        
-        PayDefinitions.put(PAY_NOT_REQ, "No requerido");
-        PayDefinitions.put(PAY_DEF_BY_AMT, "Por monto ($)");
-        PayDefinitions.put(PAY_DEF_BY_AMT_MAN, "Por monto manual ($)");
-        PayDefinitions.put(PAY_DEF_BY_PCT, "Por porcentaje (%)");
     }
     
     // Exception messages:
@@ -180,7 +168,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         CurrencyId = 0;
         CurrencyCode = "";
         RequirePayment = false;
-        RequiredPaymentDefinition = PAY_NOT_REQ;
+        RequiredPaymentDefinition = SSwapConsts.PAY_NOT_REQ;
         RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
         RequiredPaymentDate = null;
@@ -249,13 +237,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         double amount = 0;
         
         switch (RequiredPaymentDefinition) {
-            case PAY_NOT_REQ:
+            case SSwapConsts.PAY_NOT_REQ:
                 break;
-            case PAY_DEF_BY_AMT:
-            case PAY_DEF_BY_AMT_MAN:
+            case SSwapConsts.PAY_DEF_BY_AMT:
+            case SSwapConsts.PAY_DEF_BY_AMT_MAN:
                 amount = RequiredPaymentAmount;
                 break;
-            case PAY_DEF_BY_PCT:
+            case SSwapConsts.PAY_DEF_BY_PCT:
                 amount = getTotalEffective(dps) * getRequiredPaymentPct();
                 break;
             default:
@@ -410,7 +398,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
         SDbPayment payment = null;
         
-        if (RequiredPaymentDefinition == PAY_NOT_REQ) {
+        if (RequiredPaymentDefinition == SSwapConsts.PAY_NOT_REQ) {
             throw new Exception("Este documento carece de la indicación de requerir un pago.");
         }
         else if (validateIsProcessed && !isRecorded()) {
@@ -1371,7 +1359,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = RequiredPaymentNotes;
                 break;
             case 27:
-                value = PayDefinitions.get(RequiredPaymentDefinition);
+                value = SSwapConsts.PayDefinitions.get(RequiredPaymentDefinition);
                 break;
             case 28:
                 value = !isPaymentRequested() ? null : Payment.getFolio();
@@ -1586,7 +1574,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Total = resultSet.getDouble("d.tot_cur_r");
                 importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
                 importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
-                importedDocument.RequiredPaymentDefinition = PAY_NOT_REQ;
+                importedDocument.RequiredPaymentDefinition = SSwapConsts.PAY_NOT_REQ;
                 importedDocument.RequiredPaymentAmount = 0;
                 importedDocument.RequiredPaymentPct = 0;
                 importedDocument.RequiredPaymentDate = null;

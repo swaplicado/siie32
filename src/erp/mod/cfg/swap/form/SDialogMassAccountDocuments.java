@@ -1502,7 +1502,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                         }
                         
                         if (document.ImportedDocument.getRequiredPaymentDateEffective() != null) {
-                            document.ImportedDocument.RequiredPaymentDefinition = SImportedDocument.PAY_DEF_BY_AMT_MAN;
+                            document.ImportedDocument.RequiredPaymentDefinition = SSwapConsts.PAY_DEF_BY_AMT_MAN;
                             document.ImportedDocument.RequiredPaymentAmount = moDecReqPayAmount.getValue();
 
                             int index = moDocumentsGrid.getTable().getSelectedRow();

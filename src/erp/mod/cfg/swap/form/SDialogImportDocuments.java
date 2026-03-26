@@ -1414,7 +1414,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
                                     document.CurrencyCode = currencyNode.get("code").asText();
 
-                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SImportedDocument.PAY_NOT_REQ;
+                                    int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SSwapConsts.PAY_NOT_REQ;
                                     double requiredPaymentAmount = docNode.has("payment_amount") ? SLibUtils.parseDouble(docNode.get("payment_amount").asText()) : 0d;
                                     double requiredPaymentPct = SLibUtils.parseDouble(docNode.get("payment_percentage").asText());
                                     String requiredPaymentDateAsText = docNode.has("payment_date") && !docNode.path("payment_date").isNull() ? docNode.get("payment_date").asText() : "";
@@ -1422,7 +1422,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     if (requiredPaymentDate == null && requiredPaymentPct == 0) {
                                         document.RequirePayment = false;
-                                        document.RequiredPaymentDefinition = SImportedDocument.PAY_NOT_REQ;
+                                        document.RequiredPaymentDefinition = SSwapConsts.PAY_NOT_REQ;
                                         document.RequiredPaymentAmount = 0;
                                         document.RequiredPaymentPct = 0;
                                         document.RequiredPaymentDate = null;
@@ -1431,7 +1431,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     }
                                     else {
                                         document.RequirePayment = true;
-                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SImportedDocument.PAY_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SImportedDocument.PAY_DEF_BY_PCT : SImportedDocument.PAY_DEF_BY_AMT);
+                                        document.RequiredPaymentDefinition = requiredPaymentDefinition != SSwapConsts.PAY_NOT_REQ ? requiredPaymentDefinition : (requiredPaymentPct > 0 ? SSwapConsts.PAY_DEF_BY_PCT : SSwapConsts.PAY_DEF_BY_AMT);
                                         document.RequiredPaymentAmount = requiredPaymentAmount;
                                         document.RequiredPaymentPct = requiredPaymentPct;
                                         document.RequiredPaymentDate = requiredPaymentDate;
