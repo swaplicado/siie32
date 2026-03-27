@@ -122,11 +122,12 @@ import erp.mod.trn.view.SViewMaterialCostCenterGroup;
 import erp.mod.trn.view.SViewMaterialProvisionEntity;
 import erp.mod.trn.view.SViewMaterialRequesPendingSupply;
 import erp.mod.trn.view.SViewMaterialRequest;
-import erp.mod.trn.view.SViewMaterialRequestPendingOrders;
 import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
+import erp.mod.trn.view.SViewMaterialRequestPendingOrders;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
+import erp.mod.trn.view.SViewPurchasingProcess;
 import erp.mod.trn.view.SViewReportBudgetSummary;
 import erp.mod.trn.view.SViewReportMaterialConsuption;
 import erp.mod.trn.view.SViewReportMaterialConsuptionCC;
@@ -721,6 +722,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_MAT_REQ_ACC:
                 title = "Todas las requisiciones (reclasificación ctb.)";
                 view = new SViewMaterialRequest(miClient, subtype, title, params);
+                break;
+            case SModConsts.TRNX_MAT_REQ_PUR_PROC:
+                title = "Seguimiento proceso compras";
+                view = new SViewPurchasingProcess(miClient, subtype, title, params);
                 break;
             case SModConsts.TRN_STK_VAL:
                 title = "Valuación consumos materiales";
