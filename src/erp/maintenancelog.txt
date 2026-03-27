@@ -1,5 +1,16 @@
 ================================================================================
-SIIE 3.2 297.1/ 2026-03-26
+SIIE 3.2 297.0/ 2026-03-27
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de la descripción extendida de ítems.
+2) Visualización de la descripción extendida de ítems en la captura de requisiciones.
+3) Implementación de vista de requisiciones que requieren atención por Compras.
+4) Implementación de funcionalidad para cerrar y reabrir la posibilidad de solicitar cotizaciones de requisiciones.
+5) Corrección a la perdida del dato de la línea de ítems en el guardado de ítems en su forma de captura.
+6) Mejora a la experiencia del usuario en la forma de captura de requisiciones.
+
+================================================================================
+SIIE 3.2 297.0-b19/ 2026-03-26
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE.
