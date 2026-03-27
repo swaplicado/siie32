@@ -34,7 +34,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SPickerPayments extends SBeanFormDialog implements ActionListener {
     
@@ -49,8 +49,8 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
     private JButton jbResearch;
     private JLabel jlText;
     
-    private int mnCurPayment;
-    private int mnCurDoc;
+    private int mnCurrrencyLayout;
+    private int mnCurPaymentDoc;
     private int mnBankPaymentTypeId;
     private int mnBizPartnerBankId;
     private Date mtDueDate;
@@ -139,6 +139,9 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha programada pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Documento pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto del pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda del pago"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "Tipo de cambio"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto a pagar $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
                 SGridColumnForm col = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado");
@@ -160,8 +163,8 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
         jpGrid.add(moGridPayments);
         mvFormGrids.add(moGridPayments);
         
-        mnCurPayment = 1;
-        mnCurDoc = 1;
+        mnCurrrencyLayout = 1;
+        mnCurPaymentDoc = 1;
         mnBankPaymentTypeId = 0;
         mnBizPartnerBankId = 0;
         mtDueDate = new Date();
@@ -187,6 +190,9 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) AS folio_d, " +
                     "pe.des_pay_app_ety_cur, " +
                     "c.cur_key, " +
+                    "p.pay_app_cur, " +
+                    "cp.cur_key, " +
+                    "p.pay_exc_rate_app, " +
                     "b_rcpt_pay_req, " +
                     "p.fk_func, p.fk_func_sub, " +
                     "p.fk_ben, " +
@@ -201,10 +207,12 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     "INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                     "INNER JOIN erp.bpsu_bp AS b ON p.fk_ben = b.id_bp " +
                     "INNER JOIN erp.cfgu_cur AS c ON pe.fk_ety_cur = c.id_cur " +
+                    "INNER JOIN erp.cfgu_cur AS cp ON p.fk_cur = cp.id_cur " +
                     "LEFT JOIN trn_dps AS d ON pe.fk_doc_year_n = d.id_year AND pe.fk_doc_doc_n = d.id_doc " +
                     "LEFT JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
-                    "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
-                    "AND p.fk_cur = " + mnCurPayment + " AND pe.fk_ety_cur = " + mnCurDoc + " " + 
+                    "WHERE NOT p.b_del AND p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
+                    "AND p.fk_cur = " + mnCurrrencyLayout + " " + 
+                    "AND pe.fk_ety_cur = " + mnCurPaymentDoc + " " + 
                     "AND pe.ety_tp = '" + entryTp + "' " +
                     where + " " + 
                     "ORDER BY b.bp, p.dt_sched_n, d.num_ser, d.num, p.ser, p.num";
@@ -218,7 +226,10 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     row.setPayNum(resultSet.getString("folio_p"));
                     row.setDocNum(resultSet.getString("folio_d"));
                     row.setAmount(resultSet.getDouble("des_pay_app_ety_cur"));
-                    row.setCur(resultSet.getString("cur_key"));
+                    row.setCur(resultSet.getString("c.cur_key"));
+                    row.setExchangeRate(resultSet.getDouble("p.pay_exc_rate_app"));
+                    row.setAmountCurrencyToPay(resultSet.getDouble("p.pay_app_cur"));
+                    row.setCurToPay(resultSet.getString("cp.cur_key"));
                     row.setReceptionPayReq(resultSet.getBoolean("b_rcpt_pay_req"));
                     row.setFuncArea(resultSet.getInt("p.fk_func"));
                     row.setFuncSubarea(resultSet.getInt("p.fk_func_sub"));
@@ -324,9 +335,9 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
         maAllSelectedPayments.removeAll(pays);
     }
     
-    public void setCurrencies(int curPayment, int curDoc) {
-        mnCurPayment = curPayment;
-        mnCurDoc = curDoc;
+    public void setCurrencies(int curencyLayout, int curPaymentDoc) {
+        mnCurrrencyLayout = curencyLayout;
+        mnCurPaymentDoc = curPaymentDoc;
     }
     
     public void setDataBank(int bankPaymentTypeId, int bizPartnerBankId) {

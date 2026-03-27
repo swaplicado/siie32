@@ -94,6 +94,9 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_ST_AUTHORN_SND = 11; // sending
     public static final int CFGS_ST_AUTHORN_SNDF = 12; // send failure
     
+    public static final String CFGX_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_EMP = "E";
+    public static final String CFGX_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP = "D";
+    
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
     public static final String CFG_PARAM_DIOT_TAX_REGS_IGNORED = "DIOT_TAX_REGS_IGNORED";
@@ -101,14 +104,13 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_PROCESS = "HRS_PAYROLL_ACC_PROCESS";
     public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE = "HRS_PAYROLL_ACC_DYN_EMP_MODE";
-    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_EMP = "E";
-    public static final String CFG_PARAM_HRS_PAYROLL_ACC_DYN_EMP_MODE_DEP = "D";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     public static final String CFG_PARAM_HRS_AF02 = "HRS_AF02";
     public static final String CFG_PARAM_HRS_VARIABLE_EARNINGS = "HRS_VARIABLE_EARNINGS";
     public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     public static final String CFG_PARAM_CFD_ORG_NAMES = "CFD_ORG_NAMES";
     public static final String CFG_PARAM_FIN_USD_XRT_POLICY = "FIN_USD_XRT_POLICY";
+    public static final String CFG_PARAM_FIN_PAY_CFG = "FIN_PAY_CFG";
     public static final String CFG_PARAM_FIN_BANK_LAYOUT_CFD_REQ = "FIN_BANK_LAYOUT_CFD_REQ";
     public static final String CFG_PARAM_QLT_DPS_ANALYSIS_TO = "QLT_DPS_ANALYSIS_TO";
     public static final String CFG_PARAM_QLT_DPS_ANALYSIS_CC = "QLT_DPS_ANALYSIS_CC";
@@ -135,20 +137,22 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_TRN_TP_VEH_TANK_CAR = "TRN_TP_VEH_TANK_CAR";
     public static final String CFG_PARAM_TRN_DPS_RUS_TAX = "TRN_DPS_RUS_TAX";
     public static final String CFG_PARAM_TRN_DPS_US = "TRN_DPS_US";
+    public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT = "TRN_DPS_CON_CUSTOM_FMT";
     public static final String CFG_PARAM_TRN_DPS_CON_CUSTOM_FMT_ACRO = "TRN_DPS_CON_CUSTOM_FMT_ACRO";
-    public static final String CFG_PARAM_TRN_ACC_TAGS = "TRN_ACC_TAGS";
     public static final String CFG_PARAM_TRN_FISCAL_DATA_PUR_ORD = "TRN_FISCAL_DATA_PUR_ORD";
     public static final String CFG_PARAM_SIIE_APP_URLS = "SIIE_APP_URLS";
     public static final String CFG_PARAM_SIIE_WEB_DB = "SIIE_WEB_DB";
-    public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF = "SIIE_SYS_AUTH_PUSH_NOTIF";
+    public static final String CFG_PARAM_SIIE_SYS_AUTH_PUSH_NOTIF  = "SIIE_SYS_AUTH_PUSH_NOTIF ";
+    public static final String CFG_PARAM_SIIE_PURP_DPS_NAT = "SIIE_PURP_DPS_NAT";
+    public static final String CFG_PARAM_SIIE_PURP_CFD_USE = "SIIE_PURP_CFD_USE";
+    public static final String CFG_PARAM_SIIE_CFG = "SIIE_CFG";
+    public static final String CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE = "SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE";
+    public static final String CFG_PARAM_SIIE_CFG_MASS_ACC = "SIIE_CFG_MASS_ACC";
     public static final String CFG_PARAM_SWAP_SERVICES_CONFIG = "SWAP_SERVICES_CONFIG";
     public static final String CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG = "SWAP_SERVICES_AUTH_CONFIG";
     public static final String CFG_PARAM_SWAP_SOM = "SWAP_SOM";
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";
-    public static final String CFG_PARAM_SIIE_PURP_DPS_NAT = "SIIE_PURP_DPS_NAT";
-    public static final String CFG_PARAM_SIIE_PURP_CFD_USE = "SIIE_PURP_CFD_USE";
-    public static final String CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE = "SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
@@ -578,6 +582,7 @@ public abstract class SDataConstantsSys {
     public static final int BPSS_TP_CFD_ADD_ELEKTRA = 6;
     public static final int BPSS_TP_CFD_ADD_WALDOS = 7;
     public static final int BPSS_TP_CFD_ADD_AMECE71 = 11;
+    public static final int BPSS_TP_CFD_ADD_HORTIFRUT = 21;
     
     public static final int BPSS_BPB_BANK_ACC_TEL = 10;
     public static final int BPSS_BPB_BANK_ACC_NUM = 11;

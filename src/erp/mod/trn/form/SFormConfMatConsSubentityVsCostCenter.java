@@ -163,10 +163,10 @@ public class SFormConfMatConsSubentityVsCostCenter extends SBeanForm {
                             + "AND cc.id_mat_cons_subent <> " + moRegistry.getPkConsumptionSubentity() + " "
                             + "AND cc.id_cc = " + cc.getRowPrimaryKey()[0];
                     try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-                        if (resultSet.next()) {
-                            validation.setMessage("El centro de costo \"" + cc.getRowName() + "\" no puede ser asignado debido a que ya fue previamente asignado.\n"
-                                    + "Subcentro de consumo: " + resultSet.getString("subcentro") + "\nCentro de consumo: " + resultSet.getString("centro"));
-                        }
+//                        if (resultSet.next()) {
+//                            validation.setMessage("El centro de costo \"" + cc.getRowName() + "\" no puede ser asignado debido a que ya fue previamente asignado.\n"
+//                                    + "Subcentro de consumo: " + resultSet.getString("subcentro") + "\nCentro de consumo: " + resultSet.getString("centro"));
+//                        }
                     }
                 }
             }

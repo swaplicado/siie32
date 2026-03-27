@@ -584,6 +584,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;     // renglones de requisiciones en diálogo de segregaciones
     public static final int TRNX_MAT_REQ_ESTIMATE = 2024076;    // diálogo de cotizaciones
     public static final int TRNX_MAT_REQ_EST_PROVID_ROW = 2024077;   // renglones de cotizaciones
+    public static final int TRNX_MAT_REQ_PUR_PROC = 2024086;   // renglones de cotizaciones
     public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
     public static final int TRNX_FUNC_EXPENSES = 2024336;   // massive CRUD of functional area monthly-budgets
     public static final int TRNX_CONF_USR_VS_ENT = 2024337;
@@ -622,6 +623,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_VAL_UPD = 2024098;
     public static final int TRNX_STK_VAL_IN_CARDEX = 2024099;
     public static final int TRNX_STK_SEG = 2024100;
+    public static final int TRNX_PUR_PROCESS = 2024101;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;

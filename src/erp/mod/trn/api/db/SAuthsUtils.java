@@ -49,6 +49,7 @@ public class SAuthsUtils {
                 + "WHERE "
 //                + "    NOT stpsub.b_del AND "
                 + "stpsub.res_tab_name_n = '" + sTable + "' "
+                + "AND stpsub.fk_tp_authorn = " + authType + " "
                 + sWhere + "ORDER BY stpsub.ts_usr_ins ASC LIMIT 1)";
 
         return sql;

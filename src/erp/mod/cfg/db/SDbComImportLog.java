@@ -20,12 +20,13 @@ import sa.lib.gui.SGuiSession;
 /**
  * Clase para registrar la importación de datos de servicios externos.
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public class SDbComImportLog extends SDbRegistryUser {
     
     public static final String SYNC_TYPE_PUR_INV = "PUR_INV";
     public static final String SYNC_TYPE_PUR_PAY_RC = "PUR_PAY_RC";
+    public static final String SYNC_TYPE_PUR_PROF = "PUR_PROF";
     
     protected static final String SUFIX_REQUEST_BODY = "_request_body";
     protected static final String SUFIX_RESPONSE_BODY = "_response_body";

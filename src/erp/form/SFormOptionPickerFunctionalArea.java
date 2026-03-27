@@ -25,7 +25,7 @@ import javax.swing.JCheckBox;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -67,6 +67,10 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         jlFunctionalArea = new javax.swing.JLabel();
         jcbFunctionalArea = new javax.swing.JComboBox();
         jbFunctionalArea = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jlSubFunctionalArea = new javax.swing.JLabel();
+        jcbSubFunctionalArea = new javax.swing.JComboBox();
+        jbSubFunctionalArea = new javax.swing.JButton();
         jpSouth = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -80,12 +84,12 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
             }
         });
 
-        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de áreas funcionales:"));
+        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de áreas funcionales y subáreas funcionales:"));
         jpOptionPane.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jckAllFunctionalAreas.setText("Todas las áreas funcionales asignadas");
+        jckAllFunctionalAreas.setText("Todas las áreas funcionales y subáreas funcionales asignadas");
         jckAllFunctionalAreas.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel1.add(jckAllFunctionalAreas);
 
@@ -112,6 +116,30 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         jPanel2.add(jbFunctionalArea);
 
         jPanel1.add(jPanel2);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSubFunctionalArea.setText("Subárea funcional:");
+        jlSubFunctionalArea.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlSubFunctionalArea);
+
+        jcbSubFunctionalArea.setMaximumRowCount(12);
+        jcbSubFunctionalArea.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbSubFunctionalArea.setPreferredSize(new java.awt.Dimension(350, 23));
+        jcbSubFunctionalArea.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jcbSubFunctionalAreaKeyPressed(evt);
+            }
+        });
+        jPanel3.add(jcbSubFunctionalArea);
+
+        jbSubFunctionalArea.setText("...");
+        jbSubFunctionalArea.setToolTipText("Seleccionar...");
+        jbSubFunctionalArea.setFocusable(false);
+        jbSubFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel3.add(jbSubFunctionalArea);
+
+        jPanel1.add(jPanel3);
 
         jpOptionPane.add(jPanel1, java.awt.BorderLayout.PAGE_START);
 
@@ -160,15 +188,24 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         eventKeyPressedFunctionalArea(evt);
     }//GEN-LAST:event_jcbFunctionalAreaKeyPressed
 
+    private void jcbSubFunctionalAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbSubFunctionalAreaKeyPressed
+        // TODO add your handling code here:
+        eventKeyPressedSubFunctionalArea(evt);
+    }//GEN-LAST:event_jcbSubFunctionalAreaKeyPressed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbSubFunctionalArea;
     private javax.swing.JComboBox jcbFunctionalArea;
+    private javax.swing.JComboBox jcbSubFunctionalArea;
     private javax.swing.JCheckBox jckAllFunctionalAreas;
     private javax.swing.JLabel jlFunctionalArea;
+    private javax.swing.JLabel jlSubFunctionalArea;
     private javax.swing.JPanel jpOptionPane;
     private javax.swing.JPanel jpSouth;
     // End of variables declaration//GEN-END:variables
@@ -218,6 +255,12 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         }
     }
     
+    private void eventKeyPressedSubFunctionalArea(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_F5) {
+            actionPerformedSubFunctionalArea();
+        }
+    }
+    
     private void itemStateChangedAllFunctionalAreas(final boolean reset) {
         if (reset) {
             jcbFunctionalArea.setSelectedIndex(0);
@@ -244,6 +287,20 @@ public class SFormOptionPickerFunctionalArea extends javax.swing.JDialog impleme
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SFormUtilities.locateComboBoxItem(jcbFunctionalArea, picker.getSelectedPrimaryKey());
             jcbFunctionalArea.requestFocus();
+        }
+    }
+    
+    private void actionPerformedSubFunctionalArea() { // xxx234
+        SFormOptionPickerInterface picker = miClient.getOptionPicker(SModConsts.CFGU_FUNC_SUB);
+
+        picker.formReset();
+        picker.setFilterKey(new int[] { miClient.getSession().getUser().getPkUserId() });
+        picker.formRefreshOptionPane();
+        picker.setFormVisible(true);
+
+        if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            SFormUtilities.locateComboBoxItem(jcbSubFunctionalArea, picker.getSelectedPrimaryKey());
+            jcbSubFunctionalArea.requestFocus();
         }
     }
 

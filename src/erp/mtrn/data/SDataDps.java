@@ -298,6 +298,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxCheckDpsLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
+    /** Imported Document from SWAP Services, just for reference purposes. */
     protected SImportedDocument moXtaImportedDocument;
     
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
@@ -4522,10 +4523,26 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oStatement.execute(sSql);
                 
                 if (moDbmsDataDpsCfd != null) {
+                    if (((this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
+                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
+                            || (this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
+                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))) {
+                        if (this.getComprobanteVersion().equals("" + DCfdConsts.CFDI_VER_40)) {
+                            // Cuando el documento sea factura de compras o nc de compras y
+                            // el objeto comprobante no sea nulo se actualizan los datos
+                            if (moDbmsDataDpsCfd.getAuxComprobante40() != null) {
+                                moDbmsDataDpsCfd.setPaymentMethod(moDbmsDataDpsCfd.getAuxComprobante40().getAttMetodoPago().getString());
+                                moDbmsDataDpsCfd.setPaymentWay(moDbmsDataDpsCfd.getAuxComprobante40().getAttFormaPago().getString());
+                                moDbmsDataDpsCfd.setTaxRegimeIssuing(moDbmsDataDpsCfd.getAuxComprobante40().getEltEmisor().getAttRegimenFiscal().getString());
+                                moDbmsDataDpsCfd.setTaxRegimeReceiver(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttRegimenFiscalReceptor().getString());
+                                moDbmsDataDpsCfd.setCfdiUsage(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttUsoCFDI().getString());
+                            }
+                        }
+                    }
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
                     moDbmsDataDpsCfd.setVersion(getComprobanteVersion());
-                    
+
                     if (moDbmsDataDpsCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
@@ -6000,6 +6017,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     /**
+     * Create addenda for Hortifrut.
+     * @return Addenda.
+     * @throws java.lang.Exception
+     */
+    private cfd.ext.hortifrut.DElementAddendaClienteAdicional computeAddendaHortifrut() throws java.lang.Exception {
+        cfd.ext.hortifrut.DElementAddendaClienteAdicional addendaClienteAdicional = new cfd.ext.hortifrut.DElementAddendaClienteAdicional();
+        
+        addendaClienteAdicional.getEltOrdenCompra().setValue(moAuxCfdParams.getSorianaPedidoFolio());
+
+        return addendaClienteAdicional;
+    }
+
+    /**
      * Create CFDI addenda for AMECE 7.1 (e.g., Comercial City Fresko, S de RL de CV, (CCF), a.k.a., "La Comer").
      * <strong>WARNING:</strong> This method has a vulnerability: if multiple tax rates are present in document, there is no way to handle it.
      * It is assumed that all document entries have the same tax reate, if any, allways.
@@ -7033,11 +7063,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         // Create custom addendas when needed:
 
         try {
-            if (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
+            int addendaType = moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId();
+            if (addendaType != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
                 addenda = new cfd.ver4.DElementAddenda();
 
                 if (isDocumentSal() || isAdjustmentSal()) {
-                    switch (moAuxCfdParams.getReceptor().getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
+                    switch (addendaType) {
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
@@ -7053,6 +7084,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
+                        case SDataConstantsSys.BPSS_TP_CFD_ADD_HORTIFRUT:
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaHortifrut());
+                            break;
+                        /* XXX 2026-03-25 (Sergio Flores): Not supported yet!
+                        case SDataConstantsSys.BPSS_TP_CFD_ADD_WALDOS:
+                            ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaWaldos());
+                            break;
+                        */
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
                             ((cfd.ver4.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdPrcCfdIvaPorcentaje));
                             break;

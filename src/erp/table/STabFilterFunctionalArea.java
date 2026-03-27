@@ -15,7 +15,7 @@ import erp.mtrn.data.STrnFunctionalAreaUtils;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class STabFilterFunctionalArea extends javax.swing.JPanel {
     
@@ -26,6 +26,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     private erp.lib.table.STableTab moTableTab;
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnCurrentFunctionalAreaId;
+    private int mnCurrentSubFunctionalAreaId;
 
     /** Creates new tab filter STabFilterFunctionalArea.
      * By default, functional areas asigned to current user are set.
@@ -85,25 +86,26 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     private void initComponentsExtra() {
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         
-        updateAndRenderFunctionalArea(0, TAB_SETTING_ADD);
+        updateAndRenderFunctionalArea(0, 0, TAB_SETTING_ADD);
         jbFunctionalArea.setEnabled(miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
     }
 
-    private void updateAndRenderFunctionalArea(int functionalAreaId, int tabSettingAction) {
-        mnCurrentFunctionalAreaId = functionalAreaId; // preserve current functional area to be set in option picker
-        
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnCurrentFunctionalAreaId);
+    private void updateAndRenderFunctionalArea(int functionalAreaId, int subFunctionalAreaId, int tabSettingAction) {
+        mnCurrentFunctionalAreaId = functionalAreaId;
+        mnCurrentSubFunctionalAreaId = subFunctionalAreaId;
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnCurrentFunctionalAreaId, mnCurrentSubFunctionalAreaId);
         STableSetting setting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, texts[0].equals("0") ? "" : texts[0]);
-        
+
         if (tabSettingAction == TAB_SETTING_ADD) {
             moTableTab.addSetting(setting);
         }
         else {
             moTableTab.updateSetting(setting);
         }
-        
+
         jtfFunctionalArea.setText(texts[1]);
         jtfFunctionalArea.setCaretPosition(0);
+        jtfFunctionalArea.setToolTipText("Áreas y subáreas: " + texts[1]);
     }
 
     private void actionPerformedFunctionalArea() {
@@ -113,7 +115,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         moDialogFilterFunctionalArea.setFormVisible(true);
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-            updateAndRenderFunctionalArea(moDialogFilterFunctionalArea.getFunctionalAreaId(), TAB_SETTING_UPDATE);
+            updateAndRenderFunctionalArea(moDialogFilterFunctionalArea.getFunctionalAreaId(), moDialogFilterFunctionalArea.getSubFunctionalAreaId(),TAB_SETTING_UPDATE);
         }
     }
 }

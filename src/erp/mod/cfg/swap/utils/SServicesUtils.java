@@ -17,6 +17,9 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
@@ -24,14 +27,16 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Utilerías para la invocación de SWAP Services.
+ * 
  * @author Sergio Flores
  */
 public abstract class SServicesUtils {
     
     public static final String URL_FORCE_REJECT_RESOURCE = "/api/force-reject-resource";
     public static final String URL_CANCEL_FLOW = "/api/cancel-flow";
-    public static final String URL_GET_RESOURCE_FLOW = "/get-resource-flow";
+    public static final String URL_GET_RESOURCE_FLOW_HISTORY = "/get-resource-flow";
+    public static final String URL_GET_FLOW_STATUS_BY_RESOURCE = "/get-flows-by-resources";
     
     private static SyncSettings getSyncSettings(final SGuiSession session, final ObjectMapper mapper, final String configParamKey, final String elementKey) throws Exception {
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), configParamKey));
@@ -202,6 +207,34 @@ public abstract class SServicesUtils {
     }
     
     /**
+     * Ask for reject data.
+     * @param session GUI session.
+     * @return Reject data.
+     */
+    public static RejectData askForRejectData(final SGuiSession session) {
+        int userId = session.getUser().getPkUserId();
+        String user = "'" + session.getUser().getName() + "'";
+        String notes = "";
+        
+        if (userId == SDataConstantsSys.USRX_USER_SUPER || userId == SDataConstantsSys.USRX_USER_ADMIN) {
+            userId = 0;
+
+            String id = JOptionPane.showInputDialog(session.getClient().getFrame().getRootPane(), "ID del usuario que solicita el rechazo:");
+
+            if (id != null) {
+                userId = SLibUtils.parseInt(id);
+                user += " (ID = " + userId + ")";
+            }
+        }
+
+        if (userId != 0) {
+            notes = JOptionPane.showInputDialog(session.getClient().getFrame().getRootPane(), "Comentarios de rechazo:");
+        }
+        
+        return notes == null || notes.isEmpty() ? null : new RejectData(userId, user, notes);
+    }
+    
+    /**
      * Obtener el estatus de un flujo de autorización.
      * @param session Sesión de usuario.
      * @param resourceType Tipo de recurso (SSwapConsts.RESOURCE_TYPE_...)
@@ -225,7 +258,7 @@ public abstract class SServicesUtils {
         ObjectMapper mapper = new ObjectMapper();
         SyncSettings syncSettings = getSyncSettings(session, mapper, SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG, SSwapConsts.CFG_OBJ_AUTH_SRV);
         
-        syncSettings.Url += URL_GET_RESOURCE_FLOW;
+        syncSettings.Url += URL_GET_RESOURCE_FLOW_HISTORY;
         
         String urlQuery = "id_external_system=" + SSwapConsts.SIIE_EXT_SYS_ID + "&"
                 + "id_company=" + session.getConfigCompany().getCompanyId() + "&"
@@ -294,31 +327,32 @@ public abstract class SServicesUtils {
     }
     
     /**
-     * Ask for reject data.
-     * @param session GUI session.
-     * @return Reject data.
+     * Leer la configuración para SWAP Services en la empresa actual, y devolverla a un nuevo objeto <code>ConfigSettings</code>.
+     * @param session Sesión de usuario.
+     * @return 
+     * @throws java.lang.Exception 
      */
-    public static RejectData askForRejectData(final SGuiSession session) {
-        int userId = session.getUser().getPkUserId();
-        String user = "'" + session.getUser().getName() + "'";
-        String notes = "";
+    public static ConfigSettings getConfigSettings(final SGuiSession session) throws Exception {
+        ConfigSettings configSettings = new ConfigSettings();
         
-        if (userId == SDataConstantsSys.USRX_USER_SUPER || userId == SDataConstantsSys.USRX_USER_ADMIN) {
-            userId = 0;
-
-            String id = JOptionPane.showInputDialog(session.getClient().getFrame().getRootPane(), "ID del usuario que solicita el rechazo:");
-
-            if (id != null) {
-                userId = SLibUtils.parseInt(id);
-                user += " (ID = " + userId + ")";
-            }
-        }
-
-        if (userId != 0) {
-            notes = JOptionPane.showInputDialog(session.getClient().getFrame().getRootPane(), "Comentarios de rechazo:");
+        JsonNode settings = new ObjectMapper().readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_CFG));
+            
+        /*
+        JSON format of configuration settings:
+            {"cfg": [{"usrAutoAuthReqPayReq": [1, 2, 3]}, {"prcTypeAutoAuthPayReq": []}]}
+        */
+        
+        JsonNode userIds = settings.path("cfg").path(0).path("usrAutoAuthReqPayReq");
+        for (JsonNode id : userIds) {
+            configSettings.maAutoAuthReqPayReqUserIds.add(id.asInt());
         }
         
-        return notes == null || notes.isEmpty() ? null : new RejectData(userId, user, notes);
+        JsonNode processingTypeIds = settings.path("cfg").path(0).path("prcTypeAutoAuthPayReq");
+        for (JsonNode id : processingTypeIds) {
+            configSettings.maAutoAuthPayReqProcessingTypeIds.add(id.asInt());
+        }
+        
+        return configSettings;
     }
     
     private static class SyncSettings {
@@ -396,6 +430,15 @@ public abstract class SServicesUtils {
         @Override
         public String toString() {
             String string = "";
+            String actionedAt = "";
+            if (CurrActionActionedAt != null && !CurrActionActionedAt.isEmpty()) {
+                OffsetDateTime offsetDateTime = OffsetDateTime.parse(CurrActionActionedAt);
+                Date oDate = Date.from(offsetDateTime.toInstant());
+                actionedAt = SLibUtils.DateFormatDatetime.format(oDate);
+            }
+            else {
+                actionedAt = "N/A";
+            }
             
             if (FlowId != 0) {
                 string += "FLUJO DE AUTORIZACIÓN:\n"
@@ -409,7 +452,7 @@ public abstract class SServicesUtils {
                 if (CurrActionActionedById != 0) {
                     string += "- Comentarios: \"" + CurrActionNotes + "\"\n"
                             + "- Ejecutada por: " + CurrActionActionedByName + "\n"
-                            + "- Ejecutada el : " + CurrActionActionedAt + "";
+                            + "- Ejecutada el : " + actionedAt + "";
                 }
                 else {
                     string += "- Responsable(s): " + (CurrActionAllActors.isEmpty() ? "?" : CurrActionAllActors) + "";
@@ -424,6 +467,35 @@ public abstract class SServicesUtils {
             }
             
             return string;
+        }
+    }
+    
+    public static class ConfigSettings implements Serializable {
+        
+        private ArrayList<Integer> maAutoAuthReqPayReqUserIds;
+        private ArrayList<Integer> maAutoAuthPayReqProcessingTypeIds;
+        
+        public ConfigSettings() {
+            maAutoAuthReqPayReqUserIds = new ArrayList<>();
+            maAutoAuthPayReqProcessingTypeIds = new ArrayList<>();
+        }
+        
+        /**
+         * Checks if given SIIE user is set to automatically send authorization requests of payment requests.
+         * @param userId ID of required SIIE user.
+         * @return 
+         */
+        public boolean isAutoAuthReqPayReq(final int userId) {
+            return maAutoAuthReqPayReqUserIds.contains(userId);
+        }
+        
+        /**
+         * Checks if given SWAP-Services processing type is set to automatically authorize payment requests.
+         * @param processingTypeId ID of required SWAP-Services processing type.
+         * @return 
+         */
+        public boolean isAutoAuthPayReq(final int processingTypeId) {
+            return maAutoAuthPayReqProcessingTypeIds.contains(processingTypeId);
         }
     }
 }

@@ -4,12 +4,29 @@
  */
 package erp.mod.trn.form;
 
+import erp.client.SClientInterface;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.table.STableColumnForm;
+import erp.lib.table.STableConstants;
+import erp.lib.table.STablePaneGrid;
+import erp.lib.table.STableRowCustom;
 import erp.mod.SModConsts;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.model.ActionHistory;
+import erp.mod.cfg.swap.model.FlowResponse;
+import erp.mod.cfg.utils.SAuthDBUtils;
+import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SRowDocumentAuthornComments;
+import erp.server.SServerConstants;
+import erp.server.SServerRequest;
+import erp.server.SServerResponse;
 import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbRegistry;
@@ -22,15 +39,19 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     
     protected SGridPaneForm moGridLogs;
     protected ArrayList<SRowDocumentAuthornComments> maRowsAuthComm;
+    private erp.lib.table.STablePaneGrid moPaneGrid;
+    private erp.lib.table.STableColumnForm[] maoTableColumnsDps = null;
+    protected int mnRegistryType;
 
     /**
      * Creates new form SDialogMaterialRequestLogsCardex
@@ -53,10 +74,12 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jpDpsComents = new javax.swing.JPanel();
         jpAuthorizationRoute = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Comentarios de autorización (de momento solo para siie)");
+        setTitle("Historial de autorización");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -66,10 +89,17 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(100, 200));
+        jpDpsComents.setBorder(javax.swing.BorderFactory.createTitledBorder("Comentarios al enviar recurso a autorizar:"));
+        jpDpsComents.setPreferredSize(new java.awt.Dimension(100, 150));
+        jpDpsComents.setLayout(new java.awt.BorderLayout());
+        jPanel3.add(jpDpsComents, java.awt.BorderLayout.PAGE_START);
+
+        jpAuthorizationRoute.setBorder(javax.swing.BorderFactory.createTitledBorder("Flujo de autorización:"));
+        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(710, 200));
         jpAuthorizationRoute.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(jpAuthorizationRoute, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jpAuthorizationRoute, java.awt.BorderLayout.WEST);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -87,8 +117,10 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jpAuthorizationRoute;
+    private javax.swing.JPanel jpDpsComents;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -97,6 +129,16 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
         jbCancel.setVisible(false);
+        
+        int i = 0;
+
+        maoTableColumnsDps = new STableColumnForm[3];
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Fecha/hr envío", STableConstants.WIDTH_DATE_TIME);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usuario", STableConstants.WIDTH_USER);
+        maoTableColumnsDps[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Comentario", 600);
+        
+        moPaneGrid = new STablePaneGrid((SClientInterface) miClient);
+        jpDpsComents.add(moPaneGrid, BorderLayout.CENTER);
 
         moGridLogs = new SGridPaneForm(miClient, SModConsts.CFGX_AUTHORN_COMMENTS, SLibConsts.UNDEFINED, "Bitácora") {
             @Override
@@ -109,9 +151,9 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha movimiento"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio pedido", 75));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nivel", 20));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 400));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 380));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Autorizado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Rechazado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario autorizado/rechazado"));
@@ -137,39 +179,126 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    private void readSendsAuthAppWeb(int[] dpsPk) {
+        int i;
+        String sSql;
+        SServerRequest oRequest;
+        SServerResponse oResponse;
+        Vector<Vector<Object>> vData;
+
+        try {
+            moPaneGrid.clearTable();
+
+            // DPS links:
+
+            sSql = "SELECT tda.id_authorn, tda.ts_new, u.usr, IF(tda.nts = '', 'SIN COMENTARIOS', tda.nts) nts "
+                    + "FROM trn_dps_authorn AS tda "
+                    + "INNER JOIN erp.usru_usr AS u ON tda.fid_usr_new = u.id_usr "
+                    + "WHERE tda.id_year = " + dpsPk[0] + " AND tda.id_doc = " + dpsPk[1] + " "
+                    + "ORDER BY tda.id_authorn DESC;";
+
+            oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);
+            oResponse = ((SClientInterface) miClient).getSessionXXX().request(oRequest);
+
+            if (oResponse.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                throw new Exception(oResponse.getMessage());
+            }
+            else {
+                for (i = 0; i < maoTableColumnsDps.length; i++) {
+                    moPaneGrid.addTableColumn(maoTableColumnsDps[i]);
+                }
+                moPaneGrid.createTable();
+
+                vData = (Vector<Vector<Object>>) oResponse.getPacket();
+
+                for (Vector<Object> data : vData) {
+                    STableRowCustom row = new STableRowCustom();
+
+                    for (i = 1; i < data.size(); i++) {     // index 0 is descarted, used only for ordering purpouses
+                        row.getValues().add(data.get(i));
+                    }
+
+                    moPaneGrid.addTableRow(row);
+                }
+                moPaneGrid.renderTableRows();
+                moPaneGrid.setTableRowSelection(0);
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+    
     private void readAuthComments(int[] dpsPk) {
         try {
-            Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-            String sql = "SELECT * FROM( " +
-                    "SELECT " +
-                    "us.usr AS usr_step, " + 
-                    "IF(s.b_authorn, s.dt_time_authorn_n, s.dt_time_reject_n) dt_mov, " +
-                    "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) folio, " +
-                    "IF(s.comments = '', " +
-                    "IF(NOT s.b_authorn AND NOT s.b_reject, 'AUTORIZACIÓN PENDIENTE', 'SIN COMENTARIOS'), s.comments) comments, " +
-                    "IF(s.b_authorn, ua.usr, ur.usr) usr_auth, " +
-                    "s.b_authorn, s.b_reject, s.b_del, s.ts_usr_ins, s.lev " +
-                    "FROM cfgu_authorn_step s " +
-                    "INNER JOIN trn_dps AS d ON s.res_pk_n1_n = d.id_year AND s.res_pk_n2_n = d.id_doc " +
-                    "INNER JOIN erp.usru_usr AS us ON s.fk_usr_step = us.id_usr " +
-                    "LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
-                    "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
-                    "WHERE s.res_tab_name_n = 'trn_dps' " +
-                    "AND s.res_pk_n1_n = " + dpsPk[0] + " AND s.res_pk_n2_n = " + dpsPk[1] + " " +
-                    ") AS a " +
-                    "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
-                row.setDateMov(resultSet.getTimestamp("dt_mov"));
-                row.setNum(resultSet.getString("folio"));
-                row.setUserStep(resultSet.getString("usr_step"));
-                row.setComments(resultSet.getString("comments"));
-                row.setAuthorn(resultSet.getBoolean("b_authorn"));
-                row.setReject(resultSet.getBoolean("b_reject"));
-                row.setUserAuth(resultSet.getString("usr_auth"));
-                row.setDeleted(resultSet.getBoolean("b_del"));
-                maRowsAuthComm.add(row);
+            boolean hasGoogleAuthSteps = false;
+            if (mnRegistryType == SModConsts.TRN_DPS) {
+                readSendsAuthAppWeb(dpsPk);
+                // Primero consultar si el documento tiene movimientos de autorización tipo DPS_GOOGLE:
+                hasGoogleAuthSteps = SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS , dpsPk);
+            }
+            
+            if (hasGoogleAuthSteps) {
+                FlowResponse oFlow = SAuthDBUtils.fetchFlowHistoryFromMsAuth(miClient.getSession(), 
+                                                                        SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS,
+                                                                        dpsPk[0] + "_" + dpsPk[1],
+                                                                        miClient.getSession().getConfigCompany().getCompanyId());
+                
+                for (ActionHistory oAction : oFlow.getActionsHistory()) {
+                    SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
+                    if (oAction.getActionedAt() != null) {
+                        OffsetDateTime offsetDateTime = OffsetDateTime.parse(oAction.getActionedAt());
+                        Date oDate = Date.from(offsetDateTime.toInstant());
+                        row.setDateMov(oDate);
+                    }
+                    else {
+                        row.setDateMov(null);
+                    }
+                    row.setNum(oAction.getSequence() + "");
+                    row.setUserStep(oAction.getActorName());
+                    row.setComments(oAction.getNotes());
+                    row.setAuthorn(oAction.getFlowStatus().getId() == SSwapConsts.AUTHZ_STATUS_OK);
+                    row.setReject(oAction.getFlowStatus().getId() == SSwapConsts.AUTHZ_STATUS_REJECTED);
+                    row.setDeleted(!oAction.getIsCurrent());
+                    maRowsAuthComm.add(row);
+                }
+            }
+            else {
+                Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+                String sql = "SELECT * FROM( " +
+                        "SELECT " +
+                        "us.usr AS usr_step, " + 
+                        "IF(s.b_authorn, s.dt_time_authorn_n, s.dt_time_reject_n) dt_mov, " +
+                        "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) folio, " +
+                        "IF(s.comments = '', " +
+                        "IF(NOT s.b_authorn AND NOT s.b_reject, 'AUTORIZACIÓN PENDIENTE', 'SIN COMENTARIOS'), s.comments) comments, " +
+                        "IF(s.b_authorn, ua.usr, ur.usr) usr_auth, " +
+                        "s.b_authorn, s.b_reject, s.b_del, s.ts_usr_ins, s.lev " +
+                        "FROM cfgu_authorn_step s " +
+                        "INNER JOIN trn_dps AS d ON s.res_pk_n1_n = d.id_year AND s.res_pk_n2_n = d.id_doc " +
+                        "INNER JOIN erp.usru_usr AS us ON s.fk_usr_step = us.id_usr " +
+                        "LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
+                        "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
+                        "WHERE s.res_tab_name_n = 'trn_dps' "
+                        + "AND s.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " " +
+                        "AND s.res_pk_n1_n = " + dpsPk[0] + " AND s.res_pk_n2_n = " + dpsPk[1] + " " +
+                        ") AS a " +
+                        "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
+                        
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
+                    row.setDateMov(resultSet.getTimestamp("dt_mov"));
+                    row.setNum(resultSet.getString("s.lev"));
+                    row.setUserStep(resultSet.getString("usr_step"));
+                    row.setComments(resultSet.getString("comments"));
+                    row.setAuthorn(resultSet.getBoolean("b_authorn"));
+                    row.setReject(resultSet.getBoolean("b_reject"));
+                    row.setUserAuth(resultSet.getString("usr_auth"));
+                    row.setDeleted(resultSet.getBoolean("b_del"));
+                    maRowsAuthComm.add(row);
+                }
             }
         }
         catch (Exception e) {
@@ -220,6 +349,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     @Override
     public void setValue(final int type, final Object value) {
         maRowsAuthComm = new ArrayList<>();
+        mnRegistryType = type;
         switch(type) {
             case SModConsts.TRN_MAT_REQ:
                 processMatReq((int) value);

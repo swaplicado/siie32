@@ -39,7 +39,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author  Néstor Ávalos, Daniel López, Edwin Carmona, Sergio Flores
+ * @author  Néstor Ávalos, Daniel López, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -64,6 +64,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
     private String msFunctionalAreasIds;
+    private int mnSubFunctionalAreaId;
 
 
     /** Creates new form SDialogRepBizPartnerBalanceAging */
@@ -598,11 +599,14 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             
             String areasFilter = "";
             if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-                if (msFunctionalAreasIds.isEmpty()) {
-                    areasFilter = "";
+                if (mnSubFunctionalAreaId != SLibConstants.UNDEFINED) {
+                    areasFilter = " AND d.fid_func_sub = " + mnSubFunctionalAreaId + " ";
+                }
+                else if (!msFunctionalAreasIds.isEmpty()) {
+                    areasFilter = " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
                 }
                 else {
-                    areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                    areasFilter = "";
                 }
             }
             
@@ -860,17 +864,18 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
-        msFunctionalAreasIds = texts[0];
-        
-        jtfFunctionalArea.setText(texts[1]);
-        jtfFunctionalArea.setCaretPosition(0);
-    }
+    String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
+    msFunctionalAreasIds = texts[0];
+
+    jtfFunctionalArea.setText(texts[1]);
+    jtfFunctionalArea.setCaretPosition(0);
+}
     
     private void actionPickDateCutoff() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateCutoff.getDate(), moFieldDateCutoff);
@@ -995,7 +1000,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         }
         
         // Reset to default values:
-
+ 
         moFieldDateCutoff.setDate(miClient.getSessionXXX().getWorkingDate());
         
         if (miClient.getSessionXXX().getCurrentCompanyBranch() != null) {
@@ -1007,6 +1012,11 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         
         jrbDueType30_60_90d.setSelected(true);
         itemStateChangedDueType(); // sets default values for remaining parameters
+        
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        renderFunctionalArea();
     }
 
     @SuppressWarnings("unchecked")
@@ -1131,7 +1141,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
                 }
                 else if (radioButton == jrbCurrencyLoc) {
                     itemStateChangedCurrencyOptions();
-                }
+                }   
                 else if (radioButton == jrbCurrencyDoc) {
                     itemStateChangedCurrencyOptions();
                 }

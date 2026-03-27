@@ -31,7 +31,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés
  */
 public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
     
@@ -186,6 +186,8 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
                 + "v.dt_exec_n, "
                 + "v.pay_app_cur, "
                 + "c.cur_key, "
+                + "bb_pay.bank_acc AS _pay_bank, "
+                + "bb_benef.bank_acc AS _benf_bank, "
                 + "v.pay_exc_rate, "
                 + "v.pay, "
                 + "v.dt_req, "
@@ -222,6 +224,12 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
                 + "v.fk_ben = b.id_bp " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON " 
                 + "v.fk_cur = c.id_cur " 
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS ac ON "
+                + "v.fk_pay_cash_cob_n = ac.id_cob AND v.fk_pay_cash_acc_cash_n = ac.id_acc_cash "
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS bb_pay ON " 
+                + "ac.fid_bpb_n = bb_pay.id_bpb AND ac.fid_bank_acc_n = bb_pay.id_bank_acc " 
+                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS bb_benef ON " 
+                + "v.fk_ben_bank_cob_n = bb_benef.id_bpb AND v.fk_ben_bank_acc_cash_n = bb_benef.id_bank_acc " 
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON "
                 + "v.fk_func = f.id_func "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON "
@@ -276,6 +284,8 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_status", "Estatus"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_proc", "En proceso"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_pay_bank", "Cuenta pagadora"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_benf_bank", "Cuenta beneficiaria"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, "Eliminado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "usr_sched", "Usr aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "ts_usr_sched", "Usr TS aut pago"));

@@ -58,7 +58,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public abstract class SExportDataUtils {
 
@@ -1191,6 +1191,7 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "COALESCE(d.acc_tag, '') AS _acc_tag, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
@@ -1270,6 +1271,7 @@ public abstract class SExportDataUtils {
                     oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
+                    oDpsExport.account_tag = resultSet.getString("_acc_tag");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     rms = resultSet.getString("_rms");
 
@@ -1730,13 +1732,13 @@ public abstract class SExportDataUtils {
                 PreparedStatement prepStatCostProfitCenters = session.getStatement().getConnection().prepareStatement(sqlCostCenters);
 
                 String sql = "SELECT "
-                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, "
+                        + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.acc_tag, "
                         + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_authorn, t.ts_link, "
                         + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_bp_r, b.bp, t.fid_usr_new, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked, COALESCE(dpsau.nts, '') AS authz_nts "
                         + "FROM ("
                         + "SELECT "
-                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
+                        + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_bp_r, d.fid_usr_new, "
                         + "de.id_ety, de.fid_item, de.fid_unit, de.qty, "
@@ -1846,6 +1848,7 @@ public abstract class SExportDataUtils {
                     reference.owner_id = resultSet.getInt("t.fid_usr_new");
                     reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
                     reference.auth_comments = resultSet.getString("authz_nts");
+                    reference.account_tag = resultSet.getString("t.acc_tag");
 
                     references.add(reference);
                 }
@@ -1902,12 +1905,19 @@ public abstract class SExportDataUtils {
 
                                 String sql = "SELECT "
                                         + "t.id_tic, s.code, t.num, t.dt, i.name, t.qty, u.code, t.drv, t.pla, t.pla_cag, t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
-                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active "
+                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active,"
+                                        + "t.wei_des_gro_r AS _gross_weight, "
+                                        + "t.wei_des_net_r AS _net_weight, "
+                                        + "COALESCE(f.name, 'NA') AS _freight_origin, "
+                                        + "COALESCE(isrc.name, 'NA') AS _fruit_origin, "
+                                        + "COALESCE(p.name_trd, 'NA') AS _prod_name "
                                         + "FROM s_tic AS t "
                                         + "INNER JOIN su_sca AS s ON s.id_sca = t.fk_sca "
                                         + "INNER JOIN su_item AS i ON i.id_item = t.fk_item "
                                         + "INNER JOIN su_unit AS u ON u.id_unit = t.fk_unit "
                                         + "LEFT OUTER JOIN su_freight_orig AS f ON f.id_freight_orig = t.fk_freight_orig_n "
+                                        + "LEFT JOIN su_inp_src AS isrc ON isrc.id_inp_src = t.fk_inp_src "
+                                        + "LEFT JOIN su_prod AS p ON p.id_prod = t.fk_prod "
                                         + "WHERE ("
                                         + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) "
                                         + "AND " + referenceId + " NOT IN (" + syncedRegistries + "))"
@@ -1941,6 +1951,11 @@ public abstract class SExportDataUtils {
                                     reference.concepts = concepts;
                                     reference.cost_profit_centers = "";
                                     reference.owner_id = somSettings.OwnerUserId;
+                                    reference.gross_weight = somResultSet.getDouble("_gross_weight");
+                                    reference.net_weight = somResultSet.getDouble("_net_weight");
+                                    reference.purchase_origin_location = somResultSet.getString("_freight_origin");
+                                    reference.purchase_origin_zone = somResultSet.getString("_fruit_origin");
+                                    reference.productor_name = somResultSet.getString("_prod_name");
                                     reference.is_deleted = !somResultSet.getBoolean("_is_active");
 
                                     references.add(reference);
@@ -1987,7 +2002,7 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
 
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
-
+            
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
@@ -1999,7 +2014,7 @@ public abstract class SExportDataUtils {
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
                         + "p.pay_app_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
-                        + "p.fk_usr_ins, p.fk_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec, "
+                        + "p.nts_auth, p.fk_usr_ins, p.fk_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec, "
                         // payment entry:
                         + "pe.ety_tp, pe.ety_pay_app_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
                         + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
@@ -2078,6 +2093,9 @@ public abstract class SExportDataUtils {
                         int oldStatusPaymentId = resultSet.getInt("p.fk_st_pay");
                         currentPayment.payment_status = SDbPayment.getSettledStatusPaymentId(oldStatusPaymentId);
                         currentPayment.authz_authorization_id = SSwapConsts.AUTHZ_STATUS_PENDING;
+                        if (resultSet.getString("p.nts_auth") != null && !resultSet.getString("p.nts_auth").isEmpty()) {
+                            currentPayment.notes_authz = resultSet.getString("p.nts_auth");
+                        }
 
                         // paying account:
                         BankAccount payingBankAccount = new BankAccount(resultSet, "ba_ac_b.bp", "ba_ac_b.fiscal_id", "ba_ac_b.fiscal_frg_id", "ba_ac.acc_num", "ba_ac.acc_num_std");
@@ -2165,13 +2183,64 @@ public abstract class SExportDataUtils {
 
                     entries.add(paymentEntry);
                 }
+                
+                HashSet<Integer> paymentIds = new HashSet<>();
+
+                for (SExportDataPayment payment : paymentEntriesMap.keySet()) {
+                    paymentIds.add(payment.payment_id);
+                }
+
+                HashMap<Integer, ArrayList<SExportDataFile>> paymentFilesMap = new HashMap<>();
+
+                if (!paymentIds.isEmpty()) {
+
+                    String ids = paymentIds.stream()
+                            .map(String::valueOf)
+                            .collect(java.util.stream.Collectors.joining(","));
+
+                    String sqlFiles = "SELECT id_pay, file_storage_name, file_name, filevault_id "
+                            + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_FILE) + " "
+                            + "WHERE id_pay IN (" + ids + ") "
+                            + "AND NOT b_del";
+
+                    ResultSet rsFiles = statement.executeQuery(sqlFiles);
+
+                    while (rsFiles.next()) {
+                        int payId = rsFiles.getInt("id_pay");
+
+                        SExportDataFile file = new SExportDataFile();
+
+                        file.filename_storage = rsFiles.getString("file_storage_name");
+                        file.filename_original = rsFiles.getString("file_name");
+
+                        file.url_storage = "#";
+                        file.url_database = "#";
+                        file.bucket_name = CloudStorageManager.getBucketName();
+
+                        ArrayList<SExportDataFile> files = paymentFilesMap.get(payId);
+
+                        if (files == null) {
+                            files = new ArrayList<>();
+                            paymentFilesMap.put(payId, files);
+                        }
+
+                        files.add(file);
+                    }
+                }
 
                 for (SExportDataPayment payment : paymentEntriesMap.keySet()) {
                     SRequestPaymentsBody.Payment data = new SRequestPaymentsBody.Payment();
 
                     data.payment = payment;
                     data.entries = (SExportDataPaymentEntry[]) paymentEntriesMap.get(payment).toArray(new SExportDataPaymentEntry[0]);
-                    data.files = new SExportDataFile[]{};
+                    ArrayList<SExportDataFile> files = paymentFilesMap.get(payment.payment_id);
+
+                    if (files == null) {
+                        data.files = new SExportDataFile[]{};
+                    }
+                    else {
+                        data.files = files.toArray(new SExportDataFile[0]);
+                    }
 
                     payments.add(data);
                 }

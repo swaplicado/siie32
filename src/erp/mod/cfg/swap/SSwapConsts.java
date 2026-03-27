@@ -5,9 +5,11 @@
  */
 package erp.mod.cfg.swap;
 
+import java.util.HashMap;
+
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Cesar Orozco
  */
 public abstract class SSwapConsts {
 
@@ -77,18 +79,36 @@ public abstract class SSwapConsts {
     public static final String CFG_ATT_API_KEY = "api-key";
     public static final String CFG_ATT_LIMIT = "limit";
 
-    // SWAP Services constants:
+    // SWAP Services transaction constants:
     public static final int TXN_CAT_PURCHASE = 1;
     public static final int TXN_DOC_TYPE_ORDER = 22;
     public static final int TXN_DOC_TYPE_INVOICE = 41;
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
+    public static final int TXN_DOC_TYPE_PROFORMA = 52;
     public static final int TXN_REF_TYPE_ORDER = 22;
     public static final int TXN_REF_TYPE_SCALE_IN = 91;
+    
     /** Órden de compra. */
     public static final String TXN_REF_TYPE_ORDER_CODE = "OC";
     /** Boleto de báscula (de entrada). */
     public static final String TXN_REF_TYPE_SCALE_IN_CODE = "BB";
     
+    // Definition of required payment:
+    
+    public static final int PAY_NOT_REQ = 0; // pago no requerido
+    public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
+    public static final int PAY_DEF_BY_AMT_MAN = 11; // pago definido por monto (manual)
+    public static final int PAY_DEF_BY_PCT = 2; // pago definido por porcentaje
+    
+    /** Payment definition options. */
+    public static final HashMap<Integer, String> PayDefinitions = new HashMap<>();
+    
+    static {
+        PayDefinitions.put(PAY_NOT_REQ, "No requerido");
+        PayDefinitions.put(PAY_DEF_BY_AMT, "Por monto ($)");
+        PayDefinitions.put(PAY_DEF_BY_AMT_MAN, "Por monto manual ($)");
+        PayDefinitions.put(PAY_DEF_BY_PCT, "Por porcentaje (%)");
+    }
     /*
      * Sistema de Autorizaciones:
      */
@@ -179,6 +199,11 @@ public abstract class SSwapConsts {
      * Rol Proveedor.
      */
     public static final int ROL_SUPPLIER = 5;
+    
+    /**
+     * Rol administrador.
+     */
+    public static final int ROL_AUTHORIZATOR = 6;
     
     /**
      * Rol Agente Comprador.

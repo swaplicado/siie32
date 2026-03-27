@@ -33,6 +33,7 @@ public final class SCfdParams implements java.io.Serializable {
     private int mnSorianaEntregaMercancía;
     private Date mtSorianaRemisiónFecha;
     private java.lang.String msSorianaRemisiónFolio;
+    /** Además del folio de pedido Soriana, también puede tener, al menos, el númoero de orden de compra Hortifrut. */
     private java.lang.String msSorianaPedidoFolio;
     private int mnSorianaBultoTipo;
     private double mdSorianaBultoCantidad;
@@ -135,6 +136,7 @@ public final class SCfdParams implements java.io.Serializable {
     public void setSorianaEntregaMercancía(int n) { mnSorianaEntregaMercancía = n; }
     public void setSorianaRemisiónFecha(Date t) { mtSorianaRemisiónFecha = t; }
     public void setSorianaRemisiónFolio(java.lang.String s) { msSorianaRemisiónFolio = s; }
+    /** Además de poner el folio de pedido Soriana, también puede poner, al menos, el númoero de orden de compra Hortifrut. */
     public void setSorianaPedidoFolio(java.lang.String s) { msSorianaPedidoFolio = s; }
     public void setSorianaBultoTipo(int n) { mnSorianaBultoTipo = n; }
     public void setSorianaBultoCantidad(double d) { mdSorianaBultoCantidad = d; }
@@ -184,6 +186,7 @@ public final class SCfdParams implements java.io.Serializable {
     public int getSorianaEntregaMercancía() { return mnSorianaEntregaMercancía; }
     public Date getSorianaRemisiónFecha() { return mtSorianaRemisiónFecha; }
     public java.lang.String getSorianaRemisiónFolio() { return msSorianaRemisiónFolio; }
+    /** Además de obtener el folio de pedido Soriana, también puede obtener, al menos, el númoero de orden de compra Hortifrut. */
     public java.lang.String getSorianaPedidoFolio() { return msSorianaPedidoFolio; }
     public int getSorianaBultoTipo() { return mnSorianaBultoTipo; }
     public double getSorianaBultoCantidad() { return mdSorianaBultoCantidad; }

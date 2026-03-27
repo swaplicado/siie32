@@ -99,4 +99,34 @@ public class SExportDataReference implements SExportData {
      * Notas de autorización
      */
     public String auth_comments;
+    
+    /**
+     * Etiqueta contable
+     */
+    public String account_tag;
+
+    /**
+     * Peso bruto del boleto.
+     */
+    public double gross_weight;
+
+    /**
+     * Peso neto del boleto.
+     */
+    public double net_weight;
+
+    /**
+     * Origen del flete.
+     */
+    public String purchase_origin_location;
+
+    /**
+     * Origen de la fruta.
+     */
+    public String purchase_origin_zone;
+
+    /**
+     * Nombre del productor.
+     */
+    public String productor_name;
 }

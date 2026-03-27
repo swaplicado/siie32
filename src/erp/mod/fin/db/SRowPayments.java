@@ -11,7 +11,7 @@ import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SRowPayments implements SGridRow, Serializable {
     
@@ -25,6 +25,9 @@ public class SRowPayments implements SGridRow, Serializable {
     protected String msDocNum;
     protected double mdAmount;
     protected String msCur;
+    protected double mdExchangeRate;
+    protected double mdAmountCurrencyToPay;
+    protected String msCurToPay;
     protected boolean mbReceptionPayReq;
     protected int mnFuncArea;
     protected int mnFuncSubarea;
@@ -46,6 +49,9 @@ public class SRowPayments implements SGridRow, Serializable {
     public void setDocNum(String s) { msDocNum = s; };
     public void setAmount(double d) { mdAmount = d; };
     public void setCur(String s) { msCur = s; };
+    public void setExchangeRate(double d) { mdExchangeRate = d; };
+    public void setAmountCurrencyToPay(double d) { mdAmountCurrencyToPay = d; };
+    public void setCurToPay(String s) { msCurToPay = s; };
     public void setReceptionPayReq(boolean b) { mbReceptionPayReq = b; };
     public void setFuncArea(int n) { mnFuncArea = n; };
     public void setFuncSubarea(int n) { mnFuncSubarea = n; };
@@ -67,6 +73,9 @@ public class SRowPayments implements SGridRow, Serializable {
     public String getDocNum() { return msDocNum; }
     public double getAmount() { return mdAmount; }
     public String getCur() { return msCur; }
+    public double getExchangeRate() { return mdExchangeRate; }
+    public double getAmountCurrencyToPay() { return mdAmountCurrencyToPay; }
+    public String getCurToPay() { return msCurToPay; }
     public boolean getReceptionPayReq() { return mbReceptionPayReq; };
     public int getFuncArea() { return mnFuncArea; };
     public int getFuncSubarea() { return mnFuncSubarea; };
@@ -137,9 +146,18 @@ public class SRowPayments implements SGridRow, Serializable {
                 value = msCur;
                 break;
             case 6:
-                value = mbSelected;
+                value = mdExchangeRate;
                 break;
             case 7:
+                value = mdAmountCurrencyToPay;
+                break;
+            case 8:
+                value = msCurToPay;
+                break;
+            case 9:
+                value = mbSelected;
+                break;
+            case 10:
                 value = msNotes;
                 break;
             default:
@@ -152,7 +170,7 @@ public class SRowPayments implements SGridRow, Serializable {
     @Override
     public void setRowValueAt(Object value, int col) {
         switch (col) {
-            case 6: mbSelected = (boolean) value; break;
+            case 9: mbSelected = (boolean) value; break;
         }
     }
 }

@@ -1,4 +1,207 @@
 ================================================================================
+SIIE 3.2 297.1/ 2026-03-26
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE.
+2) Adecuación de textos en las vistas de solicitudes de pagos con la naturaleza de documento.
+
+================================================================================
+SIIE 3.2 297.0-b18/ 2026-03-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la determinación de manera de definir el pago requerido en la importación de facturas desde SWAP Services.
+
+================================================================================
+SIIE 3.2 297.0-b17/ 2026-03-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de addenda Hortifrut para facturas y NC de ventas, tomando como número de OC el dato referencia del documento.
+
+================================================================================
+SIIE 3.2 297.0-b16/ 2026-03-24
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Agregado filtro de área funcional a pantalla de consulta "Seguimiento al proceso de compras".
+2) Reasiganción de menú para pantalla de consulta "Seguimiento al proceso de compras".
+
+================================================================================
+SIIE 3.2 297.0-b15/ 2026-03-24
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Enviar notas al iniciarse autorización (si están disponibles) en envío automático de pagos.
+
+================================================================================
+SIIE 3.2 297.0-b14/ 2026-03-20
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Permitir selección de año al solicitar el reporte de movimientos contables de un proveedor desde Portal de Compras.
+
+================================================================================
+SIIE 3.2 297.0-b13/ 2026-03-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan columnas con método de pago y forma de pago en vistas de facturas.
+2) Procesamiento de XML del CFDI en importación para guardado de método de pago y forma de pago.
+3) Modificación de registro de DPS para guardado de método de pago y forma de pago.
+
+================================================================================
+SIIE 3.2 297.0-b12/ 2026-03-20
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección de la consulta de solicitudes de pago.
+
+================================================================================
+SIIE 3.2 297.0-b11/ 2026-03-19
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Vista de seguimiento al proceso de compras.
+
+================================================================================
+SIIE 3.2 297.0-b10/ 2026-03-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Vistas de pedidos de compra sin factura por surtir y surtidos.
+
+================================================================================
+SIIE 3.2 297.0-b9/ 2026-03-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al filtro de la consulta del diálogo seleccionador de pagos, para excluir pagos eliminados.
+
+================================================================================
+SIIE 3.2 297.0-b8/ 2026-03-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización y corrección de pagos desde forma de captura hasta layouts
+2) Vista integral de solicitudes de pago. Para este subtipo se muestran todos los pagos de tipo 'R'
+
+================================================================================
+SIIE 3.2 297.0-b7/ 2026-03-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a restricción de impresión de pedidos de compras sin autorizar, para ahora hacerlo mediante confirmación y asegurando que la impresión tenga la marca de agua con la leyenda "NO AUTORIZADO".
+
+================================================================================
+SIIE 3.2 297.0-b6/ 2026-03-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Exhibicón de la condición de urgente de facturas importadas desde SWAP Services, y su consideración al generarse sus solicitudes de pago.
+
+================================================================================
+SIIE 3.2 297.0-b5/ 2026-03-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de columnas de precio y moneda en el diálogo de relación de partidas de OC contra conceptos del CFDI en importación de facturas desde su CFDI en SIIE.
+
+================================================================================
+SIIE 3.2 297.0-b4/ 2026-03-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de implementación de la interfaz java.io.Serializable en la subclase SServicesUtils.ConfigSettings, para resolver el error en el intercambio de documentos entre el Cliente y el Servidor SIIE.
+
+================================================================================
+SIIE 3.2 297.0-b3/ 2026-03-06
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de la consulta en la vista consulta de solicitudes de pago.
+
+================================================================================
+SIIE 3.2 297.0-b2/ 2026-03-06
+César Ivan OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Liberación de funcionalidad de importación de proformas desde SWAP Services.
+
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Fix, al guardar cuenta pagadora y beneficiaria si son campos null en el dialogo de solicitudes de pago autorizadas.
+
+================================================================================
+SIIE 3.2 297.0-b1/ 2026-03-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Incorporación de funcionalidades para determinar mediante parámetro de configuración:
+- cuáles usuarios generan solicitudes de pago que se mandan en automático a autorizar al procesarse facturas desde SWAP Services;
+- cuáles tipos de procesamiento de documentos generan solicitudes de pago autorizadas en automático al procesarse facturas desde SWAP Services.
+
+================================================================================
+SIIE 3.2 295.7/ 2026-03-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión a permisos sobre opciones de repotes del Módulo Finanzas, para desasociar el acceso al informe de situación general de los estados financieros.
+
+================================================================================
+SIIE 3.2 295.5/ 2026-03-02
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Se acotaron las series asignadas a los usuarios.
+2) Se agrego la columna de activo a las vistas de solicitudes de pago.
+3) se agrego la columna de activo a las vista de flujo de efectivo y el filtro por fecha programada
+
+================================================================================
+SIIE 3.2 296.5/ 2026-03-02
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Se agregan los campos "Cuenta pagadora" u "Cuenta beneficiaria" en el dialogo de solicitudes de pago autorizadas.
+2) Se agregan columnas "Cuenta pagadora" u "Cuenta beneficiaria" en la vista de pagos operados.
+
+================================================================================
+SIIE 3.2 296.3/ 2026-02-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportación de etiqueta contable en dps a portal de compras.
+2) Exportación de peso bruto, peso neto, origen de fruta, origen de flete y productor
+en referencias de boletos a portal de compras
+
+================================================================================
+SIIE 3.2 296.4/ 2026-02-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega rol autorizador para portal de compras en permisos de usuarios.
+2) Se agrega botón de verificación de estatus de autorización en pedidos de compra.
+
+================================================================================
+SIIE 3.2 295.3/ 2026-02-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Exportación de etiqueta contable en dps a portal de compras.
+2) Exportación de peso bruto, peso neto, origen de fruta, origen de flete y productor
+en referencias de boletos a portal de compras
+
+================================================================================
+SIIE 3.2 295.2/ 2026-02-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega consulta a autorización de google en pedidos de compra para vista de DPS.
+2) Se agrega consulta de historial de flujo para pedidos de compra que tengan autorización en Google.
+3) Se agrega historial de quién envió pedido a autorización y sus comentarios.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Copiado de etiqueta contable a facturas desde el documento importado de SWAP Services.
+
+================================================================================
+SIIE 3.2 295.1/ 2026-02-12
+Adrián Alejandro AVILÉS GÓMEZ 
+--------------------------------------------------------------------------------
+1) Se agregó el campo account_tag en la clase SExportDataReference para su sincronización con el sistema de transacciones
+
+================================================================================
+SIIE 3.2 295.0/ 2026-02-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Incorporación de la fecha de vencimiento en el procesamiento y contabilización de facturas importadas desde SWAP Services.
+2) Consideración del monto total de la facturas contabilizadas cuando se vinculan a facturas importadas desde SWAP Services, al solicitarse el pago, por si el monto de la primera es distinto al de la segunda.
+3) Implementación de la configuración en parámetros de sistema y de la validación mediante confirmación del último día de pago de cada año contra la fecha requerida de pago en la gestión de solicitudes de pago.
+4) Habilitación de guardado de textos extensos de la descripción de facturas importadas en los registros de procesamiento de datos de SWAP Services.
+
+================================================================================
+SIIE 3.2 294.20/ 2026-02-04
+Jhonatan Claudio PEÑA HERNÁNDEZ, Adrian Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Corrección Saporis listas de precios.
+2) Clase para obtener el estado de cuenta de un proveedor desde servicios externos.
+
+================================================================================
 SIIE 3.2 294.19/ 2026-02-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

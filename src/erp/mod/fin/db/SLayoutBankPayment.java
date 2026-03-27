@@ -13,7 +13,7 @@ import sa.lib.SLibUtils;
 /**
  * Abstraction of a payment of a bank layout.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín, Edwin Carmona
  */
 public class SLayoutBankPayment {
     
@@ -32,6 +32,7 @@ public class SLayoutBankPayment {
     protected String msReferenceRecord;
     protected String msPrepaymentObservations;
     protected String msPrepaymentEmail;
+    protected int mnPaymentId;
     
     protected ArrayList<SLayoutBankDps> maLayoutBankDpss;
 
@@ -48,6 +49,7 @@ public class SLayoutBankPayment {
         msReferenceRecord = "";
         msPrepaymentObservations = "";
         msPrepaymentEmail = "";
+        mnPaymentId = 0;
         
         maLayoutBankDpss = new ArrayList<>();
     }
@@ -64,6 +66,7 @@ public class SLayoutBankPayment {
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setPrepaymentObservations(String s) { msPrepaymentObservations = s; }
     public void setPrepaymentEmail(String s) { msPrepaymentEmail = s; }
+    public void setPaymentId(int n) { mnPaymentId = n; }
     
     public int getTransactionType() { return mnTransactionType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
@@ -77,6 +80,7 @@ public class SLayoutBankPayment {
     public String getReferenceRecord() { return msReferenceRecord; }
     public String getPrepaymentObservations() { return msPrepaymentObservations; }
     public String getPrepaymentEmail() { return msPrepaymentEmail; }
+    public int getPaymentId() { return mnPaymentId; }
     
     public ArrayList<SLayoutBankDps> getLayoutBankDpss() { return maLayoutBankDpss; }
 
@@ -132,6 +136,7 @@ public class SLayoutBankPayment {
         clone.setReferenceRecord(this.getReferenceRecord());
         clone.setPrepaymentObservations(this.getPrepaymentObservations());
         clone.setPrepaymentEmail(this.getPrepaymentEmail());
+        clone.setPaymentId(this.getPaymentId());
         
         for (SLayoutBankDps child : maLayoutBankDpss) {
             if (child != null) {

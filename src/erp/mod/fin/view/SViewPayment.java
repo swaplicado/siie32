@@ -62,15 +62,15 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
     private static final String SUGGESTION_SPEED_UP = "SUGERENCIA: Si urge acelerar la aplicación de esta modificación, haga clic en el botón ";
     
-    private JLabel jlDate;
     private JRadioButton jrbDateApp;
     private JRadioButton jrbDateReq;
+    private JRadioButton jrbDateSched;
     private ButtonGroup bgDate;
     
     private boolean mbAppliesFilterDatePeriod;
@@ -78,8 +78,6 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterCurrency;
     private SDialogPdfViewer moDialogPdfViewer;
-    
-    private boolean mbAppliesDateRequired;
     
     private JButton jbDocShowCfdiXml;
     private JButton jbDocGetCfdiXml;
@@ -116,34 +114,34 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             setRowButtonsEnabled(true, false, true, false, true);
             jtbFilterDeleted.setEnabled(true);
         }
+        else if (mnGridSubtype == SModSysConsts.FINX_ALL_PAYMENTS) {
+            jtbFilterDeleted.setEnabled(true);
+        }
         else {
             // payments monitoring:
             setRowButtonsEnabled(false);
             jtbFilterDeleted.setEnabled(false);
         }
         
-        jlDate = new JLabel("Fecha:");
         jrbDateApp = new JRadioButton("Solicitud");
         jrbDateApp.setToolTipText("Filtrar por la fecha de la solicitud de pago");
-        
-        mbAppliesDateRequired = mnGridSubtype == SLibConsts.UNDEFINED || mnGridSubtype == SModSysConsts.FINS_ST_PAY_REJC;
-        
-        if (mbAppliesDateRequired) {
-            jrbDateReq = new JRadioButton("Requerida");
-            jrbDateReq.setToolTipText("Filtrar por la fecha requerida de pago");
-        }
-        else {
-            jrbDateReq = new JRadioButton("Programada");
-            jrbDateReq.setToolTipText("Filtrar por la fecha programada de pago");
-        }
-        
+
+        jrbDateReq = new JRadioButton("Requerida");
+        jrbDateReq.setToolTipText("Filtrar por la fecha requerida de pago");
+
+        jrbDateSched = new JRadioButton("Programada");
+        jrbDateSched.setToolTipText("Filtrar por la fecha programada de pago");
+
         bgDate = new ButtonGroup();
         bgDate.add(jrbDateApp);
         bgDate.add(jrbDateReq);
+        bgDate.add(jrbDateSched);
+
         bgDate.setSelected(jrbDateApp.getModel(), true);
-        
+
         jrbDateApp.addItemListener(this);
         jrbDateReq.addItemListener(this);
+        jrbDateSched.addItemListener(this);
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
@@ -190,12 +188,21 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
                 "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
         
-        if (SLibUtils.belongsTo(mnGridSubtype, new int[] { SLibConsts.UNDEFINED, SModSysConsts.FINS_ST_PAY_REJC, SModSysConsts.FINS_ST_PAY_SCHED, SModSysConsts.FINS_ST_PAY_CANC })) {
+        if (SLibUtils.belongsTo(mnGridSubtype, new int[] {
+                                                SLibConsts.UNDEFINED, 
+                                                SModSysConsts.FINS_ST_PAY_REJC, 
+                                                SModSysConsts.FINS_ST_PAY_SCHED, 
+                                                SModSysConsts.FINS_ST_PAY_CANC,
+                                                SModSysConsts.FINX_ALL_PAYMENTS
+                                            })) {
             mbAppliesFilterDatePeriod = true;
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlDate);
+//            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jlDate);
+//            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateApp);
+//            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateApp);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateSched);
         }
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
@@ -260,6 +267,12 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_CANC:
+                break;
+                
+            case SModSysConsts.FINX_ALL_PAYMENTS:
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JLabel());
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
                 break;
                 
             default:
@@ -705,6 +718,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             Date date = (Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
                             double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), payment.getFkCurrencyId(), date);
                             double amount = (double) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
+                            int[] paymentBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
+                            int[] benefBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
                             SDbPaymentEntry singleEntry = payment.getSingleEntry();
 
                             payment.setAuxReloadEntries(false);
@@ -713,6 +728,24 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                             payment.setDateExecution_n(date);
                             payment.setExecutedManually(true);
                             payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                            
+                            if (paymentBankKey != null) {
+                                payment.setFkPayerCashBizPartnerBranchId_n(paymentBankKey[0]);
+                                payment.setFkPayerCashAccountingCashId_n(paymentBankKey[1]);    
+                            }
+                            else {
+                                payment.setFkPayerCashBizPartnerBranchId_n(0);
+                                payment.setFkPayerCashAccountingCashId_n(0);
+                            }
+                            
+                            if (benefBankKey != null) {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankKey[0]);
+                                payment.setFkBeneficiaryBankAccountCashId_n(benefBankKey[1]);
+                            }
+                            else {
+                                payment.setFkBeneficiaryBankBizParterBranchId_n(0);
+                                payment.setFkBeneficiaryBankAccountCashId_n(0);
+                            }
 
                             payment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, singleEntry.getDocInstallment(), singleEntry.getDocBalancePreviousCy());
 
@@ -726,7 +759,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     else {
                         switch (status) {
                             case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de ppago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
                                         + "Intente más tarde de favor.");
                                 break;
                             default:
@@ -837,7 +870,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
                 SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
-                miClient.getSession().notifySuscriptors(SModConsts.FIN_PAY);
+                miClient.getSession().notifySuscriptors(mnGridType);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
@@ -857,7 +890,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         moPaneSettings.setUserInsertApplying(true);
         moPaneSettings.setUserUpdateApplying(true);
         moPaneSettings.setSystemApplying(true);
-        
+
         if (mnGridSubtype == SLibConsts.UNDEFINED) {
             filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
             if ((Boolean) filter) {
@@ -867,42 +900,46 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         else {
             sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
         }
-        
+
         if (mbAppliesFilterDatePeriod) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
+
             if (jrbDateApp.isSelected()) {
-                sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_app", (SGuiDate) filter);
+                sql += (sql.isEmpty() ? "" : "AND ") +
+                       SGridUtils.getSqlFilterDate("v.dt_app", (SGuiDate) filter);
             }
-            else {
-                if (mbAppliesDateRequired) {
-                    sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_req", (SGuiDate) filter);
-                }
-                else {
-                    sql += (sql.isEmpty() ? "" : "AND ") + "(v.dt_sched_n IS NOT NULL AND " + SGridUtils.getSqlFilterDate("v.dt_sched_n", (SGuiDate) filter) + ") ";
-                }
+            else if (jrbDateReq.isSelected()) {
+                sql += (sql.isEmpty() ? "" : "AND ") +
+                       SGridUtils.getSqlFilterDate("v.dt_req", (SGuiDate) filter);
+            }
+            else if (jrbDateSched.isSelected()) {
+                sql += (sql.isEmpty() ? "" : "AND ") +
+                       SGridUtils.getSqlFilterDate(
+                           "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END",
+                           (SGuiDate) filter);
             }
         }
-        
+
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue();
         if (filter != null && !((String) filter).isEmpty()) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_func IN (" + filter + ") ";
         }
-        
+
         filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_CUR)).getValue();
         if (filter != null && !((String) filter).isEmpty()) {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_cur IN (" + filter + ") ";
         }
-        setShowSums(filter != null && ((String) filter).split(",").length == 1); // only if a single currency is selected!
-        
+        setShowSums(filter != null && ((String) filter).split(",").length == 1);
+
         switch (mnGridSubtype) {
-            case SLibConsts.UNDEFINED: // payments management
+            case SLibConsts.UNDEFINED:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
-                + SModSysConsts.FINS_ST_PAY_NEW + ", " 
-                + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " 
-                + SModSysConsts.FINS_ST_PAY_REJC + ", " 
+                + SModSysConsts.FINS_ST_PAY_NEW + ", "
+                + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", "
+                + SModSysConsts.FINS_ST_PAY_REJC + ", "
                 + SModSysConsts.FINS_ST_PAY_REJC_P + ", "
-                + SModSysConsts.FINS_ST_PAY_SCHED + ", " 
-                + SModSysConsts.FINS_ST_PAY_SCHED_P + ", " 
+                + SModSysConsts.FINS_ST_PAY_SCHED + ", "
+                + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
                 + SModSysConsts.FINS_ST_PAY_SUBR + ", "
                 + SModSysConsts.FINS_ST_PAY_SUBR_P + ", "
                 + SModSysConsts.FINS_ST_PAY_BLOC + ", "
@@ -910,53 +947,70 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + SModSysConsts.FINS_ST_PAY_CANC + ", "
                 + SModSysConsts.FINS_ST_PAY_CANC_P + ") ";
                 break;
-                
+
             case SModSysConsts.FINS_ST_PAY_IN_AUTH:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_IN_AUTH + ") ";
                 break;
-                
+
             case SModSysConsts.FINS_ST_PAY_REJC:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_REJC + ", "
                         + SModSysConsts.FINS_ST_PAY_REJC_P + ") ";
                 break;
-                
+
             case SModSysConsts.FINS_ST_PAY_SCHED:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_SCHED + ", "
                         + SModSysConsts.FINS_ST_PAY_SCHED_P + ") ";
                 break;
-                
+
             case SModSysConsts.FINS_ST_PAY_BLOC:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_BLOC + ", "
                         + SModSysConsts.FINS_ST_PAY_BLOC_P + ") ";
                 break;
-                
+
             case SModSysConsts.FINS_ST_PAY_CANC:
                 sql += (sql.isEmpty() ? "" : "AND ") + "v.fk_st_pay IN ("
                         + SModSysConsts.FINS_ST_PAY_CANC + ", "
                         + SModSysConsts.FINS_ST_PAY_CANC_P + ") ";
                 break;
                 
+            case SModSysConsts.FINX_ALL_PAYMENTS:
+                sql += (sql.isEmpty() ? "" : "AND ") + "v.pay_tp = 'R' ";
+                break;
+
             default:
-                // nothing
         }
-        
+
+        String sqlDateField = "";
+
+        if (jrbDateApp.isSelected()) {
+            sqlDateField = "v.dt_app";
+        }
+        else if (jrbDateReq.isSelected()) {
+            sqlDateField = "v.dt_req";
+        }
+        else {
+            sqlDateField = "v.dt_sched_n";
+        }
+
         String sqlOrders = "SELECT GROUP_CONCAT(DISTINCT CONCAT(ord.num_ser, IF(ord.num_ser = '', '', '-'), ord.num) ORDER BY ord.num_ser, ord.num SEPARATOR '; ' ) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS ord ON ord.id_year = dds.id_src_year AND ord.id_doc = dds.id_src_doc "
                 + "WHERE NOT ord.b_del AND ord.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " AND dds.id_des_year = d.id_year AND dds.id_des_doc = d.id_doc";
-        
+
         msSql = "SELECT "
                 + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
                 + "CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) AS " + SDbConsts.FIELD_CODE + ", "
                 + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
-                + "v.dt_app AS " + SDbConsts.FIELD_DATE + ", "
+                + sqlDateField + " AS " + SDbConsts.FIELD_DATE + ", "   // <-- SIEMPRE DATE
                 + "v.pay_exc_rate_app, "
                 + "v.dt_req, "
-                + "v.dt_sched_n, "
+                + (jrbDateSched.isSelected() ? "CASE WHEN v.dt_sched_n IS NOT NULL THEN DATE_FORMAT(v.dt_sched_n, '%d/%m/%Y') " 
+                + "ELSE CONCAT(DATE_FORMAT(v.dt_req, '%d/%m/%Y'), '* SIN AUTORIZAR') END " : "'' " )
+                + "AS dt_sched_n, "
                 + "v.b_resched, "
                 + "v.dt_exec_n, "
                 + "v.b_exec_man, "
@@ -996,7 +1050,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "us.usr AS _usr_sched, "
                 + "urs.usr AS _usr_resched, "
                 + "ue.usr AS _usr_exec, "
-                + "(" + sqlOrders + ") AS _orders "
+                + "(" + sqlOrders + ") AS _orders, "
+                + "COALESCE(nat.code, 'S/DOC') AS nat "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " AS ve ON "
                 + "v.id_pay = ve.id_pay "
@@ -1024,8 +1079,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ve.fk_ety_cur = ce.id_cur "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
+                + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.ser, LPAD(v.num, 9, '0'), " + (jrbDateApp.isSelected() ? "v.dt_app" : "COALESCE(dt_sched_n, dt_req)") + ", b.bp "; // ): sort up to 999,999,999
+                + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
+                + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
+                + ", b.bp ";
     }
 
     @Override
@@ -1042,7 +1100,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "ve.des_pay_app_ety_cur", "Monto a pagar $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "ce.cur_key", "Moneda a pagar"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_req", "Fecha requerida pago"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sched_n", "Fecha programada pago"));
+        column= new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "dt_sched_n", "Fecha programada pago");
+        gridColumnsViews.add(column);
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_exec_n", "Fecha operación pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "c.cur", "Moneda requerida pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_priority", "Prioridad pago", 50));
@@ -1062,6 +1121,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(column);
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_sched", "Usr aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_sched", "Usr TS aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_resched", "Reprogramado"));
@@ -1153,8 +1213,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         if (e.getSource() instanceof JRadioButton && e.getStateChange() == ItemEvent.SELECTED) {
             JRadioButton radioButton = (JRadioButton) e.getSource();
             
-            if (radioButton == jrbDateApp || radioButton == jrbDateReq) {
+            if (radioButton == jrbDateApp || radioButton == jrbDateReq || radioButton == jrbDateSched) {
                 refreshGridWithRefresh();
+                
             }
         }
     }

@@ -111,6 +111,9 @@ public abstract class SUserUtils {
                 else if (role.equals("" + SSyncRoles.ADMINISTRADOR)) {
                     userRoles.add(SSwapConsts.ROL_ADMINISTRATOR);
                 }
+                else if (role.equals("" + SSyncRoles.AUTORIZADOR)) {
+                    userRoles.add(SSwapConsts.ROL_AUTHORIZATOR);
+                }
             }
         }
         

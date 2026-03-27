@@ -11,7 +11,7 @@ import sa.lib.SLibConsts;
 /**
  * Abstraction of a payment for XML representation of bank layouts.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Edwin Carmona
  */
 public class SLayoutBankXmlRow {
     
@@ -52,6 +52,7 @@ public class SLayoutBankXmlRow {
     protected String msObservations;
     protected String msEmail;
     protected boolean mbPayed;
+    protected int mnPaymentId;
 
     public SLayoutBankXmlRow() {
         mnTransactionType = 0;
@@ -91,6 +92,7 @@ public class SLayoutBankXmlRow {
         msObservations = "";
         msEmail = "";
         mbPayed = false;
+        mnPaymentId = 0;
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -130,6 +132,7 @@ public class SLayoutBankXmlRow {
     public void setObservations(String s) { msObservations = s; }
     public void setEmail(String s) { msEmail = s; }
     public void setPayed(boolean b) { mbPayed = b; }
+    public void setPaymentId(int n) { mnPaymentId = n; }
     
     public int getTransactionType() { return mnTransactionType; }
     public int getDpsYearId() { return mnDpsYearId; }
@@ -168,6 +171,7 @@ public class SLayoutBankXmlRow {
     public String getObservations() { return msObservations; }
     public String getEmail() { return msEmail; }
     public boolean isPayed() { return mbPayed; }
+    public int getPaymentId() { return mnPaymentId; }
     
     public int[] getPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
@@ -226,6 +230,7 @@ public class SLayoutBankXmlRow {
         clone.setObservations(this.getObservations());
         clone.setEmail(this.getEmail());
         clone.setPayed(this.isPayed());
+        clone.setPaymentId(this.getPaymentId());
         
         return clone;
     }

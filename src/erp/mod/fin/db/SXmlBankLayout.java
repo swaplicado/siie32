@@ -18,7 +18,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín, Edwin Carmona
  */
 public class SXmlBankLayout extends SXmlDocument {
 
@@ -106,6 +106,7 @@ public class SXmlBankLayout extends SXmlDocument {
                     xmlPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(SXmlUtils.extractAttributeValue(paymentDocNodeMap, SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC, true));
                     xmlPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(SXmlUtils.extractAttributeValue(paymentDocNodeMap, SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS, true));
                     xmlPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).setValue(SXmlUtils.extractAttributeValue(paymentDocNodeMap, SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL, false)); // optional
+                    xmlPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).setValue(SXmlUtils.extractAttributeValue(paymentDocNodeMap, SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID, false)); // optional
 
                     xmlPayment.getXmlElements().add(xmlPaymentDoc);
                 }

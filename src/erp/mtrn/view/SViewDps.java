@@ -42,12 +42,14 @@ import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocument;
+import erp.mod.cfg.swap.utils.SAuthzUtils;
 import erp.mod.cfg.swap.utils.SDataRejectResource;
 import erp.mod.cfg.swap.utils.SExportDataAuthActor;
 import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.swap.utils.SServicesUtils;
+import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -175,6 +177,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebDownloadSupportFiles;
     private javax.swing.JButton jbAuthWebClearSupportFiles;
     private javax.swing.JButton jbAuthWebAnnullAuth;
+    private javax.swing.JButton jbAuthWebForceCheckAuthStatus;
     private javax.swing.JFileChooser moAuthWebFileChooser;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -525,12 +528,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthLog = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")));
             jbAuthWebViewAuthLog.setPreferredSize(new Dimension(23, 23));
             jbAuthWebViewAuthLog.addActionListener(this);
-            jbAuthWebViewAuthLog.setToolTipText("Ver bitácora de autorización de la orden en app web");
+            jbAuthWebViewAuthLog.setToolTipText("Estatus de autorización");
 
             jbAuthWebViewAuthComments = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")));
             jbAuthWebViewAuthComments.setPreferredSize(new Dimension(23, 23));
             jbAuthWebViewAuthComments.addActionListener(this);
-            jbAuthWebViewAuthComments.setToolTipText("Ver comentarios de autorización de la orden en app web");
+            jbAuthWebViewAuthComments.setToolTipText("Ver historial de autorización de la orden en app web");
 
             jbAuthWebDownloadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
             jbAuthWebDownloadSupportFiles.setPreferredSize(new Dimension(23, 23));
@@ -546,6 +549,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebAnnullAuth.setPreferredSize(new Dimension(23, 23));
             jbAuthWebAnnullAuth.addActionListener(this);
             jbAuthWebAnnullAuth.setToolTipText("Anular autorización de la orden en app web");
+            
+            jbAuthWebForceCheckAuthStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_doub_check.gif")));
+            jbAuthWebForceCheckAuthStatus.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebForceCheckAuthStatus.addActionListener(this);
+            jbAuthWebForceCheckAuthStatus.setToolTipText("Verificar estatus de autorización");
         }
         
         moTabFilterUser = new STabFilterUsers(miClient, this);
@@ -621,6 +629,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
             addTaskBarUpperComponent(jbAuthWebClearSupportFiles);
             addTaskBarUpperComponent(jbAuthWebAnnullAuth);
+            addTaskBarUpperComponent(jbAuthWebForceCheckAuthStatus);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -709,24 +718,25 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebDownloadSupportFiles.setEnabled(true);
             jbAuthWebClearSupportFiles.setEnabled(true);
             jbAuthWebAnnullAuth.setEnabled(true);
+            jbAuthWebForceCheckAuthStatus.setEnabled(true);
         }
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[51]; // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[53]; // extra columns for accounting record and CFD info
         }
         else if (mbIsOrd) {
             if (mbIsAuthWebAvailable) {
-                aoTableColumns = new STableColumn[49];
+                aoTableColumns = new STableColumn[51];
             }
             else {
-                aoTableColumns = new STableColumn[44];
+                aoTableColumns = new STableColumn[46];
             }
         }
         else {
-            aoTableColumns = new STableColumn[43];
+            aoTableColumns = new STableColumn[45];
         }
 
         i = 0;
@@ -758,7 +768,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Cliente", 200);
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave cliente", 50);
                 }
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal cliente", 75);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bde pb", "Sucursal cliente", 75);
             }
 
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico", "Estatus", STableConstants.WIDTH_ICON);
@@ -849,6 +859,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza documento", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_func_sub_code", "Subárea funcional", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_pay_method", "Método pago", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_pay_way", "Forma pago", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_concept", "Concepto documento", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_mfg_ord", "Orden producción", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_copy", "Copia", STableConstants.WIDTH_BOOLEAN);
@@ -1151,56 +1163,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
-            /*
-            FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
-            miClient.getFileChooser().repaint();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
-            miClient.getFileChooser().setFileFilter(filter);
-            
-            SDataDps purchaseOrderDps = null; 
-
-            if (linkToOrder) {
-                moDialogDpsFinder.formReset();
-                moDialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, getDpsClassPreviousKey());
-                moDialogDpsFinder.setVisible(true);
-
-                if (moDialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    purchaseOrderDps = (SDataDps) moDialogDpsFinder.getValue(SDataConstants.TRN_DPS);
-                }
-            }
-
-            try {
-                if (!linkToOrder || (linkToOrder && purchaseOrderDps != null)) {
-                    if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        File file = miClient.getFileChooser().getSelectedFile();
-                        
-                        if (file.getName().toLowerCase().contains(".xml")) {
-                            SCfdRenderer renderer = new SCfdRenderer(miClient);
-                            SDataDps dpsRendered = renderer.renderCfdi(file, purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-                            
-                            if (dpsRendered != null) {
-                                miClient.getGuiModule(mnModule).setFormComplement(new Object[] { getDpsTypeKey(), false }); // document type key, is imported
-                                miClient.getGuiModule(mnModule).setAuxRegistry(dpsRendered);
-                                
-                                if (miClient.getGuiModule(mnModule).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
-                                    SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(mnModule).getRegistry());
-                                }
-                            }
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
-                                    + "(Archivo proporcionado: '" + file.getName() + "')");
-                        }
-                    }
-                    
-                    miClient.getFileChooser().resetChoosableFileFilters();
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(this, e);
-            }
-            */
         }
     }
     
@@ -1646,11 +1608,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     
                     if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD })) {
                         // order:
+                        
+                        boolean print = true;
 
                         if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && !dps.getIsAuthorized()) {
-                            miClient.showMsgBoxWarning("No se puede imprimir el documento porque su estatus es:\n-" + dps.getDbmsAuthorizationStatusName() + ".");
+                            print = miClient.showMsgBoxConfirm("El pedido '" + dps.getDpsNumber() + "' no está autorizado. Su estatus es '" + dps.getDbmsAuthorizationStatusName() + "'.\n"
+                                    + "De cualquier manera, ¿desea imprimirlo?") == JOptionPane.YES_OPTION;
                         }
-                        else {
+                        
+                        if (print) {
                             try {
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 
@@ -3449,6 +3415,27 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionForceCheckAuth() {
+        if (jbAuthWebForceCheckAuthStatus.isEnabled()) {
+            if (! isRowSelected()) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                String statusResponse = SAuthzUtils.forceCheckAuthStatus(miClient.getSession(), 
+                                            SSwapConsts.RESOURCE_TYPE_PUR_ORDER, 
+                                            moTablePane.getSelectedTableRow().getPrimaryKey());
+                if (statusResponse != null && statusResponse.isEmpty()) {
+                    miClient.showMsgBoxInformation("Estado de autorización verificado");
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
+                    miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRN_DPS);
+                }
+                else {
+                    miClient.showMsgBoxWarning(statusResponse);
+                }
+            }
+        }
+    }
+    
     public void publicActionPrint() {
         actionPrint(false);
     }
@@ -3516,6 +3503,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                "COALESCE(dc.pay_met, 'N/D') AS _pay_method, " +
+                "COALESCE(dc.pay_way, 'N/D') AS _pay_way, " +
                 (mbIsAuthWebAvailable ? "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, " +
                 "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SALES + ", 0) AS send, " +
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
@@ -3529,6 +3518,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsAuthWebAvailable) {
             msSql += "IF ((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stp WHERE "
                     + "     NOT stp.b_del AND stp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "     AND stp.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND stp.res_pk_n1_n = d.id_year AND stp.res_pk_n2_n = d.id_doc) > 0,"
                     + "(IF(d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + ", "
                     + "    COALESCE((SELECT GROUP_CONCAT(usr SEPARATOR ',') "
@@ -3537,12 +3527,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
                     + "    WHERE "
                     + "        NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND steps1.res_pk_n1_n = d.id_year AND steps1.res_pk_n2_n = d.id_doc "
                     + "        AND NOT steps1.b_authorn AND steps1.b_reject AND steps1.lev = (SELECT step2.lev "
                     + "    FROM "
                     + "        cfgu_authorn_step AS step2 "
                     + "    WHERE "
                     + "        NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND step2.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND step2.res_pk_n1_n = d.id_year AND step2.res_pk_n2_n = d.id_doc "
                     + "        AND NOT step2.b_authorn AND step2.b_reject "
                     + "    ORDER BY step2.lev DESC "
@@ -3556,6 +3548,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
                     + "    WHERE "
                     + "        NOT steps1.b_del AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND steps1.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND steps1.res_pk_n1_n = d.id_year AND steps1.res_pk_n2_n = d.id_doc "
                     + "        AND NOT steps1.b_authorn AND NOT steps1.b_reject "
                     + "        AND steps1.lev = (SELECT step2.lev "
@@ -3563,12 +3556,25 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        cfgu_authorn_step AS step2 "
                     + "    WHERE "
                     + "        NOT step2.b_del AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND step2.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " "
                     + "        AND step2.res_pk_n1_n = d.id_year AND step2.res_pk_n2_n = d.id_doc "
                     + "        AND NOT step2.b_authorn AND NOT step2.b_reject "
                     + "    ORDER BY step2.lev ASC "
                     + "    LIMIT 1)), "
-                    + "    '')))),"
-                    + "'N/D') AS user_in_turn, ";
+                    + "    '')))), "
+                    + "COALESCE((SELECT  "
+                    + "    ug.usr "
+                    + "FROM "
+                    + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS gstp "
+                    + "        LEFT JOIN "
+                    + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ug ON gstp.fk_usr_step = ug.id_usr "
+                    + "WHERE "
+                    + "    NOT gstp.b_del "
+                    + "        AND gstp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
+                    + "        AND gstp.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + " "
+                    + "        AND gstp.res_pk_n1_n = d.id_year "
+                    + "        AND gstp.res_pk_n2_n = d.id_doc "
+                    + "LIMIT 1), 'N/D')) AS user_in_turn, ";
         }
         
         String sqlOrders = mbIsDoc ? (
@@ -3679,7 +3685,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 (mbIsAuthWebAvailable ? "LEFT OUTER JOIN trn_sup_file_dps AS fl ON d.id_year = fl.id_year AND d.id_doc = fl.id_doc " +
                 "LEFT OUTER JOIN trn_dps_authorn AS ah ON d.id_year = ah.id_year AND d.id_doc = ah.id_doc AND NOT ah.b_del " +
                 "LEFT OUTER JOIN erp.cfgs_st_authorn AS sah ON ah.fid_st_authorn = sah.id_st_authorn " : "") +
-                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
+                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " +
+                "LEFT OUTER JOIN trn_dps_cfd AS dc ON d.id_year = dc.id_year AND d.id_doc = dc.id_doc " +
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc " +
                 "LEFT OUTER JOIN erp.usru_usr AS xu ON x.fid_usr_prc = xu.id_usr ";
@@ -3723,7 +3730,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
 
             msSql += "bp.id_bp, bpb.bpb, bpb.id_bpb ";
-        }  
+        }
+        
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+            erp.lib.gui.SGuiDate oGuiDate = (erp.lib.gui.SGuiDate) moTabFilterDatePeriod.getDate();
+            boolean isByYear = oGuiDate.getDataType() == SLibConstants.GUI_DATE_AS_YEAR;
+            SAuthDBUtils.refreshAuthMsAuthData(miClient.getSession(), msSql, isByYear);
+        }
     }
 
     @Override
@@ -3877,6 +3890,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbAuthWebAnnullAuth) {
                     actionAuthWebAnnullAuth();
+                }
+                else if (button == jbAuthWebForceCheckAuthStatus) {
+                    actionForceCheckAuth();
                 }
             }
         }
