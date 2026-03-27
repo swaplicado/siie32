@@ -22,7 +22,7 @@ import sa.lib.SLibUtils;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -108,11 +108,13 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
-
     protected erp.mitm.data.SDataUnit moDbmsDataUnit;
     protected erp.mitm.data.SDataItemGeneric moDbmsDataItemGeneric;
     protected erp.mitm.data.SDataUnit moDbmsDataCommercialUnit;
     protected java.util.Vector<erp.mitm.data.SDataItemBarcode> mvDbmsItemBarcodes;
+    protected boolean mbExistItemDescription;
+    protected java.lang.String msCompItemDescription;
+    protected boolean mbCompItemDescriptionIsDeleted;
     protected java.util.Vector<erp.mitm.data.SDataItemConfigLanguage> mvDbmsItemConfigLanguages;
     protected ArrayList<SDataItemMaterialAttribute> mlItemAttributes;
 
@@ -206,7 +208,9 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
-
+    public void setExistItemDescription(boolean b) { mbExistItemDescription = b; }
+    public void setCompItemDescription(java.lang.String description) { msCompItemDescription = description; }
+    public void setIsItemDescriptionIsDeleted(boolean b) { mbCompItemDescriptionIsDeleted = b; }
     public int getPkItemId() { return mnPkItemId; }
     public java.lang.String getKey() { return msKey; }
     public java.lang.String getItem() { return msItem; }
@@ -294,6 +298,9 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public erp.mitm.data.SDataUnit getDbmsDataCommercialUnit() { return moDbmsDataCommercialUnit; }
     public erp.mitm.data.SDataItemGeneric getDbmsDataItemGeneric() { return moDbmsDataItemGeneric; }
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
+    public boolean getExistItemDescription() { return mbExistItemDescription; }
+    public java.lang.String getCompItemDescription() { return msCompItemDescription; }
+    public boolean getCompItemDescriptionIsDeleted() { return mbCompItemDescriptionIsDeleted;}
     public java.util.Vector<SDataItemConfigLanguage> getDbmsItemConfigLanguages() { return mvDbmsItemConfigLanguages; }
     public ArrayList<SDataItemMaterialAttribute> getDbmsItemAttributes() { return mlItemAttributes; }
 
@@ -344,7 +351,14 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         
         return apply;
     }
-
+    
+    public boolean hasItemDescription() {
+        return mbExistItemDescription 
+               && !mbCompItemDescriptionIsDeleted
+               && msCompItemDescription != null
+               && !msCompItemDescription.trim().isEmpty();
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkItemId = ((int[]) pk)[0];
@@ -441,11 +455,14 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
-
+        
         moDbmsDataUnit = null;
         moDbmsDataCommercialUnit = null;
         moDbmsDataItemGeneric = null;
         mvDbmsItemBarcodes.clear();
+        mbExistItemDescription = false;
+        msCompItemDescription = "";
+        mbCompItemDescriptionIsDeleted = false;
         mvDbmsItemConfigLanguages.clear();
         mlItemAttributes.clear();
     }
@@ -549,7 +566,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
-
+                
                 // Read aswell unit object:
 
                 moDbmsDataUnit = new SDataUnit();
@@ -576,6 +593,16 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
 
                 statementAux = statement.getConnection().createStatement();
 
+                // Read aswell item description:
+                
+                sql = "SELECT item_desc, b_del FROM erp.itmu_item_desc WHERE id_item = " + key[0] + " ";                
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    mbExistItemDescription = true;
+                    msCompItemDescription = resultSet.getString("item_desc");
+                    mbCompItemDescriptionIsDeleted = resultSet.getBoolean("b_del"); 
+                }
+                
                 // Read aswell barcodes:
 
                 sql = "SELECT id_item, id_barc FROM erp.itmu_item_barc WHERE id_item = " + key[0] + " ORDER BY id_item, id_barc ";
@@ -734,7 +761,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+            callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);            
             callableStatement.execute();
 
             mnPkItemId = callableStatement.getInt(nParam - 3);
@@ -746,6 +773,31 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             }
             else {
                 statement = connection.createStatement();
+                
+                // Save as well item description:
+
+                if (mbExistItemDescription && msCompItemDescription.isEmpty()) {
+                    sql = "DELETE FROM erp.itmu_item_desc WHERE id_item = " + mnPkItemId;
+                    statement.execute(sql);
+                }
+                else if (!msCompItemDescription.isEmpty()) {
+                    if (!mbExistItemDescription) {
+                        sql = "INSERT INTO erp.itmu_item_desc (id_item, item_desc, b_del) VALUES ("
+                                + mnPkItemId + ", '"
+                                + msCompItemDescription.replace("'", "''") + "', "
+                                + (mbCompItemDescriptionIsDeleted ? 1 : 0)
+                                + ")";
+                        statement.execute(sql);
+                    }
+                    else {
+                        sql = "UPDATE erp.itmu_item_desc SET "
+                                + "item_desc = '" + msCompItemDescription.replace("'", "''") + "', "
+                                + "b_del = " + (mbCompItemDescriptionIsDeleted ? 1 : 0) + " "
+                                + "WHERE id_item = " + mnPkItemId;
+                        statement.execute(sql);
+                    }
+                }
+
                 // Save aswell the barcodes:
 
                 for (i = 0; i < mvDbmsItemBarcodes.size(); i++) {
@@ -754,7 +806,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
-
+                
                 // Save aswell foreign language descriptions:
 
                 sql = "DELETE FROM erp.itmu_cfg_item_lan WHERE id_item = " + mnPkItemId + " ";

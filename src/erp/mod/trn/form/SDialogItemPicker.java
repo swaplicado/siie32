@@ -5,6 +5,8 @@
  */
 package erp.mod.trn.form;
 
+import erp.mod.itm.db.SDbItemDescription;
+import erp.mod.itm.form.SDialogExtendItemDescription;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SRowItemPicker;
 import java.awt.BorderLayout;
@@ -16,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Vector;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JRadioButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -23,19 +27,20 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servin, Rodrigo Ayala
  */
 public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener, ItemListener {
 
     /**
      * Creates new form SBeanItemPicker
      */
-    
+
     public static final int ALL_ITEMS = 1;
     public static final int INV_ITEMS = 2;
     public static final int NOINV_ITEMS = 3;
@@ -47,6 +52,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpInvControl;
     private javax.swing.JPanel jpRefControl;
+    private javax.swing.JPanel panelCommands; // obtener el panel de CommandsSys
     private javax.swing.JLabel jlSearchItems;
     protected sa.lib.gui.bean.SBeanFieldText moSearchItem;
     private Vector<SGridRow> moAllRows;
@@ -59,8 +65,11 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.JRadioButton jrbAssItem;
     private javax.swing.JRadioButton jrbPurItem;
     private javax.swing.JRadioButton jrbExpItem;
+    private javax.swing.JButton jbViewItemDesc;
     private javax.swing.ButtonGroup jbgItems;
     private javax.swing.JLabel jlShowedItems;
+    
+    private SDialogExtendItemDescription moDialogItemDesc;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -156,9 +165,22 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         jpRefControl.add(jrbPurItem);            
         jpRefControl.add(jrbExpItem);
         
+        jbViewItemDesc = new JButton();
+        jbViewItemDesc.setToolTipText("Ver descripción extendida del ítem");
+        jbViewItemDesc.setIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_item_desc.jpg")));
+        jbViewItemDesc.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbViewItemDesc.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbViewItemDesc.addActionListener(e -> actionViewItemDescription());
+        jbViewItemDesc.setEnabled(true);
+        
+        moDialogItemDesc = null;
+        
+        panelCommands = moGridPicker.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT);
+        panelCommands.add(jbViewItemDesc, 0);
     }
     
     private void stateChangeAllItems() {
+        moAllRowsAux.clear();
         moAllRowsAux.addAll(moAllRows);
         moGridPicker.populateGrid(moAllRowsAux);
     }
@@ -223,17 +245,6 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         moGridPicker.populateGrid(moAllRowsAux);
     }
     
-//    public void setItemPickerInvDefault(boolean inv) {
-//        if (inv) {
-//            jrbInvItem.setSelected(true);
-//            stateChangeInvItem();
-//        }
-//        else {
-//            jrbNoInvItem.setSelected(true);
-//            stateChangeNoInvItem();
-//        }
-//    }
-    
     public void setDefaultEnableRadio(int radio){
         switch (radio) {
             case ALL_ITEMS:
@@ -265,6 +276,32 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
                 stateChangeExpItem();
                 break;
         }
+    }
+    
+    public void setEnableItemFilters(final int[] allowedModes, final int defaultMode) {
+        JRadioButton[] radios = new JRadioButton[] {
+            jrbAllItems,   
+            jrbInvItem,    
+            jrbNoInvItem,  
+            jrbSalItem,    
+            jrbAssItem,    
+            jrbPurItem,    
+            jrbExpItem     
+        };
+
+        for (JRadioButton radio : radios) {
+            radio.setEnabled(false);
+        }
+
+        for (int mode : allowedModes) {
+            if (mode >= 1 && mode <= 7) {
+                radios[mode - 1].setEnabled(true);
+            }
+        }
+
+        setDefaultEnableRadio(defaultMode);
+        radios[defaultMode - 1].setEnabled(true);
+        radios[defaultMode - 1].setSelected(true);
     }
     
     public void setShowedItems(String text) {
@@ -434,6 +471,48 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
             }
             else if (radioButton == jrbExpItem) {
                 stateChangeExpItem();
+            }
+        }
+    }
+    
+    private void actionViewItemDescription() {
+        SRowItemPicker row = (SRowItemPicker) moGridPicker.getSelectedGridRow();
+
+        if (row == null) {
+            miClient.showMsgBoxWarning("Debe seleccionar un ítem.");
+            return;
+        }
+
+        int[] key = row.getRowPrimaryKey();
+        int idItem = key[0];
+
+        try {
+            SDbItemDescription desc = new SDbItemDescription();
+            desc.read(miClient.getSession(), key);
+            
+            if (desc.getItemDescription() == null || desc.getItemDescription().isEmpty() || desc.getIsDeleted()) {
+                miClient.showMsgBoxInformation("El ítem no tiene descripción extendida.");
+                return;
+            }
+
+            if (moDialogItemDesc == null) {
+                moDialogItemDesc = new SDialogExtendItemDescription();
+            }
+
+            String itemKey = row.getRowValueAt(0).toString();
+            String itemName = row.getRowValueAt(1).toString();
+
+            moDialogItemDesc.setItemData(idItem, itemKey, itemName);
+            moDialogItemDesc.setRegistry(desc);
+            moDialogItemDesc.setVisible(true);
+
+        }
+        catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains(SDbConsts.ERR_MSG_REG_NOT_FOUND)) {
+                miClient.showMsgBoxInformation("El ítem no tiene descripción extendida.");
+            }
+            else {
+                SLibUtils.showException(this, e);
             }
         }
     }

@@ -33,7 +33,6 @@ import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDateCutOff;
-import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
@@ -46,32 +45,33 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Edwin Carmona, Rodrigo Ayala
+ * @author Rodrigo Ayala
  */
-public class SViewMaterialRequestPendingEstimation extends SGridPaneView implements ActionListener {
+public class SViewMaterialRequestPendingOrders extends SGridPaneView implements ActionListener{
     
     private JButton jbPrint;
-    private JButton mjbToNew; // regresar al solicitante
+    private JButton mjbToNew;
     private JButton mjbToSupply;
     private JButton mjbToEstimate;
     private JButton mjbEstimationKardex;
     private JButton jbDocsCardex;
     private JButton jbLogCardex;
-    private JButton mjbCloseForQuotation;
-    private JButton mjbReopenForQuotation;
-    //private JButton mjbClose;
-    //private JButton mjbOpen;
+    private JButton mjbClsEstimate;
     private JTextField moTextToSearch;
-    private JButton mjbSearch;
+    private JButton mjbToSearch;
     private JButton mjbCleanSearch;
-    private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterDateCutOff moFilterDateCutOff;
     private SDialogMaterialRequestEstimation moDialogEstimate;
     private SDialogMaterialRequestEstimationCardex moDialogEstimationKardex;
     private SDialogMaterialRequestDocsCardex moDialogDocsCardex;
     private SDialogMaterialRequestLogsCardex moDialogLogsCardex;
-    private boolean mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_REV).HasRight;
+    private boolean mbHasAdmRight;
     private String msSeekQueryText;
+
+    public SViewMaterialRequestPendingOrders(SGuiClient client, int viewType, int gridType, int gridSubtype, String title) {
+        super(client, viewType, gridType, gridSubtype, title);
+        initGrid();
+    }
     
     /**
      * @param client GUI client.
@@ -80,9 +80,11 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
      * @param title View's GUI tab title.
      * @param params
      */
-    public SViewMaterialRequestPendingEstimation(SGuiClient client, int type, int subtype, String title, SGuiParams params) {
+    public SViewMaterialRequestPendingOrders(SGuiClient client, int type, int subtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, type, subtype, title, params);
         initComponents();
+        initGrid();
+
     }
     
     private void initComponents() {
@@ -93,10 +95,9 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         mjbEstimationKardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex_money.gif")), "Ver solicitudes de cotización", this);
         jbDocsCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documentos relacionados", this);
         jbLogCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_detail.gif")), "Ver bitácora de cambios", this);
-        mjbCloseForQuotation = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_close_to_qtn.gif")), "Cerrar para solicitar cotización", this);
-        mjbReopenForQuotation = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_thumbs_up.gif")), "Reabrir para solicitar cotización", this);
+        mjbClsEstimate = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_close_to_qtn.gif")), "Cerrar para solicitar cotización", this);
         
-        mjbSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
+        mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Buscar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")), "Limpiar búsqueda", this);
         mbHasAdmRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_INV_REQ_MAT_ADMOR).HasRight;
         
@@ -112,34 +113,25 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbEstimationKardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDocsCardex);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLogCardex);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCloseForQuotation);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbReopenForQuotation);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbClsEstimate);
         moTextToSearch = new JTextField("");
         moTextToSearch.setPreferredSize(new Dimension(150, 23));
         moTextToSearch.setToolTipText("Escriba el ítem deseado"); 
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
         
         jbPrint.setEnabled(true);
         mjbToSupply.setEnabled(true);
         mjbToEstimate.setEnabled(true);
-        mjbEstimationKardex.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED);
+        mjbEstimationKardex.setEnabled(true);
         jbDocsCardex.setEnabled(true);
         jbLogCardex.setEnabled(true);
-        mjbCloseForQuotation.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE);
-        mjbReopenForQuotation.setEnabled(mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED);
+        mjbClsEstimate.setEnabled(true);
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
-            moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
-            moFilterDateCutOff.initFilter(null);
-            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
-        }
-        else {
-            moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
-            moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        }
+        moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
+        moFilterDateCutOff.initFilter(null);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         
         moDialogDocsCardex = new SDialogMaterialRequestDocsCardex(miClient, "Documentos relacionados de la requisición");
         moDialogLogsCardex = new SDialogMaterialRequestLogsCardex(miClient, "Bitácora de cambios");
@@ -371,13 +363,13 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                     }
                 }
                 catch (Exception ex) {
-                    Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
+                     Logger.getLogger(SViewMaterialRequest.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
     }
     
-    private void actionCloseForQuotation() {
+    private void actionCloseForEstimation() {
         if (jtTable.getSelectedRowCount() != 1) {
             miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
         }
@@ -393,56 +385,21 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             else if (!gridRow.isUpdatable()) {
                 miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
+            /*else if ()*/
             else {
                 if (miClient.showMsgBoxConfirm("¿Está seguro de cerrar para solicitar cotización?") == JOptionPane.OK_OPTION) {
                     
                     try {
-                        int[] key = (int[]) gridRow.getRowPrimaryKey();
+                    int[] key = (int[]) gridRow.getRowPrimaryKey();
 
-                        SDbMaterialRequest registry = new SDbMaterialRequest();
-                        registry.read(miClient.getSession(), key);
+                    SDbMaterialRequest registry = new SDbMaterialRequest();
+                    registry.read(miClient.getSession(), key);
 
-                        registry.setCloseQuotation(true);   
+                    registry.setCloseQuotation(true);   
 
-                        registry.save(miClient.getSession());   
+                    registry.save(miClient.getSession());   
 
-                        miClient.getSession().notifySuscriptors(mnGridType);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-    
-    private void actionReopenForQuotation() {
-        if (jtTable.getSelectedRowCount() != 1) {
-            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-        }
-        else {
-            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-            }
-            else if (gridRow.isRowSystem()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-            }
-            else if (!gridRow.isUpdatable()) {
-                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-            }
-            else {
-                if (miClient.showMsgBoxConfirm("¿Está seguro de reabrir para solicitar cotización?") == JOptionPane.OK_OPTION) {
-                    try {
-                        int[] key = (int[]) gridRow.getRowPrimaryKey();
-
-                        SDbMaterialRequest registry = new SDbMaterialRequest();
-                        registry.read(miClient.getSession(), key);
-                        registry.setCloseQuotation(false);  
-                        registry.save(miClient.getSession());   
-
-                        miClient.getSession().notifySuscriptors(mnGridType);
+                    miClient.getSession().notifySuscriptors(mnGridType);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -501,35 +458,52 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
 
         filter = ((SGridFilterValue) moFiltersMap.get(SGridConsts.FILTER_DELETED)).getValue();
         if ((Boolean) filter) {
-            where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 AND ve.b_del = 0 ";     
+            where += (where.isEmpty() ? "" : "AND ") + "v.b_del = 0 AND ve.b_del = 0 ";
         }
 
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
-            if (moFiltersMap.get(SGridConsts.FILTER_DATE) != null) {
-                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
+        if (moFiltersMap.get(SGridConsts.FILTER_DATE) != null) {
+            filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
 
-                if (filter != null) {
-                    where += (where.isEmpty() ? "" : "AND ") + "v.dt <= '" + SLibUtils.DbmsDateFormatDate.format(filter) + "' ";
-                }
+            if (filter != null) {
+                where += (where.isEmpty() ? "" : "AND ") + "v.dt <= '" + SLibUtils.DbmsDateFormatDate.format(filter) + "' ";
             }
         }
-        else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED) {
-            if (moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD) != null) {
-                filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
-                
-                if (filter != null) {
-                    where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
-                }
-            }
-        }
-            
+        
         where += (where.isEmpty() ? "" : "AND ") + "(cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST
                 + ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = "
                 + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " "
                 + "OR cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST
                 + ", '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, NULL, NULL, NULL, NULL) = "
                 + SAuthorizationUtils.AUTH_STATUS_NA + ") ";
-
+        
+        // Purchasing Attention: Requisition in Purchase status, quotation not closed, 
+        // AND (has no quotation request, returned to Purchase more than once, OR last quotation request is older than the last Purchase status change).
+        
+        where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur ";   // En compras 
+        where += "AND v.b_clo_qtn = 0 "     // No cerradas para cotizar
+                    + " AND ("
+                        + "mre.fk_mat_req_n IS NULL "   // No tiene solicitud de cotización
+                        + "OR ("
+                            + "(SELECT COUNT(*) FROM "
+                            + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG)   
+                            + " mrl WHERE mrl.id_mat_req = v.id_mat_req "
+                            + "AND mrl.fk_st_mat_req = "
+                            + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ") > 1 "      // Estuvo más de una vez en compras
+                        + "AND ("
+                            + "(SELECT MAX(er.ts_usr) "         // Ultima fecha que se hizo una solicitud de cotización
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_EST_REQ) + " er "   // Estado requisicion
+                            + "WHERE er.fk_mat_req_n = v.id_mat_req "
+                            + "AND NOT er.b_del) "
+                            + "< "
+                            + "(SELECT MAX(mrl.ts_usr) "    // Ultima fecha que entró a compras segun la bitacora 
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ST_LOG) + " mrl "   // Bitacora
+                            + "WHERE mrl.id_mat_req = v.id_mat_req "
+                            + "AND mrl.fk_st_mat_req = "
+                            + SModSysConsts.TRNS_ST_MAT_REQ_PUR + ")"
+                            + ")"
+                        + ")"
+                    + ") ";
+        
         select = "SUM(ve.qty) AS org_qty, i.item, i.item_key, i.part_num, u.unit, ve.id_ety, "
                 + "rpe.name AS ety_pty, ve.dt_req_n, ";
         join += "INNER JOIN erp.itmu_item AS i ON ve.fk_item = i.id_item "
@@ -537,20 +511,8 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_MAT_REQ_PTY) + " AS rpe ON ve.fk_mat_req_pty_n = rpe.id_mat_req_pty ";
         groupOrderBy = "ve.id_mat_req, ve.id_ety ";
 
-        // Filters:
-        // Pending Estimate: Requisition in Purchase status AND not close for Purchase AND has no quotation request AND not close for quotation:
-        // Estimated: Requisition has quotation request OR quotation process was closed.
         
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
-            where += "AND v.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_PUR + " AND NOT v.b_clo_pur AND ISNULL(mre.qty) ";
-            where += "AND v.b_clo_qtn = 0 ";
-        }
-        else if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED) {           
-            where += "AND ("
-                        + "mre.fk_mat_req_n IS NOT NULL "
-                        + "OR v.b_clo_qtn = 1"
-                        + ") ";     
-        }
+       
 
         if (usrId != 2 || !mbHasAdmRight) { // SUPER
             join += "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_PROV_ENT_USR) + " AS peu ON "
@@ -573,8 +535,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
                 + "v.b_ext_sys, "
                 + "v.b_clo_prov, "
                 + select
-                + "NOT ISNULL(mre.qty) AS is_estimated, "
-                + "v.b_clo_qtn AS is_closed_quotation, "
+                + "NOT ISNULL(mre.qty) AS is_estimated, "   //mrq.qty = NULL : is_estimated = 0 
                 + "pe.name AS prov_ent, "
                 + "rp.name AS req_pty, "
                 + "smr.name AS status, "
@@ -662,10 +623,7 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "id_ety", "Número partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "ety_pty", "Prioridad partida"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "ve.dt_req_n", "Fecha requerida partida"));
-        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "is_estimated", "Solicitud cotización"));
-        if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_ESTIMATED) {
-            columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "is_closed_quotation", "Cerrada para solicitar cotización"));
-        }
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "is_estimated", "Solicitada para cotizar"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "count_pur", "Más de una vez compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "comp_doc", "Doc compras"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "i.item_key", "Clave"));
@@ -697,7 +655,6 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
         moSuscriptionsSet.add(SModConsts.TRN_MAT_REQ);
         moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_SUP);
         moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_PUR);
-        moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_PEND_ORDERS);
         moSuscriptionsSet.add(SModConsts.TRNX_MAT_REQ_EST);
     }
 
@@ -727,13 +684,10 @@ public class SViewMaterialRequestPendingEstimation extends SGridPaneView impleme
             else if (button == jbLogCardex) {
                 actionLog();
             }
-            else if (button == mjbCloseForQuotation) {
-                actionCloseForQuotation();
+            else if (button == mjbClsEstimate) {
+                actionCloseForEstimation();
             }
-            else if (button == mjbReopenForQuotation) {
-                actionReopenForQuotation();
-            }
-            else if (button == mjbSearch) {
+            else if (button == mjbToSearch) {
                 actionSearch();
             }
             else if (button == mjbCleanSearch) {

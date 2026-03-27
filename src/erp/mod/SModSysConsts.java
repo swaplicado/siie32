@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SModSysConsts {
 
@@ -740,7 +740,7 @@ public abstract class SModSysConsts {
     
     public static final int TRNS_ST_MAT_REQ_NEW = 1; // new
     public static final int TRNS_ST_MAT_REQ_AUTH = 2; // in authorization
-    public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision
+    public static final int TRNS_ST_MAT_REQ_PROV = 3; // in provision (en suministro)
     public static final int TRNS_ST_MAT_REQ_PUR = 4; // in purchase
     public static final int TRNS_ST_MAT_REQ_CAN = 9; // cancelled
     
@@ -828,6 +828,7 @@ public abstract class SModSysConsts {
     public static final int TRNX_MAT_REQ_PROVIDED_DETAIL = 103; // suministrado a detalle
     public static final int TRNX_MAT_REQ_ESTIMATED = 104; // comprado
     public static final int TRNX_MAT_REQ_PEND_ESTIMATE = 105; // comprado
+    public static final int TRNX_MAT_REQ_PEND_ORDERS = 106; // requiere atención de compras
     public static final int TRNX_MAT_REQ_RECLASS = 107; // reclasificación contable
     //public static final int TRNX_MAT_REQ_FOLL_PUR_CLOSED = 100; // Seguimiento // se cambia por la constante SUtilConsts.ACTION_CLOSE
     

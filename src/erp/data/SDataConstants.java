@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Sergio Flores, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SDataConstants {
 
@@ -260,6 +260,7 @@ public abstract class SDataConstants {
     public static final int ITMU_LINE = 205009;
     public static final int ITMU_ITEM = 205010;
     public static final int ITMU_ITEM_BARC = 205011;
+    public static final int ITMU_ITEM_DESC = 205031;
     public static final int ITMU_CFG_ITEM_LAN = 205012;
     public static final int ITMU_CFG_ITEM_BP = 205013;
     public static final int ITMU_TP_MAT_MAT_ATT = 205029;
@@ -885,8 +886,9 @@ public abstract class SDataConstants {
         TablesMap.put(ITMU_IGEN, "erp.itmu_igen");
         TablesMap.put(ITMU_IGEN_BA, "erp.itmu_igen_ba");
         TablesMap.put(ITMU_LINE, "erp.itmu_line");
-        TablesMap.put(ITMU_ITEM, "erp.itmu_item");
+        TablesMap.put(ITMU_ITEM, "erp.itmu_item");      
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
+        TablesMap.put(ITMU_ITEM_DESC, "erp.itmu_item_desc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
         TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");
