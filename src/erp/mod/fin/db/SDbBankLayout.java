@@ -32,6 +32,7 @@ import erp.mod.fin.utils.SBankLayoutCourier;
 import erp.mod.fin.utils.SBankLayoutParams;
 import erp.mod.fin.utils.SDialogBankLayoutSendingConfirmation;
 import erp.mod.fin.utils.SDocumentRequestRow;
+import erp.mod.fin.utils.SPaymentUitls;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
@@ -409,7 +410,12 @@ public class SDbBankLayout extends SDbRegistryUser {
             xmlBankLayout.getAttribute(SXmlBankLayout.ATT_LAY_ID).setValue(mnPkBankLayoutId);
             
             for (SLayoutBankXmlRow layoutBankXmlRow : maAuxLayoutBankXmlRows) {
-                if (! layoutBankXmlRow.getAuxIsForPayments()) {
+                if (! layoutBankXmlRow.getAuxPaymentIds().isEmpty() && layoutBankXmlRow.getAuxPayments().isEmpty()) {
+                    for (Integer idPayment : layoutBankXmlRow.getAuxPaymentIds()) {
+                        layoutBankXmlRow.getAuxPayments().add(SPaymentUitls.readPayment(session.getStatement().getConnection(), idPayment));
+                    }
+                }
+                if (layoutBankXmlRow.getAuxPayments().isEmpty()) {
                     SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
 
                     xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(layoutBankXmlRow.getDpsYearId());
