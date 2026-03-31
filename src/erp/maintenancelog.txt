@@ -1,12 +1,9 @@
 ================================================================================
-SIIE 3.2 297.0-b1 2026-03-27
+SIIE 3.2 297.0 2026-03-27
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE. Corrección warnings
+1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE. Corrección de warnings.
 
-================================================================================
-================================================================================
-SIIE 3.2 297.0/ 2026-03-27
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de la descripción extendida de ítems.
