@@ -69,7 +69,9 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private String msFunctionalAreasIds;
+    private String msSubfunctionalAreasIds;
 
     /** Creates new form SDialogRepBizPartnerAccountingMoves
      * @param client
@@ -303,6 +305,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient);
         renderFunctionalArea();
+        resetFunctionalArea();
     }
 
     private void windowActivated() {
@@ -329,11 +332,13 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         
         String areasFilter = "";
         if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
+
+            if (!msFunctionalAreasIds.isEmpty()) {
+                areasFilter += " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
             }
-            else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+
+            if (!msSubfunctionalAreasIds.isEmpty()) {
+                areasFilter += " AND d.fid_sub_func IN (" + msSubfunctionalAreasIds + ") ";
             }
         }
 
@@ -443,16 +448,28 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
+        String[] texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
+
         msFunctionalAreasIds = texts[0];
-        
+
         jtfFunctionalArea.setText(texts[1]);
         jtfFunctionalArea.setCaretPosition(0);
+        jtfFunctionalArea.setToolTipText("<html><b>Áreas y subáreas:</b><br>" + texts[1] + "</html>");
+    }
+    
+    private void resetFunctionalArea() {
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        msSubfunctionalAreasIds = "";
+
+        renderFunctionalArea();
     }
 
     private void actionPickDate() {

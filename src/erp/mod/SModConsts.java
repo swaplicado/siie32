@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public abstract class SModConsts {
 
@@ -218,6 +218,7 @@ public abstract class SModConsts {
     public static final int ITMU_LINE = 1052005;
     public static final int ITMU_ITEM = 1052006;
     public static final int ITMU_ITEM_BARC = 1052007;
+    public static final int ITMU_ITEM_DESC = 1052031;
     public static final int ITMU_CFG_ITEM_LAN = 1052008;
     public static final int ITMU_CFG_ITEM_BP = 1052009;
     public static final int ITMU_TP_MAT_MAT_ATT = 1052010;
@@ -577,6 +578,7 @@ public abstract class SModConsts {
     public static final int TRNX_MAT_REQ_CLO_PUR = 2024080;     // material requisitions closed purchase
     public static final int TRNX_MAT_REQ_EST = 2024078;         // material requisitions pending purchase
     public static final int TRNX_MAT_REQ_ACC = 2024079;     // material requisitions pending purchase
+    public static final int TRNX_MAT_REQ_PEND_ORDERS =  2024083;    // material requisitions pending orders
     public static final int TRNX_MAT_REQ_FOLL_PUR = 2024081;    // material requisitions following
     public static final int TRNX_MAT_REQ_ALL = 2024082;         // material requisitions all
     public static final int TRNX_MAT_REQ_ETY_ROW = 2024073;     // renglones de requisiciones en diálogo de segregaciones
@@ -1130,6 +1132,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_LINE, "erp.itmu_line");
         TablesMap.put(ITMU_ITEM, "erp.itmu_item");
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
+        TablesMap.put(ITMU_ITEM_DESC, "erp.itmu_item_desc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
         TablesMap.put(ITMU_TP_MAT_MAT_ATT, "erp.itmu_tp_mat_mat_att");

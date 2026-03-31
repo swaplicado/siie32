@@ -64,7 +64,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[49];
+        STableColumn[] aoTableColumns = new STableColumn[50];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -123,6 +123,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_free_disc", "S/ descto. listas precios", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_free_comms", "S/ comisiones", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_sales_freight_req", "Req. flete ventas", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_has_desc", "Descripción extendida", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "i.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -144,6 +145,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         mvSuscriptors.add(SDataConstants.ITMU_TP_LEV);
         mvSuscriptors.add(SDataConstants.ITMU_VAR);
         mvSuscriptors.add(SDataConstants.ITMU_UNIT);
+        mvSuscriptors.add(SDataConstants.ITMU_ITEM_DESC);
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();
@@ -207,7 +209,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
                 "i.units_virt, i.prod_time, i.prod_cost, i.weight_gross, i.weight_delivery, i.surplus_per, i.b_ref, i.b_pre_pay, i.tariff, i.custs_unit, i.custs_equiv, " +
                 "i.b_free_price, i.b_free_disc, i.b_free_disc_u, i.b_free_disc_ety, i.b_free_disc_doc, i.b_free_comms, i.b_sales_freight_req, i.b_del, i.ts_new, i.ts_edit, i.ts_del, " +
                 "ig.igen, si.name, u.symbol, uc.symbol, uv.symbol, unc.symbol, uncu.symbol, COALESCE(ucomm.symbol, '') AS un_comm, tua.tp_unit, tl.tp_lev, brd.brd, " +
-                "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name " +
+                "mfr.mfr, emt.emt, un.usr, ue.usr, ud.usr, il.line, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name, COALESCE(d.item_desc, '') <> '' AS _has_desc " +
                 "FROM erp.itmu_item AS i " +
                 "INNER JOIN erp.itmu_igen AS ig ON " +
                 "i.fid_igen = ig.id_igen " +
@@ -245,6 +247,8 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
                 "i.fid_cfd_prod_serv_n = cfdps.id_cfd_prod_serv " +
                 "LEFT OUTER JOIN erp.itmu_unit AS ucomm ON " +
                 "i.fid_unit_comm_n = ucomm.id_unit " +
+                "LEFT OUTER JOIN erp.itmu_item_desc AS d ON " + 
+                "i.id_item = d.id_item AND NOT d.b_del " + 
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
                 "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
                     "i.item_key, i.item, " :

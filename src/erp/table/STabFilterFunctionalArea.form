@@ -29,9 +29,6 @@
           <Dimension value="[65, 23]"/>
         </Property>
       </Properties>
-      <AccessibilityProperties>
-        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="&#xc1;rea funcional"/>
-      </AccessibilityProperties>
     </Component>
     <Component class="javax.swing.JButton" name="jbFunctionalArea">
       <Properties>

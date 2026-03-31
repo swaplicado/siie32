@@ -49,7 +49,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -175,10 +175,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReqPurPendDet;
     private javax.swing.JMenuItem jmiReqPurClosed;
     private javax.swing.JMenuItem jmiReqPurClosedDet;
+    private javax.swing.JMenuItem jmiReqPendOrd;
+    private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenuItem jmiReqEstDet;
     private javax.swing.JMenuItem jmiReqFollowingPurOpen;
     private javax.swing.JMenuItem jmiReqFollowingPurClosed;
-    private javax.swing.JMenuItem jmiReqPendEstDet;
     private javax.swing.JMenu jmMenuReqAll;
     private javax.swing.JMenuItem jmiReqAll;
     private javax.swing.JMenuItem jmiReqAllAcc;
@@ -715,9 +716,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurPendDet = new JMenuItem("Requisiciones por pedir a detalle");
         jmiReqPurClosed = new JMenuItem("Requisiciones pedidas");
         jmiReqPurClosedDet = new JMenuItem("Requisiciones pedidas a detalle");
-        jmiReqPendEstDet = new JMenuItem("Requisiciones por solicitar para cotización");
-        jmiReqEstDet = new JMenuItem("Requisiciones solicitadas para cotización");
-        
+        jmiReqPendOrd = new JMenuItem("Requisiciones pendientes de atención");
+        jmiReqPendEstDet = new JMenuItem("Requisiciones por solicitar cotización");
+        jmiReqEstDet = new JMenuItem("Requisiciones solicitadas de cotización");
         jmiReqFollowingPurOpen = new JMenuItem("Seguimiento de compras de requisiciones abiertas a detalle");
         jmiReqFollowingPurClosed = new JMenuItem("Seguimiento de compras de requisiciones cerradas a detalle");
         
@@ -757,6 +758,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuReq.add(jmiReqPurClosed);
         jmMenuReq.add(jmiReqPurClosedDet);
         jmMenuReq.addSeparator();
+        jmMenuReq.add(jmiReqPendOrd);
         jmMenuReq.add(jmiReqPendEstDet);
         jmMenuReq.add(jmiReqEstDet);
         jmMenuReq.addSeparator();
@@ -796,10 +798,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurPendDet.addActionListener(this);
         jmiReqPurClosed.addActionListener(this);
         jmiReqPurClosedDet.addActionListener(this);
+        jmiReqPendOrd.addActionListener(this);
+        jmiReqPendEstDet.addActionListener(this);
         jmiReqEstDet.addActionListener(this);
         jmiReqFollowingPurOpen.addActionListener(this);
         jmiReqFollowingPurClosed.addActionListener(this);
-        jmiReqPendEstDet.addActionListener(this);
         jmiReqAll.addActionListener(this);
         jmiReqAllAcc.addActionListener(this);
         jmiReqMatConsumptionEntBudget.addActionListener(this);
@@ -1068,10 +1071,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReqPurPendDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurClosed.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqPurClosedDet.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPendOrd.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
+        jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqFollowingPurOpen.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqFollowingPurClosed.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
-        jmiReqPendEstDet.setEnabled(hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAll.setEnabled(hasRightMatReqProv || hasRightMatReqPur || hasRightMatReqAdm);
         jmiReqAllAcc.setEnabled(hasRightMatReqAcc);
         jmiReqMatConsumptionEntBudget.setEnabled(hasRightMatReqAdm);
@@ -1438,47 +1442,19 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
-                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
-                        auxTitle = "Pedidos compra sin fact";
-                    }
-                    else {
-                        auxTitle = dpsCategory;
-                    }
-                    title = auxTitle + " x surtir";
+                    title = dpsCategory + " x surtir";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
-                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
-                        auxTitle = "Pedidos compra sin fact";
-                    }
-                    else {
-                        auxTitle = dpsCategory;
-                    }
-                    title = auxTitle + " x surtir (detalle)";
+                    title = dpsCategory + " x surtir (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
-                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
-                        auxTitle = "Pedidos de compra sin fact surtidos";
-                    }
-                    else {
-                        auxTitle = dpsCategory + " surtidas";
-                    }
-                    title = auxTitle;
+                    title = dpsCategory + " surtidas";
                     break;
                 case SDataConstants.TRNX_DPS_SUPPLIED_ETY:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
-                    if (SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] == auxType01 && 
-                            SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] == auxType02) {
-                        auxTitle = "Pedidos de compra sin fact surtidos";
-                    }
-                    else {
-                        auxTitle = dpsCategory + " surtidas";
-                    }
-                    title = auxTitle + " (detalle)";
+                    title = dpsCategory + " surtidas (detalle)";
                     break;
                 case SDataConstants.TRNX_DPS_RETURN_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockReturn.class;
@@ -2145,11 +2121,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 SGuiParams params = new SGuiParams(SModSysConsts.TRNX_MAT_REQ_PUR);
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_CLO_PUR, SModSysConsts.TRNX_MAT_REQ_DETAIL, params);
             }
-            else if (item == jmiReqEstDet) {
-                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);
+            else if (item == jmiReqPendOrd) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ORDERS, null);
             }
             else if (item == jmiReqPendEstDet) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE, null);
+            }
+            else if (item == jmiReqEstDet) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_EST, SModSysConsts.TRNX_MAT_REQ_ESTIMATED, null);
             }
             else if (item == jmiReqFollowingPurOpen) {
                 miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_FOLL_PUR, SUtilConsts.ACTION_OPEN, null);

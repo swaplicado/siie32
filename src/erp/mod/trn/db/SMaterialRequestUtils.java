@@ -47,7 +47,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona, Isabel Servín
+ * @author Edwin Carmona, Isabel Servín, Rodrigo Ayala
  */
 public abstract class SMaterialRequestUtils {
 
@@ -419,6 +419,7 @@ public abstract class SMaterialRequestUtils {
         return array;
     }
     
+    /* 2026-03-27 (Rodrigo Ayala): Por respaldo del dialogo para en casos en que el Picker no requiera descripción de ítem.   
     @SuppressWarnings("unchecked")
     public static SDialogItemPicker getOptionItemPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
         String sql = "";
@@ -514,6 +515,123 @@ public abstract class SMaterialRequestUtils {
                 break;
         }
         
+        return picker;
+    }
+    */
+    
+    /**
+     * Item picker with Item Descripcion
+     * @param client
+     * @param type
+     * @param subtype
+     * @param params
+     * @return 
+     */
+    @SuppressWarnings("unchecked")
+    public static SDialogItemPicker getOptionItemPicker(SGuiClient client, int type, int subtype, SGuiParams params) {
+        String sql = "";
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
+        SGuiOptionPickerSettings settings;
+        SDialogItemPicker picker = new SDialogItemPicker();
+        switch (type) {
+            case SModConsts.ITMU_ITEM:
+                switch (subtype) {
+                    case SModConsts.TRN_MAT_REQ:
+                        String in = "";
+                        ArrayList<SDbMaterialCostCenterGroup> arr = (ArrayList<SDbMaterialCostCenterGroup>) params.getParamsMap().get(SModConsts.TRN_MAT_CC_GRP);
+                        for (SDbMaterialCostCenterGroup ccg : arr) {
+                            in += (in.isEmpty() ? "(" : ", ") + ccg.getPkMaterialCostCenterGroupId();
+                        }
+                        in += (in.isEmpty() ? "" : ")");
+                        
+                        String inv = "";
+                        if (params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV) != null) {
+                            inv += ((boolean) params.getParamsMap().get(SModSysConsts.ITMU_ITEM_INV)) ? "AND a.b_inv " : "AND NOT a.b_inv ";
+                        }
+                        
+                        String item = "";
+                        String igen = "";
+                        try {
+                            SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
+                            ObjectMapper mapper = new ObjectMapper();
+                            String sItemPurchase = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_ITEM_MAT_REQ_PUR);
+                            moConfMaterialRequestItemPurchase = mapper.readValue(sItemPurchase, SConfMaterialRequestItemPurchase.class);
+                            
+                            for (int i : moConfMaterialRequestItemPurchase.item) {
+                                item += (item.isEmpty() ? "" : ", ") + i;
+                            }
+                            for (int i : moConfMaterialRequestItemPurchase.igen) {
+                                igen += (igen.isEmpty() ? "" : ", ") + i;
+                            }
+                        }
+                        catch(Exception e) {
+                            client.showMsgBoxError(e.getMessage());
+                        }
+                    
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, "
+                                + "a.item AS " + SDbConsts.FIELD_PICK + "2, "
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "IF(a.id_item IN (" + (item.isEmpty() ? 0 : item ) + ") OR a.fid_igen IN (" + (igen.isEmpty() ? 0 : igen) + "), 1, 0) AS " + SDbConsts.FIELD_PICK + "4, "
+                                + "IF(d.id_item IS NULL, 0, 1) AS " + SDbConsts.FIELD_PICK + "5, " // ítem description (If is NULL return 0)
+                                + "a.b_inv AS " + ITEM_INV + ", "
+                                + "0 AS " + ITEM_SAL + ", "
+                                + "0 AS " + ITEM_ASS + ", "
+                                + "0 AS " + ITEM_PUR + ", "
+                                + "0 AS " + ITEM_EXP + " "
+                                + "FROM ("
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "  
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS igen ON "
+                                + "igen.id_link = " + SModSysConsts.ITMS_LINK_IGEN + " AND igen.id_ref = i.fid_igen " 
+                                + "UNION "
+                                + "SELECT * FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_ITEM) + " AS ii ON "
+                                + "ii.id_link = " + SModSysConsts.ITMS_LINK_ITEM + " AND ii.id_ref = i.id_item "
+                                + ") AS a "
+                                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM_DESC) + " AS d ON " // tabla descripción de ítem
+                                + "a.id_item = d.id_item "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
+                                + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
+                                + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
+                                + inv
+                                + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " " 
+                                + "AND ccgu.id_link = " + SModSysConsts.USRS_LINK_USR + " "
+                                + "AND ccgu.id_ref = " + params.getParamsMap().get(SModConsts.USRU_USR) + " "
+                                + "ORDER BY a.item_key, a.item, a.id_item, a.part_num, d.id_item ";
+                        break;
+                    case SLibConstants.UNDEFINED:
+                        sql = "SELECT a.id_item AS " + SDbConsts.FIELD_ID + "1, "
+                                + "a.item_key AS " + SDbConsts.FIELD_PICK + "1, a.item AS " + SDbConsts.FIELD_PICK + "2, "
+                                + "a.part_num AS " + SDbConsts.FIELD_PICK + "3, "
+                                + "0 AS " + SDbConsts.FIELD_PICK + "4, "
+                                + "IF(d.id_item IS NULL, 0, 1) AS " + SDbConsts.FIELD_PICK + "5, "
+                                + "a.b_inv AS " + ITEM_INV + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_SAL + ", 1, 0) AS " + ITEM_SAL + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_ASS + ", 1, 0) AS " + ITEM_ASS + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_PUR + ", 1, 0) AS " + ITEM_PUR + ", "
+                                + "IF(b.fid_ct_item = " + SModSysConsts.ITMS_CT_ITEM_EXP + ", 1, 0) AS " + ITEM_EXP + " "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS a " 
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS b ON "
+                                + "a.fid_igen = b.id_igen "
+                                + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM_DESC) + " AS d ON " // tabla decripción de ítem
+                                + "a.id_item = d.id_item "
+                                + "WHERE NOT a.b_del "
+                                + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " ";
+                        break;
+                    default:
+                        // nothing
+                }
+                
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_ITM, "Clave"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem", 450));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "Parte"));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_L, "Directo a compras", 71));
+                gridColumns.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_L, "Descripción extendida", 72));
+                settings = new SGuiOptionPickerSettings("Ítem", sql, gridColumns, 1);
+                
+                picker.setPickerSettings(client, type, subtype, settings);
+                break;
+        }
         return picker;
     }
     

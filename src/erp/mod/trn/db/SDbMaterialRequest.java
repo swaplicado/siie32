@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona
+ * @author Isabel Servín, Edwin Carmona, Rodrigo Ayala
  */
 public class SDbMaterialRequest extends SDbRegistryUser {
     
@@ -41,6 +41,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected boolean mbExternalSystem;
     protected String msExternalSystemId;
     protected boolean mbCloseProvision;
+    protected boolean mbCloseQuotation;
     protected boolean mbClosePurchase;
     //protected boolean mbDeleted;
     protected int mnFkMatProvisionEntityId;
@@ -55,6 +56,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkWarehouseWarehouse_n;
     protected int mnFkItemReferenceId_n;
     protected int mnFkUserCloseProvisionId;
+    protected int mnFkUserCloseQuotationId;
     protected int mnFkUserClosePurchaseId;
     protected int mnFkUserChangeId;
     /*
@@ -62,6 +64,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected int mnFkUserUpdateId;
     */
     protected Date mtTsUserCloseProvision;
+    protected Date mtTsUserCloseQuotation;
     protected Date mtTsUserClosePurchase;
     protected Date mtTsUserChange;
     /*
@@ -73,30 +76,30 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     protected ArrayList<SDbMaterialRequestCostCenter> maChildCostCenters;
     protected ArrayList<SDbMaterialRequestEntry> maChildEntries;
    
+    protected SDataItem moDbmsItemRef;
+    
     protected String msAuxReqStatus;
     protected String msAuxAuthStatus;
-    protected String msAuxProvStatus;
-    protected String msAuxPurStatus;
+    protected String msAuxProvisionStatus;
+    protected String msAuxPurchaseStatus;
+    protected String msAuxProvEntName;
     protected String msAuxNotes;
+    protected String msAuxNotesChangeStatus_n;
     
     protected int mnAuxReqStatusIdOld;
     protected int mnAuxReqAuthStatusId;
     protected int mnAuxReqAuthStatusIdOld;
-    protected int mnAuxReqProvStatusIdOld;
-    protected int mnAuxReqPurStatusIdOld;
-    protected String msAuxNotesChangeStatus_n;
-    protected String msAuxProvEntName;
-    
-    protected String msAuxAuthUser;
+    protected int mnAuxReqProvisionStatusIdOld;
+    protected int mnAuxReqPurchaseStatusIdOld;
     
     protected boolean mbAuxChangeStatus;
-    protected boolean mbAuxLastProvClosedSta;
-    protected boolean mbAuxLastPurClosedSta;
-    
-    protected SDataItem moDbmsItemRef;
+    protected boolean mbAuxChangeQuotationStatus;
+    protected boolean mbAuxLastProvisionClosedSta;
+    protected boolean mbAuxLastQuotationClosedSta;
+    protected boolean mbAuxLastPurchaseClosedSta;
     
     protected SConfMaterialRequestItemPurchase moConfMaterialRequestItemPurchase;
-
+    
     public SDbMaterialRequest() {
         super(SModConsts.TRN_MAT_REQ);
     }
@@ -113,6 +116,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setExternalSystem(boolean b) { mbExternalSystem = b; }
     public void setExternalSystemId(String s) { msExternalSystemId = s; }
     public void setCloseProvision(boolean b) { mbCloseProvision = b; }
+    public void setCloseQuotation(boolean b) { mbCloseQuotation = b; }
     public void setClosePurchase(boolean b) { mbClosePurchase = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkMatProvisionEntityId(int n) { mnFkMatProvisionEntityId = n; }
@@ -127,35 +131,18 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void setFkWarehouseWarehouse_n(int n) { mnFkWarehouseWarehouse_n = n; }
     public void setFkItemReferenceId_n(int n) { mnFkItemReferenceId_n = n; }
     public void setFkUserCloseProvisionId(int n) { mnFkUserCloseProvisionId = n; }
+    public void setFkUserCloseQuotationId(int n) { mnFkUserCloseQuotationId = n; }
     public void setFkUserClosePurchaseId(int n) { mnFkUserClosePurchaseId = n; }
     public void setFkUserChangeId(int n) { mnFkUserChangeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserCloseProvision(Date t) { mtTsUserCloseProvision = t; }
+    public void setTsUserCloseQuotation(Date t) { mtTsUserCloseQuotation = t; }
     public void setTsUserClosePurchase(Date t) { mtTsUserClosePurchase = t; }
     public void setTsUserChange(Date t) { mtTsUserChange = t; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public void setAuxReqStatus(String s) { msAuxReqStatus = s; }
-    public void setAuxAuthStatus(String s) { msAuxAuthStatus = s; }
-    public void setAuxProvStatus(String s) { msAuxProvStatus = s; }
-    public void setAuxPurStatus(String s) { msAuxPurStatus = s; }
-    public void setAuxProvEntName(String s) { msAuxProvEntName = s; }
-    
-    public void setAuxReqStatusIdOld(int n) { mnAuxReqStatusIdOld = n; }
-    public void setAuxReqAuthStatusId(int n) { mnAuxReqAuthStatusId = n; }
-    public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
-    public void setAuxReqProvStatusIdOld(int n) { mnAuxReqProvStatusIdOld = n; }
-    public void setAuxReqPurStatusIdOld(int n) { mnAuxReqPurStatusIdOld = n; }
-    public void setAuxNotesChangeStatus_n(String s) { msAuxNotesChangeStatus_n = s; }
-    
-    public void setAuxChangeStatus(boolean b) { mbAuxChangeStatus = b; }
-    public void setAuxLastProvClosedSta(boolean b) { mbAuxLastProvClosedSta = b; }
-    public void setAuxLastPurClosedSta(boolean b) { mbAuxLastPurClosedSta = b; }
-    
-    public void setDbmsItemRef(SDataItem o) { moDbmsItemRef = o; }
-    
     public int getPkMatRequestId() { return mnPkMatRequestId; }
     public String getClassRequest() { return msClassRequest; }
     public String getTypeRequest() { return msTypeRequest; }
@@ -168,6 +155,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public boolean isExternalSystem() { return mbExternalSystem; }
     public String getExternalSystemId() { return msExternalSystemId; }
     public boolean isCloseProvision() { return mbCloseProvision; }
+    public boolean isCloseQuotation() { return mbCloseQuotation; }
     public boolean isClosePurchase() { return mbClosePurchase; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkMatProvisionEntityId() { return mnFkMatProvisionEntityId; }
@@ -182,11 +170,13 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public int getFkWarehouseWarehouse_n() { return mnFkWarehouseWarehouse_n; }
     public int getFkItemReferenceId_n() { return mnFkItemReferenceId_n; }
     public int getFkUserCloseProvisionId() { return mnFkUserCloseProvisionId; }
+    public int getFkUserCloseQuotationId() { return mnFkUserCloseQuotationId; }
     public int getFkUserClosePurchaseId() { return mnFkUserClosePurchaseId; }
     public int getFkUserChangeId() { return mnFkUserChangeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserCloseProvision() { return mtTsUserCloseProvision; }
+    public Date getTsUserCloseQuotation() { return mtTsUserCloseQuotation; }
     public Date getTsUserClosePurchase() { return mtTsUserClosePurchase; }
     public Date getTsUserChange() { return mtTsUserChange; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -196,26 +186,47 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public ArrayList<SDbMaterialRequestCostCenter> getChildCostCenters() { return maChildCostCenters; }
     public ArrayList<SDbMaterialRequestEntry> getChildEntries() { return maChildEntries; }
     
+    public void setDbmsItemRef(SDataItem o) { moDbmsItemRef = o; }
+    
+    public void setAuxReqStatus(String s) { msAuxReqStatus = s; }
+    public void setAuxAuthStatus(String s) { msAuxAuthStatus = s; }
+    public void setAuxProvisionStatus(String s) { msAuxProvisionStatus = s; }
+    public void setAuxPurchaseStatus(String s) { msAuxPurchaseStatus = s; }
+    public void setAuxProvEntName(String s) { msAuxProvEntName = s; }
+    public void setAuxNotes(String s) { msAuxNotes = s; }
+    public void setAuxNotesChangeStatus_n(String s) { msAuxNotesChangeStatus_n = s; }
+    
+    public void setAuxReqStatusIdOld(int n) { mnAuxReqStatusIdOld = n; }
+    public void setAuxReqAuthStatusId(int n) { mnAuxReqAuthStatusId = n; }
+    public void setAuxReqAuthStatusIdOld(int n) { mnAuxReqAuthStatusIdOld = n; }
+    public void setAuxReqProvisionStatusIdOld(int n) { mnAuxReqProvisionStatusIdOld = n; }
+    public void setAuxReqPurchaseStatusIdOld(int n) { mnAuxReqPurchaseStatusIdOld = n; }
+    
+    public void setAuxChangeStatus(boolean b) { mbAuxChangeStatus = b; }
+    public void setAuxLastProvisionClosedSta(boolean b) { mbAuxLastProvisionClosedSta = b; }
+    public void setAuxLastQuotationClosedSta(boolean b) { mbAuxLastQuotationClosedSta = b; }
+    public void setAuxLastPurchaseClosedSta(boolean b) { mbAuxLastPurchaseClosedSta = b; }
+    
+    public SDataItem getDbmsItemRef() { return moDbmsItemRef; }
+    
     public String getAuxReqStatus() { return msAuxReqStatus; }
     public String getAuxAuthStatus() { return msAuxAuthStatus; }
-    public String getAuxProvStatus() { return msAuxProvStatus; }
-    public String getAuxPurStatus() { return msAuxPurStatus; }
+    public String getAuxProvStatus() { return msAuxProvisionStatus; }
+    public String getAuxPurStatus() { return msAuxPurchaseStatus; }
+    public String getAuxProvEntName() { return msAuxProvEntName; }
     public String getAuxNotes() { return msAuxNotes; }
+    public String getAuxNotesChangeStatus_n() { return msAuxNotesChangeStatus_n; }
 
     public int getAuxReqStatusIdOld() { return mnAuxReqStatusIdOld; }
     public int getAuxReqAuthStatusId() { return mnAuxReqAuthStatusId; }
     public int getAuxReqAuthStatusIdOld() { return mnAuxReqAuthStatusIdOld; }
-    public int getAuxReqProvStatusIdOld() { return mnAuxReqProvStatusIdOld; }
-    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurStatusIdOld; }
-    public String getAuxNotesChangeStatus_n() { return msAuxNotesChangeStatus_n; }
-    
-    public String getAuxProvEntName() { return msAuxProvEntName; }
+    public int getAuxReqProvStatusIdOld() { return mnAuxReqProvisionStatusIdOld; }
+    public int getAuxReqPurStatusIdOld() { return mnAuxReqPurchaseStatusIdOld; }
     
     public boolean getAuxChangeStatus() { return mbAuxChangeStatus; }
-    public boolean getAuxLastProvClosedSta() { return mbAuxLastProvClosedSta; }
-    public boolean getAuxLastPurClosedSta() { return mbAuxLastPurClosedSta; }
-    
-    public SDataItem getDbmsItemRef() { return moDbmsItemRef; }
+    public boolean getAuxLastProvisionClosedSta() { return mbAuxLastProvisionClosedSta; }
+    public boolean getAuxLastQuotationClosedSta() { return mbAuxLastQuotationClosedSta; }
+    public boolean getAuxLastPurchaseClosedSta() { return mbAuxLastPurchaseClosedSta; }
     
     public String getConsumptionInfo() {
         String description = "";
@@ -264,6 +275,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mbExternalSystem = false;
         msExternalSystemId = "";
         mbCloseProvision = false;
+        mbCloseQuotation = false;
         mbClosePurchase = false;
         mbDeleted = false;
         mnFkMatProvisionEntityId = 0;
@@ -278,11 +290,13 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         mnFkWarehouseWarehouse_n = 0;
         mnFkItemReferenceId_n = 0;
         mnFkUserCloseProvisionId = 0;
+        mnFkUserCloseQuotationId = 0;
         mnFkUserClosePurchaseId = 0;
         mnFkUserChangeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserCloseProvision = null;
+        mtTsUserCloseQuotation = null;
         mtTsUserClosePurchase = null;
         mtTsUserChange = null;
         mtTsUserInsert = null;
@@ -292,25 +306,27 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         maChildCostCenters = new ArrayList<>();
         maChildEntries = new ArrayList<>();
         
+        moDbmsItemRef = null;
+        
         msAuxReqStatus = "";
         msAuxAuthStatus = "";
-        msAuxProvStatus = "";
-        msAuxPurStatus = "";
+        msAuxProvisionStatus = "";
+        msAuxPurchaseStatus = "";
+        msAuxProvEntName = "";
+        msAuxNotes = "";
+        msAuxNotesChangeStatus_n = null;
         
         mnAuxReqStatusIdOld = 0;
         mnAuxReqAuthStatusId = SAuthorizationUtils.AUTH_STATUS_NA; // Las autorizaciones trabajan de manera independiente, por lo cual es necesario iniciar en NA
         mnAuxReqAuthStatusIdOld = 0;
-        mnAuxReqProvStatusIdOld = 0;
-        mnAuxReqPurStatusIdOld = 0;
-        msAuxNotesChangeStatus_n = null;
+        mnAuxReqProvisionStatusIdOld = 0;
+        mnAuxReqPurchaseStatusIdOld = 0;
         
-        msAuxProvEntName = "";
         mbAuxChangeStatus = false;
-        mbAuxLastProvClosedSta = false;
-        mbAuxLastPurClosedSta = false;
-        msAuxNotes = "";
-        
-        moDbmsItemRef = null;
+        mbAuxChangeQuotationStatus = false;
+        mbAuxLastProvisionClosedSta = false;
+        mbAuxLastQuotationClosedSta = false;
+        mbAuxLastPurchaseClosedSta = false;
         
         moConfMaterialRequestItemPurchase = null;
     }
@@ -373,6 +389,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mbExternalSystem = resultSet.getBoolean("b_ext_sys");
             msExternalSystemId = resultSet.getString("ext_sys_id");
             mbCloseProvision = resultSet.getBoolean("b_clo_prov");
+            mbCloseQuotation = resultSet.getBoolean("b_clo_qtn");
             mbClosePurchase = resultSet.getBoolean("b_clo_pur");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkMatProvisionEntityId = resultSet.getInt("fk_mat_prov_ent");
@@ -387,18 +404,21 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkWarehouseWarehouse_n = resultSet.getInt("fk_whs_whs_n");
             mnFkItemReferenceId_n = resultSet.getInt("fk_item_ref_n");
             mnFkUserCloseProvisionId = resultSet.getInt("fk_usr_clo_prov");
+            mnFkUserCloseQuotationId = resultSet.getInt("fk_usr_clo_qtn");
             mnFkUserClosePurchaseId = resultSet.getInt("fk_usr_clo_pur");
             mnFkUserChangeId = resultSet.getInt("fk_usr_chg");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserCloseProvision = resultSet.getTimestamp("ts_usr_clo_prov");
+            mtTsUserCloseQuotation = resultSet.getTimestamp("ts_usr_clo_qtn");                    
             mtTsUserClosePurchase = resultSet.getTimestamp("ts_usr_clo_pur");
             mtTsUserChange = resultSet.getTimestamp("ts_usr_chg");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            mbAuxLastProvClosedSta = mbCloseProvision;
-            mbAuxLastPurClosedSta = mbClosePurchase;
+            mbAuxLastProvisionClosedSta = mbCloseProvision;
+            mbAuxLastQuotationClosedSta = mbCloseQuotation;   // Guardamos el ultimo estado de closeQuotation
+            mbAuxLastPurchaseClosedSta = mbClosePurchase;
             
             // Read aswell document notes:
             
@@ -463,7 +483,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
-                msAuxProvStatus = resultSet.getString(1);
+                msAuxProvisionStatus = resultSet.getString(1);
             }
             // Read Pur Status
             
@@ -473,7 +493,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
-                msAuxPurStatus = resultSet.getString(1);
+                msAuxPurchaseStatus = resultSet.getString(1);
             }
             
             mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, 
@@ -482,8 +502,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             
             mnAuxReqStatusIdOld = mnFkMatRequestStatusId;
             mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
-            mnAuxReqProvStatusIdOld = mnFkMatProvisionStatusId;
-            mnAuxReqPurStatusIdOld = mnFkMatPurchaseStatusId;
+            mnAuxReqProvisionStatusIdOld = mnFkMatProvisionStatusId;
+            mnAuxReqPurchaseStatusIdOld = mnFkMatPurchaseStatusId;
             
             // Read Requisition area
             msSql = "SELECT name " + 
@@ -513,8 +533,10 @@ public class SDbMaterialRequest extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-        boolean updateProvisionStatus = false;
-        boolean updatePurchaseStatus = false;
+        
+        boolean updateCloseProvisionTs = false;
+        boolean updateCloseQuotationTs = false;  // Ver si cambió el estado de cerrado para cotizar
+        boolean updateClosePurchaseTs = false;
         
         msClassRequest = "M"; // Por el momento todas las requisiciones son de materiales; S corresponde a servicios
         
@@ -524,6 +546,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             mnFkUserCloseProvisionId = mbCloseProvision ? session.getUser().getPkUserId() : SUtilConsts.USR_NA_ID;
+            mnFkUserCloseQuotationId = mbCloseQuotation ? session.getUser().getPkUserId() : SUtilConsts.USR_NA_ID;
             mnFkUserClosePurchaseId = mbClosePurchase ? session.getUser().getPkUserId() : SUtilConsts.USR_NA_ID;
             mnFkUserChangeId = SUtilConsts.USR_NA_ID;
 
@@ -539,7 +562,8 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     mdTotal_r + ", " + 
                     (mbExternalSystem ? 1 : 0) + ", " + 
                     "'" + msExternalSystemId + "', " + 
-                    (mbCloseProvision ? 1 : 0) + ", " + 
+                    (mbCloseProvision ? 1 : 0) + ", " +
+                    (mbCloseQuotation ? 1 : 0) + ", " +
                     (mbClosePurchase ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkMatProvisionEntityId + ", " + 
@@ -554,6 +578,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") + 
                     (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") + 
                     mnFkUserCloseProvisionId + ", " + 
+                    mnFkUserCloseQuotationId + ", " +
                     mnFkUserClosePurchaseId + ", " + 
                     mnFkUserChangeId + ", " +
                     mnFkUserInsertId + ", " + 
@@ -561,6 +586,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "NOW()" + ", " + 
                     "NOW()" + ", " + 
                     "NOW()" + ", " + 
+                    "NOW()" + ", " +
                     "NOW()" + ", " + 
                     "NOW()" + " " + 
                     ")";
@@ -568,20 +594,21 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         else {
             
             mnFkUserUpdateId = session.getUser().getPkUserId();
-            if (mbAuxLastProvClosedSta != mbCloseProvision && mbCloseProvision) {
+            if (mbAuxLastProvisionClosedSta != mbCloseProvision) {
                 mnFkUserCloseProvisionId = session.getUser().getPkUserId();
-                updateProvisionStatus = true;
+                updateCloseProvisionTs = true;
             }
-            else if (!mbCloseProvision) {
-                mnFkUserCloseProvisionId = SUtilConsts.USR_NA_ID;
-            }
+
+            // If the quotation request status of the requisition changes, notify and obtain the updated user and date.
             
-            if (mbAuxLastPurClosedSta != mbClosePurchase && mbClosePurchase) {
-                mnFkUserClosePurchaseId = session.getUser().getPkUserId();
-                updatePurchaseStatus = true;
+            if (mbAuxLastQuotationClosedSta != mbCloseQuotation) {
+                mnFkUserCloseQuotationId = session.getUser().getPkUserId();
+                updateCloseQuotationTs = true;
             }
-            else if (!mbClosePurchase) {
-                mnFkUserClosePurchaseId = SUtilConsts.USR_NA_ID;
+
+            if (mbAuxLastPurchaseClosedSta != mbClosePurchase) {
+                mnFkUserClosePurchaseId = session.getUser().getPkUserId();
+                updateClosePurchaseTs = true;
             }
             
             mnFkMatRequestStatusId = mnFkMatRequestStatusId == 0 ? mnAuxReqStatusIdOld : mnFkMatRequestStatusId;
@@ -603,6 +630,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "b_ext_sys = " + (mbExternalSystem ? 1 : 0) + ", " +
                     "ext_sys_id = '" + msExternalSystemId + "', " +
                     "b_clo_prov = " + (mbCloseProvision ? 1 : 0) + ", " +
+                    "b_clo_qtn = " + (mbCloseQuotation ? 1 : 0) + ", " +
                     "b_clo_pur = " + (mbClosePurchase ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_mat_prov_ent = " + mnFkMatProvisionEntityId + ", " +
@@ -617,13 +645,15 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     "fk_whs_whs_n = " + (mnFkWarehouseWarehouse_n == 0 ? "NULL, " : mnFkWarehouseWarehouse_n + ", ") +
                     "fk_item_ref_n = " + (mnFkItemReferenceId_n == 0 ? "NULL, " : mnFkItemReferenceId_n + ", ") +
                     "fk_usr_clo_prov = " + mnFkUserCloseProvisionId + ", " +
+                    "fk_usr_clo_qtn = " + mnFkUserCloseQuotationId + ", " +
                     "fk_usr_clo_pur = " + mnFkUserClosePurchaseId + ", " +
                     "fk_usr_chg = " + mnFkUserChangeId + ", " +
                     "fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     (mbAuxChangeStatus ? "ts_usr_chg = " + "NOW()" + ", " : "") +
-                    (updateProvisionStatus ? "ts_usr_clo_prov = " + "NOW()" + ", " : "") +
-                    (updatePurchaseStatus ? "ts_usr_clo_pur = " + "NOW()" + ", " : "") +
+                    (updateCloseProvisionTs ? "ts_usr_clo_prov = " + "NOW()" + ", " : "") +
+                    (updateCloseQuotationTs ? "ts_usr_clo_qtn = " + "NOW()" + ", " : "") +                   
+                    (updateClosePurchaseTs ? "ts_usr_clo_pur = " + "NOW()" + ", " : "") +
                     //"ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
@@ -664,11 +694,11 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         
         mnAuxReqAuthStatusIdOld = mnAuxReqAuthStatusId;
         mnAuxReqAuthStatusId = SAuthorizationUtils.getAuthStatus(session, SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST, new int[]{ mnPkMatRequestId });
-        if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvStatusIdOld != mnFkMatProvisionStatusId
-                || mnAuxReqPurStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateProvisionStatus || updatePurchaseStatus) {
+        if (mnAuxReqStatusIdOld != mnFkMatRequestStatusId || mnAuxReqProvisionStatusIdOld != mnFkMatProvisionStatusId || 
+                mnAuxReqPurchaseStatusIdOld != mnFkMatPurchaseStatusId || mnAuxReqAuthStatusIdOld != mnAuxReqAuthStatusId || updateCloseProvisionTs || updateCloseQuotationTs || updateClosePurchaseTs) {
             String st;
-            if (updateProvisionStatus) {
-                if (!mbAuxLastProvClosedSta) {
+            if (updateCloseProvisionTs) {
+                if (!mbAuxLastProvisionClosedSta) {
                     st = "ABIERTO ";
                 }
                 else {
@@ -682,8 +712,23 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                     msAuxNotesChangeStatus_n += ". " + st + "PARA SUMINISTRO.";
                 }
             }
-            else if (updatePurchaseStatus) {
-                if (mbAuxLastPurClosedSta) {
+            else if (updateCloseQuotationTs) {
+                if (mbCloseQuotation) {
+                    st = "CERRADO PARA SOLICITUD COTIZACIÓN";
+                }
+                else {
+                    st = "ABIERTO PARA SOLICITUD COTIZACIÓN";
+                }
+
+                if (msAuxNotesChangeStatus_n == null || msAuxNotesChangeStatus_n.isEmpty()) {
+                    msAuxNotesChangeStatus_n = st + ".";
+                }
+                else {
+                    msAuxNotesChangeStatus_n += ". " + st + ".";
+                }
+            }
+            else if (updateClosePurchaseTs) {
+                if (mbAuxLastPurchaseClosedSta) {
                     st = "ABIERTO ";
                 }
                 else {
@@ -763,7 +808,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
                 saveLog(session);
             }
         }
-        
+                
         /**
         * Actualización de estatus específicos
         */
@@ -829,6 +874,7 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setExternalSystem(this.isExternalSystem());
         registry.setExternalSystemId(this.getExternalSystemId());
         registry.setCloseProvision(this.isCloseProvision());
+        registry.setCloseQuotation(this.isCloseQuotation());
         registry.setClosePurchase(this.isClosePurchase());
         registry.setDeleted(this.isDeleted());
         registry.setFkMatProvisionEntityId(this.getFkMatProvisionEntityId());
@@ -843,11 +889,13 @@ public class SDbMaterialRequest extends SDbRegistryUser {
         registry.setFkWarehouseWarehouse_n(this.getFkWarehouseWarehouse_n());
         registry.setFkItemReferenceId_n(this.getFkItemReferenceId_n());
         registry.setFkUserCloseProvisionId(this.getFkUserCloseProvisionId());
+        registry.setFkUserCloseQuotationId(this.getFkUserCloseQuotationId());
         registry.setFkUserClosePurchaseId(this.getFkUserClosePurchaseId());
         registry.setFkUserChangeId(this.getFkUserChangeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserCloseProvision(this.getTsUserCloseProvision());
+        registry.setTsUserCloseQuotation(this.getTsUserCloseQuotation());
         registry.setTsUserClosePurchase(this.getTsUserClosePurchase());
         registry.setTsUserChange(this.getTsUserChange());
         registry.setTsUserInsert(this.getTsUserInsert());
@@ -865,20 +913,20 @@ public class SDbMaterialRequest extends SDbRegistryUser {
             registry.getChildEntries().add(entry);
         }
         
+        registry.setDbmsItemRef(this.getDbmsItemRef());
+        
         registry.setAuxReqStatus(this.getAuxReqStatus());
-        registry.setAuxProvStatus(this.getAuxProvStatus());
-        registry.setAuxPurStatus(this.getAuxPurStatus());
+        registry.setAuxProvisionStatus(this.getAuxProvStatus());
+        registry.setAuxPurchaseStatus(this.getAuxPurStatus());
         
         registry.setAuxReqStatusIdOld(this.getAuxReqStatusIdOld());
         registry.setAuxReqAuthStatusId(this.getAuxReqAuthStatusId());
         registry.setAuxReqAuthStatusIdOld(this.getAuxReqAuthStatusIdOld());
-        registry.setAuxReqProvStatusIdOld(this.getAuxReqProvStatusIdOld());
-        registry.setAuxReqPurStatusIdOld(this.getAuxReqPurStatusIdOld());
+        registry.setAuxReqProvisionStatusIdOld(this.getAuxReqProvStatusIdOld());
+        registry.setAuxReqPurchaseStatusIdOld(this.getAuxReqPurStatusIdOld());
         
-        registry.setAuxLastProvClosedSta(this.getAuxLastProvClosedSta());
-        registry.setAuxLastPurClosedSta(this.getAuxLastPurClosedSta());
-        
-        registry.setDbmsItemRef(this.getDbmsItemRef());
+        registry.setAuxLastProvisionClosedSta(this.getAuxLastProvisionClosedSta());
+        registry.setAuxLastPurchaseClosedSta(this.getAuxLastPurchaseClosedSta());
         
         registry.setRegistryNew(this.isRegistryNew());
         

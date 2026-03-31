@@ -62,7 +62,7 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín, Rodrigo Ayala
  */
 public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -94,6 +94,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiMaterialAttribute;
     private javax.swing.JMenuItem jmiItemPackage;
     private javax.swing.JMenuItem jmiItemBarcode;
+    private javax.swing.JMenuItem jmiItemDescription;
     private javax.swing.JMenuItem jmiBizAreaItemGeneric;
     private javax.swing.JMenuItem jmiItemBizPartnerDescription;
     private javax.swing.JMenuItem jmiItemAdvancedSearch;
@@ -155,7 +156,8 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         boolean hasRightVariety;
         boolean hasRightItemConfiguration;
         boolean hasRightItem;
-
+        
+        
         jmMenuItem = new JMenu("Ítems");
         jmiItem = new JMenuItem("Ítems");
         jmiItemLine = new JMenuItem("Líneas de ítems");
@@ -184,6 +186,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiMaterialAttribute = new JMenuItem("Atributos de materiales");
         jmiItemPackage = new JMenuItem("Conversiones de ítems");
         jmiItemBarcode = new JMenuItem("Códigos de barras de ítems");
+        jmiItemDescription = new JMenuItem("Descripciones extendidas de ítems");
         jmiBizAreaItemGeneric = new JMenuItem("Áreas de negocios de ítems genéricos");
         jmiItemBizPartnerDescription = new JMenuItem("Descripciones de ítems para asociados de negocios");
         jmiItemAdvancedSearch = new JMenuItem("Busqueda avanzada de ítems");
@@ -220,6 +223,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmMenuItem.addSeparator();
         jmMenuItem.add(jmiItemPackage);
         jmMenuItem.add(jmiItemBarcode);
+        jmMenuItem.add(jmiItemDescription);
         jmMenuItem.add(jmiBizAreaItemGeneric);
         jmMenuItem.add(jmiItemBizPartnerDescription);
         jmMenuItem.addSeparator();
@@ -252,6 +256,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiMaterialAttribute.addActionListener(this);
         jmiItemPackage.addActionListener(this);
         jmiItemBarcode.addActionListener(this);
+        jmiItemDescription.addActionListener(this);
         jmiBizAreaItemGeneric.addActionListener(this);
         jmiItemBizPartnerDescription.addActionListener(this);
         jmiItemAdvancedSearch.addActionListener(this);
@@ -329,6 +334,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
         jmiLevelType.setEnabled(hasRightItem);
         jmiItemPackage.setEnabled(hasRightItemConfiguration);
         jmiItemBarcode.setEnabled(hasRightItemConfiguration);
+        jmiItemDescription.setEnabled(hasRightItemConfiguration);
         jmiBizAreaItemGeneric.setEnabled(hasRightItemConfiguration);
         jmiItemBizPartnerDescription.setEnabled(hasRightItemConfiguration);
     }
@@ -378,6 +384,7 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                     miForm = moFormItemLine;
                     break;
                 case SDataConstants.ITMU_ITEM:
+                case SDataConstants.ITMU_ITEM_DESC:
                     if (moFormItem == null) {
                         moFormItem = new SFormItem(miClient);
                     }
@@ -633,10 +640,14 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
-                    break;
+                    break; 
                 case SDataConstants.ITMU_ITEM_BARC:
                     oViewClass = erp.mitm.view.SViewItemBarcode.class;
                     sViewTitle = "Códigos barras ítems";
+                    break;
+                case SDataConstants.ITMU_ITEM_DESC:
+                    oViewClass = erp.mitm.view.SViewItemDescription.class;
+                    sViewTitle = "Descrip. extendidas ítems";
                     break;
                 case SDataConstants.ITMU_CFG_ITEM_BP:
                     oViewClass = erp.mitm.view.SViewItemConfigBizPartner.class;
@@ -944,6 +955,9 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiItemBarcode) {
                 showView(SDataConstants.ITMU_ITEM_BARC);
+            }
+            else if (item == jmiItemDescription){
+                showView(SDataConstants.ITMU_ITEM_DESC);
             }
             else if (item == jmiBizAreaItemGeneric) {
                 showView(SDataConstants.ITMU_IGEN_BA);

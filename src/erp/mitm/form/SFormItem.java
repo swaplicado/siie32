@@ -51,6 +51,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Vector;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.web.HTMLEditor;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -59,12 +63,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Sergio Flores, Rodigo Ayala
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 
@@ -78,7 +83,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private String msItemMaterialName;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
-
+    
     private erp.lib.form.SFormField moFieldFkItemGenericId;
     private erp.lib.form.SFormField moFieldFkItemLineId_n;
     private erp.lib.form.SFormField moFieldName;
@@ -88,7 +93,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldCode;
     private erp.lib.form.SFormField moFieldPartNumber;
     private erp.lib.form.SFormField moFieldItemKey;
-    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldIsDeleted; 
     private erp.lib.form.SFormField moFieldIsInventoriable;
     private erp.lib.form.SFormField moFieldIsLotApplying;
     private erp.lib.form.SFormField moFieldIsBulk;
@@ -168,10 +173,14 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldAttribute13;
     private erp.lib.form.SFormField moFieldAttribute14;
     private erp.lib.form.SFormField moFieldAttribute15;
-
+    
     private erp.lib.table.STablePane moItemConfigLanguagesPane;
     private erp.lib.table.STablePane moItemBarcodePane;
 
+    private erp.lib.form.SFormField moItemDescriptionIsDeleted;
+    private javafx.embed.swing.JFXPanel moJfxPanel;
+    private javafx.scene.web.HTMLEditor moHtmlEditor;
+    
     private erp.mitm.form.SFormItemBarcode moFormItemBarcode;
     private erp.mitm.form.SFormItemConfigLanguage moFormItemConfigLanguage;
     private erp.mitm.form.SFormNewItemCode moFormNewItemCode;
@@ -479,6 +488,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpAttribute15 = new javax.swing.JPanel();
         jlAttribute15 = new javax.swing.JLabel();
         jtfAttribute15 = new javax.swing.JTextField();
+        jpDescription = new javax.swing.JPanel();
+        jPanel22 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jckItemDescriptionIsDeleted = new javax.swing.JCheckBox();
+        panelEditor = new javax.swing.JPanel();
         jpCommandBar = new javax.swing.JPanel();
         jpCommandBar1 = new javax.swing.JPanel();
         jtfPkItemId_Ro = new javax.swing.JTextField();
@@ -494,6 +508,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 formWindowActivated(evt);
             }
         });
+
+        jTabbedPane.setName(""); // NOI18N
 
         jpRegistry.setLayout(new java.awt.BorderLayout(5, 5));
 
@@ -1430,7 +1446,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpAttributes.setLayout(new java.awt.BorderLayout());
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 1));
+        jPanel17.setBorder(javax.swing.BorderFactory.createTitledBorder("Atributos:"));
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
@@ -1441,8 +1457,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfMaterialItemNameRo.setEditable(false);
         jtfMaterialItemNameRo.setPreferredSize(new java.awt.Dimension(510, 23));
         jPanel18.add(jtfMaterialItemNameRo);
-
-        jPanel17.add(jPanel18);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
@@ -1463,16 +1477,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfPartNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel19.add(jtfPartNumberRo);
 
-        jPanel17.add(jPanel19);
-
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
 
         jLabel4.setText("Captura de atributos del ítem:");
         jLabel4.setPreferredSize(new java.awt.Dimension(700, 23));
         jPanel21.add(jLabel4);
 
-        jPanel17.add(jPanel21);
-
+        jPanel20.setToolTipText("");
         jPanel20.setLayout(new java.awt.GridLayout(15, 1));
 
         jpAttribute1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 1));
@@ -1655,11 +1666,62 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel20.add(jpAttribute15);
 
-        jPanel17.add(jPanel20);
+        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
+        jPanel17.setLayout(jPanel17Layout);
+        jPanel17Layout.setHorizontalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addGap(115, 115, 115)
+                .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel17Layout.setVerticalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         jpAttributes.add(jPanel17, java.awt.BorderLayout.CENTER);
 
         jTabbedPane.addTab("Atributos", jpAttributes);
+        jpAttributes.getAccessibleContext().setAccessibleName("Atributos");
+
+        jpDescription.setBorder(javax.swing.BorderFactory.createTitledBorder("Descripción extendida del ítem:"));
+        jpDescription.setLayout(new java.awt.BorderLayout());
+
+        jPanel22.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel2.setText("Introduce la descripción extendida del ítem.");
+        jPanel22.add(jLabel2);
+
+        jckItemDescriptionIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
+        jckItemDescriptionIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckItemDescriptionIsDeleted.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jckItemDescriptionIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel22.add(jckItemDescriptionIsDeleted);
+        jckItemDescriptionIsDeleted.getAccessibleContext().setAccessibleDescription("");
+
+        jpDescription.add(jPanel22, java.awt.BorderLayout.NORTH);
+
+        panelEditor.setLayout(new java.awt.BorderLayout());
+        jpDescription.add(panelEditor, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane.addTab("Descripción extendida", jpDescription);
 
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
@@ -1699,7 +1761,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
-
+   
     /*
      * Private methods:
      */
@@ -1714,7 +1776,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItemBarcodePane = new STablePane(miClient);
         moItemBarcodePane.setDoubleClickAction(this, "publicActionModifyItemBarcode");
         jpItemBarcode.add(moItemBarcodePane, BorderLayout.CENTER);
+        
+        // Item description panel:
 
+        moJfxPanel = new JFXPanel();
+        panelEditor.setLayout(new BorderLayout());
+        panelEditor.add(moJfxPanel, BorderLayout.CENTER);
+        
         moItemConfigLanguagesPane = new STablePane(miClient);
         moItemConfigLanguagesPane.setDoubleClickAction(this, "publicActionModifyItemForeignLanguage");
         jpConfig2Language.add(moItemConfigLanguagesPane, BorderLayout.CENTER);
@@ -1933,7 +2001,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldAttribute14.setLengthMax(20);
         moFieldAttribute15 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfAttribute15, jlAttribute15);
         moFieldAttribute15.setLengthMax(20);
-
+        
+        moItemDescriptionIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckItemDescriptionIsDeleted);
+        moItemDescriptionIsDeleted.setTabbedPaneIndex(3, jTabbedPane);
         
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
@@ -2021,6 +2091,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldAttribute13);
         mvFields.add(moFieldAttribute14);
         mvFields.add(moFieldAttribute15);
+        
+        mvFields.add(moItemDescriptionIsDeleted);
 
         moFormItemBarcode = new SFormItemBarcode(miClient);
         moFormItemConfigLanguage = new SFormItemConfigLanguage(miClient);
@@ -2084,7 +2156,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfAttribute13.addKeyListener(this);
         jtfAttribute14.addKeyListener(this);
         jtfAttribute15.addKeyListener(this);
-
+        
         i = 0;
         tableColumnsItemForeignLanguage = new STableColumnForm[4];
         tableColumnsItemForeignLanguage[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 350);
@@ -2104,6 +2176,16 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         for (i = 0; i < tableColumnsItemBarcode.length; i++) {
             moItemBarcodePane.addTableColumn(tableColumnsItemBarcode[i]);
         }
+        
+        // To execute JavaFX needs JavaFX Application Thread:
+        
+        Platform.runLater(() -> {
+            moHtmlEditor = new HTMLEditor();
+            moHtmlEditor.setPrefSize(600, 400);
+            moHtmlEditor.setHtmlText("");
+            Scene scene = new Scene(moHtmlEditor);
+            moJfxPanel.setScene(scene);
+        });
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionAddItemBarcode", "addBarcode", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionModifyItemBarcode", "modifyBarcode", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
@@ -3504,6 +3586,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
@@ -3518,6 +3601,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
@@ -3630,6 +3714,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsSalesFreightRequired;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
+    private javax.swing.JCheckBox jckItemDescriptionIsDeleted;
     private javax.swing.JLabel jlAttribute1;
     private javax.swing.JLabel jlAttribute10;
     private javax.swing.JLabel jlAttribute11;
@@ -3724,6 +3809,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jpConfig2;
     private javax.swing.JPanel jpConfig2Barcode;
     private javax.swing.JPanel jpConfig2Language;
+    private javax.swing.JPanel jpDescription;
     private javax.swing.JPanel jpItemBarcode;
     private javax.swing.JPanel jpRegistry;
     private javax.swing.JRadioButton jrbStatusActive;
@@ -3784,6 +3870,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private sa.lib.gui.bean.SBeanFieldKey moKeyCfdProdServId_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyFkMaterialTypeId_n;
     private javax.swing.JTextField moTextTariff;
+    private javax.swing.JPanel panelEditor;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -3817,6 +3904,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItemBarcodePane.createTable(null);
         moItemBarcodePane.clearTableRows();
 
+        Platform.runLater(() -> {
+            if (moHtmlEditor != null) {
+                moHtmlEditor.setHtmlText("");
+            }
+        });
+        
         moFieldFkUnitAlternativeTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
         moFieldFkLevelTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_LEV_NA });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
@@ -3826,6 +3919,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { SModSysConsts.FINS_FISCAL_ACC_NA });
 
         jckIsDeleted.setEnabled(false);
+        jckItemDescriptionIsDeleted.setEnabled(false);
         jbEditItemGeneric.setEnabled(false);
         jcbFkItemGenericId.setEnabled(true);
         jbFkItemGenericId.setEnabled(true);
@@ -4150,7 +4244,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfPkItemId_Ro.setText("" + moItem.getPkItemId());
 
         jckIsDeleted.setEnabled(true);
-
+        jckItemDescriptionIsDeleted.setEnabled(true);
+        moItemDescriptionIsDeleted.setFieldValue(moItem.getCompItemDescriptionIsDeleted());
+        
         jcbFkItemGenericId.setEnabled(false);
         jbFkItemGenericId.setEnabled(false);
         jcbFkItemLineId_n.setEnabled(false);
@@ -4177,7 +4273,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 break;
             default:
         }
-
+        
         // Read the item foreign language descriptions:
 
         for (int i = 0; i < moItem.getDbmsItemConfigLanguages().size(); i++) {
@@ -4195,6 +4291,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         }
         moItemBarcodePane.renderTableRows();
         moItemBarcodePane.setTableRowSelection(0);
+        
+        // Read the item description panel from JavaFx + Swing:
+        
+        Platform.runLater(() -> {
+            moHtmlEditor.setHtmlText(moItem.getCompItemDescription());
+        });
 
         mbResetingForm = false;
     }
@@ -4212,7 +4314,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         moItem.setFkItemGenericId(moFieldFkItemGenericId.getKeyAsIntArray()[0]);
-        moItem.setFkItemLineId_n(!jcbFkItemLineId_n.isEnabled() ? SLibConstants.UNDEFINED : moFieldFkItemLineId_n.getKeyAsIntArray()[0]);
+        moItem.setFkItemLineId_n(jcbFkItemLineId_n.getSelectedIndex() <= 0 ? SLibConstants.UNDEFINED : moFieldFkItemLineId_n.getKeyAsIntArray()[0]);
         moItem.setName(moFieldName.getString());
         moItem.setNameShort(moFieldNameShort.getString());
         moItem.setPresentation(moFieldPresentation.getString());
@@ -4371,7 +4473,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         else {
             moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_INA);
         }
-
+        
         // Save item foreign language descriptions:
 
         moItem.getDbmsItemConfigLanguages().clear();
@@ -4385,7 +4487,21 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         for (i = 0; i < moItemBarcodePane.getTable().getRowCount(); i++) {
             moItem.getDbmsItemBarcodes().add((erp.mitm.data.SDataItemBarcode) moItemBarcodePane.getTableRow(i).getData());
         }
-
+        
+        // Description field Is Deleted Bottom:
+        moItem.setIsItemDescriptionIsDeleted(moItemDescriptionIsDeleted.getBoolean());
+        
+        // Sanitize ítem description:
+        
+        String description = SLibUtils.htmlToPlainText(moHtmlEditor.getHtmlText())
+                .replaceAll(" ", "")
+                .replaceAll("\\s+", "")
+                .replaceAll("&nbsp", "")
+                .replace("\u00A0", "")
+                .trim();
+        
+        moItem.setCompItemDescription(description.isEmpty() ? "" : moHtmlEditor.getHtmlText());
+       
         return moItem;
     }
 

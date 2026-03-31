@@ -124,6 +124,7 @@ import erp.mod.trn.view.SViewMaterialRequesPendingSupply;
 import erp.mod.trn.view.SViewMaterialRequest;
 import erp.mod.trn.view.SViewMaterialRequestPending;
 import erp.mod.trn.view.SViewMaterialRequestPendingEstimation;
+import erp.mod.trn.view.SViewMaterialRequestPendingOrders;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewPurchasingProcess;
@@ -162,7 +163,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Isabel Servín, Rodrigo Ayala
  */
 public class SModuleTrn extends SGuiModule {
 
@@ -790,6 +791,8 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRNX_MAT_REQ_EST:
                 switch(subtype) {
+                    case SModSysConsts.TRNX_MAT_REQ_PEND_ORDERS: title = "Requisiciones pendientes atención";
+                        break;
                     case SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE: title = "Requisiciones x solicitar cotización";
                         break;
                     case SModSysConsts.TRNX_MAT_REQ_ESTIMATED: title = "Requisiciones solicitada cotización";
@@ -799,7 +802,12 @@ public class SModuleTrn extends SGuiModule {
                     default:
                         // nothing
                 }
-                view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
+                if (subtype == SModSysConsts.TRNX_MAT_REQ_PEND_ORDERS) {
+                    view = new SViewMaterialRequestPendingOrders(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
+                }
+                else {
+                    view = new SViewMaterialRequestPendingEstimation(miClient, SModConsts.TRNX_MAT_REQ_EST, subtype, title, params);
+                }
                 break;
             case SModConsts.TRNX_MAT_REQ_FOLL_PUR:
                 switch (subtype) {

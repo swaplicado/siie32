@@ -32,7 +32,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona, Sergio Flores
+ * @author Alfonso Flores, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -55,7 +55,9 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private String msFunctionalAreasIds;
+    private String msSubfunctionalAreasIds;
 
     /** Creates new form SDialogRepDpsWithBalance
      * @param client GUI client.
@@ -331,11 +333,17 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         
         String areasFilter = "";
         if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
-            }
-            else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+            if (!msFunctionalAreasIds.isEmpty() && !msSubfunctionalAreasIds.isEmpty()) {
+                String[] funcs = msFunctionalAreasIds.split(",");
+                String[] subs = msSubfunctionalAreasIds.split(",");
+
+                String pairs = "";
+
+                for (int i = 0; i < funcs.length; i++) {
+                    pairs += (pairs.isEmpty() ? "" : ",") + "(" + funcs[i].trim() + "," + subs[i].trim() + ")";
+                }
+
+                areasFilter = " AND (d.fid_func, d.fid_func_sub) IN (" + pairs + ") ";
             }
         }
 
@@ -415,17 +423,24 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
-        msFunctionalAreasIds = texts[0];
-        
-        jtfFunctionalArea.setText(texts[1]);
-        jtfFunctionalArea.setCaretPosition(0);
-    }
+    String[] texts = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(
+        miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
+
+    msFunctionalAreasIds = texts[0];
+
+    // ❌ esto NO lo tienes:
+    msSubfunctionalAreasIds = mnSubFunctionalAreaId == 0 || mnSubFunctionalAreaId == SLibConstants.UNDEFINED 
+        ? "" 
+        : String.valueOf(mnSubFunctionalAreaId);
+
+    jtfFunctionalArea.setText(texts[1]);
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -480,6 +495,11 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         moFieldDate.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         jrbByLocalCurrency.setSelected(true);
+                 
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        renderFunctionalArea();
     }
 
     @Override

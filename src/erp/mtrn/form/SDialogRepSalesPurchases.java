@@ -37,7 +37,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Uriel Castañeda, Edwin Carmona, Sergio Flores
+ * @author Alfonso Flores, Uriel Castañeda, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
     
@@ -58,6 +58,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private String msFunctionalAreasIds;
 
     private boolean mbParamIsSupplier;
@@ -500,11 +501,14 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         
         String areasFilter = "";
         if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
+            if (mnSubFunctionalAreaId != SLibConstants.UNDEFINED) {
+                areasFilter = " AND d.fid_func_sub = " + mnSubFunctionalAreaId + " ";
+            }
+            else if (!msFunctionalAreasIds.isEmpty()) {
+                areasFilter = " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
             }
             else {
-                areasFilter = " AND de.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                areasFilter = "";
             }
         }
         
@@ -679,14 +683,15 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
-        
+
         jtfFunctionalArea.setText(texts[1]);
         jtfFunctionalArea.setCaretPosition(0);
     }
@@ -1101,6 +1106,11 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jckWithoutRelatedParty.setSelected(false);
         jcbUnitType.removeAllItems();
         renderComboBoxUnitsType();
+        
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        renderFunctionalArea();
     }
 
     @Override

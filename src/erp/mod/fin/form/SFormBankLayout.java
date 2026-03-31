@@ -1486,7 +1486,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         int index = moGridPayments.getTable().getSelectedRow();
         
         if (index == -1) {
-            miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_GRID_ROW);
+//            miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_GRID_ROW);
         }
         else {
             SLayoutBankRow oLayoutRow = (SLayoutBankRow) moGridPayments.getSelectedGridRow();

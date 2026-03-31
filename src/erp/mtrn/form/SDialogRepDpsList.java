@@ -37,7 +37,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Alfonso Flores, Claudio Peña, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -59,6 +59,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepDpsList
@@ -334,11 +335,14 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         
         String areasFilter = "";
         if (miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
+            if (mnSubFunctionalAreaId != SLibConstants.UNDEFINED) {
+                areasFilter = " AND d.fid_func_sub = " + mnSubFunctionalAreaId + " ";
+            }
+            else if (!msFunctionalAreasIds.isEmpty()) {
+                areasFilter = " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
             }
             else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                areasFilter = "";
             }
         }
 
@@ -441,12 +445,13 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId);
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas(miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);
@@ -506,6 +511,11 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         
         jckWithoutRelatedParty.setSelected(false);
+        
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        mnSubFunctionalAreaId = SLibConstants.UNDEFINED;
+        msFunctionalAreasIds = "";
+        renderFunctionalArea();
     }
 
     @Override

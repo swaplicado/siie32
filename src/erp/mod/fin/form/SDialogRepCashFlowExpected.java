@@ -21,12 +21,13 @@ import sa.lib.gui.bean.SBeanDialogReport;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogRepCashFlowExpected extends SBeanDialogReport implements ActionListener {
     
     private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
     private int mnFunctionalAreaId;
+    private int mnSubFunctionalAreaId;
     private String msFunctionalAreasIds;
     
     /**
@@ -183,12 +184,13 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
 
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            mnSubFunctionalAreaId = moDialogFilterFunctionalArea.getSubFunctionalAreaId();
             renderFunctionalArea();
         }
     }
     
     private void renderFunctionalArea() {
-        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, mnFunctionalAreaId);
+        String texts[] = STrnFunctionalAreaUtils.getTextFilterOfFunctionalAreas((SClientInterface) miClient, mnFunctionalAreaId, mnSubFunctionalAreaId);
         msFunctionalAreasIds = texts[0];
         
         jtfFunctionalArea.setText(texts[1]);
@@ -209,11 +211,14 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport implements Act
     public void createParamsMap() {
         String areasFilter = "";
         if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
-            if (msFunctionalAreasIds.isEmpty()) {
-                areasFilter = "";
+            if (mnSubFunctionalAreaId != SLibConstants.UNDEFINED) {
+                areasFilter = " AND d.fid_func_sub = " + mnSubFunctionalAreaId + " ";
+            }
+            else if (!msFunctionalAreasIds.isEmpty()) {
+                areasFilter = " AND d.fid_func IN (" + msFunctionalAreasIds + ") ";
             }
             else {
-                areasFilter = " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ";
+                areasFilter = "";
             }
         }
         
