@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -272,29 +273,29 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             msDpsReferences = resultSet.getString("dps_refs");
             msDpsDescription = resultSet.getString("dps_descrip");
             mbDpsPaymentLocal = resultSet.getBoolean("b_dps_pay_loc");
-//            mnProcessingType = resultSet.getInt("proc_type");
-//            mbPaymentRequired = resultSet.getBoolean("b_pay_req");
-//            mdPaymentApplicationCy = resultSet.getDouble("pay_app_cur");
-//            mtPaymentDateRequired_n = resultSet.getDate("pay_dt_req_n");
-//            mnAccMethod = resultSet.getInt("acc_method");
-//            mdAccUserUnits = resultSet.getDouble("acc_usr_units");
-//            mdAccSystemUnits = resultSet.getDouble("acc_sys_units");
+            mnProcessingType = resultSet.getInt("proc_type");
+            mbPaymentRequired = resultSet.getBoolean("b_pay_req");
+            mdPaymentApplicationCy = resultSet.getDouble("pay_app_cur");
+            mtPaymentDateRequired_n = resultSet.getDate("pay_dt_req_n");
+            mnAccMethod = resultSet.getInt("acc_method");
+            mdAccUserUnits = resultSet.getDouble("acc_usr_units");
+            mdAccSystemUnits = resultSet.getDouble("acc_sys_units");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDpsYearId_n = resultSet.getInt("fk_dps_year_n");
             mnFkDpsDocId_n = resultSet.getInt("fk_dps_doc_n");
             mnFkPaymentId_n = resultSet.getInt("fk_pay_n");
-//            mnFkPayCurrencyId_n = resultSet.getInt("fk_pay_cur_n");
-//            mnFkAccUserAccountId_n = resultSet.getInt("fk_acc_usr_acc_n");
-//            mnFkAccUserCostCenterId_n = resultSet.getInt("fk_acc_usr_cc_n");
-//            mnFkAccUserItemId_n = resultSet.getInt("fk_acc_usr_item_n");
-//            mnFkAccUserItemAuxId_n = resultSet.getInt("fk_acc_usr_item_aux_n");
-//            mnFkAccUserUnitId_n = resultSet.getInt("fk_acc_usr_unit_n");
-//            mnFkAccSystemAccountId_n = resultSet.getInt("fk_acc_sys_acc_n");
-//            mnFkAccSystemCostCenterId_n = resultSet.getInt("fk_acc_sys_cc_n");
-//            mnFkAccSystemItemId_n = resultSet.getInt("fk_acc_sys_item_n");
-//            mnFkAccSystemItemAuxId_n = resultSet.getInt("fk_acc_sys_item_aux_n");
-//            mnFkAccSystemUnitId_n = resultSet.getInt("fk_acc_sys_unit_n");
+            mnFkPayCurrencyId_n = resultSet.getInt("fk_pay_cur_n");
+            mnFkAccUserAccountId_n = resultSet.getInt("fk_acc_usr_acc_n");
+            mnFkAccUserCostCenterId_n = resultSet.getInt("fk_acc_usr_cc_n");
+            mnFkAccUserItemId_n = resultSet.getInt("fk_acc_usr_item_n");
+            mnFkAccUserItemAuxId_n = resultSet.getInt("fk_acc_usr_item_aux_n");
+            mnFkAccUserUnitId_n = resultSet.getInt("fk_acc_usr_unit_n");
+            mnFkAccSystemAccountId_n = resultSet.getInt("fk_acc_sys_acc_n");
+            mnFkAccSystemCostCenterId_n = resultSet.getInt("fk_acc_sys_cc_n");
+            mnFkAccSystemItemId_n = resultSet.getInt("fk_acc_sys_item_n");
+            mnFkAccSystemItemAuxId_n = resultSet.getInt("fk_acc_sys_item_aux_n");
+            mnFkAccSystemUnitId_n = resultSet.getInt("fk_acc_sys_unit_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -327,29 +328,29 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "'" + msDpsReferences + "', " + 
                     "'" + msDpsDescription + "', " + 
                     (mbDpsPaymentLocal ? 1 : 0) + ", " + 
-//                    mnProcessingType + ", " + 
-//                    (mbPaymentRequired ? 1 : 0) + ", " + 
-//                    mdPaymentApplicationCy + ", " + 
-//                    (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " + 
-//                    mnAccMethod + ", " + 
-//                    mdAccUserUnits + ", " + 
-//                    mdAccSystemUnits + ", " + 
+                    mnProcessingType + ", " + 
+                    (mbPaymentRequired ? 1 : 0) + ", " + 
+                    mdPaymentApplicationCy + ", " + 
+                    (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " + 
+                    mnAccMethod + ", " + 
+                    mdAccUserUnits + ", " + 
+                    mdAccSystemUnits + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " + 
                     (mnFkDpsDocId_n == 0 ? "NULL" : mnFkDpsDocId_n) + ", " + 
                     (mnFkPaymentId_n == 0 ? "NULL" : mnFkPaymentId_n) + ", " + 
-//                    (mnFkPayCurrencyId_n == 0 ? "NULL" : mnFkPayCurrencyId_n) + ", " + 
-//                    (mnFkAccUserAccountId_n == 0 ? "NULL" : mnFkAccUserAccountId_n) + ", " + 
-//                    (mnFkAccUserCostCenterId_n == 0 ? "NULL" : mnFkAccUserCostCenterId_n) + ", " + 
-//                    (mnFkAccUserItemId_n == 0 ? "NULL" : mnFkAccUserItemId_n) + ", " + 
-//                    (mnFkAccUserItemAuxId_n == 0 ? "NULL" : mnFkAccUserItemAuxId_n) + ", " + 
-//                    (mnFkAccUserUnitId_n == 0 ? "NULL" : mnFkAccUserUnitId_n) + ", " + 
-//                    (mnFkAccSystemAccountId_n == 0 ? "NULL" : mnFkAccSystemAccountId_n) + ", " + 
-//                    (mnFkAccSystemCostCenterId_n == 0 ? "NULL" : mnFkAccSystemCostCenterId_n) + ", " + 
-//                    (mnFkAccSystemItemId_n == 0 ? "NULL" : mnFkAccSystemItemId_n) + ", " + 
-//                    (mnFkAccSystemItemAuxId_n == 0 ? "NULL" : mnFkAccSystemItemAuxId_n) + ", " + 
-//                    (mnFkAccSystemUnitId_n == 0 ? "NULL" : mnFkAccSystemUnitId_n) + ", " + 
+                    (mnFkPayCurrencyId_n == 0 ? "NULL" : mnFkPayCurrencyId_n) + ", " + 
+                    (mnFkAccUserAccountId_n == 0 ? "NULL" : mnFkAccUserAccountId_n) + ", " + 
+                    (mnFkAccUserCostCenterId_n == 0 ? "NULL" : mnFkAccUserCostCenterId_n) + ", " + 
+                    (mnFkAccUserItemId_n == 0 ? "NULL" : mnFkAccUserItemId_n) + ", " + 
+                    (mnFkAccUserItemAuxId_n == 0 ? "NULL" : mnFkAccUserItemAuxId_n) + ", " + 
+                    (mnFkAccUserUnitId_n == 0 ? "NULL" : mnFkAccUserUnitId_n) + ", " + 
+                    (mnFkAccSystemAccountId_n == 0 ? "NULL" : mnFkAccSystemAccountId_n) + ", " + 
+                    (mnFkAccSystemCostCenterId_n == 0 ? "NULL" : mnFkAccSystemCostCenterId_n) + ", " + 
+                    (mnFkAccSystemItemId_n == 0 ? "NULL" : mnFkAccSystemItemId_n) + ", " + 
+                    (mnFkAccSystemItemAuxId_n == 0 ? "NULL" : mnFkAccSystemItemAuxId_n) + ", " + 
+                    (mnFkAccSystemUnitId_n == 0 ? "NULL" : mnFkAccSystemUnitId_n) + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -369,29 +370,29 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "dps_refs = '" + msDpsReferences + "', " +
                     "dps_descrip = '" + msDpsDescription + "', " +
                     "b_dps_pay_loc = " + (mbDpsPaymentLocal ? 1 : 0) + ", " +
-//                    "proc_type = " + mnProcessingType + ", " +
-//                    "b_pay_req = " + (mbPaymentRequired ? 1 : 0) + ", " +
-//                    "pay_app_cur = " + mdPaymentApplicationCy + ", " +
-//                    "pay_dt_req_n = " + (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " +
-//                    "acc_method = " + mnAccMethod + ", " +
-//                    "acc_usr_units = " + mdAccUserUnits + ", " +
-//                    "acc_sys_units = " + mdAccSystemUnits + ", " +
+                    "proc_type = " + mnProcessingType + ", " +
+                    "b_pay_req = " + (mbPaymentRequired ? 1 : 0) + ", " +
+                    "pay_app_cur = " + mdPaymentApplicationCy + ", " +
+                    "pay_dt_req_n = " + (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " +
+                    "acc_method = " + mnAccMethod + ", " +
+                    "acc_usr_units = " + mdAccUserUnits + ", " +
+                    "acc_sys_units = " + mdAccSystemUnits + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_dps_year_n = " + (mnFkDpsYearId_n == 0 ? "NULL" : mnFkDpsYearId_n) + ", " +
                     "fk_dps_doc_n = " + (mnFkDpsDocId_n == 0 ? "NULL" : mnFkDpsDocId_n) + ", " +
                     "fk_pay_n = " + (mnFkPaymentId_n == 0 ? "NULL" : mnFkPaymentId_n) + ", " +
-//                    "fk_pay_cur_n = " + (mnFkPayCurrencyId_n == 0 ? "NULL" : mnFkPayCurrencyId_n) + ", " +
-//                    "fk_acc_usr_acc_n = " + (mnFkAccUserAccountId_n == 0 ? "NULL" : mnFkAccUserAccountId_n) + ", " +
-//                    "fk_acc_usr_cc_n = " + (mnFkAccUserCostCenterId_n == 0 ? "NULL" : mnFkAccUserCostCenterId_n) + ", " +
-//                    "fk_acc_usr_item_n = " + (mnFkAccUserItemId_n == 0 ? "NULL" : mnFkAccUserItemId_n) + ", " +
-//                    "fk_acc_usr_item_aux_n = " + (mnFkAccUserItemAuxId_n == 0 ? "NULL" : mnFkAccUserItemAuxId_n) + ", " +
-//                    "fk_acc_usr_unit_n = " + (mnFkAccUserUnitId_n == 0 ? "NULL" : mnFkAccUserUnitId_n) + ", " +
-//                    "fk_acc_sys_acc_n = " + (mnFkAccSystemAccountId_n == 0 ? "NULL" : mnFkAccSystemAccountId_n) + ", " +
-//                    "fk_acc_sys_cc_n = " + (mnFkAccSystemCostCenterId_n == 0 ? "NULL" : mnFkAccSystemCostCenterId_n) + ", " +
-//                    "fk_acc_sys_item_n = " + (mnFkAccSystemItemId_n == 0 ? "NULL" : mnFkAccSystemItemId_n) + ", " +
-//                    "fk_acc_sys_item_aux_n = " + (mnFkAccSystemItemAuxId_n == 0 ? "NULL" : mnFkAccSystemItemAuxId_n) + ", " +
-//                    "fk_acc_sys_unit_n = " + (mnFkAccSystemUnitId_n == 0 ? "NULL" : mnFkAccSystemUnitId_n) + ", " +
+                    "fk_pay_cur_n = " + (mnFkPayCurrencyId_n == 0 ? "NULL" : mnFkPayCurrencyId_n) + ", " +
+                    "fk_acc_usr_acc_n = " + (mnFkAccUserAccountId_n == 0 ? "NULL" : mnFkAccUserAccountId_n) + ", " +
+                    "fk_acc_usr_cc_n = " + (mnFkAccUserCostCenterId_n == 0 ? "NULL" : mnFkAccUserCostCenterId_n) + ", " +
+                    "fk_acc_usr_item_n = " + (mnFkAccUserItemId_n == 0 ? "NULL" : mnFkAccUserItemId_n) + ", " +
+                    "fk_acc_usr_item_aux_n = " + (mnFkAccUserItemAuxId_n == 0 ? "NULL" : mnFkAccUserItemAuxId_n) + ", " +
+                    "fk_acc_usr_unit_n = " + (mnFkAccUserUnitId_n == 0 ? "NULL" : mnFkAccUserUnitId_n) + ", " +
+                    "fk_acc_sys_acc_n = " + (mnFkAccSystemAccountId_n == 0 ? "NULL" : mnFkAccSystemAccountId_n) + ", " +
+                    "fk_acc_sys_cc_n = " + (mnFkAccSystemCostCenterId_n == 0 ? "NULL" : mnFkAccSystemCostCenterId_n) + ", " +
+                    "fk_acc_sys_item_n = " + (mnFkAccSystemItemId_n == 0 ? "NULL" : mnFkAccSystemItemId_n) + ", " +
+                    "fk_acc_sys_item_aux_n = " + (mnFkAccSystemItemAuxId_n == 0 ? "NULL" : mnFkAccSystemItemAuxId_n) + ", " +
+                    "fk_acc_sys_unit_n = " + (mnFkAccSystemUnitId_n == 0 ? "NULL" : mnFkAccSystemUnitId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
