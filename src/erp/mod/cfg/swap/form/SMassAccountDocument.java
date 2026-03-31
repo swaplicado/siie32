@@ -10,7 +10,6 @@ import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.account.Case;
-import erp.mod.cfg.swap.account.Config;
 import erp.mod.cfg.swap.account.Group;
 import erp.mod.cfg.swap.account.Partner;
 import erp.mod.cfg.swap.account.Unit;
@@ -46,6 +45,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     private static final int COL_COMPUTE = 8;
     
     public SImportedDocument ImportedDocument;
+    public SDialogMassAccountDocuments DialogMassAccountDocuments;
     
     public boolean Record;
     public int IconRecordable;
@@ -61,12 +61,12 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public ArrayList<SCfdiConcepto> Conceptos;
     public boolean IsEmisorPerson;
     public String EmisorFiscalId;
-    public String EmisorName;
+    public String EmisorDescripByName; // ID + " - " + name
     public String ComprobanteUnidadCode;
     public String ComprobanteProdServCode;
-    public String ComprobanteProdServDescrip; // code + " - " + name
+    public String ComprobanteProdServDescripByCode; // code + " - " + name
     public String CartaPorteBienesTranspsCode;
-    public String CartaPorteBienesTranspsDescrip; // code + " - " + name
+    public String CartaPorteBienesTranspsDescripByCode; // code + " - " + name
     public double Units;
     
     // invoice main configuration elements for accounting:
@@ -87,17 +87,18 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public AccountSettings AccountSettingsSystem;
     public AccountSettings AccountSettingsUser;
     
-    public SMassAccountDocument(final SImportedDocument importedDocument, final Config config) throws Exception {
+    public SMassAccountDocument(final SImportedDocument importedDocument, final SDialogMassAccountDocuments dialogMassAccountDocuments) throws Exception {
         ImportedDocument = importedDocument;
+        DialogMassAccountDocuments = dialogMassAccountDocuments;
         
         Record = false;
         IconRecordable = SGridConsts.ICON_NULL;
         IconRecorded = SGridConsts.ICON_WAIT;
         
-        parseComprobante(config);
+        parseComprobante();
     }
     
-    private void parseComprobante(final Config config) throws Exception {
+    private void parseComprobante() throws Exception {
         ParsingWarningType = 0;
         ParsingError = true; // by default, assume that there is a parsing error
         Comprobante = null;
@@ -105,12 +106,12 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         Conceptos = null;
         IsEmisorPerson = true; // by default, assume that partner is a person
         EmisorFiscalId = "";
-        EmisorName = "";
+        EmisorDescripByName = "";
         ComprobanteUnidadCode = "";
         ComprobanteProdServCode = "";
-        ComprobanteProdServDescrip = "";
+        ComprobanteProdServDescripByCode = "";
         CartaPorteBienesTranspsCode = "";
-        CartaPorteBienesTranspsDescrip = "";
+        CartaPorteBienesTranspsDescripByCode = "";
         Units = 0;
         
         InvoiceGroup = null;
@@ -129,11 +130,10 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         
         Comprobante = DCfdUtils.getCfdi40(SXmlUtils.readXml(ImportedDocument.AuxFiles[SImportUtils.CFDI_XML].getAbsolutePath()));
         
-        
         if (isCfdiInvoice()) {
             IsEmisorPerson = Comprobante.getEltEmisor().getAttRfc().getString().length() == DCfdConsts.LEN_RFC_PER;
             EmisorFiscalId = Comprobante.getEltEmisor().getAttRfc().getString();
-            EmisorName = Comprobante.getEltEmisor().getAttNombre().getString();
+            EmisorDescripByName = ImportedDocument.BizPartner + " - " + ImportedDocument.BizPartnerId;
             
             // parse invoice entries:
             
@@ -189,7 +189,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 }
             }
             
-            InvoiceGroup = config.getGroup(isFreight ? Group.DOC_TYPE_BOL : Group.DOC_TYPE_INVOICE);
+            InvoiceGroup = DialogMassAccountDocuments.getConfig().getGroup(isFreight ? Group.DOC_TYPE_BOL : Group.DOC_TYPE_INVOICE);
             
             if (InvoiceGroup != null) {
                 InvoicePartner = InvoiceGroup.getPartner(IsEmisorPerson);
@@ -205,7 +205,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                                 InvoiceCase = InvoicePartner.getCase(ComprobanteProdServCode, descriptions);
                                 
                                 if (InvoiceCase != null) {
-                                    ComprobanteProdServDescrip = ComprobanteProdServCode + " - " + InvoiceCase.getProdServ(ComprobanteProdServCode).getKeyDesc();
+                                    ComprobanteProdServDescripByCode = ComprobanteProdServCode + " - " + InvoiceCase.getProdServ(ComprobanteProdServCode).getKeyDesc();
                                 }
                             }
                         }
@@ -213,7 +213,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 }
 
                 if (isFreight && isCfdiInvoiceAndBol()) {
-                    GoodsGroup = config.getGroup(Group.DOC_TYPE_INVOICE);
+                    GoodsGroup = DialogMassAccountDocuments.getConfig().getGroup(Group.DOC_TYPE_INVOICE);
 
                     if (GoodsGroup != null) {
                         GoodsPartner = GoodsGroup.getPartner(IsEmisorPerson);
@@ -224,7 +224,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                                 GoodsCase = GoodsPartner.getCase(CartaPorteBienesTranspsCode, descriptions);
                                 
                                 if (GoodsCase != null) {
-                                    CartaPorteBienesTranspsDescrip = CartaPorteBienesTranspsCode + " - " + GoodsCase.getProdServ(CartaPorteBienesTranspsCode).getKeyDesc();
+                                    CartaPorteBienesTranspsDescripByCode = CartaPorteBienesTranspsCode + " - " + GoodsCase.getProdServ(CartaPorteBienesTranspsCode).getKeyDesc();
                                 }
                             }
                         }
@@ -256,6 +256,10 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 IconRecordable = SGridConsts.ICON_ANNUL;
             }
         }
+    }
+    
+    public boolean isRecordable() {
+        return !ParsingError;
     }
     
     /**
@@ -389,8 +393,22 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public void setRowValueAt(Object value, int col) {
         switch (col) {
             case COL_COMPUTE:
-                Record = (boolean) value;
+                boolean record = (boolean) value;
+                
+                if (record) {
+                    if (isRecordable() && Record != record) {
+                        Record = record; // set to true!
+                        DialogMassAccountDocuments.recountDocsToProcess();
+                    }
+                }
+                else {
+                    if (Record != record) {
+                        Record = record; // set to falwse!
+                        DialogMassAccountDocuments.recountDocsToProcess();
+                    }
+                }
                 break;
+                
             default:
                 // nothing
         }
@@ -459,39 +477,42 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 value = ImportedDocument.RequirePayment;
                 break;
             case 19:
-                value = ImportedDocument.getRequiredPaymentAmount();
-                break;
-            case 20:
-                value = ImportedDocument.CurrencyCode;
-                break;
-            case 21:
                 value = ImportedDocument.getRequiredPaymentPct();
                 break;
+            case 20:
+                value = ImportedDocument.getRequiredPaymentAmount(null);
+                break;
+            case 21:
+                value = ImportedDocument.RequiredPaymentAmountNew == 0 ? null : ImportedDocument.RequiredPaymentAmountNew;
+                break;
             case 22:
-                value = ImportedDocument.RequiredPaymentDate;
+                value = ImportedDocument.CurrencyCode;
                 break;
             case 23:
-                value = ImportedDocument.RequiredPaymentDateNew;
+                value = ImportedDocument.RequiredPaymentDate;
                 break;
             case 24:
-                value = ImportedDocument.IsRequiredPaymentLoc;
+                value = ImportedDocument.RequiredPaymentDateNew;
                 break;
             case 25:
-                value = ImportedDocument.RequiredPaymentNotes;
+                value = ImportedDocument.IsRequiredPaymentLoc;
                 break;
             case 26:
-                value = SSwapConsts.PayDefinitions.get(ImportedDocument.RequiredPaymentDefinition);
+                value = ImportedDocument.RequiredPaymentNotes;
                 break;
             case 27:
-                value = ImportedDocument.DueDate;
+                value = SSwapConsts.PayDefinitions.get(ImportedDocument.RequiredPaymentDefinition);
                 break;
             case 28:
-                value = ImportedDocument.AccountingTag;
+                value = ImportedDocument.DueDate;
                 break;
             case 29:
-                value = ImportedDocument.ExternalDocumentUuid;
+                value = ImportedDocument.AccountingTag;
                 break;
             case 30:
+                value = ImportedDocument.ExternalDocumentUuid;
+                break;
+            case 31:
                 value = ImportedDocument.ExternalDocumentId;
                 break;
             default:

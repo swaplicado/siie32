@@ -26,8 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +55,6 @@ import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldBoolean;
-import sa.lib.gui.bean.SBeanFieldDecimal;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
@@ -71,7 +68,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * 
  * @author Sergio Flores, Cesar Orozco
  */
-public class SDialogMassAccountDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener, KeyListener {
+public class SDialogMassAccountDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
     private static final String ND = "(N/D)";
     
@@ -95,6 +92,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     
     protected boolean mbDocumentsBeingSet;
     protected boolean mbDocumentsBeingFiltered;
+    protected boolean mbDocumentsBeingRendered;
     protected SDialogPdfViewer moDialogPdfViewer;
     protected ImageIcon moIconEdit;
     protected ImageIcon moIconSave;
@@ -230,7 +228,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jtfReqPayAmountPct = new javax.swing.JTextField();
         jpProcessingN6 = new javax.swing.JPanel();
         moDecReqPayAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jPanel1 = new javax.swing.JPanel();
         jbEditAndSaveReqPayAmount = new javax.swing.JButton();
+        jbCancelReqPayAmount = new javax.swing.JButton();
         jpProcessingN7 = new javax.swing.JPanel();
         jtfReqPayRequiredDate = new javax.swing.JTextField();
         jbChangeReqPayRequiredDate = new javax.swing.JButton();
@@ -821,10 +821,22 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moDecReqPayAmount.setPreferredSize(new java.awt.Dimension(105, 23));
         jpProcessingN6.add(moDecReqPayAmount);
 
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
         jbEditAndSaveReqPayAmount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
-        jbEditAndSaveReqPayAmount.setToolTipText("Cambiar fecha requerida de pago...");
+        jbEditAndSaveReqPayAmount.setToolTipText("Modificar monto requerido de pago");
         jbEditAndSaveReqPayAmount.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN6.add(jbEditAndSaveReqPayAmount);
+        jPanel1.add(jbEditAndSaveReqPayAmount);
+
+        jbCancelReqPayAmount.setForeground(java.awt.Color.red);
+        jbCancelReqPayAmount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/ico_close.png"))); // NOI18N
+        jbCancelReqPayAmount.setToolTipText("Cancelar modificación");
+        jbCancelReqPayAmount.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/ico_close_ina.png"))); // NOI18N
+        jbCancelReqPayAmount.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbCancelReqPayAmount.setPreferredSize(new java.awt.Dimension(17, 23));
+        jPanel1.add(jbCancelReqPayAmount);
+
+        jpProcessingN6.add(jPanel1);
 
         jpProcessingN.add(jpProcessingN6);
 
@@ -1006,7 +1018,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     private javax.swing.ButtonGroup bgFilter;
     private javax.swing.ButtonGroup bgSearchBy;
     private javax.swing.JLabel jLabelPeriiod1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jbAccShowParsingErrorOrWarning;
+    private javax.swing.JButton jbCancelReqPayAmount;
     private javax.swing.JButton jbChangeReqPayRequiredDate;
     private javax.swing.JButton jbDeselectAllDocs;
     private javax.swing.JButton jbEditAndSaveReqPayAmount;
@@ -1219,18 +1233,19 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Semana revisión factura", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha-hora revisión factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido")); // col 20
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_0D, "Pago requerido %"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha pago requerido"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido")); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pago requerido $")); // col 20
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Nuevo pago requerido $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda pago requerido"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha requerida pago"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Nueva fecha requerida pago"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago requerido moneda local")); // col 25
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Instrucciones pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo definición pago requerido"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha vencimiento factura"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Etiqueta contable"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES, 225));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES)); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "UUID factura " + SSwapConsts.SWAP_SERVICES, 225)); // col 30
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_RAW, "ID factura " + SSwapConsts.SWAP_SERVICES));
                 
                 return gridColumnsForm;
             }
@@ -1379,272 +1394,6 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         return id;
     }
     
-    private void actionPerformedSelectAllDocs() {
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-            ((SMassAccountDocument) row).Record = true;
-        }
-        
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
-    }
-    
-    private void actionPerformedDeselectAllDocs() {
-        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-            ((SMassAccountDocument) row).Record = false;
-        }
-        
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
-    }
-    
-    private void actionPerformedViewInvoicePdf() {
-        try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
-            
-            if (row == null) {
-                throw new Exception(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ImportedDocument.ExternalDocumentId, SFileUtilities.pdf, document.ImportedDocument.BizPartnerId);
-                
-                if (pdf == null) {
-                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), moSettings.SyncUrlDownload, document.ImportedDocument.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
-
-                    if (files == null || files.length != 2) {
-                        throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
-                    }
-                    else if (files[SImportUtils.CFDI_PDF] == null) {
-                        throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
-                    }
-                    else {
-                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ImportedDocument.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF], document.ImportedDocument.BizPartnerId);
-                    }
-                }
-                
-                if (pdf != null) {
-                    if (moDialogPdfViewer == null) {
-                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
-                    }
-
-                    moDialogPdfViewer.setPdf(new SDocumentInfo(document.ImportedDocument), pdf);
-                    moDialogPdfViewer.setVisible(true);
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-    
-    private void actionPerformedViewOrder() {
-        try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
-            
-            if (row == null) {
-                throw new Exception(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                int[] orderKey = document.ImportedDocument.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
-
-                if (orderKey == null) {
-                    throw new Exception("La factura autorizada no está relacionada con ningún pedido.");
-                }
-                else {
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-    
-    private void actionPerformedEditAndSaveReqPayAmount() {
-        try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
-            
-            if (row == null) {
-                throw new Exception(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                
-                
-                if (!moDecReqPayAmount.isEditable()) {
-                    // edit amount:
-
-                    if (document.ImportedDocument.isPaymentRequestDataAvailable() || miClient.showMsgBoxConfirm("La factura autorizada carece de información de pago requerido.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                        jbEditAndSaveReqPayAmount.setIcon(moIconSave);
-                        moDecReqPayAmount.setEditable(true);
-
-                        moDecReqPayAmount.requestFocusInWindow();
-                    }
-                }
-                else {
-                    // save amount:
-
-                    if (moDecReqPayAmount.getValue() <= 0) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT + "cero.");
-                    }
-                    else if (moDecReqPayAmount.getValue() > document.ImportedDocument.Total) {
-                        miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "$ " + SLibUtils.getDecimalFormatAmount().format(document.ImportedDocument.Total) + ".");
-                    }
-                    else {
-                        // save only if effective date is available:
-                        
-                        if (document.ImportedDocument.getRequiredPaymentDateEffective() == null) {
-                            actionPerformedChangeReqPayRequiredDate();
-                        }
-                        
-                        if (document.ImportedDocument.getRequiredPaymentDateEffective() != null) {
-                            document.ImportedDocument.RequiredPaymentDefinition = SSwapConsts.PAY_DEF_BY_AMT_MAN;
-                            document.ImportedDocument.RequiredPaymentAmount = moDecReqPayAmount.getValue();
-
-                            int index = moDocumentsGrid.getTable().getSelectedRow();
-                            moDocumentsGrid.renderGridRows();
-                            moDocumentsGrid.setSelectedGridRow(index);
-
-                            jbEditAndSaveReqPayAmount.setIcon(moIconEdit);
-                            moDecReqPayAmount.setEditable(false);
-
-                            moDocumentsGrid.getTable().requestFocusInWindow();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-    
-    private void actionPerformedChangeReqPayRequiredDate() {
-        try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
-            
-            if (row == null) {
-                throw new Exception(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                
-                if (document.ImportedDocument.changeRequiredPaymentDate(miClient.getSession())) {
-                    int index = moDocumentsGrid.getTable().getSelectedRow();
-                    moDocumentsGrid.renderGridRows();
-                    moDocumentsGrid.setSelectedGridRow(index);
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-    
-    private void actionPerformedPickReqPaysNewRequiredDate() {
-        mtNewRequiredDate = SDocumentUtils.pickDate(miClient.getSession(), mtNewRequiredDate);
-
-        if (mtNewRequiredDate == null) {
-            jtfReqPaysNewRequiredDate.setText("");
-        }
-        else if (mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(miClient.getSession().getSystemDate()))) {
-            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlReqPaysNewRequiredDate) + "' no puede ser anterior al día de hoy, " + SLibUtils.DateFormatDate.format(miClient.getSession().getSystemDate()) + ".");
-        }
-        else {
-            jtfReqPaysNewRequiredDate.setText(SLibUtils.GuiDateFormat.format(mtNewRequiredDate));
-            jtfReqPaysNewRequiredDate.setCaretPosition(0);
-        }
-    }
-    
-    private void actionPerformedSetReqPaysNewRequiredDate() {
-        int docsShown = moDocumentsGrid.getModel().getRowCount();
-        String msgDateNotAsignable = "No se puede asignar la nueva fecha requerida de pago, porque ";
-        
-        if (docsShown == 0) {
-            miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas mostradas.");
-        }
-        else if (mtNewRequiredDate == null) {
-            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlReqPaysNewRequiredDate.getText()) + "'.");
-        }
-        else {
-            int docsToRequest = 0;
-            int docsOutOfRange = 0;
-            
-            for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                
-                if (document.ImportedDocument.RequirePayment) {
-                    docsToRequest++;
-                    
-                    if (mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(document.ImportedDocument.Date))) {
-                        docsOutOfRange++;
-                    }
-                }
-            }
-            
-            if (docsToRequest == 0) {
-                miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas que requieran pago.");
-            }
-            else {
-                boolean assign = true;
-                
-                if (docsOutOfRange > 0) {
-                    assign = miClient.showMsgBoxConfirm("Hay " + (docsOutOfRange == 1 ? "una factura autorizada" : SLibUtils.DecimalFormatInteger.format(docsOutOfRange) + " facturas autorizadas")
-                            + " cuya fecha es anterior a la nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(mtNewRequiredDate) + ".\n"
-                            + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
-                }
-                
-                if (assign) {
-                    for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-                        SMassAccountDocument document = (SMassAccountDocument) row;
-
-                        if (document.ImportedDocument.RequirePayment && !mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(document.ImportedDocument.Date))) {
-                            document.ImportedDocument.RequiredPaymentDateNew = mtNewRequiredDate;
-                        }
-                    }
-                    
-                    int index = moDocumentsGrid.getTable().getSelectedRow();
-                    moDocumentsGrid.renderGridRows();
-                    moDocumentsGrid.setSelectedGridRow(index);
-                }
-            }
-        }
-    }
-    
-    private void actionPerformedRecordDocs() {
-        
-    }
-    
-    private void actionPerformedAccShowParsingErrorOrWarning() {
-        try {
-            SGridRow row = moDocumentsGrid.getSelectedGridRow();
-            
-            if (row == null) {
-                throw new Exception(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SMassAccountDocument document = (SMassAccountDocument) row;
-                
-                if (document.ParsingError) {
-                    miClient.showMsgBoxError("Hay un problema con el comprobante '" + document.ImportedDocument.getFolio() + "':\n" + document.getParsingError());
-                }
-                else if (document.ParsingWarningType != 0) {
-                    miClient.showMsgBoxWarning("Hay un inconveniente con el comprobante '" + document.ImportedDocument.getFolio() + "':\n" + document.getParsingWarning());
-                }
-                else {
-                    miClient.showMsgBoxInformation("El comprobante '" + document.ImportedDocument.getFolio() + "' es correcto.");
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-    
     private void setSettings(final SDialogImportDocuments.Settings settings) {
         moSettings = settings;
         
@@ -1740,21 +1489,21 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             HashSet<String> itemsSet = new HashSet<>();
             
             for (SImportedDocument document : documents) {
-                SMassAccountDocument mad = new SMassAccountDocument(document, moConfig);
+                SMassAccountDocument mad = new SMassAccountDocument(document, this);
                 maDocuments.add(mad);
                 
                 if (mad.isCfdiInvoice()) {
-                    partnersSet.add(mad.EmisorName);
+                    partnersSet.add(mad.EmisorDescripByName);
                     
                     switch (moSettings.ModeCase) {
                         case SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT:
-                            if (!mad.CartaPorteBienesTranspsDescrip.isEmpty()) {
-                                itemsSet.add(mad.CartaPorteBienesTranspsDescrip);
+                            if (!mad.CartaPorteBienesTranspsDescripByCode.isEmpty()) {
+                                itemsSet.add(mad.CartaPorteBienesTranspsDescripByCode);
                             }
                             break;
                         case SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE:
-                            if (!mad.ComprobanteProdServDescrip.isEmpty()) {
-                                itemsSet.add(mad.ComprobanteProdServDescrip);
+                            if (!mad.ComprobanteProdServDescripByCode.isEmpty()) {
+                                itemsSet.add(mad.ComprobanteProdServDescripByCode);
                             }
                             break;
                         default:
@@ -1768,7 +1517,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             
             moKeyFilterPartner.addItem(new SGuiItem("- " + SUtilConsts.TXT_SELECT + " " + moKeyFilterPartner.getToolTipText() + " -"));
             for (String partner : partners) {
-                moKeyFilterPartner.addItem(new SGuiItem(partner));
+                String[] elements = partner.split(" - "); // name + " - " + ID
+                moKeyFilterPartner.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(elements[1]) }, elements[0]));
             }
             
             ArrayList<String> items = new ArrayList<>(itemsSet);
@@ -1776,7 +1526,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             
             moKeyFilterItem.addItem(new SGuiItem("- " + SUtilConsts.TXT_SELECT + " " + moKeyFilterItem.getToolTipText() + " -"));
             for (String item : items) {
-                String[] elements = item.split(" - ");
+                String[] elements = item.split(" - "); // code + " - " + name
                 moKeyFilterItem.addItem(new SGuiItem(new int[] { SLibUtils.parseInt(elements[0]) }, item));
             }
 
@@ -1790,6 +1540,332 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         populateDocumentsGrid(maDocuments, documents != null);
         
         mbDocumentsBeingSet = false;
+    }
+
+    private void actionPerformedSelectAllDocs() {
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            SMassAccountDocument document = (SMassAccountDocument) row;
+            
+            if (document.isRecordable()) {
+                document.Record = true;
+            }
+        }
+        
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
+        
+        recountDocsToProcess();
+    }
+    
+    private void actionPerformedDeselectAllDocs() {
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            SMassAccountDocument document = (SMassAccountDocument) row;
+            
+            document.Record = false;
+        }
+        
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
+        
+        recountDocsToProcess();
+    }
+    
+    private void actionPerformedViewInvoicePdf() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ImportedDocument.ExternalDocumentId, SFileUtilities.pdf, document.ImportedDocument.BizPartnerId);
+                
+                if (pdf == null) {
+                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), moSettings.SyncUrlDownload, document.ImportedDocument.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+
+                    if (files == null || files.length != 2) {
+                        throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+                    }
+                    else if (files[SImportUtils.CFDI_PDF] == null) {
+                        throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+                    }
+                    else {
+                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ImportedDocument.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF], document.ImportedDocument.BizPartnerId);
+                    }
+                }
+                
+                if (pdf != null) {
+                    if (moDialogPdfViewer == null) {
+                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                    }
+
+                    moDialogPdfViewer.setPdf(new SDocumentInfo(document.ImportedDocument), pdf);
+                    moDialogPdfViewer.setVisible(true);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedViewOrder() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                int[] orderKey = document.ImportedDocument.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
+
+                if (orderKey == null) {
+                    throw new Exception("La factura autorizada no está relacionada con ningún pedido.");
+                }
+                else {
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
+                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, orderKey);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedEditAndSaveReqPayAmount() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (document.ImportedDocument.isPaymentRequestDataAvailable()) {
+                    if (!moDecReqPayAmount.isEditable()) {
+                        // edit amount:
+
+                        jbEditAndSaveReqPayAmount.setIcon(moIconSave);
+                        jbCancelReqPayAmount.setEnabled(true);
+                        moDecReqPayAmount.setEditable(true);
+
+                        moDecReqPayAmount.requestFocusInWindow();
+                    }
+                    else {
+                        // save amount:
+
+                        if (moDecReqPayAmount.getValue() <= 0) {
+                            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT + "cero.");
+                            moDecReqPayAmount.requestFocusInWindow();
+                        }
+                        else if (moDecReqPayAmount.getValue() > document.ImportedDocument.Total) {
+                            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "$ " + SLibUtils.getDecimalFormatAmount().format(document.ImportedDocument.Total) + ".");
+                            moDecReqPayAmount.requestFocusInWindow();
+                        }
+                        else {
+                            // save only if effective date is available:
+
+                            if (document.ImportedDocument.getRequiredPaymentDateEffective() == null) {
+                                actionPerformedChangeReqPayRequiredDate();
+                            }
+
+                            if (document.ImportedDocument.getRequiredPaymentDateEffective() != null) {
+                                document.ImportedDocument.RequiredPaymentDefinition = SSwapConsts.PAY_DEF_BY_AMT_MAN;
+                                document.ImportedDocument.RequiredPaymentAmountNew = moDecReqPayAmount.getValue();
+
+                                int index = moDocumentsGrid.getTable().getSelectedRow();
+                                moDocumentsGrid.renderGridRows();
+                                moDocumentsGrid.setSelectedGridRow(index);
+
+                                actionPerformedCancelReqPayAmount(false);
+                                
+                                moDocumentsGrid.getTable().requestFocusInWindow();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedCancelReqPayAmount(final boolean requestFocus) {
+        jbEditAndSaveReqPayAmount.setIcon(moIconEdit);
+        jbCancelReqPayAmount.setEnabled(false);
+        moDecReqPayAmount.setEditable(false);
+        moDecReqPayAmount.resetField();
+        
+        if (requestFocus) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
+    }
+    
+    private void actionPerformedChangeReqPayRequiredDate() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (document.ImportedDocument.changeRequiredPaymentDate(miClient.getSession())) {
+                    int index = moDocumentsGrid.getTable().getSelectedRow();
+                    moDocumentsGrid.renderGridRows();
+                    moDocumentsGrid.setSelectedGridRow(index);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedPickReqPaysNewRequiredDate() {
+        mtNewRequiredDate = SDocumentUtils.pickDate(miClient.getSession(), mtNewRequiredDate);
+
+        if (mtNewRequiredDate == null) {
+            jtfReqPaysNewRequiredDate.setText("");
+        }
+        else if (mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(miClient.getSession().getSystemDate()))) {
+            mtNewRequiredDate = null;
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlReqPaysNewRequiredDate) + "' no puede ser anterior al día de hoy, " + SLibUtils.DateFormatDate.format(miClient.getSession().getSystemDate()) + ".");
+        }
+        else {
+            jtfReqPaysNewRequiredDate.setText(SLibUtils.GuiDateFormat.format(mtNewRequiredDate));
+            jtfReqPaysNewRequiredDate.setCaretPosition(0);
+        }
+    }
+    
+    private void actionPerformedSetReqPaysNewRequiredDate() {
+        int docsShown = moDocumentsGrid.getModel().getRowCount();
+        String msgDateNotAsignable = "No se puede asignar la nueva fecha requerida de pago, porque ";
+        
+        if (docsShown == 0) {
+            miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas mostradas.");
+        }
+        else if (mtNewRequiredDate == null) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlReqPaysNewRequiredDate.getText()) + "'.");
+            jbPickReqPaysNewRequiredDate.requestFocusInWindow();
+        }
+        else {
+            int paysOutOfDate = 0;
+            int paysToRequest = 0;
+            
+            for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (document.Record && document.ImportedDocument.RequirePayment) {
+                    if (mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(document.ImportedDocument.Date))) {
+                        paysOutOfDate++;
+                    }
+                    else {
+                        paysToRequest++;
+                    }
+                }
+            }
+            
+            if (paysToRequest == 0) {
+                miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas procesables y solicitables de pago.");
+            }
+            else {
+                boolean assign = true;
+                
+                if (paysOutOfDate > 0) {
+                    assign = miClient.showMsgBoxConfirm("Hay " + (paysOutOfDate == 1 ? "una factura autorizada" : SLibUtils.DecimalFormatInteger.format(paysOutOfDate) + " facturas autorizadas")
+                            + " cuya fecha es anterior a la nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(mtNewRequiredDate) + ".\n"
+                            + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                }
+                
+                if (assign) {
+                    assign = miClient.showMsgBoxConfirm("¿Está seguro que desea asignar la nueva fecha requerida de pago, " + SLibUtils.DateFormatDate.format(mtNewRequiredDate) + ",\n"
+                            + "a " + (paysToRequest == 1 ? "la única factura autorizada procesable y solicitable de pago" : "las " + SLibUtils.DecimalFormatInteger.format(paysToRequest) + " facturas autorizadas procesables y solicitables de pago?")) == JOptionPane.YES_OPTION;
+                    
+                    if (assign) {
+                        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                            SMassAccountDocument document = (SMassAccountDocument) row;
+
+                            if (document.Record && document.ImportedDocument.RequirePayment && !mtNewRequiredDate.before(SLibTimeUtils.convertToDateOnly(document.ImportedDocument.Date))) {
+                                document.ImportedDocument.RequiredPaymentDateNew = mtNewRequiredDate;
+                            }
+                        }
+
+                        int index = moDocumentsGrid.getTable().getSelectedRow();
+                        moDocumentsGrid.renderGridRows();
+                        moDocumentsGrid.setSelectedGridRow(index);
+                    }
+                }
+            }
+            
+            mtNewRequiredDate = null;
+            jtfReqPaysNewRequiredDate.setText("");
+        }
+    }
+    
+    private void actionPerformedRecordDocs() {
+        
+    }
+    
+    private void actionPerformedAccShowParsingErrorOrWarning() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (document.ParsingError) {
+                    miClient.showMsgBoxError("Hay un problema con el comprobante '" + document.ImportedDocument.getFolio() + "':\n" + document.getParsingError());
+                }
+                else if (document.ParsingWarningType != 0) {
+                    miClient.showMsgBoxWarning("Hay un inconveniente con el comprobante '" + document.ImportedDocument.getFolio() + "':\n" + document.getParsingWarning());
+                }
+                else {
+                    miClient.showMsgBoxInformation("El comprobante '" + document.ImportedDocument.getFolio() + "' es correcto.");
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void renderReqPay(final SMassAccountDocument document) {
+        if (document == null) {
+            jtfReqPayAmount.setText("");
+            jtfReqPayAmountPct.setText("");
+            jtfReqPayRequiredDate.setText("");
+        }
+        else {
+            if (!document.ImportedDocument.isPaymentRequestDataAvailable()) {
+                jtfReqPayAmount.setText("");
+                jtfReqPayAmountPct.setText("");
+                jtfReqPayRequiredDate.setText("");
+            }
+            else {
+                jtfReqPayAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.ImportedDocument.getRequiredPaymentAmountEffective(null)) + " " + document.ImportedDocument.CurrencyCode);
+                jtfReqPayAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.ImportedDocument.getRequiredPaymentPct()));
+                jtfReqPayRequiredDate.setText(SLibUtils.GuiDateFormat.format(document.ImportedDocument.getRequiredPaymentDateEffective()));
+                
+                jtfReqPayAmount.setCaretPosition(0);
+                jtfReqPayAmountPct.setCaretPosition(0);
+                jtfReqPayRequiredDate.setCaretPosition(0);
+            }
+        }
+        
+        moDecReqPayAmount.setEditable(false);
+        moDecReqPayAmount.resetField();
     }
     
     private void renderBol(final SMassAccountDocument document) {
@@ -1906,6 +1982,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     }
     
     private void renderCurrentDocument() {
+        mbDocumentsBeingRendered = true;
+        
         SGridRow row = moDocumentsGrid.getSelectedGridRow();
         
         if (row == null) {
@@ -1919,12 +1997,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             moBoolReqPayRequire.resetField();
             itemStateChangedReqPayRequire();
             
-            jtfReqPayAmount.setText("");
-            jtfReqPayAmountPct.setText("");
-            jtfReqPayRequiredDate.setText("");
-            
-            moDecReqPayAmount.setEditable(false);
-            moDecReqPayAmount.resetField();
+            renderReqPay(null);
             
             jbAccShowParsingErrorOrWarning.setEnabled(false);
             jbAccShowParsingErrorOrWarning.setIcon(SGridCellRendererIcon.moIconDoc);
@@ -1945,27 +2018,11 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             jtfAccountCase.setText(document.getAccountCase());
             jtfAccountCase.setCaretPosition(0);
             
-            moBoolReqPayRequire.setEnabled(true);
-            moBoolReqPayRequire.setValue(document.ImportedDocument.getRequiredPaymentAmount() > 0);
+            moBoolReqPayRequire.setEnabled(document.ImportedDocument.isPaymentRequestDataAvailable());
+            moBoolReqPayRequire.setValue(document.ImportedDocument.RequirePayment);
             itemStateChangedReqPayRequire();
             
-            if (!document.ImportedDocument.isPaymentRequestDataAvailable()) {
-                jtfReqPayAmount.setText("");
-                jtfReqPayAmountPct.setText("");
-                jtfReqPayRequiredDate.setText("");
-            }
-            else {
-                jtfReqPayAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.ImportedDocument.Total * document.ImportedDocument.RequiredPaymentPct / 100) + " " + document.ImportedDocument.CurrencyCode);
-                jtfReqPayAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.ImportedDocument.RequiredPaymentPct / 100));
-                jtfReqPayRequiredDate.setText(SLibUtils.GuiDateFormat.format(document.ImportedDocument.getRequiredPaymentDateEffective()));
-                
-                jtfReqPayAmount.setCaretPosition(0);
-                jtfReqPayAmountPct.setCaretPosition(0);
-                jtfReqPayRequiredDate.setCaretPosition(0);
-            }
-            
-            moDecReqPayAmount.setEditable(false);
-            moDecReqPayAmount.resetField();
+            renderReqPay(document);
             
             if (document.ParsingError) {
                 jbAccShowParsingErrorOrWarning.setEnabled(true);
@@ -1985,6 +2042,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             
             moConceptsGrid.populateGrid(new Vector<>(document.Conceptos));
         }
+        
+        mbDocumentsBeingRendered = false;
     }
     
     private void populateDocumentsGrid(final ArrayList<SMassAccountDocument> documents, final boolean focusDocumentsGridTable) {
@@ -1998,45 +2057,51 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             moDocumentsGrid.getTable().requestFocusInWindow();
         }
         
-        int docsRecordable = 0;
-        int docsToRecord = 0;
-        
-        int reqPaysRequestable = 0;
-        int reqPaysToRequest = 0;
-        
-        for (SMassAccountDocument document : documents) {
-            if (!document.ParsingError) {
-                docsRecordable++;
-            }
-            if (document.Record) {
-                docsToRecord++;
-            }
-            if (document.ImportedDocument.isPaymentRequestDataAvailable()) {
-                reqPaysRequestable++;
-            }
-            if (document.ImportedDocument.RequirePayment) {
-                reqPaysToRequest++;
-            }
-        }
-        
         jtfDocsShown.setText(SLibUtils.DecimalFormatInteger.format(documents.size()));
-        jtfDocsRecordable.setText(SLibUtils.DecimalFormatInteger.format(docsRecordable));
-        jtfDocsToRecord.setText(SLibUtils.DecimalFormatInteger.format(docsToRecord));
-        
-        jtfReqPaysRequestable.setText(SLibUtils.DecimalFormatInteger.format(reqPaysRequestable));
-        jtfReqPaysToRequest.setText(SLibUtils.DecimalFormatInteger.format(reqPaysToRequest));
+        recountDocsProcessable();
+        recountDocsToProcess();
         
         jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
     }
     
     private void itemStateChangedReqPayRequire() {
-        if (moBoolReqPayRequire.isSelected()) {
-            jbEditAndSaveReqPayAmount.setEnabled(true);
-            jbChangeReqPayRequiredDate.setEnabled(true);
+        boolean require = moBoolReqPayRequire.isSelected(); // convenience variable
+        
+        if (mbDocumentsBeingRendered) {
+            // rendering current document:
+            
+            jbEditAndSaveReqPayAmount.setEnabled(require);
+            jbCancelReqPayAmount.setEnabled(false);
+            jbChangeReqPayRequiredDate.setEnabled(require);
         }
         else {
-            jbEditAndSaveReqPayAmount.setEnabled(false);
-            jbChangeReqPayRequiredDate.setEnabled(false);
+            // editing current document:
+            
+            try {
+                SGridRow row = moDocumentsGrid.getSelectedGridRow();
+
+                if (row == null) {
+                    throw new Exception(SGridConsts.MSG_SELECT_ROW);
+                }
+                else {
+                    SMassAccountDocument document = (SMassAccountDocument) row;
+
+                    document.ImportedDocument.RequirePayment = require;
+
+                    jbEditAndSaveReqPayAmount.setEnabled(require);
+                    jbCancelReqPayAmount.setEnabled(false);
+                    jbChangeReqPayRequiredDate.setEnabled(require);
+
+                    int index = moDocumentsGrid.getTable().getSelectedRow();
+                    moDocumentsGrid.renderGridRows();
+                    moDocumentsGrid.setSelectedGridRow(index);
+
+                    recountDocsToProcess();
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
         }
     }
     
@@ -2072,10 +2137,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             documents.addAll(maDocuments);
         }
         else {
-            String name = moKeyFilterPartner.getSelectedItem().getItem();
+            int id = moKeyFilterPartner.getSelectedItem().getPrimaryKey()[0];
             
             for (SMassAccountDocument mad : maDocuments) {
-                if (mad.EmisorName.equals(name)) {
+                if (mad.ImportedDocument.BizPartnerId == id) {
                     documents.add(mad);
                 }
             }
@@ -2120,6 +2185,54 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         populateDocumentsGrid(documents, false);
         
         mbDocumentsBeingFiltered = false;
+    }
+    
+    /*
+     * Public methods.
+     */
+    
+    public Config getConfig() {
+        return moConfig;
+    }
+
+    public void recountDocsProcessable() {
+        int docsRecordable = 0;
+        int reqPaysRequestable = 0;
+        
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            SMassAccountDocument document = (SMassAccountDocument) row;
+            
+            if (document.isRecordable()) {
+                docsRecordable++;
+                
+                if (document.ImportedDocument.isPaymentRequestDataAvailable()) {
+                    reqPaysRequestable++;
+                }
+            }
+        }
+        
+        jtfDocsRecordable.setText(SLibUtils.DecimalFormatInteger.format(docsRecordable));
+        jtfReqPaysRequestable.setText(SLibUtils.DecimalFormatInteger.format(reqPaysRequestable));
+    }
+    
+    public void recountDocsToProcess() {
+        int docsToRecord = 0;
+        int reqPaysToRequest = 0;
+        
+        for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+            SMassAccountDocument document = (SMassAccountDocument) row;
+            
+            if (document.Record) {
+                docsToRecord++;
+                
+                if (document.ImportedDocument.RequirePayment) {
+                    reqPaysToRequest++;
+                }
+            }
+        }
+        
+        jtfDocsToRecord.setText(SLibUtils.DecimalFormatInteger.format(docsToRecord));
+        jtfReqPaysToRequest.setText(SLibUtils.DecimalFormatInteger.format(reqPaysToRequest));
     }
     
     /*
@@ -2168,6 +2281,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbViewOrder.addActionListener(this);
         
         jbEditAndSaveReqPayAmount.addActionListener(this);
+        jbCancelReqPayAmount.addActionListener(this);
         jbChangeReqPayRequiredDate.addActionListener(this);
         jbPickReqPaysNewRequiredDate.addActionListener(this);
         jbSetReqPaysNewRequiredDate.addActionListener(this);
@@ -2183,8 +2297,6 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         
         moKeyFilterPartner.addItemListener(this);
         moKeyFilterItem.addItemListener(this);
-        
-        moDecReqPayAmount.addKeyListener(this);
     }
 
     @Override
@@ -2196,6 +2308,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbViewOrder.removeActionListener(this);
         
         jbEditAndSaveReqPayAmount.removeActionListener(this);
+        jbCancelReqPayAmount.removeActionListener(this);
         jbChangeReqPayRequiredDate.removeActionListener(this);
         jbPickReqPaysNewRequiredDate.removeActionListener(this);
         jbSetReqPaysNewRequiredDate.removeActionListener(this);
@@ -2211,8 +2324,6 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         
         moKeyFilterPartner.removeItemListener(this);
         moKeyFilterItem.removeItemListener(this);
-        
-        moDecReqPayAmount.removeKeyListener(this);
     }
 
     @Override
@@ -2275,6 +2386,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             else if (button == jbEditAndSaveReqPayAmount) {
                 actionPerformedEditAndSaveReqPayAmount();
             }
+            else if (button == jbCancelReqPayAmount) {
+                actionPerformedCancelReqPayAmount(true);
+            }
             else if (button == jbChangeReqPayRequiredDate) {
                 actionPerformedChangeReqPayRequiredDate();
             }
@@ -2302,7 +2416,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (!mbDocumentsBeingSet && !mbDocumentsBeingFiltered) {
+        if (!mbDocumentsBeingSet && !mbDocumentsBeingFiltered && !mbDocumentsBeingRendered) {
             if (e.getSource() instanceof SBeanFieldBoolean) {
                 SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
 
@@ -2328,24 +2442,5 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 }
             }
         }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        System.out.println("keyTyped: " + e.getKeyChar() + " (" + e.getKeyCode() + ")");
-        
-        if (e.getSource() instanceof SBeanFieldDecimal) {
-            SBeanFieldDecimal field;
-        }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        System.out.println("keyPressed: " + e.getKeyChar() + " (" + e.getKeyCode() + ")");
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        System.out.println("keyReleased: " + e.getKeyChar() + " (" + e.getKeyCode() + ")");
     }
 }
