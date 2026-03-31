@@ -4,13 +4,16 @@ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización y corrección de pagos en layouts de anticipos y transferencias
 
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de la configuración de tipos de procesamiento de facturas importadas desde SWAP Services que implican que sus pagos queden autorizados en automático.
+
 ================================================================================
 SIIE 3.2 297.0 2026-03-27
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
 1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE. Corrección de warnings.
 
-================================================================================
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de la descripción extendida de ítems.
