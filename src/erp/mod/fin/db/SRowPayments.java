@@ -31,6 +31,8 @@ public class SRowPayments implements SGridRow, Serializable {
     protected boolean mbReceptionPayReq;
     protected int mnFuncArea;
     protected int mnFuncSubarea;
+    protected String msOperationType;
+    protected boolean mbIsDocAdvance = false;
     protected boolean mbSelected = false;
     protected String msNotes;
     protected int mnInsallment;
@@ -56,6 +58,8 @@ public class SRowPayments implements SGridRow, Serializable {
     public void setFuncArea(int n) { mnFuncArea = n; };
     public void setFuncSubarea(int n) { mnFuncSubarea = n; };
     public void setNotes(String s) { msNotes = s; }
+    public void setOperationType(String s) { msOperationType = s; }
+    public void setIsDocAdvance(boolean b) { mbIsDocAdvance = b; }
     public void setSelected(boolean b) { mbSelected = b; }
     public void setInstallment(int n) { mnInsallment = n; }
     public void setDocBalancePrevAppCy(double d) { mdDocBalancePrevAppCy = d; }
@@ -80,6 +84,8 @@ public class SRowPayments implements SGridRow, Serializable {
     public int getFuncArea() { return mnFuncArea; };
     public int getFuncSubarea() { return mnFuncSubarea; };
     public String getNotes() { return msNotes; }
+    public String getOperationType() { return msOperationType; }
+    public boolean isDocAdvance() { return mbIsDocAdvance; }
     public boolean getIsSelected() { return mbSelected; }
     public int getInstallment() { return mnInsallment; }
     public double getDocBalancePrevAppCy() { return mdDocBalancePrevAppCy; }

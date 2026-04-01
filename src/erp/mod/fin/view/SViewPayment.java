@@ -1017,6 +1017,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "v.nts, "
                 + "v.nts_auth, "
                 + "v.nts_auth_flow, "
+                + "v.pay_tp_op, "
                 + "c.cur, "
                 + "c.cur_key, "
                 + "f.name AS _func, "
@@ -1105,6 +1106,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_exec_n", "Fecha operación pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "c.cur", "Moneda requerida pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_priority", "Prioridad pago", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "pay_tp_op", "Tipo operación", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Instrucciones pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts_auth", "Notas para autorización"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_status", "Estatus pago"));

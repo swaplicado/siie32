@@ -242,6 +242,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 break;
             
             case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
+            case SDataConstants.TRNX_DPS_ADV_PAY_PEND_PAY:
                 tableColumns = new STableColumnForm[14];
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha doc.", STableConstants.WIDTH_DATE);
                 tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
@@ -426,6 +427,10 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         formRefreshOptionPane();
     }
     
+    public void setOptionType(int opType) {
+        this.mnOptionType = opType;
+    }
+    
     @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
@@ -532,6 +537,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 break;
             
             case SDataConstants.TRNX_DPS_PAY_PEND_PAY:
+            case SDataConstants.TRNX_DPS_ADV_PAY_PEND_PAY:
                 switch (((Object[]) moFilterKey).length) {
                     case 2:
                         mnYear = (Integer) ((Object[]) moFilterKey)[0];

@@ -191,6 +191,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void initComponents() {
 
         bgInput = new javax.swing.ButtonGroup();
+        bgDocOpType = new javax.swing.ButtonGroup();
         jpLayout = new javax.swing.JPanel();
         jpLayoutW = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -237,6 +238,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jPanel19 = new javax.swing.JPanel();
         jlDateDue = new javax.swing.JLabel();
         moDateDateDue = new sa.lib.gui.bean.SBeanFieldDate();
+        jlAux = new javax.swing.JLabel();
+        moRadDocuments = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadAdvanceDocuments = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel22 = new javax.swing.JPanel();
         moRadInputManual = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadInputChoosingPayments = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -445,6 +449,19 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jPanel19.add(jlDateDue);
         jPanel19.add(moDateDateDue);
 
+        jlAux.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel19.add(jlAux);
+
+        bgDocOpType.add(moRadDocuments);
+        moRadDocuments.setText("Facturas");
+        moRadDocuments.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel19.add(moRadDocuments);
+
+        bgDocOpType.add(moRadAdvanceDocuments);
+        moRadAdvanceDocuments.setText("Anticipos facturados");
+        moRadAdvanceDocuments.setPreferredSize(new java.awt.Dimension(130, 23));
+        jPanel19.add(moRadAdvanceDocuments);
+
         jpLayoutC.add(jPanel19);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -561,6 +578,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }//GEN-LAST:event_formWindowActivated
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgDocOpType;
     private javax.swing.ButtonGroup bgInput;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -587,6 +605,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private javax.swing.JButton jbPickExchangeRate;
     private javax.swing.JButton jbPickLayoutPath;
     private javax.swing.JButton jbPickRecord;
+    private javax.swing.JLabel jlAux;
     private javax.swing.JLabel jlBalanceTotal;
     private javax.swing.JLabel jlBalanceTotalPayed;
     private javax.swing.JLabel jlBankAccountCash;
@@ -626,6 +645,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private sa.lib.gui.bean.SBeanFieldKey moKeyBankLayoutType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDpsCurrency;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLayoutBank;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadAdvanceDocuments;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadDocuments;
     private sa.lib.gui.bean.SBeanFieldRadio moRadInputChoosingPayments;
     private sa.lib.gui.bean.SBeanFieldRadio moRadInputManual;
     private sa.lib.gui.bean.SBeanFieldText moTextConcept;
@@ -659,7 +680,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moDateDateDue.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateDue), true);
         moDecBalanceTotal.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecBalanceTotalPayed.setDecimalSettings(SGuiUtils.getLabelName(jlBalanceTotalPayed), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        
+
+        moRadDocuments.setBooleanSettings(moRadDocuments.getText(), true);
+        moRadAdvanceDocuments.setBooleanSettings(moRadAdvanceDocuments.getText(), false);
         moRadInputManual.setBooleanSettings(moRadInputManual.getText(), true);
         moRadInputChoosingPayments.setBooleanSettings(moRadInputChoosingPayments.getText(), false);
         
@@ -679,7 +702,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FINX_LAY_BANK_ACC:
                 jbGridRowsShow.setText("Mostrar renglones");
                 jbGridRowsClear.setText("Limpiar renglones");
-                
+
+                moRadDocuments.setSelected(true);
+                moRadDocuments.setEnabled(false);
+                moRadAdvanceDocuments.setEnabled(false);
                 moRadInputManual.setSelected(true);
                 moRadInputManual.setEnabled(false);
                 moRadInputChoosingPayments.setEnabled(false);
@@ -689,6 +715,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbGridRowsShow.setText("Mostrar documentos");
                 jbGridRowsClear.setText("Limpiar documentos");
                 
+                moRadDocuments.setSelected(true);
+                moRadDocuments.setEnabled(true);
+                moRadAdvanceDocuments.setEnabled(true);
                 moRadInputManual.setSelected(true);
                 moRadInputManual.setEnabled(true);
                 moRadInputChoosingPayments.setEnabled(true);
@@ -698,6 +727,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbGridRowsShow.setText("Mostrar beneficiarios");
                 jbGridRowsClear.setText("Limpiar beneficiarios");
                 
+                moRadDocuments.setSelected(true);
+                moRadDocuments.setEnabled(false);
+                moRadAdvanceDocuments.setEnabled(false);
                 moRadInputManual.setSelected(true);
                 moRadInputManual.setEnabled(false);
                 moRadInputChoosingPayments.setEnabled(false);
@@ -874,6 +906,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moCellEditorOptionsAgreementReference = new STableCellEditorOptions((SClientInterface) miClient, true);
         
         moPickerPayments = new SPickerPayments(miClient, mnFormSubtype, "Seleccionar pagos");
+        moPickerPayments.setIsAdvanceDocuments(moRadAdvanceDocuments.isSelected());
     }
     
     private boolean isModeForAccounting() {
@@ -1255,10 +1288,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type, cx.doc_xml " +
                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
-                    "r.id_year = " + SLibTimeUtils.digestYear(moDateDateDue.getValue())[0] + " AND r.b_del = 0 AND re.b_del = 0 AND " +
-                    "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] + " AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " " +
+                    "r.id_year = " + SLibTimeUtils.digestYear(moDateDateDue.getValue())[0] + " AND r.b_del = 0 AND re.b_del = 0 " +
                     "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
-                    "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx " +
+                    "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp " +
                     "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc AND d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                     "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                     "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
@@ -1268,8 +1300,35 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " +
                     "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface) miClient) + ".trn_cfd AS cx ON x.id_cfd = cx.id_cfd " + 
                     "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
-                    (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
-                    "GROUP BY b.id_bp, b.bp, b.fiscal_id, d.exc_rate, bct.bp_key, bpb_con.email_01, cob.code, " +
+                    (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") ";
+            if (moRadDocuments.isSelected()) {
+                sql += "AND (re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] + " AND "
+                        + "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " AND "
+                        + "(SELECT  "
+                        + "            COUNT(*) "
+                        + "        FROM "
+                        + "            trn_dps_ety AS tde "
+                        + "        WHERE "
+                        + "            tde.id_year = d.id_year "
+                        + "                AND tde.id_doc = d.id_doc "
+                        + "                AND tde.b_del = 0 "
+                        + "                AND tde.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY + " "
+                        + "        LIMIT 1) = 0) "
+                        + "AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx ";
+            }
+            else {
+                sql += "AND (re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_NA[0] + " AND "
+                        + "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_NA[1] + " AND "
+                        + "(SELECT 1 FROM "
+                        + "            trn_dps_ety AS tde "
+                        + "        WHERE "
+                        + "            tde.id_year = d.id_year "
+                        + "                AND tde.id_doc = d.id_doc "
+                        + "                AND tde.b_del = 0 "
+                        + "                AND tde.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY + " "
+                        + "        LIMIT 1)) ";
+            }
+            sql += "GROUP BY b.id_bp, b.bp, b.fiscal_id, d.exc_rate, bct.bp_key, bpb_con.email_01, cob.code, " +
                     "d.id_year, d.id_doc, d.dt, d.num_ser, d.num, " +
                     "d.stot_r, d.stot_cur_r, " +
                     "d.tax_charged_r, d.tax_charged_cur_r, " +
@@ -1384,6 +1443,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moPickerPayments.setCurrencies(moKeyBankLayoutCurrency.getValue()[0], moKeyDpsCurrency.getValue()[0]);
             }
             
+            moPickerPayments.setIsAdvanceDocuments(moRadAdvanceDocuments.isSelected());
             moPickerPayments.setDataBank(mnBankPaymentTypeId, mnBizPartnerBankId);
             moPickerPayments.setLayoutDueDate(moDateDateDue.getValue());
             moPickerPayments.reloadCatalogues();
@@ -1404,6 +1464,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     
     private void actionPerformedGridRowsAddPayments() {
         moPickerPayments.setFormResult(SGuiConsts.FORM_RESULT_CANCEL);
+        moPickerPayments.setIsAdvanceDocuments(moRadAdvanceDocuments.isSelected());
         moPickerPayments.setVisible(true);
         
         if (moPickerPayments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
@@ -2119,6 +2180,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                 pay.setReceiptPaymentRequired(row.getReceptionPayReq());
                             }
                         }
+                        for (SRowPayments oRowPay : row.getPayments()) {
+                            if (oRowPay.isDocAdvance()) {
+                                pay.setPaymentOperationType(SDbPayment.OPERATION_TYPE_DOC_ADVANCE);
+                                break;
+                            }
+                        }
                         
                         pay.getChildEntries().add(createAuxNewPaymentEntry(row));
                         break;
@@ -2286,6 +2353,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbGridRowsClear.setEnabled(false);
                 jbGridRowsAddPayments.setEnabled(false);
                 jbGridRowsClearPayments.setEnabled(false);
+                moRadDocuments.setEnabled(false);
+                moRadAdvanceDocuments.setEnabled(false);
+                moRadAdvanceDocuments.setEnabled(false);
                 moRadInputManual.setEnabled(false);
                 moRadInputChoosingPayments.setEnabled(false);
                 break;
@@ -2306,6 +2376,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 jbPickExchangeRate.setEnabled(enable && !isExchangeRateNotRequired());
                 moDateDateDue.setEditable(enable);
                 
+                moRadDocuments.setEnabled(enable);
+                moRadAdvanceDocuments.setEnabled(enable);
                 moRadInputManual.setEnabled(enable);
                 moRadInputChoosingPayments.setEnabled(enable);
                 jbGridRowsShow.setEnabled(enable);
@@ -3149,6 +3221,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             // registry is being created:
 
             bgInput.setSelected(moRadInputManual.getModel(), true);
+            bgDocOpType.setSelected(moRadDocuments.getModel(), true);
             
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
@@ -3341,7 +3414,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             
                             switch (mnCfgParamCfdRequired) {
                                 case SBankLayoutConsts.CFD_REQ_YES:
-                                    validation.setMessage(message);
+//                                    validation.setMessage(message);
                                     break;
                                 case SBankLayoutConsts.CFD_REQ_OPC:
                                     if (miClient.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {

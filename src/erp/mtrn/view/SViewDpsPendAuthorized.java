@@ -404,7 +404,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
                             }
                             else {
-                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(miClient, ((int[])moTablePane.getSelectedTableRow().getPrimaryKey()));
+//                                SAuthorizationUtils.sendAutomaticProviderAuthornMails(miClient, ((int[])moTablePane.getSelectedTableRow().getPrimaryKey()));
                                 miClient.getGuiModule(isPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                             }
                         }

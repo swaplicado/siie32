@@ -2276,7 +2276,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                         "INNER JOIN " +
                         "    fin_pay AS p ON pl.id_pay = p.id_pay " +
                         "SET " +
-                        "    p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + " " +
+                        "    p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED + ", " +
+                        "    p.fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                        "    p.ts_usr_upd = NOW() " +
                         "WHERE " +
                         "p.id_pay IN (" + paymentsIds + ");";
                 session.getStatement().execute(msSql);
@@ -2293,13 +2295,18 @@ public class SDbBankLayout extends SDbRegistryUser {
             msSql = "UPDATE fin_pay_lay_bank AS pl " +
                     "INNER JOIN fin_pay AS p ON pl.id_pay = p.id_pay " +
                     "SET " +
-                    "    p.b_del = 1 " +
+                    "    p.b_del = 1, " +
+                    "    p.fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    "    p.ts_usr_upd = NOW() " +
                     "WHERE " +
                     "    p.pay_tp = 'P' AND id_lay_bank = " + mnPkBankLayoutId + ";";
             session.getStatement().execute(msSql);
 
             for (int paymentId : maAuxOldPaymentsIds) {
-                msSql = "UPDATE fin_pay SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR + " "
+                msSql = "UPDATE fin_pay "
+                        + "SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR + ", "
+                        + "fk_usr_upd = " + mnFkUserUpdateId + ", "
+                        + "ts_usr_upd = NOW() "
                         + "WHERE id_pay = " + paymentId;
                 session.getStatement().execute(msSql);
                 msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + paymentId + ", " + mnPkBankLayoutId + ")";

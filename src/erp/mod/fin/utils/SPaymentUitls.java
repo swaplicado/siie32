@@ -1,5 +1,6 @@
 package erp.mod.fin.utils;
 
+import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SRowPayments;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -37,6 +38,8 @@ public class SPaymentUitls {
         row.setFuncSubarea(resultSet.getInt("p.fk_func_sub"));
         row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
         row.setNotes(resultSet.getString("p.nts"));
+        row.setOperationType(resultSet.getString("p.pay_tp_op"));
+        row.setIsDocAdvance(row.getOperationType().equals(SDbPayment.OPERATION_TYPE_DOC_ADVANCE));
         row.setDateScheduled(resultSet.getDate("p.dt_sched_n"));
         row.setInstallment(resultSet.getInt("pe.install"));
         row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));
@@ -73,6 +76,7 @@ public class SPaymentUitls {
                 "p.fk_func, p.fk_func_sub, " +
                 "p.fk_ben, " +
                 "p.nts, " +
+                "p.pay_tp_op, " +
                 "p.dt_sched_n, " +
                 "pe.install, " +
                 "pe.doc_bal_prev_app_cur, " +
