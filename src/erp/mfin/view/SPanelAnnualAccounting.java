@@ -36,7 +36,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SPanelAnnualAccounting extends javax.swing.JPanel implements erp.lib.table.STableTabInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener {
 
@@ -405,7 +405,7 @@ public class SPanelAnnualAccounting extends javax.swing.JPanel implements erp.li
                 }
 
                 moDialogAccountingDetail.refreshAccountingDetail();
-                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStartYear, mtDateEndYear, currencyKey, null, mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStartYear, mtDateEndYear, currencyKey, "", mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
             }
         }
     }
