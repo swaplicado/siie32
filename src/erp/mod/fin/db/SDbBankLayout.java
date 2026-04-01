@@ -427,6 +427,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
                     xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(layoutBankXmlRow.getObservations());
                     xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).setValue(layoutBankXmlRow.getEmail());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).setValue("0");
 
                     boolean found = false;
 
@@ -1426,7 +1427,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                         layoutBankXmlRow.setReferenceRecord(referenceRecord);
                         layoutBankXmlRow.setObservations(observations);
                         layoutBankXmlRow.setEmail(email);
-                        layoutBankXmlRow.getAuxPaymentIds().add(idPayment);
+                        if (idPayment > 0) {
+                            layoutBankXmlRow.getAuxPaymentIds().add(idPayment);
+                        }
 
                         if (layoutBankRecordKey != null) {
                             layoutBankXmlRow.setRecYearId(layoutBankRecordKey.getPkYearId());
