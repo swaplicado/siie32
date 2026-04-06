@@ -66,7 +66,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores
  */
 public class SDialogMassAccountDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
@@ -1775,7 +1775,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
             
             if (paysToRequest == 0) {
-                miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas procesables y solicitables de pago.");
+                miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas seleccionadas para procesarse y que sean solicitables de pago.");
             }
             else {
                 boolean assign = true;
@@ -1812,7 +1812,48 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     }
     
     private void actionPerformedRecordDocs() {
+        int docsShown = moDocumentsGrid.getModel().getRowCount();
+        String msgDateNotAsignable = "No se pueden procesar los comprobantes, porque ";
         
+        if (docsShown == 0) {
+            miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas mostradas.");
+        }
+        else {
+            int paysToRecord = 0;
+            
+            for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (document.Record) {
+                    paysToRecord++;
+                }
+            }
+            
+            if (paysToRecord == 0) {
+                miClient.showMsgBoxInformation(msgDateNotAsignable + "no hay facturas autorizadas seleccionadas para procesarse.");
+            }
+            else {
+                boolean assign = miClient.showMsgBoxConfirm("¿Está seguro que desea procesar "
+                        + "a " + (paysToRecord == 1 ? "la única factura autorizada seleccionada " : "las " + SLibUtils.DecimalFormatInteger.format(paysToRecord) + " facturas autorizadas seleccionadas?")) == JOptionPane.YES_OPTION;
+
+                if (assign) {
+                    for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                        SMassAccountDocument document = (SMassAccountDocument) row;
+
+                        if (document.Record) {
+                            
+                        }
+                    }
+
+                    int index = moDocumentsGrid.getTable().getSelectedRow();
+                    moDocumentsGrid.renderGridRows();
+                    moDocumentsGrid.setSelectedGridRow(index);
+                }
+            }
+            
+            mtNewRequiredDate = null;
+            jtfReqPaysNewRequiredDate.setText("");
+        }
     }
     
     private void actionPerformedAccShowParsingErrorOrWarning() {

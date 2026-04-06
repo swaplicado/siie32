@@ -36,7 +36,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  * Clase para visualizar movimientos contables que representan documentos por cobrar y por pagar a corto plazo, así como el detalle de los movimientos individuales que los integran.
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.lib.table.STableTabInterface, java.awt.event.ActionListener, javax.swing.event.ListSelectionListener {
 
@@ -415,8 +415,7 @@ public class SPanelShortTermDocuments extends javax.swing.JPanel implements erp.
             else {
                 SPanelShortTermDocumentsRow shortTermRow = (SPanelShortTermDocumentsRow) row;
                 moDialogAccountingDetail.refreshAccountingDetail();
-                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStart, mtDateEnd, 
-                        new int[] { shortTermRow.getCurrencyId() }, shortTermRow.getReference(), mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
+                moDialogAccountingDetail.showAccountingDetail(row.getPrimaryKey(), mnYear, mtDateStart, mtDateEnd, new int[] { shortTermRow.getCurrencyId() }, shortTermRow.getReference(), mbShowRecordAdjYearEnd, mbShowRecordAdjAudit);
             }
         }
     }

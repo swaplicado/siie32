@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 297.2/ 2026-04-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la visualicación en pantalla del detalle de movimientos contables, en el panel de consulta con opción a filtrar por cada uno de los meses del año.
+- (Se implementó de forma inapropiada el filtro "referencia", en los casos de uso del panel en los que no aplican referencias.)
+
+================================================================================
 SIIE 3.2 297.1/ 2026-03-31
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
