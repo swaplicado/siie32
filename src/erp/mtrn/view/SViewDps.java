@@ -1158,7 +1158,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionImportCfdi(boolean linkToOrder) {
         if (linkToOrder ? jbImportCfdiWithOrder.isEnabled() : jbImportCfdiWithOutOrder.isEnabled()) {
             try {
-                SImportUtils.importCfdi(miClient, mbIsCategoryPur, moDialogDpsFinder, null, null, linkToOrder, null, null);
+                SImportUtils.importCfdiAndCreateAndSaveDps(miClient, mbIsCategoryPur, moDialogDpsFinder, null, null, linkToOrder, null, null);
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);

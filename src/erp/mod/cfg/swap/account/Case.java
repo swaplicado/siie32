@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.account;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -24,6 +25,9 @@ public class Case {
     private String unitDesc;
     private String account;
     private String costCenter;
+    private int docNature;
+    private int funcSubArea;
+    private int funcSubAreaRef;
 
     public String getCaseName() { return caseName; }
     public void setCaseName(String caseName) { this.caseName = caseName; }
@@ -55,10 +59,19 @@ public class Case {
     public String getCostCenter() { return normalize(costCenter); }
     public void setCostCenter(String costCenter) { this.costCenter = costCenter; }
 
+    public int getDocNature() { return docNature; }
+    public void setDocNature(int docNature) { this.docNature = docNature; }
+
+    public int getFuncSubArea() { return funcSubArea; }
+    public void setFuncSubArea(int funcSubArea) { this.funcSubArea = funcSubArea; }
+
+    public int getFuncSubAreaRef() { return funcSubAreaRef; }
+    public void setFuncSubAreaRef(int funcSubAreaRef) { this.funcSubAreaRef = funcSubAreaRef; }
+
     private String normalize(String value) {
         return (value == null || "null".equals(value)) ? null : value;
     }
-    
+
     /**
      * Get ProdServ by key.
      * @param key Key of desired ProdServ.
@@ -76,9 +89,9 @@ public class Case {
         
         return prodServ;
     }
-    
+
     /**
-     * Check if any set of key words matches the given text to be evaluated.
+     * Check if any set of key words matches the given text to be evaluated, using only ASCII characters.
      * Format of set of every key words: word1+word2+word3
      * @param textToEvaluate Text to evaluate for matching.
      * @return Returns <code>true</code> when key words are unavailable or the text to be evaluated matches any set of key words, that is, all words of the set in the defined order; otherwise <code>false</code>.
@@ -86,28 +99,32 @@ public class Case {
     public boolean matchesKeyWords(String textToEvaluate) {
         boolean matches = keyWords.isEmpty(); // matches when key words are unavailable!
         
-        for (String keyWord : keyWords) {
-            if (keyWord.isEmpty()) {
-                matches = true; // matches when there is an empty key word!
-                break;
-            }
-            else {
-                int index = 0;
-                boolean perfectMatch = true;
-                String[] words = keyWord.split(Pattern.quote("+"));
+        if (!matches) {
+            String asciiTextToEvaluate = SLibUtils.textToAscii(textToEvaluate);
+            
+            for (String keyWord : keyWords) {
+                if (keyWord.isEmpty()) {
+                    matches = true; // matches when there is an empty key word!
+                    break;
+                }
+                else {
+                    int index = 0;
+                    boolean perfectMatch = true;
+                    String[] asciiWords = SLibUtils.textToAscii(keyWord).split(Pattern.quote("+"));
 
-                for (String word : words) {
-                    index = textToEvaluate.indexOf(word, index);
+                    for (String asciiWord : asciiWords) {
+                        index = asciiTextToEvaluate.indexOf(asciiWord, index);
 
-                    if (index == -1) {
-                        perfectMatch = false;
+                        if (index == -1) {
+                            perfectMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (perfectMatch) {
+                        matches = true;
                         break;
                     }
-                }
-                
-                if (perfectMatch) {
-                    matches = true;
-                    break;
                 }
             }
         }

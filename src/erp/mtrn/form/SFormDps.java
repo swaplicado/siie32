@@ -3025,12 +3025,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel105.add(jtfFilePdf);
 
         jbLoadFilePdf.setText("...");
-        jbLoadFilePdf.setToolTipText("Seleccionar archivo XML...");
+        jbLoadFilePdf.setToolTipText("Seleccionar archivo PDF...");
         jbLoadFilePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel105.add(jbLoadFilePdf);
 
         jbDeleteFilePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbDeleteFilePdf.setToolTipText("Eliminar archivo XML");
+        jbDeleteFilePdf.setToolTipText("Eliminar archivo PDF");
         jbDeleteFilePdf.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel105.add(jbDeleteFilePdf);
 

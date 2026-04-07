@@ -161,11 +161,11 @@ public class SViewInvoicesBalance extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "cur_key", "Mon", STableConstants.WIDTH_CURRENCY_KEY));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "exc_rate", "T. Cambio", STableConstants.WIDTH_VALUE_2X));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Total $", STableConstants.WIDTH_VALUE_2X));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "MXN", "ML", STableConstants.WIDTH_CURRENCY_KEY));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, SModSysConsts.FINS_FISCAL_CUR_MXN, "ML", STableConstants.WIDTH_CURRENCY_KEY));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_cur_r", "Saldo mon $", STableConstants.WIDTH_VALUE_2X));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "cur_key", "Mon $", STableConstants.WIDTH_CURRENCY_KEY));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "tot_r", "Saldo $", STableConstants.WIDTH_VALUE_2X));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "MXN", "ML", STableConstants.WIDTH_CURRENCY_KEY));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CUR, SModSysConsts.FINS_FISCAL_CUR_MXN, "ML", STableConstants.WIDTH_CURRENCY_KEY));
 
         return gridColumnsViews;
     }

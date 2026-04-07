@@ -371,7 +371,7 @@ public final class SCfdRenderer implements ActionListener {
                 
                 SDialogCfdiImport40 dialog = new SDialogCfdiImport40(miClient, moPurchaseOrder, moCfdiFile, moPdfFile, createDocumentInfo());
                 dialog.setComprobante(comprobante);
-                dialog.setFormVisible(true);
+                dialog.setVisible(true);
                 moDpsRendered = dialog.getNewDps();
             }
         }

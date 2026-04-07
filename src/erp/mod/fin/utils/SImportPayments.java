@@ -75,7 +75,6 @@ public class SImportPayments {
     private final static int LAY_RIC_ORIGIN_SOURCE = 22;
     
     private final static String LAY_RIC_CUR_MX_CODE = "MXP";
-    private final static String SYS_CUR_MX_CODE = "MXN";
     
     SGuiClient miClient;
     
@@ -257,7 +256,7 @@ public class SImportPayments {
             }
             switch(dataLines.get(0)[LAY_RIC_CURRENCY]) {
                 case LAY_RIC_CUR_MX_CODE : 
-                    msCurrency = SYS_CUR_MX_CODE;
+                    msCurrency = SModSysConsts.FINS_FISCAL_CUR_MXN;
                     break;
                 default:
                     msCurrency = dataLines.get(0)[LAY_RIC_CURRENCY];

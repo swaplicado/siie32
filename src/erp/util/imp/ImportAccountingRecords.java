@@ -16,6 +16,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.data.SDataDatabase;
+import erp.mod.SModSysConsts;
 import java.awt.Cursor;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -401,7 +402,7 @@ public class ImportAccountingRecords extends javax.swing.JFrame {
                     dPlcImporteMonedaExtra = rsSqlServerEntry.getDouble("plc_imp_moneda_extra");
                     bPlcDifCambiaria = rsSqlServerEntry.getBoolean("plc_swdif_cambiaria");
 
-                    if (sPlcMoneda.compareTo("MXN") == 0) {
+                    if (sPlcMoneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) == 0) {
                         nFid_cur = 1;   // mexican pesos
                         dExchangeRate = 1d;
 

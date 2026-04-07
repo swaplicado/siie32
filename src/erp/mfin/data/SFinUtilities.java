@@ -42,7 +42,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Daniel López, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Alfredo Pérez, Daniel López, Claudio Peña, Sergio Flores
  */
 public abstract class SFinUtilities {
     
@@ -465,7 +465,7 @@ public abstract class SFinUtilities {
             layout += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 10 ? 0 : 10 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 10)); // Payer Account
             layout += formatDate.format(date); // Value Date
             layout += payments.get(0).getHsbcFiscalIdDebit().concat(SLibUtilities.textRepeat(" ", (18 - payments.get(0).getHsbcFiscalIdDebit().length()))); // RFC payer
-            layout += "MXN"; // Currency
+            layout += SModSysConsts.FINS_FISCAL_CUR_MXN; // Currency
             layout += "1".concat(SLibUtilities.textRepeat(" ", 39)); // Number lot
 
             layout += "\r\n";
