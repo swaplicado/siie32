@@ -1872,10 +1872,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                         Logger.getLogger(SFormBankLayout.class.getName()).log(Level.SEVERE, null, e);
                                     }
                                     if (idPayment == 0) {
-                                        amount = (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
+                                        amount = (double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue();
                                     }
                                     else {
-                                        amount = (double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue();
+                                        amount = (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
                                     }
                                     layoutBankRowInArray.getMoneyPayment().setOriginalAmount(amount);
                                     if ((mnBankLayoutCurrencyId == mnDpsCurrencyId) && ((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue() == 0)){
