@@ -1302,7 +1302,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moIconSave = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"));
     }
     
-    private boolean isDocumentAlreadyRecorded(final SImportedDocument document) throws Exception {
+    private boolean isDocAlreadyRecorded(final SImportedDocument document) throws Exception {
         boolean isRecorded = document.isRecorded();
         
         if (!isRecorded) {
@@ -1841,7 +1841,31 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                         SMassAccountDocument document = (SMassAccountDocument) row;
 
                         if (document.Record) {
-                            
+                            try {
+                                if (document.ImportedDocument.isRecorded()) {
+                                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ImportedDocument.ProcessedDps.composeRecord() + ".");
+                                }
+                                else {
+                                    if (!isDocAlreadyRecorded(document.ImportedDocument)) {
+//                                        int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
+//                                        
+//                                        if (dpsKey != null) {
+//                                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
+//                                                int index = moDocumentsGrid.getTable().getSelectedRow();
+//                                                moDocumentsGrid.renderGridRows();
+//                                                moDocumentsGrid.setSelectedGridRow(index);
+//
+//                                                if (document.isPaymentRequested()) {
+//                                                    mbExportPaymentRequests = true;
+//                                                }
+//                                            }
+//                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e) {
+                                SLibUtils.showException(this, e);
+                            }
                         }
                     }
 
@@ -2287,6 +2311,11 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 // no branch selected in current user session:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH + "\n"
                         + "No se podrá importar o capturar facturas, hasta que se seleccione una sucursal de la empresa.");
+                
+                jbRecordDocs.setEnabled(false);
+            }
+            else {
+                jbRecordDocs.setEnabled(true);
             }
             
             super.windowActivated();

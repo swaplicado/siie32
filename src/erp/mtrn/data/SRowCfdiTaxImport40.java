@@ -25,7 +25,7 @@ public final class SRowCfdiTaxImport40 extends erp.lib.table.STableRow {
      * @param taxType Tipo de impuesto. Valores soportados: SModSysConsts.FINS_TP_TAX_CHARGED o SModSysConsts.FINS_TP_TAX_RETAINED.
      * @param row Número del renglón del grid principal.
      */
-    public SRowCfdiTaxImport40(cfd.ver40.DElementConceptoImpuestos impuestos, int taxType, int row){
+    public SRowCfdiTaxImport40(cfd.ver40.DElementConceptoImpuestos impuestos, int taxType, int row) {
         moImpuestos = impuestos;
         mnTaxType = taxType;
         mnRow = row;

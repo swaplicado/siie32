@@ -1566,6 +1566,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             int countProcessed = 0;
             int docsRecorded = 0;
             int docsForeign = 0;
+            int docsReferenced = 0;
             int docsMissingXrt = 0;
             int docsMissingFiles = 0;
             int docsMissingFileXml = 0;
@@ -1591,61 +1592,70 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         docsForeign++;
                     }
                     else {
-                        // check that document's exchange rate, if needed, is available for today:
-
-                        boolean exchangeRateOk = true;
-
-                        // validate availability of exchange rates, if needed:
-
-                        if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                            Double exchangeRate = todayExchangeRates.get(document.CurrencyId);
-
-                            if (exchangeRate == null) {
-                                try {
-                                    exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
-                                }
-                                catch (Exception e) {
-                                    exchangeRate = Double.NaN;
-                                    SLibUtils.printException(this, e);
-                                }
-                                finally {
-                                    todayExchangeRates.put(document.CurrencyId, exchangeRate);
-                                }
-                            }
-
-                            if (exchangeRate == Double.NaN) {
-                                exchangeRateOk = false;
-                            }
-                        }
-
-                        if (!exchangeRateOk) {
-                            docsMissingXrt++;
+                        // check that document does not have references of type order:
+                        
+                        boolean isReferenced = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
+                        
+                        if (isReferenced) {
+                            docsReferenced++;
                         }
                         else {
-                            // retrieve CFDI files:
+                            // check that document's exchange rate, if needed, is available for today:
 
-                            boolean filesOk = document.AuxFiles != null && document.AuxFiles.length == 2 && document.AuxFiles[SImportUtils.CFDI_XML] != null && document.AuxFiles[SImportUtils.CFDI_PDF] != null;
+                            boolean exchangeRateOk = true;
 
-                            if (!filesOk) {
-                                File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                            // validate availability of exchange rates, if needed:
 
-                                if (files == null || files.length != 2) {
-                                    docsMissingFiles++;
+                            if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
+                                Double exchangeRate = todayExchangeRates.get(document.CurrencyId);
+
+                                if (exchangeRate == null) {
+                                    try {
+                                        exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
+                                    }
+                                    catch (Exception e) {
+                                        exchangeRate = Double.NaN;
+                                        SLibUtils.printException(this, e);
+                                    }
+                                    finally {
+                                        todayExchangeRates.put(document.CurrencyId, exchangeRate);
+                                    }
                                 }
-                                else if (files[SImportUtils.CFDI_XML] == null) {
-                                    docsMissingFileXml++;
-                                }
-                                else if (files[SImportUtils.CFDI_PDF] == null) {
-                                    docsMissingFilePdf++;
-                                }
-                                else {
-                                    filesOk = true;
-                                    document.AuxFiles = files;
+
+                                if (exchangeRate == Double.NaN) {
+                                    exchangeRateOk = false;
                                 }
                             }
 
-                            if (filesOk) {
-                                elegibleDocs.add(document);
+                            if (!exchangeRateOk) {
+                                docsMissingXrt++;
+                            }
+                            else {
+                                // retrieve CFDI files:
+
+                                boolean filesOk = document.AuxFiles != null && document.AuxFiles.length == 2 && document.AuxFiles[SImportUtils.CFDI_XML] != null && document.AuxFiles[SImportUtils.CFDI_PDF] != null;
+
+                                if (!filesOk) {
+                                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+
+                                    if (files == null || files.length != 2) {
+                                        docsMissingFiles++;
+                                    }
+                                    else if (files[SImportUtils.CFDI_XML] == null) {
+                                        docsMissingFileXml++;
+                                    }
+                                    else if (files[SImportUtils.CFDI_PDF] == null) {
+                                        docsMissingFilePdf++;
+                                    }
+                                    else {
+                                        filesOk = true;
+                                        document.AuxFiles = files;
+                                    }
+                                }
+
+                                if (filesOk) {
+                                    elegibleDocs.add(document);
+                                }
                             }
                         }
                     }
@@ -1673,6 +1683,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                     if (docsForeign > 0) {
                         message += "\n+ Es extranjera. (Solo se pueden procesar facturas nacionales.)";
+                    }
+                    if (docsReferenced > 0) {
+                        message += "\n+ Está referenciado a un pedido. (Solo se pueden procesar facturas que no están referenciados a un pedido.)";
                     }
                     if (docsMissingXrt > 0) {
                         message += "\n+ Está en moneda extranjera, pero no hay tipo de cambio para hoy.";
@@ -2314,7 +2327,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     // import CFDI (dialog DPS Finder should be previously prepared):
 
-                                    int[] dpsKey = SImportUtils.importCfdi((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
+                                    int[] dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
                                     linkAndProcessNewDps(document, dpsKey);
                                 }
                             }
@@ -2378,7 +2391,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                 // create CFDI (dialog DPS Finder should be previously prepared):
 
-                                int[] dpsKey = SImportUtils.createDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
+                                int[] dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
                                 linkAndProcessNewDps(document, dpsKey);
                             }
                         }

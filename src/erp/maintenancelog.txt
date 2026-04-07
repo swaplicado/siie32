@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 297.3/ 2026-04-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de opciones de selección de subáreas funcionales.
+- (Se cambió el sentido original de búsqueda de opciones, y se dejó una condición que, en empresas sin áreas funcionales, anulaba la posibilidad de obtener renglones en la consulta SQL ("... AND 1 = 0").)
+2) WIP: contabilización asistida de facturas de compras y fletes de materias primas.
+
+================================================================================
 SIIE 3.2 297.2/ 2026-04-01
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

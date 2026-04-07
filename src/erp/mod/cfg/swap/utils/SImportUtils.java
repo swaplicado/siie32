@@ -6,6 +6,7 @@
 package erp.mod.cfg.swap.utils;
 
 import cfd.DCfdUtils;
+import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.SFileUtilities;
@@ -15,11 +16,15 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbComImportLogEntry;
 import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -59,7 +64,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
  * 
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, Cesar Orozco, Sergio Flores
  */
 public abstract class SImportUtils {
     
@@ -103,6 +108,298 @@ public abstract class SImportUtils {
     }
     
     /**
+     * Get system's currency ID from given currency code.
+     * @param currencyIso3Code Currency ISO-3-code, e.t., MXN, USD, etc.
+     * @return 
+     */
+    public static int getCurrencyId(final String currencyIso3Code) throws Exception {
+        int id = 0;
+        
+        switch (currencyIso3Code) {
+            case SModSysConsts.FINS_FISCAL_CUR_MXN:
+                id = SModSysConsts.CFGU_CUR_MXN;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_USD:
+                id = SModSysConsts.CFGU_CUR_USD;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_EUR:
+                id = SModSysConsts.CFGU_CUR_EUR;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_GBP:
+                id = SModSysConsts.CFGU_CUR_GBP;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Currency code '" + currencyIso3Code + "')");
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Create DPS.
+     * @param client GUI client.
+     * @param comprobante CFDI 4.0.
+     * @param cfdiXmlFile CFDI XML file.
+     * @param cfdiPdfFile CFDI PDF file.
+     * @param bpEmisor Business partner "emisor".
+     * @param bpReceptor Business partner "receptor".
+     * @param dpsNatureId DPS nature ID.
+     * @param purchaseOrder Purchase order.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static SDataDps createDps(final SClientInterface client, final cfd.ver40.DElementComprobante comprobante, final File cfdiXmlFile, final File cfdiPdfFile, final SDataBizPartner bpEmisor, final SDataBizPartner bpReceptor, final int dpsNatureId, final SDataDps purchaseOrder) throws Exception {
+        SDataDps dps = new SDataDps();
+        
+        dps.setIsRecordAutomatic(true);
+        
+        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+        
+        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
+        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
+        
+        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
+        
+        SDataDpsCfd dpsCfd = new SDataDpsCfd();
+        dpsCfd.setAuxComprobante40(comprobante);
+        
+        dps.setDbmsDataDpsCfd(dpsCfd);
+        
+        // FORMER REFRESH METHOD STARTS HERE:
+        
+        if (dps.getIsRegistryNew()) {
+            dps.setPkYearId(SLibTimeUtilities.digestYear(comprobante.getAttFecha().getDatetime())[0]);
+            dps.setFkUserNewId(client.getSession().getUser().getPkUserId());
+        }
+        else {
+            dps.setFkUserEditId(client.getSession().getUser().getPkUserId());
+        }
+        
+        String uuid = "";
+        
+        cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+        if (tfd != null) {
+            uuid = tfd.getAttUUID().getString();
+        }
+        
+        Date date = SLibTimeUtils.convertToDateOnly(comprobante.getAttFecha().getDatetime());
+        int currencyId = SImportUtils.getCurrencyId(comprobante.getAttMoneda().getString());
+        boolean isCash = comprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PUE);
+        boolean isLocalCurrency = client.getSession().getSessionCustom().isLocalCurrency(new int[] { currencyId });
+        boolean isWithPurchaseOrder = purchaseOrder != null;
+        
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.setNumberSeries(comprobante.getAttSerie() != null ? comprobante.getAttSerie().getString() : "");
+        dps.setNumber(comprobante.getAttFolio() != null ? !comprobante.getAttFolio().getString().isEmpty() ? comprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
+        dps.setNumberReference(isWithPurchaseOrder ? purchaseOrder.getNumberReference() : "");
+        
+        dps.setDaysOfCredit(isCash ? 0 : isWithPurchaseOrder ? purchaseOrder.getDaysOfCredit() : bpEmisor.getDbmsCategorySettingsSup().getDaysOfCredit());
+        dps.setIsDiscountDocApplying(comprobante.getAttDescuento().getDouble() != 0);
+        dps.setIsDiscountDocPercentage(false);
+        dps.setDiscountDocPercentage(0);
+        
+        dps.setExchangeRate(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        dps.setExchangeRateSystem(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        
+        dps.setSubtotalProvisionalCy_r(comprobante.getAttSubTotal().getDouble());
+        dps.setDiscountDocCy_r(comprobante.getAttDescuento() == null ? 0 : comprobante.getAttDescuento().getDouble());
+        dps.setSubtotalCy_r(dps.getSubtotalProvisionalCy_r() - dps.getDiscountDocCy_r());
+        dps.setTaxChargedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
+        dps.setTaxRetainedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
+        dps.setTotalCy_r(comprobante.getAttTotal().getDouble());
+        
+        dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
+        dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
+        dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
+        dps.setFkPaymentTypeId(isCash ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA); // XXX remove ASAP (Sergio Flores, 2017-08-09)!
+        
+        dps.setFkDpsNatureId(isWithPurchaseOrder ? purchaseOrder.getFkDpsNatureId() : dpsNatureId);
+        dps.setFkCompanyBranchId(client.getSessionXXX().getCurrentCompanyBranchId());
+        
+        if (isWithPurchaseOrder) {
+            dps.setFkFunctionalAreaId(purchaseOrder.getFkFunctionalAreaId());
+            dps.setFkFunctionalSubAreaId(purchaseOrder.getFkFunctionalSubAreaId());
+            dps.setFkTaxIdentityEmisorTypeId(purchaseOrder.getFkTaxIdentityEmisorTypeId());
+            dps.setFkTaxIdentityReceptorTypeId(purchaseOrder.getFkTaxIdentityReceptorTypeId());
+        }
+        else {
+            /*
+            if (!isApplingFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
+                dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+            }
+            else {
+                SFormComponentItem item = (SFormComponentItem) jcbFunctionalSubArea.getSelectedItem();
+                dps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
+                dps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
+            }
+            */
+        }
+        
+        dps.setFkBizPartnerId_r(bpEmisor.getPkBizPartnerId());
+        dps.setFkBizPartnerBranchId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkBizPartnerAltId_r(bpEmisor.getPkBizPartnerId()); 
+        dps.setFkBizPartnerBranchAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkTaxIdentityEmisorTypeId(bpEmisor.getFkTaxIdentityId());
+        dps.setFkTaxIdentityReceptorTypeId(bpReceptor.getFkTaxIdentityId());
+        
+        dps.setFkLanguajeId(isWithPurchaseOrder ? purchaseOrder.getFkLanguajeId() : (bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? client.getSessionXXX().getParamsErp().getFkLanguageId() : bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
+        dps.setFkCurrencyId(currencyId);
+        
+        dps.setAuxKeepDpsData(true);
+        dps.setAuxKeepExchangeRate(true); 
+        dps.setAuxFileXml(cfdiXmlFile);
+        dps.setAuxFilePdf(cfdiPdfFile);
+        
+        dps.getDbmsDpsEntries().clear();
+        /*
+        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+            
+            if (isWithPurchaseOrder) {
+                if (row.getNewDpsEntries().size() == row.getImportedDpsEntries().size()) {
+                    for (int j = 0; j < row.getNewDpsEntries().size(); j++) {
+                        row.getNewDpsEntries().get(j).setConcept(purchaseOrder.getDbmsDpsEntry(row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey()).getConcept());
+                    }
+                }
+            }
+            
+            dps.getDbmsDpsEntries().addAll(row.getNewDpsEntries());
+            saveItemMatchBizPartner(row);
+        }
+        */
+        try {
+            dps.calculateTotal(client); 
+        }
+        catch (Exception e) {
+            SLibUtils.printException(SImportUtils.class.getName(), e);
+        }
+        
+        return dps;
+    }
+    
+    /**
+     * Create and save a new DPS.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS finder dialog.
+     * @param dpsXml XML DPS file. Can be <code>null</code>.
+     * @param dpsPdf PDF DPS file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
+     * @return DPS key as <code>int[]</code> of new invoice created.
+     * @throws java.lang.Exception
+     */
+    public static int[] createAndSaveDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsXml, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+        SDataDps invoice = null;
+        SDataDps order = null; 
+
+        if (linkToOrder) {
+            if (orderRequired != null) {
+                order = orderRequired;
+            }
+            else {
+                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                
+                dialogDpsFinder.formReset();
+                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
+                dialogDpsFinder.setVisible(true);
+
+                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                }
+            }
+        }
+        
+        Exception exception = null;
+
+        try {
+            if (!linkToOrder || (linkToOrder && order != null)) {
+                int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                
+                Object complement;
+                
+                if (order != null) {
+                    complement = new Object[] { invoiceTypeKey, false, order };
+                }
+                else {
+                    complement = new Object[] { invoiceTypeKey };
+                }
+                
+                SDataDps newDps = null;
+                
+                if (importedDocument != null) {
+                    newDps = importedDocument.createDps(client.getSession(), order);
+                    newDps.setAuxFileXml(dpsXml);
+                    newDps.setAuxFilePdf(dpsPdf);
+                    
+                    try {
+                        /**
+                         * Cuando el documento sea factura de compras o NC de compras, y el archivo XML del DPS no sea nulo, 
+                         * se parsea el XML para obtener los datos fiscales del CFDI 4.0 y se asignan al objeto 
+                         * comprobante auxiliar del DPS, para que posteriormente se asignen en la clase SFormDps.
+                         */
+                        String sXml = new String(Files.readAllBytes(dpsXml.toPath()), "UTF-8");
+                        cfd.ver40.DElementComprobante oCfdi = DCfdUtils.getCfdi40(sXml);
+                        if (newDps.getDbmsDataDpsCfd() == null) {
+                            SDataDpsCfd oDpsCfd = new SDataDpsCfd();
+                            oDpsCfd.setAuxComprobante40(oCfdi);
+                            newDps.setDbmsDataDpsCfd(oDpsCfd);
+                        }
+                        else {
+                            newDps.getDbmsDataDpsCfd().setAuxComprobante40(oCfdi);
+                        }
+                    }
+                    catch (Exception e) {
+                        Logger.getLogger(SImportUtils.class.getName()).
+                                log(java.util.logging.Level.SEVERE, 
+                                "Error al parsear el CFDI del documento importado.", e);
+                    }
+                }
+
+                client.getGuiModule(module).setFormComplement(complement);
+                client.getGuiModule(module).setAuxRegistry(newDps);
+
+                if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                    invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                    SDataUtilities.showDpsRecord(client, invoice);
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
+    }
+    
+    /**
      * Import and create a new invoice.
      * @param client GUI client.
      * @param isPurchase Is-purchase flag.
@@ -115,7 +412,7 @@ public abstract class SImportUtils {
      * @return DPS key as <code>int[]</code> of new invoice created.
      * @throws java.lang.Exception
      */
-    public static int[] importCfdi(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+    public static int[] importCfdiAndCreateAndSaveDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
         SDataDps invoice = null;
         SDataDps order = null; 
 
@@ -196,108 +493,6 @@ public abstract class SImportUtils {
                 client.getFileChooser().resetChoosableFileFilters();
                 client.getFileChooser().setAcceptAllFileFilterUsed(true);
             }
-        }
-        
-        if (exception != null) {
-            throw exception;
-        }
-        
-        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
-    }
-    
-    /**
-     * Create a new invoice.
-     * @param client GUI client.
-     * @param isPurchase Is-purchase flag.
-     * @param dialogDpsFinder DPS finder dialog.
-     * @param dpsXml XML DPS file. Can be <code>null</code>.
-     * @param dpsPdf PDF DPS file. Can be <code>null</code>.
-     * @param linkToOrder Link-to-order flag.
-     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
-     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
-     * @return DPS key as <code>int[]</code> of new invoice created.
-     * @throws java.lang.Exception
-     */
-    public static int[] createDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsXml, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
-        SDataDps invoice = null;
-        SDataDps order = null; 
-
-        if (linkToOrder) {
-            if (orderRequired != null) {
-                order = orderRequired;
-            }
-            else {
-                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
-                
-                dialogDpsFinder.formReset();
-                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
-                dialogDpsFinder.setVisible(true);
-
-                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
-                }
-            }
-        }
-        
-        Exception exception = null;
-
-        try {
-            if (!linkToOrder || (linkToOrder && order != null)) {
-                int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
-                int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
-                
-                Object complement;
-                
-                if (order != null) {
-                    complement = new Object[] { invoiceTypeKey, false, order };
-                }
-                else {
-                    complement = new Object[] { invoiceTypeKey };
-                }
-                
-                SDataDps newDps = null;
-                
-                if (importedDocument != null) {
-                    newDps = importedDocument.createDps(client.getSession(), order);
-                    newDps.setAuxFileXml(dpsXml);
-                    newDps.setAuxFilePdf(dpsPdf);
-                    try {
-                        /**
-                         * Cuando el documento sea factura de compras o nc de compras y el archivo XML del DPS no sea nulo, 
-                         * se parsea el XML para obtener los datos fiscales del CFDI 4.0 y se asignan al objeto 
-                         * comprobante auxiliar del DPS, para que posteriormente se asignen en la clase SFormDps.
-                         */
-                        String sXml = new String(Files.readAllBytes(dpsXml.toPath()), "UTF-8");
-                        cfd.ver40.DElementComprobante oCfdi = DCfdUtils.getCfdi40(sXml);
-                        if (newDps.getDbmsDataDpsCfd() == null) {
-                            SDataDpsCfd oDpsCfd = new SDataDpsCfd();
-                            oDpsCfd.setAuxComprobante40(oCfdi);
-                            newDps.setDbmsDataDpsCfd(oDpsCfd);
-                        }
-                        else {
-                            newDps.getDbmsDataDpsCfd().setAuxComprobante40(oCfdi);
-                        }
-                    }
-                    catch (Exception e) {
-                        Logger.getLogger(SImportUtils.class.getName()).
-                                log(java.util.logging.Level.SEVERE, 
-                                "Error al parsear el CFDI del documento importado.", e);
-                    }
-                }
-
-                client.getGuiModule(module).setFormComplement(complement);
-                client.getGuiModule(module).setAuxRegistry(newDps);
-
-                if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
-
-                    invoice = (SDataDps) client.getGuiModule(module).getRegistry();
-                    SDataUtilities.showDpsRecord(client, invoice);
-                }
-            }
-        }
-        catch (Exception e) {
-            exception = e;
         }
         
         if (exception != null) {
@@ -753,6 +948,7 @@ public abstract class SImportUtils {
      * @param responseCode
      * @param userId
      * @param referenceId
+     * @return 
      * @throws Exception 
      */
     public static int countImports(final PreparedStatement preparedStatement, final String syncType, final String responseCode, final int userId, final String referenceId) throws Exception {
@@ -831,6 +1027,7 @@ public abstract class SImportUtils {
      * @param dpsKey DPS primary key.
      * @param dueDate Required due date.
      * @return 
+     * @throws java.lang.Exception 
      */
     public static boolean updateDpsDaysOfCreditByDueDate(final SGuiSession session, final int[] dpsKey, final Date dueDate) throws Exception {
         boolean updated = false;

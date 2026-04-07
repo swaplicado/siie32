@@ -1,6 +1,7 @@
 package erp.mod.hrs.utils;
 
 import erp.SFileUtilities;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import java.io.File;
 import java.io.FileWriter;
@@ -21,7 +22,7 @@ import sa.lib.SLibTimeUtils;
 /**
  * Clase para generar un reporte de cuotas patronales por centro de costo.
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SReportEmpRetiremetReport {
 
@@ -45,7 +46,7 @@ public class SReportEmpRetiremetReport {
         String formattedDateEnd = dateFormat.format(dateEnd);
         String monthName = monthFormat.format(dateStart).toUpperCase();
         int mnPeriodDays = SLibTimeUtils.countPeriodDays(dateStart, dateEnd);
-        String currencyCode = "MXN"; 
+        String currencyCode = SModSysConsts.FINS_FISCAL_CUR_MXN; 
 
         try {
             if (connection == null) {
@@ -53,13 +54,6 @@ public class SReportEmpRetiremetReport {
             }
             if (dateStart == null || dateEnd == null) {
                 throw new IllegalArgumentException("Las fechas de inicio y fin no pueden ser nulas.");
-            }
-
-            String currencySql = "SELECT cur_key FROM erp.CFGU_CUR WHERE cur_key = 'MXN' LIMIT 1;";
-            pstmtCurrency = connection.prepareStatement(currencySql);
-            rsCurrency = pstmtCurrency.executeQuery();
-            if (rsCurrency.next()) {
-                currencyCode = rsCurrency.getString("cur_key");
             }
 
             int[] aDt = SLibTimeUtils.digestDate(dateStart);

@@ -678,15 +678,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel84 = new javax.swing.JPanel();
         jlComplCfdProdServ = new javax.swing.JLabel();
         jtfComplCfdProdServ = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
+        jlComplCfdProdServHint = new javax.swing.JLabel();
         jPanel85 = new javax.swing.JPanel();
         jlComplCfdUnit = new javax.swing.JLabel();
         jtfComplCfdUnit = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
+        jlComplCfdUnitHint = new javax.swing.JLabel();
         jPanel89 = new javax.swing.JPanel();
         jPanel90 = new javax.swing.JPanel();
         jlComplPredial = new javax.swing.JLabel();
         jtfComplPredial = new javax.swing.JTextField();
+        jlComplPredial1 = new javax.swing.JLabel();
         jpQuality = new javax.swing.JPanel();
         jpItemComposition = new javax.swing.JPanel();
         jPanel81 = new javax.swing.JPanel();
@@ -2398,10 +2399,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfComplCfdProdServ.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel84.add(jtfComplCfdProdServ);
 
-        jLabel6.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel6.setText("p. ej., 01010101");
-        jLabel6.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel84.add(jLabel6);
+        jlComplCfdProdServHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlComplCfdProdServHint.setText("p. ej., 01010101");
+        jlComplCfdProdServHint.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel84.add(jlComplCfdProdServHint);
 
         jpCompl.add(jPanel84);
 
@@ -2414,10 +2415,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfComplCfdUnit.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel85.add(jtfComplCfdUnit);
 
-        jLabel8.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel8.setText("p. ej., XUN");
-        jLabel8.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel85.add(jLabel8);
+        jlComplCfdUnitHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlComplCfdUnitHint.setText("p. ej., XUN");
+        jlComplCfdUnitHint.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel85.add(jlComplCfdUnitHint);
 
         jpCompl.add(jPanel85);
 
@@ -2434,6 +2435,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jtfComplPredial.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel90.add(jtfComplPredial);
+
+        jlComplPredial1.setForeground(java.awt.SystemColor.textInactiveText);
+        jlComplPredial1.setText("(Solamente letras o dígitios (a-z, A-Z, 0-9), sin espacios ni signos.)");
+        jlComplPredial1.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel90.add(jlComplPredial1);
 
         jPanel89.add(jPanel90, java.awt.BorderLayout.NORTH);
 
@@ -5608,9 +5614,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -5795,10 +5799,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlAddingMultipleMailHelp1;
     private javax.swing.JLabel jlAddingMultipleMailHelp2;
     private javax.swing.JLabel jlComplCfdProdServ;
+    private javax.swing.JLabel jlComplCfdProdServHint;
     private javax.swing.JLabel jlComplCfdUnit;
+    private javax.swing.JLabel jlComplCfdUnitHint;
     private javax.swing.JLabel jlComplConcept;
     private javax.swing.JLabel jlComplConceptKey;
     private javax.swing.JLabel jlComplPredial;
+    private javax.swing.JLabel jlComplPredial1;
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlConceptKey;
     private javax.swing.JLabel jlContainerTank;
