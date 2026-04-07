@@ -43,7 +43,6 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
-import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -120,8 +119,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public String CurrencyCode;
     public boolean RequirePayment;
     public int RequiredPaymentDefinition;
-    public double RequiredPaymentAmount;
     public double RequiredPaymentPct;
+    public double RequiredPaymentAmount;
+    public double RequiredPaymentAmountNew;
     public Date RequiredPaymentDate;
     public Date RequiredPaymentDateNew;
     public boolean IsRequiredPaymentLoc;
@@ -169,8 +169,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         CurrencyCode = "";
         RequirePayment = false;
         RequiredPaymentDefinition = SSwapConsts.PAY_NOT_REQ;
-        RequiredPaymentAmount = 0;
         RequiredPaymentPct = 0;
+        RequiredPaymentAmount = 0;
+        RequiredPaymentAmountNew = 0;
         RequiredPaymentDate = null;
         RequiredPaymentDateNew = null;
         IsRequiredPaymentLoc = false;
@@ -254,15 +255,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Ger required payment amount of document, directly defined or indirectly from required payment percentage.
+     * Ger effective required payment amount of document, just already defined or originally defined, either directly or indirectly defined from required payment percentage.
+     * @param dps Document.
      * @return 
      */
-    public double getRequiredPaymentAmount() {
-        return getRequiredPaymentAmount(null);
+    public double getRequiredPaymentAmountEffective(final SThinDps dps) {
+        return RequiredPaymentAmountNew != 0 ? RequiredPaymentAmountNew : getRequiredPaymentAmount(dps);
     }
     
     /**
-     * Get effective required payment date.
+     * Get effective required payment date, just already defined or originally defined.
      * @return 
      */
     public Date getRequiredPaymentDateEffective() {
@@ -314,7 +316,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public boolean isPaymentRequestDataAvailable() {
-        return getRequiredPaymentDateEffective() != null && (getRequiredPaymentAmount() > 0 || (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1));
+        return getRequiredPaymentDateEffective() != null && (getRequiredPaymentAmountEffective(null) > 0 || (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1));
     }
     
     /**
@@ -413,7 +415,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         else if (getRequiredPaymentDateEffective() == null) {
             throw new Exception("Este documento no tiene fecha requerida de pago.");
         }
-        else if (getRequiredPaymentAmount(dps) == 0) {
+        else if (getRequiredPaymentAmountEffective(dps) == 0) {
             throw new Exception("Este documento no tiene monto requerido de pago.");
         }
         else if (getRequiredPaymentPct() == 0) {
@@ -441,7 +443,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 SDbPaymentEntry singleEntry = new SDbPaymentEntry();
                 payment.getChildEntries().add(singleEntry);
                 
-                payment.processPaymentAtApplication(session, getRequiredPaymentAmount(dps), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, getTotalEffective(dps));
+                payment.processPaymentAtApplication(session, getRequiredPaymentAmountEffective(dps), CurrencyId, exchangeRate, IsRequiredPaymentLoc, 1, getTotalEffective(dps));
 
                 //payment.setPkPaymentId(...);
                 payment.setPaymentType(SDbPayment.TYPE_REQUEST);
@@ -1338,60 +1340,63 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = RequirePayment;
                 break;
             case 20:
-                value = getRequiredPaymentAmount();
-                break;
-            case 21:
-                value = CurrencyCode;
-                break;
-            case 22:
                 value = getRequiredPaymentPct();
                 break;
+            case 21:
+                value = getRequiredPaymentAmount(null);
+                break;
+            case 22:
+                value = RequiredPaymentAmountNew == 0 ? null : RequiredPaymentAmountNew;
+                break;
             case 23:
-                value = RequiredPaymentDate;
+                value = CurrencyCode;
                 break;
             case 24:
-                value = RequiredPaymentDateNew;
+                value = RequiredPaymentDate;
                 break;
             case 25:
-                value = IsRequiredPaymentLoc;
+                value = RequiredPaymentDateNew;
                 break;
             case 26:
-                value = RequiredPaymentNotes;
+                value = IsRequiredPaymentLoc;
                 break;
             case 27:
-                value = SSwapConsts.PayDefinitions.get(RequiredPaymentDefinition);
+                value = RequiredPaymentNotes;
                 break;
             case 28:
-                value = !isPaymentRequested() ? null : Payment.getFolio();
+                value = SSwapConsts.PayDefinitions.get(RequiredPaymentDefinition);
                 break;
             case 29:
-                value = !isPaymentRequested() ? null : Payment.getDateApplication();
+                value = !isPaymentRequested() ? null : Payment.getFolio();
                 break;
             case 30:
-                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
+                value = !isPaymentRequested() ? null : Payment.getDateApplication();
                 break;
             case 31:
-                value = !isRecorded() ? null : ProcessedDps.DpsDate;
+                value = !isRecorded() ? null : ProcessedDps.DpsFolio;
                 break;
             case 32:
-                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
+                value = !isRecorded() ? null : ProcessedDps.DpsDate;
                 break;
             case 33:
-                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
+                value = !isRecorded() ? null : ProcessedDps.DpsTotalCy;
                 break;
             case 34:
-                value = !isRecorded() ? null : getTotalComparison();
+                value = !isRecorded() ? null : ProcessedDps.DpsCurrencyCode;
                 break;
             case 35:
-                value = DueDate;
+                value = !isRecorded() ? null : getTotalComparison();
                 break;
             case 36:
-                value = AccountingTag;
+                value = DueDate;
                 break;
             case 37:
-                value = ExternalDocumentUuid;
+                value = AccountingTag;
                 break;
             case 38:
+                value = ExternalDocumentUuid;
+                break;
+            case 39:
                 value = ExternalDocumentId;
                 break;
             default:
@@ -1575,8 +1580,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.CurrencyId = resultSet.getInt("c.id_cur");
                 importedDocument.CurrencyCode = resultSet.getString("c.cur_key");
                 importedDocument.RequiredPaymentDefinition = SSwapConsts.PAY_NOT_REQ;
-                importedDocument.RequiredPaymentAmount = 0;
                 importedDocument.RequiredPaymentPct = 0;
+                importedDocument.RequiredPaymentAmount = 0;
+                importedDocument.RequiredPaymentAmountNew = 0;
                 importedDocument.RequiredPaymentDate = null;
                 importedDocument.RequiredPaymentDateNew = null;
                 importedDocument.IsRequiredPaymentLoc = false;

@@ -32,6 +32,7 @@ import erp.mod.fin.utils.SBankLayoutCourier;
 import erp.mod.fin.utils.SBankLayoutParams;
 import erp.mod.fin.utils.SDialogBankLayoutSendingConfirmation;
 import erp.mod.fin.utils.SDocumentRequestRow;
+import erp.mod.fin.utils.SPaymentUitls;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
@@ -409,84 +410,177 @@ public class SDbBankLayout extends SDbRegistryUser {
             xmlBankLayout.getAttribute(SXmlBankLayout.ATT_LAY_ID).setValue(mnPkBankLayoutId);
             
             for (SLayoutBankXmlRow layoutBankXmlRow : maAuxLayoutBankXmlRows) {
-                SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
-                
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(layoutBankXmlRow.getDpsYearId());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(layoutBankXmlRow.getDpsDocId());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(layoutBankXmlRow.getAmount());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(layoutBankXmlRow.getAmountCy());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(layoutBankXmlRow.getCurrencyId());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).setValue(layoutBankXmlRow.getExchangeRate());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(layoutBankXmlRow.getObservations());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).setValue(layoutBankXmlRow.getEmail());
-                xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).setValue(layoutBankXmlRow.getPaymentId());
-                
-                boolean found = false;
-                
-                for (SXmlBankLayoutPayment xmlBankLayoutPayment : xmlBankLayoutPayments) {
-                    found = false;
-                    
-                    if (mnXtaBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                        if (layoutBankXmlRow.getAgreement().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue()) && layoutBankXmlRow.getAgreementReference().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue())) {
-                            found = true;
-                        }
-                    }
-                    else {
-                        if (SLibUtilities.compareKeys(new int[] { layoutBankXmlRow.getBizPartnerBranchId(), layoutBankXmlRow.getBizPartnerBranchAccountId() },
-                                new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).getValue(), (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }) &&
-                                SLibUtils.compareAmount((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).getValue() * 100, layoutBankXmlRow.getExchangeRate() * 100)) {
-                            found = true;
-                        }
-                    }
-                    
-                    if (found) {
-                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + layoutBankXmlRow.getAmount());
-                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + layoutBankXmlRow.getAmountCy());
-                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).getValue()) + "," + layoutBankXmlRow.getReference());
-                        xmlBankLayoutPayment.getXmlElements().add(xmlBankLayoutPaymentDoc);
-                        break;
+                if (! layoutBankXmlRow.getAuxPaymentIds().isEmpty() && layoutBankXmlRow.getAuxPayments().isEmpty()) {
+                    for (Integer idPayment : layoutBankXmlRow.getAuxPaymentIds()) {
+                        layoutBankXmlRow.getAuxPayments().add(SPaymentUitls.readPayment(session.getStatement().getConnection(), idPayment));
                     }
                 }
-                
-                if (!found) {
-                    SXmlBankLayoutPayment xmlBankLayoutPayment = new SXmlBankLayoutPayment();
-                    
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(layoutBankXmlRow.getAmount());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(layoutBankXmlRow.getAmountCy());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(layoutBankXmlRow.getReference());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(layoutBankXmlRow.getCurrencyId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(layoutBankXmlRow.getAgreement());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(layoutBankXmlRow.getAgreementReference());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(layoutBankXmlRow.getConceptCie());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).setValue(layoutBankXmlRow.getExchangeRate());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CON).setValue(layoutBankXmlRow.getConcept());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(layoutBankXmlRow.getHsbcFiscalVoucher());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(layoutBankXmlRow.getHsbcAccountType());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(layoutBankXmlRow.getHsbcBankCode());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(layoutBankXmlRow.getHsbcFiscalIdDebit());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(layoutBankXmlRow.getHsbcFiscalIdCredit());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DESCRIP).setValue(layoutBankXmlRow.getDescription());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SANT_BANK_CODE).setValue(layoutBankXmlRow.getSantanderBankCode());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(layoutBankXmlRow.getBajioBankCode());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(layoutBankXmlRow.getBajioBankNick());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(layoutBankXmlRow.getBankKey());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(layoutBankXmlRow.isPayed());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).setValue(layoutBankXmlRow.getBizPartnerId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).setValue(layoutBankXmlRow.getBizPartnerBranchId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(layoutBankXmlRow.getBizPartnerBranchAccountId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(layoutBankXmlRow.getRecYearId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(layoutBankXmlRow.getRecPeriodId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(layoutBankXmlRow.getRecBookkeepingCenterId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(layoutBankXmlRow.getRecRecordTypeId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(layoutBankXmlRow.getRecNumberId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(layoutBankXmlRow.getBookkeepingYearId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(layoutBankXmlRow.getBookkeepingNumberId());
-                    xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
-                    
-                    xmlBankLayoutPayment.getXmlElements().add(xmlBankLayoutPaymentDoc);
+                if (layoutBankXmlRow.getAuxPayments().isEmpty()) {
+                    SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
 
-                    xmlBankLayoutPayments.add(xmlBankLayoutPayment);
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(layoutBankXmlRow.getDpsYearId());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(layoutBankXmlRow.getDpsDocId());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(layoutBankXmlRow.getAmount());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(layoutBankXmlRow.getAmountCy());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(layoutBankXmlRow.getCurrencyId());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).setValue(layoutBankXmlRow.getExchangeRate());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(layoutBankXmlRow.getObservations());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).setValue(layoutBankXmlRow.getEmail());
+                    xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).setValue("0");
+
+                    boolean found = false;
+
+                    for (SXmlBankLayoutPayment xmlBankLayoutPayment : xmlBankLayoutPayments) {
+                        found = false;
+
+                        if (mnXtaBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                            if (layoutBankXmlRow.getAgreement().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue()) && layoutBankXmlRow.getAgreementReference().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue())) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if (SLibUtilities.compareKeys(new int[] { layoutBankXmlRow.getBizPartnerBranchId(), layoutBankXmlRow.getBizPartnerBranchAccountId() },
+                                    new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).getValue(), (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }) &&
+                                    SLibUtils.compareAmount((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).getValue() * 100, layoutBankXmlRow.getExchangeRate() * 100)) {
+                                found = true;
+                            }
+                        }
+
+                        if (found) {
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + layoutBankXmlRow.getAmount());
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + layoutBankXmlRow.getAmountCy());
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).getValue()) + "," + layoutBankXmlRow.getReference());
+                            xmlBankLayoutPayment.getXmlElements().add(xmlBankLayoutPaymentDoc);
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        SXmlBankLayoutPayment xmlBankLayoutPayment = new SXmlBankLayoutPayment();
+
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(layoutBankXmlRow.getAmount());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(layoutBankXmlRow.getAmountCy());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(layoutBankXmlRow.getReference());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(layoutBankXmlRow.getCurrencyId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(layoutBankXmlRow.getAgreement());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(layoutBankXmlRow.getAgreementReference());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(layoutBankXmlRow.getConceptCie());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).setValue(layoutBankXmlRow.getExchangeRate());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CON).setValue(layoutBankXmlRow.getConcept());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(layoutBankXmlRow.getHsbcFiscalVoucher());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(layoutBankXmlRow.getHsbcAccountType());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(layoutBankXmlRow.getHsbcBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(layoutBankXmlRow.getHsbcFiscalIdDebit());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(layoutBankXmlRow.getHsbcFiscalIdCredit());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DESCRIP).setValue(layoutBankXmlRow.getDescription());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SANT_BANK_CODE).setValue(layoutBankXmlRow.getSantanderBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(layoutBankXmlRow.getBajioBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(layoutBankXmlRow.getBajioBankNick());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(layoutBankXmlRow.getBankKey());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(layoutBankXmlRow.isPayed());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).setValue(layoutBankXmlRow.getBizPartnerId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).setValue(layoutBankXmlRow.getBizPartnerBranchId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(layoutBankXmlRow.getBizPartnerBranchAccountId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(layoutBankXmlRow.getRecYearId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(layoutBankXmlRow.getRecPeriodId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(layoutBankXmlRow.getRecBookkeepingCenterId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(layoutBankXmlRow.getRecRecordTypeId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(layoutBankXmlRow.getRecNumberId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(layoutBankXmlRow.getBookkeepingYearId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(layoutBankXmlRow.getBookkeepingNumberId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
+
+                        xmlBankLayoutPayment.getXmlElements().add(xmlBankLayoutPaymentDoc);
+
+                        xmlBankLayoutPayments.add(xmlBankLayoutPayment);
+                    }
+                }
+                else {
+                    ArrayList<SXmlBankLayoutPaymentDoc> xmlBankLayoutRowDocsPayments = new ArrayList<>();
+                    for (SRowPayments layoutBankPaymentRow : layoutBankXmlRow.getAuxPayments()) {
+                        SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
+
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(layoutBankXmlRow.getDpsYearId());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(layoutBankXmlRow.getDpsDocId());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(layoutBankPaymentRow.getAmount());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(layoutBankPaymentRow.getAmountCurrencyToPay());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(layoutBankXmlRow.getCurrencyId());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).setValue(layoutBankXmlRow.getExchangeRate());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(layoutBankXmlRow.getObservations());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).setValue(layoutBankXmlRow.getEmail());
+                        xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).setValue(layoutBankPaymentRow.getIdPayment());
+
+                        xmlBankLayoutRowDocsPayments.add(xmlBankLayoutPaymentDoc);
+                    }
+
+                    boolean found = false;
+
+                    for (SXmlBankLayoutPayment xmlBankLayoutPayment : xmlBankLayoutPayments) {
+                        found = false;
+
+                        if (mnXtaBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                            if (layoutBankXmlRow.getAgreement().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue()) && layoutBankXmlRow.getAgreementReference().trim().equals((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue())) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if (SLibUtilities.compareKeys(new int[] { layoutBankXmlRow.getBizPartnerBranchId(), layoutBankXmlRow.getBizPartnerBranchAccountId() },
+                                    new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).getValue(), (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }) &&
+                                    SLibUtils.compareAmount((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).getValue() * 100, layoutBankXmlRow.getExchangeRate() * 100)) {
+                                found = true;
+                            }
+                        }
+
+                        if (found) {
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + layoutBankXmlRow.getAmount());
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + layoutBankXmlRow.getAmountCy());
+                            xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).getValue()) + "," + layoutBankXmlRow.getReference());
+                            xmlBankLayoutPayment.getXmlElements().addAll(xmlBankLayoutRowDocsPayments);
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        SXmlBankLayoutPayment xmlBankLayoutPayment = new SXmlBankLayoutPayment();
+
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(layoutBankXmlRow.getAmount());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(layoutBankXmlRow.getAmountCy());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALPHA).setValue(layoutBankXmlRow.getReference());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(layoutBankXmlRow.getCurrencyId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(layoutBankXmlRow.getAgreement());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(layoutBankXmlRow.getAgreementReference());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(layoutBankXmlRow.getConceptCie());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).setValue(layoutBankXmlRow.getExchangeRate());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CON).setValue(layoutBankXmlRow.getConcept());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(layoutBankXmlRow.getHsbcFiscalVoucher());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(layoutBankXmlRow.getHsbcAccountType());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(layoutBankXmlRow.getHsbcBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(layoutBankXmlRow.getHsbcFiscalIdDebit());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(layoutBankXmlRow.getHsbcFiscalIdCredit());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DESCRIP).setValue(layoutBankXmlRow.getDescription());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SANT_BANK_CODE).setValue(layoutBankXmlRow.getSantanderBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(layoutBankXmlRow.getBajioBankCode());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(layoutBankXmlRow.getBajioBankNick());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(layoutBankXmlRow.getBankKey());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(layoutBankXmlRow.isPayed());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).setValue(layoutBankXmlRow.getBizPartnerId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).setValue(layoutBankXmlRow.getBizPartnerBranchId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(layoutBankXmlRow.getBizPartnerBranchAccountId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(layoutBankXmlRow.getRecYearId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(layoutBankXmlRow.getRecPeriodId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(layoutBankXmlRow.getRecBookkeepingCenterId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(layoutBankXmlRow.getRecRecordTypeId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(layoutBankXmlRow.getRecNumberId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(layoutBankXmlRow.getBookkeepingYearId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(layoutBankXmlRow.getBookkeepingNumberId());
+                        xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(layoutBankXmlRow.getReferenceRecord());
+
+                        xmlBankLayoutPayment.getXmlElements().addAll(xmlBankLayoutRowDocsPayments);
+
+                        xmlBankLayoutPayments.add(xmlBankLayoutPayment);
+                    }
                 }
             }
             
@@ -1245,7 +1339,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                 // create layout bank document:
                 
                 double paymentCur = 0;
-
+                boolean isPrepaymentMultiplePayments = false;
+                boolean isMultipleDpsPayments = false;
                 for (SXmlElement elementDoc : xmlBankLayoutPayment.getXmlElements()) {
                     if (elementDoc instanceof SXmlBankLayoutPaymentDoc) {
                         // parse individual payments of payment:
@@ -1268,13 +1363,13 @@ public class SDbBankLayout extends SDbRegistryUser {
                         catch (Exception e) {
                             System.out.println(e);
                         }
-                        
-                        paymentCur = SLibUtils.roundAmount(paymentCur + dpsAmountCur);
-                        
                         SDataDps dps = null;
-
                         if (dpsYearId == 0 && dpsDocId == 0) {
                             // is a prepayment:
+                            if (xmlBankLayoutPayment.getXmlElements().size() > 1 && idPayment > 0) {
+                                isPrepaymentMultiplePayments = true;
+                                break;
+                            }
                             
                             layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY);
                             layoutBankPayment.setPrepaymentObservations(observations);
@@ -1283,7 +1378,10 @@ public class SDbBankLayout extends SDbRegistryUser {
                         }
                         else {
                             // is a payment:
-                            
+                            if (xmlBankLayoutPayment.getXmlElements().size() > 1 && idPayment > 0) {
+                                isMultipleDpsPayments = true;
+                                break;
+                            }
                             dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.TRN_DPS, new int[] { dpsYearId, dpsDocId }, SLibConstants.EXEC_MODE_SILENT);
                             
                             SLayoutBankDps layoutBankDps = new SLayoutBankDps(dps, dpsAmount, dpsAmountCur, email);
@@ -1329,7 +1427,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                         layoutBankXmlRow.setReferenceRecord(referenceRecord);
                         layoutBankXmlRow.setObservations(observations);
                         layoutBankXmlRow.setEmail(email);
-                        layoutBankXmlRow.setPaymentId(idPayment);
+                        if (idPayment > 0) {
+                            layoutBankXmlRow.getAuxPaymentIds().add(idPayment);
+                        }
 
                         if (layoutBankRecordKey != null) {
                             layoutBankXmlRow.setRecYearId(layoutBankRecordKey.getPkYearId());
@@ -1352,6 +1452,118 @@ public class SDbBankLayout extends SDbRegistryUser {
                         
                         maAuxLayoutBankXmlRows.add(layoutBankXmlRow);
                     }
+                }
+                if (isPrepaymentMultiplePayments || isMultipleDpsPayments) {
+                    if (isPrepaymentMultiplePayments) {
+                        layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY);
+                    }
+                    else {
+                        layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY);
+                    }
+                    int dpsYearId = 0;
+                    int dpsDocId = 0;
+                    SDataDps oDps = null;
+                    double paymentAmount = 0;
+                    double paymentAmountCur = 0;
+                    String referenceRecord = "";
+                    int idPayment = 0;
+                    String email = "";
+                    ArrayList<Integer> paymentIds = new ArrayList<>();
+
+                    int elemDocIndex = 0;
+                    for (SXmlElement elementDoc : xmlBankLayoutPayment.getXmlElements()) {
+                        if (elementDoc instanceof SXmlBankLayoutPaymentDoc) {
+                            // parse individual payments of payment:
+                            
+                            SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = (SXmlBankLayoutPaymentDoc) elementDoc;
+                            paymentAmount += (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
+                            paymentAmountCur += (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
+                            if (elemDocIndex == 0) {
+                                if (isMultipleDpsPayments) {
+                                    dpsYearId = (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue();
+                                    dpsDocId = (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue();
+
+                                    oDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.TRN_DPS, new int[] { dpsYearId, dpsDocId }, SLibConstants.EXEC_MODE_SILENT);
+                                }
+                                referenceRecord = (String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue();
+                                email = (String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).getValue();
+                                layoutBankPayment.setPrepaymentEmail(email);
+                            }
+                            try {
+                                idPayment = 0;
+                                idPayment = Integer.parseInt((String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).getValue());
+                            }
+                            catch (Exception e) { System.out.println(e); }
+                            paymentIds.add(idPayment);
+                        }
+                        elemDocIndex++;
+                    }
+                    
+                    paymentAmount = SLibUtils.roundAmount(paymentAmount);
+                    paymentAmountCur = SLibUtils.roundAmount(paymentAmountCur);
+                    paymentCur = SLibUtils.roundAmount(paymentCur + paymentAmountCur);
+
+                    if (isMultipleDpsPayments) {
+                        SLayoutBankDps layoutBankDps = new SLayoutBankDps(oDps, paymentAmount, paymentAmountCur, email);
+                        layoutBankPayment.getLayoutBankDpss().add(layoutBankDps);
+                    }
+                    
+                    SLayoutBankXmlRow layoutBankXmlRow = new SLayoutBankXmlRow();
+
+                    layoutBankXmlRow.setTransactionType(layoutBankPayment.getTransactionType());
+                    layoutBankXmlRow.setDpsYearId(dpsYearId);
+                    layoutBankXmlRow.setDpsDocId(dpsDocId);
+                    layoutBankXmlRow.setAmount(paymentAmount);
+                    layoutBankXmlRow.setAmountCy(paymentAmountCur);
+                    layoutBankXmlRow.setAmountPayed(paymentAmount);
+                    layoutBankXmlRow.setExchangeRate((double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXR).getValue());
+                    layoutBankXmlRow.setCurrencyId(bizPartnerBranchBankAccount.getFkCurrencyId());
+                    layoutBankXmlRow.setPayed(layoutBankPaymentRow.isPayed());
+                    layoutBankXmlRow.setBizPartnerId(bizPartner.getPkBizPartnerId());
+                    layoutBankXmlRow.setBizPartnerBranchId(bizPartnerBranchBankAccount.getPkBizPartnerBranchId());
+                    layoutBankXmlRow.setBizPartnerBranchAccountId(bizPartnerBranchBankAccount.getPkBankAccountId());
+
+                    layoutBankXmlRow.setAgreement(layoutBankPaymentRow.getAgreement());
+                    layoutBankXmlRow.setAgreementReference(layoutBankPaymentRow.getAgreementReference());
+                    layoutBankXmlRow.setConceptCie(layoutBankPaymentRow.getAgreementConceptCie());
+
+                    layoutBankXmlRow.setHsbcBankCode(SLibUtils.parseInt((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).getValue()));
+                    layoutBankXmlRow.setHsbcAccountType((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).getValue());
+                    layoutBankXmlRow.setHsbcFiscalIdDebit((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).getValue());
+                    layoutBankXmlRow.setHsbcFiscalIdCredit((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).getValue());
+                    layoutBankXmlRow.setHsbcFiscalVoucher(SLibUtils.parseInt((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).getValue()));
+                    layoutBankXmlRow.setSantanderBankCode((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SANT_BANK_CODE).getValue());
+                    layoutBankXmlRow.setConcept((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CON).getValue());
+                    layoutBankXmlRow.setDescription((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DESCRIP).getValue());
+                    layoutBankXmlRow.setReference("");
+                    layoutBankXmlRow.setBajioBankCode((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
+                    layoutBankXmlRow.setBajioBankNick((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
+                    layoutBankXmlRow.setBankKey((int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
+                    layoutBankXmlRow.setReferenceRecord(referenceRecord);
+//                    layoutBankXmlRow.setObservations(observations);
+                    layoutBankXmlRow.setEmail(email);
+                    layoutBankXmlRow.getAuxPaymentIds().addAll(paymentIds);
+
+                    if (layoutBankRecordKey != null) {
+                        layoutBankXmlRow.setRecYearId(layoutBankRecordKey.getPkYearId());
+                        layoutBankXmlRow.setRecPeriodId(layoutBankRecordKey.getPkPeriodId());
+                        layoutBankXmlRow.setRecBookkeepingCenterId(layoutBankRecordKey.getPkBookkeepingCenterId());
+                        layoutBankXmlRow.setRecRecordTypeId(layoutBankRecordKey.getPkRecordTypeId());
+                        layoutBankXmlRow.setRecNumberId(layoutBankRecordKey.getPkNumberId());
+                        layoutBankXmlRow.setBookkeepingYearId(layoutBankPayment.getBookkeepingYearId_n());
+                        layoutBankXmlRow.setBookkeepingNumberId(layoutBankPayment.getBookkeepingNumberId_n());
+                    }
+                    else {
+                        layoutBankXmlRow.setRecYearId(0);
+                        layoutBankXmlRow.setRecPeriodId(0);
+                        layoutBankXmlRow.setRecBookkeepingCenterId(0);
+                        layoutBankXmlRow.setRecRecordTypeId("");
+                        layoutBankXmlRow.setRecNumberId(0);
+                        layoutBankXmlRow.setBookkeepingYearId(0);
+                        layoutBankXmlRow.setBookkeepingNumberId(0);
+                    }
+
+                    maAuxLayoutBankXmlRows.add(layoutBankXmlRow);
                 }
                 
                 layoutBankPaymentRow.setPaymentCur(paymentCur);
@@ -1873,7 +2085,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                 msXtaBankLayoutType = resultSet.getString("tp_lay_bank");
             }
             
-            msSql = "SELECT fid_cur FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " WHERE id_cob = " + mnFkBankCompanyBranchId + " AND id_acc_cash = " + mnFkBankAccountCashId + " ";
+            msSql = "SELECT fid_cur FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " "
+                    + "WHERE id_cob = " + mnFkBankCompanyBranchId + " AND id_acc_cash = " + mnFkBankAccountCashId + " ";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -1885,9 +2098,21 @@ public class SDbBankLayout extends SDbRegistryUser {
             statement = session.getDatabase().getConnection().createStatement();
             
             maAuxOldPaymentsIds = new ArrayList<>();
-            msSql = "SELECT p.id_pay FROM fin_pay AS p "
-                    + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                    + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ")";
+            msSql = "SELECT  " +
+                    "    pr.id_pay " +
+                    "FROM " +
+                    "    fin_pay AS p " +
+                    "        INNER JOIN " +
+                    "    fin_pay_ety pe ON p.id_pay = pe.id_pay " +
+                    "        INNER JOIN " +
+                    "    fin_pay pr ON pe.fk_pay_req_n = pr.id_pay " +
+                    "        INNER JOIN " +
+                    "    fin_pay_lay_bank AS b ON p.id_pay = b.id_pay " +
+                    "        AND b.id_lay_bank = " + mnPkBankLayoutId + " " +
+                    "WHERE " +
+                    "    pr.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ") " +
+                    "    AND p.b_del = 0 " +
+                    "    AND pr.b_del = 0;";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 maAuxOldPaymentsIds.add(resultSet.getInt(1));
@@ -1896,8 +2121,10 @@ public class SDbBankLayout extends SDbRegistryUser {
             maAuxNewPayments = new ArrayList<>();
             msSql = "SELECT p.id_pay "
                     + "FROM fin_pay AS p "
-                    + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                    + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS;
+                    + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND "
+                        + "b.id_lay_bank = " + mnPkBankLayoutId + " "
+                    + "WHERE p.b_del = 0 AND "
+                    + "p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS + ";";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 SDbPayment pay = new SDbPayment();
@@ -2180,6 +2407,10 @@ public class SDbBankLayout extends SDbRegistryUser {
         
         for (SLayoutBankRecord child : maAuxLayoutBankRecords) {
             registry.getAuxLayoutBankRecords().add(child.clone());
+        }
+        
+        for (Integer pay : maAuxOldPaymentsIds) {
+            registry.getAuxOldPaymentsIds().add(pay);
         }
         
         for (SDbPayment pay : maAuxNewPayments) {

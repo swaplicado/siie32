@@ -1,5 +1,34 @@
 ================================================================================
-SIIE 3.2 297.0/ 2026-03-27
+SIIE 3.2 297.3/ 2026-04-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de opciones de selección de subáreas funcionales.
+- (Se cambió el sentido original de búsqueda de opciones, y se dejó una condición que, en empresas sin áreas funcionales, anulaba la posibilidad de obtener renglones en la consulta SQL ("... AND 1 = 0").)
+2) WIP: contabilización asistida de facturas de compras y fletes de materias primas.
+
+================================================================================
+SIIE 3.2 297.2/ 2026-04-01
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la visualicación en pantalla del detalle de movimientos contables, en el panel de consulta con opción a filtrar por cada uno de los meses del año.
+- (Se implementó de forma inapropiada el filtro "referencia", en los casos de uso del panel en los que no aplican referencias.)
+
+================================================================================
+SIIE 3.2 297.1/ 2026-03-31
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización y corrección de pagos en layouts de anticipos y transferencias
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de la configuración de tipos de procesamiento de facturas importadas desde SWAP Services que implican que sus pagos queden autorizados en automático.
+
+================================================================================
+SIIE 3.2 297.0 2026-03-27
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Restringir consulta de DPS y pagos en vistas y consultas por subárea funcional en SIIE. Corrección de warnings.
+
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de la descripción extendida de ítems.

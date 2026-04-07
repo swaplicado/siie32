@@ -19,16 +19,18 @@ import erp.lib.table.STableUtilities;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDialogAccountingDetailRow;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SDialogAccountingDetail extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
@@ -686,13 +688,12 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
         mbShowRecordAdjYearEnd = bShowRecordAdjYearEnd;
         mbShowRecordAdjAudit = bShowRecordAdjAudit;
         msReference = reference.equals("(SIN REFERENCIA)") ? "" : reference;
-        if (msReference != null) {
-            if (!msReference.isEmpty()) {
-                this.setTitle("Movimientos del período (" + msReference + ")");
-            }
-            else {
-                this.setTitle("Movimientos del período (Sin referencia)");
-            }
+        
+        if (!msReference.isEmpty()) {
+            this.setTitle("Movimientos del período (" + msReference + ")");
+        }
+        else {
+            this.setTitle("Movimientos del período (sin referencia)");
         }
 
         jckShowRecordAdjYearEnd.setSelected(mbShowRecordAdjYearEnd);
@@ -874,7 +875,7 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
             sqlFromPrevious += sTemp;
             sqlFromCurrent += sTemp;
             
-            if (msReference != null) {
+            if (!msReference.isEmpty()) {
                 sqlWhere += (sqlWhere.length() == 0 ? "WHERE " : "AND ") + " re.ref = '" + msReference + "' ";
                 sqlGroupBy += (sqlGroupBy.length() == 0 ? "GROUP BY " : "") + " re.ref ";
             }
@@ -994,10 +995,20 @@ public class SDialogAccountingDetail extends javax.swing.JDialog implements java
                 moPaneDetails.addTableRow(oRow);
             }
 
-            jtfBalanceOpening.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dOpeningBalance));
-            jtfDebit.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dDebitTotal - (dOpeningBalance >= 0 ? dOpeningBalance : 0)));
-            jtfCredit.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dCreditTotal + (dOpeningBalance >= 0 ? 0 : dOpeningBalance)));
-            jtfBalanceEnding.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dDebitTotal - dCreditTotal));
+            double balOpen = dOpeningBalance;
+            double debit = dDebitTotal - (dOpeningBalance >= 0 ? dOpeningBalance : 0);
+            double credit = dCreditTotal + (dOpeningBalance >= 0 ? 0 : dOpeningBalance);
+            double balEnd = dDebitTotal - dCreditTotal;
+            
+            jtfBalanceOpening.setText(SLibUtils.getDecimalFormatAmount().format(dOpeningBalance));
+            jtfDebit.setText(SLibUtils.getDecimalFormatAmount().format(debit));
+            jtfCredit.setText(SLibUtils.getDecimalFormatAmount().format(credit));
+            jtfBalanceEnding.setText(SLibUtils.getDecimalFormatAmount().format(balEnd));
+
+            jtfBalanceOpening.setForeground(dOpeningBalance >= 0 ? Color.BLACK : Color.RED);
+            jtfDebit.setForeground(debit >= 0 ? Color.BLACK : Color.RED);
+            jtfCredit.setForeground(credit >= 0 ? Color.BLACK : Color.RED);
+            jtfBalanceEnding.setForeground(balEnd >= 0 ? Color.BLACK : Color.RED);
 
             if (moPaneDetails.getTableGuiRowCount() > 0) {
                 moPaneDetails.renderTableRows();

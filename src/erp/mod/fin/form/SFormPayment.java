@@ -825,6 +825,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private void stateChangeBeneficiary() {
         clearDps();
         
+        readBp();
+    }
+    
+    private void readBp() {
         if (moKeyBeneficiary.getSelectedIndex() > 0) {
             moBp = new SDataBizPartner();
             moBp.read(moKeyBeneficiary.getValue(), miClient.getSession().getStatement());
@@ -970,6 +974,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moKeyBeneficiary.setValue(new int[] { moRegistry.getFkBeneficiaryId() });
         moTextDps.setText(moDps == null ? "" : moDps.getDpsNumber());
         moKeyFunctionalArea.setValue(new int[] { moRegistry.getFkFunctionalAreaId(), moRegistry.getFkFunctionalSubareaId() });
+        readBp();
         
         if (singleEntry == null) {
             moKeyEntryCurrency.setValue(new int[] { SModSysConsts.CFGU_CUR_MXN });

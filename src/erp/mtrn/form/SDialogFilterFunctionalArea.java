@@ -269,6 +269,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void itemStateChangedFunctionalArea() {
         try {
             if (jcbFunctionalArea.getSelectedIndex() <= 0) {
@@ -278,7 +279,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
             int funcId = moFieldFunctionalArea.getKeyAsIntArray()[0];
             int userId = miClient.getSessionXXX().getUser().getPkUserId();
 
-            SFormUtilities.populateComboBox(miClient,jcbSubFunctionalArea,SModConsts.CFGU_FUNC_SUB,new int[] { userId });
+            SFormUtilities.populateComboBox(miClient, (javax.swing.JComboBox<erp.lib.form.SFormComponentItem>) jcbSubFunctionalArea, SModConsts.CFGU_FUNC_SUB, new int[] { userId });
             
             for (int i = jcbSubFunctionalArea.getItemCount() - 1; i >= 0; i--) {
                 Object item = jcbSubFunctionalArea.getItemAt(i);
@@ -392,7 +393,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
     @Override
     @SuppressWarnings("unchecked")
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient,jcbFunctionalArea,SModConsts.CFGU_FUNC,new int[] { miClient.getSession().getUser().getPkUserId()});
+        SFormUtilities.populateComboBox(miClient, (javax.swing.JComboBox<erp.lib.form.SFormComponentItem>) jcbFunctionalArea, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         jcbSubFunctionalArea.removeAllItems();
     }
 

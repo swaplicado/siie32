@@ -339,7 +339,7 @@ public abstract class SServicesUtils {
             
         /*
         JSON format of configuration settings:
-            {"cfg": [{"usrAutoAuthReqPayReq": [1, 2, 3]}, {"prcTypeAutoAuthPayReq": []}]}
+            {"cfg": [{"usrAutoAuthReqPayReq": [1, 2, 3]}, {"prcTypeAutoAuthPayReq": [1, 2, 3]}]}
         */
         
         JsonNode userIds = settings.path("cfg").path(0).path("usrAutoAuthReqPayReq");
@@ -347,7 +347,7 @@ public abstract class SServicesUtils {
             configSettings.maAutoAuthReqPayReqUserIds.add(id.asInt());
         }
         
-        JsonNode processingTypeIds = settings.path("cfg").path(0).path("prcTypeAutoAuthPayReq");
+        JsonNode processingTypeIds = settings.path("cfg").path(1).path("prcTypeAutoAuthPayReq");
         for (JsonNode id : processingTypeIds) {
             configSettings.maAutoAuthPayReqProcessingTypeIds.add(id.asInt());
         }

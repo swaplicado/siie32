@@ -6,6 +6,7 @@
 package erp.mod.fin.db;
 
 import erp.mod.SModSysConsts;
+import java.util.ArrayList;
 import sa.lib.SLibConsts;
 
 /**
@@ -52,7 +53,10 @@ public class SLayoutBankXmlRow {
     protected String msObservations;
     protected String msEmail;
     protected boolean mbPayed;
-    protected int mnPaymentId;
+    
+    protected boolean mbAuxIsForPayments;
+    protected ArrayList<Integer> maAuxPaymentIds;
+    protected ArrayList<SRowPayments> maAuxPayments;
 
     public SLayoutBankXmlRow() {
         mnTransactionType = 0;
@@ -92,7 +96,10 @@ public class SLayoutBankXmlRow {
         msObservations = "";
         msEmail = "";
         mbPayed = false;
-        mnPaymentId = 0;
+        
+        mbAuxIsForPayments = false;
+        maAuxPaymentIds = new ArrayList<>();
+        maAuxPayments = new ArrayList<>();
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -132,7 +139,8 @@ public class SLayoutBankXmlRow {
     public void setObservations(String s) { msObservations = s; }
     public void setEmail(String s) { msEmail = s; }
     public void setPayed(boolean b) { mbPayed = b; }
-    public void setPaymentId(int n) { mnPaymentId = n; }
+    
+    public void setAuxIsForPayments(boolean b) { mbAuxIsForPayments = b; }
     
     public int getTransactionType() { return mnTransactionType; }
     public int getDpsYearId() { return mnDpsYearId; }
@@ -171,7 +179,10 @@ public class SLayoutBankXmlRow {
     public String getObservations() { return msObservations; }
     public String getEmail() { return msEmail; }
     public boolean isPayed() { return mbPayed; }
-    public int getPaymentId() { return mnPaymentId; }
+    
+    public boolean getAuxIsForPayments() { return mbAuxIsForPayments; }
+    public ArrayList<Integer> getAuxPaymentIds() { return maAuxPaymentIds; }
+    public ArrayList<SRowPayments> getAuxPayments() { return maAuxPayments; }
     
     public int[] getPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
@@ -230,7 +241,10 @@ public class SLayoutBankXmlRow {
         clone.setObservations(this.getObservations());
         clone.setEmail(this.getEmail());
         clone.setPayed(this.isPayed());
-        clone.setPaymentId(this.getPaymentId());
+        
+        clone.setAuxIsForPayments(this.getAuxIsForPayments());
+        clone.getAuxPaymentIds().addAll(this.getAuxPaymentIds());
+        clone.getAuxPayments().addAll(this.getAuxPayments());
         
         return clone;
     }

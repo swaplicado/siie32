@@ -43,6 +43,7 @@ import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
 import erp.mod.fin.utils.SBankLayoutConsts;
+import erp.mod.fin.utils.SPaymentUitls;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.redis.SLockUtils;
 import java.awt.BorderLayout;
@@ -62,6 +63,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -1500,6 +1503,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             computeBalance();
             moGridPayments.renderGridRows();
             moGridPayments.setSelectedGridRow(index);
+            
+            isForPayments = true;
         }
     }
 
@@ -1852,7 +1857,27 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     docsFound++; 
                                     layoutBankRowInArray.setForPayment(true);
                                     layoutBankRowInArray.setPayed((boolean) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).getValue());
-                                    layoutBankRowInArray.getMoneyPayment().setOriginalAmount((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue());
+                                    double amount = 0d;
+                                    int idPayment = 0;
+                                    try {
+                                        idPayment = Integer.parseInt((String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).getValue());
+                                        if (idPayment > 0) {
+                                            SRowPayments oPaymentRow = SPaymentUitls.readPayment(miClient.getSession().getStatement().getConnection(), idPayment);
+                                            layoutBankRowInArray.setFuncArea(oPaymentRow.getFuncArea());
+                                            layoutBankRowInArray.setFuncSubarea(oPaymentRow.getFuncSubarea());
+                                            layoutBankRowInArray.getPayments().add(oPaymentRow);
+                                        }
+                                    }
+                                    catch (Exception e) {
+                                        Logger.getLogger(SFormBankLayout.class.getName()).log(Level.SEVERE, null, e);
+                                    }
+                                    if (idPayment == 0) {
+                                        amount = (double) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue();
+                                    }
+                                    else {
+                                        amount = (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
+                                    }
+                                    layoutBankRowInArray.getMoneyPayment().setOriginalAmount(amount);
                                     if ((mnBankLayoutCurrencyId == mnDpsCurrencyId) && ((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue() == 0)){
                                         layoutBankRowInArray.setExchangeRate(1);
                                     }
@@ -1869,6 +1894,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     layoutBankRowInArray.setObservations((String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).getValue());
                                     layoutBankRowInArray.setBeneficiaryEmail((String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).getValue());
                                 }
+                                    
                             }
                         }
                     }
@@ -1964,9 +1990,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             SLayoutBankRow layoutBankRowInGrid = (SLayoutBankRow) gridRow;
             
             for (SLayoutBankRow layoutBankRowInArray : maAllLayoutBankRows) {
-                if (layoutBankRowInArray.isForPayment()) {
-                    System.out.println("");
-                }
                 if (layoutBankRowInArray.isForPayment() && SLibUtils.compareKeys(layoutBankRowInArray.getRowPrimaryKey(), layoutBankRowInGrid.getRowPrimaryKey())) {
                     SLayoutBankXmlRow layoutBankXmlRow = new SLayoutBankXmlRow();
 
@@ -2035,10 +2058,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankXmlRow.setObservations(layoutBankRowInGrid.getObservations());
                     layoutBankXmlRow.setEmail(layoutBankRowInGrid.getBeneficiaryEmail());
                     if (layoutBankRowInGrid.getPayments() != null && ! layoutBankRowInGrid.getPayments().isEmpty()) {
-                        layoutBankXmlRow.setPaymentId(layoutBankRowInGrid.getPayments().get(0).getIdPayment());
-                    }
-                    else {
-                        layoutBankXmlRow.setPaymentId(0);
+                        layoutBankXmlRow.setAuxIsForPayments(true);
+                        layoutBankXmlRow.getAuxPayments().addAll(layoutBankRowInGrid.getPayments());
                     }
                     
                     layoutBankXmlRows.add(layoutBankXmlRow);
@@ -2126,8 +2147,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     payment.setSystem(true);
                     payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_IN_TREAS);
                     payment.setFkCurrencyId(moKeyBankLayoutCurrency.getValue()[0]); 
-                    payment.setFkBeneficiaryId(row.getBizPartnerId()); 
-                    payment.setFkFunctionalAreaId(row.getFuncArea()); 
+                    payment.setFkBeneficiaryId(row.getBizPartnerId());
+                    payment.setFkFunctionalAreaId(row.getFuncArea());
                     payment.setFkFunctionalSubareaId(row.getFuncSubarea()); 
                     payment.setFkPayerCashBizPartnerBranchId_n(moKeyBankAccountCash.getValue()[0]); 
                     payment.setFkPayerCashAccountingCashId_n(moKeyBankAccountCash.getValue()[1]);
