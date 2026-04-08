@@ -1,4 +1,9 @@
 ================================================================================
+2026-04-07, 3.2 297.4
+Rodrigo Abel AYALA VÁZQUEZ
+1) Corrección en la consulta del "getOptionItemPicker" al seleccionar la descripción extendida del ítem.
+
+================================================================================
 SIIE 3.2 297.3/ 2026-04-07
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

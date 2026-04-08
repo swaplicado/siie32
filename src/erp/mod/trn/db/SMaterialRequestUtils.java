@@ -589,7 +589,7 @@ public abstract class SMaterialRequestUtils {
                                 + "ii.id_link = " + SModSysConsts.ITMS_LINK_ITEM + " AND ii.id_ref = i.id_item "
                                 + ") AS a "
                                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM_DESC) + " AS d ON " // tabla descripción de ítem
-                                + "a.id_item = d.id_item "
+                                + "a.id_item = d.id_item AND NOT d.b_del "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_CC_GRP_USR) + " AS ccgu ON "
                                 + "a.id_mat_cc_grp = ccgu.id_mat_cc_grp "
                                 + "WHERE NOT a.b_del AND a.id_mat_cc_grp IN " + in + " "
@@ -614,7 +614,7 @@ public abstract class SMaterialRequestUtils {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_IGEN) + " AS b ON "
                                 + "a.fid_igen = b.id_igen "
                                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM_DESC) + " AS d ON " // tabla decripción de ítem
-                                + "a.id_item = d.id_item "
+                                + "a.id_item = d.id_item AND NOT d.b_del "
                                 + "WHERE NOT a.b_del "
                                 + "AND a.fid_st_item = " + SModSysConsts.ITMS_ST_ITEM_ACT + " ";
                         break;
