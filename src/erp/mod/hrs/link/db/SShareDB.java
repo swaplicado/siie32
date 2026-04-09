@@ -1411,7 +1411,10 @@ public class SShareDB {
             }else{
                 
                 consumos = "UPDATE hrs_abs "
-                        + "SET b_clo = 1 WHERE ext_req_id IN " + arregloAuxiliar + ";";
+                        + "SET b_clo = 1, "
+                        + "ts_usr_clo = NOW(), "
+                        + "ts_usr_upd = NOW() "
+                        + "WHERE ext_req_id IN " + arregloAuxiliar + ";";
                 
                 PreparedStatement preparedStmt = conn.prepareStatement(consumos);
                 preparedStmt.executeUpdate();

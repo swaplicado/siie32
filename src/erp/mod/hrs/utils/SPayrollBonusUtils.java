@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Cesar Orozco
  */
 public class SPayrollBonusUtils {
     
@@ -34,11 +34,21 @@ public class SPayrollBonusUtils {
      * @param startDate
      * @param endDate
      * @param oData
+     * @param payType
      * @return 
      */
-    public static boolean hasBonus(Date startDate, Date endDate, SDataRow oData) {
-        if (oData.getDelayMins() > 15) {
-            return false;
+    public static boolean hasBonus(Date startDate, Date endDate, SDataRow oData, int payType) {
+        // para semana
+        if (payType == 1){
+            if (oData.getDelayMins() > 8) {
+                return false;
+            }
+        }
+        // para quincena
+        else{
+            if (oData.getDelayMins() > 15) {
+                return false;
+            }
         }
         if (oData.getAbsences() > 0) {
             return false;

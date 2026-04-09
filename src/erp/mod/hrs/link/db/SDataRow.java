@@ -9,13 +9,14 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Cesar Orozco
  */
 public class SDataRow {
     
     private int idEmployee;
     private int delayMins;
     private int absences;
+    private int prematureOut;
     private boolean hasNoChecks;
     private boolean lostBonus;
     private ArrayList<String> incidents;
@@ -39,9 +40,18 @@ public class SDataRow {
     public int getAbsences() {
         return absences;
     }
-
+  
     public void setAbsences(int absences) {
         this.absences = absences;
+    }
+    
+    public int getPrematureOut() {
+        return prematureOut;
+    }
+    
+    public void setPrematureOut() {
+        this.prematureOut = prematureOut;
+                
     }
 
     public boolean isHasNoChecks() {
