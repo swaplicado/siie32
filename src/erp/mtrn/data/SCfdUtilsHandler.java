@@ -270,20 +270,34 @@ public class SCfdUtilsHandler {
         String valEstado = "";
         String valEstatusCancelacion = "";
         
+        SDataCfdStatusLog log = new SDataCfdStatusLog();
+        log.setUserId(miClient.getSession().getUser().getPkUserId());
+        log.setUuid(uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", DCfdVer4Consts.LEN_UUID) : uuid);
+        log.setResponse(false);
+        
         if (acuse != null) {
+            log.setResponse(true);
+            log.setResponseXml("");
+            
             if (acuse.getEsCancelable() != null) {
                 valEsCancelable = acuse.getEsCancelable().getValue();
+                log.setIsCancellable(acuse.getEsCancelable().getValue());
             }
             if (acuse.getCodigoEstatus() != null) {
                 valCodigoEstatus = acuse.getCodigoEstatus().getValue();
+                log.setStatusCode(acuse.getCodigoEstatus().getValue());
             }
             if (acuse.getEstado() != null) {
                 valEstado = acuse.getEstado().getValue();
+                log.setStatusDescription(acuse.getEstado().getValue());
             }
             if (acuse.getEstatusCancelacion() != null) {
                 valEstatusCancelacion = acuse.getEstatusCancelacion().getValue();
+                log.setCancellableStatus(acuse.getEstatusCancelacion().getValue());
             }
         }
+        
+        log.save(miClient.getSession().getStatement().getConnection());
         
         boolean areCfdiRelatedApplicable = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().equals(rfcEmisor); // ¿el emisor del CFDI es la empresa de la sesión?
         CfdiAckQuery cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion, areCfdiRelatedApplicable);
