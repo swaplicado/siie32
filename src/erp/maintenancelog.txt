@@ -1,4 +1,10 @@
 =================================================================================
+SIIE 3.2 297.6/ 2026-04-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Agrupación y desagrupación de pagos y documentos en layouts de pago
+
+=================================================================================
 2026-04-07, 3.2 297.4
 Rodrigo Abel AYALA VÁZQUEZ
 1) Corrección en la consulta del "getOptionItemPicker" al seleccionar la descripción extendida del ítem.
