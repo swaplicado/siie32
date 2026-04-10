@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores, Cesar Orozco
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -2590,12 +2590,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         miClient.showMsgBoxError("No existe configuración para día de corte");
                         return;
                     }
-
-                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
-                    DateTime dateTime = new DateTime(moDateDateEnd.getValue());
-                    Date endDatePrevious = dateTime.plusDays(-7).toDate();
-                    Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
-                    dates[0] = dates1[0];
+                    if (SModSysConsts.HRSS_BONUS_WEEKS == 1){
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                        DateTime dateTime = new DateTime(moDateDateEnd.getValue());
+//                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                    }
+                    else if(SModSysConsts.HRSS_BONUS_WEEKS == 2){
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                        DateTime dateTime = new DateTime(moDateDateEnd.getValue());
+                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                        Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
+                        dates[0] = dates1[0];
+                    }
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());

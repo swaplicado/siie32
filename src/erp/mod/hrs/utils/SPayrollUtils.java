@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Cesar Orozco
  */
 public class SPayrollUtils {
     
@@ -270,7 +270,7 @@ public class SPayrollUtils {
             comments = "";
             hasBonus = false;
             if (! row.isLostBonus()) {
-                hasBonus = SPayrollBonusUtils.hasBonus(tStartDate, tEndDate, row);
+                hasBonus = SPayrollBonusUtils.hasBonus(tStartDate, tEndDate, row, payType);
                 comments += hasBonus ? "" : "Con retardos o faltas.";
             }
             else {
@@ -282,6 +282,7 @@ public class SPayrollUtils {
             }
             
             comments += (row.isHasNoChecks() ? " Omitió checar." : "");
+            comments += (row.getPrematureOut() > 0 ? " Con salida anticipada." : "");
             oBonusAux.setHasBonus(hasBonus ? 1d : 0d);
             oBonusAux.setComments(comments);
             

@@ -1340,7 +1340,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                 
                 double paymentCur = 0;
                 boolean isPrepaymentMultiplePayments = false;
-                boolean isMultipleDpsPayments = false;
                 for (SXmlElement elementDoc : xmlBankLayoutPayment.getXmlElements()) {
                     if (elementDoc instanceof SXmlBankLayoutPaymentDoc) {
                         // parse individual payments of payment:
@@ -1374,14 +1373,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                             layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY);
                             layoutBankPayment.setPrepaymentObservations(observations);
                             layoutBankPayment.setPrepaymentEmail(email);
-                            layoutBankPayment.setPaymentId(idPayment);
                         }
                         else {
-                            // is a payment:
-                            if (xmlBankLayoutPayment.getXmlElements().size() > 1 && idPayment > 0) {
-                                isMultipleDpsPayments = true;
-                                break;
-                            }
                             dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.TRN_DPS, new int[] { dpsYearId, dpsDocId }, SLibConstants.EXEC_MODE_SILENT);
                             
                             SLayoutBankDps layoutBankDps = new SLayoutBankDps(dps, dpsAmount, dpsAmountCur, email);
@@ -1453,16 +1446,12 @@ public class SDbBankLayout extends SDbRegistryUser {
                         maAuxLayoutBankXmlRows.add(layoutBankXmlRow);
                     }
                 }
-                if (isPrepaymentMultiplePayments || isMultipleDpsPayments) {
+                if (isPrepaymentMultiplePayments) {
                     if (isPrepaymentMultiplePayments) {
                         layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY);
                     }
-                    else {
-                        layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY);
-                    }
                     int dpsYearId = 0;
                     int dpsDocId = 0;
-                    SDataDps oDps = null;
                     double paymentAmount = 0;
                     double paymentAmountCur = 0;
                     String referenceRecord = "";
@@ -1473,22 +1462,16 @@ public class SDbBankLayout extends SDbRegistryUser {
                     int elemDocIndex = 0;
                     for (SXmlElement elementDoc : xmlBankLayoutPayment.getXmlElements()) {
                         if (elementDoc instanceof SXmlBankLayoutPaymentDoc) {
-                            // parse individual payments of payment:
-                            
                             SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = (SXmlBankLayoutPaymentDoc) elementDoc;
                             paymentAmount += (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue();
                             paymentAmountCur += (double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).getValue();
+                            
                             if (elemDocIndex == 0) {
-                                if (isMultipleDpsPayments) {
-                                    dpsYearId = (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue();
-                                    dpsDocId = (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue();
-
-                                    oDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.TRN_DPS, new int[] { dpsYearId, dpsDocId }, SLibConstants.EXEC_MODE_SILENT);
-                                }
                                 referenceRecord = (String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).getValue();
                                 email = (String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EMAIL).getValue();
                                 layoutBankPayment.setPrepaymentEmail(email);
                             }
+                            
                             try {
                                 idPayment = 0;
                                 idPayment = Integer.parseInt((String) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_PAY_ID).getValue());
@@ -1502,11 +1485,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                     paymentAmount = SLibUtils.roundAmount(paymentAmount);
                     paymentAmountCur = SLibUtils.roundAmount(paymentAmountCur);
                     paymentCur = SLibUtils.roundAmount(paymentCur + paymentAmountCur);
-
-                    if (isMultipleDpsPayments) {
-                        SLayoutBankDps layoutBankDps = new SLayoutBankDps(oDps, paymentAmount, paymentAmountCur, email);
-                        layoutBankPayment.getLayoutBankDpss().add(layoutBankDps);
-                    }
                     
                     SLayoutBankXmlRow layoutBankXmlRow = new SLayoutBankXmlRow();
 
@@ -1540,7 +1518,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                     layoutBankXmlRow.setBajioBankNick((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
                     layoutBankXmlRow.setBankKey((int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
                     layoutBankXmlRow.setReferenceRecord(referenceRecord);
-//                    layoutBankXmlRow.setObservations(observations);
                     layoutBankXmlRow.setEmail(email);
                     layoutBankXmlRow.getAuxPaymentIds().addAll(paymentIds);
 
@@ -1568,7 +1545,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 
                 layoutBankPaymentRow.setPaymentCur(paymentCur);
                 layoutBankPaymentRow.setLayoutBankPayment(layoutBankPayment);
-                
+
                 maAuxLayoutBankPaymentRows.add(layoutBankPaymentRow);
                 
                 if (layoutBankPaymentRow.isForPayment()) {
