@@ -1,4 +1,4 @@
-================================================================================
+=================================================================================
 2026-04-07, 3.2 297.4
 Rodrigo Abel AYALA VÁZQUEZ
 1) Corrección en la consulta del "getOptionItemPicker" al seleccionar la descripción extendida del ítem.
