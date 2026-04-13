@@ -18,6 +18,8 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SFinUtils;
+import erp.mod.fin.utils.SPaymentUtils;
+import erp.mod.fin.utils.SPaymentUtils.PurchaseDpsBalance;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogPickerDps;
 import erp.mtrn.form.SPanelDps;
@@ -31,6 +33,8 @@ import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -613,48 +617,13 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     }
     
     private double calculatePaymentCy() throws Exception {
-        double paymentCy = 0;
-        
-        // la moneda del pago es local y se pagará en moneda local
-        if (isLocalCurrency(moKeyCurrency.getValue()[0])) {
-            paymentCy = moCurPaymentApplication.getField().getValue();
-        }
-        // la moneda del pago o la moneda en que se pagará son extranjeras
-        else {
-            // la moneda de pago y a pagar son la misma
-            if (SLibUtils.compareKeys(moKeyCurrency.getValue(), moKeyEntryCurrency.getValue())) {
-                paymentCy = moCurPaymentCy.getField().getValue();
-            }
-            else {
-                // la moneda a pagar es local
-                if (isLocalCurrency(moKeyEntryCurrency.getValue()[0])) {
-                    double excRate = getExchangeRate(moKeyCurrency.getValue()[0]);
-                    
-                    if (excRate == 0d) {
-                        throw new Exception("No se puede guardar el registro debido a que no hay tipo de cambio de " + moKeyCurrency.getSelectedItem().getItem() + " a moneda local en el sistema.");
-                    }
-                    else {
-                        double convRate = SLibUtils.round(1 / excRate, 6);
-                        paymentCy = SLibUtils.roundAmount(moCurPaymentCy.getField().getValue() * convRate);
-                    }
-                }
-                // la moneda a pagar es extranjera
-                else {
-                    double excRatePay = getExchangeRate(moKeyCurrency.getValue()[0]);
-                    double excRateToPay = getExchangeRate(moKeyEntryCurrency.getValue()[0]);
-                    
-                    if (excRatePay == 0d || excRateToPay == 0d) {
-                        throw new Exception("No se puede guardar el registro debido a que no hay tipo de cambio de " + moKeyCurrency.getSelectedItem().getItem() + " o " + moKeyEntryCurrency.getSelectedItem().getItem() + " a moneda local en el sistema.");
-                    }
-                    else {
-                        double convRate = SLibUtils.round(excRateToPay / excRatePay, 6);
-                        paymentCy = SLibUtils.roundAmount(moCurPaymentCy.getField().getValue() * convRate);
-                    }
-                }
-            }
-        }
-        
-        return paymentCy;
+        return SPaymentUtils.calculatePaymentCy(
+                (SClientInterface) miClient,
+                moKeyCurrency.getValue()[0],
+                moKeyEntryCurrency.getValue()[0],
+                moCurPaymentCy.getField().getValue(),
+                moCurPaymentApplication.getField().getValue(),
+                moDateApplication.getValue());
     }
     
     private double calculateExchangeRateApplication() throws Exception {
@@ -675,78 +644,6 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         return excRate;
     }
     
-    private PurchaseDpsBalance getDpsBalance(final boolean subtractThisPayment) throws Exception {
-        PurchaseDpsBalance dpsBalance = null;
-        
-        String sql = "SELECT " +
-                "SUM(re.debit - re.credit) AS f_bal," +
-                "SUM(IF(re.fid_cur <> d.fid_cur, 0.0, re.debit_cur - re.credit_cur)) AS f_bal_cur, " +
-                "COALESCE(ps.sum_pay_cur, 0.0) AS f_pay_pend_cur, " +
-                "SUM(IF(re.fid_cur <> d.fid_cur, 0.0, re.debit_cur - re.credit_cur)) + COALESCE(ps.sum_pay_cur, 0.0) AS f_bal_net_cur " +
-                "FROM fin_rec AS r " +
-                "INNER JOIN fin_rec_ety AS re ON " +
-                "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
-                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + moDps.getPkYearId() + " " +
-                "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
-                "LEFT JOIN (" +
-                "  SELECT " +
-                "    pe.fk_doc_year_n AS id_year, " +
-                "    pe.fk_doc_doc_n AS id_doc, " +
-                "    SUM(pe.des_pay_app_ety_cur) AS sum_pay_cur " +
-                "  FROM fin_pay AS p " +
-                "  INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
-                "  WHERE NOT p.b_del " +
-                "    AND p.fk_st_pay IN (" +
-                "   " + SModSysConsts.FINS_ST_PAY_NEW + ", " +
-                "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
-                "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
-                /*
-                "   " + SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
-                */
-                "   " + SModSysConsts.FINS_ST_PAY_BLOC + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_BLOC_P + ") " +
-                "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
-                ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc " + 
-                "WHERE d.fid_bp_r = " + moDps.getFkBizPartnerId_r() + " AND ";
-        
-        if (moRadNormalDoc.getValue()) {
-            sql += "(re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND "
-                        + "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + ")";
-        }
-        else {
-            sql += "(re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_NA + " AND "
-                        + "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_NA[1] + " AND "
-                        + "(SELECT  "
-                        + "  1 "
-                        + "FROM "
-                        + "  trn_dps_ety AS tde "
-                        + "WHERE "
-                        + "  tde.id_year = d.id_year "
-                        + "    AND tde.id_doc = d.id_doc "
-                        + "    AND tde.b_del = 0 "
-                        + "    AND tde.ops_type = 13 "
-                        + "LIMIT 1))";
-        }
-        sql += "AND d.id_year = " + moDps.getPkYearId() + " AND d.id_doc = " + moDps.getPkDocId();
-
-        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                double paymentCy = subtractThisPayment ? calculatePaymentCy() : 0;
-                
-                double balance = resultSet.getDouble("f_bal");
-                double balanceCy = resultSet.getDouble("f_bal_cur");
-                double paymentsPendCy = SLibUtils.roundAmount(resultSet.getDouble("f_pay_pend_cur") - paymentCy);
-                double balanceNetCy = SLibUtils.roundAmount(resultSet.getDouble("f_bal_net_cur") + paymentCy);
-                
-                dpsBalance = new PurchaseDpsBalance(balance, balanceCy, paymentsPendCy, balanceNetCy);
-            }
-        }
-        
-        return dpsBalance;
-    }
-    
     private void clearDps(boolean cleanBp) {
         moDps = null;
         moDpsBalance = null;
@@ -763,7 +660,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moKeyEntryCurrency.setValue(new int[] { moDps.getFkCurrencyId() });
         moKeyFunctionalArea.setValue(new int[] { moDps.getFkFunctionalAreaId(), moDps.getFkFunctionalSubAreaId() });
         moTextDps.setValue(moDps.getDpsNumber());
-
+        boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+        moDps.setAuxIsDocAdvanced(isDocAdvance);
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
         String sql = "SELECT b_dps_pay_loc FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " "
@@ -776,7 +674,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             }
         }
         
-        if (moDpsBalance != null && moDpsBalance.BalanceNetCy <= 0) {
+        if (moDpsBalance != null && moDpsBalance.getBalanceNetCy() <= 0) {
             miClient.showMsgBoxWarning(composeDpsBalanceNetWarning());
         }
     }
@@ -788,8 +686,9 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             warning = SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDps) + "'.";
         }
         else {
-            warning = "El saldo neto del documento es $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.BalanceNetCy) + ".\n"
-                    + "Aunque el documento tiene saldo de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.BalanceCy) + ", también tiene pagos pendientes por $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.PaymentsPendCy) + ".";
+            warning = "El saldo neto del documento es $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceNetCy()) + ".\n"
+                    + "Aunque el documento tiene saldo de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceCy()) 
+                    + ", también tiene pagos pendientes por $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getPaymentsPendCy()) + ".";
         }
         
         return warning;
@@ -814,7 +713,12 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             if (moDialogDpsPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                 try {
                     moDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, moDialogDpsPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-                    moDpsBalance = getDpsBalance(false);
+                    boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+                    moDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
+                                                moDps.getPkYearId(),
+                                                moDps.getPkDocId(),
+                                                isDocAdvance,
+                                                0);
                     
                     showDps();
                 }
@@ -844,7 +748,12 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
 
                 if (dpsKey != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
-                    moDpsBalance = getDpsBalance(false);
+                    boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+                    moDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
+                                                    moDps.getPkYearId(),
+                                                    moDps.getPkDocId(),
+                                                    isDocAdvance,
+                                                    0);
                     
                     showDps();
                 }
@@ -863,11 +772,11 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     
     private void actionSetDpsBalanceNetCur() {
         if (jbSetDpsBalanceNetCur.isEnabled()) {
-            if (moDpsBalance.BalanceNetCy <= 0) {
+            if (moDpsBalance.getBalanceNetCy() <= 0) {
                 miClient.showMsgBoxWarning(composeDpsBalanceNetWarning());
             }
             else {
-                moCurPaymentCy.getField().setValue(moDpsBalance.BalanceNetCy);
+                moCurPaymentCy.getField().setValue(moDpsBalance.getBalanceNetCy());
                 calculateAmountLocal();
             }
         }
@@ -1034,12 +943,15 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             
             singleEntry = moRegistry.getSingleEntry();
             
+            stateChangeTypePayment();
+            
             jchkIsSystem.setSelected(moRegistry.isSystem());
             bgEntryType.setSelected(singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT) ? moRadTypePayment.getModel() : moRadTypeAdvance.getModel(), true);
             
             if (singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT)) {
                 if (moRegistry.getPaymentOperationType().equals(SDbPayment.OPERATION_TYPE_DOC_ADVANCE)) {
                     bgDocumentType.setSelected(moRadAdvanceDoc.getModel(), true);
+                    moRadAdvanceDoc.setSelected(true);
                 }
                 else {
                     bgDocumentType.setSelected(moRadNormalDoc.getModel(), true);
@@ -1048,8 +960,6 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             else {
                 bgDocumentType.setSelected(moRadNormalDoc.getModel(), true);
             }
-            
-            stateChangeTypePayment();
 
             moCurPaymentCy.setCurrencyKey(new int[] { singleEntry.getFkEntryCurrencyId() });
             
@@ -1080,15 +990,31 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         moTextNotes.setValue(moRegistry.getNotes());
         moTextNotesAuthorization.setValue(moRegistry.getNotesAuthorization());
         
+        boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
         if (moRegistry.isRegistryNew()) {
             moDps = null;
             moDpsBalance = null;
         }
         else {
+            if (singleEntry == null) {
+                throw new Exception("El registro debe tener una sola partida.");
+            }
             moDps = singleEntry.getDpsRelated();
-            moDpsBalance = moDps == null ? null : getDpsBalance(true); // note that all fields must be already set with proper values!
+            moDpsBalance = moDps == null ? null : SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
+                                                                (SClientInterface) miClient,
+                                                                moKeyCurrency.getValue()[0],
+                                                                moKeyEntryCurrency.getValue()[0],
+                                                                moCurPaymentCy.getField().getValue(),
+                                                                moCurPaymentApplication.getField().getValue(),
+                                                                moDateApplication.getValue(),
+                                                                moDps.getPkYearId(),
+                                                                moDps.getPkDocId(),
+                                                                isDocAdvance,
+                                                                0); // note that all fields must be already set with proper values!
         }
-        
+        if (moDps != null) {
+            moDps.setAuxIsDocAdvanced(isDocAdvance);
+        }
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
         
         if ((moRegistry.isRegistryNew() 
@@ -1202,8 +1128,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         singleEntry.setDestinyPaymentEntryCy(singleEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
         
         singleEntry.setDocInstallment(moDps == null ? 0 : 1);
-        singleEntry.setDocBalancePreviousApplicationCy(moDps == null ? 0 : moDpsBalance.BalanceNetCy);
-        singleEntry.setDocBalanceUnpaidApplicationCy_r(moDps == null ? 0 : SLibUtils.roundAmount(moDpsBalance.BalanceNetCy - moCurPaymentCy.getField().getValue()));
+        singleEntry.setDocBalancePreviousApplicationCy(moDps == null ? 0 : moDpsBalance.getBalanceNetCy());
+        singleEntry.setDocBalanceUnpaidApplicationCy_r(moDps == null ? 0 : SLibUtils.roundAmount(moDpsBalance.getBalanceNetCy() - moCurPaymentCy.getField().getValue()));
         singleEntry.setDocBalancePreviousCy(singleEntry.getDocBalancePreviousApplicationCy()); // same value "at application"!
         singleEntry.setDocBalanceUnpaidCy_r(singleEntry.getDocBalanceUnpaidApplicationCy_r()); // same value "at application"!
         singleEntry.setFkDocYearId_n(moDps == null ? 0 : moDps.getPkYearId());
@@ -1223,13 +1149,30 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+        try {
+            moDpsBalance = moDps == null ? null : SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
+                    (SClientInterface) miClient,
+                    moKeyCurrency.getValue()[0],
+                    moKeyEntryCurrency.getValue()[0],
+                    moCurPaymentCy.getField().getValue(),
+                    moCurPaymentApplication.getField().getValue(),
+                    moDateApplication.getValue(),
+                    moDps.getPkYearId(),
+                    moDps.getPkDocId(),
+                    isDocAdvance,
+                    0); // note that all fields must be already set with proper values!
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SFormPayment.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         if (validation.isValid()) {
             if (moRadTypePayment.isSelected() && moDps == null) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moTextDps.getFieldName() + "'.");
                 validation.setComponent(moTextDps);
             }
-            else if (moDps != null && moDpsBalance != null && moCurPaymentCy.getField().getValue() > moDpsBalance.BalanceNetCy) {
+            else if (moDps != null && moDpsBalance != null && moCurPaymentCy.getField().getValue() > moDpsBalance.getBalanceNetCy()) {
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moCurPaymentCy.getField().getFieldName() + "':\n" + composeDpsBalanceNetWarning());
                 validation.setComponent(moCurPaymentCy.getField().getComponent());
             }
@@ -1306,33 +1249,6 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             
             if (textField == ((SBeanFieldDecimal) moCurPaymentCy.getField())) {
                 focusLostCurAmount();
-            }
-        }
-    }
-    
-    private class PurchaseDpsBalance {
-        
-        double Balance;
-        double BalanceCy;
-        double PaymentsPendCy;
-        double BalanceNetCy;
-        
-        public PurchaseDpsBalance(final double balance, final double balanceCy, final double paymentsPendCy, final double balanceNetCy) {
-            Balance = balance;
-            BalanceCy = balanceCy;
-            PaymentsPendCy = paymentsPendCy;
-            BalanceNetCy = balanceNetCy;
-            
-            if (Balance != 0) {
-                Balance *= -1; // purchases have negative balance by defect
-            }
-
-            if (BalanceCy != 0) {
-                BalanceCy *= -1; // purchases have negative balance by defect
-            }
-
-            if (BalanceNetCy != 0) {
-                BalanceNetCy *= -1; // purchases have negative balance by defect
             }
         }
     }

@@ -19,6 +19,8 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
+import erp.mod.fin.utils.SPaymentUtils;
+import erp.mod.fin.utils.SPaymentUtils.PurchaseDpsBalance;
 import javax.swing.border.TitledBorder;
 
 /**
@@ -30,6 +32,7 @@ public class SPanelDps extends javax.swing.JPanel {
     private erp.client.SClientInterface miClient;
     private java.lang.String msTitledBorderComplement;
     private erp.mtrn.data.SDataDps moDps;
+    private boolean mbIsDpsAdvance;
     private int mnReferenceYear;
     private java.util.Date mtReferenceDate;
     private double[] madDpsBalance;
@@ -615,7 +618,18 @@ public class SPanelDps extends javax.swing.JPanel {
             }
             else {
                 try {
-                    madDpsBalance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moDps.getPrimaryKey(), mnReferenceYear);
+                    if (! moDps.getAuxIsDocAdvanced()) {
+                        madDpsBalance = SDataUtilities.obtainDpsBalance(miClient, (int[]) moDps.getPrimaryKey(), mnReferenceYear);
+                    }
+                    else {
+                        PurchaseDpsBalance oBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
+                                                        moDps.getPkYearId(),
+                                                        moDps.getPkDocId(),
+                                                        mbIsDpsAdvance,
+                                                        0);
+
+                        madDpsBalance = new double[] { oBalance.getBalanceNet(), oBalance.getBalanceNetCy() };
+                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -712,6 +726,7 @@ public class SPanelDps extends javax.swing.JPanel {
 
     public void setDps(erp.mtrn.data.SDataDps dps, java.util.Date referenceDate) {
         moDps = dps;
+        mbIsDpsAdvance = moDps == null ? false : moDps.getAuxIsDocAdvanced();
         mtReferenceDate = referenceDate != null ? referenceDate : SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate());
         mnReferenceYear = SLibTimeUtilities.digestYear(mtReferenceDate)[0];
         renderDps();

@@ -32,7 +32,7 @@ import erp.mod.fin.utils.SBankLayoutCourier;
 import erp.mod.fin.utils.SBankLayoutParams;
 import erp.mod.fin.utils.SDialogBankLayoutSendingConfirmation;
 import erp.mod.fin.utils.SDocumentRequestRow;
-import erp.mod.fin.utils.SPaymentUitls;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
@@ -105,6 +105,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected String msLayoutXml;
     protected int mnTransactionType;
     protected int mnAuthorizationRequests;
+    protected String msLayoutOperationType;
     protected boolean mbClosedPayment;
     //protected boolean mbDeleted;
     protected int mnFkBankLayoutTypeId;
@@ -412,7 +413,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             for (SLayoutBankXmlRow layoutBankXmlRow : maAuxLayoutBankXmlRows) {
                 if (! layoutBankXmlRow.getAuxPaymentIds().isEmpty() && layoutBankXmlRow.getAuxPayments().isEmpty()) {
                     for (Integer idPayment : layoutBankXmlRow.getAuxPaymentIds()) {
-                        layoutBankXmlRow.getAuxPayments().add(SPaymentUitls.readPayment(session.getStatement().getConnection(), idPayment));
+                        layoutBankXmlRow.getAuxPayments().add(SPaymentUtils.readPayment(session.getStatement().getConnection(), idPayment));
                     }
                 }
                 if (layoutBankXmlRow.getAuxPayments().isEmpty()) {
@@ -597,6 +598,104 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
     }
     
+    /**
+     * Contenedor de resultados del cálculo de proporciones por impuesto.
+     * Agrupa los totales de balance, el mapa de proporciones y el impuesto con mayor saldo.
+     */
+    private static class TaxBalanceResult {
+        final double totalBalance;       // Suma de saldos en moneda local
+        final double totalBalanceCur;    // Suma de saldos en moneda original
+        final HashMap<String, double[]> taxBalances; // Clave: "taxBasicId_taxId" -> [percLocal, percCur]
+        final int[] taxMax;              // Impuesto con mayor saldo en moneda original
+        final double amtToPay;           // Monto a pagar prorrateado (local)
+        final double amtToPayCur;        // Monto a pagar prorrateado (moneda original)
+
+        TaxBalanceResult(double totalBalance, double totalBalanceCur,
+                HashMap<String, double[]> taxBalances, int[] taxMax,
+                double amtToPay, double amtToPayCur) {
+            this.totalBalance = totalBalance;
+            this.totalBalanceCur = totalBalanceCur;
+            this.taxBalances = taxBalances;
+            this.taxMax = taxMax;
+            this.amtToPay = amtToPay;
+            this.amtToPayCur = amtToPayCur;
+        }
+    }
+
+    /**
+     * Calcula el tipo de cambio efectivo para un DPS dado el pago que lo contiene.
+     * Reglas:
+     *   - Misma moneda pago/DPS          -> tipo de cambio contable del layout
+     *   - Pago en moneda extranjera vs MXN -> 1.0
+     *   - Ambas monedas extranjeras       -> tipo de cambio del pago * tipo contable
+     *   - Resto                           -> tipo de cambio del pago
+     */
+    private double resolveExchangeRate(final SGuiSession session,
+            final SLayoutBankPayment layoutBankPayment,
+            final SLayoutBankDps layoutBankDps) throws Exception {
+        int payCurId = layoutBankPayment.getMoneyAmount().getOriginalCurrencyId();
+        int dpsCurId = layoutBankDps.moDps.getFkCurrencyId();
+        boolean payIsLocal = session.getSessionCustom().isLocalCurrency(new int[]{payCurId});
+        boolean dpsIsLocal = session.getSessionCustom().isLocalCurrency(new int[]{dpsCurId});
+
+        if (payCurId == dpsCurId) {
+            return mdExchangeRateAcc;
+        }
+        if (!payIsLocal && dpsCurId == SModSysConsts.CFGU_CUR_MXN) {
+            return 1.0;
+        }
+        if (!payIsLocal && !dpsIsLocal) {
+            return layoutBankPayment.getExchangeRateForPayment() * mdExchangeRateAcc;
+        }
+        return layoutBankPayment.getExchangeRateForPayment();
+    }
+
+    /**
+     * Calcula las proporciones de pago por impuesto a partir de los saldos del DPS.
+     * Retorna un TaxBalanceResult con totales, mapa de proporciones, impuesto mayor
+     * y montos prorrateados.
+     *
+     * @param balances   Lista de saldos por impuesto del DPS.
+     * @param payment    Monto a pagar en moneda local.
+     * @param paymentCy  Monto a pagar en moneda original.
+     */
+    private TaxBalanceResult buildTaxBalanceResult(ArrayList<SFinBalanceTax> balances,
+            double payment, double paymentCy) {
+        // Calcular totales de saldo
+        double totalBalance = 0d;
+        double totalBalanceCur = 0d;
+        for (SFinBalanceTax b : balances) {
+            totalBalance = SLibUtils.roundAmount(totalBalance + b.getBalance());
+            totalBalanceCur = SLibUtils.roundAmount(totalBalanceCur + b.getBalanceCurrency());
+        }
+
+        // Calcular proporciones y acumular montos prorrateados
+        HashMap<String, double[]> taxBalances = new HashMap<>();
+        int[] taxMax = {0, 0};
+        double amtMaj = 0d;
+        double amtToPay = 0d;
+        double amtToPayCur = 0d;
+
+        for (SFinBalanceTax b : balances) {
+            String key = b.getTaxBasicId() + "_" + b.getTaxId();
+            double perc = b.getBalance() / totalBalance;
+            double percCur = b.getBalanceCurrency() / totalBalanceCur;
+
+            taxBalances.put(key, new double[]{perc, percCur});
+            amtToPay += SLibUtils.roundAmount(payment * perc);
+            amtToPayCur += SLibUtils.roundAmount(paymentCy * percCur);
+
+            // Registrar el impuesto con mayor saldo para absorber diferencias de redondeo
+            if (b.getBalanceCurrency() > amtMaj) {
+                amtMaj = b.getBalanceCurrency();
+                taxMax = new int[]{b.getTaxBasicId(), b.getTaxId()};
+            }
+        }
+
+        return new TaxBalanceResult(totalBalance, totalBalanceCur,
+                taxBalances, taxMax, amtToPay, amtToPayCur);
+    }
+
     private String composeRecordEntryConcept(final SGuiSession session, final String bizPartnerName, final int[] bpbBankAccountKey, final String reference) throws Exception {
         String bank = "";
         
@@ -768,7 +867,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     if (layoutBankPayment.getTransactionType() == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                         int sortingPositionBankAccount = ++sortingPosition;
                         
-                        // Movimientos de bancos    
+                        // Movimientos de bancos
                         if (!layoutPayment.mbAdded) {
                             String referenceBankAccount = "";
                             double amountPayed = 0;
@@ -789,154 +888,201 @@ public class SDbBankLayout extends SDbRegistryUser {
                             layoutPayment.mbAdded = true;
                         }
                         
-                        for (SLayoutBankDps layoutBankDps : layoutBankPayment.getLayoutBankDpss()) {
-                            /* TIPOS DE CAMBIO:
-                            ** Monedas iguales -> Tipo de cambio asignado en la forma
-                            ** Moneda extranjera vs. MXN -> 1.0
-                            ** Monedas diferentes extranjeras -> Tipo de cambio asignado en la forma * tipo de cambio del layout
-                            ** Resto de casos: Tipo de cambio del layout
-                            */
-                            double exchangeRate = layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() == layoutBankDps.moDps.getFkCurrencyId() ? mdExchangeRateAcc : 
-                                    !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() } ) && layoutBankDps.moDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN ? 1.0 :
-                                    !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() } ) && !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankDps.moDps.getFkCurrencyId() } ) ? layoutBankPayment.getExchangeRateForPayment() * mdExchangeRateAcc : layoutBankPayment.getExchangeRateForPayment();
-                            
-                            double paymentCy = layoutBankDps.getPaymentCy();
-                            double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
-                            
-                            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
-                                    SLibTimeUtils.digestYear(mtDateLayout)[0], 
-                                    layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId(), 
-                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
-                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1], 
-                                    null);
-        
-                            double dTotalBalance = 0d;
-                            double dTotalBalanceCur = 0d;
-                            
-                            for (SFinBalanceTax balance : balances) {
-                                dTotalBalance = SLibUtils.roundAmount(dTotalBalance + balance.getBalance());
-                                dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
+                        if (msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL)) {
+                            for (SLayoutBankDps layoutBankDps : layoutBankPayment.getLayoutBankDpss()) {
+                                /* TIPOS DE CAMBIO:
+                                ** Monedas iguales -> Tipo de cambio asignado en la forma
+                                ** Moneda extranjera vs. MXN -> 1.0
+                                ** Monedas diferentes extranjeras -> Tipo de cambio asignado en la forma * tipo de cambio del layout
+                                ** Resto de casos: Tipo de cambio del layout
+                                */
+                                double exchangeRate = layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() == layoutBankDps.moDps.getFkCurrencyId() ? mdExchangeRateAcc : 
+                                        !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() } ) && layoutBankDps.moDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN ? 1.0 :
+                                        !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankPayment.getMoneyAmount().getOriginalCurrencyId() } ) && !session.getSessionCustom().isLocalCurrency(new int[] { layoutBankDps.moDps.getFkCurrencyId() } ) ? layoutBankPayment.getExchangeRateForPayment() * mdExchangeRateAcc : layoutBankPayment.getExchangeRateForPayment();
+
+                                double paymentCy = layoutBankDps.getPaymentCy();
+                                double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
+
+                                ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
+                                        SLibTimeUtils.digestYear(mtDateLayout)[0], 
+                                        layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId(), 
+                                        msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL) ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_NA[0], 
+                                        msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL) ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_NA[1], 
+                                        null);
+
+                                double dTotalBalance = 0d;
+                                double dTotalBalanceCur = 0d;
+
+                                for (SFinBalanceTax balance : balances) {
+                                    dTotalBalance = SLibUtils.roundAmount(dTotalBalance + balance.getBalance());
+                                    dTotalBalanceCur = SLibUtils.roundAmount(dTotalBalanceCur + balance.getBalanceCurrency());
+                                }
+
+                                HashMap<String, double[]> taxBalances = new HashMap();
+                                String tax;
+                                double perc;
+                                double percCur;
+                                double amtToPay = 0;
+                                double amtToPayCur = 0;
+                                int[] taxMax = new int[] { 0, 0 };
+                                double amtMaj = 0d;
+                                for (SFinBalanceTax balance : balances) {
+                                    tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
+                                    perc = balance.getBalance() / dTotalBalance;
+                                    percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
+
+                                    taxBalances.put(tax, new double[] { perc, percCur });
+
+                                    amtToPay += SLibUtils.roundAmount(payment * perc);
+                                    amtToPayCur += SLibUtils.roundAmount(paymentCy * percCur);
+
+                                    if (balance.getBalanceCurrency() > amtMaj) {
+                                        amtMaj = balance.getBalanceCurrency();
+                                        taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
+                                    }
+                                }
+
+                                double diffCur = 0;
+                                if (paymentCy != amtToPayCur) {
+                                    diffCur = SLibUtils.roundAmount(paymentCy - amtToPayCur);
+                                }
+                                double diff = 0;
+                                if (payment != amtToPay) {
+                                    diff = SLibUtils.roundAmount(payment - amtToPay);
+                                }
+
+                                for (SFinBalanceTax balance : balances) {
+                                    SDataDsmEntry dsmEntry = new SDataDsmEntry();
+
+                                    tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
+
+                                    dsmEntry.setSourceValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
+                                    dsmEntry.setSourceValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
+
+                                    dsmEntry.setDestinyValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
+                                    dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
+
+                                    if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+                                        dsmEntry.setSourceValue(SLibUtils.roundAmount(dsmEntry.getSourceValue() + diff));
+                                        dsmEntry.setSourceValueCy(SLibUtils.roundAmount(dsmEntry.getSourceValueCy() + diffCur));
+
+                                        dsmEntry.setDestinyValue(SLibUtils.roundAmount(dsmEntry.getDestinyValue() + diff));
+                                        dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(dsmEntry.getDestinyValueCy() + diffCur));
+                                    }
+
+                                    dsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
+                                    dsmEntry.setFkTaxId_n(balance.getTaxId());
+
+                                    dsmEntry.setPkYearId(session.getCurrentYear());
+                                    dsmEntry.setFkUserNewId(session.getUser().getPkUserId());
+
+                                    dsmEntry.setSourceReference("");
+                                    dsmEntry.setFkSourceCurrencyId(layoutBankDps.getDps().getFkCurrencyId());
+                                    dsmEntry.setSourceExchangeRateSystem(mdExchangeRate);
+                                    dsmEntry.setSourceExchangeRate(exchangeRate);
+
+                                    dsmEntry.setFkDestinyDpsYearId_n(layoutBankDps.getDps().getPkYearId());
+                                    dsmEntry.setFkDestinyDpsDocId_n(layoutBankDps.getDps().getPkDocId());
+                                    dsmEntry.setFkDestinyCurrencyId(layoutBankDps.getDps().getFkCurrencyId());
+                                    dsmEntry.setDestinyExchangeRateSystem(mdExchangeRate);
+                                    dsmEntry.setDestinyExchangeRate(exchangeRate);
+                                    dsmEntry.setDbmsFkDpsCategoryId(layoutBankDps.getDps().getFkDpsCategoryId());
+                                    dsmEntry.setDbmsDestinyDps(layoutBankDps.getDps().getDpsNumber());
+                                    //dsmEntry.setDbmsSubclassMove((String) session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME)); // 2019-10-09, Sergio Flores: please remove if not really needed!
+                                    dsmEntry.setDbmsBizPartner(bizPartnerName);
+                                    //dsmEntry.setDbmsDestinyTpDps((String) session.readField(SModConsts.TRNU_TP_DPS, new int[] { layoutBankDps.getDps().getFkDpsCategoryId(), layoutBankDps.getDps().getFkDpsClassId(), layoutBankDps.getDps().getFkDpsTypeId() }, SDbRegistry.FIELD_CODE)); // 2019-10-09, Sergio Flores: please remove if not really needed!
+
+                                    dsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
+                                    dsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
+                                    dsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
+                                    dsmEntry.setDbmsCtSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]);
+                                    dsmEntry.setDbmsTpSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]);
+                                    //dsm.setDbmsSubsystemTypeBiz((String) session.readField(SModConsts.BPSS_CT_BP, new int[] { SDataConstantsSys.BPSS_CT_BP_SUP }, SDbRegistry.FIELD_CODE)); // 2019-10-09, Sergio Flores: please remove if not really needed!
+                                    dsmEntry.setFkBizPartnerId(layoutBankDps.getDps().getFkBizPartnerId_r());
+                                    dsmEntry.setDbmsFkBizPartnerBranchId_n(layoutBankDps.getDps().getFkBizPartnerBranchId());
+
+                                    Vector<SFinAccountConfigEntry> configEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), layoutBankDps.getDps().getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_SUP,
+                                            record.getPkBookkeepingCenterId(), record.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, layoutBankDps.getDps().getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, dsmEntry.getTaxPk());
+                                    if (configEntries.size() > 0) {
+                                        dsmEntry.setDbmsAccountOp(configEntries.get(0).getAccountId());
+                                    }
+
+                                    dsm.getDbmsEntries().add(dsmEntry);
+                                }
+
+                                dsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_SUP);
+
+                                dsm.setDate(session.getCurrentDate());
+                                dsm.setDbmsErpTaxModel(((SDataParamsErp) session.getConfigSystem()).getTaxModel()); // PRESERVE!!!
+                                dsm.setFkSubsystemCategoryId(SDataConstantsSys.BPSS_CT_BP_SUP);
+                                dsm.setFkCompanyBranchId(record.getFkCompanyBranchId_n());
+                                dsm.setFkUserNewId(session.getUser().getPkUserId());
+                                dsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
+                                //dsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { record.getFkCompanyBranchId_n() }).getCode()); // 2019-10-09, Sergio Flores: please remove if not really needed!
+                                dsm.setDbmsErpDecimalsValue(((SDataParamsErp) session.getConfigSystem()).getDecimalsValue()); // PRESERVE!!!
+                                dsm.setDbmsIsRecordSaved(false);
+
+                                dsm = (SDataDsm) ((SClientInterface) session.getClient()).getGuiModule(SDataConstants.MOD_FIN).processRegistry(dsm);
+                                SDataRecord recordDsm = dsm.getDbmsRecord();
+
+                                String reference = layoutBankDps.getDps().getDpsNumber();
+                                String concept = composeRecordEntryConcept(session, bizPartnerName, layoutBankPayment.getBizPartnerBranchBankAccountKey(), reference);
+
+                                for (SDataRecordEntry recordEntry : recordDsm.getDbmsRecordEntries()) {
+                                    recordEntry.setConcept(concept);
+                                    recordEntry.setSortingPosition(++sortingPosition);
+                                    recordEntry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
+                                    recordEntry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
+                                    recordEntries.add(recordEntry);
+                                }
+
+                                dsm.getDbmsEntries().clear();
                             }
+                        }
+                        else {
+                            /**
+                             * PAGO DE FACTURAS DE ANTICIPO
+                             *
+                             * Por cada DPS del pago se generan partidas
+                             * contables a la cuenta de anticipos de proveedores
+                             * por facturar (via
+                             * SLayoutBankAccountingAdvance.getDbmsAdvanceRecordEntries).
+                             * 
+                             */
+                            for (SLayoutBankDps layoutBankDps : layoutBankPayment.getLayoutBankDpss()) {
+                                // 1. Tipo de cambio efectivo según combinación de monedas
+                                double exchangeRate = resolveExchangeRate(session, layoutBankPayment, layoutBankDps);
 
-                            HashMap<String, double[]> taxBalances = new HashMap();
-                            String tax;
-                            double perc;
-                            double percCur;
-                            double amtToPay = 0;
-                            double amtToPayCur = 0;
-                            int[] taxMax = new int[] { 0, 0 };
-                            double amtMaj = 0d;
-                            for (SFinBalanceTax balance : balances) {
-                                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
-                                perc = balance.getBalance() / dTotalBalance;
-                                percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
+                                SLayoutBankAccountingAdvance accountingAdvance = new SLayoutBankAccountingAdvance(
+                                        session,
+                                        layoutBankPayment.getBizPartnerId(),
+                                        layoutBankPayment.getBizPartnerBranchId(),
+                                        layoutBankPayment.getBizPartnerBranchBankAccountId(),
+                                        mnFkBankCompanyBranchId,
+                                        mnFkBankAccountCashId);
+                                accountingAdvance.setBankLayoutTypeId(mnFkBankLayoutTypeId);
+                                accountingAdvance.setBizPartnerId(layoutBankPayment.getBizPartnerId());
+                                accountingAdvance.setBizPartnerBranchId(layoutBankPayment.getBizPartnerBranchId());
+                                accountingAdvance.setBizPartnerBranchAccountCreditId(layoutBankPayment.getBizPartnerBranchBankAccountId());
+                                accountingAdvance.setCompanyBranchId(mnFkBankCompanyBranchId);
+                                accountingAdvance.setCompanyBranchAccountDebitId(mnFkBankAccountCashId);
+                                accountingAdvance.setAmount(layoutBankPayment.getMoneyAmount().getOriginalAmount());
+                                accountingAdvance.setCurrencyId(layoutBankDps.getDps().getFkCurrencyId());
+                                accountingAdvance.setExcRate(exchangeRate);
+                                accountingAdvance.setExcRateSystem(layoutBankDps.getDps().getExchangeRateSystem());
+                                accountingAdvance.setBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
+                                accountingAdvance.setBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
+                                accountingAdvance.setBookkeepingCenterId(record.getPkBookkeepingCenterId());
+                                accountingAdvance.setDate(mtDateLayout);
+                                accountingAdvance.setBizPartner(bizPartnerName);
+                                accountingAdvance.setReferenceRecord(layoutBankPayment.getReferenceRecord());
 
-                                taxBalances.put(tax, new double[] { perc, percCur });
-
-                                amtToPay += SLibUtils.roundAmount(payment * perc);
-                                amtToPayCur += SLibUtils.roundAmount(paymentCy * percCur);
-
-                                if (balance.getBalanceCurrency() > amtMaj) {
-                                    amtMaj = balance.getBalanceCurrency();
-                                    taxMax = new int[] { balance.getTaxBasicId(), balance.getTaxId() };
+                                // Agregar partidas contables generadas por el anticipo
+                                for (SDataRecordEntry recordEntry : accountingAdvance.getDbmsAdvanceRecordEntries(layoutBankDps.getDps())) {
+                                    recordEntry.setSortingPosition(++sortingPosition);
+                                    recordEntries.add(recordEntry);
                                 }
                             }
-
-                            double diffCur = 0;
-                            if (paymentCy != amtToPayCur) {
-                                diffCur = SLibUtils.roundAmount(paymentCy - amtToPayCur);
-                            }
-                            double diff = 0;
-                            if (payment != amtToPay) {
-                                diff = SLibUtils.roundAmount(payment - amtToPay);
-                            }
-                            
-                            for (SFinBalanceTax balance : balances) {
-                                SDataDsmEntry dsmEntry = new SDataDsmEntry();
-                                
-                                tax = balance.getTaxBasicId() + "_" + balance.getTaxId();
-
-                                dsmEntry.setSourceValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
-                                dsmEntry.setSourceValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
-                                
-                                dsmEntry.setDestinyValue(SLibUtils.roundAmount(payment * taxBalances.get(tax)[0]));
-                                dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(paymentCy * taxBalances.get(tax)[1]));
-                                
-                                if (balance.getTaxBasicId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
-                                    dsmEntry.setSourceValue(SLibUtils.roundAmount(dsmEntry.getSourceValue() + diff));
-                                    dsmEntry.setSourceValueCy(SLibUtils.roundAmount(dsmEntry.getSourceValueCy() + diffCur));
-
-                                    dsmEntry.setDestinyValue(SLibUtils.roundAmount(dsmEntry.getDestinyValue() + diff));
-                                    dsmEntry.setDestinyValueCy(SLibUtils.roundAmount(dsmEntry.getDestinyValueCy() + diffCur));
-                                }
-                                
-                                dsmEntry.setFkTaxBasId_n(balance.getTaxBasicId());
-                                dsmEntry.setFkTaxId_n(balance.getTaxId());
-                                
-                                dsmEntry.setPkYearId(session.getCurrentYear());
-                                dsmEntry.setFkUserNewId(session.getUser().getPkUserId());
-
-                                dsmEntry.setSourceReference("");
-                                dsmEntry.setFkSourceCurrencyId(layoutBankDps.getDps().getFkCurrencyId());
-                                dsmEntry.setSourceExchangeRateSystem(mdExchangeRate);
-                                dsmEntry.setSourceExchangeRate(exchangeRate);
-
-                                dsmEntry.setFkDestinyDpsYearId_n(layoutBankDps.getDps().getPkYearId());
-                                dsmEntry.setFkDestinyDpsDocId_n(layoutBankDps.getDps().getPkDocId());
-                                dsmEntry.setFkDestinyCurrencyId(layoutBankDps.getDps().getFkCurrencyId());
-                                dsmEntry.setDestinyExchangeRateSystem(mdExchangeRate);
-                                dsmEntry.setDestinyExchangeRate(exchangeRate);
-                                dsmEntry.setDbmsFkDpsCategoryId(layoutBankDps.getDps().getFkDpsCategoryId());
-                                dsmEntry.setDbmsDestinyDps(layoutBankDps.getDps().getDpsNumber());
-                                //dsmEntry.setDbmsSubclassMove((String) session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME)); // 2019-10-09, Sergio Flores: please remove if not really needed!
-                                dsmEntry.setDbmsBizPartner(bizPartnerName);
-                                //dsmEntry.setDbmsDestinyTpDps((String) session.readField(SModConsts.TRNU_TP_DPS, new int[] { layoutBankDps.getDps().getFkDpsCategoryId(), layoutBankDps.getDps().getFkDpsClassId(), layoutBankDps.getDps().getFkDpsTypeId() }, SDbRegistry.FIELD_CODE)); // 2019-10-09, Sergio Flores: please remove if not really needed!
-
-                                dsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
-                                dsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
-                                dsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
-                                dsmEntry.setDbmsCtSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0]);
-                                dsmEntry.setDbmsTpSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]);
-                                //dsm.setDbmsSubsystemTypeBiz((String) session.readField(SModConsts.BPSS_CT_BP, new int[] { SDataConstantsSys.BPSS_CT_BP_SUP }, SDbRegistry.FIELD_CODE)); // 2019-10-09, Sergio Flores: please remove if not really needed!
-                                dsmEntry.setFkBizPartnerId(layoutBankDps.getDps().getFkBizPartnerId_r());
-                                dsmEntry.setDbmsFkBizPartnerBranchId_n(layoutBankDps.getDps().getFkBizPartnerBranchId());
-
-                                Vector<SFinAccountConfigEntry> configEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), layoutBankDps.getDps().getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_SUP,
-                                        record.getPkBookkeepingCenterId(), record.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, layoutBankDps.getDps().getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, dsmEntry.getTaxPk());
-                                if (configEntries.size() > 0) {
-                                    dsmEntry.setDbmsAccountOp(configEntries.get(0).getAccountId());
-                                }
-                                
-                                dsm.getDbmsEntries().add(dsmEntry);
-                            }
-
-                            dsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_SUP);
-
-                            dsm.setDate(session.getCurrentDate());
-                            dsm.setDbmsErpTaxModel(((SDataParamsErp) session.getConfigSystem()).getTaxModel()); // PRESERVE!!!
-                            dsm.setFkSubsystemCategoryId(SDataConstantsSys.BPSS_CT_BP_SUP);
-                            dsm.setFkCompanyBranchId(record.getFkCompanyBranchId_n());
-                            dsm.setFkUserNewId(session.getUser().getPkUserId());
-                            dsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranchHq().getPkBizPartnerBranchId());
-                            //dsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { record.getFkCompanyBranchId_n() }).getCode()); // 2019-10-09, Sergio Flores: please remove if not really needed!
-                            dsm.setDbmsErpDecimalsValue(((SDataParamsErp) session.getConfigSystem()).getDecimalsValue()); // PRESERVE!!!
-                            dsm.setDbmsIsRecordSaved(false);
-
-                            dsm = (SDataDsm) ((SClientInterface) session.getClient()).getGuiModule(SDataConstants.MOD_FIN).processRegistry(dsm);
-                            SDataRecord recordDsm = dsm.getDbmsRecord();
-
-                            String reference = layoutBankDps.getDps().getDpsNumber();
-                            String concept = composeRecordEntryConcept(session, bizPartnerName, layoutBankPayment.getBizPartnerBranchBankAccountKey(), reference);
-
-                            for (SDataRecordEntry recordEntry : recordDsm.getDbmsRecordEntries()) {
-                                recordEntry.setConcept(concept);
-                                recordEntry.setSortingPosition(++sortingPosition);
-                                recordEntry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
-                                recordEntry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
-                                recordEntries.add(recordEntry);
-                            }
-
-                            dsm.getDbmsEntries().clear();
                         }
                     }
                     else if (layoutBankPayment.getTransactionType() == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) {
@@ -1131,6 +1277,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public void setLayoutXml(String s) { msLayoutXml = s; }
     public void setTransactionType(int n) { mnTransactionType = n; }
     public void setAuthorizationRequests(int n) { mnAuthorizationRequests = n; }
+    public void setLayoutOperationType(String s) { msLayoutOperationType = s; }
     public void setClosedPayment(boolean b) { mbClosedPayment = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkBankLayoutTypeId(int n) { mnFkBankLayoutTypeId = n; }
@@ -1172,6 +1319,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public String getLayoutText() { return msLayoutText; }
     public String getLayoutXml() { return msLayoutXml; }
     public int getAuthorizationRequests() { return mnAuthorizationRequests; }
+    public String getLayoutOperationType() { return msLayoutOperationType; }
     public int getTransactionType() { return mnTransactionType; }
     public boolean isClosedPayment() { return mbClosedPayment; }
     public boolean isDeleted() { return mbDeleted; }
@@ -1274,6 +1422,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).getValue() }, SLibConstants.EXEC_MODE_SILENT);
 
                 SLayoutBankPaymentRow layoutBankPaymentRow = new SLayoutBankPaymentRow(client);
+                ArrayList<Integer> paymentIdsLocal = new ArrayList<>();
                 
                 layoutBankPaymentRow.setBizPartnerId(bizPartner.getPkBizPartnerId());
                 layoutBankPaymentRow.setBizPartnerBranchId(bizPartnerBranchBankAccount.getPkBizPartnerBranchId());
@@ -1362,6 +1511,9 @@ public class SDbBankLayout extends SDbRegistryUser {
                         catch (Exception e) {
                             System.out.println(e);
                         }
+                        if (idPayment > 0) {
+                            paymentIdsLocal.add(idPayment);
+                        }
                         SDataDps dps = null;
                         if (dpsYearId == 0 && dpsDocId == 0) {
                             // is a prepayment:
@@ -1422,6 +1574,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         layoutBankXmlRow.setEmail(email);
                         if (idPayment > 0) {
                             layoutBankXmlRow.getAuxPaymentIds().add(idPayment);
+                            paymentIdsLocal.add(idPayment);
                         }
 
                         if (layoutBankRecordKey != null) {
@@ -1520,6 +1673,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     layoutBankXmlRow.setReferenceRecord(referenceRecord);
                     layoutBankXmlRow.setEmail(email);
                     layoutBankXmlRow.getAuxPaymentIds().addAll(paymentIds);
+                    paymentIdsLocal.addAll(paymentIds);
 
                     if (layoutBankRecordKey != null) {
                         layoutBankXmlRow.setRecYearId(layoutBankRecordKey.getPkYearId());
@@ -1545,6 +1699,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 
                 layoutBankPaymentRow.setPaymentCur(paymentCur);
                 layoutBankPaymentRow.setLayoutBankPayment(layoutBankPayment);
+                layoutBankPaymentRow.setPaymentIds(paymentIdsLocal);
 
                 maAuxLayoutBankPaymentRows.add(layoutBankPaymentRow);
                 
@@ -1947,7 +2102,8 @@ public class SDbBankLayout extends SDbRegistryUser {
         msLayoutText = "";
         msLayoutXml = "";
         mnTransactionType = 0;
-	    mnAuthorizationRequests = 0;
+        mnAuthorizationRequests = 0;
+        msLayoutOperationType = "";
         mbClosedPayment = false;
         mbDeleted = false;
         mnFkBankLayoutTypeId = 0;
@@ -2036,6 +2192,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             msLayoutXml = resultSet.getString("lay_xml");
             mnTransactionType = resultSet.getInt("trn_tp");
             mnAuthorizationRequests = resultSet.getInt("auth_req");
+            msLayoutOperationType = resultSet.getString("lay_tp_op");
             mbClosedPayment = resultSet.getBoolean("b_clo_pay");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
@@ -2075,21 +2232,18 @@ public class SDbBankLayout extends SDbRegistryUser {
             statement = session.getDatabase().getConnection().createStatement();
             
             maAuxOldPaymentsIds = new ArrayList<>();
-            msSql = "SELECT  " +
-                    "    pr.id_pay " +
-                    "FROM " +
-                    "    fin_pay AS p " +
-                    "        INNER JOIN " +
-                    "    fin_pay_ety pe ON p.id_pay = pe.id_pay " +
-                    "        INNER JOIN " +
-                    "    fin_pay pr ON pe.fk_pay_req_n = pr.id_pay " +
-                    "        INNER JOIN " +
-                    "    fin_pay_lay_bank AS b ON p.id_pay = b.id_pay " +
-                    "        AND b.id_lay_bank = " + mnPkBankLayoutId + " " +
-                    "WHERE " +
-                    "    pr.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ") " +
-                    "    AND p.b_del = 0 " +
-                    "    AND pr.b_del = 0;";
+            msSql = "SELECT  "
+                    + "    pr.id_pay "
+                    + "FROM "
+                    + "    fin_pay_lay_bank AS b "
+                    + "        INNER JOIN "
+                    + "    fin_pay pr ON b.id_pay = pr.id_pay "
+                    + "WHERE "
+                    + "    pr.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", "
+                                            + "" + SModSysConsts.FINS_ST_PAY_SUBR_P + ") "
+                    + "    AND b.id_lay_bank = " + mnPkBankLayoutId + " "
+                    + "    AND pr.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' "
+                    + "    AND pr.b_del = 0;";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
                 maAuxOldPaymentsIds.add(resultSet.getInt(1));
@@ -2101,6 +2255,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND "
                         + "b.id_lay_bank = " + mnPkBankLayoutId + " "
                     + "WHERE p.b_del = 0 AND "
+                    + "p.pay_tp = '" + SDbPayment.TYPE_PAYMENT + "' AND "
                     + "p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS + ";";
             resultSet = statement.executeQuery(msSql);
             while (resultSet.next()) {
@@ -2183,6 +2338,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "'" + msLayoutXml + "', " +
                     mnTransactionType + ", " + 
                     mnAuthorizationRequests + ", " + 
+                    "'" + msLayoutOperationType + "', " +
                     (mbClosedPayment ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBankLayoutTypeId + ", " + 
@@ -2215,6 +2371,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "lay_xml = '" + msLayoutXml + "', " +
                     "trn_tp = " + mnTransactionType + ", " +
                     "auth_req = " + mnAuthorizationRequests + ", " +
+                    "lay_tp_op = '" + msLayoutOperationType + "', " +
                     "b_clo_pay = " + (mbClosedPayment ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_lay_bank = " + mnFkBankLayoutTypeId + ", " +
@@ -2239,7 +2396,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             msSql = "SELECT p.id_pay FROM fin_pay AS p "
                     + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
                     + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ") "
-                    + "AND p.pay_tp = 'R'";
+                    + "AND p.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' ";
             ResultSet resultSet = session.getStatement().executeQuery(msSql);
             ArrayList<Integer> prevPayments = new ArrayList<>();
             while (resultSet.next()) {
@@ -2276,7 +2433,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "    p.fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     "    p.ts_usr_upd = NOW() " +
                     "WHERE " +
-                    "    p.pay_tp = 'P' AND id_lay_bank = " + mnPkBankLayoutId + ";";
+                    "    p.pay_tp = '" + SDbPayment.TYPE_PAYMENT + "' " +
+                    "    AND id_lay_bank = " + mnPkBankLayoutId + ";";
             session.getStatement().execute(msSql);
 
             for (int paymentId : maAuxOldPaymentsIds) {
@@ -2285,8 +2443,6 @@ public class SDbBankLayout extends SDbRegistryUser {
                         + "fk_usr_upd = " + mnFkUserUpdateId + ", "
                         + "ts_usr_upd = NOW() "
                         + "WHERE id_pay = " + paymentId;
-                session.getStatement().execute(msSql);
-                msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + paymentId + ", " + mnPkBankLayoutId + ")";
                 session.getStatement().execute(msSql);
             }
         }
@@ -2303,6 +2459,13 @@ public class SDbBankLayout extends SDbRegistryUser {
                 pay.save(session);
                 try {
                     msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + pay.getPkPaymentId() + ", " + mnPkBankLayoutId + ")";
+                    session.getStatement().execute(msSql);
+                }
+                catch (Exception e) {}
+            }
+            for (int paymentId : maAuxOldPaymentsIds) {
+                try {
+                    msSql = "INSERT INTO fin_pay_lay_bank VALUES (" + paymentId + ", " + mnPkBankLayoutId + ")";
                     session.getStatement().execute(msSql);
                 }
                 catch (Exception e) {}
@@ -2360,6 +2523,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setLayoutXml(this.getLayoutXml());
         registry.setTransactionType(this.getTransactionType());
         registry.setAuthorizationRequests(this.getAuthorizationRequests());
+        registry.setLayoutOperationType(this.getLayoutOperationType());
         registry.setClosedPayment(this.isClosedPayment());
         registry.setDeleted(this.isDeleted());
         registry.setFkBankLayoutTypeId(this.getFkBankLayoutTypeId());

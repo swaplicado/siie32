@@ -298,6 +298,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxCheckDpsLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
+    protected boolean mbAuxIsDocAdvance;
     /** Imported Document from SWAP Services, just for reference purposes. */
     protected SImportedDocument moXtaImportedDocument;
     
@@ -2149,6 +2150,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxCheckDpsLinks(boolean b) { mbAuxCheckDpsLinks = b; }
     public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
     public void setXtaHasAuthWeb(boolean b) { mbXtaHasAuthWeb = b;}
+    public void setAuxIsDocAdvanced(boolean b) { mbAuxIsDocAdvance = b; }
     public void setXtaImportedDocument(SImportedDocument o) { moXtaImportedDocument = o; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
@@ -2191,6 +2193,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxCheckDpsLinks() { return mbAuxCheckDpsLinks; }
     public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
     public boolean getXtaHasAuthWeb() { return mbXtaHasAuthWeb; }
+    public boolean getAuxIsDocAdvanced() { return mbAuxIsDocAdvance; }
     public SImportedDocument getXtaImportedDocument() { return moXtaImportedDocument; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
@@ -2503,6 +2506,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxCheckDpsLinks = true; // 'true', yes!, 'true' by default!
         mbXtaHasSuppFiles = false;
         mbXtaHasAuthWeb = false;
+        mbAuxIsDocAdvance = false;
         moXtaImportedDocument = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
