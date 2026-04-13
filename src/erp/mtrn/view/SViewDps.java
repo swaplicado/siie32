@@ -6,6 +6,10 @@
 package erp.mtrn.view;
 
 import cfd.DCfdConsts;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import erp.SClientUtils;
 import erp.SFileUtilities;
 import erp.client.SClientInterface;
@@ -37,6 +41,7 @@ import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
 import erp.mod.cfg.swap.SSyncType;
@@ -50,6 +55,7 @@ import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mod.cfg.swap.utils.SResponses;
 import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthDBUtils;
+import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
@@ -84,6 +90,7 @@ import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -98,8 +105,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -116,7 +128,7 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -178,6 +190,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebClearSupportFiles;
     private javax.swing.JButton jbAuthWebAnnullAuth;
     private javax.swing.JButton jbAuthWebForceCheckAuthStatus;
+    private javax.swing.JButton jbAuthWebDownloadAllFiles;
     private javax.swing.JFileChooser moAuthWebFileChooser;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -212,6 +225,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightLogistics;
     private boolean mbIsAuthWebAvailable; // auth web must be enabled in configuration and this view must be for purchases orders!
     private boolean mbSwapServicesLinkUp;
+    private JDialog progressDialog;
+    private JProgressBar progressBar;
     
     private int mnModule;
     
@@ -539,7 +554,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebDownloadSupportFiles.setPreferredSize(new Dimension(23, 23));
             jbAuthWebDownloadSupportFiles.addActionListener(this);
             jbAuthWebDownloadSupportFiles.setToolTipText("Descargar archivos de soporte de la orden");
-
+            
             jbAuthWebClearSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")));
             jbAuthWebClearSupportFiles.setPreferredSize(new Dimension(23, 23));
             jbAuthWebClearSupportFiles.addActionListener(this);
@@ -553,7 +568,26 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebForceCheckAuthStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_doub_check.gif")));
             jbAuthWebForceCheckAuthStatus.setPreferredSize(new Dimension(23, 23));
             jbAuthWebForceCheckAuthStatus.addActionListener(this);
-            jbAuthWebForceCheckAuthStatus.setToolTipText("Verificar estatus de autorización");
+            jbAuthWebForceCheckAuthStatus.setToolTipText("Verificar estatus de autorización");        
+        }
+        
+        if(mbIsOrd) {
+            jbAuthWebDownloadAllFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down.gif")));
+            jbAuthWebDownloadAllFiles.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebDownloadAllFiles.addActionListener(this);
+            jbAuthWebDownloadAllFiles.setToolTipText("Descargar archivos de vinculados a la orden");
+        }
+        else if(mbIsDoc) {
+            jbAuthWebDownloadAllFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down.gif")));
+            jbAuthWebDownloadAllFiles.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebDownloadAllFiles.addActionListener(this);
+            jbAuthWebDownloadAllFiles.setToolTipText("Descargar archivos de vinculados a la factura");    
+        } 
+        else {
+            jbAuthWebDownloadAllFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down.gif")));
+            jbAuthWebDownloadAllFiles.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebDownloadAllFiles.addActionListener(this);
+            jbAuthWebDownloadAllFiles.setToolTipText("Descargar archivos de vinculados");
         }
         
         moTabFilterUser = new STabFilterUsers(miClient, this);
@@ -664,6 +698,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(moTabFilterDocumentNature);
         addTaskBarLowerComponent(moTabFilterFunctionalArea);
         addTaskBarLowerComponent(moTabFilterDnsDps);
+        addTaskBarUpperComponent(jbAuthWebDownloadAllFiles);
 
         jbNew.setEnabled(mbHasRightNew);
         jbEdit.setEnabled(true);
@@ -707,6 +742,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
         jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbAuthWebDownloadAllFiles.setEnabled((mbIsOrd || mbIsDoc) && mnModule == SDataConstants.MOD_PUR);
         moTabFilterDnsDps.setVisible(mbIsOrd);
         
         if (mbIsAuthWebAvailable) { // just for consistence, because buttons are instantiated ONLY if needed
@@ -3212,6 +3248,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
                         
                         if (moAuthWebFileChooser.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                            //
+                            JDialog progressDialog = new JDialog(miClient.getFrame(), "Descargando...", true);
+                            JProgressBar progressBar = new JProgressBar(0, 100);
+                            progressBar.setStringPainted(true);
+
+                            progressDialog.setLayout(new java.awt.BorderLayout());
+                            progressDialog.add(new JLabel("Descargando archivo ZIP..."), java.awt.BorderLayout.NORTH);
+                            progressDialog.add(progressBar, java.awt.BorderLayout.CENTER);
+
+                            progressDialog.setSize(300, 100);
+                            progressDialog.setLocationRelativeTo(miClient.getFrame());
+                            //
                             int files = 0;
                             
                             for (SDbSupplierFile file : fileProcess.getSuppFiles()) {
@@ -3231,6 +3279,120 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         catch (Exception e) {
             miClient.showMsgBoxWarning(e.getMessage());
         }
+    }
+    
+    private void actionAuthWebDownloadAllFiles() {
+        try {
+            if (!jbAuthWebDownloadAllFiles.isEnabled() || !isRowSelected()) {
+                return;
+            }
+
+            if (moAuthWebFileChooser == null) {
+                moAuthWebFileChooser = new JFileChooser();
+                moAuthWebFileChooser.setAcceptAllFileFilterUsed(false);
+                moAuthWebFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                moAuthWebFileChooser.setDialogTitle("Seleccionar directorio para descargar archivos...");
+            }
+
+            if (moAuthWebFileChooser.showSaveDialog(miClient.getFrame()) != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            int[] pk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
+            int year = pk[0];
+            int doc = pk[1];
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+
+            String baseUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+            String token = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_TOKEN);
+            String apiKey = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_API_KEY);
+            String url = baseUrl + "/api/documents/download-all-docs-zip/";
+
+            ArrayNode documentArray = mapper.createArrayNode();
+            ArrayNode ocArray = mapper.createArrayNode();
+            int option;
+
+            if (mbIsOrd) {
+                String ocId = year + "_" + doc;
+                ocArray.add(ocId);
+                option = 0;
+            }
+            else {
+                  String documentId = SExportUtils.getExtDataId(miClient, year, doc);
+
+                if (documentId == null) {
+                    throw new Exception("No se encontró información de este documento.");
+                }
+
+                documentArray.add(Integer.parseInt(documentId));
+                option = 2;
+            }
+
+            ObjectNode jsonBody = mapper.createObjectNode();
+            if (mbIsOrd) {
+                jsonBody.set("oc_ids", ocArray);
+            } 
+            else if (mbIsDoc) {
+                jsonBody.set("document_ids", documentArray);
+            }
+
+            jsonBody.put("processing_type", option);
+            String folio = SExportUtils.getDpsFolio(miClient, year, doc);
+            if (folio == null || folio.isEmpty()) {
+                folio = "DOC_" + year + "_" + doc;
+            }
+
+            String safeFolio = folio.replaceAll("[^a-zA-Z0-9_-]", "_");
+
+            String filePath = moAuthWebFileChooser.getSelectedFile().getAbsolutePath()
+                    + "\\" + safeFolio + ".zip";
+
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    SExportUtils.requestSwapServiceToFile("", url, SHttpConsts.METHOD_POST, jsonBody.toString(), token, apiKey, filePath, SSwapConsts.TIME_180_SEC, progressBar);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    progressDialog.dispose();
+                    try {
+                        get();
+                        miClient.showMsgBoxInformation("Descarga completada correctamente.");
+                    }
+                    catch (Exception e) {
+                        miClient.showMsgBoxWarning(e.getMessage());
+                    }
+                }
+            };
+
+            if (progressDialog == null) {
+                initProgressDialog();
+            }
+            worker.execute();
+            progressDialog.setVisible(true);
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    private void initProgressDialog() {
+        progressDialog = new JDialog(miClient.getFrame(), "Descargando...", true);
+        progressDialog.setSize(300, 100);
+        progressDialog.setLocationRelativeTo(miClient.getFrame());
+        progressDialog.setLayout(new BorderLayout());
+        progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+
+        JLabel label = new JLabel("Descargando archivos, por favor espere...");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        progressDialog.add(label, BorderLayout.NORTH);
+        progressDialog.add(progressBar, BorderLayout.CENTER);
     }
     
     private void actionAuthWebClearSupportFiles() {
@@ -3893,6 +4055,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbAuthWebForceCheckAuthStatus) {
                     actionForceCheckAuth();
+                }
+                else if (button == jbAuthWebDownloadAllFiles) {
+                    actionAuthWebDownloadAllFiles();
                 }
             }
         }

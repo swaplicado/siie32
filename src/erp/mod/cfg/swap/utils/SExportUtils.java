@@ -23,8 +23,10 @@ import erp.mod.cfg.swap.SSyncType;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,6 +47,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -64,7 +68,7 @@ import sa.lib.gui.SGuiSession;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de 
  * información con otros sistemas.
  * 
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public abstract class SExportUtils {
     
@@ -1391,6 +1395,123 @@ public abstract class SExportUtils {
         }
         
         return companies.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    public static void requestSwapServiceToFile(String user, String url, String method, String jsonBody, String token, String apiKey, String filePath, int timeout, JProgressBar progressBar) throws Exception {
+        HttpURLConnection connection = null;
+
+        try {
+            URL obj = new URL(url);
+            connection = (HttpURLConnection) obj.openConnection();
+
+            connection.setRequestMethod(method);
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("x-api-key", apiKey);
+
+            connection.setDoOutput(true);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(jsonBody.getBytes("UTF-8"));
+            }
+
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                int totalSize = connection.getContentLength();
+
+                try (InputStream is = connection.getInputStream(); FileOutputStream fos = new FileOutputStream(filePath)) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    int totalRead = 0;
+
+                    while ((bytesRead = is.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                        totalRead += bytesRead;
+
+                        if (totalSize > 0 && progressBar != null) {
+                            int progress = (int) ((totalRead * 100L) / totalSize);
+                            SwingUtilities.invokeLater(() -> {progressBar.setValue(progress);});
+                        }
+                    }
+                    SwingUtilities.invokeLater(() -> progressBar.setValue(100));
+                }
+            }
+            else {
+                InputStream errorStream = connection.getErrorStream();
+                StringBuilder errorMsg = new StringBuilder();
+
+                if (errorStream != null) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(errorStream));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        errorMsg.append(line);
+                    }
+                    br.close();
+                }
+                throw new Exception("Error HTTP: " + responseCode + " -> " + errorMsg.toString());
+            }
+
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
+    
+    public static String getExtDataId(SClientInterface miClient, int year, int doc) throws Exception {
+        String extDataId = null;
+        
+        String sql = "SELECT ext_data_id " +
+                     "FROM TRN_SWAP_DATA_PRC " +
+                     "WHERE fk_dps_year_n = " + year + " " +
+                     "AND fk_dps_doc_n = " + doc + " " +
+                     "AND b_del = 0 " + 
+                     "LIMIT 1";
+
+        try (Statement stmt = miClient.getSession().getStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                extDataId = rs.getString("ext_data_id");
+            }
+        }
+
+        return extDataId;
+    }
+    
+    public static String getDpsFolio(SClientInterface miClient, int year, int doc) throws Exception {
+    String folio = null;
+
+    String sql = "SELECT dt.code, d.num_ser, d.num " +
+                 "FROM trn_dps AS d " +
+                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                 "WHERE d.id_year = " + year + " " +
+                 "AND d.id_doc = " + doc + " " +
+                 "AND d.b_del = 0 " +
+                 "LIMIT 1";
+
+        try (Statement stmt = miClient.getSession().getStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                String tip = rs.getString("dt.code");
+                String numSer = rs.getString("d.num_ser");
+                String num = rs.getString("d.num");
+                tip = tip != null ? tip : "";
+                numSer = numSer != null ? numSer : "";
+                num = num != null ? num : "";
+                if (numSer == null || numSer.isEmpty()) {
+                    folio = tip + "/" +num;
+                }
+                else{
+                    folio = tip + "/" + numSer + "-" + num;
+                }
+            }
+        }
+
+        return folio;
     }
     
     private static class BarePayment {

@@ -62,7 +62,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona, Claudio Peña
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -1043,6 +1043,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ve.doc_bal_unpd_app_cur_r, "
                 + "ce.cur_key, "
                 + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps, "
+                + "CASE WHEN d.id_doc IS NOT NULL THEN "
+                + "CASE sw.proc_type WHEN 0 THEN 'Estándar' WHEN 11 THEN 'Fletes MP' "
+                + "WHEN 12 THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type,"
                 + "v.ts_usr_sched, "
                 + "v.ts_usr_resched, "
                 + "v.ts_usr_exec, "
@@ -1081,6 +1084,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
                 + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
+                + "LEFT JOIN TRN_SWAP_DATA_PRC sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
                 + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
@@ -1124,6 +1128,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_proc_type", "Tipo carga"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_sched", "Usr aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_sched", "Usr TS aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_resched", "Reprogramado"));
