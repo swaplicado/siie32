@@ -139,10 +139,10 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario pago", 250));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha programada pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Documento pago"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto del pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda del pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "Tipo de cambio"));

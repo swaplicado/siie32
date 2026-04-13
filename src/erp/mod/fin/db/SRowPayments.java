@@ -134,16 +134,16 @@ public class SRowPayments implements SGridRow, Serializable {
         
         switch (col) {
             case 0:
-                value = msBeneficiary;
+                value = msPayNum;
                 break;
             case 1:
-                value = mtDateScheduled;
+                value = msBeneficiary;
                 break;
             case 2:
-                value = msDocNum;
+                value = mtDateScheduled;
                 break;
             case 3:
-                value = msPayNum;
+                value = msDocNum;
                 break;
             case 4:
                 value = mdAmount;
