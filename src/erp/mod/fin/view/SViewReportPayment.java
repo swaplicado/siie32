@@ -5,7 +5,6 @@
  */
 package erp.mod.fin.view;
 
-import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.view.SViewFilter;
@@ -241,6 +240,9 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
             + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
             + "COALESCE(MAX(nat.code), 'S/DOC') AS nat "
+            + "CASE WHEN d.id_doc IS NOT NULL THEN "
+            + "CASE sw.proc_type WHEN 0 THEN 'Estándar' WHEN 11 THEN 'Fletes MP' "
+            + "WHEN 12 THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type "
             + "FROM fin_pay AS v "
             + "INNER JOIN ( "
             + "SELECT id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n, "
@@ -252,6 +254,7 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "INNER JOIN erp.cfgu_cur AS ce ON base.fk_ety_cur = ce.id_cur "
             + "LEFT JOIN trn_dps AS d ON d.id_doc = base.fk_doc_doc_n AND d.id_year = base.fk_doc_year_n "
             + "LEFT JOIN erp.TRNU_DPS_NAT nat ON d.fid_dps_nat = nat.id_dps_nat "
+            + "LEFT JOIN TRN_SWAP_DATA_PRC sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
             + (sql.isEmpty() ? "" : "WHERE " + sql)
             + "GROUP BY b.bp "
             + "ORDER BY b.bp";
@@ -271,8 +274,8 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "FechaRequeridaPago", "Fecha requerida pago", 70));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "conceptoPrincipal", "Concepto mayor", 500));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc", 100));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_proc_type", "Tipo carga"));
        
-
         return gridColumnsViews;
     }
 

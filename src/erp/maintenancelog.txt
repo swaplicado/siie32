@@ -1,4 +1,11 @@
 =================================================================================
+SIIE 3.2 297.8/ 2026-04-13
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Funcionalidad de descarga de todos los archivos relacionados con los pedidos y facturas
+2) Adición de las columnas de tipo de carga en las vistas de solicitudes de pago
+
+=================================================================================
 SIIE 3.2 297.7/ 2026-04-10
 Adrián Alejandro AVILES GOMEZ
 --------------------------------------------------------------------------------
