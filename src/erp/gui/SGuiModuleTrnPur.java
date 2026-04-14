@@ -156,6 +156,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsAudPending;
     private javax.swing.JMenuItem jmiDpsAudAudited;
     private javax.swing.JMenuItem jmiDpsEntryAnnulled;
+    private javax.swing.JMenuItem jmiDpsPurAdvance;
     private javax.swing.JMenuItem jmiDpsPrice;
     private javax.swing.JMenuItem jmiDpsPriceHist;
     private javax.swing.JMenuItem jmiDpsDocRemission;
@@ -498,6 +499,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAudPending = new JMenuItem("Facturas por auditar");
         jmiDpsAudAudited = new JMenuItem("Facturas auditadas");
         jmiDpsEntryAnnulled = new JMenuItem("Facturas anuladas");
+        jmiDpsPurAdvance = new JMenuItem("Facturas de anticipos");
         jmiDpsPrice = new JMenuItem("Precios de compras");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
@@ -525,6 +527,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsAudPending);
         jmDps.add(jmiDpsAudAudited);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsPurAdvance);
         jmDps.addSeparator();
         jmDps.add(jmiDpsEntryAnnulled);
         jmDps.addSeparator();
@@ -863,6 +867,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAudPending.addActionListener(this);
         jmiDpsAudAudited.addActionListener(this);
         jmiDpsEntryAnnulled.addActionListener(this);
+        jmiDpsPurAdvance.addActionListener(this);
         jmiDpsPrice.addActionListener(this);
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
@@ -1054,6 +1059,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsEntryAnnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
+        jmiDpsPurAdvance.setEnabled(hasRightDocTransaction);
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -2037,6 +2043,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsEntryAnnulled) {
                 showView(SDataConstants.TRNU_TP_DPS_ANN, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_DOC);
+            }
+            else if (item == jmiDpsPurAdvance) {
+                miClient.getSession().showView(SModConsts.TRNX_DPS_PUR_ADVANCE, SModConsts.MOD_TRN_PUR_N, null);
             }
             else if (item == jmiDpsPrice || item == jmiOrdersPrice) {
                 showView(SDataConstants.MKT_PLIST_ITEM, SDataConstantsSys.TRNS_CT_DPS_PUR);

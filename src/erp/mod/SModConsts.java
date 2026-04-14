@@ -625,6 +625,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_VAL_IN_CARDEX = 2024099;
     public static final int TRNX_STK_SEG = 2024100;
     public static final int TRNX_PUR_PROCESS = 2024101;
+    public static final int TRNX_DPS_PUR_ADVANCE = 2024102;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
