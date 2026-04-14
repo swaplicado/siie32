@@ -949,7 +949,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             bgEntryType.setSelected(singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT) ? moRadTypePayment.getModel() : moRadTypeAdvance.getModel(), true);
             
             if (singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_PAYMENT)) {
-                if (moRegistry.getPaymentOperationType().equals(SDbPayment.OPERATION_TYPE_DOC_ADVANCE)) {
+                if (moRegistry.getPaymentOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC) {
                     bgDocumentType.setSelected(moRadAdvanceDoc.getModel(), true);
                     moRadAdvanceDoc.setSelected(true);
                 }
@@ -1063,10 +1063,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         registry.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
         if (moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected()) {
-            registry.setPaymentOperationType(SDbPayment.OPERATION_TYPE_DOC_ADVANCE);
+            registry.setPaymentOperationType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC);
         }
         else {
-            registry.setPaymentOperationType(SDbPayment.OPERATION_TYPE_NORMAL);
+            registry.setPaymentOperationType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
         }
         
         registry.setPriority(moKeyPriority.getValue()[0]);

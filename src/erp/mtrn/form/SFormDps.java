@@ -9771,7 +9771,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
                         continue;
-                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:        // prepayments invoiced
+                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC:        // prepayments invoiced
                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
                         miClient.showMsgBoxWarning("Todas las partidas del documento deben ser de operaciones o de operaciones con aplicación de anticipo facturado,\n"
@@ -12665,7 +12665,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             SDataDpsEntry dpsEntry = (SDataDpsEntry) row.getData();
                             if (dpsEntry.isAccountable()) {
                                 switch (dpsEntry.getOperationsType()) {
-                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:
+                                    case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC:
                                         prepaymentsCy = SLibUtils.round(prepaymentsCy + dpsEntry.getSubtotalCy_r(), 2);
                                         break;
                                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:

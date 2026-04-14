@@ -219,7 +219,7 @@ public class SViewDpsAdvance extends SGridPaneView implements ActionListener, It
                     + "INNER JOIN fin_pay_ety AS pre ON pr.id_pay = pre.id_pay "
                     + "WHERE pr.b_del = 0 "
                     + "AND pr.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' "
-                    + "AND pr.pay_tp_op = '" + SDbPayment.OPERATION_TYPE_DOC_ADVANCE + "' "
+                    + "AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + " "
                     + "GROUP BY pre.fk_doc_year_n, pre.fk_doc_doc_n"
                 + ") AS p ON d.id_year = p.fk_doc_year_n AND d.id_doc = p.fk_doc_doc_n "
                 + where

@@ -105,7 +105,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected String msLayoutXml;
     protected int mnTransactionType;
     protected int mnAuthorizationRequests;
-    protected String msLayoutOperationType;
+    protected int mnLayoutOperationType;
     protected boolean mbClosedPayment;
     //protected boolean mbDeleted;
     protected int mnFkBankLayoutTypeId;
@@ -888,7 +888,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             layoutPayment.mbAdded = true;
                         }
                         
-                        if (msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL)) {
+                        if (mnLayoutOperationType == SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS) {
                             for (SLayoutBankDps layoutBankDps : layoutBankPayment.getLayoutBankDpss()) {
                                 /* TIPOS DE CAMBIO:
                                 ** Monedas iguales -> Tipo de cambio asignado en la forma
@@ -906,8 +906,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                                 ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), 
                                         SLibTimeUtils.digestYear(mtDateLayout)[0], 
                                         layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId(), 
-                                        msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL) ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_NA[0], 
-                                        msLayoutOperationType.equals(SDbPayment.OPERATION_TYPE_NORMAL) ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_NA[1], 
+                                        SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
+                                        SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1], 
                                         null);
 
                                 double dTotalBalance = 0d;
@@ -1277,7 +1277,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public void setLayoutXml(String s) { msLayoutXml = s; }
     public void setTransactionType(int n) { mnTransactionType = n; }
     public void setAuthorizationRequests(int n) { mnAuthorizationRequests = n; }
-    public void setLayoutOperationType(String s) { msLayoutOperationType = s; }
+    public void setLayoutOperationType(int n) { mnLayoutOperationType = n; }
     public void setClosedPayment(boolean b) { mbClosedPayment = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkBankLayoutTypeId(int n) { mnFkBankLayoutTypeId = n; }
@@ -1319,7 +1319,7 @@ public class SDbBankLayout extends SDbRegistryUser {
     public String getLayoutText() { return msLayoutText; }
     public String getLayoutXml() { return msLayoutXml; }
     public int getAuthorizationRequests() { return mnAuthorizationRequests; }
-    public String getLayoutOperationType() { return msLayoutOperationType; }
+    public int getLayoutOperationType() { return mnLayoutOperationType; }
     public int getTransactionType() { return mnTransactionType; }
     public boolean isClosedPayment() { return mbClosedPayment; }
     public boolean isDeleted() { return mbDeleted; }
@@ -2103,7 +2103,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         msLayoutXml = "";
         mnTransactionType = 0;
         mnAuthorizationRequests = 0;
-        msLayoutOperationType = "";
+        mnLayoutOperationType = 0;
         mbClosedPayment = false;
         mbDeleted = false;
         mnFkBankLayoutTypeId = 0;
@@ -2192,7 +2192,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             msLayoutXml = resultSet.getString("lay_xml");
             mnTransactionType = resultSet.getInt("trn_tp");
             mnAuthorizationRequests = resultSet.getInt("auth_req");
-            msLayoutOperationType = resultSet.getString("lay_tp_op");
+            mnLayoutOperationType = resultSet.getInt("lay_tp_op");
             mbClosedPayment = resultSet.getBoolean("b_clo_pay");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkBankLayoutTypeId = resultSet.getInt("fk_tp_lay_bank");
@@ -2338,7 +2338,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "'" + msLayoutXml + "', " +
                     mnTransactionType + ", " + 
                     mnAuthorizationRequests + ", " + 
-                    "'" + msLayoutOperationType + "', " +
+                    "'" + mnLayoutOperationType + "', " +
                     (mbClosedPayment ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkBankLayoutTypeId + ", " + 
@@ -2371,7 +2371,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "lay_xml = '" + msLayoutXml + "', " +
                     "trn_tp = " + mnTransactionType + ", " +
                     "auth_req = " + mnAuthorizationRequests + ", " +
-                    "lay_tp_op = '" + msLayoutOperationType + "', " +
+                    "lay_tp_op = '" + mnLayoutOperationType + "', " +
                     "b_clo_pay = " + (mbClosedPayment ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_lay_bank = " + mnFkBankLayoutTypeId + ", " +

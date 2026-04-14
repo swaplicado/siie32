@@ -1509,9 +1509,10 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
     
+    public static final int TRNX_OPS_TYPE_OPS_PREPAYMENT = 11;             // operations
     public static final int TRNX_OPS_TYPE_OPS_OPS = 11;             // operations
     public static final int TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY = 12;  // operations - application of prepayment invoiced as discount
-    public static final int TRNX_OPS_TYPE_OPS_PREPAY = 13;          // prepayment invoiced
+    public static final int TRNX_OPS_TYPE_OPS_PREPAY_DOC = 13;          // prepayment invoiced
 
     public static final int TRNX_OPS_TYPE_ADJ_OPS = 21;             // adjustment of operations
     public static final int TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY = 22;  // adjustment of operations - application of prepayment invoiced as discount
@@ -1527,7 +1528,7 @@ public abstract class SDataConstantsSys {
     static {
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS, "Operación");
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, "Operación con aplicación anticipo facturado");
-        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY, "Facturación de anticipo");
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY_DOC, "Facturación de anticipo");
         
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS, "Ajuste operación");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY, "Ajuste operación con aplicación anticipo facturado");

@@ -1,4 +1,12 @@
 =================================================================================
+SIIE 3.2 297.12/ 2026-04-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Pago de facturas de anticipos
+2) Refactorización de layouts y modificación de forma de captura de pagos
+3) Adición de columnas tipo de operación en pagos y layouts
+
+=================================================================================
 SIIE 3.2 297.11/ 2026-04-14
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

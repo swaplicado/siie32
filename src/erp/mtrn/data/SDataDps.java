@@ -954,7 +954,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double amountPrepayment = 0;
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY)) {
+            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY)) {
                 for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
                     taxAmount = SLibUtils.roundAmount(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()));
                 }
@@ -3509,7 +3509,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 if (SLibUtils.belongsTo(dpsEntry.getOperationsType(),
                                         new int[] {
-                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY,
+                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC,
                                             SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY
                                         })) {
                                     // caso: anticipos facturados:
@@ -4100,7 +4100,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                             break;
 
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:        // prepayments invoiced
+                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC:        // prepayments invoiced
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
 
