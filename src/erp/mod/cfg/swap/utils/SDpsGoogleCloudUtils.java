@@ -212,7 +212,7 @@ public class SDpsGoogleCloudUtils {
      * GCS.
      * @throws StorageManagerException si ocurre un error durante la subida.
      */
-    private static CloudStorageFile uploadFile(String absolutePath, String fileName) throws StorageManagerException {
+    public static CloudStorageFile uploadFile(String absolutePath, String fileName) throws StorageManagerException {
         return CloudStorageManager.uploadObject(absolutePath, fileName);
     }
 

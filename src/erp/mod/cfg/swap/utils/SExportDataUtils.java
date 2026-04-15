@@ -10,6 +10,7 @@ import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
+import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
@@ -28,6 +29,9 @@ import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
+import erp.server.SSessionServer;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,6 +45,8 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -1885,7 +1891,11 @@ public abstract class SExportDataUtils {
 
                     Exception somException = null;
                     SDbDatabase somDatabase = new SDbDatabase(SDbConsts.DBMS_MYSQL);
-                    if (somDatabase.connect(somSettings.DbmsHost, somSettings.DbmsPort, somSettings.DbName, somSettings.DbmsUser, somSettings.DbmsPswd) == SDbConsts.CONNECTION_OK) {
+                    if (somDatabase.connect(somSettings.DbmsHost, 
+                                            somSettings.DbmsPort, 
+                                            somSettings.DbName, 
+                                            somSettings.DbmsUser, 
+                                            somSettings.DbmsPswd) == SDbConsts.CONNECTION_OK) {
                         try {
                             try (Statement somStatement = somDatabase.getConnection().createStatement()) {
                                 String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_SCALE_IN_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(s.code, '-', t.num))"; // código de tipo de referencia + '/' + referencia
@@ -1904,8 +1914,12 @@ public abstract class SExportDataUtils {
                                 }
 
                                 String sql = "SELECT "
-                                        + "t.id_tic, s.code, t.num, t.dt, i.name, t.qty, u.code, t.drv, t.pla, t.pla_cag, t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
-                                        + "(NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active,"
+                                        + "t.id_tic, s.code, t.num, t.dt, i.name, "
+                                        + "t.qty, u.code, t.drv, t.pla, t.pla_cag, "
+                                        + "t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
+                                        + " (NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND "
+                                        + " t.freight_tic_tp = 'F' AND "
+                                        + " i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active,"
                                         + "t.wei_des_gro_r AS _gross_weight, "
                                         + "t.wei_des_net_r AS _net_weight, "
                                         + "COALESCE(f.name, 'NA') AS _freight_origin, "
@@ -1919,10 +1933,15 @@ public abstract class SExportDataUtils {
                                         + "LEFT JOIN su_inp_src AS isrc ON isrc.id_inp_src = t.fk_inp_src "
                                         + "LEFT JOIN su_prod AS p ON p.id_prod = t.fk_prod "
                                         + "WHERE ("
-                                        + "((NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND t.freight_tic_tp = 'F' AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) "
-                                        + "AND " + referenceId + " NOT IN (" + syncedRegistries + "))"
-                                        + (lastSyncDatetime == null ? "" : " OR ("
-                                                + "t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                                        + "("
+                                        + " (NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' "
+                                        + "     AND t.freight_tic_tp = 'F' "
+                                        + "     AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")"
+                                        + " ) "
+                                        + " AND " + referenceId + " NOT IN (" + syncedRegistries + ")"
+                                        + ") "
+                                        + (lastSyncDatetime == null ? "" : " "
+                                        + "OR (t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                                         + ") "
                                         + "AND t.dt >= '" + SLibUtils.DbmsDateFormatDate.format(somSettings.Start) + "' "
                                         + "ORDER BY s.code, t.num, t.id_tic;";
@@ -1957,6 +1976,45 @@ public abstract class SExportDataUtils {
                                     reference.purchase_origin_zone = somResultSet.getString("_fruit_origin");
                                     reference.productor_name = somResultSet.getString("_prod_name");
                                     reference.is_deleted = !somResultSet.getBoolean("_is_active");
+                                    
+                                    File oPdf = null;
+                                    try {
+                                        reference.som_ticket_file_name = "";
+                                        reference.som_ticket_file_bucket = "";
+                                        reference.som_ticket_file_project_id = "";
+
+                                        HashMap<String, Object> map = SExportDataSomUtils.createReportParamsMap(session);
+                                        map.put("nTicketId", somResultSet.getInt("t.id_tic"));
+                                        map.put("sTable", "s_tic");
+                                        JasperPrint jasperPrint = SSessionServer.createJasperPrint(SDataConstantsSys.REP_TRN_SOM_TICKET, 
+                                                                            map, 
+                                                                            somDatabase.getConnection());
+                                        String fileName = "SOM_TIC_" + reference.external_id;
+                                        String folderName = "SOM_REV_TIC/";
+                                        oPdf = new File("temp", fileName + (new Date()).hashCode() + ".pdf");
+                                        FileOutputStream outputStreamPdf = new FileOutputStream(oPdf);
+                                        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
+                                        outputStreamPdf.close();
+                                        CloudStorageFile gcsFile = SDpsGoogleCloudUtils.uploadFile(oPdf.getAbsolutePath(), (folderName + fileName + ".pdf"));
+                                        if (gcsFile != null) {
+                                            reference.som_ticket_file_name = gcsFile.getFileName();
+                                            reference.som_ticket_file_bucket = gcsFile.getBucketName();
+                                            reference.som_ticket_file_project_id = gcsFile.getProjectId();
+                                        }
+                                    }
+                                    catch (Exception e) {
+                                        Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, 
+                                                "Error exporting scale ticket report to PDF for ticket ID " + reference.external_id, e);
+                                    }
+                                    finally {
+                                        // clean up temp PDF file:
+                                        if (oPdf != null) {
+                                            boolean deleted = oPdf.delete();
+                                            if (!deleted) {
+                                                System.out.println("No se pudo borrar el archivo temporal: " + oPdf.getAbsolutePath());
+                                            }
+                                        }
+                                    }
 
                                     references.add(reference);
                                 }
