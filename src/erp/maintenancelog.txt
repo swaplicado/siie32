@@ -1,4 +1,18 @@
 =================================================================================
+SIIE 3.2 298.2/ 2026-04-16
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Condición de sincronización de boletos de som.
+2) Refactorización de funcionalidad de generación de PDF de ticket de revuelta.
+
+=================================================================================
+SIIE 3.2 298.1/ 2026-04-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Generar el PDF de boletos de báscula Revuelta residentes en SOM, con el formato de 
+impresión similar al de Revuelta, y exportarlos a Google Cloud para que estén disponibles en PC.
+
+=================================================================================
 SIIE 3.2 298.0/ 2026-04-14
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -3038,6 +3038,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_MAT_CONS_BUDGET:
                 name = "reps/trn_mat_cons_cc_budget.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_SOM_TICKET:
+                name = "reps/s_alt_tic.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_STK_MOV_MOV:
                 name = "reps/trn_stk_mov_mov.jasper";
                 break;

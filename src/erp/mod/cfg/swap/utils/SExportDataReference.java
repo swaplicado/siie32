@@ -129,4 +129,22 @@ public class SExportDataReference implements SExportData {
      * Nombre del productor.
      */
     public String productor_name;
+    
+    /**
+     * Nombre del archivo del ticket de som con
+     * el que se guardó en Google Cloud
+     */
+    public String som_ticket_file_name;
+
+    /**
+     * Bucket de Google Cloud Storage donde se guarda el 
+     * archivo del ticket de som.
+     */
+    public String som_ticket_file_bucket;
+
+    /**
+    * Proyecto de Google Cloud Storage donde se guarda el 
+    * archivo del ticket de som.
+    */
+    public String som_ticket_file_project_id;
 }
