@@ -8,6 +8,7 @@ package erp.mod.cfg.swap.form;
 import cfd.ver4.DCfdVer4Consts;
 import cfd.ver40.DCfdi40Catalogs;
 import erp.SClientUtils;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -43,6 +44,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -63,9 +65,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final int DOC_CASE_RAW_MAT_FREIGHT = 2;
     public static final int DOC_CASE_RAW_MAT_PURCHASE = 3;
     
-    public static final int MATCH_PAY_TP_OMIT = 0; // coincidencia de tipo de pago: omitir
-    public static final int MATCH_PAY_TP_REQUIRED = 1; // coincidencia de tipo de pago: requerida
-    public static final int MATCH_PAY_TP_CONFIRM_ON_FAIL = 2; // coincidencia de tipo de pago: confirmar cuando no corresponda
+    /** Coincidencia de tipo de pago: obligatoria. */
+    public static final int MATCH_PAY_TP_MAND = 1;
+    /** Coincidencia de tipo de pago: confirmar cuando es diferente. */
+    public static final int MATCH_PAY_TP_CONF_DIFF = 2;
     
     /** Document types. */
     public static final HashMap<Integer, String> DocTypes = new HashMap<>();
@@ -105,7 +108,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public String BizPartner;
     public String NumberSeries;
     public String Number;
+    /** Date of document. */
     public Date Date;
+    /** Due date of document. Actually seldom set. */
     public Date DueDate;
     public int ReferencesType;
     public String ReferencesAsText;
@@ -144,7 +149,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     public Reference[] References;
     
+    /** Payment type of document: credit (default option) or cash. */
+    public int AuxPaymentType;
+    /** Files of document: XML & PDF. */
     public File[] AuxFiles;
+    
+    public int AccMethod;
+    public int AccAccountId;
+    public int AccCostCenterId;
+    public int AccItemId;
+    public int AccItemAuxId;
+    public double AccUnits;
+    public int AccUnitId;
     
     public SImportedDocument(final SServicesUtils.ConfigSettings configSettings) {
         ConfigSettings = configSettings;
@@ -193,7 +209,20 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
         References = null;
         
+        AuxPaymentType = SDataConstantsSys.TRNS_TP_PAY_CREDIT;
         AuxFiles = null;
+        
+        setMassAccountSettings(SDbSwapDataProcessing.ACC_METHOD_MANUAL, 0, 0, 0, 0, 0, 0);
+    }
+    
+    public final void setMassAccountSettings(final int method, final int accountId, final int costCenterId, final int itemId, final int itemAuxId, double units, final int unitId) {
+        AccMethod = method;
+        AccAccountId = accountId;
+        AccCostCenterId = costCenterId;
+        AccItemId = itemId;
+        AccItemAuxId = itemAuxId;
+        AccUnits = units;
+        AccUnitId = unitId;
     }
     
     /**
@@ -529,15 +558,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Intenged to be used in GUI context.
      * @param session GUI session.
      * @param docFilesDownloadSrvUrl URL of document files download service.
-     * @param dpsKey DPS primary key.
-     * @param allowLaterInvoice Allow linking an invoice wichi is issued later.
-     * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
-     * @param createPaymentRequest Create-payment-request flag.
+     * @param dpsKey DPS primary key of invoice to be linked to.
      * @param paymentTypeMatchigPolicy Payment type matching policy: MATCH_PAY_TP...
+     * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
+     * @param allowLaterInvoice Allow linking an invoice wich is issued later.
+     * @param ommitNumberValidation Ommit number validation of invoice to be linked to.
+     * @param createPaymentRequest Create-payment-request flag.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final boolean createPaymentRequest, final boolean allowLaterInvoice, final boolean allowGreaterInvoice, final int paymentTypeMatchigPolicy) throws Exception {
+    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final int paymentTypeMatchigPolicy, final boolean allowGreaterInvoice, final boolean allowLaterInvoice, final boolean ommitNumberValidation, final boolean createPaymentRequest) throws Exception {
         boolean linked = false;
         String prefix = "No se pudo realizar la vinculación:\n";
         
@@ -551,8 +581,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             
             SThinDps dps = new SThinDps();
             dps.read(dpsKey, session.getStatement());
-            
-            Date dueDate = getDueDateEffective();
             
             // Validate DPS:
             
@@ -569,15 +597,17 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 throw new Exception(prefix + "La moneda de este documento, " + CurrencyCode + ", "
                         + "es distinta a la de la factura a vincular, " + dps.getDbmsCurrencyCode() + ".");
             }
-            else if ((dueDate != null && dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CREDIT) && (paymentTypeMatchigPolicy == MATCH_PAY_TP_REQUIRED || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONFIRM_ON_FAIL &&
-                    session.getClient().showMsgBoxConfirm("Este documento es de crédito, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
-                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
-                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de crédito.");
-            }
-            else if ((dueDate == null && dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CASH) && (paymentTypeMatchigPolicy == MATCH_PAY_TP_REQUIRED || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONFIRM_ON_FAIL &&
+            else if ((AuxPaymentType == SDataConstantsSys.TRNS_TP_PAY_CASH && AuxPaymentType != dps.getFkPaymentTypeId()) &&
+                    (paymentTypeMatchigPolicy == MATCH_PAY_TP_MAND || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONF_DIFF &&
                     session.getClient().showMsgBoxConfirm("Este documento es de contado, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
                 throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de contado.");
+            }
+            else if ((AuxPaymentType == SDataConstantsSys.TRNS_TP_PAY_CREDIT && AuxPaymentType != dps.getFkPaymentTypeId()) &&
+                    (paymentTypeMatchigPolicy == MATCH_PAY_TP_MAND || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONF_DIFF &&
+                    session.getClient().showMsgBoxConfirm("Este documento es de crédito, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
+                            + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
+                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de crédito.");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
                     (Math.abs(Total - dps.getTotalCy_r()) < 1d && session.getClient().showMsgBoxConfirm(
@@ -603,108 +633,112 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         + "es distinta a la de la factura a vincular, " + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
-                String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
+                if (!ommitNumberValidation) {
+                    // validate folio of document
 
-                // check folio number: it must match its counterpart in document, in DPS it is allways available:
+                    String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
-                String msgTopic = "";
-                String msgError = "";
-                String msgConfirm = "";
+                    // check folio number: it must match its counterpart in document, in DPS it is allways available:
 
-                if (!Number.isEmpty()) {
-                    // document has folio number:
+                    String msgMatter = "";
+                    String msgError = "";
+                    String msgConfirm = "";
 
-                    msgTopic = "El número del folio de este documento, '" + Number + "', ";
+                    if (!Number.isEmpty()) {
+                        // document has folio number:
 
-                    if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase())) {
-                        // match required:
-                        msgError = msgTopic + "es distinto al de la factura a vincular, '" + dps.getNumber() + "'.";
-                    }
-                }
-                else {
-                    // document does not have folio number:
+                        msgMatter = "El número del folio de este documento, '" + Number + "', ";
 
-                    msgTopic = "Este documento no tiene número de folio";
-
-                    if (ExternalDocumentUuid.isEmpty()) {
-                        // no UUID available to attempt to find similitudes:
-
-                        // match required:
-                        msgError = " ni UUID,\n"
-                                + "mientras que el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
+                        if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase())) {
+                            // match required:
+                            msgError = msgMatter + "es distinto al de la factura a vincular, '" + dps.getNumber() + "'.";
+                        }
                     }
                     else {
-                        // UUID available, attempt to find similitudes:
+                        // document does not have folio number:
 
-                        if (ExternalDocumentUuid.toUpperCase().equals(dps.getNumber().toUpperCase())) {
-                            msgConfirm = msgTopic + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
-                                    + "es igual al número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
-                        }
-                        else if (dps.getNumber().length() >= DCfdVer4Consts.LEN_UUID_1ST_SEGMENT && dps.getNumber().length() < ExternalDocumentUuid.length() && ExternalDocumentUuid.toUpperCase().startsWith(dps.getNumber().toUpperCase())) {
-                            msgConfirm = msgTopic + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
-                                    + "inicia como el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                        msgMatter = "Este documento no tiene número de folio";
+
+                        if (ExternalDocumentUuid.isEmpty()) {
+                            // no UUID available to attempt to find similitudes:
+
+                            // match required:
+                            msgError = " ni UUID,\n"
+                                    + "mientras que el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
                         }
                         else {
-                            // match required:
-                            msgError = msgTopic + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
-                                    + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                            // UUID available, attempt to find similitudes:
+
+                            if (ExternalDocumentUuid.toUpperCase().equals(dps.getNumber().toUpperCase())) {
+                                msgConfirm = msgMatter + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
+                                        + "es igual al número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                            }
+                            else if (dps.getNumber().length() >= DCfdVer4Consts.LEN_UUID_1ST_SEGMENT && dps.getNumber().length() < ExternalDocumentUuid.length() && ExternalDocumentUuid.toUpperCase().startsWith(dps.getNumber().toUpperCase())) {
+                                msgConfirm = msgMatter + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
+                                        + "inicia como el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                            }
+                            else {
+                                // match required:
+                                msgError = msgMatter + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
+                                        + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                            }
                         }
                     }
-                }
 
-                // processs folio number validation:
+                    // processs folio number validation:
 
-                if (!msgError.isEmpty()) {
-                    throw new Exception(prefix + msgError);
-                }
-                else if (!msgConfirm.isEmpty()) {
-                    if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
-                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                        throw new Exception(msgChooseOtherInvoice);
+                    if (!msgError.isEmpty()) {
+                        throw new Exception(prefix + msgError);
                     }
-                }
-
-                // check folio series: it must match its counterpart in document, in DPS it is not allways available:
-
-                msgTopic = "";
-                msgError = "";
-                msgConfirm = "";
-
-                if (!NumberSeries.isEmpty()) {
-                    // document has folio series:
-
-                    msgTopic = "La serie del folio de este documento, '" + NumberSeries + "', ";
-
-                    if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase())) {
-                        // match required:
-                        msgError = msgTopic + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
+                    else if (!msgConfirm.isEmpty()) {
+                        if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
+                                + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                                + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                            throw new Exception(msgChooseOtherInvoice);
+                        }
                     }
-                    else if (dps.getNumberSeries().isEmpty()) {
-                        // match required:
-                        msgConfirm = msgTopic + "no corresponde a la de la factura a vincular porque esta carece de serie.";
+
+                    // check folio series: it must match its counterpart in document, in DPS it is not allways available:
+
+                    msgMatter = "";
+                    msgError = "";
+                    msgConfirm = "";
+
+                    if (!NumberSeries.isEmpty()) {
+                        // document has folio series:
+
+                        msgMatter = "La serie del folio de este documento, '" + NumberSeries + "', ";
+
+                        if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase())) {
+                            // match required:
+                            msgError = msgMatter + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
+                        }
+                        else if (dps.getNumberSeries().isEmpty()) {
+                            // match required:
+                            msgConfirm = msgMatter + "no corresponde a la de la factura a vincular porque esta carece de serie.";
+                        }
                     }
-                }
-                else {
-                    // document does not have folio series:
+                    else {
+                        // document does not have folio series:
 
-                    msgTopic = "Este documento no tiene serie de folio";
+                        msgMatter = "Este documento no tiene serie de folio";
 
-                    if (!dps.getNumberSeries().isEmpty()) {
-                        msgConfirm = msgTopic + ", y no corresponde a la de la factura a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
+                        if (!dps.getNumberSeries().isEmpty()) {
+                            msgConfirm = msgMatter + ", y no corresponde a la de la factura a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
+                        }
                     }
-                }
 
-                // processs folio series validation:
+                    // processs folio series validation:
 
-                if (!msgError.isEmpty()) {
-                    throw new Exception(prefix + msgError);
-                }
-                else if (!msgConfirm.isEmpty()) {
-                    if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                            + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
-                            + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                        throw new Exception(msgChooseOtherInvoice);
+                    if (!msgError.isEmpty()) {
+                        throw new Exception(prefix + msgError);
+                    }
+                    else if (!msgConfirm.isEmpty()) {
+                        if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
+                                + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                                + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                            throw new Exception(msgChooseOtherInvoice);
+                        }
                     }
                 }
 
@@ -744,29 +778,41 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 swapDataProcessing.setDpsReferences(composeReferences());
                 swapDataProcessing.setDpsDescription(Description);
                 swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
-                swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
-                swapDataProcessing.setPaymentRequired(false);
-                swapDataProcessing.setPaymentApplicationCy(0);
-                swapDataProcessing.setPaymentDateRequired_n(null);
-                swapDataProcessing.setAccMethod(SDbSwapDataProcessing.ACC_METHOD_MANUAL);
-                swapDataProcessing.setAccUserUnits(0);
-                swapDataProcessing.setAccSystemUnits(0);
+                swapDataProcessing.setProcessingType(ProcessingTypeId);
+                
+                swapDataProcessing.setPaymentRequired(RequirePayment);
+                if (RequirePayment && isPaymentRequestDataAvailable()) {
+                    swapDataProcessing.setPaymentApplicationCy(getRequiredPaymentAmountEffective(dps));
+                    swapDataProcessing.setPaymentDateRequired_n(getRequiredPaymentDateEffective());
+                }
+                else {
+                    swapDataProcessing.setPaymentApplicationCy(0);
+                    swapDataProcessing.setPaymentDateRequired_n(null);
+                }
+                
                 swapDataProcessing.setDeleted(false);
                 swapDataProcessing.setSystem(false);
+                
                 swapDataProcessing.setFkDpsYearId_n(dps.getPkYearId());
                 swapDataProcessing.setFkDpsDocId_n(dps.getPkDocId());
+                
                 swapDataProcessing.setFkPaymentId_n(payment == null ? 0 : payment.getPkPaymentId());
-                //swapDataProcessing.setFkPayCurrencyId_n(...);
-                //swapDataProcessing.setFkAccUserAccountId_n(...);
-                //swapDataProcessing.setFkAccUserCostCenterId_n(...);
-                //swapDataProcessing.setFkAccUserItemId_n(...);
-                //swapDataProcessing.setFkAccUserItemAuxId_n(...);
-                //swapDataProcessing.setFkAccUserUnitId_n(...);
-                //swapDataProcessing.setFkAccSystemAccountId_n(...);
-                //swapDataProcessing.setFkAccSystemCostCenterId_n(...);
-                //swapDataProcessing.setFkAccSystemItemId_n(...);
-                //swapDataProcessing.setFkAccSystemItemAuxId_n(...);
-                //swapDataProcessing.setFkAccSystemUnitId_n(...);
+                swapDataProcessing.setFkPayCurrencyId_n(payment == null ? 0 : payment.getFkCurrencyId());
+                
+                swapDataProcessing.setAccMethod(AccMethod);
+                swapDataProcessing.setAccUserUnits(AccUnits);
+                swapDataProcessing.setAccSystemUnits(AccUnits);
+                swapDataProcessing.setFkAccUserAccountId_n(AccAccountId);
+                swapDataProcessing.setFkAccUserCostCenterId_n(AccCostCenterId);
+                swapDataProcessing.setFkAccUserItemId_n(AccItemId);
+                swapDataProcessing.setFkAccUserItemAuxId_n(AccItemAuxId);
+                swapDataProcessing.setFkAccUserUnitId_n(AccUnitId);
+                swapDataProcessing.setFkAccSystemAccountId_n(AccAccountId);
+                swapDataProcessing.setFkAccSystemCostCenterId_n(AccCostCenterId);
+                swapDataProcessing.setFkAccSystemItemId_n(AccItemId);
+                swapDataProcessing.setFkAccSystemItemAuxId_n(AccItemAuxId);
+                swapDataProcessing.setFkAccSystemUnitId_n(AccUnitId);
+                
                 //swapDataProcessing.setFkUserInsertId(...);
                 //swapDataProcessing.setFkUserUpdateId(...);
                 //swapDataProcessing.setTsUserInsert(...);
@@ -787,15 +833,19 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 boolean attachPdf = dps.getThinPdf() == null;
                 
                 if (attachXml || attachPdf) {
-                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                    File[] files = AuxFiles; // re-use existing files, if available
                     
-                    if (files != null && files.length == 2) {
-                        if (attachXml && files[SImportUtils.CFDI_XML] != null) {
+                    if (files == null || files.length != SImportUtils.CFDI_FILES) {
+                        files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                    }
+                    
+                    if (files != null && files.length == SImportUtils.CFDI_FILES) {
+                        if (attachXml && files[SImportUtils.CFDI_XML_IDX] != null) {
                             // attach CFD:
                             
                             SDataCfd cfd = SDataCfd.prepareCfd(
                                     null, 
-                                    files[SImportUtils.CFDI_XML], 
+                                    files[SImportUtils.CFDI_XML_IDX], 
                                     session.getUser().getPkUserId());
                             
                             cfd.setFkDpsYearId_n(dps.getPkYearId());
@@ -809,12 +859,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                             ProcessedDps.HasCfd = true;
                         }
                         
-                        if (attachPdf && files[SImportUtils.CFDI_PDF] != null) {
+                        if (attachPdf && files[SImportUtils.CFDI_PDF_IDX] != null) {
                             // attach PDF:
                             
                             SDataPdf pdf = SDataPdf.preparePdf(
                                     null, 
-                                    files[SImportUtils.CFDI_PDF], 
+                                    files[SImportUtils.CFDI_PDF_IDX], 
                                     dps.getPkYearId(), 
                                     ((SDataParamsCompany) session.getConfigCompany()).getXmlBaseDirectory());
                             
@@ -1042,7 +1092,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Create a new DPS from this document.
+     * Create a new DPS header, without entries, from this document.
      * @param session GUI session.
      * @param order Order, can be <code>null</code>.
      * @return 
@@ -1051,7 +1101,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         int year = SLibTimeUtils.digestYear(Date)[0];
         SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.BPSU_BP, new int[] { BizPartnerId }, SLibConstants.EXEC_MODE_STEALTH);
         SDbFunctionalSubArea functionalSubArea = (SDbFunctionalSubArea) session.readRegistry(SModConsts.CFGU_FUNC_SUB, new int[] { FunctionalSubAreaId });
-        Date dueDate = getDueDateEffective();
         
         SDataDps dps = new SDataDps();
         
@@ -1098,7 +1147,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setPayments(
         //dps.setPaymentMethod(
         //dps.setPaymentAccount(
-        dps.setAccountingTag(AccountingTag);
+        //dps.setAccountingTag(
         //dps.setAutomaticAuthorizationRejection(
         //dps.setIsPublic(
         //dps.setIsLinked(
@@ -1117,7 +1166,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
         dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
         dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
-        dps.setFkPaymentTypeId(dueDate != null ? SDataConstantsSys.TRNS_TP_PAY_CREDIT : SDataConstantsSys.TRNS_TP_PAY_CASH);
+        dps.setFkPaymentTypeId(AuxPaymentType);
         dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
         dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
@@ -1187,14 +1236,101 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         //dps.setFkUserEditId(
         //dps.setFkUserDeleteId(
         
-        if (dueDate != null) {
-            dps.setDaysOfCreditByDueDate(dueDate);
+        // set dayos of credit and accounting tag:
+        
+        if (AuxPaymentType == SDataConstantsSys.TRNS_TP_PAY_CREDIT && getDueDateEffective() != null) {
+            dps.setDaysOfCreditByDueDate(getDueDateEffective());
         }
+        
+        String tag = AccountingTag;
+        
+        if (tag.isEmpty() && order != null && !order.getAccountingTag().isEmpty()) {
+            tag = order.getAccountingTag();
+        }
+        
+        dps.setAccountingTag(tag);
+        
+        // complete DPS creation:
         
         dps.setAuxKeepDpsData(true);
         dps.setXtaImportedDocument(this);
         
         return dps;
+    }
+    
+    /**
+     * Retrieve PDF file of document.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @return PDF file, if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public File retrievePdf(final SGuiSession session, final String serviceUrl) throws Exception {
+        File pdf = null;
+        
+        if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
+            pdf = AuxFiles[SImportUtils.CFDI_PDF_IDX]; // re-use existing files, if available
+        }
+        
+        if (pdf == null) {
+            pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
+        }
+        
+        if (pdf == null) {
+            File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, serviceUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+            
+            if (files == null || files.length != SImportUtils.CFDI_FILES) {
+                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+            }
+            else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+            }
+            else {
+                AuxFiles = files;
+                pdf = SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF_IDX], BizPartnerId);
+            }
+        }
+        
+        return pdf;
+    }
+    
+    /**
+     * Retrieve XML and PDF files of document.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @return PDF file, if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public File[] retrieveFiles(final SGuiSession session, final String serviceUrl) throws Exception {
+        File[] files = null;
+        
+        if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
+            files = AuxFiles; // re-use existing files, if available
+        }
+        
+        if (files == null) {
+            // check that business partner is domestic:
+
+            boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(BizPartnerId, (SClientInterface) session.getClient());
+
+            // retrieve CFDI files:
+
+            files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, serviceUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+
+            if (files == null || files.length != SImportUtils.CFDI_FILES) {
+                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+            }
+            else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
+            }
+            else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+            }
+            
+            AuxFiles = files;
+        }
+        
+        return files;
     }
     
     /**
@@ -1301,7 +1437,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 value = CurrencyCode;
                 break;
             case 7:
-//                value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
+                value = Priority == SDbPayment.PRIORITY_URGENT ? SGridConsts.ICON_EXCL : SGridConsts.ICON_NULL;
                 break;
             case COL_DOWNLOAD:
                 value = Download;

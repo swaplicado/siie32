@@ -159,6 +159,14 @@ public abstract class SGuiModule {
         }
     }
 
+    /**
+     * Process form and save registry through SIIE Server.
+     * WARNING: Similar save logic as in erp.mod.cfg.swap.utils.SImportUtils.saveRegistry(). Keep save logic synced on any change on either of both methods!
+     * @param pk Primary key of registry to process in current form.
+     * @param isCopy Is copy flag.
+     * @return Response code get from server when registry is saved.
+     * @throws Exception 
+     */
     protected int processForm(java.lang.Object pk, boolean isCopy) throws java.lang.Exception {
         int result = SLibConstants.UNDEFINED;
         SServerRequest request = null;
@@ -425,7 +433,6 @@ public abstract class SGuiModule {
                 if (slock != null) {
                     SLockUtils.releaseLock(miClient, slock);
                 }
-
                 
                 for (SLock sl : mvIndependentSLocks) {
                     SLockUtils.releaseLock(miClient, sl);

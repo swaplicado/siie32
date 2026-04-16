@@ -116,7 +116,6 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
-    public static final int CONCEPT_LENGTH_MAX = 130;
     public static final int LINK_TICKET_SELECT = 1; 
     public static final int LINK_TICKET_ENABLED = 2; 
     public static final int LINKED_TICKET = 3; 
@@ -2558,9 +2557,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
         moFieldFkItemId.setPickerButton(jbFkItemId);
         moFieldConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtConceptfKey, jlConceptKey);
-        moFieldConceptKey.setLengthMax(35);
+        moFieldConceptKey.setLengthMax(SDataDpsEntry.LEN_CONCEPT_KEY);
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
-        moFieldConcept.setLengthMax(CONCEPT_LENGTH_MAX);
+        moFieldConcept.setLengthMax(SDataDpsEntry.LEN_CONCEPT);
         moFieldFkOriginalUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkOriginalUnitId, jlFkOriginalUnitId);
         moFieldFkOriginalUnitId.setPickerButton(jbFkOriginalUnitId);
         //moFieldAcidityPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfAcidityPercentage, jlAcidityPercentage);
@@ -2677,7 +2676,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldFkItemReferenceId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemReferenceId_n, jlFkItemReferenceId_n);
         moFieldFkItemReferenceId_n.setPickerButton(jbFkItemReferenceId_n);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
-        moFieldReference.setLengthMax(25);
+        moFieldReference.setLengthMax(SDataDpsEntry.LEN_REFERENCE);
         moFieldOperationsType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbOperationsType, jlOperationsType);
         
         moFieldAddBachocoNúmeroPosición = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfAddBachocoNúmeroPosición, jlAddBachocoNúmeroPosición);

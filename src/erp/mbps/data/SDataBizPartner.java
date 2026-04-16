@@ -939,32 +939,34 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
      * @return 
      * @throws java.lang.Exception 
      */
-    public static boolean checkIsDomestic(final int bizPartnerId, final SClientInterface client) throws Exception {
+    public static Boolean checkIsDomestic(final int bizPartnerId, final SClientInterface client) throws Exception {
         Boolean isDomestic = null;
         
         String sql = "SELECT b.fiscal_id, bba.fid_cty_n "
                 + "FROM erp.bpsu_bp AS b "
                 + "INNER JOIN erp.bpsu_bpb AS bb ON bb.fid_bp = b.id_bp AND bb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " "
-                + "INNER JOIN erp.bpsu_bpb_add AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SUtilConsts.BRA_ADD_ID + "  "
+                + "INNER JOIN erp.bpsu_bpb_add AS bba ON bba.id_bpb = bb.id_bpb AND bba.id_add = " + SUtilConsts.BRA_ADD_ID + " "
                 + "WHERE b.id_bp = " + bizPartnerId + ";";
         
-        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                String fiscalId = resultSet.getString("b.fiscal_id");
-                
-                if (fiscalId.equals(DCfdConsts.RFC_GEN_NAC)) {
-                    isDomestic = true;
-                }
-                else if (fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
-                    isDomestic = false;
-                }
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        if (resultSet.next()) {
+            String fiscalId = resultSet.getString("b.fiscal_id");
 
-                if (isDomestic == null) {
-                    int country = resultSet.getInt("bba.fid_cty_n");
-                    isDomestic = country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
-                }
+            if (fiscalId.equals(DCfdConsts.RFC_GEN_NAC)) {
+                isDomestic = true;
+            }
+            else if (fiscalId.equals(DCfdConsts.RFC_GEN_INT)) {
+                isDomestic = false;
+            }
+
+            if (isDomestic == null) {
+                int country = resultSet.getInt("bba.fid_cty_n");
+                isDomestic = country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
             }
         }
+        
+        resultSet.close();
         
         return isDomestic;
     }

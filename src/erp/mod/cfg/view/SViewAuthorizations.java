@@ -45,44 +45,44 @@ public class SViewAuthorizations extends SGridPaneView implements ActionListener
     private void actionAuthorizeOrRejectResource(final int iAction) {
         if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else if (gridRow.isRowSystem()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+            }
+            else if (!gridRow.isUpdatable()) {
+                miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
             }
             else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                try {
+                    String response = "Error";
+                    if (iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
+                        response = SAuthorizationUtils.authorizeById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");
+                    }
+                    else {
+                        response = SAuthorizationUtils.rejectById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");
+                    }
 
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        String response = "Error";
-                        if (iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE) {
-                            response = SAuthorizationUtils.authorizeById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");
-                        }
-                        else {
-                            response = SAuthorizationUtils.rejectById(miClient.getSession(), gridRow.getRowPrimaryKey()[0], "");
-                        }
-                        
-                        if (response.length() > 0) {
-                            miClient.showMsgBoxError(response);
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("Documento " + 
-                                    (iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "autorizado" : "rechazado") + 
-                                    " con éxito");
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
+                    if (response.length() > 0) {
+                        miClient.showMsgBoxError(response);
                     }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
+                    else {
+                        miClient.showMsgBoxInformation("Documento " + 
+                                (iAction == SAuthorizationUtils.AUTH_ACTION_AUTHORIZE ? "autorizado" : "rechazado") + 
+                                " con éxito");
+                        miClient.getSession().notifySuscriptors(mnGridType);
                     }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
                 }
             }
+        }
     }
 
     @Override

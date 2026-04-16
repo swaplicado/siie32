@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.account;
+package erp.mod.cfg.swap.model.account;
 
 /**
  *
@@ -15,19 +15,19 @@ import java.util.List;
 
 public class Partner {
     
-    public static final String PARTNER_TYPE_ALL = "all";
-    public static final String PARTNER_TYPE_PERSON = "person";
-    public static final String PARTNER_TYPE_ORGANIZATION = "organization";
+    public static final String TYPE_ALL = "all";
+    public static final String TYPE_PERSON = "person";
+    public static final String TYPE_ORGANIZATION = "organization";
     
-    public static final HashMap<String, String> PartnerTypes = new HashMap<>();
-    public static final HashMap<String, String> PartnerTypeCodes = new HashMap<>();
+    public static final HashMap<String, String> Types = new HashMap<>();
+    public static final HashMap<String, String> TypeCodes = new HashMap<>();
     
     static {
-        PartnerTypes.put(PARTNER_TYPE_PERSON, "Persona física");
-        PartnerTypes.put(PARTNER_TYPE_ORGANIZATION, "Persona moral");
+        Types.put(TYPE_PERSON, "Persona física");
+        Types.put(TYPE_ORGANIZATION, "Persona moral");
         
-        PartnerTypeCodes.put(PARTNER_TYPE_PERSON, "PF");
-        PartnerTypeCodes.put(PARTNER_TYPE_ORGANIZATION, "PM");
+        TypeCodes.put(TYPE_PERSON, "PF");
+        TypeCodes.put(TYPE_ORGANIZATION, "PM");
     }
     
     private String partnerType;

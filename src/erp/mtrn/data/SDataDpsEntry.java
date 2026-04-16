@@ -34,6 +34,10 @@ import sa.lib.SLibUtils;
  * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López, Isabel Servín, Edwin Carmona
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final int LEN_CONCEPT_KEY = 35;
+    public static final int LEN_CONCEPT = 130;
+    public static final int LEN_REFERENCE = 25;
 
     protected int mnPkYearId;
     protected int mnPkDocId;

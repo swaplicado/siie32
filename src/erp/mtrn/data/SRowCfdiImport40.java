@@ -257,7 +257,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moDpsEntry.setPkDocId(...);
         moDpsEntry.setPkEntryId(...)
         */
-        moNewDpsEntry.setConceptKey(moItem == null ? "" : moItem.getCode());
+        moNewDpsEntry.setConceptKey(moItem == null ? "" : moItem.getKey());
         moNewDpsEntry.setConcept(moItem == null ? "" : moItem.getItem());
         /*
         moDpsEntry.setReference(...);
