@@ -29,9 +29,7 @@ import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
-import erp.server.SSessionServer;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,8 +43,6 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperPrint;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -1877,7 +1873,6 @@ public abstract class SExportDataUtils {
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
-
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
 
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -1898,28 +1893,30 @@ public abstract class SExportDataUtils {
                                             somSettings.DbmsPswd) == SDbConsts.CONNECTION_OK) {
                         try {
                             try (Statement somStatement = somDatabase.getConnection().createStatement()) {
-                                String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_SCALE_IN_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(s.code, '-', t.num))"; // código de tipo de referencia + '/' + referencia
+                                String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_SCALE_IN_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(s.code, '-', t.num))";
                                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_SCALE_TICKET, database);
 
-                                String syncedRegistries = "";
+                                // Obtener la subconsulta SQL de registros sincronizados
+                                String sqlSyncedSubQuery = getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_SCALE_TICKET, database);
 
-                                try (ResultSet resultSet = statement.executeQuery(getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_SCALE_TICKET, database))) {
-                                    while (resultSet.next()) {
-                                        syncedRegistries += (syncedRegistries.isEmpty() ? "" : ", ") + "'" + resultSet.getString(1) + "'";
-                                    }
-                                }
+                                // Construir condición de registros activos (is_active)
+                                String activeCondition = "(NOT t.b_del "
+                                        + "AND t.b_tar "
+                                        + "AND t.req_freight = 'Y' "
+                                        + "AND t.freight_tic_tp = 'F' "
+                                        + "AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + "))";
 
-                                if (syncedRegistries.isEmpty()) {
-                                    syncedRegistries = "''";
-                                }
+                                // Construir condición de actualización (is_updated)
+                                String updatedCondition = lastSyncDatetime != null ? 
+                                        "t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'" : 
+                                        "FALSE";
 
                                 String sql = "SELECT "
                                         + "t.id_tic, s.code, t.num, t.dt, i.name, "
                                         + "t.qty, u.code, t.drv, t.pla, t.pla_cag, "
                                         + "t.ts_arr, t.ts_dep, f.name, " + referenceId + " AS _reference, "
-                                        + " (NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' AND "
-                                        + " t.freight_tic_tp = 'F' AND "
-                                        + " i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")) AS _is_active,"
+                                        + activeCondition + " AS _is_active, "
+                                        + updatedCondition + " AS _is_updated, "
                                         + "t.wei_des_gro_r AS _gross_weight, "
                                         + "t.wei_des_net_r AS _net_weight, "
                                         + "COALESCE(f.name, 'NA') AS _freight_origin, "
@@ -1932,37 +1929,33 @@ public abstract class SExportDataUtils {
                                         + "LEFT OUTER JOIN su_freight_orig AS f ON f.id_freight_orig = t.fk_freight_orig_n "
                                         + "LEFT JOIN su_inp_src AS isrc ON isrc.id_inp_src = t.fk_inp_src "
                                         + "LEFT JOIN su_prod AS p ON p.id_prod = t.fk_prod "
-                                        + "WHERE ("
-                                        + "("
-                                        + " (NOT t.b_del AND t.b_tar AND t.req_freight = 'Y' "
-                                        + "     AND t.freight_tic_tp = 'F' "
-                                        + "     AND i.fk_inp_ct IN (" + somSettings.getInputCategoryIdsAsText() + ")"
-                                        + " ) "
-                                        + " AND " + referenceId + " NOT IN (" + syncedRegistries + ")"
+                                        + "LEFT JOIN (" + sqlSyncedSubQuery + ") AS synced ON synced.reference_id = " + referenceId + " "
+                                        + "WHERE t.dt >= '" + SLibUtils.DbmsDateFormatDate.format(somSettings.Start) + "' "
+                                        // Condición: (ya está sincronizado Y fue modificado después) O (NO está sincronizado Y está activo)
+                                        + "AND ( "
+                                        + "     (synced.reference_id IS NOT NULL AND " + updatedCondition + ") "
+                                        + "     OR (synced.reference_id IS NULL AND " + activeCondition + ") "
                                         + ") "
-                                        + (lastSyncDatetime == null ? "" : " "
-                                        + "OR (t.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
-                                        + ") "
-                                        + "AND t.dt >= '" + SLibUtils.DbmsDateFormatDate.format(somSettings.Start) + "' "
                                         + "ORDER BY s.code, t.num, t.id_tic;";
 
                                 ResultSet somResultSet = somStatement.executeQuery(sql);
-
+                                int idTicket;
                                 while (somResultSet.next()) {
                                     String concepts = "CHOFER: " + somResultSet.getString("t.drv") + "; "
                                             + "PLACAS: " + somResultSet.getString("t.pla") + "; "
                                             + somResultSet.getString("i.name") + " " + SLibUtils.DecimalFormatInteger.format(somResultSet.getDouble("t.qty")) + " " + somResultSet.getString("u.code");
 
                                     SExportDataReference reference = new SExportDataReference();
-
-                                    reference.external_id = "" + somResultSet.getInt("t.id_tic");
+                                    
+                                    idTicket = somResultSet.getInt("t.id_tic");
+                                    reference.external_id = "" + idTicket;
                                     reference.external_company_id = companyId;
                                     reference.external_functional_area_id = somSettings.FunctionalSubAreaId;
                                     reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
                                     reference.document_ref_type_id = SSwapConsts.TXN_REF_TYPE_SCALE_IN;
                                     reference.external_partner_id = companyId;
                                     reference.reference = somResultSet.getString("_reference");
-                                    reference.date = SLibUtils.IsoFormatDate.format(somResultSet.getDate("t.dt")); // yyyy-mm-dd
+                                    reference.date = SLibUtils.IsoFormatDate.format(somResultSet.getDate("t.dt"));
                                     reference.currency_code = DCfdi40Catalogs.ClaveMonedaMxn;
                                     reference.amount = 0;
                                     reference.fiscal_use = somSettings.CfdiUsage;
@@ -1976,33 +1969,29 @@ public abstract class SExportDataUtils {
                                     reference.purchase_origin_zone = somResultSet.getString("_fruit_origin");
                                     reference.productor_name = somResultSet.getString("_prod_name");
                                     reference.is_deleted = !somResultSet.getBoolean("_is_active");
-                                    
+
                                     File oPdf = null;
                                     try {
                                         reference.som_ticket_file_name = "";
                                         reference.som_ticket_file_bucket = "";
                                         reference.som_ticket_file_project_id = "";
 
-                                        HashMap<String, Object> map = SExportDataSomUtils.createReportParamsMap(session);
-                                        map.put("nTicketId", somResultSet.getInt("t.id_tic"));
-                                        map.put("sTable", "s_tic");
-                                        JasperPrint jasperPrint = SSessionServer.createJasperPrint(SDataConstantsSys.REP_TRN_SOM_TICKET, 
-                                                                            map, 
-                                                                            somDatabase.getConnection());
-                                        String fileName = "SOM_TIC_" + reference.external_id;
-                                        String folderName = "SOM_REV_TIC/";
-                                        oPdf = new File("temp", fileName + (new Date()).hashCode() + ".pdf");
-                                        FileOutputStream outputStreamPdf = new FileOutputStream(oPdf);
-                                        JasperExportManager.exportReportToPdfStream(jasperPrint, outputStreamPdf);
-                                        outputStreamPdf.close();
-                                        CloudStorageFile gcsFile = SDpsGoogleCloudUtils.uploadFile(oPdf.getAbsolutePath(), (folderName + fileName + ".pdf"));
-                                        if (gcsFile != null) {
-                                            reference.som_ticket_file_name = gcsFile.getFileName();
-                                            reference.som_ticket_file_bucket = gcsFile.getBucketName();
-                                            reference.som_ticket_file_project_id = gcsFile.getProjectId();
+                                        oPdf = SExportDataSomUtils.createTicketPdf(session, somDatabase.getConnection(), idTicket, false);
+                                        if (oPdf != null) {
+                                            String folderName = "SOM_REV_TIC/";
+                                            String fileName = "SOM_TIC_" + idTicket;
+                                            CloudStorageFile gcsFile = SDpsGoogleCloudUtils.uploadFile(oPdf.getAbsolutePath(), (folderName + fileName + ".pdf"));
+                                            if (gcsFile != null) {
+                                                reference.som_ticket_file_name = gcsFile.getFileName();
+                                                reference.som_ticket_file_bucket = gcsFile.getBucketName();
+                                                reference.som_ticket_file_project_id = gcsFile.getProjectId();
+                                            }
                                         }
                                     }
                                     catch (Exception e) {
+                                        reference.som_ticket_file_name = "";
+                                        reference.som_ticket_file_bucket = "";
+                                        reference.som_ticket_file_project_id = "";
                                         Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, 
                                                 "Error exporting scale ticket report to PDF for ticket ID " + reference.external_id, e);
                                     }
