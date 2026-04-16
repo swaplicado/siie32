@@ -80,7 +80,7 @@ public abstract class SMaterialRequestEstimationUtils {
                 }
             }
             catch(Exception e){
-                SLibUtils.showException(SMaterialRequestEstimationUtils.class.getName(), e);
+                SLibUtils.printException(SMaterialRequestEstimationUtils.class.getName(), e);
             }
             
             row = "PARTIDA #" + SMaterialRequestEstimationUtils.padLeft(ety + "", 2, '0') + "\n" + 
