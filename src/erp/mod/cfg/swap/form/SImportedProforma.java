@@ -653,7 +653,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             SDbPayment payment = createAndSavePaymentRequest(session);
             SDbSwapDataProcessing swapDataProcessing = new SDbSwapDataProcessing();
 
-                //swapDataProcessing.setPkSwapDataProcessingId(...);
+            //swapDataProcessing.setPkSwapDataProcessingId(...);
             swapDataProcessing.setDataType(SDbSwapDataProcessing.DATA_TYPE_PRF);
             swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
             swapDataProcessing.setExternalDataId(ExternalDocumentId);
@@ -706,7 +706,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             SDbPayment payment = createAndSavePaymentRequest(miClient, urlDownload);
             SDbSwapDataProcessing swapDataProcessing = new SDbSwapDataProcessing();
 
-                //swapDataProcessing.setPkSwapDataProcessingId(...);
+            //swapDataProcessing.setPkSwapDataProcessingId(...);
             swapDataProcessing.setDataType(SDbSwapDataProcessing.DATA_TYPE_PRF);
             swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
             swapDataProcessing.setExternalDataId(ExternalDocumentId);

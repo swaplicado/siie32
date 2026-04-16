@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.account;
+package erp.mod.cfg.swap.model.account;
 
 /**
  *

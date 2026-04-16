@@ -1320,7 +1320,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SSwapConsts.TXN_DOC_TYPE_PROFORMA);
                 
                 if (files != null) {
-                    File zipFile = files[SImportUtils.FILES_ZIP];
+                    File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];
 
                     for (SGridRow row : moProformasGrid.getModel().getGridRows()) {
                         if (((SImportedProforma) row).Download && !((SImportedProforma) row).AlreadyDownloaded) {

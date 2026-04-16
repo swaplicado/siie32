@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.account;
+package erp.mod.cfg.swap.model.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -16,20 +16,37 @@ import java.util.List;
 public class Config {
     
     private List<Group> groups;
+    private List<Tax> taxes;
 
     public List<Group> getGroups() { return groups; }
     public void setGroups(List<Group> groups) { this.groups = groups; }
     
+    public List<Tax> getTaxes() { return taxes; }
+    public void setTaxes(List<Tax> taxes) { this.taxes = taxes; }
+    
     public Group getGroup(final String docType) {
-        Group group = null;
+        Group matchingGroup = null;
         
         for (Group g : groups) {
             if (g.getDocType().equals(docType)) {
-                group = g;
+                matchingGroup = g;
                 break;
             }
         }
         
-        return group;
+        return matchingGroup;
+    }
+    
+    public Tax getTax(final String type, final String tax, final String factor, final String rate) {
+        Tax matchingTax = null;
+        
+        for (Tax t : taxes) {
+            if (t.getType().equals(type) && t.getTax().equals(tax) && t.getFactor().equals(factor) && t.getRate().equals(rate)) {
+                matchingTax = t;
+                break;
+            }
+        }
+        
+        return matchingTax;
     }
 }

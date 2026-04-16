@@ -16,6 +16,9 @@ import sa.gui.util.SUtilConsts;
  */
 public class SDataState extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
+    public static final String CDMX_OBS = "DIF";
+    public static final String CDMX_NEW = "CMX";
+    
     protected int mnPkStateId;
     protected java.lang.String msState;
     protected java.lang.String msStateLan;

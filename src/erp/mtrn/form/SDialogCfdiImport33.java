@@ -1637,7 +1637,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     private void updateNameItem() {
         if (((SRowCfdiImport33) moConceptTablePane.getSelectedTableRow()).getItem().getDbmsDataItemGeneric().getIsItemNameEditable()) {
             String concept = ((String) moConceptTablePane.getSelectedTableRow().getValues().get(COL_ITEM_NAME)); 
-            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SFormDpsEntry.CONCEPT_LENGTH_MAX);
+            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SDataDpsEntry.LEN_CONCEPT);
             SRowCfdiImport33 row = (SRowCfdiImport33) moConceptTablePane.getSelectedTableRow();
             row.getItem().setItem(concept);
             row.getDpsEntry().setConcept(concept);
