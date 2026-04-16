@@ -18,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Adrián Avilés
  */
 public class SDbSwapDataProcessing extends SDbRegistryUser {
     
@@ -450,5 +450,27 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         
         return registry;
+    }
+
+    public static SDbSwapDataProcessing readByDpsKey(final SGuiSession session, int[] dpsKey) throws Exception {
+        ResultSet resultSet;
+        SDbSwapDataProcessing instance = new SDbSwapDataProcessing();
+
+        instance.msSql = "SELECT id_swap_data_prc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " " +
+                "WHERE" +
+                " fk_dps_year_n = " + dpsKey[0] +
+                " AND fk_dps_doc_n = " + dpsKey[1] +
+                " AND NOT b_del;";
+        resultSet = session.getStatement().executeQuery(instance.msSql);
+        if (!resultSet.next()) {
+            return null;
+        }
+        else {
+            int[] pk = {resultSet.getInt("id_swap_data_prc")};
+            instance.read(session, pk);
+        }
+        
+        return instance;
     }
 }
