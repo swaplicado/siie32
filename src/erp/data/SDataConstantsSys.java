@@ -1849,6 +1849,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_ADV = 207037;
     public static final int REP_TRN_MAT_CONS_BUDGET = 207039;
     
+    public static final int REP_TRN_SOM_TICKET = 207040;
+    
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
     public static final int REP_TRN_CFDI_33 = 207112;

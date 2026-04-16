@@ -45,3 +45,4 @@ src/.tmp.driveupload/
 .tmp.driveupload/
 .vscode/
 /out
+/temp
