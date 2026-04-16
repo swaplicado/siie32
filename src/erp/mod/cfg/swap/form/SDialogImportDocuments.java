@@ -2061,12 +2061,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 String confirm;
                 
                 if (recordableDocs.size() == 1) {
-                    confirm = "Se descargarán los archivos XML y PDF del comprobante, y se revisará\n";
-                    confirm += "si la única factura autorizada sin contabilizar se puede procesar.";
+                    confirm = "Se descargarán los archivos XML y PDF del comprobante, y se revisará que:\n";
+                    confirm += "la única factura autorizada sin contabilizar se puede procesar.";
                 }
                 else {
-                    confirm = "Se descargarán los archivos XML y PDF de los comprobantes, y se revisará\n";
-                    confirm += "si las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas sin contabilizar se pueden procesar.";
+                    confirm = "Se descargarán los archivos XML y PDF de los comprobantes, y se revisará que:\n";
+                    confirm += "las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas sin contabilizar se pueden procesar.";
                 }
                 
                 boolean process = miClient.showMsgBoxConfirm(confirm + "\nLa descarga y revisión pueden demorar unos instantes.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;

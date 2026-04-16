@@ -33,7 +33,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SExportDataSomUtils {
+public abstract class SExportDataSomUtils {
     
     /**
      * Construye el mapa de parámetros estándar requerido por los reportes
@@ -45,7 +45,7 @@ public class SExportDataSomUtils {
      * @param session Sesión activa del usuario.
      * @return Mapa de parámetros listo para pasarse a JasperFillManager.
      */
-    public static HashMap<String, Object> createReportParamsMap(final SGuiSession session) {
+    private static HashMap<String, Object> createReportParamsMap(final SGuiSession session) {
         HashMap<String, Object> map = new HashMap<String, Object>();
 
         // Parameters that need to be declared in reports:

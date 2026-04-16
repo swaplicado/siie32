@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
@@ -47,6 +48,7 @@ import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbDatabase;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -80,6 +82,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     public static final int VALUE_DOCS = 2;
     public static final int VALUE_EXPORT_PAYMENTS = 3;
     
+    protected String msCompanyName;
     protected SGridPaneForm moDocumentsGrid;
     protected SGridPaneForm moConceptsGrid;
     
@@ -100,6 +103,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     protected boolean mbExportPaymentRequests;
     protected int mnDocsRecordedAndLinked;
     protected SDialogPdfViewer moDialogPdfViewer;
+    protected SDbDatabase moSomDatabase;
     protected ImageIcon moIconEdit;
     protected ImageIcon moIconSave;
     
@@ -1254,6 +1258,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT)));
         moKeyDocModeCase.addItem(new SGuiItem(new int[] { SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE}, SImportedDocument.DocCases.get(SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE)));
         
+        msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
+        
         moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
             @Override
             public void initGrid() {
@@ -1833,7 +1839,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 int[] orderKey = document.ImportedDocument.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
 
                 if (orderKey == null) {
-                    throw new Exception("La factura autorizada no está relacionada con ningún pedido.");
+                    throw new Exception("La factura autorizada '" + document.ImportedDocument.getFolio() + "' no está relacionada con ningún pedido.");
                 }
                 else {
                     ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_ORD);
@@ -1893,7 +1899,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                                 moDocumentsGrid.getTable().requestFocusInWindow();
                             }
                             else {
-                                miClient.showMsgBoxWarning("No se puede cambiar el monto requerido de pago porque el documento no tiene una fecha efectiva de pago.");
+                                miClient.showMsgBoxWarning("No se puede cambiar el monto requerido de pago porque la factura autorizada '" + document.ImportedDocument.getFolio() + "' no tiene una fecha efectiva de pago.");
                             }
                         }
                     }
@@ -2090,6 +2096,72 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     
     private void actionPerformedBolViewScaleTicket() {
         miClient.showMsgBoxInformation("Esta funcionalidad aún no está disponible.");
+        /* XXX 2026-04-16, Sergio Flores: Work in progress, DO NOT REMOVE!
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                int scaleTicket = SLibUtils.parseInt(document.ScaleTicketBol);
+                
+                if (scaleTicket == 0) {
+                    miClient.showMsgBoxWarning("La factura autorizada '" + document.ImportedDocument.getFolio() + "' no tiene boleto.");
+                }
+                else {
+                    if (moSomDatabase == null) {
+                        String swapSomParamValue = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SOM);
+                        SSwapUtils.SomSettings somSettings = new SSwapUtils.SomSettings(swapSomParamValue);
+
+                        if (somSettings.LinkUp) {
+                            moSomDatabase = new SDbDatabase(SDbConsts.DBMS_MYSQL);
+                            if (moSomDatabase.connect(somSettings.DbmsHost, 
+                                                    somSettings.DbmsPort, 
+                                                    somSettings.DbName, 
+                                                    somSettings.DbmsUser, 
+                                                    somSettings.DbmsPswd) != SDbConsts.CONNECTION_OK) {
+                                miClient.showMsgBoxError(SDbConsts.ERR_MSG_DB_CONNECTION + "\n(" + SSwapConsts.SOM + ")");
+                            }
+                        }
+                    }
+
+                    if (moSomDatabase == null || !moSomDatabase.isConnected()) {
+                        miClient.showMsgBoxWarning("No se puede mostrar el boleto. No hay conexión a " + SSwapConsts.SOM + ".");
+                    }
+                    else {
+                        File pdf = SExportDataSomUtils.createTicketPdf(miClient.getSession(), moSomDatabase.getConnection(), scaleTicket, false);
+                        
+                        if (pdf != null) {
+                            if (moDialogPdfViewer == null) {
+                                moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                            }
+                            
+                            SDocument documentInfo = new SDocument() {
+
+                                @Override
+                                public String getFolio() {
+                                    return document.ScaleTicketBol;
+                                }
+
+                                @Override
+                                public String getIssuer() {
+                                    return msCompanyName;
+                                }
+                            };
+
+                            moDialogPdfViewer.setPdf(documentInfo, pdf);
+                            moDialogPdfViewer.setVisible(true);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        */
     }
     
     private void actionPerformedAccShowParsingErrorOrWarning() {
