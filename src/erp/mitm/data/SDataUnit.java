@@ -237,4 +237,9 @@ public class SDataUnit extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
     }
+    
+    @Override
+    public String toString() {
+        return msUnit + " (" + msSymbol + ")";
+    }
 }

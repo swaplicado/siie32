@@ -417,6 +417,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             SLibUtils.showException(this, ioe);
         }
     }
+    
     private void actionPerformedFileDeleteToUpdate() {
         if (!jchkDeleteOnClose.isSelected()) {
             String confirmDeletion = "¡El presente archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' será descartado!\n"

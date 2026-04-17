@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.account;
+package erp.mod.cfg.swap.model.account;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,7 +27,7 @@ public class Case {
     private String costCenter;
     private int docNature;
     private int funcSubArea;
-    private int funcSubAreaRef;
+    private int funcSubAreaBol;
 
     public String getCaseName() { return caseName; }
     public void setCaseName(String caseName) { this.caseName = caseName; }
@@ -65,8 +65,8 @@ public class Case {
     public int getFuncSubArea() { return funcSubArea; }
     public void setFuncSubArea(int funcSubArea) { this.funcSubArea = funcSubArea; }
 
-    public int getFuncSubAreaRef() { return funcSubAreaRef; }
-    public void setFuncSubAreaRef(int funcSubAreaRef) { this.funcSubAreaRef = funcSubAreaRef; }
+    public int getFuncSubAreaBol() { return funcSubAreaBol; }
+    public void setFuncSubAreaBol(int funcSubAreaBol) { this.funcSubAreaBol = funcSubAreaBol; }
 
     private String normalize(String value) {
         return (value == null || "null".equals(value)) ? null : value;

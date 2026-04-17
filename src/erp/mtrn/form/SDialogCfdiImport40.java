@@ -23,7 +23,6 @@ import erp.data.SDataUtilities;
 import erp.form.SFormOptionPicker;
 import erp.form.SFormOptionPickerItems;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
@@ -46,11 +45,9 @@ import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocumentInfo;
-import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataDpsCfd;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryTax;
 import erp.mtrn.data.SDataDpsEntryTaxRow;
@@ -65,14 +62,12 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
-import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 import sa.lib.grid.SGridUtils;
@@ -904,7 +899,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         SFormUtilities.populateComboBox(miClient, jcbTaxRegion, SDataConstants.FINU_TAX_REG);
         SFormUtilities.populateComboBox(miClient, jcbDpsNature, SDataConstants.TRNU_DPS_NAT);
         
-        if (!isApplingFunctionalAreas()) {
+        if (!miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
             SFormUtilities.populateComboBox(miClient, jcbFunctionalSubArea, SModConsts.CFGU_FUNC_SUB); // load all functional sub-areas, "non-applying" inclusive
         }
         else {
@@ -918,7 +913,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbPickTaxRegion.setEnabled(!isWithPurchaseOrder());
         jbViewPurchaseOrder.setEnabled(isWithPurchaseOrder());
         jcbDpsNature.setEnabled(!isWithPurchaseOrder());
-        jcbFunctionalSubArea.setEnabled(!isWithPurchaseOrder() && isApplingFunctionalAreas());
+        jcbFunctionalSubArea.setEnabled(!isWithPurchaseOrder() && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         
         jbCopyRow.setEnabled(!isWithPurchaseOrder());
         jbPasteRow.setEnabled(false);
@@ -954,10 +949,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jtfPoPendingQuantityCurrent.setText("");
         
         moRowCfdiCopy = null;
-    }
-    
-    private boolean isApplingFunctionalAreas() {
-        return miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas();
     }
     
     private boolean isWithInvoicePdf() {
@@ -1119,7 +1110,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             
             moFieldDpsNature.setKey(new int[] { SDataConstantsSys.TRNU_DPS_NAT_DEF });
             
-            if (!isApplingFunctionalAreas()) {
+            if (!miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas()) {
                 moFieldFunctionalSubArea.setKey(new int[] { SModSysConsts.CFGU_FUNC_SUB_NA });
             }
             else {
@@ -1200,7 +1191,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 
         if (!validation.getIsError()) {
             moNewDps = createDps();
-            setVisible(false);
+            
+            if (moNewDps != null) { // when null, do nothing!
+                setVisible(false);
+            }
         }
         else { 
             if (validation.getComponent() != null) {
@@ -1619,7 +1613,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private void updateNameItem() {
         if (((SRowCfdiImport40) moConceptTablePane.getSelectedTableRow()).getItem().getDbmsDataItemGeneric().getIsItemNameEditable()) {
             String concept = ((String) moConceptTablePane.getSelectedTableRow().getValues().get(COL_ITEM_NAME)); 
-            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SFormDpsEntry.CONCEPT_LENGTH_MAX);
+            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SDataDpsEntry.LEN_CONCEPT);
             SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getSelectedTableRow();
             row.getItem().setItem(concept);
             for (SDataDpsEntry entry : row.getNewDpsEntries()) {
@@ -2308,6 +2302,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
 
     private SDataDps createDps() {
+        /*
+        XXX 2026-04-08, Sergio Flores: Original code. Preserved for further reference.
+        
         SDataDps dps = new SDataDps();
         
         dps.setIsRecordAutomatic(true);
@@ -2390,11 +2387,12 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         if (isWithPurchaseOrder()) {
             dps.setFkFunctionalAreaId(moPurchaseOrder.getFkFunctionalAreaId());
             dps.setFkFunctionalSubAreaId(moPurchaseOrder.getFkFunctionalSubAreaId());
+        
             dps.setFkTaxIdentityEmisorTypeId(moPurchaseOrder.getFkTaxIdentityEmisorTypeId());
             dps.setFkTaxIdentityReceptorTypeId(moPurchaseOrder.getFkTaxIdentityReceptorTypeId());
         }
         else {
-            if (!isApplingFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
+            if (!miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
                 dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
                 dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
             }
@@ -2403,6 +2401,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 dps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
                 dps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
             }
+        
+            dps.setFkTaxIdentityEmisorTypeId(moBizPartnerEmisor.getFkTaxIdentityId());
+            dps.setFkTaxIdentityReceptorTypeId(moBizPartnerReceptor.getFkTaxIdentityId());
         }
         
         dps.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
@@ -2412,9 +2413,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         dps.setFkBizPartnerAltId_r(moBizPartnerEmisor.getPkBizPartnerId()); 
         dps.setFkBizPartnerBranchAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
         dps.setFkBizPartnerBranchAddressAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
-        
-        dps.setFkTaxIdentityEmisorTypeId(moBizPartnerEmisor.getFkTaxIdentityId());
-        dps.setFkTaxIdentityReceptorTypeId(moBizPartnerReceptor.getFkTaxIdentityId());
         
         dps.setFkLanguajeId(isWithPurchaseOrder() ? moPurchaseOrder.getFkLanguajeId() : (moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? miClient.getSessionXXX().getParamsErp().getFkLanguageId() : moBizPartnerEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
         dps.setFkCurrencyId(mnCfdiCurrencyId);
@@ -2438,7 +2436,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             }
             
             dps.getDbmsDpsEntries().addAll(row.getNewDpsEntries());
-            saveItemMatchBizPartner(row);
+            saveBizPartnerItemMatching(row);
         }
         
         try {
@@ -2449,9 +2447,57 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
         
         return dps;
+        */
+        
+        ArrayList<SDataDpsEntry> dpsEntries = new ArrayList<>();
+        
+        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+            
+            if (isWithPurchaseOrder()) {
+                if (row.getNewDpsEntries().size() == row.getImportedDpsEntries().size()) {
+                    for (int j = 0; j < row.getNewDpsEntries().size(); j++) {
+                        row.getNewDpsEntries().get(j).setConcept(moPurchaseOrder.getDbmsDpsEntry(row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey()).getConcept());
+                    }
+                }
+            }
+            
+            dpsEntries.addAll(row.getNewDpsEntries());
+            saveBizPartnerItemMatching(row); // preserve preferences for current busines partner!
+        }
+        
+        int dpsNatureId = isWithPurchaseOrder() ? moPurchaseOrder.getFkDpsNatureId() : moFieldDpsNature.getKeyAsIntArray()[0];
+        
+        int funcAreaId = 0;
+        int funcSubAreaId = 0;
+        
+        if (!miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
+            funcAreaId = SModSysConsts.CFGU_FUNC_NA;
+            funcSubAreaId = SModSysConsts.CFGU_FUNC_SUB_NA;
+        }
+        else {
+            SFormComponentItem item = (SFormComponentItem) jcbFunctionalSubArea.getSelectedItem();
+            funcAreaId = ((int[]) item.getForeignKey())[0];
+            funcSubAreaId = ((int[]) item.getPrimaryKey())[0];
+        }
+        
+        SDataDps dps = null;
+        
+        try {
+            dps = SImportUtils.createDps(miClient, SDataConstantsSys.TRNU_TP_DPS_PUR_INV, moComprobante, moCfdiXmlFile, moCfdiPdfFile, moBizPartnerReceptor, moBizPartnerEmisor, dpsEntries, moPurchaseOrder, dpsNatureId, funcAreaId, funcSubAreaId);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
+        return dps;
     }
 
-    private void saveItemMatchBizPartner(SRowCfdiImport40 rowCfdiImport) {
+    /**
+     * Preserve item matching preferences for current business partner.
+     * @param rowCfdiImport 
+     */
+    private void saveBizPartnerItemMatching(SRowCfdiImport40 rowCfdiImport) {
         try {
             SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
             

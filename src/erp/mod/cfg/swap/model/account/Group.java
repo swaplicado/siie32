@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.cfg.swap.account;
+package erp.mod.cfg.swap.model.account;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,15 +49,15 @@ public class Group {
         Partner partner = null;
         
         for (Partner p : partners) {
-            if (isPerson && p.getPartnerType().equals(Partner.PARTNER_TYPE_PERSON)) {
+            if (isPerson && p.getPartnerType().equals(Partner.TYPE_PERSON)) {
                 partner = p;
                 break;
             }
-            else if (!isPerson && p.getPartnerType().equals(Partner.PARTNER_TYPE_ORGANIZATION)) {
+            else if (!isPerson && p.getPartnerType().equals(Partner.TYPE_ORGANIZATION)) {
                 partner = p;
                 break;
             }
-            else if (p.getPartnerType().equals(Partner.PARTNER_TYPE_ALL)) {
+            else if (p.getPartnerType().equals(Partner.TYPE_ALL)) {
                 partner = p;
                 break;
             }

@@ -4444,7 +4444,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
-        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession().getStatement(), asociadoNegocios.getBizPartnerCountryId()));
 
         comprobante.setEltEmisor((cfd.ver32.DElementEmisor) asociadoNegocios.createRootElementEmisor());
         comprobante.getAttLugarExpedicion().setString(asociadoNegocios.getCfdLugarExpedicion());
@@ -4461,7 +4461,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
-        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession().getStatement(), asociadoNegocios.getBizPartnerCountryId()));
 
         comprobante.setEltReceptor((cfd.ver32.DElementReceptor) asociadoNegocios.createRootElementReceptor());
         

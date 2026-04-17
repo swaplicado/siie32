@@ -44,6 +44,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import erp.mod.itm.db.SDbItemDescription;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -93,7 +94,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public abstract class STrnUtilities {
     
@@ -2969,6 +2970,27 @@ public abstract class STrnUtilities {
             map.put("sTaxRegimeRec", taxRegimeRec);
             map.put("sCfdiUsage", cfdiUsage);
 
+            HashMap<Integer, String> itemDescsMap = new HashMap<>();
+                
+            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                if (entry.isAccountable()) {
+                    SDbItemDescription oItemDesc = new SDbItemDescription();
+
+                    try {
+                        oItemDesc.read(client.getSession(), new int[] { entry.getFkItemId() });
+
+                        if (!oItemDesc.getIsDeleted() && oItemDesc.getItemDescription() != null && !oItemDesc.getItemDescription().trim().isEmpty()) {
+                            itemDescsMap.put(entry.getPkEntryId(), sa.lib.SLibUtils.htmlToPlainText(oItemDesc.getItemDescription()));
+                        }
+                    }
+                    catch (Exception e) {
+//                        SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+                    }
+                }
+            }
+
+            map.put("oItemDescsMap", itemDescsMap);
+            
             if (client.isGui() && (dbName == null || dbName.isEmpty())) {
                 jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             }

@@ -8,7 +8,6 @@ package erp.mod.cfg.swap.form;
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -1095,12 +1094,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private boolean isMassAccountingElegible() {
-//        return mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
-        return false;
+    private void refreshDocumentsGrid() {
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
     }
     
-    private boolean isDocAlreadyRecorded(final SImportedDocument document) throws Exception {
+    private boolean isMassAccountingElegible() {
+//        return false;
+        return mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
+    }
+    
+    private boolean isDocAlreadyRecorded(final SImportedDocument document, boolean refreshDocumentsGrid) throws Exception {
         boolean isRecorded = document.isRecorded();
         
         if (!isRecorded) {
@@ -1113,10 +1118,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                 if (miClient.showMsgBoxConfirm("Se encontró la factura " + SSwapConsts.SIIE + " '" + dpsNumber + "' de " + document.BizPartner + ".\n"
                         + "¿Desea vincularla a esta factura autorizada?") == JOptionPane.YES_OPTION) {
-                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, false) && refreshDocumentsGrid) {
+                        refreshDocumentsGrid();
                     }
                 }
             }
@@ -1258,6 +1261,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private void exportPaymentRequestsIfNeeded() {
         if (moBoolExportPaymentRequestsOnClose.isSelected()) {
             if (!mbExportPaymentRequests) {
+                // one last check:
                 for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
                     SImportedDocument document = (SImportedDocument) row;
                     if (document.isPaymentRequested() && SLibUtils.belongsTo(document.Payment.getFkStatusPaymentId(), new int[] { SModSysConsts.FINS_ST_PAY_NEW, SModSysConsts.FINS_ST_PAY_SCHED_P })) {
@@ -1268,6 +1272,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
 
             if (mbExportPaymentRequests) {
+                // export payment requests to SWAP Services:
                 try {
                     miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
                     SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
@@ -1285,10 +1290,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
         if (dpsKey != null) {
-            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, true, false, false, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
-                int index = moDocumentsGrid.getTable().getSelectedRow();
-                moDocumentsGrid.renderGridRows();
-                moDocumentsGrid.setSelectedGridRow(index);
+            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, true)) {
+                refreshDocumentsGrid();
 
                 if (document.isPaymentRequested()) {
                     mbExportPaymentRequests = true;
@@ -1353,13 +1356,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void processShowingDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
-        int countRetreived = 0;
-        int countElegible = 0;
-        int countShown = 0;
-        int companyId = miClient.getSession().getConfigCompany().getCompanyId();
         Exception exception = null;
         
         try {
+            int countRetreived = 0;
+            int countElegible = 0;
+            int countShown = 0;
+            int companyId = miClient.getSession().getConfigCompany().getCompanyId();
+
             try (InputStream is = connection.getInputStream()) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(is);
@@ -1553,20 +1557,23 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void processRetrievingDocsToRegister(ArrayList<SImportedDocument> availableDocs, final SProgressCallback callback) {
-        moDocumentsGrid.getTable().setEnabled(false);
-        mbDocumentsBeingRecorded = true;
-        renderCurrentDoc();
-
-        disableFieldsWhenRegisteringDocs();
-
+    private void processRetrievingDocsToRegister(final ArrayList<SImportedDocument> recordableDocs, final SProgressCallback callback) {
         try {
-            startProgress("Analizando " + (availableDocs.size() == 1 ? "1 factura" : availableDocs.size() + " facturas") + "...");
+            mbDocumentsBeingRecorded = true;
+
+            moDocumentsGrid.getTable().setEnabled(false);
+            renderCurrentDoc();
+
+            disableFieldsWhenRegisteringDocs();
+
+            startProgress("Revisando " + (recordableDocs.size() == 1 ? "1 factura" : recordableDocs.size() + " facturas") + "...");
             
             int countProcessed = 0;
-            int docsRecorded = 0;
-            int docsForeign = 0;
-            int docsReferenced = 0;
+            int docsJustRecorded = 0;
+            int docsAlreadyRecorded = 0;
+            int bizPartnersUnknown = 0;
+            int bizPartnersForeign = 0;
+            int docsOrderReferenced = 0;
             int docsMissingXrt = 0;
             int docsMissingFiles = 0;
             int docsMissingFileXml = 0;
@@ -1574,22 +1581,30 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             HashMap<Integer, Double> todayExchangeRates = new HashMap<>(); // key: currencyId; value: exchange rate (when available) or NaN (when not available)
             ArrayList<SImportedDocument> elegibleDocs = new ArrayList<>();
 
-            for (SImportedDocument document : availableDocs) {
-                callback.onProgress((int) ((++countProcessed / (double) availableDocs.size()) * 100));
+            for (SImportedDocument document : recordableDocs) {
+                callback.onProgress((int) ((++countProcessed / (double) recordableDocs.size()) * 100));
                 
                 // check that document is not already recorded:
+                
+                boolean previouslyRecorded = document.isRecorded();
 
-//                            if (isDocAlreadyRecorded(document)) {
-                if (false) {
-                    docsRecorded++;
+                if (isDocAlreadyRecorded(document, false)) {
+                    if (!previouslyRecorded && document.isRecorded()) {
+                        docsJustRecorded++;
+                    }
+                    
+                    docsAlreadyRecorded++;
                 }
                 else {
                     // check that document's business partner is domestic:
 
-                    boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
+                    Boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
 
-                    if (!isBizPartnerDomestic) {
-                        docsForeign++;
+                    if (isBizPartnerDomestic == null) {
+                        bizPartnersUnknown++;
+                    }
+                    else if (!isBizPartnerDomestic) {
+                        bizPartnersForeign++;
                     }
                     else {
                         // check that document does not have references of type order:
@@ -1597,7 +1612,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         boolean isReferenced = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
                         
                         if (isReferenced) {
-                            docsReferenced++;
+                            docsOrderReferenced++;
                         }
                         else {
                             // check that document's exchange rate, if needed, is available for today:
@@ -1633,23 +1648,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             else {
                                 // retrieve CFDI files:
 
-                                boolean filesOk = document.AuxFiles != null && document.AuxFiles.length == 2 && document.AuxFiles[SImportUtils.CFDI_XML] != null && document.AuxFiles[SImportUtils.CFDI_PDF] != null;
+                                boolean filesOk = document.AuxFiles != null && document.AuxFiles.length == SImportUtils.CFDI_FILES && document.AuxFiles[SImportUtils.CFDI_XML_IDX] != null && document.AuxFiles[SImportUtils.CFDI_PDF_IDX] != null;
 
                                 if (!filesOk) {
-                                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                                    File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
 
-                                    if (files == null || files.length != 2) {
+                                    if (files == null || files.length != SImportUtils.CFDI_FILES) {
                                         docsMissingFiles++;
                                     }
-                                    else if (files[SImportUtils.CFDI_XML] == null) {
+                                    else if (files[SImportUtils.CFDI_XML_IDX] == null) {
                                         docsMissingFileXml++;
                                     }
-                                    else if (files[SImportUtils.CFDI_PDF] == null) {
+                                    else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
                                         docsMissingFilePdf++;
                                     }
                                     else {
                                         filesOk = true;
-                                        document.AuxFiles = files;
                                     }
                                 }
 
@@ -1664,28 +1678,37 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
             callback.onProgress(100); // assure to show 100%
             
-            if (elegibleDocs.size() < availableDocs.size()) {
-                String message;
+            // inform about the processing:
+            
+            if (elegibleDocs.size() < recordableDocs.size()) {
+                String message = "";
 
                 if (elegibleDocs.isEmpty()) {
-                    message = "No hay facturas autorizadas elegiles para ser contabilizadas:\n\n";
-
+                    message = "¡No hay facturas autorizadas que se puedan contabilizar!\n\n";
                 }
                 else {
-                    message = "Solamente algunas facturas autorizadas son elegiles para ser contabilizadas:\n\n";
+                    if (recordableDocs.size() == 1) {
+                        message = "¡Ninguna factura autorizada se puede contabilizar!\n\n";
+                    }
+                    else {
+                        message = "¡No todas las facturas autorizadas se pueden contabilizar!\n\n";
+                    }
                 }
 
-                if (availableDocs.size() == 1) {
-                    message += "La única factura autorizada disponible:";
+                if (recordableDocs.size() == 1) {
+                    message += "La única factura autorizada disponible para contabilizar:";
 
-                    if (docsRecorded > 0) {
+                    if (docsAlreadyRecorded > 0) {
                         message += "\n+ Ya está contabilizada.";
                     }
-                    if (docsForeign > 0) {
+                    if (bizPartnersUnknown > 0) {
+                        message += "\n+ Tiene asociado de negocios desconocido.";
+                    }
+                    if (bizPartnersForeign > 0) {
                         message += "\n+ Es extranjera. (Solo se pueden procesar facturas nacionales.)";
                     }
-                    if (docsReferenced > 0) {
-                        message += "\n+ Está referenciado a un pedido. (Solo se pueden procesar facturas que no están referenciados a un pedido.)";
+                    if (docsOrderReferenced > 0) {
+                        message += "\n+ Está referenciada a un pedido. (Solo se pueden procesar facturas que no están referenciados a un pedido.)";
                     }
                     if (docsMissingXrt > 0) {
                         message += "\n+ Está en moneda extranjera, pero no hay tipo de cambio para hoy.";
@@ -1701,12 +1724,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
                 else {
-                    message += "De las " + SLibUtils.DecimalFormatInteger.format(availableDocs.size()) + " facturas autorizadas disponibles:\n";
-                    if (docsRecorded > 0) {
-                        message += "\n+ " + (docsRecorded == 1 ? "Una ya está contabilizada" : SLibUtils.DecimalFormatInteger.format(docsRecorded) + " ya están contabilizadas") + ".";
+                    message += "De las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas disponibles para contabilizar:\n";
+                    
+                    if (docsAlreadyRecorded > 0) {
+                        message += "\n+ " + (docsAlreadyRecorded == 1 ? "Una ya está contabilizada" : SLibUtils.DecimalFormatInteger.format(docsAlreadyRecorded) + " ya están contabilizadas") + ".";
                     }
-                    if (docsForeign > 0) {
-                        message += "\n+ " + (docsForeign == 1 ? "Una es extranjera" : SLibUtils.DecimalFormatInteger.format(docsForeign) + " son extranjeras") + ". (Solo se pueden procesar facturas nacionales.)";
+                    if (bizPartnersUnknown > 0) {
+                        message += "\n+ " + (bizPartnersUnknown == 1 ? "Una tiene asociado de negocios desconocido" : SLibUtils.DecimalFormatInteger.format(bizPartnersUnknown) + " tienen asociados de negocios desconocidos") + ".";
+                    }
+                    if (bizPartnersForeign > 0) {
+                        message += "\n+ " + (bizPartnersForeign == 1 ? "Una es extranjera" : SLibUtils.DecimalFormatInteger.format(bizPartnersForeign) + " son extranjeras") + ". (Solo se pueden procesar facturas nacionales.)";
+                    }
+                    if (docsOrderReferenced > 0) {
+                        message += "\n+ " + (docsOrderReferenced == 1 ? "Una está referenciada a un pedido" : SLibUtils.DecimalFormatInteger.format(docsOrderReferenced) + " están referenciadas a un pedido") + ". (Solo se pueden procesar facturas que no están referenciados a un pedido.)";
                     }
                     if (docsMissingXrt > 0) {
                         message += "\n+ " + (docsMissingXrt == 1 ? "Una está" : SLibUtils.DecimalFormatInteger.format(docsMissingXrt) + " están") + " en moneda extranjera, pero no hay tipo de cambio para hoy.";
@@ -1726,11 +1756,18 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     miClient.showMsgBoxWarning(message);
                 }
                 else {
+                    message += "\n\n" + (elegibleDocs.size() == 1 ? "Se procesará una factura autorizada." : "Se procesarán " + SLibUtils.DecimalFormatInteger.format(elegibleDocs.size()) + " facturas autorizadas.");
                     miClient.showMsgBoxInformation(message);
                 }
             }
+            
+            if (docsJustRecorded > 0) {
+                refreshDocumentsGrid();
+            }
                     
             if (!elegibleDocs.isEmpty()) {
+                // process documents:
+                
                 if (moDialogMassAccountDocuments == null) {
                     moDialogMassAccountDocuments = new SDialogMassAccountDocuments(miClient);
                 }
@@ -1739,18 +1776,25 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_SETTINGS, createSettings());
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_DOCS, elegibleDocs);
                 moDialogMassAccountDocuments.setVisible(true);
+                
+                // check whether payments need to be exported:
+                
+                if ((boolean) moDialogMassAccountDocuments.getValue(SDialogMassAccountDocuments.VALUE_EXPORT_PAYMENTS)) {
+                    mbExportPaymentRequests = true;
+                }
             }
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
         finally {
+            clearProgress();
+            enableFieldsForShowingDocs(true);
+            
             moDocumentsGrid.getTable().setEnabled(true);
-            mbDocumentsBeingRecorded = false;
             renderCurrentDoc();
             
-            enableFieldsForShowingDocs(true);
-            clearProgress();
+            mbDocumentsBeingRecorded = false;
         }
     }
     
@@ -1854,7 +1898,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     @Override
                     protected void process(List<Integer> chunks) {
                         int latest = chunks.get(chunks.size() - 1);
-                        jProgressBar.setValue(latest);   // runs on EDT
+                        jProgressBar.setValue(latest); // runs on EDT
                     }
 
                     @Override
@@ -1913,9 +1957,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        refreshDocumentsGrid();
     }
     
     private void actionPerformedSelectAllDocs() {
@@ -1923,9 +1965,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             ((SImportedDocument) row).Download = true;
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        refreshDocumentsGrid();
     }
     
     private void actionPerformedDeselectAllDocs() {
@@ -1933,9 +1973,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             ((SImportedDocument) row).Download = false;
         }
         
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        refreshDocumentsGrid();
     }
     
     private void actionPerformedDownloadSelectedDocs() {
@@ -1959,7 +1997,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SSwapConsts.TXN_DOC_TYPE_INVOICE);
                 
                 if (files != null) {
-                    File zipFile = files[SImportUtils.FILES_ZIP];
+                    File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];
 
                     for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
                         if (((SImportedDocument) row).Download && !((SImportedDocument) row).AlreadyDownloaded) {
@@ -1973,9 +2011,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         }
                     }
 
-                    int index = moDocumentsGrid.getTable().getSelectedRow();
-                    moDocumentsGrid.renderGridRows();
-                    moDocumentsGrid.setSelectedGridRow(index);
+                    refreshDocumentsGrid();
 
                     String zipPath = zipFile.getAbsolutePath();
                     System.out.println("ZIP saved to: " + zipPath);
@@ -2006,39 +2042,43 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             miClient.showMsgBoxInformation("No hay facturas autorizadas para ser contabilizadas.");
         }
         else {
-            ArrayList<SImportedDocument> availableDocs = new ArrayList<>();
+            ArrayList<SImportedDocument> recordableDocs = new ArrayList<>();
 
             for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-//                if (!((SImportedDocument) row).isRecorded()) {
-                    availableDocs.add((SImportedDocument) row);
-//                }
+                if (!((SImportedDocument) row).isRecorded()) {
+                    recordableDocs.add((SImportedDocument) row);
+                }
             }
 
-            if (availableDocs.isEmpty()) {
+            if (recordableDocs.isEmpty()) {
                 miClient.showMsgBoxInformation("Todas las facturas autorizadas ya están contabilizadas.");
             }
             else {
                 // prepare to background processing:
                 
-                initProgress("Preparando el procesamiento...");
+                initProgress("Preparando la revisión...");
                 
-                String confirm = "Se procederá a revisar si ";
+                String confirm;
                 
-                if (availableDocs.size() == 1) {
-                    confirm += "la única factura autorizada disponible es elegible para ser contabilizada.";
+                if (recordableDocs.size() == 1) {
+                    confirm = "Se descargarán los archivos XML y PDF del comprobante, y se revisará que:\n";
+                    confirm += "la única factura autorizada sin contabilizar se puede procesar.";
                 }
                 else {
-                    confirm += "las " + SLibUtils.DecimalFormatInteger.format(availableDocs.size()) + " facturas autorizadas disponibles son elegibles para ser contabilizadas.";
+                    confirm = "Se descargarán los archivos XML y PDF de los comprobantes, y se revisará que:\n";
+                    confirm += "las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas sin contabilizar se pueden procesar.";
                 }
                 
-                if (miClient.showMsgBoxConfirm(confirm + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                boolean process = miClient.showMsgBoxConfirm(confirm + "\nLa descarga y revisión pueden demorar unos instantes.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                
+                if (process) {
                     // start of background processing...
                 
                     SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
 
                         @Override
                         protected Void doInBackground() throws Exception {
-                            processRetrievingDocsToRegister(availableDocs, progress -> {
+                            processRetrievingDocsToRegister(recordableDocs, progress -> {
                                 publish(progress);
                             });
                             return null;
@@ -2047,7 +2087,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         @Override
                         protected void process(List<Integer> chunks) {
                             int latest = chunks.get(chunks.size() - 1);
-                            jProgressBar.setValue(latest);   // runs on EDT
+                            jProgressBar.setValue(latest); // runs on EDT
                         }
 
                         @Override
@@ -2084,7 +2124,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moPrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
                         if (dpsKey != null) {
-                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, false, false, SImportedDocument.MATCH_PAY_TP_REQUIRED)) {
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_MAND, false, false, false, false)) {
                                 newlyLinked++;
                             }
                         }
@@ -2126,8 +2166,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 
                 if (newlyLinked > 0) {
-                    moDocumentsGrid.renderGridRows();
                     moDocumentsGrid.setSelectedGridRow(0);
+                    refreshDocumentsGrid();
                 }
             }
         }
@@ -2150,7 +2190,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
-                    if (!isDocAlreadyRecorded(document)) {
+                    if (!isDocAlreadyRecorded(document, true)) {
                         SGuiParams params = new SGuiParams();
                         params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDatePeriodEnd.getValue())[0]);
                         params.getParamsMap().put(SGuiConsts.PARAM_BPR, document.BizPartnerId);
@@ -2162,10 +2202,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
                             int[] dpsKey = (int[]) picker.getOption();
 
-                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, false, true, mbAllowLinkGreaterInvoices, SImportedDocument.MATCH_PAY_TP_CONFIRM_ON_FAIL)) {
-                                int index = moDocumentsGrid.getTable().getSelectedRow();
-                                moDocumentsGrid.renderGridRows();
-                                moDocumentsGrid.setSelectedGridRow(index);
+                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, mbAllowLinkGreaterInvoices, true, false, false)) {
+                                refreshDocumentsGrid();
                             }
                         }
                     }
@@ -2196,7 +2234,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             + SGuiConsts.MSG_CNF_CONT;
                     
                     if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
-                        if (!isDocAlreadyRecorded(document)) {
+                        if (!isDocAlreadyRecorded(document, true)) {
                             SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
                             
                             if (rejectData != null) {
@@ -2262,9 +2300,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 else {
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea desvincular la factura " + SSwapConsts.SIIE + " de esta factura autorizada?\n(IMPORTANTE: Esta acción no se puede revertir.)") == JOptionPane.YES_OPTION) {
                         if (document.unlink(miClient.getSession())) {
-                            int index = moDocumentsGrid.getTable().getSelectedRow();
-                            moDocumentsGrid.renderGridRows();
-                            moDocumentsGrid.setSelectedGridRow(index);
+                            refreshDocumentsGrid();
                         }
                     }
                 }
@@ -2289,7 +2325,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
-                    if (!isDocAlreadyRecorded(document)) {
+                    if (!isDocAlreadyRecorded(document, true)) {
                         if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
                             throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
                         }
@@ -2310,26 +2346,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             }
                             else {
                                 // retrieve CFDI files:
+                                File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
 
-                                File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                                // retrieve order, if available:
+                                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
-                                if (files == null || files.length != 2) {
-                                    throw new Exception("No se pudieron descargar o no existen los archivos XML y PDF del CFDI de esta factura autorizada.");
-                                }
-                                else if (files[SImportUtils.CFDI_XML] == null) {
-                                    throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
-                                }
-                                else {
-                                    // retrieve order, if available:
-
-                                    SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                                    boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
-
-                                    // import CFDI (dialog DPS Finder should be previously prepared):
-
-                                    int[] dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
-                                    linkAndProcessNewDps(document, dpsKey);
-                                }
+                                // import CFDI (dialog DPS Finder should be previously prepared):
+                                int[] dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
+                                linkAndProcessNewDps(document, dpsKey);
                             }
                         }
                     }
@@ -2355,7 +2380,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
-                    if (!isDocAlreadyRecorded(document)) {
+                    if (!isDocAlreadyRecorded(document, true)) {
                         if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
                             throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
                         }
@@ -2366,34 +2391,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
                             }
                             
-                            // check that business partner is domestic:
-                            
-                            boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
-                            
                             // retrieve CFDI files:
+                            File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
 
-                            File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                            // retrieve order, if available:
+                            SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                            boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
-                            if (files == null || files.length != 2) {
-                                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
-                            }
-                            else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML] == null) {
-                                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
-                            }
-                            else if (files[SImportUtils.CFDI_PDF] == null) {
-                                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
-                            }
-                            else {
-                                // retrieve order, if available:
-
-                                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
-
-                                // create CFDI (dialog DPS Finder should be previously prepared):
-
-                                int[] dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML], files[SImportUtils.CFDI_PDF], linkToOrder, order, document);
-                                linkAndProcessNewDps(document, dpsKey);
-                            }
+                            // create CFDI (dialog DPS Finder should be previously prepared):
+                            int[] dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
+                            linkAndProcessNewDps(document, dpsKey);
                         }
                     }
                 }
@@ -2413,21 +2420,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(document.ExternalDocumentId, SFileUtilities.pdf, document.BizPartnerId);
-                
-                if (pdf == null) {
-                    File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(miClient.getSession(), msSyncUrlDownload, document.ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
-
-                    if (files == null || files.length != 2) {
-                        throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
-                    }
-                    else if (files[SImportUtils.CFDI_PDF] == null) {
-                        throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
-                    }
-                    else {
-                        pdf = SImportUtils.copyDocumentFileToTempDir(document.ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF], document.BizPartnerId);
-                    }
-                }
+                File pdf = document.retrievePdf(miClient.getSession(), msSyncUrlDownload);
                 
                 if (pdf != null) {
                     if (moDialogPdfViewer == null) {
@@ -2527,11 +2520,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SImportedDocument document = (SImportedDocument) row;
                 
                 if (document.requestPayment(miClient.getSession())) {
-                    int index = moDocumentsGrid.getTable().getSelectedRow();
-                    moDocumentsGrid.renderGridRows();
-                    moDocumentsGrid.setSelectedGridRow(index);
-                    
                     mbExportPaymentRequests = true;
+                    refreshDocumentsGrid();
                 }
             }
         }
@@ -2568,11 +2558,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
-
                         mbExportPaymentRequests = true;
+                        refreshDocumentsGrid();
                     }
                 }
             }
@@ -2610,11 +2597,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
-
                         mbExportPaymentRequests = true;
+                        refreshDocumentsGrid();
                     }
                 }
             }
@@ -2652,11 +2636,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 else {
                     if (document.changeRequiredPaymentDate(miClient.getSession())) {
-                        int index = moDocumentsGrid.getTable().getSelectedRow();
-                        moDocumentsGrid.renderGridRows();
-                        moDocumentsGrid.setSelectedGridRow(index);
-
                         mbExportPaymentRequests = true;
+                        refreshDocumentsGrid();
                     }
                 }
             }
@@ -2782,14 +2763,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGridTable) {
+    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusOnDocumentsGrid) {
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
         
-        if (focusDocumentsGridTable) {
+        if (focusOnDocumentsGrid) {
             moDocumentsGrid.getTable().requestFocusInWindow();
         }
         
@@ -2811,10 +2792,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
+    private void itemStateChangedDocType(final boolean focusOnDocumentsGrid) {
         if (moKeyDocModeType.isEnabled()) {
             if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ALL) {
-                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
+                populateDocumentsGrid(maDocuments, focusOnDocumentsGrid);
             }
             else {
                 ArrayList<SImportedDocument> documents = new ArrayList<>();
@@ -2834,17 +2815,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents, focusDocumentsGridTable);
+                populateDocumentsGrid(documents, focusOnDocumentsGrid);
             }
             
             jbRecordAllDocs.setEnabled(isMassAccountingElegible());
         }
     }
     
-    private void itemStateChangedDocCase(final boolean focusDocumentsGridTable) {
+    private void itemStateChangedDocCase(final boolean focusOnDocumentsGrid) {
         if (moKeyDocModeCase.isEnabled()) {
             if (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_ALL) {
-                populateDocumentsGrid(maDocuments, focusDocumentsGridTable);
+                populateDocumentsGrid(maDocuments, focusOnDocumentsGrid);
             }
             else {
                 Integer processingTypeId = null;
@@ -2873,7 +2854,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents, focusDocumentsGridTable);
+                populateDocumentsGrid(documents, focusOnDocumentsGrid);
             }
             
             jbRecordAllDocs.setEnabled(isMassAccountingElegible());

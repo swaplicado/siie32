@@ -16,6 +16,8 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.cfg.swap.SSwapConsts;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataUserDnsDps;
@@ -25,13 +27,15 @@ import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés
  */
 public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -253,7 +257,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         populateTable();
     }
 
-    private void actionDeleteLinks() {
+    private void actionDeleteLinks() throws Exception {
         int gui = isViewForCategoryPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
         SDataDps oSrcDps = null;
         SDataDps oDesDps = null;
@@ -264,16 +268,24 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
             }
             else {
                 pk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
-
+                SDbSwapDataProcessing regystry = null;
+                        
                 if (isViewFromSource()) {
-                    oSrcDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[0], pk[1] }, SLibConstants.EXEC_MODE_SILENT);
-                    oDesDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[2], pk[3] }, SLibConstants.EXEC_MODE_SILENT);
+                    oSrcDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[0], pk[1] }, SLibConstants.EXEC_MODE_SILENT); //pedido
+                    oDesDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[2], pk[3] }, SLibConstants.EXEC_MODE_SILENT); //factura
+                    
+                    regystry = SDbSwapDataProcessing.readByDpsKey(miClient.getSession(), new int[] { pk[2], pk[3] });
+
+                    if (regystry != null){
+                        miClient.showMsgBoxWarning("No se puede desvincular el documento '" + oDesDps.getDpsNumber() + "' porque proveniene de " + SSwapConsts.PURCHASE_PORTAL + ".");
+                        return;
+                    }
                 }
                 else {
-                    oSrcDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[2], pk[3] }, SLibConstants.EXEC_MODE_SILENT);
-                    oDesDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[0], pk[1] }, SLibConstants.EXEC_MODE_SILENT);
+                    oSrcDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[2], pk[3] }, SLibConstants.EXEC_MODE_SILENT); //pedido
+                    oDesDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { pk[0], pk[1] }, SLibConstants.EXEC_MODE_SILENT); //contrato
                 }
-
+                
                 if (miClient.showMsgBoxConfirm("La acción eliminará el vínculo entre los docs. '" + oSrcDps.getDpsNumber() + "' y '" + oDesDps.getDpsNumber() + "', lo cual es irreversible,\n" + SLibConstants.MSG_CNF_MSG_CONT) == JOptionPane.YES_OPTION) {
                     try {
                          for (SDataDpsEntry entry : oDesDps.getDbmsDpsEntries()) {
@@ -542,7 +554,13 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
             JButton button = (javax.swing.JButton) e.getSource();
 
             if (button == jbDeleteLinks) {
-                actionDeleteLinks();
+                try {
+                    actionDeleteLinks();
+                }
+                catch (Exception ex) {
+                    SLibUtilities.renderException(this, ex);
+                    Logger.getLogger(SViewDpsLinksQuery.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

@@ -17,6 +17,7 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
+import erp.lib.data.SDataRegistry;
 import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -28,9 +29,13 @@ import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
+import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
+import erp.server.SServerConstants;
+import erp.server.SServerRequest;
+import erp.server.SServerResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,10 +61,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
+import sa.lib.srv.SSrvConsts;
 
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
@@ -75,9 +82,10 @@ public abstract class SImportUtils {
     private static final String DOWNLOAD_FILE_PROFORMA_PREFIX = "proformas compras "; // keep final blank space!
     private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
     
-    public static final int FILES_ZIP = 0;
-    public static final int CFDI_XML = 0;
-    public static final int CFDI_PDF = 1;
+    public static final int DOC_FILES_ZIP_IDX = 0;
+    public static final int CFDI_XML_IDX = 0;
+    public static final int CFDI_PDF_IDX = 1;
+    public static final int CFDI_FILES = 2;
     
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
     public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
@@ -111,6 +119,7 @@ public abstract class SImportUtils {
      * Get system's currency ID from given currency code.
      * @param currencyIso3Code Currency ISO-3-code, e.t., MXN, USD, etc.
      * @return 
+     * @throws java.lang.Exception 
      */
     public static int getCurrencyId(final String currencyIso3Code) throws Exception {
         int id = 0;
@@ -136,22 +145,145 @@ public abstract class SImportUtils {
     }
     
     /**
-     * Create DPS.
+     * Save registry through SIIE Server.
+     * WARNING: Similar save logic as in erp.lib.gui.SGuiModule.processForm(). Keep save logic synced on any change on either of both methods!
      * @param client GUI client.
-     * @param comprobante CFDI 4.0.
-     * @param cfdiXmlFile CFDI XML file.
-     * @param cfdiPdfFile CFDI PDF file.
-     * @param bpEmisor Business partner "emisor".
+     * @param registry Registry to save.
+     * @return Response code get from server when registry is saved.
+     * @throws Exception 
+     */
+    public static int saveRegistry(final SClientInterface client, final SDataRegistry registry) throws Exception {
+        int result = SLibConstants.UNDEFINED;
+        
+        SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+        request.setPacket(registry);
+        SServerResponse response = client.getSessionXXX().request(request);
+        
+        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+            throw new Exception(response.getMessage());
+        }
+        else {
+            result = response.getResultType();
+
+            if (result != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
+            }
+            else {
+                SDataRegistry registrySaved = (SDataRegistry) response.getPacket();
+                Object lastSavedPrimaryKey = registrySaved.getPrimaryKey();
+                
+                registry.setPrimaryKey(registrySaved.getPrimaryKey());
+                registry.deleteTempFile(client);
+            }
+
+            // Post-save processing:
+
+            if (result == SLibConstants.DB_ACTION_SAVE_OK) {
+                if (registry.getPostSaveTarget() != null && registry.getPostSaveMethod() != null) {
+                    SLibUtils.invoke(registry.getPostSaveTarget(), registry.getPostSaveMethod(), registry.getPostSaveMethodArgs());
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Create DPS from a CFDI 4.0.
+     * @param client GUI client.
+     * @param dpsTypeKey DPS type key (category, class, type) of the DPS being created.
+     * @param comprobante In-memory CFDI 4.0.
+     * @param cfdiXmlFile CFDI's XML file.
+     * @param cfdiPdfFile CFDI's PDF file.
      * @param bpReceptor Business partner "receptor".
-     * @param dpsNatureId DPS nature ID.
-     * @param purchaseOrder Purchase order.
+     * @param bpEmisor Business partner "emisor".
+     * @param dpsEntries DPS entries.
+     * @param purchaseOrder Purchase order. Can be <code>null</code>.
+     * @param dpsNatureId DPS nature ID. Requred when purchaseOrder is <code>null</code>.
+     * @param funcAreaId Functional area ID.
+     * @param funcSubAreaId Functional sub-area ID.
      * @return 
      * @throws java.lang.Exception 
      */
-    public static SDataDps createDps(final SClientInterface client, final cfd.ver40.DElementComprobante comprobante, final File cfdiXmlFile, final File cfdiPdfFile, final SDataBizPartner bpEmisor, final SDataBizPartner bpReceptor, final int dpsNatureId, final SDataDps purchaseOrder) throws Exception {
+    public static SDataDps createDps(final SClientInterface client, final int[] dpsTypeKey,
+            final cfd.ver40.DElementComprobante comprobante, final File cfdiXmlFile, final File cfdiPdfFile,
+            final SDataBizPartner bpReceptor, final SDataBizPartner bpEmisor, final ArrayList<SDataDpsEntry> dpsEntries, final SDataDps purchaseOrder, final int dpsNatureId, final int funcAreaId, final int funcSubAreaId) throws Exception {
+        Date date = SLibTimeUtils.convertToDateOnly(comprobante.getAttFecha().getDatetime());
+        int currencyId = SImportUtils.getCurrencyId(comprobante.getAttMoneda().getString());
+        boolean isCash = comprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PUE);
+        boolean isLocalCurrency = client.getSession().getSessionCustom().isLocalCurrency(new int[] { currencyId });
+        String uuid = comprobante.getEltOpcComplementoTimbreFiscalDigital() != null ? comprobante.getEltOpcComplementoTimbreFiscalDigital().getAttUUID().getString() : "";
+        
         SDataDps dps = new SDataDps();
         
         dps.setIsRecordAutomatic(true);
+        
+        dps.setPkYearId(SLibTimeUtilities.digestYear(comprobante.getAttFecha().getDatetime())[0]);
+        //dps.setPkDocId(...);
+        
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.setNumberSeries(comprobante.getAttSerie() != null ? comprobante.getAttSerie().getString() : "");
+        dps.setNumber(comprobante.getAttFolio() != null ? !comprobante.getAttFolio().getString().isEmpty() ? comprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
+        dps.setNumberReference(purchaseOrder != null ? purchaseOrder.getNumberReference() : "");
+        
+        dps.setDaysOfCredit(isCash ? 0 : purchaseOrder != null ? purchaseOrder.getDaysOfCredit() : bpEmisor.getDbmsCategorySettingsSup().getDaysOfCredit());
+        dps.setIsDiscountDocApplying(comprobante.getAttDescuento().getDouble() > 0);
+        dps.setIsDiscountDocPercentage(false);
+        dps.setDiscountDocPercentage(0);
+        
+        dps.setExchangeRate(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        dps.setExchangeRateSystem(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        
+        dps.setSubtotalProvisionalCy_r(comprobante.getAttSubTotal().getDouble());
+        dps.setDiscountDocCy_r(comprobante.getAttDescuento() == null ? 0 : comprobante.getAttDescuento().getDouble());
+        dps.setSubtotalCy_r(SLibUtils.roundAmount(dps.getSubtotalProvisionalCy_r() - dps.getDiscountDocCy_r()));
+        dps.setTaxChargedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
+        dps.setTaxRetainedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
+        dps.setTotalCy_r(comprobante.getAttTotal().getDouble());
+        
+        dps.setFkDpsCategoryId(dpsTypeKey[0]);
+        dps.setFkDpsClassId(dpsTypeKey[1]);
+        dps.setFkDpsTypeId(dpsTypeKey[2]);
+        dps.setFkPaymentTypeId(isCash ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA); // XXX remove ASAP (Sergio Flores, 2017-08-09)!
+        
+        dps.setFkDpsNatureId(purchaseOrder != null ? purchaseOrder.getFkDpsNatureId() : dpsNatureId);
+        dps.setFkCompanyBranchId(client.getSessionXXX().getCurrentCompanyBranchId());
+        
+        if (purchaseOrder != null) {
+            dps.setFkFunctionalAreaId(purchaseOrder.getFkFunctionalAreaId());
+            dps.setFkFunctionalSubAreaId(purchaseOrder.getFkFunctionalSubAreaId());
+            
+            dps.setFkTaxIdentityEmisorTypeId(purchaseOrder.getFkTaxIdentityEmisorTypeId());
+            dps.setFkTaxIdentityReceptorTypeId(purchaseOrder.getFkTaxIdentityReceptorTypeId());
+        }
+        else {
+            if (!client.getSessionXXX().getParamsCompany().getIsFunctionalAreas() || funcAreaId == 0 || funcSubAreaId == 0) {
+                dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+            }
+            else {
+                dps.setFkFunctionalAreaId(funcAreaId);
+                dps.setFkFunctionalSubAreaId(funcSubAreaId);
+            }
+            
+            dps.setFkTaxIdentityEmisorTypeId(bpEmisor.getFkTaxIdentityId());
+            dps.setFkTaxIdentityReceptorTypeId(bpReceptor.getFkTaxIdentityId());
+        }
+        
+        dps.setFkBizPartnerId_r(bpEmisor.getPkBizPartnerId());
+        dps.setFkBizPartnerBranchId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkBizPartnerAltId_r(bpEmisor.getPkBizPartnerId()); 
+        dps.setFkBizPartnerBranchAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkLanguajeId(purchaseOrder != null ? purchaseOrder.getFkLanguajeId() : (bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? client.getSessionXXX().getParamsErp().getFkLanguageId() : bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
+        dps.setFkCurrencyId(currencyId);
         
         dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
@@ -169,129 +301,38 @@ public abstract class SImportUtils {
         dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
         dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
-        
-        SDataDpsCfd dpsCfd = new SDataDpsCfd();
-        dpsCfd.setAuxComprobante40(comprobante);
-        
-        dps.setDbmsDataDpsCfd(dpsCfd);
-        
-        // FORMER REFRESH METHOD STARTS HERE:
-        
-        if (dps.getIsRegistryNew()) {
-            dps.setPkYearId(SLibTimeUtilities.digestYear(comprobante.getAttFecha().getDatetime())[0]);
-            dps.setFkUserNewId(client.getSession().getUser().getPkUserId());
-        }
-        else {
-            dps.setFkUserEditId(client.getSession().getUser().getPkUserId());
-        }
-        
-        String uuid = "";
-        
-        cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
-        if (tfd != null) {
-            uuid = tfd.getAttUUID().getString();
-        }
-        
-        Date date = SLibTimeUtils.convertToDateOnly(comprobante.getAttFecha().getDatetime());
-        int currencyId = SImportUtils.getCurrencyId(comprobante.getAttMoneda().getString());
-        boolean isCash = comprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PUE);
-        boolean isLocalCurrency = client.getSession().getSessionCustom().isLocalCurrency(new int[] { currencyId });
-        boolean isWithPurchaseOrder = purchaseOrder != null;
-        
-        dps.setDate(date);
-        dps.setDateDoc(date);
-        dps.setDateStartCredit(date);
-        
-        dps.setNumberSeries(comprobante.getAttSerie() != null ? comprobante.getAttSerie().getString() : "");
-        dps.setNumber(comprobante.getAttFolio() != null ? !comprobante.getAttFolio().getString().isEmpty() ? comprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
-        dps.setNumberReference(isWithPurchaseOrder ? purchaseOrder.getNumberReference() : "");
-        
-        dps.setDaysOfCredit(isCash ? 0 : isWithPurchaseOrder ? purchaseOrder.getDaysOfCredit() : bpEmisor.getDbmsCategorySettingsSup().getDaysOfCredit());
-        dps.setIsDiscountDocApplying(comprobante.getAttDescuento().getDouble() != 0);
-        dps.setIsDiscountDocPercentage(false);
-        dps.setDiscountDocPercentage(0);
-        
-        dps.setExchangeRate(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
-        dps.setExchangeRateSystem(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
-        
-        dps.setSubtotalProvisionalCy_r(comprobante.getAttSubTotal().getDouble());
-        dps.setDiscountDocCy_r(comprobante.getAttDescuento() == null ? 0 : comprobante.getAttDescuento().getDouble());
-        dps.setSubtotalCy_r(dps.getSubtotalProvisionalCy_r() - dps.getDiscountDocCy_r());
-        dps.setTaxChargedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
-        dps.setTaxRetainedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
-        dps.setTotalCy_r(comprobante.getAttTotal().getDouble());
-        
-        dps.setFkDpsCategoryId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0]);
-        dps.setFkDpsClassId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]);
-        dps.setFkDpsTypeId(SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]);
-        dps.setFkPaymentTypeId(isCash ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
-        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA); // XXX remove ASAP (Sergio Flores, 2017-08-09)!
-        
-        dps.setFkDpsNatureId(isWithPurchaseOrder ? purchaseOrder.getFkDpsNatureId() : dpsNatureId);
-        dps.setFkCompanyBranchId(client.getSessionXXX().getCurrentCompanyBranchId());
-        
-        if (isWithPurchaseOrder) {
-            dps.setFkFunctionalAreaId(purchaseOrder.getFkFunctionalAreaId());
-            dps.setFkFunctionalSubAreaId(purchaseOrder.getFkFunctionalSubAreaId());
-            dps.setFkTaxIdentityEmisorTypeId(purchaseOrder.getFkTaxIdentityEmisorTypeId());
-            dps.setFkTaxIdentityReceptorTypeId(purchaseOrder.getFkTaxIdentityReceptorTypeId());
-        }
-        else {
-            /*
-            if (!isApplingFunctionalAreas() || jcbFunctionalSubArea.getSelectedIndex() <= 0) {
-                dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
-                dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
-            }
-            else {
-                SFormComponentItem item = (SFormComponentItem) jcbFunctionalSubArea.getSelectedItem();
-                dps.setFkFunctionalAreaId(((int[]) item.getForeignKey())[0]);
-                dps.setFkFunctionalSubAreaId(((int[]) item.getPrimaryKey())[0]);
-            }
-            */
-        }
-        
-        dps.setFkBizPartnerId_r(bpEmisor.getPkBizPartnerId());
-        dps.setFkBizPartnerBranchId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        dps.setFkBizPartnerBranchAddressId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
-        
-        dps.setFkBizPartnerAltId_r(bpEmisor.getPkBizPartnerId()); 
-        dps.setFkBizPartnerBranchAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        dps.setFkBizPartnerBranchAddressAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
-        
-        dps.setFkTaxIdentityEmisorTypeId(bpEmisor.getFkTaxIdentityId());
-        dps.setFkTaxIdentityReceptorTypeId(bpReceptor.getFkTaxIdentityId());
-        
-        dps.setFkLanguajeId(isWithPurchaseOrder ? purchaseOrder.getFkLanguajeId() : (bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? client.getSessionXXX().getParamsErp().getFkLanguageId() : bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
-        dps.setFkCurrencyId(currencyId);
+        dps.setFkUserNewId(client.getSession().getUser().getPkUserId());
+        dps.setFkUserEditId(SUtilConsts.USR_NA_ID);
+        dps.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
         
         dps.setAuxKeepDpsData(true);
         dps.setAuxKeepExchangeRate(true); 
         dps.setAuxFileXml(cfdiXmlFile);
         dps.setAuxFilePdf(cfdiPdfFile);
         
-        dps.getDbmsDpsEntries().clear();
-        /*
-        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
-            
-            if (isWithPurchaseOrder) {
-                if (row.getNewDpsEntries().size() == row.getImportedDpsEntries().size()) {
-                    for (int j = 0; j < row.getNewDpsEntries().size(); j++) {
-                        row.getNewDpsEntries().get(j).setConcept(purchaseOrder.getDbmsDpsEntry(row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey()).getConcept());
-                    }
-                }
-            }
-            
-            dps.getDbmsDpsEntries().addAll(row.getNewDpsEntries());
-            saveItemMatchBizPartner(row);
-        }
-        */
-        try {
-            dps.calculateTotal(client); 
-        }
-        catch (Exception e) {
-            SLibUtils.printException(SImportUtils.class.getName(), e);
-        }
+        SDataDpsCfd dpsCfd = new SDataDpsCfd();
+        
+        dpsCfd.setVersion("" + comprobante.getVersion());
+        dpsCfd.setCfdiType(comprobante.getAttTipoDeComprobante().getString());
+        dpsCfd.setPaymentWay(comprobante.getAttFormaPago().getString());
+        dpsCfd.setPaymentMethod(comprobante.getAttMetodoPago().getString());
+        dpsCfd.setPaymentConditions(comprobante.getAttCondicionesDePago().getString());
+        dpsCfd.setExportation(comprobante.getAttExportacion().getString());
+        //dpsCfd.setGlobalPeriodocity(...);
+        //dpsCfd.setGlobalMonths(...);
+        //dpsCfd.setGlobalYear(...);
+        dpsCfd.setZipIssue(comprobante.getAttLugarExpedicion().getString());
+        dpsCfd.setConfirmation(comprobante.getAttConfirmacion().getString());
+        dpsCfd.setTaxRegimeIssuing(comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+        dpsCfd.setTaxRegimeReceiver(comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString());
+        dpsCfd.setCfdiUsage(comprobante.getEltReceptor().getAttUsoCFDI().getString());
+        dpsCfd.setAuxComprobante40(comprobante);
+        
+        dps.setDbmsDataDpsCfd(dpsCfd);
+        
+        dps.getDbmsDpsEntries().addAll(dpsEntries);
+        
+        dps.calculateTotal(client);
         
         return dps;
     }
@@ -439,7 +480,7 @@ public abstract class SImportUtils {
         try {
             if (!linkToOrder || (linkToOrder && order != null)) {
                 File chosenCfdiXml = cfdiXml;
-                
+
                 if (chosenCfdiXml == null) {
                     chooserUsed = true;
                     FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
@@ -462,11 +503,25 @@ public abstract class SImportUtils {
 
                         newDps.setAuxFilePdf(cfdiPdf);
                         
-                        if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument != null && importedDocument.getDueDateEffective() != null) {
-                            newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
+                        // set dayos of credit and accounting tag:
+                        
+                        String tag = "";
+                        
+                        if (importedDocument != null) {
+                            if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument.getDueDateEffective() != null) {
+                                newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
+                            }
+                            
+                            tag = importedDocument.AccountingTag;
                         }
                         
-                        newDps.setAccountingTag(importedDocument != null ? importedDocument.AccountingTag : (order != null ? order.getAccountingTag() : ""));
+                        if (tag.isEmpty() && order != null && !order.getAccountingTag().isEmpty()) {
+                            tag = order.getAccountingTag();
+                        }
+                        
+                        newDps.setAccountingTag(tag);
+                        
+                        // complete DPS creation:
                         
                         client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
                         client.getGuiModule(module).setAuxRegistry(newDps);
@@ -518,19 +573,19 @@ public abstract class SImportUtils {
      * @param session GUI session.
      * @param serviceUrl Download service URL.
      * @param downloadMode Download mode.
-     * @param documents List of external document IDs whose files needs to be downloaded.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return 
      * @throws java.lang.Exception 
      */
-    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documents, final int documentType) throws Exception {
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
         File[] files = null;
         File zipFile = null;
         Path tempDir = null;
         Path tempFile = null;
         Exception exception = null;
         HttpURLConnection conn = null;
-        String ids = documents.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        String ids = documentExternalIds.stream().map(String::valueOf).collect(Collectors.joining(", "));
         
         try {
             // open download service connection:
@@ -651,7 +706,7 @@ public abstract class SImportUtils {
                         
                         System.out.println("Loging import downloads...");
                         
-                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documents, documentType);
+                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documentExternalIds, documentType);
                         
                         files = new File[] { zipFile };
                         break;
@@ -786,27 +841,27 @@ public abstract class SImportUtils {
      * Download documents' all files as ZIP.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
-     * @param documents List of external document IDs whose files needs to be downloaded.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documents, final int documentType) throws Exception {
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documents, documentType);
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType);
     }
 
     /**
      * Download document's all files into temporal directory.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
-     * @param document External document ID whose files needs to be downloaded.
+     * @param documentExternalId External document ID whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document, final int documentType) throws Exception {
+    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
-        documents.add(document);
+        documents.add(documentExternalId);
         return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType);
     }
     
@@ -814,14 +869,14 @@ public abstract class SImportUtils {
      * Download document XML & PDF files as ZIP.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
-     * @param document External document ID whose XML & PDF files needs to be downloaded.
+     * @param documentExternalId External document ID whose XML & PDF files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 2 elements: the XML (at index 0) & PDF (at index 1) files.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int document, final int documentType) throws Exception {
+    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
-        documents.add(document);
+        documents.add(documentExternalId);
         return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType);
     }
     
@@ -866,15 +921,15 @@ public abstract class SImportUtils {
     
     /**
      * Get local temporal file for required document external ID and file extension. Creates local temporal directory if not exists.
-     * @param externalId Document external ID.
+     * @param documentExternalId Document external ID.
      * @param fileExtension Extension of temporal file.
      * @param bizPartnerId Business partner ID.
      * @return Local temporal file.
      * @throws IOException 
      */
-    private static File createDocumentLocalTempFile(final int externalId, final int bizPartnerId, final String fileExtension) throws IOException {
+    private static File createDocumentLocalTempFile(final int documentExternalId, final int bizPartnerId, final String fileExtension) throws IOException {
         File localTempDir = createDocumentsLocalTempDir(fileExtension);
-        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(externalId) + "." + fileExtension;
+        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(documentExternalId) + "." + fileExtension;
         
         System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
         
@@ -883,14 +938,14 @@ public abstract class SImportUtils {
     
     /**
      * Get document file from temporal directory.
-     * @param externalId Document external ID.
+     * @param documentExternalId Document external ID.
      * @param fileExtension Extension of temporal file.
      * @param bizPartnerId Business partner ID.
      * @return Document file from temporal directory if exists, otherwise <code>null</code>.
      * @throws IOException 
      */
-    public static File getDocumentFileFromTempDirIfExists(final int externalId, final String fileExtension, final int bizPartnerId) throws IOException {
-        File tempFile = createDocumentLocalTempFile(externalId, bizPartnerId,fileExtension);
+    public static File getDocumentFileFromTempDirIfExists(final int documentExternalId, final String fileExtension, final int bizPartnerId) throws IOException {
+        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId,fileExtension);
         
         if (!tempFile.exists()) {
             tempFile = null;
@@ -901,20 +956,20 @@ public abstract class SImportUtils {
     
     /**
      * Copy document original file to temporal directory.
-     * @param externalId Document external ID.
+     * @param documentExternalId Document external ID.
      * @param fileExtension Extension of temporal file.
      * @param originalFile Document original file.
      * @param bizPartnerId Business partner ID.
      * @return Just created document file from temporal directory.
      * @throws IOException 
      */
-    public static File copyDocumentFileToTempDir(final int externalId, final String fileExtension, final File originalFile, final int bizPartnerId) throws IOException {
-        File tempFile = createDocumentLocalTempFile(externalId, bizPartnerId, fileExtension);
+    public static File copyDocumentFileToTempDir(final int documentExternalId, final String fileExtension, final File originalFile, final int bizPartnerId) throws IOException {
+        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId, fileExtension);
         
         Files.copy(
             originalFile.toPath(),
             tempFile.toPath(),
-            StandardCopyOption.REPLACE_EXISTING
+                StandardCopyOption.REPLACE_EXISTING
         );
         
         return tempFile;
@@ -977,11 +1032,11 @@ public abstract class SImportUtils {
      * @param httpResponseStatusCode HTTP response status code.
      * @param responseBody Service response body as JSON.
      * @param responseDatetime Service response datetime.
-     * @param documents List of IDs of downloaded documents.
+     * @param documentExternalIds List of IDs of downloaded documents.
      * @param typeDocument Type of document (invoice, proforma).
      * @throws Exception 
      */
-    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documents, final int typeDocument) throws Exception {
+    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documentExternalIds, final int typeDocument) throws Exception {
         SDbComImportLog log = new SDbComImportLog();
         
         //log.setPkSyncLogId(...);
@@ -1002,7 +1057,7 @@ public abstract class SImportUtils {
         //log.mnFkUserId...
         //log.mtTsUser...
         
-        for (Integer document : documents) {
+        for (Integer document : documentExternalIds) {
             SDbComImportLogEntry entry = new SDbComImportLogEntry();
             
             //entry.setPkSyncLogId(...);
