@@ -1,3 +1,9 @@
+================================================================================
+SIIE 3.2 299.4/ 2026-04-17
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de botón de descripción extendida de ítem en forma de documentos de compras-ventas.
+
 =================================================================================
 SIIE 3.2 299.3/ 2026-04-16
 Edwin Omar CARMONA FIGUEROA
