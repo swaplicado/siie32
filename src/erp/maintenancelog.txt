@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 299.5/ 2026-04-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Consulta de boleto de báscula en la contabilización asistida de fletes de materias primas.
+2) Descarte de generación de solicitud de pago o cambio de monto a pagar en la importación de facturas desde SWAP Services.
+3) Obtención del ID del boleto de báscula a partir de su número, desde la BD de SOM.
+4) Cambio a la generación del archivo PDF de boletos de báscula para guardarse en la carpeta temporal del sistema operativo.
+5) Corrección a la visualización de compras de materias primas en la contabilización asistida.
+
+================================================================================
 SIIE 3.2 299.4/ 2026-04-17
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
