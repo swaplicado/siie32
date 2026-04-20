@@ -17,7 +17,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Rodrigo Ayala
  */
-public class SDialogExtendItemDescription extends SBeanFormDialog {
+public class SDialogItemDescription extends SBeanFormDialog {
 
     private SDbItemDescription moRegistry;
     public HTMLEditor moHtmlEditor;
@@ -28,7 +28,7 @@ public class SDialogExtendItemDescription extends SBeanFormDialog {
     /**
      * Creates new form NewBeanForm
      */
-    public SDialogExtendItemDescription() {
+    public SDialogItemDescription() {
         setTitle("Descripción del ítem");
         initComponents();
         initComponentsCustom();

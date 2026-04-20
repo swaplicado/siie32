@@ -6,7 +6,7 @@
 package erp.mod.trn.form;
 
 import erp.mod.itm.db.SDbItemDescription;
-import erp.mod.itm.form.SDialogExtendItemDescription;
+import erp.mod.itm.form.SDialogItemDescription;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SRowItemPicker;
 import java.awt.BorderLayout;
@@ -69,7 +69,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
     private javax.swing.ButtonGroup jbgItems;
     private javax.swing.JLabel jlShowedItems;
     
-    private SDialogExtendItemDescription moDialogItemDesc;
+    private SDialogItemDescription moDialogItemDescription;
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -173,7 +173,7 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
         jbViewItemDesc.addActionListener(e -> actionViewItemDescription());
         jbViewItemDesc.setEnabled(true);
         
-        moDialogItemDesc = null;
+        moDialogItemDescription = null;
         
         panelCommands = moGridPicker.getPanelCommandsSys(SGuiConsts.PANEL_RIGHT);
         panelCommands.add(jbViewItemDesc, 0);
@@ -495,16 +495,16 @@ public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener,
                 return;
             }
 
-            if (moDialogItemDesc == null) {
-                moDialogItemDesc = new SDialogExtendItemDescription();
+            if (moDialogItemDescription == null) {
+                moDialogItemDescription = new SDialogItemDescription();
             }
 
             String itemKey = row.getRowValueAt(0).toString();
             String itemName = row.getRowValueAt(1).toString();
 
-            moDialogItemDesc.setItemData(idItem, itemKey, itemName);
-            moDialogItemDesc.setRegistry(desc);
-            moDialogItemDesc.setVisible(true);
+            moDialogItemDescription.setItemData(idItem, itemKey, itemName);
+            moDialogItemDescription.setRegistry(desc);
+            moDialogItemDescription.setVisible(true);
 
         }
         catch (Exception e) {

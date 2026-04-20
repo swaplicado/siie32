@@ -71,7 +71,7 @@ import sa.lib.srv.SSrvConsts;
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
  * 
- * @author Sergio Flores, Cesar Orozco, Sergio Flores
+ * @author Sergio Flores, Cesar Orozco, Sergio Flores, Edwin Carmona
  */
 public abstract class SImportUtils {
     
@@ -1045,6 +1045,9 @@ public abstract class SImportUtils {
         }
         else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
             log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
+        }
+        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT) {
+            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PAY_RC);
         }
         //log.msRequestBodyFileName...
         log.setRequestTimestamp(requestDatetime);

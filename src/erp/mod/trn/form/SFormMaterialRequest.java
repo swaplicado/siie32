@@ -19,7 +19,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.SModuleItm;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.itm.db.SDbItemDescription;
-import erp.mod.itm.form.SDialogExtendItemDescription;
+import erp.mod.itm.form.SDialogItemDescription;
 import erp.mod.trn.db.SConfMaterialRequestItemPurchase;
 import erp.mod.trn.db.SDbMaterialCostCenterGroup;
 import erp.mod.trn.db.SDbMaterialRequest;
@@ -101,7 +101,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private SFormCapturingNotes moFormCapturingNotesReq;
     private SFormCapturingNotes moFormCapturingNotesEty;
     
-    private SDialogExtendItemDescription moDialogItemDesc;
+    private SDialogItemDescription moDialogItemDescription;
     private SDialogItemPicker moDialogPickerItem;
     private SDialogItemPicker moDialogPickerItemRef;
     private SDialogItemPicker moDialogPickerItemRefEty;
@@ -1264,7 +1264,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         mnLastSelectedRow = -1; // default
         mbActionDeleteEtyOcurred = false;
         
-        moDialogItemDesc = null;
+        moDialogItemDescription = null;
         moDialogPickerItem = null;
         moDialogPickerItemRef = null;
         moDialogPickerItemRefEty = null;
@@ -1893,7 +1893,9 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private void actionExtendItemDesc() {
         if (moItemEty != null) {
             try {
-                moDialogItemDesc = new SDialogExtendItemDescription();
+                if (moDialogItemDescription == null) {
+                    moDialogItemDescription = new SDialogItemDescription();
+                }
 
                 SDbItemDescription odesc = new SDbItemDescription();
 
@@ -1904,14 +1906,14 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                     odesc.setItemDescription("");
                 }
 
-                moDialogItemDesc.setItemData(
+                moDialogItemDescription.setItemData(
                     moItemEty.getPkItemId(),
                     moItemEty.getKey(),
                     moItemEty.getItem()
                 );
                 
-                moDialogItemDesc.setRegistry(odesc);
-                moDialogItemDesc.setVisible(true);
+                moDialogItemDescription.setRegistry(odesc);
+                moDialogItemDescription.setVisible(true);
             }
             catch (Exception e) {
                 miClient.showMsgBoxError(e.getMessage());

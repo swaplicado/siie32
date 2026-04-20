@@ -63,6 +63,8 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocumentInfo;
 import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.itm.db.SDbItemDescription;
+import erp.mod.itm.form.SDialogItemDescription;
 import erp.mod.log.db.SDbBillOfLading;
 import erp.mod.trn.db.SDbInitiative;
 import erp.mod.trn.db.STrnUtils;
@@ -149,6 +151,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibMethod;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
@@ -190,6 +193,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbDocBeingImported;
     private boolean mbMatRequestImport;
     private boolean mbIsCopy;
+    private boolean mbHasItemDescription;
     private java.util.Vector<SFormField> mvFields;
     private erp.client.SClientInterface miClient;
     
@@ -401,6 +405,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mtrn.form.SDialogShowDocumentLinks moDialogShowDocumentLinks;
     private erp.mtrn.form.SDialogDpsTime moDialogDpsTime;
+    private erp.mod.itm.form.SDialogItemDescription moDialogItemDescription;
     private erp.mfin.form.SPanelRecord moPanelRecord;
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
@@ -627,6 +632,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryWizard = new javax.swing.JButton();
         jsEntry03 = new javax.swing.JSeparator();
         jbEntryViewLinks = new javax.swing.JButton();
+        jbItemDesc = new javax.swing.JButton();
         jsEntry4 = new javax.swing.JSeparator();
         jbEntryImportFromMatRequest = new javax.swing.JButton();
         jbEntryViewMatReqLinks = new javax.swing.JButton();
@@ -1928,6 +1934,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewLinks);
 
+        jbItemDesc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_item_desc.jpg"))); // NOI18N
+        jbItemDesc.setToolTipText("Ver descripción extendida del concepto");
+        jbItemDesc.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbItemDesc);
+
         jsEntry4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jsEntry4.setPreferredSize(new java.awt.Dimension(3, 23));
         jpEntriesControlsWest.add(jsEntry4);
@@ -1953,11 +1964,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpEntriesControls.add(jpEntriesControlsWest, java.awt.BorderLayout.WEST);
 
-        jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+        jpEntriesControlsEast.setPreferredSize(new java.awt.Dimension(643, 23));
+        jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
 
         jlAdjustmentSubtypeId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlAdjustmentSubtypeId.setText("Tipo ajuste: ");
-        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(65, 23));
         jpEntriesControlsEast.add(jlAdjustmentSubtypeId);
 
         jcbAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -4324,6 +4336,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryImportFromDps.addActionListener(this);
         jbEntryWizard.addActionListener(this);
         jbEntryViewLinks.addActionListener(this);
+        jbItemDesc.addActionListener(this);
         jbEntryImportFromMatRequest.addActionListener(this);
         jbEntryViewMatReqLinks.addActionListener(this);
         jbExportCsv.addActionListener(this);
@@ -9162,6 +9175,47 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    private void actionItemDescricption() {
+        SDataDpsEntry entry = null;
+        int index = moPaneGridEntries.getTable().getSelectedRow();
+
+        if (index != -1) {
+            try {
+                entry = (SDataDpsEntry) moPaneGridEntries.getTableRow(index).getData();
+                
+                if (moDialogItemDescription == null) {
+                    moDialogItemDescription = new SDialogItemDescription();
+                }
+                
+                SDbItemDescription oDesc = new SDbItemDescription();
+                SDataItem oEtyItem = new SDataItem();   // para obtener el "Key" y el "Nombre" del ítem
+
+                oEtyItem.read(new int[] { entry.getFkItemId() }, miClient.getSession().getStatement());
+
+                try {
+                    oDesc.read(miClient.getSession(), new int[] { entry.getFkItemId() });
+                }
+                catch (Exception e) {
+                    if (e.getMessage() != null && e.getMessage().contains(SDbConsts.ERR_MSG_REG_NOT_FOUND)) {
+                        miClient.showMsgBoxInformation("El concepto no tiene descripción extendida.");
+                        return;
+                    }
+                    else {
+                        SLibUtils.showException(this, e);
+                        return;
+                    }
+                }
+
+                moDialogItemDescription.setItemData(entry.getFkItemId(), oEtyItem.getKey(), oEtyItem.getItem());
+                moDialogItemDescription.setRegistry(oDesc);
+                moDialogItemDescription.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     private void actionImportEntryFromMatRequest() {
         SDialogDpsMaterialRequestLink oDialog = new SDialogDpsMaterialRequestLink(miClient, moDps.getDpsTypeKey());
@@ -11504,6 +11558,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbFkModeOfTransportationTypeId;
     private javax.swing.JButton jbFkProductionOrderId_n;
     private javax.swing.JButton jbFkVehicleId_n;
+    private javax.swing.JButton jbItemDesc;
     private javax.swing.JButton jbLoadBillOfLading;
     private javax.swing.JButton jbLoadFilePdf;
     private javax.swing.JButton jbLoadFileXml;
@@ -14120,6 +14175,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbEntryViewLinks) {
                     actionEntryViewLinks();
+                }
+                else if (button == jbItemDesc) {
+                    actionItemDescricption();
                 }
                 else if (button == jbEntryImportFromMatRequest) {
                     actionImportEntryFromMatRequest();

@@ -103,6 +103,7 @@ import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.form.SDialogImportProformas;
 import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
@@ -138,7 +139,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores, Cesar Orozco, Edwin Carmona
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -250,6 +251,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiAccRecPaymentsCanc;
     private javax.swing.JMenuItem jmiAccRecPaymentsAll;
     private javax.swing.JMenuItem jmiFinImportProformas;
+    private javax.swing.JMenuItem jmiFinImportCRP;
     private javax.swing.JSeparator jsFinCash;
     private javax.swing.JMenuItem jmiFinLayoutBank;
     private javax.swing.JMenuItem jmiFinLayoutBankPending;
@@ -391,6 +393,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckFormat moFormCheckFormat;
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
     private erp.mod.cfg.swap.form.SDialogImportProformas moDialogImportProformas;
+    private erp.mod.cfg.swap.form.SDialogImportProformas moDialogImportCrps;
     private erp.mtrn.form.SFormCtr moFormCtr;
     private erp.mtrn.form.SDialogRepAccountTag moDialogRepAccTag;
 
@@ -651,6 +654,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsCanc = new JMenuItem("Solicitudes de pago canceladas");
         jmiAccRecPaymentsAll = new JMenuItem("Todas las solicitudes de pago");
         jmiFinImportProformas = new JMenuItem("Importación de proformas...");
+        jmiFinImportCRP = new JMenuItem("Importación de comp. de recepción de pagos (CRP)...");
         jsFinCash = new JPopupMenu.Separator();
         jmiFinLayoutBank = new JMenuItem("Layouts de transferencias");
         jmiFinLayoutBankPending = new JMenuItem("Layouts de transferencias por pagar");
@@ -692,6 +696,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFinAccRec.add(jmiAccRecPaymentsAll);
         jmFinAccRec.addSeparator();
         jmFinAccRec.add(jmiFinImportProformas);
+        jmFinAccRec.add(jmiFinImportCRP);
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinBankNbDay);
@@ -1053,6 +1058,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiAccRecPaymentsCanc.addActionListener(this);
         jmiAccRecPaymentsAll.addActionListener(this);
         jmiFinImportProformas.addActionListener(this);
+        jmiFinImportCRP.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
         jmiFinLayoutBankPending.addActionListener(this);
         jmiFinLayoutBankDone.addActionListener(this);
@@ -1312,6 +1318,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinMassInvoices.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
         jmiFinImportProformas.setEnabled(true);
+        jmiFinImportCRP.setEnabled(true);
         jmFinCfdiMassiveValidation.setEnabled(hasRightMoveAccCash);
         jmiFinCfdiMassiveValidationPur.setEnabled(hasRightMoveAccCash);
         jmiFinCfdiMassiveValidationSal.setEnabled(hasRightMoveAccCash);
@@ -2405,10 +2412,19 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if(item == jmiFinImportProformas) {
                 if (moDialogImportProformas == null) {
-                    moDialogImportProformas = new SDialogImportProformas((SGuiClient) miClient);
+                    String title = "Importación de proformas autorizadas";
+                    moDialogImportProformas = new SDialogImportProformas((SGuiClient) miClient, SSwapConsts.TXN_DOC_TYPE_PROFORMA, title);
                 }
                 moDialogImportProformas.resetForm();
                 moDialogImportProformas.setVisible(true);
+            }
+            else if(item == jmiFinImportCRP) {
+                if (moDialogImportCrps == null) {
+                    String title = "Importación de comp. recep. pagos autorizados";
+                    moDialogImportCrps = new SDialogImportProformas((SGuiClient) miClient, SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT, title);
+                }
+                moDialogImportCrps.resetForm();
+                moDialogImportCrps.setVisible(true);
             }
             else if (item == jmiFinLayoutBank) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);
