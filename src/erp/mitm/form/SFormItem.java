@@ -1704,12 +1704,14 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpDescription.setBorder(javax.swing.BorderFactory.createTitledBorder("Descripción extendida del ítem:"));
         jpDescription.setLayout(new java.awt.BorderLayout());
 
-        jPanel22.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 1));
 
         jLabel2.setText("Introduce la descripción extendida del ítem.");
+        jLabel2.setPreferredSize(new java.awt.Dimension(730, 14));
         jPanel22.add(jLabel2);
 
         jckItemDescriptionIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
+        jckItemDescriptionIsDeleted.setText("Descripción extendida eliminada");
         jckItemDescriptionIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jckItemDescriptionIsDeleted.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jckItemDescriptionIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -4145,12 +4147,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     public int getFormStatus() {
         return mnFormStatus;
     }
-
+    
     @Override
     public int getFormResult() {
         return mnFormResult;
     }
-
+    
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
@@ -4297,7 +4299,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         Platform.runLater(() -> {
             moHtmlEditor.setHtmlText(moItem.getCompItemDescription());
         });
-
+        
         mbResetingForm = false;
     }
 

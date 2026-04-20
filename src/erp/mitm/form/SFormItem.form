@@ -2771,14 +2771,17 @@
                 </Constraint>
               </Constraints>
 
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                <Property name="columns" type="int" value="0"/>
-                <Property name="rows" type="int" value="1"/>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="1"/>
               </Layout>
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jLabel2">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Introduce la descripci&#xf3;n extendida del &#xed;tem."/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[730, 14]"/>
+                    </Property>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckItemDescriptionIsDeleted">
@@ -2786,6 +2789,7 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="0" green="0" red="cc" type="rgb"/>
                     </Property>
+                    <Property name="text" type="java.lang.String" value="Descripci&#xf3;n extendida eliminada"/>
                     <Property name="horizontalAlignment" type="int" value="11"/>
                     <Property name="horizontalTextPosition" type="int" value="10"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

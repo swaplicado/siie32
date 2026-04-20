@@ -8,6 +8,11 @@ Sergio Abraham FLORES GUTIÉRREZ
 4) Cambio a la generación del archivo PDF de boletos de báscula para guardarse en la carpeta temporal del sistema operativo.
 5) Corrección a la visualización de compras de materias primas en la contabilización asistida.
 
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Corrección de selección de renglón al refrescar la vista de Descripciones extendidas de ítems.
+2) Corrección de campo de check-box de Descripción extendida eliminada.
+
 ================================================================================
 SIIE 3.2 299.4/ 2026-04-17
 Rodrigo Abel AYALA VÁZQUEZ

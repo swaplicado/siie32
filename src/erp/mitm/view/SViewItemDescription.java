@@ -28,6 +28,8 @@ public class SViewItemDescription extends erp.lib.table.STableTab implements jav
 
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
+    private int mnLastSelectedItemId;
+    private int mnLastSelectedRow;
 
     public SViewItemDescription(erp.client.SClientInterface client, java.lang.String tabTitle) {
         super(client, tabTitle, SDataConstants.ITMU_ITEM_DESC);
@@ -46,6 +48,9 @@ public class SViewItemDescription extends erp.lib.table.STableTab implements jav
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moPanelFilterItemGeneric);
 
+        mnLastSelectedItemId = -1;
+        mnLastSelectedRow = -1;
+                
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_ITM_ITEM).Level;
 
         jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
@@ -107,8 +112,11 @@ public class SViewItemDescription extends erp.lib.table.STableTab implements jav
     public void actionEdit() {
         if (jbEdit.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
+                mnLastSelectedRow = moTablePane.getTable().getSelectedRow();
+                mnLastSelectedItemId = ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0];
+                
                 if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                        miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).refreshCatalogues(mnTabType);
+                    miClient.getGuiModule(SDataConstants.GLOBAL_CAT_ITM).refreshCatalogues(mnTabType);
                 }
             }
         }
@@ -135,6 +143,24 @@ public class SViewItemDescription extends erp.lib.table.STableTab implements jav
                 moTablePane.getTableModel().setValueAt(clean, row, colIndex);
             }
         }
+        
+        boolean rowFound = false;
+        
+        // Recorrer tabla buscando el ítem seleccionado:
+        
+        for (int row = 0; row < moTablePane.getTableGuiRowCount(); row++) {
+            if (((int[]) moTablePane.getTableRow(row).getPrimaryKey())[0] == mnLastSelectedItemId) {
+                moTablePane.setTableRowSelection(row);
+                rowFound = true;
+                break;
+            }
+        }
+        
+        // Si el ítem o la descrpción fueron eliminados, selecciona la fila más cercana posible:
+        
+        if (!rowFound && moTablePane.getTableGuiRowCount() > 0) {
+            moTablePane.setTableRowSelection(Math.min(mnLastSelectedRow, moTablePane.getTableGuiRowCount() - 1));
+        }
     }
     
     @Override
@@ -149,7 +175,7 @@ public class SViewItemDescription extends erp.lib.table.STableTab implements jav
         super.actionRefresh(refreshMode);
 
         if (refreshMode == STableConstants.REFRESH_MODE_RELOAD) {
-        populateTable();    
+            populateTable();    
         }
     }
     
