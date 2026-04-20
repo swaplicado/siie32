@@ -1971,12 +1971,14 @@ public abstract class SExportDataUtils {
                                     reference.is_deleted = !somResultSet.getBoolean("_is_active");
 
                                     File oPdf = null;
+                                    
                                     try {
                                         reference.som_ticket_file_name = "";
                                         reference.som_ticket_file_bucket = "";
                                         reference.som_ticket_file_project_id = "";
 
-                                        oPdf = SExportDataSomUtils.createTicketPdf(session, somDatabase.getConnection(), idTicket, false);
+                                        oPdf = SExportDataSomUtils.createTicketPdf(session, somDatabase.getConnection(), idTicket, true, false);
+                                        
                                         if (oPdf != null) {
                                             String folderName = "SOM_REV_TIC/";
                                             String fileName = "SOM_TIC_" + idTicket;

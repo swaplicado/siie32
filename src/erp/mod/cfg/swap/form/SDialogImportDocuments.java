@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -128,8 +129,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected boolean mbAllowLinkGreaterInvoices;
     
     protected boolean mbExportPaymentRequests;
-    protected boolean mbDocumentsBeingUpdated;
-    protected boolean mbDocumentsBeingRecorded;
+    protected boolean mbDocumentsBeingProcessed;
+    protected boolean mbDocumentsBeingReloaded;
+    protected boolean mbDocumentsBeingRendered;
+    protected boolean mbDocumentsBeingRefreshed;
+    protected ImageIcon moIconEdit;
+    protected ImageIcon moIconSave;
     protected SDialogPdfViewer moDialogPdfViewer;
     protected SDialogMassAccountDocuments moDialogMassAccountDocuments;
     
@@ -231,33 +236,38 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfRecord = new javax.swing.JTextField();
         jbViewRecord = new javax.swing.JButton();
         jpProcessingN9 = new javax.swing.JPanel();
-        jlReqPay = new javax.swing.JLabel();
+        moBoolReqPayRequire = new sa.lib.gui.bean.SBeanFieldBoolean();
         jpProcessingN10 = new javax.swing.JPanel();
         jtfReqPayAmount = new javax.swing.JTextField();
         jtfReqPayAmountPct = new javax.swing.JTextField();
         jpProcessingN11 = new javax.swing.JPanel();
+        moDecReqPayAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jpProcessingN111 = new javax.swing.JPanel();
+        jbEditAndSaveReqPayAmount = new javax.swing.JButton();
+        jbCancelEditReqPayAmount = new javax.swing.JButton();
+        jpProcessingN12 = new javax.swing.JPanel();
         jtfReqPayRequiredDate = new javax.swing.JTextField();
         jbChangeReqPayRequiredDate = new javax.swing.JButton();
-        jpProcessingN12 = new javax.swing.JPanel();
-        jbRequestPayment = new javax.swing.JButton();
         jpProcessingN13 = new javax.swing.JPanel();
-        jlPay = new javax.swing.JLabel();
+        jbRequestPayment = new javax.swing.JButton();
         jpProcessingN14 = new javax.swing.JPanel();
+        jlPay = new javax.swing.JLabel();
+        jpProcessingN15 = new javax.swing.JPanel();
         jtfPayFolio = new javax.swing.JTextField();
         jtfPayDate = new javax.swing.JTextField();
-        jpProcessingN15 = new javax.swing.JPanel();
+        jpProcessingN16 = new javax.swing.JPanel();
         jtfPayRequiredDate = new javax.swing.JTextField();
         jbChangePayRequiredDate = new javax.swing.JButton();
-        jpProcessingN16 = new javax.swing.JPanel();
-        jtfPayStatus = new javax.swing.JTextField();
         jpProcessingN17 = new javax.swing.JPanel();
-        jlPayScheduledDate = new javax.swing.JLabel();
+        jtfPayStatus = new javax.swing.JTextField();
         jpProcessingN18 = new javax.swing.JPanel();
+        jlPayScheduledDate = new javax.swing.JLabel();
+        jpProcessingN19 = new javax.swing.JPanel();
         jtfPayScheduledDate = new javax.swing.JTextField();
         jbChangePayScheduledDate = new javax.swing.JButton();
-        jpProcessingN19 = new javax.swing.JPanel();
-        jlPayExecution = new javax.swing.JLabel();
         jpProcessingN20 = new javax.swing.JPanel();
+        jlPayExecution = new javax.swing.JLabel();
+        jpProcessingN21 = new javax.swing.JPanel();
         jtfPayExecutionDate = new javax.swing.JTextField();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -507,7 +517,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpDocumentsProcessing.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 0, 0, 2));
         jpDocumentsProcessing.setLayout(new java.awt.BorderLayout());
 
-        jpProcessingN.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
+        jpProcessingN.setLayout(new java.awt.GridLayout(21, 1, 0, 1));
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -612,9 +622,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlReqPay.setText("Pago requerido:");
-        jlReqPay.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN9.add(jlReqPay);
+        moBoolReqPayRequire.setText("Pago requerido:");
+        moBoolReqPayRequire.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        moBoolReqPayRequire.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN9.add(moBoolReqPayRequire);
 
         jpProcessingN.add(jpProcessingN9);
 
@@ -640,47 +651,69 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        moDecReqPayAmount.setPreferredSize(new java.awt.Dimension(105, 23));
+        jpProcessingN11.add(moDecReqPayAmount);
+
+        jpProcessingN111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jbEditAndSaveReqPayAmount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditAndSaveReqPayAmount.setToolTipText("Modificar monto requerido de pago");
+        jbEditAndSaveReqPayAmount.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN111.add(jbEditAndSaveReqPayAmount);
+
+        jbCancelEditReqPayAmount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/ico_close.png"))); // NOI18N
+        jbCancelEditReqPayAmount.setToolTipText("Cancelar modificación");
+        jbCancelEditReqPayAmount.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbCancelEditReqPayAmount.setPreferredSize(new java.awt.Dimension(17, 23));
+        jpProcessingN111.add(jbCancelEditReqPayAmount);
+
+        jpProcessingN11.add(jpProcessingN111);
+
+        jpProcessingN.add(jpProcessingN11);
+
+        jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jtfReqPayRequiredDate.setEditable(false);
         jtfReqPayRequiredDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfReqPayRequiredDate.setText("dow 01/mon/2001");
         jtfReqPayRequiredDate.setToolTipText("Fecha requerida de pago");
         jtfReqPayRequiredDate.setFocusable(false);
         jtfReqPayRequiredDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN11.add(jtfReqPayRequiredDate);
+        jpProcessingN12.add(jtfReqPayRequiredDate);
 
         jbChangeReqPayRequiredDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangeReqPayRequiredDate.setToolTipText("Cambiar fecha requerida de pago...");
         jbChangeReqPayRequiredDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN11.add(jbChangeReqPayRequiredDate);
-
-        jpProcessingN.add(jpProcessingN11);
-
-        jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jbRequestPayment.setText("Solicitar pago");
-        jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN12.add(jbRequestPayment);
+        jpProcessingN12.add(jbChangeReqPayRequiredDate);
 
         jpProcessingN.add(jpProcessingN12);
 
         jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPay.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlPay.setText("Solicitud de pago:");
-        jlPay.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN13.add(jlPay);
+        jbRequestPayment.setText("Solicitar pago");
+        jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN13.add(jbRequestPayment);
 
         jpProcessingN.add(jpProcessingN13);
 
         jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPay.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jlPay.setText("Solicitud de pago:");
+        jlPay.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN14.add(jlPay);
+
+        jpProcessingN.add(jpProcessingN14);
+
+        jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayFolio.setEditable(false);
         jtfPayFolio.setText("P-000000");
         jtfPayFolio.setToolTipText("Folio de solicitud de pago");
         jtfPayFolio.setFocusable(false);
         jtfPayFolio.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpProcessingN14.add(jtfPayFolio);
+        jpProcessingN15.add(jtfPayFolio);
 
         jtfPayDate.setEditable(false);
         jtfPayDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -688,11 +721,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayDate.setToolTipText("Fecha de solicitud de pago");
         jtfPayDate.setFocusable(false);
         jtfPayDate.setPreferredSize(new java.awt.Dimension(70, 23));
-        jpProcessingN14.add(jtfPayDate);
+        jpProcessingN15.add(jtfPayDate);
 
-        jpProcessingN.add(jpProcessingN14);
+        jpProcessingN.add(jpProcessingN15);
 
-        jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayRequiredDate.setEditable(false);
         jtfPayRequiredDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -700,35 +733,35 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayRequiredDate.setToolTipText("Fecha requerida de pago en solicitud de pago");
         jtfPayRequiredDate.setFocusable(false);
         jtfPayRequiredDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN15.add(jtfPayRequiredDate);
+        jpProcessingN16.add(jtfPayRequiredDate);
 
         jbChangePayRequiredDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangePayRequiredDate.setToolTipText("Cambiar fecha requerida de pago en solicitud de pago...");
         jbChangePayRequiredDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN15.add(jbChangePayRequiredDate);
+        jpProcessingN16.add(jbChangePayRequiredDate);
 
-        jpProcessingN.add(jpProcessingN15);
+        jpProcessingN.add(jpProcessingN16);
 
-        jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayStatus.setEditable(false);
         jtfPayStatus.setText("STATUS");
         jtfPayStatus.setToolTipText("Estatus de solicitud de pago");
         jtfPayStatus.setFocusable(false);
         jtfPayStatus.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN16.add(jtfPayStatus);
-
-        jpProcessingN.add(jpProcessingN16);
-
-        jpProcessingN17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPayScheduledDate.setText("Programación del pago:");
-        jlPayScheduledDate.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN17.add(jlPayScheduledDate);
+        jpProcessingN17.add(jtfPayStatus);
 
         jpProcessingN.add(jpProcessingN17);
 
         jpProcessingN18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayScheduledDate.setText("Programación del pago:");
+        jlPayScheduledDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN18.add(jlPayScheduledDate);
+
+        jpProcessingN.add(jpProcessingN18);
+
+        jpProcessingN19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayScheduledDate.setEditable(false);
         jtfPayScheduledDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -736,24 +769,24 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayScheduledDate.setToolTipText("Fecha de programación del pago");
         jtfPayScheduledDate.setFocusable(false);
         jtfPayScheduledDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN18.add(jtfPayScheduledDate);
+        jpProcessingN19.add(jtfPayScheduledDate);
 
         jbChangePayScheduledDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbChangePayScheduledDate.setToolTipText("Cambiar fecha de programación del pago...");
         jbChangePayScheduledDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN18.add(jbChangePayScheduledDate);
-
-        jpProcessingN.add(jpProcessingN18);
-
-        jpProcessingN19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPayExecution.setText("Operación del pago:");
-        jlPayExecution.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN19.add(jlPayExecution);
+        jpProcessingN19.add(jbChangePayScheduledDate);
 
         jpProcessingN.add(jpProcessingN19);
 
         jpProcessingN20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayExecution.setText("Operación del pago:");
+        jlPayExecution.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN20.add(jlPayExecution);
+
+        jpProcessingN.add(jpProcessingN20);
+
+        jpProcessingN21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfPayExecutionDate.setEditable(false);
         jtfPayExecutionDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -761,9 +794,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jtfPayExecutionDate.setToolTipText("Fecha de operación del pago");
         jtfPayExecutionDate.setFocusable(false);
         jtfPayExecutionDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN20.add(jtfPayExecutionDate);
+        jpProcessingN21.add(jtfPayExecutionDate);
 
-        jpProcessingN.add(jpProcessingN20);
+        jpProcessingN.add(jpProcessingN21);
 
         jpDocumentsProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
 
@@ -787,6 +820,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabelPeriiod1;
     private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JButton jbCancelEditReqPayAmount;
     private javax.swing.JButton jbChangePayRequiredDate;
     private javax.swing.JButton jbChangePayScheduledDate;
     private javax.swing.JButton jbChangeReqPayRequiredDate;
@@ -794,6 +828,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbCreateInvoiceFromScratch;
     private javax.swing.JButton jbDeselectAllDocs;
     private javax.swing.JButton jbDownloadSelectedDocs;
+    private javax.swing.JButton jbEditAndSaveReqPayAmount;
     private javax.swing.JButton jbImportInvoiceFromCfdi;
     private javax.swing.JButton jbLinkAllDocs;
     private javax.swing.JButton jbLinkInvoice;
@@ -816,7 +851,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JLabel jlPayExecution;
     private javax.swing.JLabel jlPayScheduledDate;
     private javax.swing.JLabel jlProgress;
-    private javax.swing.JLabel jlReqPay;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid1;
@@ -841,6 +875,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JPanel jpProcessingN1;
     private javax.swing.JPanel jpProcessingN10;
     private javax.swing.JPanel jpProcessingN11;
+    private javax.swing.JPanel jpProcessingN111;
     private javax.swing.JPanel jpProcessingN12;
     private javax.swing.JPanel jpProcessingN13;
     private javax.swing.JPanel jpProcessingN14;
@@ -851,6 +886,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JPanel jpProcessingN19;
     private javax.swing.JPanel jpProcessingN2;
     private javax.swing.JPanel jpProcessingN20;
+    private javax.swing.JPanel jpProcessingN21;
     private javax.swing.JPanel jpProcessingN3;
     private javax.swing.JPanel jpProcessingN4;
     private javax.swing.JPanel jpProcessingN5;
@@ -873,11 +909,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JTextField jtfUserFuncSubAreas;
     private javax.swing.JTextField jtfUserName;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolExcludeRecorded;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolReqPayRequire;
     private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekEnd;
     private sa.lib.gui.bean.SBeanFieldCalendarWeek moCalWeekStart;
     private sa.lib.gui.bean.SBeanFieldCalendarYear moCalWeekYear;
     private sa.lib.gui.bean.SBeanFieldDate moDatePeriodEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDatePeriodStart;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecReqPayAmount;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDocModeCase;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDocModeType;
     private sa.lib.gui.bean.SBeanFieldRadio moRadDocModeCase;
@@ -906,6 +944,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moKeyDocModeType.setKeySettings(miClient, SGuiUtils.getLabelName(moRadDocModeType.getText()), false);
         moKeyDocModeCase.setKeySettings(miClient, SGuiUtils.getLabelName(moRadDocModeCase.getText()), false);
         moBoolExcludeRecorded.setBooleanSettings(SGuiUtils.getLabelName(moBoolExcludeRecorded.getText()), false);
+        moBoolReqPayRequire.setBooleanSettings(SGuiUtils.getLabelName(moBoolReqPayRequire.getText()), false);
+        moDecReqPayAmount.setDecimalSettings(SGuiUtils.getLabelName(moBoolReqPayRequire.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
         moFields.addField(moRadSearchByPeriod);
         moFields.addField(moRadSearchByWeek);
@@ -919,6 +959,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moFields.addField(moKeyDocModeType);
         moFields.addField(moKeyDocModeCase);
         moFields.addField(moBoolExcludeRecorded);
+        moFields.addField(moBoolReqPayRequire);
+        moFields.addField(moDecReqPayAmount);
         moFields.setFormButton(jbShowDocs);
         
         jbSave.setEnabled(false);
@@ -1092,16 +1134,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-    }
-    
-    private void refreshDocumentsGrid() {
-        int index = moDocumentsGrid.getTable().getSelectedRow();
-        moDocumentsGrid.renderGridRows();
-        moDocumentsGrid.setSelectedGridRow(index);
+        
+        moIconEdit = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"));
+        moIconSave = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"));
     }
     
     private boolean isMassAccountingElegible() {
-//        return false;
         return mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
     }
     
@@ -1126,6 +1164,45 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         
         return isRecorded;
+    }
+    
+    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGrid) {
+        Collections.sort(documents);
+        
+        moDocumentsGrid.populateGrid(new Vector<>(documents), this);
+        moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        moDocumentsGrid.setSelectedGridRow(0);
+        
+        if (focusDocumentsGrid) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
+        
+        jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
+    }
+    
+    public void reloadDocumentsGrid() {
+        mbDocumentsBeingReloaded = true;
+        
+        if (moRadDocModeType.isSelected()) {
+            itemStateChangedDocType(false); // reloads documents grid
+        }
+        else if (moRadDocModeCase.isSelected()) {
+            itemStateChangedDocCase(false); // reloads documents grid
+        }
+        
+        mbDocumentsBeingReloaded = false;
+    }
+    
+    private void refreshDocumentsGrid() {
+        mbDocumentsBeingRefreshed = true;
+        
+        int index = moDocumentsGrid.getTable().getSelectedRow();
+        moDocumentsGrid.renderGridRows();
+        moDocumentsGrid.setSelectedGridRow(index);
+        
+        renderCurrentDoc(false);
+        
+        mbDocumentsBeingRefreshed = false;
     }
     
     private SDataDps readOrderAndPrepareDialogDpsFinder(final SImportedDocument document) throws Exception {
@@ -1256,6 +1333,50 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbDownloadSelectedDocs.setEnabled(setShowingDocsModeOn);
         jbRecordAllDocs.setEnabled(setShowingDocsModeOn && isMassAccountingElegible());
         jbLinkAllDocs.setEnabled(setShowingDocsModeOn);
+    }
+    
+    private void enableEditingReqPayAmount(final boolean enable) {
+        // set according status in dialog:
+        
+        if (enable) {
+            disableFieldsWhenRegisteringDocs();
+        }
+        else {
+            enableFieldsForShowingDocs(true);
+        }
+        
+        moDocumentsGrid.getTable().setEnabled(!enable);
+        
+        jbImportInvoiceFromCfdi.setEnabled(!enable);
+        jbCreateInvoiceFromScratch.setEnabled(!enable);
+        jbLinkInvoice.setEnabled(!enable);
+        jbUnlinkInvoice.setEnabled(!enable);
+        jbRejectInvoice.setEnabled(!enable);
+        jbViewInvoicePdf.setEnabled(!enable);
+        jbViewInvoice.setEnabled(!enable);
+        jbViewOrder.setEnabled(!enable);
+        jbViewRecord.setEnabled(!enable);
+        
+        moBoolReqPayRequire.setEnabled(!enable);
+        jbChangeReqPayRequiredDate.setEnabled(!enable);
+        jbRequestPayment.setEnabled(!enable);
+        jbChangePayRequiredDate.setEnabled(!enable);
+        jbChangePayScheduledDate.setEnabled(!enable);        
+        
+        // set according status in edition field and controls:
+        
+        jbEditAndSaveReqPayAmount.setIcon(enable ? moIconSave : moIconEdit);
+        jbEditAndSaveReqPayAmount.setEnabled(true);
+        jbCancelEditReqPayAmount.setEnabled(enable);
+        
+        moDecReqPayAmount.setEditable(enable);
+        
+        if (enable) {
+            moDecReqPayAmount.requestFocusInWindow();
+        }
+        else {
+            moDecReqPayAmount.resetField();
+        }
     }
     
     private void exportPaymentRequestsIfNeeded() {
@@ -1540,8 +1661,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
 
                 enableFieldsForShowingDocs(true);
-                
-                itemStateChangedDocType(true); // reloads documents grid
+                populateDocumentsGrid(maDocuments, !maDocuments.isEmpty());
+                renderCurrentDoc(false);
             }
         }
         catch (Exception e) {
@@ -1549,7 +1670,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             handleShowException(e);
         }
         finally {
-            mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
+            mbDocumentsBeingProcessed = false; // enables item state change events from being handled again!
             
             if (exception != null) {
                 throw exception;
@@ -1557,12 +1678,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void processRetrievingDocsToRegister(final ArrayList<SImportedDocument> recordableDocs, final SProgressCallback callback) {
+        ArrayList<SImportedDocument> rejectedInvoices = null;
+        
         try {
-            mbDocumentsBeingRecorded = true;
+            mbDocumentsBeingProcessed = true;
 
             moDocumentsGrid.getTable().setEnabled(false);
-            renderCurrentDoc();
+            renderCurrentDoc(true); // forcing clearing!
 
             disableFieldsWhenRegisteringDocs();
 
@@ -1778,10 +1902,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 moDialogMassAccountDocuments.setVisible(true);
                 
                 // check whether payments need to be exported:
-                
                 if ((boolean) moDialogMassAccountDocuments.getValue(SDialogMassAccountDocuments.VALUE_EXPORT_PAYMENTS)) {
                     mbExportPaymentRequests = true;
                 }
+                
+                // check whether invoices were rejected:
+                rejectedInvoices = (ArrayList<SImportedDocument>) moDialogMassAccountDocuments.getValue(SDialogMassAccountDocuments.VALUE_REJECTED_INVOICES);
             }
         }
         catch (Exception e) {
@@ -1791,10 +1917,19 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             clearProgress();
             enableFieldsForShowingDocs(true);
             
-            moDocumentsGrid.getTable().setEnabled(true);
-            renderCurrentDoc();
+            if (rejectedInvoices != null && !rejectedInvoices.isEmpty()) {
+                int index = moDocumentsGrid.getTable().getSelectedRow();
+
+                maDocuments.removeAll(rejectedInvoices);
+                reloadDocumentsGrid();
+
+                moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
+            }
             
-            mbDocumentsBeingRecorded = false;
+            moDocumentsGrid.getTable().setEnabled(true);
+            renderCurrentDoc(false);
+                                    
+            mbDocumentsBeingProcessed = false;
         }
     }
     
@@ -1834,7 +1969,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         if (SGuiUtils.computeValidation(miClient, validation)) {
             try {
-                mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
+                mbDocumentsBeingProcessed = true; // prevents item-state-change events from being handled!
                 
                 disableFieldsToSearchDocs();
                 
@@ -1919,12 +2054,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void actionPerformedClearDocs() {
         try {
-            mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
+            mbDocumentsBeingProcessed = true; // prevents item-state-change events from being handled!
             
             maDocuments.clear();
             
             moDocumentsGrid.populateGrid(new Vector<>());
-            renderCurrentDoc();
+            renderCurrentDoc(true); // forcing clearing!
 
             enableFieldsForShowingDocs(false);
 
@@ -1943,7 +2078,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             SLibUtils.showException(this, e);
         }
         finally {
-            mbDocumentsBeingUpdated = false; // enables item state change events from being handled again!
+            mbDocumentsBeingProcessed = false; // enables item state change events from being handled again!
         }
     }
     
@@ -2062,14 +2197,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 if (recordableDocs.size() == 1) {
                     confirm = "Se descargarán los archivos XML y PDF del comprobante, y se revisará que:\n";
-                    confirm += "la única factura autorizada sin contabilizar se puede procesar.";
+                    confirm += "la única factura autorizada sin contabilizar se pueda procesar.";
                 }
                 else {
                     confirm = "Se descargarán los archivos XML y PDF de los comprobantes, y se revisará que:\n";
-                    confirm += "las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas sin contabilizar se pueden procesar.";
+                    confirm += "las " + SLibUtils.DecimalFormatInteger.format(recordableDocs.size()) + " facturas autorizadas sin contabilizar se puedan procesar.";
                 }
                 
-                boolean process = miClient.showMsgBoxConfirm(confirm + "\nLa descarga y revisión pueden demorar unos instantes.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+                boolean process = miClient.showMsgBoxConfirm(confirm + "\nLa descarga y revisión pueden demorar algunos segundos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                 
                 if (process) {
                     // start of background processing...
@@ -2229,7 +2364,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
                 else {
-                    String confirm = "Será posible rechazar la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ", solamente si no está contabilizada.\n"
+                    String confirm = "Será posible rechazar la factura autorizada '" + document.getFolio() + "' de " + document.BizPartner + ", solamente si aún no está contabilizada.\n"
                             + "IMPORTANTE: ¡Considere que el rechazo de una factura autorizada es una acción que no se puede revertir!\n"
                             + SGuiConsts.MSG_CNF_CONT;
                     
@@ -2261,7 +2396,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     int index = moDocumentsGrid.getTable().getSelectedRow();
 
                                     maDocuments.remove(document);
-                                    itemStateChangedDocType(false); // reloads documents grid
+                                    reloadDocumentsGrid();
 
                                     moDocumentsGrid.setSelectedGridRow(index < moDocumentsGrid.getTable().getRowCount() ? index : --index);
 
@@ -2509,6 +2644,71 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void actionPerformedEditAndSaveReqPayAmount() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                
+                if (document.isPaymentRequestDataAvailable()) {
+                    if (!moDecReqPayAmount.isEditable()) {
+                        // edit amount:
+                        
+                        enableEditingReqPayAmount(true);
+                    }
+                    else {
+                        // save amount:
+
+                        if (moDecReqPayAmount.getValue() <= 0) {
+                            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT + "cero.");
+                            moDecReqPayAmount.requestFocusInWindow();
+                        }
+                        else if (moDecReqPayAmount.getValue() > document.Total) {
+                            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moDecReqPayAmount.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "$ " + SLibUtils.getDecimalFormatAmount().format(document.Total) + ".");
+                            moDecReqPayAmount.requestFocusInWindow();
+                        }
+                        else {
+                            // save only if effective date is available:
+
+                            if (document.getRequiredPaymentDateEffective() == null) {
+                                actionPerformedChangeReqPayRequiredDate();
+                            }
+
+                            if (document.getRequiredPaymentDateEffective() != null) {
+                                document.RequiredPaymentDefinition = SSwapConsts.PAY_DEF_BY_AMT_MAN;
+                                document.RequiredPaymentAmountNew = moDecReqPayAmount.getValue();
+
+                                refreshDocumentsGrid();
+
+                                actionPerformedCancelEditReqPayAmount(false);
+                                
+                                moDocumentsGrid.getTable().requestFocusInWindow();
+                            }
+                            else {
+                                miClient.showMsgBoxWarning("No se puede cambiar el monto requerido de pago porque la factura autorizada '" + document.getFolio() + "' no tiene una fecha efectiva de pago.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedCancelEditReqPayAmount(final boolean focusDocumentsGrid) {
+        enableEditingReqPayAmount(false);
+        
+        if (focusDocumentsGrid) {
+            moDocumentsGrid.getTable().requestFocusInWindow();
+        }
+    }
+    
     private void actionPerformedRequestPayment() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
@@ -2647,10 +2847,39 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void renderCurrentDoc() {
+    private void renderReqPay(final SImportedDocument document) {
+        if (document == null) {
+            jtfReqPayAmount.setText("");
+            jtfReqPayAmountPct.setText("");
+            jtfReqPayRequiredDate.setText("");
+        }
+        else {
+            if (!document.isPaymentRequestDataAvailable()) {
+                jtfReqPayAmount.setText("");
+                jtfReqPayAmountPct.setText("");
+                jtfReqPayRequiredDate.setText("");
+            }
+            else {
+                jtfReqPayAmount.setText(SLibUtils.getDecimalFormatAmount().format(document.getRequiredPaymentAmountEffective(null)) + " " + document.CurrencyCode);
+                jtfReqPayAmountPct.setText(SLibUtils.DecimalFormatPercentage0D.format(document.getRequiredPaymentPct()));
+                jtfReqPayRequiredDate.setText(SLibUtils.GuiDateFormat.format(document.getRequiredPaymentDateEffective()));
+                
+                jtfReqPayAmount.setCaretPosition(0);
+                jtfReqPayAmountPct.setCaretPosition(0);
+                jtfReqPayRequiredDate.setCaretPosition(0);
+            }
+        }
+        
+        moDecReqPayAmount.setEditable(false);
+        moDecReqPayAmount.resetField();
+    }
+    
+    private void renderCurrentDoc(final boolean forceClearing) {
+        mbDocumentsBeingRendered = true;
+        
         SGridRow row = moDocumentsGrid.getSelectedGridRow();
         
-        if (mbDocumentsBeingRecorded || row == null) {
+        if (forceClearing || row == null) {
             jbImportInvoiceFromCfdi.setEnabled(false);
             jbCreateInvoiceFromScratch.setEnabled(false);
             jbLinkInvoice.setEnabled(false);
@@ -2660,8 +2889,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbViewInvoice.setEnabled(false);
             jbViewOrder.setEnabled(false);
             jbViewRecord.setEnabled(false);
-            jbChangeReqPayRequiredDate.setEnabled(false);
-            jbRequestPayment.setEnabled(false);
+            
+            moBoolReqPayRequire.setEnabled(false);
+            moBoolReqPayRequire.resetField();
+            itemStateChangedReqPayRequire();
+            renderReqPay(null);
+            
             jbChangePayRequiredDate.setEnabled(false);
             jbChangePayScheduledDate.setEnabled(false);
             
@@ -2696,7 +2929,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbViewInvoice.setEnabled(true);
             jbViewOrder.setEnabled(true);
             jbViewRecord.setEnabled(true);
-            jbChangeReqPayRequiredDate.setEnabled(true);
+            
+            moBoolReqPayRequire.setEnabled(document.isPaymentRequestDataAvailable());
+            moBoolReqPayRequire.setValue(document.RequirePayment);
+            itemStateChangedReqPayRequire();
+            renderReqPay(document);
+            
             jbRequestPayment.setEnabled(true);
             jbChangePayRequiredDate.setEnabled(true);
             jbChangePayScheduledDate.setEnabled(true);
@@ -2761,20 +2999,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 jtfPayExecutionDate.setCaretPosition(0);
             }
         }
-    }
-    
-    private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusOnDocumentsGrid) {
-        Collections.sort(documents);
         
-        moDocumentsGrid.populateGrid(new Vector<>(documents), this);
-        moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        moDocumentsGrid.setSelectedGridRow(0);
-        
-        if (focusOnDocumentsGrid) {
-            moDocumentsGrid.getTable().requestFocusInWindow();
-        }
-        
-        jlStatus.setText("Facturas autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(documents.size()));
+        mbDocumentsBeingRendered = false;
     }
     
     private void itemStateChangedSearchBy() {
@@ -2783,19 +3009,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private void itemStateChangedDocMode() {
         enableFieldsOfDocMode();
-        
-        if (moRadDocModeType.isSelected()) {
-            itemStateChangedDocType(false); // reloads documents grid
-        }
-        else if (moRadDocModeCase.isSelected()) {
-            itemStateChangedDocCase(false); // reloads documents grid
-        }
+        reloadDocumentsGrid();
     }
     
-    private void itemStateChangedDocType(final boolean focusOnDocumentsGrid) {
+    private void itemStateChangedDocType(final boolean focusDocumentsGrid) {
         if (moKeyDocModeType.isEnabled()) {
             if (moKeyDocModeType.getValue()[0] == SImportedDocument.DOC_TYPE_ALL) {
-                populateDocumentsGrid(maDocuments, focusOnDocumentsGrid);
+                populateDocumentsGrid(maDocuments, focusDocumentsGrid);
             }
             else {
                 ArrayList<SImportedDocument> documents = new ArrayList<>();
@@ -2815,17 +3035,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents, focusOnDocumentsGrid);
+                populateDocumentsGrid(documents, focusDocumentsGrid);
             }
             
             jbRecordAllDocs.setEnabled(isMassAccountingElegible());
         }
     }
     
-    private void itemStateChangedDocCase(final boolean focusOnDocumentsGrid) {
+    private void itemStateChangedDocCase(final boolean focusDocumentsGrid) {
         if (moKeyDocModeCase.isEnabled()) {
             if (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_ALL) {
-                populateDocumentsGrid(maDocuments, focusOnDocumentsGrid);
+                populateDocumentsGrid(maDocuments, focusDocumentsGrid);
             }
             else {
                 Integer processingTypeId = null;
@@ -2854,10 +3074,48 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
 
-                populateDocumentsGrid(documents, focusOnDocumentsGrid);
+                populateDocumentsGrid(documents, focusDocumentsGrid);
             }
             
             jbRecordAllDocs.setEnabled(isMassAccountingElegible());
+        }
+    }
+    
+    private void itemStateChangedReqPayRequire() {
+        boolean enable = false;
+        boolean require = moBoolReqPayRequire.isSelected(); // convenience variable
+        
+        if (mbDocumentsBeingRendered) {
+            // just rendering current document:
+            enable = true;
+        }
+        else {
+            // editing current document:
+            try {
+                SGridRow row = moDocumentsGrid.getSelectedGridRow();
+
+                if (row == null) {
+                    throw new Exception(SGridConsts.MSG_SELECT_ROW);
+                }
+                else {
+                    SImportedDocument document = (SImportedDocument) row;
+                    document.RequirePayment = require;
+
+                    refreshDocumentsGrid();
+
+                    enable = true;
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+        
+        if (enable) {
+            jbEditAndSaveReqPayAmount.setEnabled(require);
+            jbCancelEditReqPayAmount.setEnabled(false);
+            jbChangeReqPayRequiredDate.setEnabled(require);
+            jbRequestPayment.setEnabled(require);
         }
     }
     
@@ -2925,10 +3183,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbViewInvoice.addActionListener(this);
         jbViewOrder.addActionListener(this);
         jbViewRecord.addActionListener(this);
+        
+        jbEditAndSaveReqPayAmount.addActionListener(this);
+        jbCancelEditReqPayAmount.addActionListener(this);
         jbChangeReqPayRequiredDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
         jbChangePayRequiredDate.addActionListener(this);
         jbChangePayScheduledDate.addActionListener(this);
+        
+        moBoolReqPayRequire.addItemListener(this);
         
         moRadSearchByPeriod.addItemListener(this);
         moRadSearchByWeek.addItemListener(this);
@@ -2958,10 +3221,15 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbViewInvoice.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
         jbViewRecord.removeActionListener(this);
+        
+        jbEditAndSaveReqPayAmount.removeActionListener(this);
+        jbCancelEditReqPayAmount.removeActionListener(this);
         jbChangeReqPayRequiredDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
         jbChangePayRequiredDate.removeActionListener(this);
         jbChangePayScheduledDate.removeActionListener(this);
+        
+        moBoolReqPayRequire.removeItemListener(this);
         
         moRadSearchByPeriod.removeItemListener(this);
         moRadSearchByWeek.removeItemListener(this);
@@ -3057,6 +3325,12 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbRequestPayment) {
                 actionPerformedRequestPayment();
             }
+            else if (button == jbEditAndSaveReqPayAmount) {
+                actionPerformedEditAndSaveReqPayAmount();
+            }
+            else if (button == jbCancelEditReqPayAmount) {
+                actionPerformedCancelEditReqPayAmount(true);
+            }
             else if (button == jbChangeReqPayRequiredDate) {
                 actionPerformedChangeReqPayRequiredDate();
             }
@@ -3071,15 +3345,24 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (!e.getValueIsAdjusting()) {
-            renderCurrentDoc();
+        if (!mbDocumentsBeingProcessed && !mbDocumentsBeingRefreshed) {
+            if (!e.getValueIsAdjusting()) {
+                renderCurrentDoc(false);
+            }
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (!mbDocumentsBeingUpdated) {
-            if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+        if (!mbDocumentsBeingProcessed && !mbDocumentsBeingReloaded && !mbDocumentsBeingRendered) {
+            if (e.getSource() instanceof SBeanFieldBoolean) {
+                SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
+
+                if (field == moBoolReqPayRequire) {
+                    itemStateChangedReqPayRequire();
+                }
+            }
+            else if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
                 SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
 
                 if (field == moRadSearchByPeriod || field == moRadSearchByWeek) {

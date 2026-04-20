@@ -549,8 +549,6 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
      * Create DPS entries from a CFDI 4.0 and set account settings for imner imported document.
      * @param client GUI client.
      * @param taxRegionId Tax region ID.
-     * @param config Accounting configuration.
-     * @param warehousePattern Regex Pattern to extract "warehouse" workd (in Spanish).
      * @return 
      * @throws java.lang.Exception 
      */
@@ -610,72 +608,74 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
             
             if (concepto.getAttObjetoImp().getString().equals(DCfdi40Catalogs.ClaveObjetoImpSí) && concepto.getEltOpcConceptoImpuestos() != null) {
                 // charged taxes:
-                
-                for (cfd.ver40.DElementConceptoImpuestoTraslado traslado : concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados()) {
-                    Tax tax = DialogMassAccountDocuments.getConfig().getTax(Tax.TYPE_ADDED, traslado.getAttImpuesto().getString(), traslado.getAttTipoFactor().getString(), traslado.getAttTasaOCuota().getFormattedDouble());
-                    
-                    if (tax != null) {
-                        SDataTax erpTax = SMassAccountUtils.getErpTax(client, tax.getTaxKey());
+                if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) { // documents usually always have taxes
+                    for (cfd.ver40.DElementConceptoImpuestoTraslado traslado : concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados()) {
+                        Tax tax = DialogMassAccountDocuments.getConfig().getTax(Tax.TYPE_ADDED, traslado.getAttImpuesto().getString(), traslado.getAttTipoFactor().getString(), traslado.getAttTasaOCuota().getFormattedDouble());
 
-                        SDataDpsEntryTax entryTax = new SDataDpsEntryTax();
-                        
-                        //entryTax.setPkYearId(...);
-                        //entryTax.setPkDocId(...);
-                        //entryTax.setPkEntryId(...);
-                        entryTax.setPkTaxBasicId(erpTax.getPkTaxBasicId());
-                        entryTax.setPkTaxId(erpTax.getPkTaxId());
-                        entryTax.setPercentage(erpTax.getPercentage());
-                        entryTax.setValueUnitary(0);
-                        entryTax.setValue(0);
-                        //entryTax.setTax(...);
-                        entryTax.setTaxCy(SLibUtils.roundAmount(traslado.getAttImporte().getDouble())); // notice: sometimes amount has more than 2 decimals!
-                        entryTax.setFkTaxTypeId(erpTax.getFkTaxTypeId());
-                        entryTax.setFkTaxCalculationTypeId(erpTax.getFkTaxCalculationTypeId());
-                        entryTax.setFkTaxApplicationTypeId(erpTax.getFkTaxApplicationTypeId());
+                        if (tax != null) {
+                            SDataTax erpTax = SMassAccountUtils.getErpTax(client, tax.getTaxKey());
 
-                        entryTaxes.add(entryTax);
-                    }
-                    else {
-                        throw new Exception("No se encontró el impuesto para: "
-                                + "tipo = '" + Tax.TYPE_ADDED + "'; "
-                                + traslado.getAttImpuesto().getName() + " = '" + traslado.getAttImpuesto().getString() + "'; "
-                                + traslado.getAttTipoFactor().getName() + " = '" + traslado.getAttTipoFactor().getString() + "'; "
-                                + traslado.getAttTasaOCuota().getName() + " = '" + traslado.getAttTasaOCuota().getFormattedDouble()+ "'.");
+                            SDataDpsEntryTax entryTax = new SDataDpsEntryTax();
+
+                            //entryTax.setPkYearId(...);
+                            //entryTax.setPkDocId(...);
+                            //entryTax.setPkEntryId(...);
+                            entryTax.setPkTaxBasicId(erpTax.getPkTaxBasicId());
+                            entryTax.setPkTaxId(erpTax.getPkTaxId());
+                            entryTax.setPercentage(erpTax.getPercentage());
+                            entryTax.setValueUnitary(0);
+                            entryTax.setValue(0);
+                            //entryTax.setTax(...);
+                            entryTax.setTaxCy(SLibUtils.roundAmount(traslado.getAttImporte().getDouble())); // notice: sometimes amount has more than 2 decimals!
+                            entryTax.setFkTaxTypeId(erpTax.getFkTaxTypeId());
+                            entryTax.setFkTaxCalculationTypeId(erpTax.getFkTaxCalculationTypeId());
+                            entryTax.setFkTaxApplicationTypeId(erpTax.getFkTaxApplicationTypeId());
+
+                            entryTaxes.add(entryTax);
+                        }
+                        else {
+                            throw new Exception("No se encontró el impuesto para: "
+                                    + "tipo = '" + Tax.TYPE_ADDED + "'; "
+                                    + traslado.getAttImpuesto().getName() + " = '" + traslado.getAttImpuesto().getString() + "'; "
+                                    + traslado.getAttTipoFactor().getName() + " = '" + traslado.getAttTipoFactor().getString() + "'; "
+                                    + traslado.getAttTasaOCuota().getName() + " = '" + traslado.getAttTasaOCuota().getFormattedDouble()+ "'.");
+                        }
                     }
                 }
                 
                 // withheld taxes:
-                
-                for (cfd.ver40.DElementConceptoImpuestoRetencion retencion : concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones()) {
-                    Tax tax = DialogMassAccountDocuments.getConfig().getTax(Tax.TYPE_WITHHELD, retencion.getAttImpuesto().getString(), retencion.getAttTipoFactor().getString(), retencion.getAttTasaOCuota().getFormattedDouble());
-                    
-                    if (tax != null) {
-                        SDataTax erpTax = SMassAccountUtils.getErpTax(client, tax.getTaxKey());
+                if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) { // documents don't always have withheld taxes
+                    for (cfd.ver40.DElementConceptoImpuestoRetencion retencion : concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones()) {
+                        Tax tax = DialogMassAccountDocuments.getConfig().getTax(Tax.TYPE_WITHHELD, retencion.getAttImpuesto().getString(), retencion.getAttTipoFactor().getString(), retencion.getAttTasaOCuota().getFormattedDouble());
 
-                        SDataDpsEntryTax entryTax = new SDataDpsEntryTax();
-                        
-                        //entryTax.setPkYearId(...);
-                        //entryTax.setPkDocId(...);
-                        //entryTax.setPkEntryId(...);
-                        entryTax.setPkTaxBasicId(erpTax.getPkTaxBasicId());
-                        entryTax.setPkTaxId(erpTax.getPkTaxId());
-                        entryTax.setPercentage(erpTax.getPercentage());
-                        entryTax.setValueUnitary(0);
-                        entryTax.setValue(0);
-                        //entryTax.setTax(...);
-                        entryTax.setTaxCy(SLibUtils.roundAmount(retencion.getAttImporte().getDouble())); // notice: sometimes amount has more than 2 decimals!
-                        entryTax.setFkTaxTypeId(erpTax.getFkTaxTypeId());
-                        entryTax.setFkTaxCalculationTypeId(erpTax.getFkTaxCalculationTypeId());
-                        entryTax.setFkTaxApplicationTypeId(erpTax.getFkTaxApplicationTypeId());
+                        if (tax != null) {
+                            SDataTax erpTax = SMassAccountUtils.getErpTax(client, tax.getTaxKey());
 
-                        entryTaxes.add(entryTax);
-                    }
-                    else {
-                        throw new Exception("No se encontró el impuesto para: "
-                                + "tipo = '" + Tax.TYPE_WITHHELD + "'; "
-                                + retencion.getAttImpuesto().getName() + " = '" + retencion.getAttImpuesto().getString() + "'; "
-                                + retencion.getAttTipoFactor().getName() + " = '" + retencion.getAttTipoFactor().getString() + "'; "
-                                + retencion.getAttTasaOCuota().getName() + " = '" + retencion.getAttTasaOCuota().getFormattedDouble()+ "'.");
+                            SDataDpsEntryTax entryTax = new SDataDpsEntryTax();
+
+                            //entryTax.setPkYearId(...);
+                            //entryTax.setPkDocId(...);
+                            //entryTax.setPkEntryId(...);
+                            entryTax.setPkTaxBasicId(erpTax.getPkTaxBasicId());
+                            entryTax.setPkTaxId(erpTax.getPkTaxId());
+                            entryTax.setPercentage(erpTax.getPercentage());
+                            entryTax.setValueUnitary(0);
+                            entryTax.setValue(0);
+                            //entryTax.setTax(...);
+                            entryTax.setTaxCy(SLibUtils.roundAmount(retencion.getAttImporte().getDouble())); // notice: sometimes amount has more than 2 decimals!
+                            entryTax.setFkTaxTypeId(erpTax.getFkTaxTypeId());
+                            entryTax.setFkTaxCalculationTypeId(erpTax.getFkTaxCalculationTypeId());
+                            entryTax.setFkTaxApplicationTypeId(erpTax.getFkTaxApplicationTypeId());
+
+                            entryTaxes.add(entryTax);
+                        }
+                        else {
+                            throw new Exception("No se encontró el impuesto para: "
+                                    + "tipo = '" + Tax.TYPE_WITHHELD + "'; "
+                                    + retencion.getAttImpuesto().getName() + " = '" + retencion.getAttImpuesto().getString() + "'; "
+                                    + retencion.getAttTipoFactor().getName() + " = '" + retencion.getAttTipoFactor().getString() + "'; "
+                                    + retencion.getAttTasaOCuota().getName() + " = '" + retencion.getAttTasaOCuota().getFormattedDouble()+ "'.");
+                        }
                     }
                 }
             }

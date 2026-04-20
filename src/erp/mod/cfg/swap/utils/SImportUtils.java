@@ -89,7 +89,7 @@ public abstract class SImportUtils {
     
     public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
     public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
-    public static final DecimalFormat FormatBizPartnerId = new DecimalFormat(SLibUtils.textRepeat("0", 6));
+    public static final DecimalFormat FormatBizPartnerId = new DecimalFormat(SLibUtils.textRepeat("0", 6)); // 000000
     
     private static final int DL_MODE_DOCS_ALL_FILES_AS_ZIP = 1;
     private static final int DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR = 11;
