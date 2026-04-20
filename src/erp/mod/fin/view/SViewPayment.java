@@ -29,6 +29,7 @@ import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.view.SViewFilter;
 import erp.mtrn.view.SViewDps;
+import erp.musr.data.SDataUser.Right;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,6 +44,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -109,6 +111,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     }
     
     private void initComponetsCustom() {
+        Right oRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_PUR_ACC_PEND);
+        
         if (mnGridSubtype == SLibConsts.UNDEFINED) {
             // payments management:
             setRowButtonsEnabled(true, false, true, false, true);
@@ -187,13 +191,65 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         
         jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
                 "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
+
+        jbDocShowCfdiXml.setEnabled(false);
+        jbDocGetCfdiXml.setEnabled(false);
+        jbDocShowDocPdf.setEnabled(false);
+        jbDocGetDocPdf.setEnabled(false);
+        jbAuthWebLoadSupportFiles.setEnabled(false);
+        jbAuthWebStartAuth.setEnabled(false);
+        jbAuthWebViewAuthLog.setEnabled(false);
+        jbAuthWebDownloadSupportFiles.setEnabled(false);
+        jbAuthWebClearSupportFiles.setEnabled(false);
+        jbAuthWebAnnullAuth.setEnabled(false);
+
+        jbPaymentReschedule.setEnabled(false);
+        jbPaymentChangeCurrency.setEnabled(false);
+        jbPaymentMarkAsPaid.setEnabled(false);
+        jbPaymentBlock.setEnabled(false);
+        jbPaymentUnblock.setEnabled(false);
+        jbPaymentCancel.setEnabled(false);
+        jbExportDataToSwapServices.setEnabled(false);
+
+        if (oRight.HasRight) {
+            switch (oRight.Level) {
+                case SUtilConsts.LEV_MANAGER:
+                case SUtilConsts.LEV_EDITOR:
+                    jbAuthWebAnnullAuth.setEnabled(true);
+                    jbPaymentReschedule.setEnabled(true);
+                    jbPaymentChangeCurrency.setEnabled(true);
+                    jbPaymentMarkAsPaid.setEnabled(true);
+                    jbPaymentBlock.setEnabled(true);
+                    jbPaymentUnblock.setEnabled(true);
+                    jbPaymentCancel.setEnabled(true);
+
+                case SUtilConsts.LEV_AUTHOR:
+                case SUtilConsts.LEV_CAPTURE:
+                    jbAuthWebLoadSupportFiles.setEnabled(true);
+                    jbAuthWebStartAuth.setEnabled(true);
+                    jbAuthWebDownloadSupportFiles.setEnabled(true);
+                    jbAuthWebClearSupportFiles.setEnabled(true);
+
+                case SUtilConsts.LEV_READ:
+                    jbDocShowCfdiXml.setEnabled(true);
+                    jbDocGetCfdiXml.setEnabled(true);
+                    jbDocShowDocPdf.setEnabled(true);
+                    jbDocGetDocPdf.setEnabled(true);
+                    jbAuthWebViewAuthLog.setEnabled(true);
+                    jbExportDataToSwapServices.setEnabled(true);
+                    break;
+            
+                default:
+                    break;
+            }
+        }
         
         if (SLibUtils.belongsTo(mnGridSubtype, new int[] {
-                                                SLibConsts.UNDEFINED, 
-                                                SModSysConsts.FINS_ST_PAY_REJC, 
-                                                SModSysConsts.FINS_ST_PAY_SCHED, 
-                                                SModSysConsts.FINS_ST_PAY_CANC,
-                                                SModSysConsts.FINX_ALL_PAYMENTS
+                                            SLibConsts.UNDEFINED, 
+                                            SModSysConsts.FINS_ST_PAY_REJC, 
+                                            SModSysConsts.FINS_ST_PAY_SCHED, 
+                                            SModSysConsts.FINS_ST_PAY_CANC,
+                                            SModSysConsts.FINX_ALL_PAYMENTS
                                             })) {
             mbAppliesFilterDatePeriod = true;
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
