@@ -1,8 +1,16 @@
 =================================================================================
+SIIE 3.2 299.6/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-587: Corrección cuando se elimina una OC o boleto de báscula, y se crea otra con 
+el mismo folio en SIIE o SOM, se exporta como eliminada a PC.
+
+=================================================================================
 SIIE 3.2 299.5/ 2026-04-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) PCD-508: Restringir comandos de vistas de solicitudes de pagos en SIIE.
+
 ================================================================================
 SIIE 3.2 299.4/ 2026-04-17
 Rodrigo Abel AYALA VÁZQUEZ
