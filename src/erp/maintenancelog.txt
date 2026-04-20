@@ -1,4 +1,12 @@
 =================================================================================
+SIIE 3.2 299.7/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-594: Hacer en la invocación del envío a autorizar, si la OC se quedó en estatus inconsistente, 
+primero la validación de estatus en PC para corregirlo en SIIE, 
+tal como si el usuario solicitara hacer esta misma validación con el botón de verificación de estatus.
+
+=================================================================================
 SIIE 3.2 299.6/ 2026-04-20
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -135,7 +135,7 @@ public class SProcDpsSendAuthornWeb extends Thread {
             }
             auth.save(connection);
             miClient.showMsgBoxWarning(e.getMessage());
-        }        
+        }
     }
 
     private boolean sendAuthorn() throws Exception {
