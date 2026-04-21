@@ -1810,7 +1810,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         if (tax != null) {
                             int cantDpsEntries = rowCfdiImport.getNewDpsEntries().size();
                             for (SDataDpsEntry newDpsEntry : rowCfdiImport.getNewDpsEntries()) {
-                                for(int j = 0; j < newDpsEntry.getDbmsEntryTaxes().size(); j++) {
+                                for (int j = 0; j < newDpsEntry.getDbmsEntryTaxes().size(); j++) {
                                     SDataDpsEntryTax dpsEntryTax = newDpsEntry.getDbmsEntryTaxes().get(j);
 
                                     if (dpsEntryTax.getPkTaxBasicId() == tax.getPkTaxBasicId() &&

@@ -520,6 +520,7 @@ public abstract class SImportUtils {
                         }
                         
                         newDps.setAccountingTag(tag);
+                        newDps.setXtaImportedDocument(importedDocument);
                         
                         // complete DPS creation:
                         

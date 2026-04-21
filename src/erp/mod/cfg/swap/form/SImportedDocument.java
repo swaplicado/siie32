@@ -395,26 +395,30 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     public String getPaymentRequestDataAsString() {
-        String data = "Solicitud de pago:";
+        String data = "";
         
         if (!RequirePayment) {
-            data += "\n¡No se solicitó pago!";
+            data += "¡No se solicitó pago!";
         }
         
         if (!isPaymentRequestDataAvailable()) {
-            data += "\nNo nay información disponible para solicitar pago.";
+            data += (!data.isEmpty() ? "; " : "");
+            
+            data += "¡No nay información disponible para solicitar pago!";
         }
         else {
+            data += (!data.isEmpty() ? "; " : "");
+            
             double amountEffective = getRequiredPaymentAmountEffective(null);
             
             if (amountEffective > 0) {
-                data += "\nMonto solicitado de pago: $" + SLibUtils.getDecimalFormatAmount().format(amountEffective) + " " + CurrencyCode + ".";
+                data += "monto solicitado de pago: $" + SLibUtils.getDecimalFormatAmount().format(amountEffective) + " " + CurrencyCode + "; ";
             }
             else {
-                data += "\nPorcentaje solicitado de pago: $" + SLibUtils.DecimalFormatPercentage1D.format(getRequiredPaymentPct()) + ".";
+                data += "porcentaje solicitado de pago: $" + SLibUtils.DecimalFormatPercentage1D.format(getRequiredPaymentPct()) + "; ";
             }
             
-            data += "\nFecha requerida de pago: " + SLibUtils.GuiDateFormat.format(getRequiredPaymentDateEffective()) + ".";
+            data += "fecha requerida de pago: " + SLibUtils.GuiDateFormat.format(getRequiredPaymentDateEffective()) + ".";
         }
         
         return data;
@@ -1575,11 +1579,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     @Override
     public String toString() {
-        return "Emisor: " + BizPartner + "; " // allways available
-                + "Folio: " + getFolio() + "; " // allways available
-                + "Fecha: " + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
-                + "Total: $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
-                + (!FunctionalSubArea.isEmpty() ? "; Subárea funcional: " + FunctionalSubArea : "") // may not be available
+        return "emisor: " + BizPartner + "; " // allways available
+                + "folio: " + getFolio() + "; " // allways available
+                + "fecha: " + SLibUtils.DateFormatDate.format(Date) + "; " // allways available
+                + "total: $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
+                + (!FunctionalSubArea.isEmpty() ? "; subárea funcional: " + FunctionalSubArea : "") // may not be available
                 + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
                 + ".";
     }

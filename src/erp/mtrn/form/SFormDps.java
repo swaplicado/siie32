@@ -7973,8 +7973,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionViewImportedDocument() {
         if (moImportedDocument != null) {
             miClient.showMsgBoxInformation("Documento importado:"
-                    + "\n" + moImportedDocument.toString().replaceAll(";", "\n")
-                    + "\n" + moImportedDocument.getPaymentRequestDataAsString());
+                    + "\n" + moImportedDocument.toString().replaceAll("; ", "\n")
+                    + "\n\nSolicitud de pago:"
+                    + "\n" + moImportedDocument.getPaymentRequestDataAsString().replaceAll("; ", "\n"));
         }
     }
 
