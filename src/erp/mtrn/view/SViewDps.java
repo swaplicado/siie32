@@ -3449,6 +3449,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         try {
             if (jbAuthWebStartAuthGc.isEnabled()) {
                 if (isRowSelected()) {
+                    SAuthzUtils.forceCheckAuthStatus(miClient.getSession(), 
+                                                SSwapConsts.RESOURCE_TYPE_PUR_ORDER, 
+                                                moTablePane.getSelectedTableRow().getPrimaryKey());
                     if (SAuthorizationUtils.sendAuthornPurchaseOrderAppWeb(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey())) {
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(mnTabType);
                         miClient.getGuiModule(SDataConstants.MOD_PUR).refreshCatalogues(SDataConstants.TRNX_DPS_AUTH_APP);

@@ -1608,7 +1608,10 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             moImportationsGrid.getTable().requestFocusInWindow();
         }
 
-        jlStatus.setText(getDocumentName("Aa") + "s autorizadas elegibles: " + SLibUtils.DecimalFormatInteger.format(maImportedDocuments.size()) + "; mostradas: " + SLibUtils.DecimalFormatInteger.format(proformas.size()));
+        jlStatus.setText(getDocumentName("Aa") + "s autorizados elegibles: "
+                + SLibUtils.DecimalFormatInteger.format(mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA ? maImportedDocuments.size() : maCRPs.size())
+                + "; mostrados: "
+                + SLibUtils.DecimalFormatInteger.format(mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA ? proformas.size() : crps.size()));
     }
 
     private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {

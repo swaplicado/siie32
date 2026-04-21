@@ -1,3 +1,24 @@
+=================================================================================
+SIIE 3.2 299.7/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-594: Hacer en la invocación del envío a autorizar, si la OC se quedó en estatus inconsistente, 
+primero la validación de estatus en PC para corregirlo en SIIE, 
+tal como si el usuario solicitara hacer esta misma validación con el botón de verificación de estatus.
+
+=================================================================================
+SIIE 3.2 299.6/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-587: Corrección cuando se elimina una OC o boleto de báscula, y se crea otra con 
+el mismo folio en SIIE o SOM, se exporta como eliminada a PC.
+
+=================================================================================
+SIIE 3.2 299.5/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-508: Restringir comandos de vistas de solicitudes de pagos en SIIE.
+
 ================================================================================
 SIIE 3.2 299.6/ 2026-04-21
 Sergio Abraham FLORES GUTIÉRREZ
