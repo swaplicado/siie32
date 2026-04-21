@@ -115,11 +115,11 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
      * Creates new form SDialogImportDocuments
      *
      * @param client GUI client.
-     * @param formType
+     * @param formSubtype
      * @param title
      */
-    public SDialogImportProformas(SGuiClient client, final int formType, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, formType, 0, title);
+    public SDialogImportProformas(SGuiClient client, final int formSubtype, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGX_SWAP_IMP_PROFS, formSubtype, title);
         initComponents();
         initComponentsCustom();
     }
@@ -225,7 +225,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             }
         });
 
-        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de " + ((mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "proformas" : "CRPs") + " autorizadas"));
+        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de " + ((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "proformas" : "CRPs") + " autorizadas"));
         jpDownload.setToolTipText("");
         jpDownload.setLayout(new java.awt.BorderLayout());
 
@@ -280,7 +280,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbShowProformas.setText((mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Mostrar proformas" : "Mostrar CRPs");
+        jbShowProformas.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Mostrar proformas" : "Mostrar CRPs");
         jbShowProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbShowProformas.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbShowProformas);
@@ -305,7 +305,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jbClearProformas.setText((mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Limpiar proformas" : "Limpiar CRPs");
+        jbClearProformas.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Limpiar proformas" : "Limpiar CRPs");
         jbClearProformas.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbClearProformas.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbClearProformas);
@@ -352,7 +352,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         getContentPane().add(jpDownload, java.awt.BorderLayout.NORTH);
         jpDownload.getAccessibleContext().setAccessibleName("Búsqueda de  autorizadas:");
 
-        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder(((mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proformas autorizadas" : "CRPs autorizados")));
+        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder(((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proformas autorizadas" : "CRPs autorizados")));
         jpDocuments.setLayout(new java.awt.BorderLayout(5, 0));
 
         jpDocumentsGrid.setLayout(new java.awt.BorderLayout());
@@ -411,7 +411,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlProforma.setText((mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma" : "");
+        jlProforma.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma" : "");
         jlProforma.setPreferredSize(new java.awt.Dimension(122, 23));
         jpProcessingN1.add(jlProforma);
 
@@ -610,7 +610,6 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
     private javax.swing.ButtonGroup bgSearchBy;
@@ -720,7 +719,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[]{miClient.getSession().getConfigCompany().getCompanyId()}, SLibConstants.DESCRIPTION_NAME);
         mnShowingDocsMode = OFF;
 
-        moImportationsGrid = new SGridPaneForm(miClient, 0, 0, "Proformas", null) {
+        moImportationsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_IMP_PROFS, 1, "Proformas", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -731,7 +730,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 SGridColumnForm column;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor proforma", 200));  // col 0
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio proforma", 75));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha proforma"));
@@ -757,7 +756,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha solicitud pago")); // col 20
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo definición pago requerido"));
                 }
-                else if (mnFormType == SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT) {
+                else if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT) {
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor CRP", 200));       // col 0
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio CRP", 75));             // col 1
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha CRP"));                 // col 2
@@ -790,7 +789,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         moBoolExportPaymentRequestsOnClose.setPreferredSize(new Dimension(250, 23));
         ((FlowLayout) jpCommandCenter.getLayout()).setAlignment(FlowLayout.RIGHT);
         jpCommandCenter.add(moBoolExportPaymentRequestsOnClose);
-        moBoolExportPaymentRequestsOnClose.setEnabled(mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
+        moBoolExportPaymentRequestsOnClose.setEnabled(mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
         mbAllowLinkGreaterInvoices = miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_LINK_INV_GREATER);
 
@@ -874,7 +873,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     }
 
     private String getDocumentName(String sCase) {
-        if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+        if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
             if (sCase.equals("AA")) {
                 return "PROFORMA";
             }
@@ -1037,7 +1036,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
                             if (SDbFunctionalSubArea.belongsToFunctionalSubAreas(maFunctionalSubAreas, functionalSubAreaId)) {
                                 String imporType;
-                                if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                                if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                                     imporType = SDbComImportLog.SYNC_TYPE_PUR_PROF;
                                 }
                                 else {
@@ -1049,7 +1048,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                                                                                 miClient.getSession().getUser().getPkUserId(),
                                                                                 "" + externalProformaId);
 
-                                if (mnFormType != SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                                if (mnFormSubtype != SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                                     SImportedCRP oCrp = new SImportedCRP(docNode, externalProformaId, functionalSubAreaId, countOfImports > 0);
                                     maCRPs.add(oCrp);
                                     countShown++;
@@ -1143,7 +1142,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
                 urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
-                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + mnFormType);
+                urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + mnFormSubtype);
 
                 urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
 
@@ -1207,6 +1206,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             maCRPs.clear();
 
             moImportationsGrid.populateGrid(new Vector<>());
+            moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(true);
             renderCurrentProforma();
 
             enableFieldsForShowingProforms(false);
@@ -1263,7 +1263,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     private void actionPerformedDownloadSelectedProformas() {
         ArrayList<Integer> documents = new ArrayList<>();
 
-        if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+        if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
             for (SGridRow row : moImportationsGrid.getModel().getGridRows()) {
                 if (((SImportedProforma) row).Download) {
                     documents.add(((SImportedProforma) row).ExternalDocumentId);
@@ -1280,7 +1280,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         if (documents.isEmpty()) {
             String sMessage = "";
-            if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+            if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                 sMessage = "una " + getDocumentName("aa") + " autorizada";
             }
             else {
@@ -1294,12 +1294,12 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         }
         else {
             try {
-                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, mnFormType);
+                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, mnFormSubtype);
 
                 if (files != null) {
                     File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];
 
-                    if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+                    if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
                         for (SGridRow row : moImportationsGrid.getModel().getGridRows()) {
                             if (((SImportedProforma) row).Download) {
                                 int externalId = ((SImportedProforma) row).ExternalDocumentId;
@@ -1527,7 +1527,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jtfPayExecDate.setText("");
 
         }
-        else if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+        else if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
             SImportedProforma proforma = (SImportedProforma) row;
 
             jbChangeRequiredPaymentDate.setEnabled(true);
@@ -1592,7 +1592,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     private void populateProformasGrid(final ArrayList<SImportedProforma> proformas,
             final ArrayList<SImportedCRP> crps,
             final boolean focusProformasGridTable) {
-        if (mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+        if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
             Collections.sort(proformas);
             moImportationsGrid.populateGrid(new Vector<>(proformas), this);
         }
@@ -1600,7 +1600,8 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             Collections.sort(crps);
             moImportationsGrid.populateGrid(new Vector<>(crps), this);
         }
-        moImportationsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(true);
+        moImportationsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         moImportationsGrid.setSelectedGridRow(0);
 
         if (focusProformasGridTable) {
@@ -1638,7 +1639,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         mbFirstActivation = true;
 
         mbExportPaymentRequests = false;
-        moBoolExportPaymentRequestsOnClose.setSelected(mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
+        moBoolExportPaymentRequestsOnClose.setSelected(mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
         Date date = miClient.getSession().getCurrentDate();
 

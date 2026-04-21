@@ -116,6 +116,10 @@ public abstract class SModConsts {
     public static final int CFGX_AUTHORN_COMMENTS = 1014001;
     public static final int CFGX_FUNC_SUB = 1014012;
     
+    public static final int CFGX_SWAP_IMP_DOCS = 1015001;
+    public static final int CFGX_SWAP_IMP_PROFS = 1015006;
+    public static final int CFGX_SWAP_MASS_ACC = 1015011;
+    
     /*
      * Users
      */

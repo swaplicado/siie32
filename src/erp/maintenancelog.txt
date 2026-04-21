@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 299.6/ 2026-04-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de información de pago requerido en el diálog de consulta de importación de documentos en la forma de captura de documentos.
+2) Habilitación de reordenamiento de columnas en los diálogos de importación de documentos, importación de proformas y CRP y contabilización masiva, pero aún sin preservarse estas preferencias de usuario.
+
+================================================================================
 SIIE 3.2 299.5/ 2026-04-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

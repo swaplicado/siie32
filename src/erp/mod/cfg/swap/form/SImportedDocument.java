@@ -394,6 +394,32 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return orderKey;
     }
     
+    public String getPaymentRequestDataAsString() {
+        String data = "Solicitud de pago:";
+        
+        if (!RequirePayment) {
+            data += "\n¡No se solicitó pago!";
+        }
+        
+        if (!isPaymentRequestDataAvailable()) {
+            data += "\nNo nay información disponible para solicitar pago.";
+        }
+        else {
+            double amountEffective = getRequiredPaymentAmountEffective(null);
+            
+            if (amountEffective > 0) {
+                data += "\nMonto solicitado de pago: $" + SLibUtils.getDecimalFormatAmount().format(amountEffective) + " " + CurrencyCode + ".";
+            }
+            else {
+                data += "\nPorcentaje solicitado de pago: $" + SLibUtils.DecimalFormatPercentage1D.format(getRequiredPaymentPct()) + ".";
+            }
+            
+            data += "\nFecha requerida de pago: " + SLibUtils.GuiDateFormat.format(getRequiredPaymentDateEffective()) + ".";
+        }
+        
+        return data;
+    }
+    
     /**
      * Get payment request by DPS key.
      * @param session GUI session.

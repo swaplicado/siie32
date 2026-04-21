@@ -143,7 +143,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
      * @param client GUI client.
      */
     public SDialogImportDocuments(SGuiClient client) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Importación de facturas autorizadas");
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGX_SWAP_IMP_DOCS, 0, "Importación de facturas autorizadas");
         initComponents();
         initComponentsCustom();
     }
@@ -981,7 +981,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
         mnShowingDocsMode = OFF;
         
-        moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
+        moDocumentsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_IMP_DOCS, 1, "Facturas", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -1170,6 +1170,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
+        moDocumentsGrid.getTable().getTableHeader().setReorderingAllowed(true);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
         

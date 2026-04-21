@@ -17,6 +17,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SCfgUtils;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.SSwapUtils;
@@ -121,7 +122,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
      * @param client GUI client.
      */
     public SDialogMassAccountDocuments(SGuiClient client) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Contabilización de facturas autorizadas");
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGX_SWAP_MASS_ACC, 0, "Contabilización de facturas autorizadas");
         initComponents();
         initComponentsCustom();
     }
@@ -1276,7 +1277,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_NAME);
         
-        moDocumentsGrid = new SGridPaneForm(miClient, 0, 0, "Facturas", null) {
+        moDocumentsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_MASS_ACC, 1, "Facturas", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -1333,7 +1334,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moDocumentsGrid.setPaneFormOwner(null);
         jpDocumentsPanel.add(moDocumentsGrid, BorderLayout.CENTER);
         
-        moConceptsGrid = new SGridPaneForm(miClient, 0, 0, "Conceptos", null) {
+        moConceptsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_MASS_ACC, 2, "Conceptos", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -1478,6 +1479,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         Collections.sort(documents);
         
         moDocumentsGrid.populateGrid(new Vector<>(documents), this);
+        moDocumentsGrid.getTable().getTableHeader().setReorderingAllowed(true);
         moDocumentsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         moDocumentsGrid.setSelectedGridRow(0);
         
@@ -2537,6 +2539,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             renderAccountSettings(null);
             
             moConceptsGrid.populateGrid(new Vector<>());
+            moConceptsGrid.getTable().getTableHeader().setReorderingAllowed(true);
         }
         else {
             SMassAccountDocument document = (SMassAccountDocument) row;
@@ -2572,6 +2575,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             renderAccountSettings(document);
             
             moConceptsGrid.populateGrid(new Vector<>(document.Conceptos));
+            moConceptsGrid.getTable().getTableHeader().setReorderingAllowed(true);
         }
         
         mbDocumentsBeingRendered = false;
