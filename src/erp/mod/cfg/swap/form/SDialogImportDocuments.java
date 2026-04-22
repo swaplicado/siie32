@@ -17,6 +17,7 @@ import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
+import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
@@ -113,6 +114,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected SDialogDpsFinder moDialogDpsFinder;
     protected ArrayList<SImportedDocument> maDocuments;
     protected ArrayList<SDbFunctionalSubArea> maFunctionalSubAreas;
+    protected HashMap<Integer, SFinUtilities.Balance[]> moAdvancesMap;
     protected SServicesUtils.ConfigSettings moServicesConfigSettings;
     protected String msUserFunctionalSubAreaCodes;
     protected String msSyncUrlRetrieveByPeriod;
@@ -237,6 +239,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbViewRecord = new javax.swing.JButton();
         jpProcessingN9 = new javax.swing.JPanel();
         moBoolReqPayRequire = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jbViewAdvances = new javax.swing.JButton();
         jpProcessingN10 = new javax.swing.JPanel();
         jtfReqPayAmount = new javax.swing.JTextField();
         jtfReqPayAmountPct = new javax.swing.JTextField();
@@ -624,8 +627,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         moBoolReqPayRequire.setText("Pago requerido:");
         moBoolReqPayRequire.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        moBoolReqPayRequire.setPreferredSize(new java.awt.Dimension(150, 23));
+        moBoolReqPayRequire.setPreferredSize(new java.awt.Dimension(122, 23));
         jpProcessingN9.add(moBoolReqPayRequire);
+
+        jbViewAdvances.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
+        jbViewAdvances.setToolTipText("Ver anticipos del proveedor...");
+        jbViewAdvances.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN9.add(jbViewAdvances);
 
         jpProcessingN.add(jpProcessingN9);
 
@@ -839,6 +847,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbSelectRemainingDocs;
     private javax.swing.JButton jbShowDocs;
     private javax.swing.JButton jbUnlinkInvoice;
+    private javax.swing.JButton jbViewAdvances;
     private javax.swing.JButton jbViewInvoice;
     private javax.swing.JButton jbViewInvoicePdf;
     private javax.swing.JButton jbViewOrder;
@@ -1082,6 +1091,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jtfUserFuncSubAreas.setText(msUserFunctionalSubAreaCodes);
             jtfUserFuncSubAreas.setCaretPosition(0);
             jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreaCodes);
+            
+            moAdvancesMap = new HashMap<>();
             
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
@@ -1900,6 +1911,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 moDialogMassAccountDocuments.resetForm();
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_SETTINGS, createSettings());
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_DOCS, elegibleDocs);
+                moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_ADVANCES, moAdvancesMap);
                 moDialogMassAccountDocuments.setVisible(true);
                 
                 // check whether payments need to be exported:
@@ -1909,6 +1921,10 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 // check whether invoices were rejected:
                 rejectedInvoices = (ArrayList<SImportedDocument>) moDialogMassAccountDocuments.getValue(SDialogMassAccountDocuments.VALUE_REJECTED_INVOICES);
+                
+                // update advances:
+                moAdvancesMap.clear();
+                moAdvancesMap.putAll((HashMap<Integer, SFinUtilities.Balance[]>) moDialogMassAccountDocuments.getValue(SDialogMassAccountDocuments.VALUE_ADVANCES));
             }
         }
         catch (Exception e) {
@@ -2645,6 +2661,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void actionPerformedViewAdvances() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SDialogImportDocuments.showAdvances(miClient, (SImportedDocument) row);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     private void actionPerformedEditAndSaveReqPayAmount() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
@@ -2875,6 +2907,39 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         moDecReqPayAmount.resetField();
     }
     
+    private void renderAdvances(final SImportedDocument document) {
+        if (document == null) {
+            jbViewAdvances.setEnabled(false);
+        }
+        else {
+            if (document.AuxAdvances == null) { // retrieve advances just only once!
+                document.AuxAdvances = moAdvancesMap.get(document.BizPartnerId);
+                
+                if (document.AuxAdvances == null) {
+                    try {
+                        ArrayList<SFinUtilities.Balance> advancesList = new ArrayList<>();
+                        SFinUtilities.Balance[] balances = SFinUtilities.getBizPartnerBalances((SClientInterface) miClient, document.BizPartnerId, SDataConstantsSys.BPSS_CT_BP_SUP, miClient.getSession().getSystemDate());
+
+                        for (SFinUtilities.Balance balance : balances) {
+                            if (balance.CurAdvance != 0 || balance.LocAdvance != 0) {
+                                advancesList.add(balance);
+                            }
+                        }
+
+                        SFinUtilities.Balance[] advances = advancesList.toArray(new SFinUtilities.Balance[0]);
+                        moAdvancesMap.put(document.BizPartnerId, advances);
+                        document.AuxAdvances = advances;
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
+                }
+            }
+
+            jbViewAdvances.setEnabled(document.hasAdvances());
+        }
+    }
+    
     private void renderCurrentDoc(final boolean forceClearing) {
         mbDocumentsBeingRendered = true;
         
@@ -2895,6 +2960,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moBoolReqPayRequire.resetField();
             itemStateChangedReqPayRequire();
             renderReqPay(null);
+            renderAdvances(null);
             
             jbChangePayRequiredDate.setEnabled(false);
             jbChangePayScheduledDate.setEnabled(false);
@@ -2935,6 +3001,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moBoolReqPayRequire.setValue(document.RequirePayment);
             itemStateChangedReqPayRequire();
             renderReqPay(document);
+            renderAdvances(document);
             
             jbRequestPayment.setEnabled(true);
             jbChangePayRequiredDate.setEnabled(true);
@@ -3185,6 +3252,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbViewOrder.addActionListener(this);
         jbViewRecord.addActionListener(this);
         
+        jbViewAdvances.addActionListener(this);
         jbEditAndSaveReqPayAmount.addActionListener(this);
         jbCancelEditReqPayAmount.addActionListener(this);
         jbChangeReqPayRequiredDate.addActionListener(this);
@@ -3223,6 +3291,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbViewOrder.removeActionListener(this);
         jbViewRecord.removeActionListener(this);
         
+        jbViewAdvances.removeActionListener(this);
         jbEditAndSaveReqPayAmount.removeActionListener(this);
         jbCancelEditReqPayAmount.removeActionListener(this);
         jbChangeReqPayRequiredDate.removeActionListener(this);
@@ -3326,6 +3395,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbRequestPayment) {
                 actionPerformedRequestPayment();
             }
+            else if (button == jbViewAdvances) {
+                actionPerformedViewAdvances();
+            }
             else if (button == jbEditAndSaveReqPayAmount) {
                 actionPerformedEditAndSaveReqPayAmount();
             }
@@ -3383,6 +3455,29 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     itemStateChangedDocCase(false); // reloads documents grid
                 }
             }
+        }
+    }
+    
+    /**
+     * Show in a dialog message the advances of business partner of document.
+     * @param client GUI client.
+     * @param document Document.
+     * @throws Exception 
+     */
+    public static void showAdvances(final SGuiClient client, final SImportedDocument document) throws Exception {
+        if (document.hasAdvances()) {
+            String message = "El proveedor " + document.BizPartner + " tiene "
+                    + (document.AuxAdvances.length == 1 ? "el siguiente anticipo" : "los siguientes " + SLibUtils.DecimalFormatInteger.format(document.AuxAdvances.length) + " anticiipos") + ", "
+                    + "al corte de " + SLibUtils.DateFormatDate.format(client.getSession().getSystemDate()) + ":";
+
+            for (int i = 0; i < document.AuxAdvances.length; i++) {
+                message += "\n" + (i + 1) + ") " + document.AuxAdvances[i].getAdvanceAsString();
+            }
+
+            client.showMsgBoxInformation(message);
+        }
+        else {
+            client.showMsgBoxWarning(SImportedDocument.EXC_ADV_NO_ADVANCES);
         }
     }
     

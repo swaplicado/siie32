@@ -15,6 +15,7 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SCfgUtils;
+import erp.mfin.data.SFinUtilities;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
@@ -39,6 +40,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
@@ -89,6 +91,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     public static final int VALUE_DOCS = 2;
     public static final int VALUE_EXPORT_PAYMENTS = 11;
     public static final int VALUE_REJECTED_INVOICES = 12;
+    public static final int VALUE_ADVANCES = 21;
     
     protected String msCompanyName;
     protected SGridPaneForm moDocumentsGrid;
@@ -98,6 +101,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     protected SDialogImportDocuments.Settings moSettings;
     protected ArrayList<SMassAccountDocument> maDocuments;
     protected ArrayList<SMassAccountDocument> maDocumentsRejected;
+    protected HashMap<Integer, SFinUtilities.Balance[]> moAdvancesMap;
     protected Date mtNewRequiredDate;
     protected Pattern moPatternScaleTicketBol;
     protected Pattern moPatternScaleTicketRef;
@@ -247,6 +251,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jtfAccountCase = new javax.swing.JTextField();
         jpProcessingN5 = new javax.swing.JPanel();
         moBoolReqPayRequire = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jbViewAdvances = new javax.swing.JButton();
         jpProcessingN6 = new javax.swing.JPanel();
         jtfReqPayAmount = new javax.swing.JTextField();
         jtfReqPayAmountPct = new javax.swing.JTextField();
@@ -843,8 +848,13 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
         moBoolReqPayRequire.setText("Pago requerido:");
         moBoolReqPayRequire.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        moBoolReqPayRequire.setPreferredSize(new java.awt.Dimension(150, 23));
+        moBoolReqPayRequire.setPreferredSize(new java.awt.Dimension(122, 23));
         jpProcessingN5.add(moBoolReqPayRequire);
+
+        jbViewAdvances.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
+        jbViewAdvances.setToolTipText("Ver anticipos del proveedor...");
+        jbViewAdvances.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN5.add(jbViewAdvances);
 
         jpProcessingN.add(jpProcessingN5);
 
@@ -1097,6 +1107,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     private javax.swing.JButton jbRejectInvoice;
     private javax.swing.JButton jbSelectAllDocs;
     private javax.swing.JButton jbSetReqPaysNewRequiredDate;
+    private javax.swing.JButton jbViewAdvances;
     private javax.swing.JButton jbViewInvoicePdf;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JLabel jlAcc;
@@ -1375,6 +1386,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         
         maDocuments = new ArrayList<>();
         maDocumentsRejected = new ArrayList<>();
+        moAdvancesMap = new HashMap<>();
         moPatternScaleTicketBol = SMassAccountUtils.createPatternForScaleTicketBol();
         moPatternScaleTicketRef = SMassAccountUtils.createPatternForScaleTicketRef();
         moPatternWarehouse = SMassAccountUtils.createPatternForWarehouse();
@@ -1585,7 +1597,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
     }
     
-    private void setImportedDocuments(ArrayList<SImportedDocument> documents) {
+    private void setImportedDocuments(final ArrayList<SImportedDocument> documents) {
         maDocuments.clear();
         maDocumentsRejected.clear();
         
@@ -1601,6 +1613,11 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
         
         reloadDocumentsGrid();
+    }
+    
+    private void setAdvances(final HashMap<Integer, SFinUtilities.Balance[]> advances) {
+        moAdvancesMap.clear();
+        moAdvancesMap.putAll(advances);
     }
     
     private void enableControlsForShowingDocs(final boolean enable) {
@@ -2015,6 +2032,22 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
     }
     
+    private void actionPerformedViewAdvances() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SDialogImportDocuments.showAdvances(miClient, ((SMassAccountDocument) row).ImportedDocument);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     private void actionPerformedEditAndSaveReqPayAmount() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
@@ -2379,6 +2412,39 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moDecReqPayAmount.resetField();
     }
     
+    private void renderAdvances(final SImportedDocument document) {
+        if (document == null) {
+            jbViewAdvances.setEnabled(false);
+        }
+        else {
+            if (document.AuxAdvances == null) { // retrieve advances just only once!
+                document.AuxAdvances = moAdvancesMap.get(document.BizPartnerId);
+                
+                if (document.AuxAdvances == null) {
+                    try {
+                        ArrayList<SFinUtilities.Balance> advancesList = new ArrayList<>();
+                        SFinUtilities.Balance[] balances = SFinUtilities.getBizPartnerBalances((SClientInterface) miClient, document.BizPartnerId, SDataConstantsSys.BPSS_CT_BP_SUP, miClient.getSession().getSystemDate());
+
+                        for (SFinUtilities.Balance balance : balances) {
+                            if (balance.CurAdvance != 0 || balance.LocAdvance != 0) {
+                                advancesList.add(balance);
+                            }
+                        }
+
+                        SFinUtilities.Balance[] advances = advancesList.toArray(new SFinUtilities.Balance[0]);
+                        moAdvancesMap.put(document.BizPartnerId, advances);
+                        document.AuxAdvances = advances;
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
+                }
+            }
+
+            jbViewAdvances.setEnabled(document.hasAdvances());
+        }
+    }
+    
     private void renderBol(final SMassAccountDocument document) {
         if (document == null || !document.isCfdiInvoiceAndBol()) {
             jtfBolSrcAddress.setText("");
@@ -2531,6 +2597,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             moBoolReqPayRequire.resetField();
             itemStateChangedReqPayRequire();
             renderReqPay(null);
+            renderAdvances(null);
             
             jbAccShowParsingErrorOrWarning.setEnabled(false);
             jbAccShowParsingErrorOrWarning.setIcon(SGridCellRendererIcon.moIconDoc);
@@ -2557,6 +2624,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             moBoolReqPayRequire.setValue(document.ImportedDocument.RequirePayment);
             itemStateChangedReqPayRequire();
             renderReqPay(document.ImportedDocument);
+            renderAdvances(document.ImportedDocument);
             
             if (document.ParsingError) {
                 jbAccShowParsingErrorOrWarning.setEnabled(true);
@@ -2819,6 +2887,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbViewInvoicePdf.addActionListener(this);
         jbViewOrder.addActionListener(this);
         
+        jbViewAdvances.addActionListener(this);
         jbEditAndSaveReqPayAmount.addActionListener(this);
         jbCancelEditReqPayAmount.addActionListener(this);
         jbChangeReqPayRequiredDate.addActionListener(this);
@@ -2848,6 +2917,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbViewInvoicePdf.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
         
+        jbViewAdvances.removeActionListener(this);
         jbEditAndSaveReqPayAmount.removeActionListener(this);
         jbCancelEditReqPayAmount.removeActionListener(this);
         jbChangeReqPayRequiredDate.removeActionListener(this);
@@ -2900,6 +2970,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 setImportedDocuments((ArrayList<SImportedDocument>) value);
                 break;
                 
+            case VALUE_ADVANCES:
+                setAdvances((HashMap<Integer, SFinUtilities.Balance[]>) value);
+                break;
+                
             default:
                 // nothing
         }
@@ -2921,6 +2995,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                         rejectedInvoices.add(mad.ImportedDocument);
                     }
                     value = rejectedInvoices;
+                    break;
+                    
+                case VALUE_ADVANCES:
+                    value = moAdvancesMap;
                     break;
                     
                 default:
@@ -2972,6 +3050,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
             else if (button == jbViewOrder) {
                 actionPerformedViewOrder();
+            }
+            else if (button == jbViewAdvances) {
+                actionPerformedViewAdvances();
             }
             else if (button == jbEditAndSaveReqPayAmount) {
                 actionPerformedEditAndSaveReqPayAmount();

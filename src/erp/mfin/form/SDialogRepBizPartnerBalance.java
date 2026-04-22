@@ -611,23 +611,23 @@ public class SDialogRepBizPartnerBalance extends javax.swing.JDialog implements 
                 map.put("nSysMoveTypeId", manSysMoveTypeKey[1]);
                 map.put("sBizPartnerCat", msBizPartnerCatSng.toUpperCase());
                 map.put("sBizPartnerCatPlural", msBizPartnerCatPlr.toUpperCase());
-                map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
-                map.put("sLocalCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode());
+                map.put("nLocalCurrencyId", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]); // only in REP_FIN_BPS_BAL_DPS_EXR
+                map.put("sLocalCurrencyCode", miClient.getSession().getSessionCustom().getLocalCurrencyCode()); // only in REP_FIN_BPS_BAL_DPS_EXR
                 map.put("sLocalCurrency", miClient.getSession().getSessionCustom().getLocalCurrency());
+                map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]); // only in REP_FIN_BPS_BAL_DPS_EXR
+                map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
+                map.put("sCurrency", txtCurrency); // only in REP_FIN_BPS_BAL_DPS_EXR
                 map.put("nYear", SLibTimeUtilities.digestYear(moFieldDateCutoff.getDate())[0]);
                 map.put("tDate", moFieldDateCutoff.getDate());
                 map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? SUtilConsts.ALL : moFieldBizPartner.getString()));
                 map.put("sFilterBizPartner", filterBp);
-                map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
-                map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
-                map.put("sCurrency", txtCurrency);
-                map.put("sFilterCurrency", filterCur);
-                map.put("dExchangeRate", moFieldExRate.getDouble());
-                map.put("oExcRateFormat", SLibUtils.getDecimalFormatExchangeRate());
-                map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED);
-                map.put("bShowDetail", false);
+                map.put("sFilterCurrency", filterCur); // only in REP_FIN_BPS_BAL_DPS_EXR
+                map.put("dExchangeRate", moFieldExRate.getDouble()); // only in REP_FIN_BPS_BAL_DPS_EXR
+                map.put("oExcRateFormat", SLibUtils.getDecimalFormatExchangeRate()); // only in REP_FIN_BPS_BAL_DPS_EXR
+                map.put("nStDps", SModSysConsts.TRNS_ST_DPS_EMITED); // only in REP_FIN_BPS_BAL_DPS_EXR
                 map.put("sSqlDpsFilter", sqlDpsFilter);
-
+                map.put("bShowDetail", false); // only in REP_FIN_BPS_BAL_DPS_EXR
+                
                 jasperPrint = SDataUtilities.fillReport(miClient, report, map);
             }
             else if (jrbTypeCutoffCredit.isSelected()) {

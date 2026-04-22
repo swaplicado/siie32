@@ -17,6 +17,7 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataRecord;
+import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -97,6 +98,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final String EXC_PAY_NOT_REQUESTED = "Este documento no tiene solicitud de pago.";
     public static final String EXC_PAY_ALREADY_REQUESTED_IN_ = "Este documento ya tiene solicitud de pago: ";
     
+    public static final String EXC_ADV_NO_ADVANCES = "Este documento no tiene anticipos.";
+    
     private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
     private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
 
@@ -153,6 +156,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int AuxPaymentType;
     /** Files of document: XML & PDF. */
     public File[] AuxFiles;
+    public SFinUtilities.Balance[] AuxAdvances;
     
     public int AccMethod;
     public int AccAccountId;
@@ -211,6 +215,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         AuxPaymentType = SDataConstantsSys.TRNS_TP_PAY_CREDIT;
         AuxFiles = null;
+        AuxAdvances = null;
         
         setMassAccountSettings(SDbSwapDataProcessing.ACC_METHOD_MANUAL, 0, 0, 0, 0, 0, 0);
     }
@@ -355,6 +360,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     public boolean hasReferences(final int refDocType) {
         return References != null && References.length > 0 && ReferencesType == refDocType;
+    }
+    
+    public boolean hasAdvances() {
+        return AuxAdvances != null && AuxAdvances.length > 0;
     }
     
     /**

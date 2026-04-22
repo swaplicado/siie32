@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.JFileChooser;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
@@ -1682,10 +1684,103 @@ public abstract class SFinUtilities {
         return ((Double) out.get(0));
     }
     
+    public static Balance[] getBizPartnerBalances(final SClientInterface client, final int idBizPartner, final int idBizPartnerCategory, final Date cutoff) throws Exception {
+        ArrayList<Balance> balances = new ArrayList<>();
+        int[] sysMoveTypeKey = null;
+        
+        switch (idBizPartnerCategory) {
+            case SDataConstantsSys.BPSS_CT_BP_SUP:
+                sysMoveTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
+                break;
+            case SDataConstantsSys.BPSS_CT_BP_CUS:
+                sysMoveTypeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+                break;
+            default:
+                // nothing
+        }
+        
+        String sql = "SELECT "
+                + "b.id_bp, b.bp, c.id_cur, c.cur_key, "
+                + "SUM(IF (re.fid_dps_doc_n is null, re.debit - re.credit, 0.0)) as f_adv, "
+                + "SUM(IF (re.fid_dps_doc_n is not null, re.debit - re.credit, 0.0)) as f_bal, "
+                + "SUM(re.debit - re.credit) AS f_bal_net, "
+                + "SUM(IF (re.fid_dps_doc_n is null, re.debit_cur - re.credit_cur, 0.0)) as f_cur_adv, "
+                + "SUM(IF (re.fid_dps_doc_n is not null, re.debit_cur - re.credit_cur, 0.0)) as f_cur_bal, "
+                + "SUM(re.debit_cur - re.credit_cur) AS f_cur_bal_net "
+                + "FROM "
+                + "fin_rec AS r INNER JOIN fin_rec_ety AS re ON "
+                + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = re.fid_cur "
+                + "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp "
+                + "WHERE "
+                + "r.id_year = " + SLibTimeUtils.digestYear(cutoff)[0] + " AND r.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' AND NOT r.b_del AND NOT re.b_del "
+                + "AND re.fid_ct_sys_mov_xxx = " + sysMoveTypeKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMoveTypeKey[1] + " "
+                + "AND re.fid_bp_nr = " + idBizPartner + " "
+                + "GROUP BY b.id_bp, b.bp, c.id_cur, c.cur_key "
+                + "HAVING f_bal_net <> 0 "
+                + "ORDER BY b.bp, b.id_bp, c.id_cur, c.cur_key;";
+        
+        try (Statement statement = client.getSession().getStatement().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            while (resultSet.next()) {
+                balances.add(new Balance(client,
+                        resultSet.getDouble("f_adv"), resultSet.getDouble("f_bal"), resultSet.getDouble("f_bal_net"),
+                        resultSet.getDouble("f_cur_adv"), resultSet.getDouble("f_cur_bal"), resultSet.getDouble("f_cur_bal_net"),
+                        resultSet.getInt("c.id_cur"), resultSet.getString("c.cur_key")));
+            }
+        }
+        
+        return balances.toArray(new Balance[0]);
+    }
+    
     public static boolean finYearExists(final SClientInterface client, int pkYearId) throws SQLException {
         String mySql = "SELECT * FROM fin_year WHERE id_year = " + pkYearId + " AND NOT b_closed AND NOT b_del;";
         Statement statement = client.getSession().getStatement().getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(mySql);
         return resultSet.next();
+    }
+    
+    public static class Balance implements Serializable {
+        
+        public double LocAdvance;
+        public double LocBalance;
+        public double LocNetBalance;
+        public double CurAdvance;
+        public double CurBalance;
+        public double CurNetBalance;
+        public int CurCurrencyId;
+        public String CurCurrencyCode;
+        public boolean IsLocCurrency;
+        public String LocCurrencyCode;
+        
+        public Balance(final SClientInterface client,
+                final double locAdvance, final double locBalance, final double locNetBalance,
+                final double curAdvance, final double curBalance, final double curNetBalance,
+                final int curCurrencyId, final String curCurrencyCode) {
+            LocAdvance = locAdvance;
+            LocBalance = locBalance;
+            LocNetBalance = locNetBalance;
+            CurAdvance = curAdvance;
+            CurBalance = curBalance;
+            CurNetBalance = curNetBalance;
+            CurCurrencyId = curCurrencyId;
+            CurCurrencyCode = curCurrencyCode;
+            IsLocCurrency = ((SGuiClient) client).getSession().getSessionCustom().isLocalCurrency(new int[] { CurCurrencyId });
+            LocCurrencyCode = ((SGuiClient) client).getSession().getSessionCustom().getLocalCurrencyCode();
+        }
+        
+        public String getAdvanceAsString() {
+            String string = "";
+            
+            if (CurAdvance != 0 || LocAdvance != 0) {
+                string = "$" + SLibUtils.getDecimalFormatAmount().format(CurAdvance) + " " + CurCurrencyCode;
+                if (!IsLocCurrency) {
+                    string += " = $" + SLibUtils.getDecimalFormatAmount().format(LocAdvance) + " " + LocCurrencyCode;
+                }
+            }
+            
+            return string;
+        }
     }
 }

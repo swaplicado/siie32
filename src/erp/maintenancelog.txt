@@ -1,3 +1,9 @@
+================================================================================
+SIIE 3.2 299.8/ 2026-04-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de advertencia de anticipos a proveedores en la importación de facturas y en su contabilización masiva desde SWAP Services.
+
 =================================================================================
 SIIE 3.2 299.7/ 2026-04-20
 Edwin Omar CARMONA FIGUEROA
