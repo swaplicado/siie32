@@ -4,6 +4,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Reforzamiento a las advertencias de existencia de anticipos a proveedores en la creación de facturas desde SWAP Services y en su contabilización masiva.
 2) Refactorización para concentrar en un método la creación de facturas desde CFDI y cuando se hace desde cero cuando se importan desde SWAP Services.
+3) Asignación de 1 semana a la constante que controla la obtención de datos del dispositivo de control de asistencia para el procesamiento de bonos de nóminas semanales.
 
 ================================================================================
 SIIE 3.2 299.9/ 2026-04-22
