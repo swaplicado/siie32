@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -606,6 +606,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                     validation.setComponent(moKeyCurrency);
                 }
             }
+            else if ((mnFormCase == CASE_RESCHEDULE || mnFormCase == CASE_MARK_AS_PAID) && moDateNewDate.getValue() == null) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moDateNewDate.getFieldName() + "'.");
+                validation.setComponent(moDateNewDate.getComponent());
+            }
             
             if (validation.isValid()) {
                 switch (mnFormCase) {
@@ -695,20 +699,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 value = moTextNotesAuthorization.getValue();
                 break;
             case VALUE_PAYMENT_BANK:
-                if (moKeyPaymentBank.getSelectedIndex() > 0) {
-                    value = moKeyPaymentBank.getValue();
-                }
-                else {
-                    value = null;
-                }
+                value = moKeyPaymentBank.getSelectedIndex() > 0 ? moKeyPaymentBank.getValue() : null;
                 break;
             case VALUE_BENEFIT_BANK:
-                if (moKeyBeneffBank.getSelectedIndex() > 0) {
-                    value = moKeyBeneffBank.getValue();
-                }
-                else {
-                    value = null;
-                }
+                value = moKeyBeneffBank.getSelectedIndex() > 0 ? moKeyBeneffBank.getValue() : null;
                 break;
             default:
                 // nothing
