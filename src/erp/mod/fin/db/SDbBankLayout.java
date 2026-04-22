@@ -1534,7 +1534,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                             layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY);
                             layoutBankPayment.getLayoutBankDpss().add(layoutBankDps);
                         }
-
+                        
+                        paymentCur = SLibUtils.roundAmount(paymentCur + dpsAmountCur);
                         layoutBankPayment.getMoneyAmount().setExchangeRate(dps == null ? 1d : dps.getExchangeRate());
                         layoutBankPayment.setReferenceRecord(referenceRecord);
 
