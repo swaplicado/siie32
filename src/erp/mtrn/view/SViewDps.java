@@ -60,6 +60,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFile;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.SCfdUtils;
@@ -225,6 +226,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightLogistics;
     private boolean mbIsAuthWebAvailable; // auth web must be enabled in configuration and this view must be for purchases orders!
     private boolean mbSwapServicesLinkUp;
+    private boolean mbSwapDataProcessing;
     private JDialog progressDialog;
     private JProgressBar progressBar;
     
@@ -513,8 +515,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
         
         // Enable SWAP Services:
-        if (mbIsCategoryPur && mbIsOrd) { // purchase orders only!
-            mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+        if (mbIsCategoryPur && (mbIsOrd || mbIsDoc || mbIsDocAdj)) { // purchase orders, invoices and credit notes only!
+            boolean isLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
+            
+            mbSwapServicesLinkUp = isLinkUp && mbIsOrd;
+            
             if (mbSwapServicesLinkUp) {
                 jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
                     "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_ORDER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
@@ -522,6 +527,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 addTaskBarUpperSeparator();
                 addTaskBarUpperComponent(jbExportDataToSwapServices);
             }
+            
+            mbSwapDataProcessing = isLinkUp && (mbIsDoc || mbIsDocAdj);
         }
 
         if (mbIsAuthWebAvailable) {
@@ -656,7 +663,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsAuthWebAvailable) {
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jbAuthWebLoadSupportFiles);
-//            addTaskBarUpperComponent(jbAuthWebStartAuth); Se comenta para dejar de utilizar autorización en portal de autorizaciones
+            //addTaskBarUpperComponent(jbAuthWebStartAuth); Se comenta para dejar de utilizar autorización en portal de autorizaciones
             addTaskBarUpperComponent(jbAuthWebStartAuthGc);
             addTaskBarUpperComponent(jbAuthWebViewAuthLog);
             addTaskBarUpperComponent(jbAuthWebViewAuthComments);
@@ -761,7 +768,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[53]; // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[(mbSwapDataProcessing) ? 54 : 53]; // extra columns for accounting record and CFD info, and, for purchases & SWAP processing type, document's processing type
         }
         else if (mbIsOrd) {
             if (mbIsAuthWebAvailable) {
@@ -909,6 +916,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "d.ts_close", "Cierre surtido", STableConstants.WIDTH_DATE_TIME);
 
         if (mbIsDoc || mbIsDocAdj) {
+            if (mbSwapDataProcessing) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_data_prc", "Caso documento", 50);
+            }
+            
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Pedidos", STableConstants.WIDTH_DOC_NUM);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rper", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
@@ -3645,6 +3656,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         
         boolean dnsRight = false; 
+        
         if (mbIsOrd) {
             if (mbIsCategoryPur) {
                 dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
@@ -3680,6 +3692,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(sah.id_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_SNDF + ", " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 STableConstants.ICON_NULL + ")) AS ico_send_warn, "
                 : "");
+        
         if (mbIsAuthWebAvailable) {
             msSql += "IF ((SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stp WHERE "
                     + "     NOT stp.b_del AND stp.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -3778,6 +3791,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "ELSE " + STableConstants.ICON_NULL + " END AS f_status ";
 
         if (mbIsDoc || mbIsDocAdj) {
+            if (mbSwapDataProcessing) {
+                msSql += ", (SELECT CASE "
+                        + "WHEN sdp.proc_type = " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT + " THEN '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT) + "' "
+                        + "WHEN sdp.proc_type = " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE + " THEN '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE) + "' "
+                        + "ELSE '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_STANDARD) + "' END "
+                        + "FROM trn_swap_data_prc AS sdp WHERE sdp.fk_dps_year_n = d.id_year AND sdp.fk_dps_doc_n = d.id_doc AND NOT b_del LIMIT 1) AS f_data_prc ";
+            }
+            
             msSql += ", xu.usr, " +
                     "(SELECT rbkc.code FROM fin_bkc AS rbkc WHERE rbkc.id_bkc = r.id_bkc) AS f_rbkc_code, " +
                     "(SELECT rbpb.code FROM erp.bpsu_bpb AS rbpb WHERE rbpb.id_bpb = r.fid_cob) AS f_rbpb_code, " +
