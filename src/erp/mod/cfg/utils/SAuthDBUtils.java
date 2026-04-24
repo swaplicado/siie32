@@ -1,5 +1,6 @@
 package erp.mod.cfg.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
@@ -252,6 +253,47 @@ public class SAuthDBUtils {
         FlowResponse oFlow = mapper.treeToValue(responseJson.get("flow"), FlowResponse.class);
 
         return oFlow;
+    }
+
+    public static JsonNode getResourceManagmentData(SGuiSession session, 
+                                                        final int resourceTypeId, 
+                                                        final String idResource, 
+                                                        final int idCompany) throws JsonProcessingException, Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+        String baseUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+        String url = baseUrl + SServicesUtils.URL_GET_RESOURCE_MANAGMENT_DATA + "/";
+        SManagmentRequest request = new SManagmentRequest();
+        request.setIdExternalSystem(1);
+        request.setBHistory(1);
+        List<SManagmentRequestRow> lRows = new ArrayList<>();
+        SManagmentRequestRow oRow;
+        if (resourceTypeId != SSwapConsts.RESOURCE_TYPE_PUR_INVOICE) {
+            oRow = new SManagmentRequestRow("", idResource, idCompany, resourceTypeId);
+        }
+        else {
+            oRow = new SManagmentRequestRow(idResource, "", idCompany, resourceTypeId);
+        }
+        lRows.add(oRow);
+        request.setRows(lRows);
+        String requestBody = mapper.writeValueAsString(request);
+        String responseBody = SExportUtils.requestSwapService("", url, SHttpConsts.METHOD_POST, requestBody, "", "", SSwapConsts.TIME_30_SEC);
+        JsonNode responseJson = mapper.readTree(responseBody);
+        // La petición devuleve un array, se obtiene el primer elemento que corresponde al recurso solicitado
+        if (responseJson.isArray() && responseJson.size() > 0) {
+            responseJson = responseJson.get(0);
+        }
+        else {
+            LOGGER.log(Level.SEVERE, "Respuesta inesperada desde el servicio de gestión de autorizaciones: " + responseBody);
+            return null;
+        }
+
+        if (responseJson.has("error")) {
+            LOGGER.log(Level.SEVERE, "Error desde MS Auth: " + responseJson.get("error").asText());
+            return null;
+        }
+        
+        return responseJson;
     }
 
     /**

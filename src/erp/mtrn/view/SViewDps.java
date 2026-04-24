@@ -209,6 +209,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
     private erp.mod.cfg.swap.form.SDialogPdfViewer moDialogPdfViewer;
+    private SDialogDocumentAuthornComments moDialogAuthComments;
     private java.text.DecimalFormat moUsQuantityFormat;
 
     private boolean mbIsCategoryPur;
@@ -225,6 +226,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private boolean mbHasRightAnnul;
     private boolean mbHasRightLogistics;
     private boolean mbIsAuthWebAvailable; // auth web must be enabled in configuration and this view must be for purchases orders!
+    private boolean mbIsAuthzLogPurInvoice;
     private boolean mbSwapServicesLinkUp;
     private boolean mbSwapDataProcessing;
     private JDialog progressDialog;
@@ -264,8 +266,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         mbHasRightAnnul = false;
         
         try {
-            String authWebConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB);
-            mbIsAuthWebAvailable = SLibUtils.parseInt(authWebConfig) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT && mbIsCategoryPur && mbIsOrd;
+            String sAuxAuthWebConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB);
+            mbIsAuthWebAvailable = SLibUtils.parseInt(sAuxAuthWebConfig) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT && mbIsCategoryPur && mbIsOrd;
+            mbIsAuthzLogPurInvoice = SLibUtils.parseInt(sAuxAuthWebConfig) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT && mbIsCategoryPur && mbIsDoc;
         } 
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -552,11 +555,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthLog.addActionListener(this);
             jbAuthWebViewAuthLog.setToolTipText("Estatus de autorización");
 
-            jbAuthWebViewAuthComments = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")));
-            jbAuthWebViewAuthComments.setPreferredSize(new Dimension(23, 23));
-            jbAuthWebViewAuthComments.addActionListener(this);
-            jbAuthWebViewAuthComments.setToolTipText("Ver historial de autorización de la orden en app web");
-
             jbAuthWebDownloadSupportFiles = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")));
             jbAuthWebDownloadSupportFiles.setPreferredSize(new Dimension(23, 23));
             jbAuthWebDownloadSupportFiles.addActionListener(this);
@@ -576,6 +574,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebForceCheckAuthStatus.setPreferredSize(new Dimension(23, 23));
             jbAuthWebForceCheckAuthStatus.addActionListener(this);
             jbAuthWebForceCheckAuthStatus.setToolTipText("Verificar estatus de autorización");        
+        }
+        
+        if (mbIsAuthWebAvailable || mbIsAuthzLogPurInvoice) {
+            jbAuthWebViewAuthComments = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")));
+            jbAuthWebViewAuthComments.setPreferredSize(new Dimension(23, 23));
+            jbAuthWebViewAuthComments.addActionListener(this);
+            jbAuthWebViewAuthComments.setToolTipText("Ver historial de autorización de la orden en app web");
+            
+            moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, 
+                                                                "Comentarios de autorización en app web");
         }
         
         if(mbIsOrd) {
@@ -666,11 +674,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             //addTaskBarUpperComponent(jbAuthWebStartAuth); Se comenta para dejar de utilizar autorización en portal de autorizaciones
             addTaskBarUpperComponent(jbAuthWebStartAuthGc);
             addTaskBarUpperComponent(jbAuthWebViewAuthLog);
-            addTaskBarUpperComponent(jbAuthWebViewAuthComments);
             addTaskBarUpperComponent(jbAuthWebDownloadSupportFiles);
             addTaskBarUpperComponent(jbAuthWebClearSupportFiles);
             addTaskBarUpperComponent(jbAuthWebAnnullAuth);
             addTaskBarUpperComponent(jbAuthWebForceCheckAuthStatus);
+        }
+        if (mbIsAuthzLogPurInvoice || mbIsAuthWebAvailable) {
+            addTaskBarUpperComponent(jbAuthWebViewAuthComments);
         }
         
         addTaskBarLowerComponent(jbPrint);
@@ -757,12 +767,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebStartAuth.setEnabled(true);
             jbAuthWebStartAuthGc.setEnabled(true);
             jbAuthWebViewAuthLog.setEnabled(true);
-            jbAuthWebViewAuthComments.setEnabled(true);
             jbAuthWebDownloadSupportFiles.setEnabled(true);
             jbAuthWebClearSupportFiles.setEnabled(true);
             jbAuthWebAnnullAuth.setEnabled(true);
             jbAuthWebForceCheckAuthStatus.setEnabled(true);
         }
+        
+        jbAuthWebViewAuthComments.setEnabled(mbIsAuthWebAvailable || mbIsAuthzLogPurInvoice);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
@@ -3579,10 +3590,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionAuthWebViewAuthComments() {
         try {
             if (jbAuthWebViewAuthComments.isEnabled()) {
-                if (isRowSelected()) {
-                    SDialogDocumentAuthornComments dialog = new SDialogDocumentAuthornComments((SGuiClient) miClient, "Comentarios de autorización en app web");
-                    dialog.setValue(SModConsts.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
-                    dialog.setVisible(true);
+                if (isRowSelected() && moDialogAuthComments != null) {
+                    if (mbIsOrd) {
+                        moDialogAuthComments.setValue(SModConsts.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
+                    }
+                    else if (mbIsDoc) {
+                        moDialogAuthComments.setValue(SSwapConsts.RESOURCE_TYPE_PUR_INVOICE, moTablePane.getSelectedTableRow().getPrimaryKey());
+                    }
+                    moDialogAuthComments.setVisible(true);
                 }
             }
         }

@@ -37,6 +37,7 @@ public abstract class SServicesUtils {
     public static final String URL_CANCEL_FLOW = "/api/cancel-flow";
     public static final String URL_GET_RESOURCE_FLOW_HISTORY = "/get-resource-flow";
     public static final String URL_GET_FLOW_STATUS_BY_RESOURCE = "/get-flows-by-resources";
+    public static final String URL_GET_RESOURCE_MANAGMENT_DATA = "/api/get-managment-data";
     
     private static SyncSettings getSyncSettings(final SGuiSession session, final ObjectMapper mapper, final String configParamKey, final String elementKey) throws Exception {
         JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), configParamKey));
