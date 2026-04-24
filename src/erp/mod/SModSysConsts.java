@@ -964,7 +964,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_PAY_WEE = 1;    // Weekly 
     public static final int HRSS_TP_PAY_FOR = 2;    // Fortnightly 
     
-    public static final int HRSS_BONUS_WEEKS = 2; // Cuantas semanas para checar bonos
+    public static final int HRSS_WEEKLY_BONUS_WEEKS = 1; // Cuantas semanas para checar bonos de nóminas semanales
 
     public static final int HRSS_TP_PAY_SHT_NOR = 1;    // Normal
     public static final int HRSS_TP_PAY_SHT_SPE = 2;    // Special

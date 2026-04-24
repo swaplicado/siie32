@@ -101,6 +101,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     public static final int SEARCH_BY_PERIOD = 1;
     public static final int SEARCH_BY_WEEK = 2;
     
+    public static final int CREATE_FROM_CFDI = 1;
+    public static final int CREATE_FROM_SCRATCH = 2;
+    
     protected static final int OFF = 0;
     protected static final int ON = 1;
     protected static final int LIMIT_DAYS = 31; // 1 calendar month
@@ -218,7 +221,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
-        jbImportInvoiceFromCfdi = new javax.swing.JButton();
+        jbCreateInvoiceFromCfdi = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
         jbCreateInvoiceFromScratch = new javax.swing.JButton();
         jpProcessingN3 = new javax.swing.JPanel();
@@ -524,11 +527,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbImportInvoiceFromCfdi.setForeground(java.awt.Color.blue);
-        jbImportInvoiceFromCfdi.setText("Importar CFDI");
-        jbImportInvoiceFromCfdi.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbImportInvoiceFromCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN1.add(jbImportInvoiceFromCfdi);
+        jbCreateInvoiceFromCfdi.setForeground(java.awt.Color.blue);
+        jbCreateInvoiceFromCfdi.setText("Importar CFDI");
+        jbCreateInvoiceFromCfdi.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbCreateInvoiceFromCfdi.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN1.add(jbCreateInvoiceFromCfdi);
 
         jpProcessingN.add(jpProcessingN1);
 
@@ -833,11 +836,11 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbChangePayScheduledDate;
     private javax.swing.JButton jbChangeReqPayRequiredDate;
     private javax.swing.JButton jbClearDocs;
+    private javax.swing.JButton jbCreateInvoiceFromCfdi;
     private javax.swing.JButton jbCreateInvoiceFromScratch;
     private javax.swing.JButton jbDeselectAllDocs;
     private javax.swing.JButton jbDownloadSelectedDocs;
     private javax.swing.JButton jbEditAndSaveReqPayAmount;
-    private javax.swing.JButton jbImportInvoiceFromCfdi;
     private javax.swing.JButton jbLinkAllDocs;
     private javax.swing.JButton jbLinkInvoice;
     private javax.swing.JButton jbRecordAllDocs;
@@ -1359,7 +1362,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         
         moDocumentsGrid.getTable().setEnabled(!enable);
         
-        jbImportInvoiceFromCfdi.setEnabled(!enable);
+        jbCreateInvoiceFromCfdi.setEnabled(!enable);
         jbCreateInvoiceFromScratch.setEnabled(!enable);
         jbLinkInvoice.setEnabled(!enable);
         jbUnlinkInvoice.setEnabled(!enable);
@@ -1416,18 +1419,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 }
                 finally {
                     miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
-            }
-        }
-    }
-    
-    private void linkAndProcessNewDps(final SImportedDocument document, final int[] dpsKey) throws Exception {
-        if (dpsKey != null) {
-            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, true)) {
-                refreshDocumentsGrid();
-
-                if (document.isPaymentRequested()) {
-                    mbExportPaymentRequests = true;
                 }
             }
         }
@@ -1910,8 +1901,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                 moDialogMassAccountDocuments.resetForm();
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_SETTINGS, createSettings());
-                moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_DOCS, elegibleDocs);
-                moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_ADVANCES, moAdvancesMap);
+                moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_DOCUMENTS_AND_ADVANCES, new Object[] { elegibleDocs, moAdvancesMap });
                 moDialogMassAccountDocuments.setVisible(true);
                 
                 // check whether payments need to be exported:
@@ -1947,6 +1937,62 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             renderCurrentDoc(false);
                                     
             mbDocumentsBeingProcessed = false;
+        }
+    }
+    
+    private void createAndLinkDps(final SImportedDocument document, final int creationMode) throws Exception {
+        if (document.isRecorded()) {
+            throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
+        }
+        else if (!isDocAlreadyRecorded(document, true)) {
+            if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
+                throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
+            }
+            else if (document.checkAdvancesOnUpcommingPaymentRequest(miClient, false)) {
+                // validate availability of exchange rate, if needed:
+
+                if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
+                    SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
+                }
+
+                // retrieve CFDI files:
+                File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
+
+                // retrieve order, if available:
+                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
+                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
+
+                // creaet DPS:
+                
+                int[] dpsKey = null;
+                
+                switch (creationMode) {
+                    case CREATE_FROM_CFDI:
+                        // import CFDI (dialog DPS Finder should be previously prepared):
+                        dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
+                        break;
+                        
+                    case CREATE_FROM_SCRATCH:
+                        // create CFDI (dialog DPS Finder should be previously prepared):
+                        dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
+                        break;
+                        
+                    default:
+                        // nothing
+                }
+                
+                // link DPS:
+                
+                if (dpsKey != null) {
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, true)) {
+                        refreshDocumentsGrid();
+
+                        if (document.isPaymentRequested()) {
+                            mbExportPaymentRequests = true;
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -2074,6 +2120,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             mbDocumentsBeingProcessed = true; // prevents item-state-change events from being handled!
             
             maDocuments.clear();
+            moAdvancesMap.clear();
             
             moDocumentsGrid.populateGrid(new Vector<>());
             renderCurrentDoc(true); // forcing clearing!
@@ -2341,22 +2388,20 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 if (document.isRecorded()) {
                     throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
                 }
-                else {
-                    if (!isDocAlreadyRecorded(document, true)) {
-                        SGuiParams params = new SGuiParams();
-                        params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDatePeriodEnd.getValue())[0]);
-                        params.getParamsMap().put(SGuiConsts.PARAM_BPR, document.BizPartnerId);
+                else if (!isDocAlreadyRecorded(document, true)) {
+                    SGuiParams params = new SGuiParams();
+                    params.getParamsMap().put(SGuiConsts.PARAM_YEAR, SLibTimeUtils.digestYear(moDatePeriodEnd.getValue())[0]);
+                    params.getParamsMap().put(SGuiConsts.PARAM_BPR, document.BizPartnerId);
 
-                        SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_TRN_N, SModConsts.MOD_TRN_PUR_N).getOptionPicker(SModConsts.TRN_DPS, SDataConstantsSys.TRNX_TP_DPS_DOC, params);
-                        picker.resetPicker();
-                        picker.setPickerVisible(true);
+                    SGuiOptionPicker picker = miClient.getSession().getModule(SModConsts.MOD_TRN_N, SModConsts.MOD_TRN_PUR_N).getOptionPicker(SModConsts.TRN_DPS, SDataConstantsSys.TRNX_TP_DPS_DOC, params);
+                    picker.resetPicker();
+                    picker.setPickerVisible(true);
 
-                        if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
-                            int[] dpsKey = (int[]) picker.getOption();
+                    if (picker.getPickerResult() == SGuiConsts.FORM_RESULT_OK) {
+                        int[] dpsKey = (int[]) picker.getOption();
 
-                            if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, mbAllowLinkGreaterInvoices, true, false, false)) {
-                                refreshDocumentsGrid();
-                            }
+                        if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, mbAllowLinkGreaterInvoices, true, false, false)) {
+                            refreshDocumentsGrid();
                         }
                     }
                 }
@@ -2463,7 +2508,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
-    private void actionPerformedImportInvoiceFromCfdi() {
+    private void actionPerformedCreateInvoiceFromCfdi() {
         try {
             SGridRow row = moDocumentsGrid.getSelectedGridRow();
             
@@ -2473,43 +2518,16 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isRecorded()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
+                // check that business partner is domestic:
+                
+                boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
+
+                if (!isBizPartnerDomestic) {
+                    throw new Exception("Los CFDI solamente son emitidos por proveedores nacionales. El proveedor de este factura autorizada es extranjero.\n"
+                            + "Se puede contabilizar la factura autorizada en '" + jbCreateInvoiceFromScratch.getText() + "'");
                 }
                 else {
-                    if (!isDocAlreadyRecorded(document, true)) {
-                        if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
-                        }
-                        else {
-                            // validate availability of exchange rate, if needed:
-
-                            if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
-                            }
-                            
-                            // check that business partner is domestic:
-                            
-                            boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
-                            
-                            if (!isBizPartnerDomestic) {
-                                throw new Exception("Los CFDI solamente son emitidos por proveedores nacionales. El proveedor de este factura autorizada es extranjero.\n"
-                                        + "Se puede contabilizar la factura autorizada en '" + jbCreateInvoiceFromScratch.getText() + "'");
-                            }
-                            else {
-                                // retrieve CFDI files:
-                                File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
-
-                                // retrieve order, if available:
-                                SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                                boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
-
-                                // import CFDI (dialog DPS Finder should be previously prepared):
-                                int[] dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
-                                linkAndProcessNewDps(document, dpsKey);
-                            }
-                        }
-                    }
+                    createAndLinkDps(document, CREATE_FROM_CFDI);
                 }
             }
         }
@@ -2528,34 +2546,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isRecorded()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
-                }
-                else {
-                    if (!isDocAlreadyRecorded(document, true)) {
-                        if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
-                            throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
-                        }
-                        else {
-                            // validate availability of exchange rate, if needed:
-
-                            if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
-                                SDocumentUtils.getExchangeRate(miClient.getSession(), document.CurrencyId, miClient.getSession().getCurrentDate()); // throws exception if exchange rate is unavailable
-                            }
-                            
-                            // retrieve CFDI files:
-                            File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
-
-                            // retrieve order, if available:
-                            SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
-                            boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
-
-                            // create CFDI (dialog DPS Finder should be previously prepared):
-                            int[] dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
-                            linkAndProcessNewDps(document, dpsKey);
-                        }
-                    }
-                }
+                createAndLinkDps(document, CREATE_FROM_SCRATCH);
             }
         }
         catch (Exception e) {
@@ -2669,7 +2660,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDialogImportDocuments.showAdvances(miClient, (SImportedDocument) row);
+                SImportedDocument document = (SImportedDocument) row;
+                
+                if (document.hasAdvances()) {
+                    miClient.showMsgBoxInformation(document.getAdvancesAsString(miClient));
+                }
+                else {
+                    miClient.showMsgBoxWarning(SImportedDocument.EXC_ADV_NO_ADVANCES);
+                }
             }
         }
         catch (Exception e) {
@@ -2752,9 +2750,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.requestPayment(miClient.getSession())) {
-                    mbExportPaymentRequests = true;
-                    refreshDocumentsGrid();
+                if (document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
+                }
+                else if (document.checkAdvancesOnUpcommingPaymentRequest(miClient, true)) {
+                    if (document.requestPayment(miClient.getSession())) {
+                        mbExportPaymentRequests = true;
+                        refreshDocumentsGrid();
+                    }
                 }
             }
         }
@@ -2946,7 +2949,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         SGridRow row = moDocumentsGrid.getSelectedGridRow();
         
         if (forceClearing || row == null) {
-            jbImportInvoiceFromCfdi.setEnabled(false);
+            jbCreateInvoiceFromCfdi.setEnabled(false);
             jbCreateInvoiceFromScratch.setEnabled(false);
             jbLinkInvoice.setEnabled(false);
             jbRejectInvoice.setEnabled(false);
@@ -2987,7 +2990,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         else {
             SImportedDocument document = (SImportedDocument) row;
             
-            jbImportInvoiceFromCfdi.setEnabled(true);
+            jbCreateInvoiceFromCfdi.setEnabled(true);
             jbCreateInvoiceFromScratch.setEnabled(true);
             jbLinkInvoice.setEnabled(true);
             jbRejectInvoice.setEnabled(true);
@@ -3242,7 +3245,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbRecordAllDocs.addActionListener(this);
         jbLinkAllDocs.addActionListener(this);
         
-        jbImportInvoiceFromCfdi.addActionListener(this);
+        jbCreateInvoiceFromCfdi.addActionListener(this);
         jbCreateInvoiceFromScratch.addActionListener(this);
         jbLinkInvoice.addActionListener(this);
         jbRejectInvoice.addActionListener(this);
@@ -3281,7 +3284,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbRecordAllDocs.removeActionListener(this);
         jbLinkAllDocs.removeActionListener(this);
         
-        jbImportInvoiceFromCfdi.removeActionListener(this);
+        jbCreateInvoiceFromCfdi.removeActionListener(this);
         jbCreateInvoiceFromScratch.removeActionListener(this);
         jbLinkInvoice.removeActionListener(this);
         jbRejectInvoice.removeActionListener(this);
@@ -3365,8 +3368,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else if (button == jbLinkAllDocs) {
                 actionPerformedLinkAllDocs();
             }
-            else if (button == jbImportInvoiceFromCfdi) {
-                actionPerformedImportInvoiceFromCfdi();
+            else if (button == jbCreateInvoiceFromCfdi) {
+                actionPerformedCreateInvoiceFromCfdi();
             }
             else if (button == jbCreateInvoiceFromScratch) {
                 actionPerformedCreateInvoiceFromScratch();
@@ -3455,29 +3458,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     itemStateChangedDocCase(false); // reloads documents grid
                 }
             }
-        }
-    }
-    
-    /**
-     * Show in a dialog message the advances of business partner of document.
-     * @param client GUI client.
-     * @param document Document.
-     * @throws Exception 
-     */
-    public static void showAdvances(final SGuiClient client, final SImportedDocument document) throws Exception {
-        if (document.hasAdvances()) {
-            String message = "El proveedor " + document.BizPartner + " tiene "
-                    + (document.AuxAdvances.length == 1 ? "el siguiente anticipo" : "los siguientes " + SLibUtils.DecimalFormatInteger.format(document.AuxAdvances.length) + " anticiipos") + ", "
-                    + "al corte de " + SLibUtils.DateFormatDate.format(client.getSession().getSystemDate()) + ":";
-
-            for (int i = 0; i < document.AuxAdvances.length; i++) {
-                message += "\n" + (i + 1) + ") " + document.AuxAdvances[i].getAdvanceAsString();
-            }
-
-            client.showMsgBoxInformation(message);
-        }
-        else {
-            client.showMsgBoxWarning(SImportedDocument.EXC_ADV_NO_ADVANCES);
         }
     }
     

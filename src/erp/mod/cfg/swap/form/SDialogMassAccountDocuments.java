@@ -88,7 +88,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     private static final String ND = "(N/D)";
     
     public static final int VALUE_SETTINGS = 1;
-    public static final int VALUE_DOCS = 2;
+    public static final int VALUE_DOCUMENTS_AND_ADVANCES = 2;
     public static final int VALUE_EXPORT_PAYMENTS = 11;
     public static final int VALUE_REJECTED_INVOICES = 12;
     public static final int VALUE_ADVANCES = 21;
@@ -101,7 +101,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     protected SDialogImportDocuments.Settings moSettings;
     protected ArrayList<SMassAccountDocument> maDocuments;
     protected ArrayList<SMassAccountDocument> maDocumentsRejected;
-    protected HashMap<Integer, SFinUtilities.Balance[]> moAdvancesMap;
+    protected HashMap<Integer, SFinUtilities.Balance[]> moAdvancesMap; // key: business partner ID; value: balances
     protected Date mtNewRequiredDate;
     protected Pattern moPatternScaleTicketBol;
     protected Pattern moPatternScaleTicketRef;
@@ -1527,6 +1527,24 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         mbDocumentsBeingRefreshed = false;
     }
     
+    private void retrieveAllAdvances(final ArrayList<Integer> bizPartnerIds) throws Exception {
+        for (Integer bizPartnerId : bizPartnerIds) {
+            if (moAdvancesMap.get(bizPartnerId) == null) {
+                ArrayList<SFinUtilities.Balance> advancesList = new ArrayList<>();
+                SFinUtilities.Balance[] balances = SFinUtilities.getBizPartnerBalances((SClientInterface) miClient, bizPartnerId, SDataConstantsSys.BPSS_CT_BP_SUP, miClient.getSession().getSystemDate());
+
+                for (SFinUtilities.Balance balance : balances) {
+                    if (balance.CurAdvance != 0 || balance.LocAdvance != 0) {
+                        advancesList.add(balance);
+                    }
+                }
+
+                SFinUtilities.Balance[] advances = advancesList.toArray(new SFinUtilities.Balance[0]);
+                moAdvancesMap.put(bizPartnerId, advances);
+            }
+        }
+    }
+    
     private void setSettings(final SDialogImportDocuments.Settings settings) {
         moSettings = settings;
         
@@ -1597,27 +1615,47 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
     }
     
-    private void setImportedDocuments(final ArrayList<SImportedDocument> documents) {
+    private void setImportedDocuments(final ArrayList<SImportedDocument> documents, final HashMap<Integer, SFinUtilities.Balance[]> advances) {
+        // set documents:
+        
         maDocuments.clear();
         maDocumentsRejected.clear();
         
-        try {
-            if (documents != null && !documents.isEmpty()) {
+        if (documents != null) {
+            try {
                 for (SImportedDocument document : documents) {
                     maDocuments.add(new SMassAccountDocument(document, this));
                 }
             }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
         }
         
-        reloadDocumentsGrid();
-    }
-    
-    private void setAdvances(final HashMap<Integer, SFinUtilities.Balance[]> advances) {
+        // set advances:
+        
         moAdvancesMap.clear();
-        moAdvancesMap.putAll(advances);
+        
+        if (advances != null) {
+            moAdvancesMap.putAll(advances);
+            
+            try {
+                HashSet<Integer> bizPartnerIds = new HashSet<>();
+
+                for (SMassAccountDocument document : maDocuments) {
+                    bizPartnerIds.add(document.ImportedDocument.BizPartnerId);
+                }
+
+                retrieveAllAdvances(new ArrayList<>(bizPartnerIds));
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+        
+        // make the documents visible:
+        
+        reloadDocumentsGrid();
     }
     
     private void enableControlsForShowingDocs(final boolean enable) {
@@ -2040,7 +2078,15 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SDialogImportDocuments.showAdvances(miClient, ((SMassAccountDocument) row).ImportedDocument);
+                SMassAccountDocument mad = (SMassAccountDocument) row;
+                SImportedDocument document = mad.ImportedDocument;
+                
+                if (document.hasAdvances()) {
+                    miClient.showMsgBoxInformation(document.getAdvancesAsString(miClient));
+                }
+                else {
+                    miClient.showMsgBoxWarning(SImportedDocument.EXC_ADV_NO_ADVANCES);
+                }
             }
         }
         catch (Exception e) {
@@ -2226,10 +2272,25 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
         else {
             int docsToRecord = 0;
+            int paysRequestableWithAdvances = 0;
+            HashSet<String> bizPartnersWithAdvances = new HashSet<>();
             
             for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-                if (((SMassAccountDocument) row).Record) {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+
+                if (document.Record) {
                     docsToRecord++;
+                    
+                    if (document.ImportedDocument.isPaymentRequestable(false)) {
+                        if (document.ImportedDocument.AuxAdvances == null) {
+                            document.ImportedDocument.AuxAdvances = moAdvancesMap.get(document.ImportedDocument.BizPartnerId);
+                        }
+                        
+                        if (document.ImportedDocument.hasAdvances()) {
+                            paysRequestableWithAdvances++;
+                            bizPartnersWithAdvances.add(document.ImportedDocument.BizPartner);
+                        }
+                    }
                 }
             }
             
@@ -2241,10 +2302,25 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 
                 initProgress();
                 
-                boolean process = miClient.showMsgBoxConfirm("¿Está seguro que desea procesar "
-                        + "a " + (docsToRecord == 1 ? "la única factura seleccionada?" : "las " + SLibUtils.DecimalFormatInteger.format(docsToRecord) + " facturas seleccionadas?")) == JOptionPane.YES_OPTION;
-
-                if (process) {
+                String confirm = "¿Está seguro que desea procesar "
+                        + (docsToRecord == 1 ? "la única factura seleccionada?" : "las " + SLibUtils.DecimalFormatInteger.format(docsToRecord) + " facturas seleccionadas?");
+                
+                if (paysRequestableWithAdvances > 0) {
+                    confirm += "\n\nConsidere que hay " + (paysRequestableWithAdvances == 0 ? "una factura" : SLibUtils.DecimalFormatInteger.format(paysRequestableWithAdvances) + " facturas") + " "
+                            + (bizPartnersWithAdvances.size() == 1 ? "cuyo proveedor tiene anticipos" : "cuyos proveedores tienen anticipos") + ", "
+                            + "al corte del " + SLibUtils.DateFormatDate.format(miClient.getSession().getSystemDate()) + ":";
+                    
+                    ArrayList<String> bizPartners = new ArrayList<>(bizPartnersWithAdvances);
+                    bizPartners.sort(null);
+                    
+                    for (String bizPartner : bizPartners) {
+                        confirm += "\n+ " + bizPartner;
+                    }
+                    
+                    confirm += "\n\n" + SGuiConsts.MSG_CNF_CONT;
+                }
+                
+                if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
                     // start of background processing...
                     
                     final int docs = docsToRecord;
@@ -2862,7 +2938,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             moConfig = new ObjectMapper().readValue(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SIIE_CFG_MASS_ACC), Config.class);
             
             setSettings(null);
-            setImportedDocuments(null);
+            setImportedDocuments(null, null);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -2966,12 +3042,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 setSettings(((SDialogImportDocuments.Settings) value));
                 break;
                 
-            case VALUE_DOCS:
-                setImportedDocuments((ArrayList<SImportedDocument>) value);
-                break;
-                
-            case VALUE_ADVANCES:
-                setAdvances((HashMap<Integer, SFinUtilities.Balance[]>) value);
+            case VALUE_DOCUMENTS_AND_ADVANCES:
+                Object[] params = (Object[]) value;
+                setImportedDocuments((ArrayList<SImportedDocument>) params[0], (HashMap<Integer, SFinUtilities.Balance[]>) params[1]);
                 break;
                 
             default:

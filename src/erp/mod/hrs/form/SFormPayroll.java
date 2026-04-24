@@ -2590,12 +2590,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         miClient.showMsgBoxError("No existe configuración para día de corte");
                         return;
                     }
-                    if (SModSysConsts.HRSS_BONUS_WEEKS == 1){
+                    if (SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 1) {
                         dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
                         DateTime dateTime = new DateTime(moDateDateEnd.getValue());
-//                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
                     }
-                    else if(SModSysConsts.HRSS_BONUS_WEEKS == 2){
+                    else if(SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 2) {
                         dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
                         DateTime dateTime = new DateTime(moDateDateEnd.getValue());
                         Date endDatePrevious = dateTime.plusDays(-7).toDate();

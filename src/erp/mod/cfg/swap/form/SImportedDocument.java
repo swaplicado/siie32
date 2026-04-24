@@ -94,8 +94,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public static final String EXC_DOC_NOT_RECORDED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
     public static final String EXC_DOC_ALREADY_RECORDED_IN_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
 
+    public static final String EXC_PAY_NOT_REQUIRED = "Este documento no requiere pago.";
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
-    public static final String EXC_PAY_NOT_REQUESTED = "Este documento no tiene solicitud de pago.";
+    public static final String EXC_PAY_NOT_REQUESTED_YET = "Este documento no tiene aún solicitud de pago.";
     public static final String EXC_PAY_ALREADY_REQUESTED_IN_ = "Este documento ya tiene solicitud de pago: ";
     
     public static final String EXC_ADV_NO_ADVANCES = "Este documento no tiene anticipos.";
@@ -346,6 +347,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
+     * Check if payment is indeed required and if the required payment definition is different from "not required".
+     * @return 
+     */
+    private boolean isPaymentRequired() {
+        return RequirePayment && RequiredPaymentDefinition != SSwapConsts.PAY_NOT_REQ;
+    }
+    
+    /**
      * Check if payment is requestable.
      * @return 
      */
@@ -362,8 +371,55 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return References != null && References.length > 0 && ReferencesType == refDocType;
     }
     
+    /**
+     * Check if supplier of document has advances.
+     * @return 
+     */
     public boolean hasAdvances() {
         return AuxAdvances != null && AuxAdvances.length > 0;
+    }
+    
+    /**
+     * Get advances data as a string.
+     * @param client
+     * @return 
+     */
+    public String getAdvancesAsString(final SGuiClient client) {
+        String string = "";
+        
+        if (hasAdvances()) {
+            string = "El proveedor " + BizPartner + " tiene "
+                    + (AuxAdvances.length == 1 ? "el siguiente anticipo" : "los siguientes " + SLibUtils.DecimalFormatInteger.format(AuxAdvances.length) + " anticiipos") + ", "
+                    + "al corte del " + SLibUtils.DateFormatDate.format(client.getSession().getSystemDate()) + ":";
+
+            for (int i = 0; i < AuxAdvances.length; i++) {
+                string += "\n" + (i + 1) + ") " + AuxAdvances[i].getAdvanceAsString();
+            }
+        }
+        
+        return string;
+    }
+    
+    /**
+     * Check suitability of business partner's advances on an upcomign payment request.
+     * Regarding business partner's advances, when these do not exist, go ahead, otherwise, ask for confirmation.
+     * @param client GUI client.
+     * @param validateDocumentIsRecorded Validate if document is already recorded.
+     * @return <code>true</code> only when payment is not requestable or there are not advances or user confirmed that these advances do not matter.
+     */
+    public boolean checkAdvancesOnUpcommingPaymentRequest(final SGuiClient client, final boolean validateDocumentIsRecorded) {
+        boolean check = true;
+        
+        if (isPaymentRequestable(validateDocumentIsRecorded)) {
+            if (hasAdvances()) {
+                String confirm = "Considere que:\n"
+                        + getAdvancesAsString(client) + "\n"
+                        + SGuiConsts.MSG_CNF_CONT;
+                check = client.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION;
+            }
+        }
+        
+        return check;
     }
     
     /**
@@ -403,34 +459,38 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return orderKey;
     }
     
+    /**
+     * Get payment request data as a string.
+     * @return 
+     */
     public String getPaymentRequestDataAsString() {
-        String data = "";
+        String string = "";
         
-        if (!RequirePayment) {
-            data += "¡No se solicitó pago!";
+        if (!isPaymentRequired()) {
+            string += "¡No se solicitó pago!";
         }
         
         if (!isPaymentRequestDataAvailable()) {
-            data += (!data.isEmpty() ? "; " : "");
+            string += (!string.isEmpty() ? "; " : "");
             
-            data += "¡No nay información disponible para solicitar pago!";
+            string += "¡No nay información disponible para solicitar pago!";
         }
         else {
-            data += (!data.isEmpty() ? "; " : "");
+            string += (!string.isEmpty() ? "; " : "");
             
             double amountEffective = getRequiredPaymentAmountEffective(null);
             
             if (amountEffective > 0) {
-                data += "monto solicitado de pago: $" + SLibUtils.getDecimalFormatAmount().format(amountEffective) + " " + CurrencyCode + "; ";
+                string += "monto solicitado de pago: $" + SLibUtils.getDecimalFormatAmount().format(amountEffective) + " " + CurrencyCode + "; ";
             }
             else {
-                data += "porcentaje solicitado de pago: $" + SLibUtils.DecimalFormatPercentage1D.format(getRequiredPaymentPct()) + "; ";
+                string += "porcentaje solicitado de pago: $" + SLibUtils.DecimalFormatPercentage1D.format(getRequiredPaymentPct()) + "; ";
             }
             
-            data += "fecha requerida de pago: " + SLibUtils.GuiDateFormat.format(getRequiredPaymentDateEffective()) + ".";
+            string += "fecha requerida de pago: " + SLibUtils.GuiDateFormat.format(getRequiredPaymentDateEffective()) + ".";
         }
         
-        return data;
+        return string;
     }
     
     /**
@@ -461,17 +521,17 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Create and save payment request.
      * @param session GUI session.
      * @param dps Linked DPS.
-     * @param validateIsProcessed Validate if document is already processed.
+     * @param validateDocumentIsRecorded Validate if document is already recorded.
      * @return
      * @throws Exception 
      */
-    private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateIsProcessed) throws Exception {
+    private SDbPayment createAndSavePaymentRequest(final SGuiSession session, final SThinDps dps, final boolean validateDocumentIsRecorded) throws Exception {
         SDbPayment payment = null;
         
-        if (RequiredPaymentDefinition == SSwapConsts.PAY_NOT_REQ) {
-            throw new Exception("Este documento carece de la indicación de requerir un pago.");
+        if (!isPaymentRequired()) {
+            throw new Exception(EXC_PAY_NOT_REQUIRED);
         }
-        else if (validateIsProcessed && !isRecorded()) {
+        else if (validateDocumentIsRecorded && !isRecorded()) {
             throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (dps == null) {
@@ -503,6 +563,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 boolean isAutoAuthReqPayReq = ConfigSettings.isAutoAuthReqPayReq(session.getUser().getPkUserId()); // check if payment request needs to be send to be authorized automatically
                 boolean isAutoAuthPayReq = ConfigSettings.isAutoAuthPayReq(ProcessingTypeId); // check if payment request will be authorized automatically
                 double exchangeRate = SDocumentUtils.getExchangeRate(session, CurrencyId, session.getCurrentDate()); // throws exception if exchange rate is unavailable
+                Date dateRequired = getRequiredPaymentDateEffective();
 
                 // create & prepare payment and its single one payment entry:
 
@@ -518,8 +579,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 payment.setSeries("");
                 payment.setNumber(0);
                 payment.setDateApplication(session.getCurrentDate());
-                payment.setDateRequired(getRequiredPaymentDateEffective());
-                payment.setDateSchedule_n(null);
+                payment.setDateRequired(dateRequired);
+                payment.setDateSchedule_n(isAutoAuthPayReq ? dateRequired : null);
                 payment.setDateExecution_n(null);
                 // ...
                 payment.setPaymentWay(DCfdi40Catalogs.FDP_POR_DEF);
@@ -673,7 +734,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             }
             else {
                 if (!ommitNumberValidation) {
-                    // validate folio of document
+                    // validate folio of document:
 
                     String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
@@ -800,7 +861,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                 SDbPayment payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
 
-                if (createPaymentRequest && RequirePayment && isPaymentRequestDataAvailable() && payment == null) {
+                if (createPaymentRequest && payment == null && isPaymentRequired() && isPaymentRequestDataAvailable()) {
                     payment = createAndSavePaymentRequest(session, dps, false);
                 }
 
@@ -819,8 +880,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
                 swapDataProcessing.setProcessingType(ProcessingTypeId);
                 
-                swapDataProcessing.setPaymentRequired(RequirePayment);
-                if (RequirePayment && isPaymentRequestDataAvailable()) {
+                swapDataProcessing.setPaymentRequired(isPaymentRequired());
+                if (isPaymentRequired() && isPaymentRequestDataAvailable()) {
                     swapDataProcessing.setPaymentApplicationCy(getRequiredPaymentAmountEffective(dps));
                     swapDataProcessing.setPaymentDateRequired_n(getRequiredPaymentDateEffective());
                 }
@@ -999,16 +1060,33 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Validate if a new payment request can be created.
+     * Check if payment is requestable.
+     * If needed, document needs to be recorded, then payment must not be already requested and payment is required and its data available.
+     * @param validateDocumentIsRecorded Validate if document is already recorded.
+     * @return 
+     */
+    public boolean isPaymentRequestable(final boolean validateDocumentIsRecorded) {
+        return (!validateDocumentIsRecorded || isRecorded()) &&
+                !isPaymentRequested() &&
+                isPaymentRequired() &&
+                isPaymentRequestDataAvailable();
+    }
+    
+    /**
+     * Validate if payment is requestable.
+     * If needed, document needs to be recorded, then payment must not be already requested and payment is required and its data available.
      * @return
      * @throws Exception 
      */
-    private boolean validatePaymentRequestCreation() throws Exception {
-        if (!isRecorded()) {
+    private boolean validatePaymentIsRequestable(final boolean validateDocumentIsRecorded) throws Exception {
+        if (validateDocumentIsRecorded && !isRecorded()) {
             throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (isPaymentRequested()) {
             throw new Exception(EXC_PAY_ALREADY_REQUESTED_IN_ + Payment.getFolio() + ", " + SLibUtils.DateFormatDate.format(Payment.getDateApplication()) + ".");
+        }
+        else if (!isPaymentRequired()) {
+            throw new Exception(EXC_PAY_NOT_REQUIRED);
         }
         else if (!isPaymentRequestDataAvailable()) {
             throw new Exception(EXC_PAY_NOT_REQUESTABLE);
@@ -1026,7 +1104,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public boolean requestPayment(final SGuiSession session) throws Exception {
         boolean requested = false;
         
-        if (validatePaymentRequestCreation()) {
+        if (validatePaymentIsRequestable(true)) {
             SThinDps dps = new SThinDps();
             dps.read(ProcessedDps.getDpsKey(), session.getStatement());
             
@@ -1044,16 +1122,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Validate if a new payment request can be created.
+     * Validate if the required payment date can be changed.
      * @return
      * @throws Exception 
      */
-    private boolean validateRequiredPaymentDateChanging() throws Exception {
+    private boolean validateRequiredPaymentDateIsChangeable() throws Exception {
         if (!isRecorded()) {
             throw new Exception(EXC_DOC_NOT_RECORDED);
         }
         else if (!isPaymentRequested()) {
-            throw new Exception(EXC_PAY_NOT_REQUESTED);
+            throw new Exception(EXC_PAY_NOT_REQUESTED_YET);
         }
         else if (!Payment.isExportable()) {
             throw new Exception("No se puede cambiar la fecha requerida de pago, el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "' o '" + SDbPayment.ST_SCHED + "'.");
@@ -1074,13 +1152,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         if (!isPaymentRequested()) {
             // payment request not yet created:
-            if (!isPaymentRequestDataAvailable()) {
+            if (!isPaymentRequired()) {
+                throw new Exception(EXC_PAY_NOT_REQUIRED);
+            }
+            else if (!isPaymentRequestDataAvailable()) {
                 throw new Exception(EXC_PAY_NOT_REQUESTABLE);
             }
         }
         else {
             // payment request already created:
-            validateRequiredPaymentDateChanging(); // thorws exception on validation failure
+            validateRequiredPaymentDateIsChangeable(); // thorws exception on validation failure
         }
 
         newDate = SDocumentUtils.pickDate(session, getRequiredPaymentDateEffective());
