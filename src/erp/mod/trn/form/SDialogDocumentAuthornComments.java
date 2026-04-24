@@ -4,7 +4,10 @@
  */
 package erp.mod.trn.form;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.client.SClientInterface;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STableColumnForm;
@@ -15,6 +18,7 @@ import erp.mod.SModConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.model.ActionHistory;
 import erp.mod.cfg.swap.model.FlowResponse;
+import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SRowDocumentAuthornComments;
@@ -25,9 +29,13 @@ import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
@@ -42,21 +50,51 @@ import sa.lib.gui.bean.SBeanFormDialog;
 import sa.lib.srv.SSrvConsts;
 
 /**
- *
+ * Diálogo que muestra el historial de autorización de documentos.
+ * 
+ * Esta clase es responsable de mostrar:
+ * - Información del documento (folio, tipo, quién lo subió y cuándo)
+ * - Información de aceptación del documento
+ * - Estado actual de la autorización
+ * - Información del usuario que autorizó y cuándo
+ * - Historial completo de movimientos/acciones en el flujo de autorización
+ * 
+ * Soporta múltiples tipos de recursos:
+ * - Órdenes de compra (TRN_DPS/PUR_ORDER)
+ * - Facturas de compra (PUR_INVOICE)
+ * - Pagos (PUR_PAYMENT)
+ * - Solicitudes de material (TRN_MAT_REQ)
+ * 
+ * Las fechas se convierten automáticamente a la zona horaria de México (America/Mexico_City).
+ * 
  * @author Isabel Servín, Edwin Carmona
+ * @version 2.0
  */
 public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     
+    /** Grid que muestra el historial de autorizaciones con detalles de cada paso */
     protected SGridPaneForm moGridLogs;
+    
+    /** Lista de filas de comentarios de autorización del documento */
     protected ArrayList<SRowDocumentAuthornComments> maRowsAuthComm;
+    
+    /** Panel de tabla para mostrar los comentarios de envío a autorización */
     private erp.lib.table.STablePaneGrid moPaneGrid;
+    
+    /** Definición de columnas de la tabla de comentarios */
     private erp.lib.table.STableColumnForm[] maoTableColumnsDps = null;
+    
+    /** Tipo de registro que se está visualizando (ej: TRN_DPS, TRN_MAT_REQ) */
     protected int mnRegistryType;
+    
+    /** Subtipo de registro que se está visualizando */
+    protected int[] mnRegistrySubType;
 
     /**
-     * Creates new form SDialogMaterialRequestLogsCardex
-     * @param client
-     * @param title
+     * Constructor del diálogo de autorización de documentos.
+     * 
+     * @param client Cliente de la interfaz gráfica
+     * @param title Título que se mostrará en la ventana del diálogo
      */
     public SDialogDocumentAuthornComments(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGX_AUTHORN_COMMENTS, SLibConsts.UNDEFINED, title);
@@ -74,9 +112,42 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
         jpDpsComents = new javax.swing.JPanel();
         jpAuthorizationRoute = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jlNumber1 = new javax.swing.JLabel();
+        moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel9 = new javax.swing.JPanel();
+        jlDocumentType = new javax.swing.JLabel();
+        moTextDocumentType = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jlNumber = new javax.swing.JLabel();
+        moTextUploadedBy = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel12 = new javax.swing.JPanel();
+        jlNumber2 = new javax.swing.JLabel();
+        moTextUploadedAt = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
+        jlNumber8 = new javax.swing.JLabel();
+        moTextAcceptedBy = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel23 = new javax.swing.JPanel();
+        jlNumber12 = new javax.swing.JLabel();
+        moTextAcceptedAt = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
+        moTextAuthzStatus = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel25 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
+        jlNumber9 = new javax.swing.JLabel();
+        moTextAuthorizedBy = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel24 = new javax.swing.JPanel();
+        jlNumber13 = new javax.swing.JLabel();
+        moTextAuthorizedAt = new sa.lib.gui.bean.SBeanFieldText();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Historial de autorización");
@@ -89,19 +160,152 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jpDpsComents.setBorder(javax.swing.BorderFactory.createTitledBorder("Comentarios al enviar recurso a autorizar:"));
-        jpDpsComents.setPreferredSize(new java.awt.Dimension(100, 150));
+        jpDpsComents.setPreferredSize(new java.awt.Dimension(100, 120));
         jpDpsComents.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpDpsComents, java.awt.BorderLayout.PAGE_START);
 
         jpAuthorizationRoute.setBorder(javax.swing.BorderFactory.createTitledBorder("Flujo de autorización:"));
-        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(710, 200));
+        jpAuthorizationRoute.setPreferredSize(new java.awt.Dimension(800, 200));
         jpAuthorizationRoute.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpAuthorizationRoute, java.awt.BorderLayout.WEST);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del documento"));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 5));
+
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber1.setText("Folio:");
+        jlNumber1.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel11.add(jlNumber1);
+
+        moTextNumber.setEditable(false);
+        jPanel11.add(moTextNumber);
+
+        jPanel4.add(jPanel11);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDocumentType.setText("Tipo doc:");
+        jlDocumentType.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel9.add(jlDocumentType);
+
+        moTextDocumentType.setEditable(false);
+        jPanel9.add(moTextDocumentType);
+
+        jPanel4.add(jPanel9);
+
+        jPanel6.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber.setText("Subido por:");
+        jlNumber.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel10.add(jlNumber);
+
+        moTextUploadedBy.setEditable(false);
+        moTextUploadedBy.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel10.add(moTextUploadedBy);
+
+        jPanel5.add(jPanel10);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber2.setText("Subido el:");
+        jlNumber2.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel12.add(jlNumber2);
+
+        moTextUploadedAt.setEditable(false);
+        moTextUploadedAt.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel12.add(moTextUploadedAt);
+
+        jPanel5.add(jPanel12);
+
+        jPanel6.add(jPanel5);
+
+        jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber8.setText("Acept. por:");
+        jlNumber8.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel19.add(jlNumber8);
+
+        moTextAcceptedBy.setEditable(false);
+        moTextAcceptedBy.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel19.add(moTextAcceptedBy);
+
+        jPanel7.add(jPanel19);
+
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber12.setText("Acept. el:");
+        jlNumber12.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel23.add(jlNumber12);
+
+        moTextAcceptedAt.setEditable(false);
+        moTextAcceptedAt.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel23.add(moTextAcceptedAt);
+
+        jPanel7.add(jPanel23);
+
+        jPanel6.add(jPanel7);
+
+        jPanel13.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moTextAuthzStatus.setEditable(false);
+        moTextAuthzStatus.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel21.add(moTextAuthzStatus);
+
+        jPanel13.add(jPanel21);
+
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel13.add(jPanel25);
+
+        jPanel6.add(jPanel13);
+
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber9.setText("Por:");
+        jlNumber9.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel20.add(jlNumber9);
+
+        moTextAuthorizedBy.setEditable(false);
+        moTextAuthorizedBy.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel20.add(moTextAuthorizedBy);
+
+        jPanel8.add(jPanel20);
+
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNumber13.setText("El:");
+        jlNumber13.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel24.add(jlNumber13);
+
+        moTextAuthorizedAt.setEditable(false);
+        moTextAuthorizedAt.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel24.add(moTextAuthorizedAt);
+
+        jPanel8.add(jPanel24);
+
+        jPanel6.add(jPanel8);
+
+        jPanel2.add(jPanel6);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -109,7 +313,11 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * Closes the dialog
+     * Cierra el diálogo cuando el usuario hace clic en el botón de cerrar.
+     * 
+     * Ejecuta la acción de guardar antes de cerrar.
+     * 
+     * @param evt Evento de cierre de ventana
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
        actionSave();
@@ -117,14 +325,55 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel jlDocumentType;
+    private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlNumber1;
+    private javax.swing.JLabel jlNumber12;
+    private javax.swing.JLabel jlNumber13;
+    private javax.swing.JLabel jlNumber2;
+    private javax.swing.JLabel jlNumber8;
+    private javax.swing.JLabel jlNumber9;
     private javax.swing.JPanel jpAuthorizationRoute;
     private javax.swing.JPanel jpDpsComents;
+    private sa.lib.gui.bean.SBeanFieldText moTextAcceptedAt;
+    private sa.lib.gui.bean.SBeanFieldText moTextAcceptedBy;
+    private sa.lib.gui.bean.SBeanFieldText moTextAuthorizedAt;
+    private sa.lib.gui.bean.SBeanFieldText moTextAuthorizedBy;
+    private sa.lib.gui.bean.SBeanFieldText moTextAuthzStatus;
+    private sa.lib.gui.bean.SBeanFieldText moTextDocumentType;
+    private sa.lib.gui.bean.SBeanFieldText moTextNumber;
+    private sa.lib.gui.bean.SBeanFieldText moTextUploadedAt;
+    private sa.lib.gui.bean.SBeanFieldText moTextUploadedBy;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Inicializa componentes personalizados después de la generación del GUI.
+     * 
+     * Configura:
+     * - La tabla de comentarios de envío a autorización
+     * - La tabla de historial de autorización con sus columnas
+     * - Propiedades de ventana y botones
+     */
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 720, 450);
+        SGuiUtils.setWindowBounds(this, 800, 500);
         
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
@@ -150,7 +399,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE_DATETIME, "Fecha movimiento"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Fecha movimiento"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nivel", 20));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_USR, "Usuario"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 380));
@@ -166,11 +415,135 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         jpAuthorizationRoute.add(moGridLogs, BorderLayout.CENTER);
     }
     
+    /**
+     * Establece los datos del encabezado del diálogo basado en la información del flujo de autorización.
+     * 
+     * Extrae y formatea la siguiente información del flujo:
+     * - Tipo de documento
+     * - Número/folio del documento
+     * - Usuario que subió el documento y fecha (convertida a zona horaria México)
+     * - Usuario que aceptó el documento y fecha
+     * - Estado actual de la autorización
+     * - Usuario que realizó la última acción de autorización y fecha
+     * 
+     * Todas las fechas se convierten a la zona horaria de México (America/Mexico_City).
+     * Si algún dato no está disponible, se muestra "NA".
+     * 
+     * @param oNode Nodo JSON con la información del recurso del flujo de autorización
+     * @param oFlow Objeto FlowResponse con la información del flujo de autorización
+     */
+    private void setHeaderData(JsonNode oNode, FlowResponse oFlow) {
+        try {
+            if (oNode != null && oFlow != null) {
+                // Obtener información del documento
+                String docType = oFlow.getResource().getResourceType().getName();
+                String docNum = oFlow.getResource().getCode();
+                moTextDocumentType.setValue(docType.toUpperCase());
+                moTextNumber.setValue(docNum);
+
+                // Obtener y formatear información de quien subió el documento
+                String uploadedBy = oNode.get("uploaded_by") != null && !oNode.get("uploaded_by").asText().equals("null") ? 
+                                                        oNode.get("uploaded_by").asText() : "NA";
+                String uploadedAt = oNode.get("uploaded_at") != null && !oNode.get("uploaded_at").asText().equals("null") ?
+                                                        oNode.get("uploaded_at").asText() : null;
+                moTextUploadedBy.setValue(uploadedBy.toUpperCase());
+                moTextUploadedAt.setValue(formatDatetime(uploadedAt));
+
+                // Obtener y formatear información de aceptación del documento
+                String acceptedBy = oNode.get("accepted_by") != null && !oNode.get("accepted_by").asText().equals("null") ? 
+                                                        oNode.get("accepted_by").asText() : "NA";
+                String acceptedAt = oNode.get("accepted_at") != null && !oNode.get("accepted_at").asText().equals("null") ?
+                                                        oNode.get("accepted_at").asText() : null;
+                moTextAcceptedBy.setValue(acceptedBy.toUpperCase());
+                moTextAcceptedAt.setValue(formatDatetime(acceptedAt));
+
+                // Obtener información de la acción actual en el flujo
+                JsonNode oFlowHistory = oNode.get("flow_history");
+                JsonNode oCurrentAction = oFlowHistory.get("current_action");
+                JsonNode oStatus = oFlowHistory.get("status");
+
+                // Obtener y formatear estado actual de autorización
+                String sAuthzStatus = oStatus.get("name").asText();
+                moTextAuthzStatus.setValue(sAuthzStatus.toUpperCase());
+                // {"id":17565,"sequence":1,"flow_status":{"id":1,"code":"PND","name":"PENDIENTE"},"notes":"","actioned_at":null,"actioned_by":null,"all_actors":[{"full_name":"EDGAR BARRON","external_id":17}],"created_at":"2026-04-01T16:49:20.968019Z"}
+
+                String authorizedBy = "NA";
+                if (oStatus.get("id").asInt() == SSwapConsts.AUTHZ_STATUS_IN_PROGRESS) {
+                    // Si el estatus es "En progreso", mostrar el usuario que realizó la última acción
+                    authorizedBy = oCurrentAction.get("all_actors") != null && oCurrentAction.get("all_actors").isArray() && oCurrentAction.get("all_actors").size() > 0 ?
+                                                            oCurrentAction.get("all_actors").get(0).get("full_name").asText() : "NA";
+                }
+                else {
+                    authorizedBy = oCurrentAction.get("actioned_by") != null && oCurrentAction.get("actioned_by").get("full_name") != null ? 
+                                                            oCurrentAction.get("actioned_by").get("full_name").asText() : "NA";
+                }
+
+
+                // Obtener y formatear información de quien realizó la última acción de autorización
+                String authorizedAt = oCurrentAction.get("actioned_at") != null && !oCurrentAction.get("actioned_at").asText().equals("null") ?
+                                                        oCurrentAction.get("actioned_at").asText() : null;
+                moTextAuthorizedBy.setValue(authorizedBy.toUpperCase());
+                moTextAuthorizedAt.setValue(formatDatetime(authorizedAt));
+            }
+            else {
+                // Si no hay datos disponibles, mostrar NA en todos los campos
+                moTextDocumentType.setValue("NA");
+                moTextNumber.setValue("NA");
+                moTextUploadedBy.setValue("NA");
+                moTextUploadedAt.setValue("NA");
+                moTextAcceptedBy.setValue("NA");
+                moTextAcceptedAt.setValue("NA");
+                moTextAuthzStatus.setValue("NA");
+                moTextAuthorizedBy.setValue("NA");
+                moTextAuthorizedAt.setValue("NA");
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SDialogDocumentAuthornComments.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    // Función para formatear fecha UTC a zona horaria de México
+    private String formatDatetime(String fechaUTC) {
+        if (fechaUTC == null || fechaUTC.equals("null")) {
+            return "NA";
+        }
+
+        try {
+            OffsetDateTime utcDateTime = OffsetDateTime.parse(fechaUTC);
+            ZonedDateTime mxDateTime = utcDateTime.atZoneSameInstant(ZoneId.of("America/Mexico_City"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            return mxDateTime.format(formatter);
+        } catch (Exception e) {
+            return "NA";
+        }
+    }
+    
+    /**
+     * Procesa una solicitud de material y obtiene el documento DPS asociado.
+     * 
+     * Busca en la base de datos el documento de orden de compra (DPS) asociado
+     * a la solicitud de material especificada y luego llama a readAuthComments
+     * para obtener el historial de autorización.
+     * 
+     * @param matId ID de la solicitud de material a procesar
+     */
     private void processMatReq(int matId) {
         try {
-            String sql = "SELECT DISTINCT fid_dps_year, fid_dps_doc FROM trn_dps_mat_req WHERE fid_mat_req = " + matId;
+            String sql = "SELECT DISTINCT fid_dps_year, fid_dps_doc "
+                    + "FROM trn_dps_mat_req AS dm "
+                    + "INNER JOIN trn_dps AS d ON dm.fid_dps_year = d.id_year AND "
+                        + "dm.fid_dps_doc = d.id_doc "
+                    + "WHERE fid_mat_req = " + matId + " "
+                    + "AND fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                    + "AND fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                    + "AND fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                    + "LIMIT 1;";
             ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resultSet.next()) {
+                mnRegistryType = SModConsts.TRN_DPS;
+                mnRegistrySubType = SDataConstantsSys.TRNU_TP_DPS_PUR_ORD;
                 readAuthComments(new int[] { resultSet.getInt(1), resultSet.getInt(2) });
             }
         }
@@ -179,6 +552,14 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         }
     }
     
+    /**
+     * Lee los comentarios de autorización desde la tabla de envíos de autorización (trn_dps_authorn).
+     * 
+     * Consulta la base de datos para obtener todos los comentarios realizados cuando
+     * el documento fue enviado a autorización, mostrándolos en la tabla de comentarios.
+     * 
+     * @param dpsPk Array con [año del DPS, número del DPS]
+     */
     @SuppressWarnings("unchecked")
     private void readSendsAuthAppWeb(int[] dpsPk) {
         int i;
@@ -190,8 +571,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         try {
             moPaneGrid.clearTable();
 
-            // DPS links:
-
+            // Consultar comentarios de envío a autorización del documento DPS
             sSql = "SELECT tda.id_authorn, tda.ts_new, u.usr, IF(tda.nts = '', 'SIN COMENTARIOS', tda.nts) nts "
                     + "FROM trn_dps_authorn AS tda "
                     + "INNER JOIN erp.usru_usr AS u ON tda.fid_usr_new = u.id_usr "
@@ -212,10 +592,12 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
                 vData = (Vector<Vector<Object>>) oResponse.getPacket();
 
+                // Procesar filas de datos y agregarlas a la tabla
                 for (Vector<Object> data : vData) {
                     STableRowCustom row = new STableRowCustom();
 
-                    for (i = 1; i < data.size(); i++) {     // index 0 is descarted, used only for ordering purpouses
+                    // Omitir el índice 0 que se usa solo para ordenamiento
+                    for (i = 1; i < data.size(); i++) {
                         row.getValues().add(data.get(i));
                     }
 
@@ -230,41 +612,104 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         }
     }
     
-    private void readAuthComments(int[] dpsPk) {
+    /**
+     * Lee el historial de comentarios y autorizaciones del recurso.
+     * 
+     * Determina el tipo de recurso (DPS, Orden de compra, Factura, Pago, etc.) y obtiene
+     * el historial de autorizaciones correspondiente. Soporta dos fuentes de datos:
+     * 1. Flujo de autorización web (Google Auth Steps) - datos JSON del sistema SWAP
+     * 2. Base de datos local - tabla cfgu_authorn_step (autorización tradicional)
+     * 
+     * Los datos del flujo de autorización se convierten a objetos SRowDocumentAuthornComments
+     * y se almacenan en maRowsAuthComm para ser mostrados en el grid.
+     * 
+     * @param resourcePk Array con la clave primaria del recurso (estructura varía según tipo)
+     */
+    private void readAuthComments(int[] resourcePk) {
         try {
             boolean hasGoogleAuthSteps = false;
-            if (mnRegistryType == SModConsts.TRN_DPS) {
-                readSendsAuthAppWeb(dpsPk);
-                // Primero consultar si el documento tiene movimientos de autorización tipo DPS_GOOGLE:
-                hasGoogleAuthSteps = SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS , dpsPk);
+            int resourceType = 0;
+            String idResource = "";
+            // Determinar tipo de recurso y configurar parámetros para obtener el historial
+            switch (mnRegistryType) {
+                case SModConsts.TRN_DPS:
+                    // Para documentos DPS locales
+                    readSendsAuthAppWeb(resourcePk);
+                    resourceType = SSwapConsts.RESOURCE_TYPE_PUR_ORDER;
+                    hasGoogleAuthSteps = SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS, resourcePk);
+                    idResource = resourcePk[0] + "_" + resourcePk[1];
+                    break;
+                
+                case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+                    // Para órdenes de compra e facturas desde SWAP
+                    resourceType = mnRegistryType;
+                    idResource = resourcePk[0] + "_" + resourcePk[1];
+                    hasGoogleAuthSteps = true;
+                    break;
+                    
+                case SSwapConsts.RESOURCE_TYPE_PUR_INVOICE:
+                    resourceType = mnRegistryType;
+                    idResource = "" + resourcePk[0];
+                    hasGoogleAuthSteps = true;
+                    break;
+                    
+                case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+                    // Para pagos desde SWAP
+                    resourceType = mnRegistryType;
+                    idResource = "" + resourcePk[0];
+                    hasGoogleAuthSteps = true;
+                    break;
+                default:
+                    break;
             }
             
+            // Obtener datos del flujo de autorización desde SWAP
             if (hasGoogleAuthSteps) {
-                FlowResponse oFlow = SAuthDBUtils.fetchFlowHistoryFromMsAuth(miClient.getSession(), 
-                                                                        SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS,
-                                                                        dpsPk[0] + "_" + dpsPk[1],
-                                                                        miClient.getSession().getConfigCompany().getCompanyId());
+                ObjectMapper mapper = new ObjectMapper();
                 
+                // Obtener datos del recurso desde la base de datos de gestión de autorizaciones
+                JsonNode oNode = SAuthDBUtils.getResourceManagmentData(miClient.getSession(), 
+                                                                    resourceType, 
+                                                                    idResource, 
+                                                                    miClient.getSession().getConfigCompany().getCompanyId());
+                if (oNode == null) {
+                    miClient.showMsgBoxWarning("No hay información de autorización para este registro");
+                    setHeaderData(null, null);
+                    return;
+                }
+                JsonNode oFlowHistoryNode = oNode.get("flow_history");
+                FlowResponse oFlow = mapper.treeToValue(oFlowHistoryNode.get("flow"), FlowResponse.class);
+                
+                // Establecer datos del encabezado
+                setHeaderData(oNode, oFlow);
+                
+                // Procesar cada acción/paso en el historial del flujo
                 for (ActionHistory oAction : oFlow.getActionsHistory()) {
+                    // Crear una fila con los datos de la acción
                     SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
+                    
+                    // Convertir fecha a zona horaria de México si existe
                     if (oAction.getActionedAt() != null) {
-                        OffsetDateTime offsetDateTime = OffsetDateTime.parse(oAction.getActionedAt());
-                        Date oDate = Date.from(offsetDateTime.toInstant());
-                        row.setDateMov(oDate);
+                        row.setDateMov(formatDatetime(oAction.getActionedAt()));
                     }
                     else {
                         row.setDateMov(null);
                     }
+                    
+                    // Llenar datos de la fila
                     row.setNum(oAction.getSequence() + "");
                     row.setUserStep(oAction.getActorName());
                     row.setComments(oAction.getNotes());
                     row.setAuthorn(oAction.getFlowStatus().getId() == SSwapConsts.AUTHZ_STATUS_OK);
                     row.setReject(oAction.getFlowStatus().getId() == SSwapConsts.AUTHZ_STATUS_REJECTED);
                     row.setDeleted(!oAction.getIsCurrent());
+                    row.setUserAuth(oAction.getActorName());
+
                     maRowsAuthComm.add(row);
                 }
             }
             else {
+                // Si no hay pasos de autorización en SWAP, consultar la base de datos local
                 Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
                 String sql = "SELECT * FROM( " +
                         "SELECT " +
@@ -282,14 +727,15 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
                         "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
                         "WHERE s.res_tab_name_n = 'trn_dps' "
                         + "AND s.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " " +
-                        "AND s.res_pk_n1_n = " + dpsPk[0] + " AND s.res_pk_n2_n = " + dpsPk[1] + " " +
+                        "AND s.res_pk_n1_n = " + resourcePk[0] + " AND s.res_pk_n2_n = " + resourcePk[1] + " " +
                         ") AS a " +
                         "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
-                        
+                // Ejecutar consulta y procesar resultados                
                 ResultSet resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
+                    // Mapear datos del resultado de la consulta a la fila
                     SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
-                    row.setDateMov(resultSet.getTimestamp("dt_mov"));
+                    row.setDateMov(formatDatetime(resultSet.getString("dt_mov")));
                     row.setNum(resultSet.getString("s.lev"));
                     row.setUserStep(resultSet.getString("usr_step"));
                     row.setComments(resultSet.getString("comments"));
@@ -306,6 +752,13 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         }
     }
     
+    /**
+     * Muestra las filas de comentarios de autorización en el grid.
+     * 
+     * Convierte la lista de SRowDocumentAuthornComments en un Vector de SGridRow
+     * y las carga en el grid de historial de autorizaciones. Luego selecciona la
+     * primera fila.
+     */
     private void showRows() {
         Vector<SGridRow> rows = new Vector<>();
 
@@ -320,18 +773,22 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
     
     @Override
     public void addAllListeners() {
+        // Implementación no requerida para este diálogo
     }
 
     @Override
     public void removeAllListeners() {
+        // Implementación no requerida para este diálogo
     }
 
     @Override
     public void reloadCatalogues() {
+        // Implementación no requerida para este diálogo
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        // Implementación no requerida para este diálogo
     }
 
     @Override
@@ -339,6 +796,11 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Valida los campos del formulario.
+     * 
+     * @return Objeto SGuiValidation con los resultados de la validación
+     */
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
@@ -346,6 +808,19 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
         return validation;
     }
 
+    /**
+     * Establece el tipo de recurso y su clave primaria para cargar el historial de autorización.
+     * 
+     * Soporta varios tipos de recursos:
+     * - SModConsts.TRN_MAT_REQ: Solicitud de material (value = int)
+     * - SModConsts.TRN_DPS: Documento de compra local (value = int[])
+     * - SSwapConsts.RESOURCE_TYPE_PUR_ORDER: Orden de compra SWAP (value = int[])
+     * - SSwapConsts.RESOURCE_TYPE_PUR_INVOICE: Factura de compra SWAP (value = int[])
+     * - SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT: Pago SWAP (value = int[])
+     * 
+     * @param type Tipo de recurso
+     * @param value Clave primaria del recurso (int o int[] según tipo)
+     */
     @Override
     public void setValue(final int type, final Object value) {
         maRowsAuthComm = new ArrayList<>();
@@ -357,10 +832,40 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
             case SModConsts.TRN_DPS:
                 readAuthComments((int[]) value);
                 break;
+            case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+            case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+                readAuthComments((int[]) value);
+                break;
+            case SSwapConsts.RESOURCE_TYPE_PUR_INVOICE:
+                try {
+                    String invoiceId = SExportUtils.getExtDataId((SClientInterface) miClient, 
+                                                                ((int[]) value)[0], 
+                                                                ((int[]) value)[1]);
+                    if (invoiceId == null) {
+                        miClient.showMsgBoxWarning("No hay información de autorización para este registro");
+                        setHeaderData(null, null);
+                        return;
+                    }
+                    readAuthComments(new int[] { Integer.parseInt(invoiceId) });
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SDialogDocumentAuthornComments.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException("Tipo de recurso no soportado.");
+
         }
+
         showRows();
     }
 
+    /**
+     * Obtiene el valor del registro (no implementado).
+     * 
+     * @param type Tipo de registro a obtener
+     * @return Siempre retorna un objeto vacío
+     */
     @Override
     public Object getValue(final int type) {
         return new Object();

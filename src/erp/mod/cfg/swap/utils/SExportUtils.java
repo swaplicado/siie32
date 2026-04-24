@@ -1462,16 +1462,16 @@ public abstract class SExportUtils {
     
     public static String getExtDataId(SClientInterface miClient, int year, int doc) throws Exception {
         String extDataId = null;
-        
-        String sql = "SELECT ext_data_id " +
-                     "FROM TRN_SWAP_DATA_PRC " +
-                     "WHERE fk_dps_year_n = " + year + " " +
-                     "AND fk_dps_doc_n = " + doc + " " +
-                     "AND b_del = 0 " + 
-                     "LIMIT 1";
+
+        String sql = "SELECT ext_data_id "
+                + "FROM TRN_SWAP_DATA_PRC "
+                + "WHERE fk_dps_year_n = " + year + " "
+                + "AND fk_dps_doc_n = " + doc + " "
+                + "AND b_del = 0 "
+                + "LIMIT 1";
 
         try (Statement stmt = miClient.getSession().getStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             if (rs.next()) {
                 extDataId = rs.getString("ext_data_id");

@@ -27,6 +27,7 @@ import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.hrs.utils.SDocUtils;
+import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.view.SViewFilter;
 import erp.mtrn.view.SViewDps;
 import erp.musr.data.SDataUser.Right;
@@ -89,6 +90,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private JButton jbAuthWebLoadSupportFiles;
     private JButton jbAuthWebStartAuth;
     private JButton jbAuthWebViewAuthLog;
+    private JButton jbAuthWebViewAuthComments;
     private JButton jbAuthWebDownloadSupportFiles;
     private JButton jbAuthWebClearSupportFiles;
     private JButton jbAuthWebAnnullAuth;
@@ -104,6 +106,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private JFileChooser moAuthWebFileChooser;
     private SDialogPaymentChangeStatus moDialogPaymentChangeStatus;
+    private SDialogDocumentAuthornComments moDialogAuthComments;
 
     public SViewPayment(SGuiClient client, int subType, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_PAY, subType, title);
@@ -169,6 +172,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 "Iniciar autorización de la solicitud en app web", this);
         jbAuthWebViewAuthLog = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")),
                 "Ver estatus de autorización de la solicitud en app web", this);
+        jbAuthWebViewAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")),
+                "Ver historial de autorización de la orden en app web", this);
         jbAuthWebDownloadSupportFiles = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")),
                 "Descargar archivos de soporte de la solicitud", this);
         jbAuthWebClearSupportFiles = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")),
@@ -199,6 +204,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         jbAuthWebLoadSupportFiles.setEnabled(false);
         jbAuthWebStartAuth.setEnabled(false);
         jbAuthWebViewAuthLog.setEnabled(false);
+        jbAuthWebViewAuthComments.setEnabled(false);
         jbAuthWebDownloadSupportFiles.setEnabled(false);
         jbAuthWebClearSupportFiles.setEnabled(false);
         jbAuthWebAnnullAuth.setEnabled(false);
@@ -236,6 +242,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     jbDocShowDocPdf.setEnabled(true);
                     jbDocGetDocPdf.setEnabled(true);
                     jbAuthWebViewAuthLog.setEnabled(true);
+                    jbAuthWebViewAuthComments.setEnabled(true);
                     jbExportDataToSwapServices.setEnabled(true);
                     break;
             
@@ -276,6 +283,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebLoadSupportFiles);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebStartAuth);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebDownloadSupportFiles);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebClearSupportFiles);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebAnnullAuth);
@@ -286,6 +294,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 
             case SModSysConsts.FINS_ST_PAY_IN_AUTH:
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebAnnullAuth);
                 break;
                 
@@ -293,6 +302,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 jbPaymentReschedule.setToolTipText("Cambiar fecha requerida");
 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentCancel);
                 
@@ -304,6 +314,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 jbPaymentReschedule.setToolTipText("Cambiar fecha programada");
 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentReschedule);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentChangeCurrency);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentMarkAsPaid);
@@ -327,6 +338,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 
             case SModSysConsts.FINX_ALL_PAYMENTS:
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+                getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JLabel());
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
                 break;
@@ -334,6 +346,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
+        
+        moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, 
+                                                                "Comentarios de autorización en app web");
     }
     
     private int[] getDocKeyOfSelectedPayment() throws Exception {
@@ -474,6 +489,19 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     SLibUtils.showException(this, e);
                 }
             }
+        }
+    }
+    
+    private void actionAuthWebViewAuthComments() {
+        try {
+            if (jbAuthWebViewAuthComments.isEnabled() && isRowDataSelected() && moDialogAuthComments != null) {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                moDialogAuthComments.setValue(SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, gridRow.getRowPrimaryKey());
+                moDialogAuthComments.setVisible(true);
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
         }
     }
     
@@ -1237,6 +1265,9 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             }
             else if (button == jbAuthWebViewAuthLog) {
                 actionAuthWebViewAuthLog();
+            }
+            else if (button == jbAuthWebViewAuthComments) {
+                actionAuthWebViewAuthComments();
             }
             else if (button == jbAuthWebDownloadSupportFiles) {
                 actionAuthWebDownloadSupportFiles();

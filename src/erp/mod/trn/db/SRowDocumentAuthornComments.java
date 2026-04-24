@@ -5,7 +5,6 @@
  */
 package erp.mod.trn.db;
 
-import java.util.Date;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -15,7 +14,7 @@ import sa.lib.grid.SGridRow;
 public class SRowDocumentAuthornComments implements SGridRow {
 
     private boolean mbDeleted;
-    private Date mtDateMov;
+    private String msDateMov;
     private String msNum;
     private String msUserStep;
     private String msComments;
@@ -24,7 +23,7 @@ public class SRowDocumentAuthornComments implements SGridRow {
     private String msUserAuth;
     
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setDateMov(Date t) { mtDateMov = t; }
+    public void setDateMov(String s) { msDateMov = s; }
     public void setNum(String s) { msNum = s; }
     public void setUserStep(String s) { msUserStep = s; }
     public void setComments(String s) { msComments = s; }
@@ -72,7 +71,7 @@ public class SRowDocumentAuthornComments implements SGridRow {
         Object value = null;
         
         switch (col) {
-            case 0: value = mtDateMov; break;
+            case 0: value = msDateMov; break;
             case 1: value = msNum; break;
             case 2: value = msUserStep; break;
             case 3: value = msComments; break;
