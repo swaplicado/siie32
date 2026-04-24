@@ -1,8 +1,15 @@
 ================================================================================
+SIIE 3.2 299.12/ 2026-04-24
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de la descarga masiva de archivos de facturas importadas desde SWAP Services, para hacerlo en lotes de cierto número predeterminado de documentos. Provisionalmente son 100 los documentos procesados en cada bloque.
+2) Inclusión del dato naturaleza del documento en la exportación a SWAP Services de pedidos de compras (OC) y referencias de pedidos de compras (OC).
+
+================================================================================
 SIIE 3.2 299.11/ 2026-04-24
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Se agrega botón de consulta de flujo de autorización en vista de facturas de compras y pagos
+1) Se agrega botón de consulta de flujo de autorización en vista de facturas de compras y pagos.
 
 ================================================================================
 SIIE 3.2 299.10/ 2026-04-22
