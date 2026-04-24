@@ -78,8 +78,9 @@ public abstract class SImportUtils {
     public static final int DOC_TYPE_INVOICE = 41;
     public static final int DOC_TYPE_PROFORMA = 52;
     
-    private static final String DOWNLOAD_FILE_INVOICE_PREFIX = "facturas compras "; // keep final blank space!
-    private static final String DOWNLOAD_FILE_PROFORMA_PREFIX = "proformas compras "; // keep final blank space!
+    private static final String FILE_PREFIX_INVOICES = "facturas compras";
+    private static final String FILE_PREFIX_PROFORMAS = "proformas compras";
+    private static final String FILE_PREFIX_RECEIPT_PAYMENTS = "CRP compras";
     private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
     
     public static final int DOC_FILES_ZIP_IDX = 0;
@@ -569,6 +570,56 @@ public abstract class SImportUtils {
         return documents;
     }
     
+    private static String getFilePrefix(final int documentType) {
+        String prefix = "";
+        
+        switch (documentType) {
+            case SSwapConsts.TXN_DOC_TYPE_INVOICE:
+                prefix = FILE_PREFIX_INVOICES + " ";
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_PROFORMA:
+                prefix = FILE_PREFIX_PROFORMAS + " ";
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT:
+                prefix = FILE_PREFIX_RECEIPT_PAYMENTS + " ";
+                break;
+            default:
+                // nothing
+        }
+        
+        return prefix;
+    }
+    
+    /**
+     * Choose download ZIP file.
+     * @param session GUI session.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return 
+     */
+    public static File chooseDownloadZipFile(final SGuiSession session, final int documentType) {
+        File zipFile = null;
+        String prefix = getFilePrefix(documentType);
+        String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
+        JFileChooser fileChooser = session.getClient().getFileChooser();
+        fileChooser.repaint();
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(filter);
+        fileChooser.setSelectedFile(new File(prefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+
+        if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
+            zipFile = fileChooser.getSelectedFile();
+
+            // ensure file ends with ".zip":
+            if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.zip)) {
+                zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.zip);
+            }
+        }
+        
+        return zipFile;
+    }
+    
     /**
      * Download documents files.
      * @param session GUI session.
@@ -576,10 +627,12 @@ public abstract class SImportUtils {
      * @param downloadMode Download mode.
      * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
+     * @param zipBatch Current batch number when downloading several documents as ZIP in a loop, can be zero. When greater than zero, this batch nomber is added to the name of the desired file, when it is available.
      * @return 
      * @throws java.lang.Exception 
      */
-    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
         File[] files = null;
         File zipFile = null;
         Path tempDir = null;
@@ -632,32 +685,33 @@ public abstract class SImportUtils {
 
             // choose download ZIP file:
             
-            String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
-            
             switch (downloadMode) {
                 case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
                     // ask for desired ZIP file:
                     
-                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
-                    JFileChooser fileChooser = session.getClient().getFileChooser();
-                    fileChooser.repaint();
-                    fileChooser.setAcceptAllFileFilterUsed(false);
-                    fileChooser.setFileFilter(filter);
+                    if (desiredZipFile != null) {
+                        zipFile = desiredZipFile;
+                    }
+                    else {
+                        zipFile = chooseDownloadZipFile(session, documentType);
+                    }
                     
-                    if (documentType == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
-                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_INVOICE_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
-                    }
-                    else if (documentType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
-                        fileChooser.setSelectedFile(new File(DOWNLOAD_FILE_PROFORMA_PREFIX + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
-                    }
-
-                    if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
-                        zipFile = fileChooser.getSelectedFile();
-
-                        // Ensure file ends with ".zip"
-                        if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.zip)) {
-                            zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.zip);
+                    if (zipFile != null && desiredZipFile != null && zipBatch > 0) {
+                        // add batch number to desired ZIP file:
+                        
+                        // lower case absolute path to find ZIP extension:
+                        String absolutePath = zipFile.getAbsolutePath().toLowerCase();
+                        
+                        // set absolute path in original case:
+                        if (absolutePath.endsWith("." + SFileUtilities.zip)) {
+                            absolutePath = zipFile.getAbsolutePath().substring(0, absolutePath.lastIndexOf("." + SFileUtilities.zip));
                         }
+                        else {
+                            absolutePath = zipFile.getAbsolutePath();
+                        }
+                        
+                        // add batch number to file name:
+                        zipFile = new File(absolutePath += " (" + (zipBatch < 10 ? "0" : "") + zipBatch + ")." + SFileUtilities.zip);
                     }
                     break;
                     
@@ -665,15 +719,13 @@ public abstract class SImportUtils {
                 case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
                     // set ZIP file in temporal directory:
                     
+                    String prefix = getFilePrefix(documentType);
+                    String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+                    
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
                     System.out.println("Temporary directory created at: " + tempDir);
                     
-                    if (documentType == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
-                        tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_INVOICE_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
-                    }
-                    else if (documentType == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
-                        tempFile = Files.createFile(tempDir.resolve((DOWNLOAD_FILE_PROFORMA_PREFIX + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
-                    }
+                    tempFile = Files.createFile(tempDir.resolve((prefix + " " + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
                     
                     zipFile = tempFile.toFile();
                     break;
@@ -844,11 +896,26 @@ public abstract class SImportUtils {
      * @param serviceUrl Download service URL.
      * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
+     * @param zipBatch Current batch number when downloading several documents as ZIP in a loop, can be zero. When greater than zero, this batch nomber is added to the name of the desired file, when it is available.
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, desiredZipFile, zipBatch);
+    }
+
+    /**
+     * Download documents' all files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
     public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, null, 0);
     }
 
     /**
@@ -863,7 +930,7 @@ public abstract class SImportUtils {
     public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
         documents.add(documentExternalId);
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
     }
     
     /**
@@ -878,7 +945,7 @@ public abstract class SImportUtils {
     public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
         documents.add(documentExternalId);
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
     }
     
     /**

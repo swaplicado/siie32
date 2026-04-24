@@ -48,14 +48,19 @@ public class SExportDataDps implements SExportData {
     public int partner;
     
     /**
-     * ID del socio de negocios en el sistema externo.
+     * Serie del folio del documento.
      */
     public String series;
     
     /**
-     * ID del socio de negocios en el sistema externo.
+     * Número del folio del documento.
      */
     public int number;
+    
+    /**
+     * Naturaleza del documento.
+     */
+    public String nature;
     
     /**
      * Código de moneda (ISO 4217) del monto del documento.

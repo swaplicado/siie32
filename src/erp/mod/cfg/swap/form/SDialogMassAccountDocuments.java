@@ -31,6 +31,7 @@ import erp.mod.cfg.swap.utils.SServicesUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SThinDps;
+import erp.mtrn.view.SViewDps;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -695,12 +696,14 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
         jtfBolGoodCode.setEditable(false);
         jtfBolGoodCode.setText("00000000");
+        jtfBolGoodCode.setToolTipText("Clave ProdServ");
         jtfBolGoodCode.setFocusable(false);
         jtfBolGoodCode.setPreferredSize(new java.awt.Dimension(65, 23));
         jpBol4.add(jtfBolGoodCode);
 
         jtfBolGoodDescrip.setEditable(false);
         jtfBolGoodDescrip.setText("TEXT");
+        jtfBolGoodDescrip.setToolTipText("Descripción ProdServ");
         jtfBolGoodDescrip.setFocusable(false);
         jtfBolGoodDescrip.setPreferredSize(new java.awt.Dimension(130, 23));
         jpBol4.add(jtfBolGoodDescrip);
@@ -712,12 +715,14 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
         jtfBolGoodUnitCode.setEditable(false);
         jtfBolGoodUnitCode.setText("TEXT");
+        jtfBolGoodUnitCode.setToolTipText("Clave Unidad");
         jtfBolGoodUnitCode.setFocusable(false);
         jtfBolGoodUnitCode.setPreferredSize(new java.awt.Dimension(35, 23));
         jpBol4.add(jtfBolGoodUnitCode);
 
         jtfBolGoodUnitDescrip.setEditable(false);
         jtfBolGoodUnitDescrip.setText("TEXT");
+        jtfBolGoodUnitDescrip.setToolTipText("Nombre Unidad");
         jtfBolGoodUnitDescrip.setFocusable(false);
         jtfBolGoodUnitDescrip.setPreferredSize(new java.awt.Dimension(75, 23));
         jpBol4.add(jtfBolGoodUnitDescrip);
@@ -781,7 +786,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jpAccounting.add(jtfAccCostCenter);
 
         jbAccShowParsingErrorOrWarning.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
-        jbAccShowParsingErrorOrWarning.setToolTipText("Ver advertencia...");
+        jbAccShowParsingErrorOrWarning.setToolTipText("Ver error o advertencia...");
         jbAccShowParsingErrorOrWarning.setPreferredSize(new java.awt.Dimension(23, 23));
         jpAccounting.add(jbAccShowParsingErrorOrWarning);
 
@@ -1356,10 +1361,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave ProdServ")); // col 0
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Descripción ProdServ", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Clave Unidad"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Unidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Nombre Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Valor Unitario")); // col 5
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Importe"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Objeto Impuesto"));
@@ -1735,7 +1740,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         }
     }
     
-    private void processRecordingDocs(int docsToRecord, final SProgressCallback callback) {
+    private void backgroundProcessForRecordingDocs(int docsToRecord, final SProgressCallback callback) {
         try {
             mbDocumentsBeingProcessed = true;
 
@@ -2028,15 +2033,23 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
             else {
                 SMassAccountDocument document = (SMassAccountDocument) row;
-                File pdf = document.ImportedDocument.retrievePdf(miClient.getSession(), moSettings.SyncUrlDownload);
                 
-                if (pdf != null) {
-                    if (moDialogPdfViewer == null) {
-                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                if (moDialogPdfViewer == null) {
+                    moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                }
+                
+                if (document.ImportedDocument.isRecorded()) {
+                    // if document is recorded, prefer PDF stored in ERP:
+                    SViewDps.showDocPdf((SClientInterface) miClient, document.ImportedDocument.ProcessedDps.getDpsKey(), moDialogPdfViewer);
+                }
+                else {
+                    // retrieve PDF from SWAP Services:
+                    File pdf = document.ImportedDocument.retrievePdf(miClient.getSession(), moSettings.SyncUrlDownload);
+                    
+                    if (pdf != null) {
+                        moDialogPdfViewer.setPdf(new SDocumentInfo(document.ImportedDocument), pdf);
+                        moDialogPdfViewer.setVisible(true);
                     }
-
-                    moDialogPdfViewer.setPdf(new SDocumentInfo(document.ImportedDocument), pdf);
-                    moDialogPdfViewer.setVisible(true);
                 }
             }
         }
@@ -2329,7 +2342,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
                         @Override
                         protected Void doInBackground() throws Exception {
-                            processRecordingDocs(docs, progress -> {
+                            backgroundProcessForRecordingDocs(docs, progress -> {
                                 publish(progress);
                             });
                             return null;

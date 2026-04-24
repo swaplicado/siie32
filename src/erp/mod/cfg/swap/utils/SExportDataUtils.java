@@ -1192,10 +1192,10 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT "
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
-                        + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, "
+                        + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, nat.dps_nat, "
                         + "COALESCE(d.acc_tag, '') AS _acc_tag, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
-                        + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
+                        + "IF(d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " "
@@ -1225,6 +1225,7 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = d.fid_cur "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS nat ON nat.id_dps_nat = d.fid_dps_nat "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
                         + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
                         + "WHERE "
@@ -1264,6 +1265,7 @@ public abstract class SExportDataUtils {
                     oDpsExport.series = resultSet.getString("d.num_ser");
                     oDpsExport.number = resultSet.getInt("d.num");
                     oDpsExport.date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("d.dt")); // yyyy-mm-dd
+                    oDpsExport.nature = resultSet.getString("nat.dps_nat");
                     oDpsExport.currency = resultSet.getString("c.cur_key");
                     oDpsExport.amount = resultSet.getDouble("d.tot_cur_r");
                     oDpsExport.exchange_rate = resultSet.getDouble("d.exc_rate");
@@ -1728,7 +1730,7 @@ public abstract class SExportDataUtils {
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.acc_tag, "
                         + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_authorn, t.ts_link, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_bp_r, b.bp, "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, nat.dps_nat, t.fid_bp_r, b.bp, "
                         + "t.fid_usr_new, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
                         + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked, COALESCE(dpsau.nts, '') AS authz_nts "
                         + "FROM ("
@@ -1780,6 +1782,7 @@ public abstract class SExportDataUtils {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
                         + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS nat ON nat.id_dps_nat = d.fid_dps_nat "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd "
                         + "    ON dcfd.id_year = t.id_year AND dcfd.id_doc = t.id_doc "
@@ -1864,6 +1867,7 @@ public abstract class SExportDataUtils {
                     reference.amount = resultSet.getDouble("t.tot_cur_r");
                     reference.fiscal_use = resultSet.getString("_cfd_use");
                     reference.payment_method = resultSet.getInt("t.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    reference.nature = resultSet.getString("nat.dps_nat");
                     reference.concepts = concepts;
                     reference.cost_profit_centers = costProfitCenters;
                     reference.owner_id = resultSet.getInt("t.fid_usr_new");

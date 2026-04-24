@@ -38,6 +38,7 @@ import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.form.SDialogDpsFinder;
+import erp.mtrn.view.SViewDps;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -108,7 +109,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected static final int ON = 1;
     protected static final int LIMIT_DAYS = 31; // 1 calendar month
     protected static final int LIMIT_WEEKS = 4; // 1 lunar month
-    protected static final int LIMIT_DOWNLOADS = 250; // 0.25 k documents
+    protected static final int BATCH_DOWNLOADS = 100;
+    
     protected static final int FUNC_SUB_AREA_CODES_PER_LINE = 15;
     
     protected String msCompanyName;
@@ -1244,7 +1246,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         return order;
     }
     
-    private void handleShowException(final Exception e) {
+    private void handleExceptionWhenShowingDocs(final Exception e) {
         System.err.println(e);
         SLibUtils.showException(this, e);
         
@@ -1479,7 +1481,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         return settings;
     }
     
-    private void processShowingDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
+    private void backgroundProcessForShowingDocs(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
         Exception exception = null;
         
         try {
@@ -1670,7 +1672,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         catch (Exception e) {
             exception = e;
-            handleShowException(e);
+            handleExceptionWhenShowingDocs(e);
         }
         finally {
             mbDocumentsBeingProcessed = false; // enables item state change events from being handled again!
@@ -1681,8 +1683,147 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    private void backgroundProcessForDownloadingDocs(final ArrayList<Integer> documents, final SProgressCallback callback) {
+        int docsDownloaded = 0;
+        ArrayList<Integer> externalIdsDownloaded = new ArrayList<>();
+        
+        try {
+            // prepare GUI:
+            
+            mbDocumentsBeingProcessed = true;
+
+            moDocumentsGrid.getTable().setEnabled(false);
+            renderCurrentDoc(true); // forcing clearing!
+
+            disableFieldsWhenRegisteringDocs();
+            
+            // process download:
+            
+            startProgress("Descargando " + (documents.size() == 1 ? "una factura" : SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas") + "...");
+            
+            ArrayList<List<Integer>> documentsBatches = new ArrayList<>();
+            int batches = (documents.size() + BATCH_DOWNLOADS - 1)/ BATCH_DOWNLOADS; // ceilling division
+            
+            for (int i = 0; i < batches; i++) {
+                int from = i * BATCH_DOWNLOADS;
+                int to = (i + 1) * BATCH_DOWNLOADS;
+                        
+                documentsBatches.add(documents.subList(from, to < documents.size() ? to : documents.size()));
+            }
+            
+            int zipsSaved = 0;
+            String zipPaths = "";
+            File desiredZipFile = null;
+            boolean download = documentsBatches.size() == 1;
+            
+            if (documentsBatches.size() > 1) {
+                // get the desired ZIP file once when there are several download batches:
+                desiredZipFile = SImportUtils.chooseDownloadZipFile(miClient.getSession(), SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                download = desiredZipFile != null;
+            }
+            
+            if (download) {
+                for (int zipBatch = 1; zipBatch <= documentsBatches.size(); zipBatch++) {
+                    int docs = documentsBatches.get(zipBatch - 1).size();
+                    
+                    try {
+                        ArrayList<Integer> documentsBatch = new ArrayList<>(documentsBatches.get(zipBatch - 1));
+                        File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documentsBatch, SSwapConsts.TXN_DOC_TYPE_INVOICE, desiredZipFile, zipBatch);
+
+                        if (files != null) {
+                            zipsSaved++;
+                            docsDownloaded += docs;
+                            externalIdsDownloaded.addAll(documentsBatch);
+                            
+                            File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];
+                            zipPaths += (!zipPaths.isEmpty() ? "\n" : "") + "+ " + zipFile.getAbsolutePath();
+                            System.out.println("ZIP #" + zipBatch + " saved to: " + zipFile.getAbsolutePath());
+                        }
+                    }
+                    catch (Exception e) {
+                        int remaining = documentsBatches.size() - zipBatch;
+                        String warning = "Ocurrió un problema con la descarga del bloque #" + zipBatch + " de facturas, "
+                                + "que debería contener " + (docs == 1 ? "una factura" : docs + " facturas") + ".\n"
+                                + (remaining > 0  ? "Se proseguirá con la descarga " + (remaining == 1 ? "del bloque restante" : "de los " + remaining + " bloques restantes") + ".\n" : "")
+                                + "\n" + e;
+                        miClient.showMsgBoxWarning(warning);
+                        SLibUtils.printException(this, e);
+                    }
+                    finally {
+                        callback.onProgress((int) ((zipBatch / (double) documentsBatches.size()) * 100)); // reveal progress after the long-taking previous task
+                    }
+                }
+
+                callback.onProgress(100); // assure to show 100%
+
+                // inform about the download process:
+                
+                if (docsDownloaded == 0) {
+                    String warning = "¡No se " + (documents.size() == 1 ?
+                            "descargaron los archivos de la factura autorizada seleccionada" :
+                            "descargó ninguno de los archivos de las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas")
+                            + "!";
+                    miClient.showMsgBoxWarning(warning);
+                }
+                else {
+                    String message = "";
+                    
+                    if (docsDownloaded == documents.size()) {
+                        message = "Se descargaron " + (documents.size() == 1 ? "" : "todos ") + "los archivos de " + (documents.size() == 1 ?
+                                "la factura autorizada seleccionada" :
+                                "las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas")
+                                + ".";
+                    }
+                    else {
+                        message = "Solamente se descargaron los archivos de " + (docsDownloaded == 1 ?
+                                "una" :
+                                "" + docsDownloaded)
+                                + " de las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas.";
+                    }
+                    
+                    message += "\n" + (zipsSaved == 1 ? "El archivo ZIP fue guardado en" : "Los " + zipsSaved + " archivos ZIP fueron guardados en") + ":"
+                            + "\n" + zipPaths;
+                    miClient.showMsgBoxInformation(message);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            // refresh documents grid:
+
+            if (docsDownloaded > 0) {
+                for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
+                    SImportedDocument document = (SImportedDocument) row;
+
+                    if (document.Download && !document.AlreadyDownloaded) {
+                        for (Integer externalId : externalIdsDownloaded) {
+                            if (externalId == document.ExternalDocumentId) {
+                                document.AlreadyDownloaded = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                refreshDocumentsGrid();
+            }
+            
+            // restore GUI:
+            
+            clearProgress();
+            enableFieldsForShowingDocs(true);
+            
+            moDocumentsGrid.getTable().setEnabled(true);
+            renderCurrentDoc(false);
+                                    
+            mbDocumentsBeingProcessed = false;
+        }
+    }
+    
     @SuppressWarnings("unchecked")
-    private void processRetrievingDocsToRegister(final ArrayList<SImportedDocument> recordableDocs, final SProgressCallback callback) {
+    private void backgroundProcessForRecordingDocs(final ArrayList<SImportedDocument> recordableDocs, final SProgressCallback callback) {
         ArrayList<SImportedDocument> rejectedInvoices = null;
         
         try {
@@ -2087,7 +2228,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     @Override
                     protected Void doInBackground() throws Exception {
-                        processShowingDocs(connection, progress -> {
+                        backgroundProcessForShowingDocs(connection, progress -> {
                             publish(progress);
                         });
                         return null;
@@ -2110,7 +2251,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 // ... end of background processing
             }
             catch (Exception e) {
-                handleShowException(e);
+                handleExceptionWhenShowingDocs(e);
             }
         }
     }
@@ -2185,50 +2326,56 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
         
         if (documents.isEmpty()) {
-            miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga.");
-        }
-        else if (documents.size() > LIMIT_DOWNLOADS && miClient.showMsgBoxConfirm("Se recomienda descargar los archivos en bloques no mayores a " + LIMIT_DOWNLOADS + " facturas autorizadas.\n"
-                + "Sin embargo, puede intentar descargar las " + documents.size() + " facturas autorizadas seleccionadas.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-            miClient.showMsgBoxWarning("Se sugiere seleccionar hasta " + LIMIT_DOWNLOADS + " facturas autorizadas para realizar la descarga.");
+            miClient.showMsgBoxWarning("Se debe seleccionar al menos una factura autorizada para realizar la descarga de sus archivos.");
         }
         else {
-            try {
-                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, SSwapConsts.TXN_DOC_TYPE_INVOICE);
-                
-                if (files != null) {
-                    File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];
-
-                    for (SGridRow row : moDocumentsGrid.getModel().getGridRows()) {
-                        if (((SImportedDocument) row).Download && !((SImportedDocument) row).AlreadyDownloaded) {
-                            int externalId = ((SImportedDocument) row).ExternalDocumentId;
-                            for (Integer document : documents) {
-                                if (externalId == document) {
-                                    ((SImportedDocument) row).AlreadyDownloaded = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    refreshDocumentsGrid();
-
-                    String zipPath = zipFile.getAbsolutePath();
-                    System.out.println("ZIP saved to: " + zipPath);
-
-                    String message;
-
-                    if (documents.size() == 1) {
-                        message = "La factura autorizada seleccionada fue descargada en:\n";
-                    }
-                    else {
-                        message = "Las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas fueron descargadas en:\n";
-                    }
-
-                    miClient.showMsgBoxInformation(message + zipPath);
-                }
+            // prepare to background processing:
+            
+            initProgress("Preparando la descarga...");
+//            miClient.getFileChooser(); // force creation of Save As dialog box before entering section of background processing!
+            
+            String confirm;
+            
+            if (documents.size() > BATCH_DOWNLOADS) {
+                confirm = "Se descargarán los archivos de las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas, agrupándolos en bloques de " + BATCH_DOWNLOADS + " facturas.";
             }
-            catch (Exception e) {
-                SLibUtils.showException(this, e);
+            else {
+                confirm = "Se descargarán los archivos de " + (documents.size() == 1 ? "la factura autorizada seleccionada" : "las " + SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas autorizadas seleccionadas") + ".";
+            }
+            
+            boolean process = miClient.showMsgBoxConfirm(confirm + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
+            
+            if (process) {
+                // start of background processing...
+
+                SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        backgroundProcessForDownloadingDocs(documents, progress -> {
+                            publish(progress);
+                        });
+                        return null;
+                    }
+
+                    @Override
+                    protected void process(List<Integer> chunks) {
+                        int latest = chunks.get(chunks.size() - 1);
+                        jProgressBar.setValue(latest); // runs on EDT
+                    }
+
+                    @Override
+                    protected void done() {
+                        clearProgress();
+                    }
+                };
+
+                worker.execute();
+
+                // ... end of background processing
+            }
+            else {
+                clearProgress();
             }
         }
     }
@@ -2277,7 +2424,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                         @Override
                         protected Void doInBackground() throws Exception {
-                            processRetrievingDocsToRegister(recordableDocs, progress -> {
+                            backgroundProcessForRecordingDocs(recordableDocs, progress -> {
                                 publish(progress);
                             });
                             return null;
@@ -2563,15 +2710,23 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                File pdf = document.retrievePdf(miClient.getSession(), msSyncUrlDownload);
                 
-                if (pdf != null) {
-                    if (moDialogPdfViewer == null) {
-                        moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                if (moDialogPdfViewer == null) {
+                    moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                }
+                
+                if (document.isRecorded()) {
+                    // if document is recorded, prefer PDF stored in ERP:
+                    SViewDps.showDocPdf((SClientInterface) miClient, document.ProcessedDps.getDpsKey(), moDialogPdfViewer);
+                }
+                else {
+                    // retrieve PDF from SWAP Services:
+                    File pdf = document.retrievePdf(miClient.getSession(), msSyncUrlDownload);
+                    
+                    if (pdf != null) {
+                        moDialogPdfViewer.setPdf(new SDocumentInfo(document), pdf);
+                        moDialogPdfViewer.setVisible(true);
                     }
-
-                    moDialogPdfViewer.setPdf(new SDocumentInfo(document), pdf);
-                    moDialogPdfViewer.setVisible(true);
                 }
             }
         }

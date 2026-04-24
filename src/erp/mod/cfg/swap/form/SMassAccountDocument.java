@@ -357,11 +357,11 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         }
         else if (InvoiceUnit == null) {
             error = "No se pudo determinar la unidad de medida de contabilización del comprobante.\n"
-                    + "No existe una configuración aplicable a unidades de medida de clave SAT '" + ComprobanteUnidadCode + "'.";
+                    + "No existe una configuración aplicable a unidades de medida de clave SAT (ClaveUnidad) '" + ComprobanteUnidadCode + "'.";
         }
         else if (InvoiceCase == null) {
             error = "No se pudo determinar el caso de contabilización del comprobante.\n"
-                    + "No existe una configuración aplicable a productos o servicios de clave SAT '" + ComprobanteProdServCode + "'.";
+                    + "No existe una configuración aplicable a productos o servicios de clave SAT (ClaveProdServ) '" + ComprobanteProdServCode + "'.";
         }
         else if (isFreight()) {
             if (GoodsGroup == null) {
@@ -374,7 +374,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
             }
             else if (GoodsCase == null) {
                 error = "No se pudo determinar el caso de contabilización de los bienes transportados.\n"
-                        + "No existe una configuración aplicable a productos o servicios de clave SAT '" + CartaPorteBienesTranspsCode + "'.";
+                        + "No existe una configuración aplicable a productos o servicios de clave SAT (ClaveProdServ) '" + CartaPorteBienesTranspsCode + "'.";
             }
         }
         
