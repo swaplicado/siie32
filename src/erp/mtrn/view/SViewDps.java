@@ -199,17 +199,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.table.STabFilterDnsDps moTabFilterDnsDps;
-    private erp.mtrn.form.SDialogUpdateDpsDeliveryAddress moDialogUpdateDpsDlvryAddrss;
+    private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
+    private erp.mtrn.form.SDialogUpdateDpsDeliveryAddress moDialogUpdateDpsDeliveryAddress;
     private erp.mtrn.form.SDialogUpdateDpsSalesAgentComms moDialogUpdateDpsSalesAgentComms;
     private erp.mtrn.form.SDialogUpdateDpsLogistics moDialogUpdateDpsLogistics;
     private erp.mtrn.form.SDialogUpdateDpsDate moDialogUpdateDpsDate;
     private erp.mtrn.form.SDialogUpdateDpsReferenceComms moDialogUpdateDpsRefCommissions;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
-    private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private erp.mod.trn.form.SDialogDocumentAuthornComments moDialogAuthComments;
     private erp.mod.cfg.swap.form.SDialogPdfViewer moDialogPdfViewer;
-    private SDialogDocumentAuthornComments moDialogAuthComments;
     private java.text.DecimalFormat moUsQuantityFormat;
 
     private boolean mbIsCategoryPur;
@@ -250,7 +250,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         int i = 0;
         int levelDoc = SDataConstantsSys.UNDEFINED;
         int typeImportFinder = SLibConstants.UNDEFINED;
-        boolean createImportFinder = false;
 
         mbIsCategoryPur = mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
         mbIsCategorySal = mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL;
@@ -581,9 +580,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebViewAuthComments.setPreferredSize(new Dimension(23, 23));
             jbAuthWebViewAuthComments.addActionListener(this);
             jbAuthWebViewAuthComments.setToolTipText("Ver historial de autorización de la orden en app web");
-            
-            moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, 
-                                                                "Comentarios de autorización en app web");
         }
         
         if(mbIsOrd) {
@@ -614,17 +610,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
         
-        moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
-        moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
-        moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
-        moDialogUpdateDpsDate = new SDialogUpdateDpsDate(miClient);
-        moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
-        moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
-        moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
-        moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
-
+        boolean createDpsFinder = false;
+        
         if (mbIsOrd || mbIsDoc || mbIsDocAdj) {
-            createImportFinder = true;
+            createDpsFinder = true;
 
             if (mbIsOrd || mbIsDoc) {
                 typeImportFinder = SDataConstants.TRNX_DPS_PEND_LINK;
@@ -634,7 +623,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
 
-        moDialogDpsFinder = !createImportFinder ? null : new SDialogDpsFinder(miClient, typeImportFinder);
+        moDialogDpsFinder = !createDpsFinder ? null : new SDialogDpsFinder(miClient, typeImportFinder);
 
         addTaskBarUpperComponent(jbAnnul);
         addTaskBarUpperSeparator();
@@ -679,7 +668,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             addTaskBarUpperComponent(jbAuthWebAnnullAuth);
             addTaskBarUpperComponent(jbAuthWebForceCheckAuthStatus);
         }
-        if (mbIsAuthzLogPurInvoice || mbIsAuthWebAvailable) {
+        
+        if (mbIsAuthWebAvailable || mbIsAuthzLogPurInvoice) {
             addTaskBarUpperComponent(jbAuthWebViewAuthComments);
         }
         
@@ -722,7 +712,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbDelete.setEnabled(mbHasRightDelete);
         jbAnnul.setEnabled(mbHasRightAnnul && mbHasRightEdit && (mbIsDoc || mbIsDocAdj));
         jbCopy.setEnabled(mbHasRightNew && !mbIsDocAdj);
-        jbImport.setEnabled(mbHasRightNew && createImportFinder);
+        jbImport.setEnabled(mbHasRightNew && createDpsFinder);
         jbImportCfdiWithOutOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportCfdiWithOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportMatRequest.setEnabled(mbIsCategoryPur);
@@ -773,7 +763,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             jbAuthWebForceCheckAuthStatus.setEnabled(true);
         }
         
-        jbAuthWebViewAuthComments.setEnabled(mbIsAuthWebAvailable || mbIsAuthzLogPurInvoice);
+        if (mbIsAuthWebAvailable || mbIsAuthzLogPurInvoice) {
+            jbAuthWebViewAuthComments.setEnabled(true); // just for consistence
+        }
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
@@ -1113,6 +1105,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         params = new SGuiParams();
 
                         if (dps.getDbmsDataCfd().isStamped()) {
+                            if (moDialogAnnulCfdi == null) {
+                                moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
+                            }
+                            
                             moDialogAnnulCfdi.formReset();
                             moDialogAnnulCfdi.formRefreshCatalogues();
                             moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, dps.getDate());
@@ -1277,11 +1273,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionChangeDeliveryAddress() {
         if (jbChangeDeliveryAddress.isEnabled()) {
             if (isRowSelected()) {
-                moDialogUpdateDpsDlvryAddrss.formReset();
-                moDialogUpdateDpsDlvryAddrss.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
-                moDialogUpdateDpsDlvryAddrss.setFormVisible(true);
+                if (moDialogUpdateDpsDeliveryAddress == null) {
+                    moDialogUpdateDpsDeliveryAddress = new SDialogUpdateDpsDeliveryAddress(miClient);
+                }
+                
+                moDialogUpdateDpsDeliveryAddress.formReset();
+                moDialogUpdateDpsDeliveryAddress.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogUpdateDpsDeliveryAddress.setFormVisible(true);
 
-                if (moDialogUpdateDpsDlvryAddrss.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                if (moDialogUpdateDpsDeliveryAddress.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
                 }
             }
@@ -1291,6 +1291,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionChangeAgentSupervisor() {
         if (jbChangeAgentSupervisor.isEnabled()) {
             if (isRowSelected()) {
+                if (moDialogUpdateDpsSalesAgentComms == null) {
+                    moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
+                }
+                
                 moDialogUpdateDpsSalesAgentComms.formReset();
                 moDialogUpdateDpsSalesAgentComms.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogUpdateDpsSalesAgentComms.setFormVisible(true);
@@ -1305,6 +1309,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionSetDeliveryDate() {
         if (jbSetDeliveryDate.isEnabled()) {
             if (isRowSelected()) {
+                if (moDialogUpdateDpsLogistics == null) {
+                    moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
+                }
+                
                 moDialogUpdateDpsLogistics.formReset();
                 moDialogUpdateDpsLogistics.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogUpdateDpsLogistics.setFormVisible(true);
@@ -1319,13 +1327,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionChangeDpsDate() {
         if (jbChangeDpsDate.isEnabled()) {
             if (isRowSelected()) {
+                if (moDialogUpdateDpsDate == null) {
+                    moDialogUpdateDpsDate = new SDialogUpdateDpsDate(miClient);
+                }
+                
                 moDialogUpdateDpsDate.formReset();
                 moDialogUpdateDpsDate.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
-                if (moDialogUpdateDpsDate.getFormResult() == SLibConstants.UNDEFINED) {
+                
+                if (moDialogUpdateDpsDate.getFormResult() == SLibConstants.UNDEFINED) { // chack if date can be changed
                     moDialogUpdateDpsDate.setFormVisible(true);
-                }
-                if (moDialogUpdateDpsDate.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                    
+                    if (moDialogUpdateDpsDate.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                    }
                 }
             }
         }
@@ -1334,6 +1348,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void actionSetReferenceCommissions() {
         if (jbSetReferenceCommissions.isEnabled()) {
             if (isRowSelected()) {
+                if (moDialogUpdateDpsRefCommissions == null) {
+                    moDialogUpdateDpsRefCommissions = new SDialogUpdateDpsReferenceComms(miClient);
+                }
+                
                 moDialogUpdateDpsRefCommissions.formReset();
                 moDialogUpdateDpsRefCommissions.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogUpdateDpsRefCommissions.setFormVisible(true);
@@ -1365,6 +1383,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbViewContractAnalysis.isEnabled()) {
             if (isRowSelected()) {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                
+                if (moDialogContractAnalysis == null) {
+                    moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
+                }
 
                 moDialogContractAnalysis.formReset();
                 moDialogContractAnalysis.setValue(SDataConstants.TRN_DPS, dps);
@@ -1549,6 +1571,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (isRowSelected()) {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                if (moDialogAccountingMoveDpsBizPartner == null) {
+                    moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
+                }
 
                 moDialogAccountingMoveDpsBizPartner.refreshAccountingDetail();
                 moDialogAccountingMoveDpsBizPartner.setParamBizPartnerName(bizPartner.getBizPartner());
@@ -1565,6 +1591,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (isRowSelected()) {
                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                 SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                if (moDialogAccountingMoveDpsBizPartner == null) {
+                    moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
+                }
 
                 moDialogAccountingMoveDpsBizPartner.refreshAccountingDetail();
                 moDialogAccountingMoveDpsBizPartner.setParamBizPartnerName(bizPartner.getBizPartner());
@@ -3589,8 +3619,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     
     private void actionAuthWebViewAuthComments() {
         try {
-            if (jbAuthWebViewAuthComments.isEnabled()) {
-                if (isRowSelected() && moDialogAuthComments != null) {
+            if (jbAuthWebViewAuthComments != null && jbAuthWebViewAuthComments.isEnabled()) {
+                if (moDialogAuthComments == null) {
+                    moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, "Comentarios de autorización en app web");
+                }
+                
+                if (isRowSelected()) {
                     if (mbIsOrd) {
                         moDialogAuthComments.setValue(SModConsts.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
                     }
