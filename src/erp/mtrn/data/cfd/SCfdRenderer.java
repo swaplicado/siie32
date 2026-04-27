@@ -242,9 +242,8 @@ public final class SCfdRenderer implements ActionListener {
         
         // validar receptor del CFDI:
         
-        int idEmisor = 0;
-        
         if (!validation.getIsError()) {
+            int idEmisor = 0;
             String receptor;
 
             if (comprobante.getEltReceptor().getAttNombre() == null || comprobante.getEltReceptor().getAttNombre().getString().isEmpty()) {
@@ -316,63 +315,63 @@ public final class SCfdRenderer implements ActionListener {
                     }
                 }
             }
-        }
-        
-        if (!validation.getIsError()) {
-            int[] key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, new int[] { idEmisor });
-            
-            if (key != null) {
-                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
-                
-                validation.setMessage("El documento '" + dps.getDpsNumber() + "' ya existe en la siguiente póliza contable:\n" +
-                    "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
-                    "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
-                    "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
-            }
             
             if (!validation.getIsError()) {
-                cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
-                if (tfd != null) {
-                    if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
-                        validation.setMessage("El UUID del documento ya existe en la base de datos (" + tfd.getAttUUID().getString() + ").");
-                    }
+                int[] key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC, new int[] { idEmisor });
+
+                if (key != null) {
+                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+                    Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
+
+                    validation.setMessage("El documento '" + dps.getDpsNumber() + "' ya existe en la siguiente póliza contable:\n" +
+                        "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
+                        "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
+                        "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
                 }
-            }
-            
-            if (!validation.getIsError() && moPurchaseOrder != null) {
-                if (moPurchaseOrder.getDate().after(comprobante.getAttFecha().getDatetime())) {
-                    validation.setMessage("El documento no puede tener una fecha anterior a la de la orden de compra.\n"
-                            + "Fecha OC: " + SLibUtils.DateFormatDate.format(moPurchaseOrder.getDate()) + "\n"
-                            + "Fecha CFDI: " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()));
-                }
-                
+
                 if (!validation.getIsError()) {
-                    int idCur = 0;
-                    try {
-                        String sql = "SELECT id_cur FROM erp.cfgu_cur WHERE cur_key = '" + comprobante.getAttMoneda().getString() + "'";
-                        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-                            if (resultSet.next()) {
-                                idCur = resultSet.getInt(1);
-                            }
+                    cfd.ver40.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();
+                    if (tfd != null) {
+                        if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
+                            validation.setMessage("El UUID del documento ya existe en la base de datos (" + tfd.getAttUUID().getString() + ").");
                         }
                     }
-                    catch (Exception e) {
-                        SLibUtils.printException(this, e);
+                }
+
+                if (!validation.getIsError() && moPurchaseOrder != null) {
+                    if (moPurchaseOrder.getDate().after(comprobante.getAttFecha().getDatetime())) {
+                        validation.setMessage("El documento no puede tener una fecha anterior a la de la orden de compra.\n"
+                                + "Fecha OC: " + SLibUtils.DateFormatDate.format(moPurchaseOrder.getDate()) + "\n"
+                                + "Fecha CFDI: " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()));
                     }
-                    if (moPurchaseOrder.getFkCurrencyId() != idCur) {
-                        validation.setMessage("La moneda del documento no coincide con el de la orden de compra.");
+
+                    if (!validation.getIsError()) {
+                        int idCur = 0;
+                        try {
+                            String sql = "SELECT id_cur FROM erp.cfgu_cur WHERE cur_key = '" + comprobante.getAttMoneda().getString() + "'";
+                            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                                if (resultSet.next()) {
+                                    idCur = resultSet.getInt(1);
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtils.printException(this, e);
+                        }
+                        if (moPurchaseOrder.getFkCurrencyId() != idCur) {
+                            validation.setMessage("La moneda del documento no coincide con el de la orden de compra.");
+                        }
                     }
                 }
-            }
-            
-            if (!validation.getIsError()) {
-                moCfdiViewer.setVisible(false);
-                
-                SDialogCfdiImport40 dialog = new SDialogCfdiImport40(miClient, moPurchaseOrder, moCfdiFile, moPdfFile, createDocumentInfo());
-                dialog.setComprobante(comprobante);
-                dialog.setVisible(true);
-                moDpsRendered = dialog.getNewDps();
+
+                if (!validation.getIsError()) {
+                    moCfdiViewer.setVisible(false);
+
+                    SDialogCfdiImport40 dialog = new SDialogCfdiImport40(miClient, moPurchaseOrder, moCfdiFile, moPdfFile, createDocumentInfo());
+                    dialog.setComprobante(comprobante);
+                    dialog.setVisible(true);
+                    moDpsRendered = dialog.getNewDps();
+                }
             }
         }
         

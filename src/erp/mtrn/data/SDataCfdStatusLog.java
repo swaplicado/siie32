@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import erp.SClientUtils;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import java.sql.Statement;
 import java.util.Date;
@@ -90,9 +91,9 @@ public class SDataCfdStatusLog extends erp.lib.data.SDataRegistry implements jav
                         "st_code, " +
                         "st_desc, " +
                         "is_can, " +
-                        "user_id, " +
                         "can_st, " +
-                        "efos_val " +
+                        "efos_val, " +
+                        "user_id " +
                     ")" +
                     "VALUES (" +
                         "NOW(), " +
@@ -102,17 +103,19 @@ public class SDataCfdStatusLog extends erp.lib.data.SDataRegistry implements jav
                         "'" + msStatusCode + "', " +
                         "'" + msStatusDescription + "', " +
                         "'" + msIsCancellable+ "', " +
-                        mnUserId + ", " +
                         "'" + msCancellableStatus + "', " +
-                        "'" + msEfosValidation + "' " +
+                        "'" + msEfosValidation + "', " +
+                        mnUserId + " " +
                     ");";
             
             statement.execute(sql);
             
+            mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            SLibUtilities.printOutException(this, e);
         }
         
         return mnLastDbActionResult;

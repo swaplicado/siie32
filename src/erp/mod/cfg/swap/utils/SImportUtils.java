@@ -537,7 +537,7 @@ public abstract class SImportUtils {
                     }
                 }
                 else {
-                    client.showMsgBoxInformation("El archivo proporcionado debe ser XML.\n"
+                    client.showMsgBoxInformation("El archivo proporcionado debe ser " + SFileUtilities.xml.toUpperCase() + ".\n"
                             + "(Archivo proporcionado: '" + chosenCfdiXml.getName() + "')");
                 }
             }

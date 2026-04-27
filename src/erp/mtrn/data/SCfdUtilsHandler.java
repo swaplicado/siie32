@@ -271,13 +271,13 @@ public class SCfdUtilsHandler {
         String valEstatusCancelacion = "";
         
         SDataCfdStatusLog log = new SDataCfdStatusLog();
-        log.setUserId(miClient.getSession().getUser().getPkUserId());
         log.setUuid(uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", DCfdVer4Consts.LEN_UUID) : uuid);
-        log.setResponse(false);
+        log.setUserId(miClient.getSession().getUser().getPkUserId());
         
         if (acuse != null) {
             log.setResponse(true);
             log.setResponseXml("");
+            log.setEfosValidation("");
             
             if (acuse.getEsCancelable() != null) {
                 valEsCancelable = acuse.getEsCancelable().getValue();
