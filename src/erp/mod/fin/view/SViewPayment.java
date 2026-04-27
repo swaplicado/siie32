@@ -450,9 +450,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
                     
-                    if (SAuthorizationUtils.sendAuthornPaymentsAppWeb((SClientInterface) miClient, gridRow.getRowPrimaryKey())) {
-                        miClient.getSession().notifySuscriptors(mnGridType);
-                    }
+                    SAuthorizationUtils.sendAuthornPaymentsAppWeb((SClientInterface) miClient, gridRow.getRowPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

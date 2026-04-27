@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -16,6 +17,8 @@ import erp.mtrn.data.SThinDps;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
+
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 
@@ -58,6 +61,7 @@ public class SExportPayments extends Thread {
                 if (sResult.isEmpty()) {
                     moPayment.updatePaymentStatus(miClient.getSession(), SModSysConsts.FINS_ST_PAY_IN_AUTH);
                     miClient.showMsgBoxInformation("Pago enviado a autorización con éxito.");
+                    miClient.getSession().notifySuscriptors(SModConsts.FIN_PAY);
                 }
                 else {
                     miClient.showMsgBoxInformation("No se pudo iniciar el proceso de autorización, intente de nuevo por favor.\n" + sResult);
@@ -188,9 +192,15 @@ public class SExportPayments extends Thread {
     private SDataBizPartnerBranchBankAccount getBranchBankAcc(int[] pk) {
         SDataBizPartnerBranchBankAccount ba = new SDataBizPartnerBranchBankAccount();
         try {
-            ba.read(pk, miClient.getSession().getStatement());
+            if (pk != null && pk.length > 0 && pk[0] > 1) {
+                ba.read(pk, miClient.getSession().getStatement());
+            }
+            else {
+                return ba;
+            }
         }
         catch (Exception e) {
+            Logger.getLogger(SExportPayments.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
             miClient.showMsgBoxError(e.getMessage());
         }
         return ba;

@@ -65,7 +65,8 @@ public class SDpsGoogleCloudUtils {
                 oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                 File pdf;
                 if (oPdfFile == null) {
-                    pdf = new File("temp", fileData.getFileName());
+                    File localTempDir = SDpsGoogleCloudUtils.getTemporalDir();
+                    pdf = new File(localTempDir, fileData.getFileName());
                     STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                 }
                 else {
@@ -89,7 +90,8 @@ public class SDpsGoogleCloudUtils {
                     oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                     File pdf;
                     if (oPdfFile == null) {
-                        pdf = new File("temp", fileData.getFileName());
+                        File localTempDir = SDpsGoogleCloudUtils.getTemporalDir();
+                        pdf = new File(localTempDir, fileData.getFileName());
                         STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                     }
                     else {
@@ -141,6 +143,26 @@ public class SDpsGoogleCloudUtils {
         }
         
         return null;
+    }
+
+    /**
+     * Obtiene el directorio temporal para almacenar archivos antes de subir a GCS.
+     * Si no existe, lo crea.
+     * Nota: Este método asume que el sistema operativo tiene configurado un directorio temporal válido.
+     * 
+     * @return File representando el directorio temporal local para esta aplicación.
+     */
+    private static File getTemporalDir() {
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + "OCS_TEMP");
+        if (!localTempDir.exists()) {
+            boolean ok = localTempDir.mkdirs();
+            if (!ok) {
+                throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
+            }
+        }
+
+        return localTempDir;
     }
 
     /**
