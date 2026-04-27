@@ -2332,7 +2332,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             // prepare to background processing:
             
             initProgress("Preparando la descarga...");
-//            miClient.getFileChooser(); // force creation of Save As dialog box before entering section of background processing!
             
             String confirm;
             
