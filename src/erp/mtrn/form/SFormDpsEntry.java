@@ -6784,15 +6784,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             if (!validation.getIsError()) {
                 if (((int[]) moFieldItemCompositionItem.getFieldValue())[0] != SLibConstants.UNDEFINED) {
                     if (moFieldItemCompositionPer.getDouble() == 0.0 || moFieldItemCompositionOriginalQuantity.getDouble() == 0.0) {
-                        validation.setMessage("Se debe especificar un porcentaje de composición");
+                        validation.setMessage("Se debe especificar un porcentaje de composición.");
                         validation.setComponent(jtfItemCompositionPer);
                         validation.setTabbedPaneIndex(TAB_ITEM_COMP);
                     }
                 }
             }
             if (!validation.getIsError()) {
-                if (moPaneTaxes.getTableGuiRowCount() == 0) {
-                    validation.setMessage("La partida debe tener al menos un impuesto.\nSe sugiere cambiar la región de impuestos o revisar la configuración de impuestos del ítem.");
+                if (moPaneTaxes.getTableGuiRowCount() == 0 && miClient.showMsgBoxConfirm("¿Está seguro que la partida no tenga impuestos?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage("Si la partida debe tener impuestos, puede:"
+                            + "\na) seleccionar un valor distinto en el campo '" + jlFkTaxRegionId.getText() + "'; o"
+                            + "\nb) suspender la captura del documento, revisar la configuración de impuestos del ítem, y continuar la captura.");
                     validation.setComponent(jcbFkTaxRegionId);
                     validation.setTabbedPaneIndex(TAB_TAX);
                 }
@@ -6801,9 +6803,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 try {
                     if (moDpsEntry.hasDpsLinksAsDestiny()) {
                         if (STrnUtilities.getTaxRegionDpsEty(miClient, moDpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsEntryKey()) != ((int[]) moFieldFkTaxRegionId.getKey())[0]) {
-                            if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es diferente a la región de impuestos de la partida del documento de origen.\n¿Desea continuar?") != JOptionPane.OK_OPTION) {
-                                validation.setMessage("Seleccionar la región de impuestos de la partida del documento de origen.");
-                                validation.setComponent(jcbFkTaxRegionId);
+                            if (miClient.showMsgBoxConfirm("La región de impuestos de la partida es distinta a la región de impuestos de la partida del documento origen.\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL) != JOptionPane.OK_OPTION) {
+                                validation.setMessage("Seleccionar la misma región de impuestos de la partida del documento origen.");
+                                validation.setComponent(jcbFkTaxRegionId.isEnabled() ? jcbFkTaxRegionId : jbEditTaxRegion);
                                 validation.setTabbedPaneIndex(TAB_TAX);
                             }
                         }

@@ -371,7 +371,8 @@ public class SDialogUpdateDpsDate extends javax.swing.JDialog implements erp.lib
             case SDataConstants.TRN_DPS:
                 moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, value, SLibConstants.EXEC_MODE_VERBOSE);
                 moPanelDps.setDps(moDps, null);
-                if(isDpsUpdateable()) {
+                
+                if (isDpsUpdateable()) {
                     renderDpsDates();
                 }
                 break;
