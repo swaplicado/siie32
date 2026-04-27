@@ -1801,7 +1801,8 @@ public abstract class SAuthorizationUtils {
                     if (picker.hasAuthornPaths()) {
                         picker.setVisible(true);
                         if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            new SExportPayments((SGuiClient) client, payment, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                            SExportPayments export = new SExportPayments((SGuiClient) client, payment, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes());
+                            export.start();
                         }
                         else {
                             return false;
