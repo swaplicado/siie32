@@ -7,6 +7,7 @@ package erp.mod.cfg.swap.utils;
 
 import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
+import cfd.ver40.DCfdi40Consts;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.SFileUtilities;
@@ -19,6 +20,7 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.data.SDataRegistry;
 import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
@@ -27,6 +29,7 @@ import erp.mod.cfg.swap.SHttpConsts;
 import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mod.cfg.swap.form.SImportedDocument;
+import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
 import erp.mtrn.data.SDataDpsEntry;
@@ -187,6 +190,53 @@ public abstract class SImportUtils {
         }
         
         return result;
+    }
+    
+    /**
+     * Validate status of CFDI before SAT.
+     * @param client GUI client.
+     * @param comprobante CFDI 4.0 to validate.
+     * @param tipoDeComprobante Required CFDI attribute "TipoDeComprobante", e.g., "I", "E", "T", "P", "N", etc.
+     * @param throwExceptionIfInvalid Throw exception if document status is not valid, i.e., if it is not "Vigente".
+     * @return Current status of CFDI 4.0.
+     */
+    public static String validateCfdi(final SClientInterface client, final cfd.ver40.DElementComprobante comprobante, final String tipoDeComprobante, final boolean throwExceptionIfInvalid) throws Exception {
+        String cfdiStatus = "";
+        
+        String tdc = comprobante.getAttTipoDeComprobante().getString();
+
+        if (!tdc.toUpperCase().equals(tipoDeComprobante)) {
+            throw new Exception("No se validar estatus SAT del CFDI porque su tipo es \"" + tdc + "\", pero debe ser \"" + tipoDeComprobante + "\".");
+        }
+        else if (((SDataParamsCompany) client.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
+            int cfdType = 0;
+            
+            switch (tipoDeComprobante) {
+                case DCfdi40Catalogs.CFD_TP_I:
+                case DCfdi40Catalogs.CFD_TP_E:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_INV;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_T:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_BOL;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_P:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_PAY_REC;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_N:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
+                    break;
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Tipo del CFDI \"" + tipoDeComprobante + "\".)");
+            }
+            
+            cfdiStatus = new SCfdUtilsHandler(client).getCfdiSatStatus(cfdType, comprobante).getCfdiStatus();
+
+            if (throwExceptionIfInvalid && !cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
+                throw new Exception("El estatus SAT del CFDI es \"" + cfdiStatus + "\".");
+            }
+        }
+        
+        return cfdiStatus;
     }
     
     /**

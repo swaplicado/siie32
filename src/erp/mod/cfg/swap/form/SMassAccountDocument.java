@@ -8,6 +8,7 @@ package erp.mod.cfg.swap.form;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
+import cfd.ver40.DCfdi40Consts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mfin.data.SDataTax;
@@ -60,6 +61,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     
     private static final int COL_RECORD = 8;
     
+    final public SClientInterface Client;
     public SImportedDocument ImportedDocument;
     public SDialogMassAccountDocuments DialogMassAccountDocuments;
     
@@ -73,6 +75,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public boolean ParsingError;
     
     public cfd.ver40.DElementComprobante Comprobante;
+    public String EstatusComprobante;
     public cfd.ver4.ccp31.DElementCartaPorte CartaPorte;
     public ArrayList<SCfdiConcepto> Conceptos;
     public boolean IsEmisorPerson;
@@ -106,7 +109,8 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public AccountSettings AccountSettingsSystem;
     public AccountSettings AccountSettingsUser;
     
-    public SMassAccountDocument(final SImportedDocument importedDocument, final SDialogMassAccountDocuments dialogMassAccountDocuments) throws Exception {
+    public SMassAccountDocument(final erp.client.SClientInterface client, final SImportedDocument importedDocument, final SDialogMassAccountDocuments dialogMassAccountDocuments) throws Exception {
+        Client = client;
         ImportedDocument = importedDocument;
         DialogMassAccountDocuments = dialogMassAccountDocuments;
         
@@ -121,6 +125,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         ParsingWarningType = 0;
         ParsingError = true; // by default, assume that there is a parsing error
         Comprobante = null;
+        EstatusComprobante = "";
         CartaPorte = null;
         Conceptos = null;
         IsEmisorPerson = true; // by default, assume that partner is a person
@@ -153,42 +158,45 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         Comprobante = DCfdUtils.getCfdi40(SXmlUtils.readXml(ImportedDocument.AuxFiles[SImportUtils.CFDI_XML_IDX].getAbsolutePath()));
         
         if (isCfdiInvoice()) {
+            // CFDI status:
+            EstatusComprobante = SImportUtils.validateCfdi(Client, Comprobante, DCfdi40Catalogs.CFD_TP_I, false);
+            
             // issuer settings:
             IsEmisorPerson = Comprobante.getEltEmisor().getAttRfc().getString().length() == DCfdConsts.LEN_RFC_PER;
             EmisorFiscalId = Comprobante.getEltEmisor().getAttRfc().getString();
             EmisorDescripByName = ImportedDocument.BizPartner + " - " + ImportedDocument.BizPartnerId;
-            
+
             // payment type setting:
             ImportedDocument.AuxPaymentType = Comprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PPD) ? SDataConstantsSys.TRNS_TP_PAY_CREDIT : SDataConstantsSys.TRNS_TP_PAY_CASH;
-            
+
             // parse invoice entries:
-            
+
             Conceptos = new ArrayList<>();
-            
+
             HashSet<String> conceptoProdServClavesSet = new HashSet<>();
             HashSet<String> conceptoUnidadClavesSet = new HashSet<>();
             HashSet<String> cartaPorteBienesTranspsSet = null;
-            
+
             for (cfd.ver40.DElementConcepto concepto : Comprobante.getEltConceptos().getEltConceptos()) {
                 Conceptos.add(new SCfdiConcepto(concepto));
                 conceptoProdServClavesSet.add(concepto.getAttClaveProdServ().getString());
                 conceptoUnidadClavesSet.add(concepto.getAttClaveUnidad().getString());
             }
-            
+
             if (conceptoProdServClavesSet.size() != 1) {
                 ParsingWarningType = WARN_CFDI_MULT_PROD_SERV; // error: multiple ClaveProdServ
             }
-            
+
             if (conceptoUnidadClavesSet.size() != 1) {
                 ParsingWarningType = WARN_CFDI_MULT_UNIT; // error: multiple ClaveUnidad
             }
-            
+
             boolean isFreight = isFreight();
-            
+
             if (isFreight) {
                 CartaPorte = (cfd.ver4.ccp31.DElementCartaPorte) Comprobante.getEltComplemento(cfd.ver4.ccp31.DElementCartaPorte.NAME);
             }
-            
+
             if (isFreight && isCfdiInvoiceAndBol()) {
                 // parse BOL entries:
 
@@ -201,36 +209,36 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 if (cartaPorteBienesTranspsSet.size() != 1) {
                     ParsingWarningType = WARN_CCP_MULT_MERC_TRAN; // error: multiple BienesTransp
                 }
-                
+
                 ScaleTicketBol = SMassAccountUtils.extractScaleTicket(Comprobante.getEltConceptos().getEltConceptos().get(0).getAttDescripcion().getString(), DialogMassAccountDocuments.getPatternScaleTicketBol(), false);
                 ScaleTicketRef = SMassAccountUtils.extractScaleTicket(ImportedDocument.ReferencesAsText, DialogMassAccountDocuments.getPatternScaleTicketRef(), false);
             }
-            
+
             // determine invoice main configuration elements for accounting:
-            
+
             ArrayList<String> descriptions = new ArrayList<>();
 
             for (cfd.ver40.DElementConcepto concepto : Comprobante.getEltConceptos().getEltConceptos()) {
                 descriptions.add(concepto.getAttDescripcion().getString());
-                
+
                 Units += concepto.getAttCantidad().getDouble();
             }
-            
+
             InvoiceGroup = DialogMassAccountDocuments.getConfig().getGroup(isFreight ? Group.DOC_TYPE_BOL : Group.DOC_TYPE_INVOICE);
-            
+
             if (InvoiceGroup != null) {
                 InvoicePartner = InvoiceGroup.getPartner(IsEmisorPerson);
-                
+
                 if (InvoicePartner != null) {
                     if (!conceptoProdServClavesSet.isEmpty()) {
                         ComprobanteUnidadCode = conceptoUnidadClavesSet.toArray()[0].toString();
                         InvoiceUnit = InvoicePartner.getUnit(ComprobanteUnidadCode);
-                        
+
                         if (InvoiceUnit != null) {
                             if (!conceptoUnidadClavesSet.isEmpty()) {
                                 ComprobanteProdServCode = conceptoProdServClavesSet.toArray()[0].toString();
                                 InvoiceCase = InvoicePartner.getCase(ComprobanteProdServCode, descriptions);
-                                
+
                                 if (InvoiceCase != null) {
                                     ComprobanteProdServDescripByCode = ComprobanteProdServCode + " - " + InvoiceCase.getProdServ(ComprobanteProdServCode).getKeyDesc();
                                 }
@@ -249,7 +257,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                             if (!cartaPorteBienesTranspsSet.isEmpty()) {
                                 CartaPorteBienesTranspsCode = cartaPorteBienesTranspsSet.toArray()[0].toString();
                                 GoodsCase = GoodsPartner.getCase(CartaPorteBienesTranspsCode, descriptions);
-                                
+
                                 if (GoodsCase != null) {
                                     CartaPorteBienesTranspsDescripByCode = CartaPorteBienesTranspsCode + " - " + GoodsCase.getProdServ(CartaPorteBienesTranspsCode).getKeyDesc();
                                 }
@@ -258,7 +266,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                     }
                 }
             }
-            
+
             if (isFreight && InvoiceCase != null && GoodsCase != null) {
                 AccountSettingsSystem = new AccountSettings(
                         GoodsCase.getItem(), GoodsCase.getItemDesc(),
@@ -273,8 +281,8 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                         InvoiceCase.getUnit(), InvoiceCase.getUnitDesc(),
                         InvoiceCase.getAccount(), InvoiceCase.getCostCenter());
             }
-            
-            if (AccountSettingsSystem != null) {
+
+            if (AccountSettingsSystem != null && EstatusComprobante.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) { // CFDI must be recordable and valid!
                 AccountSettingsUser = AccountSettingsSystem.clone();
                 IconRecordable = ParsingWarningType != 0 ? SGridConsts.ICON_WARN : SGridConsts.ICON_THUMBS_UP;
                 ParsingError = false;
@@ -341,8 +349,14 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         if (Comprobante == null) {
             error = "El documento no tiene CFDI.";
         }
+        else if (EstatusComprobante.isEmpty()) {
+            error = "No se ha validado el estatus SAT del CFDI.";
+        }
+        else if (!EstatusComprobante.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
+            error = "El estatus SAT del CFDI es '" + EstatusComprobante + "', pero debe ser '" + DCfdi40Consts.CFDI_ESTATUS_VIG + "'.";
+        }
         else if (!isCfdiInvoice()) {
-            error = "El CFDI no es de tipo Ingreso.";
+            error = "El CFDI no es de tipo Ingreso (\"" + DCfdi40Catalogs.CFD_TP_I + "\").";
         }
         else if (isFreight() && CartaPorte == null) {
             error = "El CFDI no tiene Complemento Carta Porte.";

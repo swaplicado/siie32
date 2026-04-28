@@ -10,7 +10,6 @@ import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver40.DCfdi40Catalogs;
-import cfd.ver40.DCfdi40Consts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -22,11 +21,11 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
-import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.cfg.swap.form.SDialogPdfViewer;
 import erp.mod.cfg.swap.form.SDocumentInfo;
+import erp.mod.cfg.swap.utils.SImportUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
@@ -224,20 +223,12 @@ public final class SCfdRenderer implements ActionListener {
         
         // validar CFDI:
         
-        String tipoDeComprobante = comprobante.getAttTipoDeComprobante().getString();
-
-        if (!tipoDeComprobante.toUpperCase().equals(DCfdi40Catalogs.CFD_TP_I)) {
-            validation.setMessage("No se puede importar el CFDI porque su tipo debe ser '" + DCfdi40Catalogs.CFD_TP_I + "', pero es '" + tipoDeComprobante + "'.");
+        try {
+            SImportUtils.validateCfdi(miClient, comprobante, DCfdi40Catalogs.CFD_TP_I, true);
         }
-        
-        if (!validation.getIsError()) {
-            if (((SDataParamsCompany) miClient.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
-                String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(SDataConstantsSys.TRNS_TP_CFD_INV, comprobante).getCfdiStatus();
-
-                if (!cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
-                    validation.setMessage("No se puede importar el CFDI porque su estatus SAT es: " + cfdiStatus + ".");
-                }
-            }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+            validation.setMessage(e.getMessage());
         }
         
         // validar receptor del CFDI:

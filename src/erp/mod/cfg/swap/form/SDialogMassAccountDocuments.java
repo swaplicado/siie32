@@ -1629,7 +1629,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         if (documents != null) {
             try {
                 for (SImportedDocument document : documents) {
-                    maDocuments.add(new SMassAccountDocument(document, this));
+                    maDocuments.add(new SMassAccountDocument((SClientInterface) miClient, document, this));
                 }
             }
             catch (Exception e) {
@@ -2117,7 +2117,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             else {
                 SMassAccountDocument document = (SMassAccountDocument) row;
                 
-                if (document.ImportedDocument.isPaymentRequestDataAvailable()) {
+                if (document.ParsingError) {
+                    actionPerformedAccShowParsingErrorOrWarning();
+                }
+                else if (document.ImportedDocument.isPaymentRequestDataAvailable()) {
                     if (!moDecReqPayAmount.isEditable()) {
                         // edit amount:
                         
@@ -2186,7 +2189,10 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             else {
                 SMassAccountDocument document = (SMassAccountDocument) row;
                 
-                if (document.ImportedDocument.changeRequiredPaymentDate(miClient.getSession())) {
+                if (document.ParsingError) {
+                    actionPerformedAccShowParsingErrorOrWarning();
+                }
+                else if (document.ImportedDocument.changeRequiredPaymentDate(miClient.getSession())) {
                     refreshDocumentsGrid();
                 }
             }

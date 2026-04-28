@@ -1521,7 +1521,6 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 document.retrieveProcessing(miClient.getSession(), moPrepStatToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
 
                                 if (!moBoolExcludeRecorded.isSelected() || !document.isRecorded()) {
-
                                     if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
                                         document.ExternalDocumentUuid = docNode.path("uuid").asText();
                                     }
@@ -1856,7 +1855,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 boolean previouslyRecorded = document.isRecorded();
 
-                if (isDocAlreadyRecorded(document, false)) {
+                if (previouslyRecorded || isDocAlreadyRecorded(document, false)) {
                     if (!previouslyRecorded && document.isRecorded()) {
                         docsJustRecorded++;
                     }
@@ -2036,6 +2035,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             if (!elegibleDocs.isEmpty()) {
                 // process documents:
                 
+                initProgress("Validando estatus SAT de " + (elegibleDocs.size() == 1 ? "1 factura" : elegibleDocs.size() + " facturas") + "...");
+                
                 if (moDialogMassAccountDocuments == null) {
                     moDialogMassAccountDocuments = new SDialogMassAccountDocuments(miClient);
                 }
@@ -2043,6 +2044,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 moDialogMassAccountDocuments.resetForm();
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_SETTINGS, createSettings());
                 moDialogMassAccountDocuments.setValue(SDialogMassAccountDocuments.VALUE_DOCUMENTS_AND_ADVANCES, new Object[] { elegibleDocs, moAdvancesMap });
+                
+                callback.onProgress(100); // assure to show 100% again
+                
                 moDialogMassAccountDocuments.setVisible(true);
                 
                 // check whether payments need to be exported:
@@ -2904,8 +2908,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                if (document.isRecorded()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ProcessedDps.composeRecord() + ".");
+                if (!document.isRecorded()) {
+                    throw new Exception(SImportedDocument.EXC_DOC_NOT_RECORDED);
                 }
                 else if (document.checkAdvancesOnUpcommingPaymentRequest(miClient, true)) {
                     if (document.requestPayment(miClient.getSession())) {
