@@ -7,6 +7,7 @@ package erp.mod.fin.view;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.view.SViewFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -241,8 +242,8 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
             + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
             + "COALESCE(MAX(nat.code), 'S/DOC') AS nat "
             + "CASE WHEN d.id_doc IS NOT NULL THEN "
-            + "CASE sw.proc_type WHEN 0 THEN 'Estándar' WHEN 11 THEN 'Fletes MP' "
-            + "WHEN 12 THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type "
+            + "CASE sw.proc_type WHEN " + SDbSwapDataProcessing.PROC_TYPE_STANDARD + " THEN 'Estándar' WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT + " THEN 'Fletes MP' "
+            + "WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE + " THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type "
             + "FROM fin_pay AS v "
             + "INNER JOIN ( "
             + "SELECT id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n, "

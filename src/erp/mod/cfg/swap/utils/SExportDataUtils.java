@@ -1696,8 +1696,6 @@ public abstract class SExportDataUtils {
                  */
 
                 String database = databasesMap.get(companyId);
-                // código de tipo de referencia + '/' + referencia
-                String referenceId = "CONCAT('" + SSwapConsts.TXN_REF_TYPE_ORDER_CODE + "', '" + SSwapConsts.SEPARATOR_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))";
 
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_REF_ORDER, database);
 
@@ -1727,31 +1725,32 @@ public abstract class SExportDataUtils {
                 PreparedStatement prepStatConcepts = session.getStatement().getConnection().prepareStatement(sqlConcepts);
                 PreparedStatement prepStatCostProfitCenters = session.getStatement().getConnection().prepareStatement(sqlCostCenters);
 
+                String referenceIdConcat = "CONCAT('"
+                        + SSwapConsts.TXN_REF_TYPE_ORDER_CODE + "', '"
+                        + SSwapConsts.SEPARATOR_REF + "', CONCAT(t.num_ser, IF(t.num_ser = '', '', '-'), t.num))";
+
                 String sql = "SELECT "
                         + "t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.acc_tag, "
-                        + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_authorn, t.ts_link, "
-                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name AS _func_sub, t.fid_dps_nat, nat.dps_nat, t.fid_bp_r, b.bp, "
+                        + "t.b_authorn, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, "
+                        + "t.ts_edit, t.ts_authorn, t.ts_link, "
+                        + "t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, "
+                        + "t.fid_func_sub, fs.name AS _func_sub, "
+                        + "t.fid_dps_nat, nat.dps_nat, "
+                        + "t.fid_bp_r, b.bp, "
                         + "t.fid_usr_new, COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
-                        + "COUNT(*) AS _entries, SUM(_is_linked) AS _entries_linked, COALESCE(dpsau.nts, '') AS authz_nts "
+                        + "COUNT(*) AS _entries, SUM(t._is_linked) AS _entries_linked, "
+                        + "COALESCE(dpsau.nts, '') AS authz_nts "
                         + "FROM ("
                         + "    SELECT "
                         + "        d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
-                        + "        d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, d.ts_edit, d.ts_authorn, d.ts_link, "
-                        + "        d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, d.fid_dps_nat, d.fid_bp_r, d.fid_usr_new, "
+                        + "        d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, "
+                        + "        d.ts_edit, d.ts_authorn, d.ts_link, "
+                        + "        d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, "
+                        + "        d.fid_dps_nat, d.fid_bp_r, d.fid_usr_new, "
                         + "        de.id_ety, de.fid_item, de.fid_unit, de.qty, "
                         + "        COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _qty_linked, "
                         + "        (de.qty <= COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0)) AS _is_linked "
                         + "    FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
-                        + "    INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
-                        + "        ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
-                        + "    LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds "
-                        + "        ON dds.id_src_year = de.id_year AND dds.id_src_doc = de.id_doc AND dds.id_src_ety = de.id_ety "
-                        + "    LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS xde "
-                        + "        ON xde.id_year = dds.id_des_year AND xde.id_doc = dds.id_des_doc AND xde.id_ety = dds.id_des_ety "
-                        + "    LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS xd "
-                        + "        ON xd.id_year = xde.id_year AND xd.id_doc = xde.id_doc "
-
-                        // === CLAVE: Se toma solo la última versión por referencia ===
                         + "    INNER JOIN ("
                         + "        SELECT num_ser, num, MAX(id_year) AS max_id_year, MAX(id_doc) AS max_id_doc "
                         + "        FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS)
@@ -1760,31 +1759,41 @@ public abstract class SExportDataUtils {
                         + "          AND id_year >= " + (session.getSystemYear() - 1)
                         + "        GROUP BY num_ser, num "
                         + "    ) AS last_version "
-                        + "        ON last_version.num_ser = d.num_ser "
-                        + "       AND last_version.num = d.num "
-                        + "       AND last_version.max_id_year = d.id_year "
-                        + "       AND last_version.max_id_doc = d.id_doc "
-
+                        + "        ON  last_version.num_ser     = d.num_ser "
+                        + "        AND last_version.num         = d.num "
+                        + "        AND last_version.max_id_year = d.id_year "
+                        + "        AND last_version.max_id_doc  = d.id_doc "
+                        + "    INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
+                        + "        ON  de.id_year = d.id_year AND de.id_doc = d.id_doc "
+                        + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds "
+                        + "        ON  dds.id_src_year = de.id_year AND dds.id_src_doc = de.id_doc AND dds.id_src_ety = de.id_ety "
+                        + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS xde "
+                        + "        ON  xde.id_year = dds.id_des_year AND xde.id_doc = dds.id_des_doc AND xde.id_ety = dds.id_des_ety "
+                        + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS xd "
+                        + "        ON  xd.id_year = xde.id_year AND xd.id_doc = xde.id_doc "
                         + "    WHERE NOT de.b_del "
                         + "      AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0]
                         + "      AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1]
                         + "      AND d.id_year >= " + (session.getSystemYear() - 1)
-                        + "    GROUP BY d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
-                        + "        d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, d.ts_edit, "
-                        + "        d.ts_authorn, d.ts_link, d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, "
-                        + "        d.fid_bp_r, d.fid_usr_new, de.id_ety, de.fid_item, de.fid_unit, de.qty "
-                        + "    ORDER BY d.num_ser, LPAD(d.num, " + SSwapConsts.LEN_UUID + ", '0'), d.num, d.dt, "
-                        + "        d.id_year, d.id_doc, d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, "
-                        + "        d.fid_tp_pay, d.ts_edit, d.ts_authorn, d.ts_link, d.tot_r, d.tot_cur_r, "
-                        + "        d.fid_cur, d.fid_func_sub, d.fid_bp_r, de.id_ety, de.fid_item, de.fid_unit, de.qty "
+                        + "    GROUP BY "
+                        + "        d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
+                        + "        d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, "
+                        + "        d.ts_edit, d.ts_authorn, d.ts_link, "
+                        + "        d.tot_r, d.tot_cur_r, d.fid_cur, d.fid_func_sub, "
+                        + "        d.fid_dps_nat, d.fid_bp_r, d.fid_usr_new, "
+                        + "        de.id_ety, de.fid_item, de.fid_unit, de.qty "
                         + ") AS t "
-
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON c.id_cur = t.fid_cur "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = t.fid_func_sub "
-                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = fs.fk_func "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS nat ON nat.id_dps_nat = t.fid_dps_nat "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = t.fid_bp_r "
-                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c "
+                        + "    ON c.id_cur = t.fid_cur "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs "
+                        + "    ON fs.id_func_sub = t.fid_func_sub "
+                        + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f "
+                        + "    ON f.id_func = fs.fk_func "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_DPS_NAT) + " AS nat "
+                        + "    ON nat.id_dps_nat = t.fid_dps_nat "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                        + "    ON b.id_bp = t.fid_bp_r "
+                        + "LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd "
                         + "    ON dcfd.id_year = t.id_year AND dcfd.id_doc = t.id_doc "
                         + "LEFT JOIN ("
                         + "    SELECT da.id_year, da.id_doc, da.nts "
@@ -1793,63 +1802,90 @@ public abstract class SExportDataUtils {
                         + "        SELECT id_year, id_doc, MAX(id_authorn) AS max_authorn "
                         + "        FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN)
                         + "        WHERE NOT b_del "
-                        + "        GROUP BY id_year, id_doc"
-                        + "    ) AS maxa ON maxa.id_year = da.id_year AND maxa.id_doc = da.id_doc "
-                        + "           AND maxa.max_authorn = da.id_authorn "
+                        + "        GROUP BY id_year, id_doc "
+                        + "    ) AS maxa "
+                        + "        ON  maxa.id_year     = da.id_year "
+                        + "        AND maxa.id_doc      = da.id_doc "
+                        + "        AND maxa.max_authorn = da.id_authorn "
                         + "    WHERE NOT da.b_del "
-                        + ") AS dpsau ON t.id_year = dpsau.id_year AND t.id_doc = dpsau.id_doc "
-
+                        + ") AS dpsau "
+                        + "    ON dpsau.id_year = t.id_year AND dpsau.id_doc = t.id_doc "
+                        + "LEFT JOIN ("
+                        + "    SELECT DISTINCT sle.reference_id "
+                        + "    FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS sl "
+                        + "    INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS sle "
+                        + "        ON sle.id_sync_log = sl.id_sync_log "
+                        + "    WHERE sl.sync_type = '" + SSyncType.PUR_REF_ORDER.name() + "' "
+                        + "      AND sle.response_code IN ('200', '201') "
+                        + ") AS synced "
+                        + "    ON synced.reference_id = " + referenceIdConcat + " "
                         + "WHERE ("
-                        + "    ((NOT t.b_del AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
-                        + "      AND t.b_authorn AND NOT t.b_link) "
-                        + "     AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_REF_ORDER, database) + "))"
-                        + (lastSyncDatetime == null ? "" : " OR ("
-                                + "(t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "  AND (t.b_del OR t.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                                + "OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "OR t.ts_link >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
+                        + "    (    NOT t.b_del "
+                        + "     AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "     AND t.b_authorn "
+                        + "     AND NOT t.b_link "
+                        + "     AND synced.reference_id IS NULL "
+                        + "    )"
+                        + (lastSyncDatetime == null ? ""
+                                : " OR ("
+                                + "    (t.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "     AND (t.b_del OR t.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
+                                + "    OR t.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                                + "    OR t.ts_link    >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'"
+                                + ")")
                         + ") "
-                        + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' "
-                        + "OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
-
-                        + "GROUP BY t.num_ser, t.num, t.dt, t.id_year, t.id_doc, t.b_link, t.b_del, "
-                        + "t.fid_st_dps, t.fid_tp_pay, t.ts_edit, t.ts_link, t.tot_r, t.tot_cur_r, t.fid_cur, "
-                        + "c.cur_key, t.fid_func_sub, fs.name, t.fid_bp_r, b.bp, dcfd.cfd_use "
-                        + "HAVING _entries_linked < _entries "
-                        + "ORDER BY t.num_ser, LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), t.num, t.dt, "
-                        + "t.id_year, t.id_doc, t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, t.ts_edit, "
-                        + "t.ts_link, t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, t.fid_func_sub, fs.name, "
-                        + "t.fid_bp_r, b.bp, dcfd.cfd_use;";
+                        + "AND NOT ("
+                        + "       b.fiscal_id = '' "
+                        + "    OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' "
+                        + "    OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '') "
+                        + ") "
+                        + "GROUP BY "
+                        + "    t.id_year, t.id_doc, "
+                        + "    t.num_ser, t.num, t.dt, "
+                        + "    t.b_link, t.b_del, t.fid_st_dps, t.fid_tp_pay, "
+                        + "    t.ts_edit, t.ts_link, "
+                        + "    t.tot_r, t.tot_cur_r, t.fid_cur, c.cur_key, "
+                        + "    t.fid_func_sub, fs.name, "
+                        + "    t.fid_bp_r, b.bp, "
+                        + "    dcfd.cfd_use "
+                        + "HAVING SUM(t._is_linked) < COUNT(*) "
+                        + "ORDER BY "
+                        + "    t.num_ser, "
+                        + "    LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), "
+                        + "    t.id_year, "
+                        + "    t.id_doc;";
 
                 ResultSet resultSet = statement.executeQuery(sql);
 
                 while (resultSet.next()) {
-                    int dpsYear = resultSet.getInt("t.id_year");
-                    int dpsDoc = resultSet.getInt("t.id_doc");
+                    int dpsYear = resultSet.getInt("id_year");
+                    int dpsDoc = resultSet.getInt("id_doc");
 
-                    String txnReference = resultSet.getString("t.num_ser");
-                    txnReference += (txnReference.isEmpty() ? "" : "-") + resultSet.getString("t.num");
-                    txnReference = SSwapConsts.TXN_REF_TYPE_ORDER_CODE + SSwapConsts.SEPARATOR_REF + txnReference; // código de tipo de referencia + '/' + referencia
+                    String txnReference = resultSet.getString("num_ser");
+                    txnReference += (txnReference.isEmpty() ? "" : "-") + resultSet.getString("num");
+                    txnReference = SSwapConsts.TXN_REF_TYPE_ORDER_CODE + SSwapConsts.SEPARATOR_REF + txnReference;
 
                     String concepts = "";
                     prepStatConcepts.setInt(1, dpsYear);
                     prepStatConcepts.setInt(2, dpsDoc);
                     prepStatConcepts.setInt(3, dpsYear);
                     prepStatConcepts.setInt(4, dpsDoc);
-
                     try (ResultSet resultSetAux = prepStatConcepts.executeQuery()) {
                         while (resultSetAux.next()) {
-                            concepts += (concepts.isEmpty() ? "" : ";") + resultSetAux.getString("t.item_key") + " - " + resultSetAux.getString("t.item");
+                            concepts += (concepts.isEmpty() ? "" : ";")
+                                    + resultSetAux.getString("item_key") + " - "
+                                    + resultSetAux.getString("item");
                         }
                     }
 
                     String costProfitCenters = "";
                     prepStatCostProfitCenters.setInt(1, dpsYear);
                     prepStatCostProfitCenters.setInt(2, dpsDoc);
-
                     try (ResultSet resultSetAux = prepStatCostProfitCenters.executeQuery()) {
                         while (resultSetAux.next()) {
-                            costProfitCenters += (costProfitCenters.isEmpty() ? "" : ";") + resultSetAux.getString("cc.id_cc") + " - " + resultSetAux.getString("cc.cc");
+                            costProfitCenters += (costProfitCenters.isEmpty() ? "" : ";")
+                                    + resultSetAux.getString("id_cc") + " - "
+                                    + resultSetAux.getString("cc");
                         }
                     }
 
@@ -1857,23 +1893,27 @@ public abstract class SExportDataUtils {
 
                     reference.external_id = dpsYear + "_" + dpsDoc;
                     reference.external_company_id = companyId;
-                    reference.external_functional_area_id = resultSet.getInt("t.fid_func_sub");
+                    reference.external_functional_area_id = resultSet.getInt("fid_func_sub");
                     reference.transaction_class_id = SSwapConsts.TXN_CAT_PURCHASE;
                     reference.document_ref_type_id = SSwapConsts.TXN_REF_TYPE_ORDER;
-                    reference.external_partner_id = resultSet.getInt("t.fid_bp_r");
+                    reference.external_partner_id = resultSet.getInt("fid_bp_r");
                     reference.reference = txnReference;
-                    reference.date = SLibUtils.IsoFormatDate.format(resultSet.getDate("t.dt")); // yyyy-mm-dd
-                    reference.currency_code = resultSet.getString("c.cur_key");
-                    reference.amount = resultSet.getDouble("t.tot_cur_r");
+                    reference.date = SLibUtils.IsoFormatDate.format(resultSet.getDate("dt"));
+                    reference.currency_code = resultSet.getString("cur_key");
+                    reference.amount = resultSet.getDouble("tot_cur_r");
                     reference.fiscal_use = resultSet.getString("_cfd_use");
-                    reference.payment_method = resultSet.getInt("t.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
-                    reference.nature = resultSet.getString("nat.dps_nat");
+                    reference.payment_method = resultSet.getInt("fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH
+                            ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    reference.nature = resultSet.getString("dps_nat");
                     reference.concepts = concepts;
                     reference.cost_profit_centers = costProfitCenters;
-                    reference.owner_id = resultSet.getInt("t.fid_usr_new");
-                    reference.is_deleted = resultSet.getBoolean("t.b_del") || resultSet.getInt("t.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED || !resultSet.getBoolean("t.b_authorn") || resultSet.getBoolean("t.b_link");
+                    reference.owner_id = resultSet.getInt("fid_usr_new");
+                    reference.is_deleted = resultSet.getBoolean("b_del")
+                            || resultSet.getInt("fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED
+                            || !resultSet.getBoolean("b_authorn")
+                            || resultSet.getBoolean("b_link");
                     reference.auth_comments = resultSet.getString("authz_nts");
-                    reference.account_tag = resultSet.getString("t.acc_tag");
+                    reference.account_tag = resultSet.getString("acc_tag");
 
                     references.add(reference);
                 }

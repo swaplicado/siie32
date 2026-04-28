@@ -27,6 +27,7 @@ import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.hrs.utils.SDocUtils;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.view.SViewFilter;
 import erp.mtrn.view.SViewDps;
@@ -1126,8 +1127,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ce.cur_key, "
                 + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps, "
                 + "CASE WHEN d.id_doc IS NOT NULL THEN "
-                + "CASE sw.proc_type WHEN 0 THEN 'Estándar' WHEN 11 THEN 'Fletes MP' "
-                + "WHEN 12 THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type,"
+                + "CASE sw.proc_type WHEN " + SDbSwapDataProcessing.PROC_TYPE_STANDARD + " THEN 'Estándar' WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT + " THEN 'Fletes MP' "
+                + "WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE + " THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type,"
                 + "v.ts_usr_sched, "
                 + "v.ts_usr_resched, "
                 + "v.ts_usr_exec, "
