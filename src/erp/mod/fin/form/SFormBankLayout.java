@@ -62,6 +62,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1245,11 +1246,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             String[] docKeyParts = SLibUtils.textExplode(docKey, "-");
                             int docYearId = Integer.parseInt(docKeyParts[0]);
                             int docDocId = Integer.parseInt(docKeyParts[1]);
-
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(moDateDateLayout.getValue());
+                            int finYear = cal.get(Calendar.YEAR);
                             PurchaseDpsBalance oDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(), 
                                                                                 docYearId, 
                                                                                 docDocId, 
                                                                                 moRadAdvanceDocuments.isSelected(),
+                                                                                finYear,
                                                                                 moRegistry.getPkBankLayoutId());
                             double paymentAmount = paymentAmountByDoc.get(docKey);
                             if (paymentAmount > oDpsBalance.getBalance()) {

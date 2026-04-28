@@ -9,6 +9,7 @@ import erp.mod.fin.db.SRowPayments;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Calendar;
 import java.util.Date;
 import sa.lib.SLibUtils;
 
@@ -237,8 +238,9 @@ public class SPaymentUtils {
                                             final int idYear,
                                             final int idDoc,
                                             final boolean isDocAdvance,
+                                            final int finYear,
                                             final int idLayout) throws Exception {
-        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, 0d, idLayout);
+        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, 0d, finYear, idLayout);
     }
 
     public static PurchaseDpsBalance getDpsBalance(Statement oStatement,
@@ -253,7 +255,11 @@ public class SPaymentUtils {
                                             final boolean isDocAdvance,
                                             final int idLayout) throws Exception {
         double paymentCy = calculatePaymentCy(miClient, fkCurrencyId, fkEntryCurrencyId, paymentAmountCy, paymentAmountApplication, date);
-        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, paymentCy, idLayout);
+        // obtener el año del objeto Date recibido:
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int finYear = cal.get(Calendar.YEAR);
+        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, paymentCy, finYear, idLayout);
     }
 
     private static PurchaseDpsBalance getDpsBalance(Statement oStatement,
@@ -261,6 +267,7 @@ public class SPaymentUtils {
                                             final int idDoc,
                                             final boolean isDocAdvance,
                                             final double paymentCy,
+                                            final int finYear,
                                             final int idLayout) throws Exception {
         PurchaseDpsBalance dpsBalance = null;
         String sql = "";
@@ -274,7 +281,7 @@ public class SPaymentUtils {
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON " +
                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
-                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + idYear + " " +
+                "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + finYear + " " +
                 "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
                 "LEFT JOIN (" +
                 "  SELECT " +
@@ -378,5 +385,70 @@ public class SPaymentUtils {
         }
         
         return dpsBalance;
+    }
+
+    /**
+     * Obtiene el número de parcialidades de un documento de compra.
+     *
+     * <p>Este método consulta la base de datos para contar las partidas de recepción
+     * relacionadas con un documento específico. Filtra solo los registros no eliminados
+     * y que correspondan a movimientos de compra con débito positivo.</p>
+     *
+     * <p>La consulta realiza JOINs entre:</p>
+     * <ul>
+     *   <li><strong>fin_rec</strong> (r): Tabla de recepciones de compra</li>
+     *   <li><strong>fin_rec_ety</strong> (re): Partidas de recepción</li>
+     *   <li><strong>trn_dps</strong> (d): Documentos (órdenes de compra, facturas, etc.)</li>
+     * </ul>
+     *
+     * @param oStatement     conexión activa a la base de datos para ejecutar la consulta
+     * @param idYear         año fiscal del documento a consultar
+     * @param idDoc          identificador único del documento de compra
+     * @param finYear        año fiscal para filtrar las recepciones activas
+     * @return número de cuotas/instalaciones encontradas; 0 si no hay registros
+     * @throws Exception si ocurre un error al ejecutar la consulta SQL
+     * 
+     * @see SDataConstantsSys#FINS_CT_SYS_MOV_BPS
+     * @see SDataConstantsSys#FINS_TP_SYS_MOV_BPS_SUP
+     */
+    public static int getDpsNumInstallments(Statement oStatement, 
+                                                final int idYear, 
+                                                final int idDoc, 
+                                                final int finYear) throws Exception {
+        int installments = 0;
+        
+        String sql = "SELECT  "
+                + "    COUNT(*) AS installments "
+                + "FROM "
+                + "    fin_rec AS r "
+                + "        INNER JOIN "
+                + "    fin_rec_ety AS re ON r.id_year = re.id_year "
+                + "        AND r.id_per = re.id_per "
+                + "        AND r.id_bkc = re.id_bkc "
+                + "        AND r.id_tp_rec = re.id_tp_rec "
+                + "        AND r.id_num = re.id_num "
+                + "        AND r.b_del = 0 "  // Solo recepciones no eliminadas
+                + "        AND re.b_del = 0 "  // Solo partidas no eliminadas
+                + "        AND r.id_year = " + finYear + " "  // Filtrar por año fiscal
+                + "        INNER JOIN "
+                // JOIN con documentos asociados a las partidas de recepción
+                + "    trn_dps AS d ON re.fid_dps_year_n = d.id_year "
+                + "        AND re.fid_dps_doc_n = d.id_doc "
+                + "WHERE "
+                // Filtrar por tipo de movimiento: Movimiento de compra (BPS = Buy Purchase Supp)
+                + "    re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " "
+                // Filtrar por tipo específico de movimiento de compra
+                + "    AND re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " "
+                + "    AND re.debit > 0 "
+                + "    AND d.id_year = " + idYear + ""
+                + "    AND d.id_doc = " + idDoc + ";";
+
+        try (ResultSet resultSet = oStatement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                installments = resultSet.getInt("installments");
+            }
+        }
+
+        return installments;
     }
 }

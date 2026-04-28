@@ -1,9 +1,16 @@
 ================================================================================
+SIIE 3.2 299.16/ 2026-04-28
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Actualizar parcialidad y saldo del documento al crear solicitudes de pago a facturas en SIIE. PDC-637.
+
+================================================================================
 SIIE 3.2 299.15/ 2026-04-27
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización de exportación de referencias de compra, se reduce el tiempo de ejecución de la consulta.
 
+================================================================================
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización de método de validación de estatus SAT de CFDI para invocarse indistintamente en la importación individual de CFDI como en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.

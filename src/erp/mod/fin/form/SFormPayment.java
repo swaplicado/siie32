@@ -31,6 +31,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.ResultSet;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -714,10 +715,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 try {
                     moDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, moDialogDpsPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
                     boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(moDateApplication.getValue());
+                    int finYear = cal.get(Calendar.YEAR);
                     moDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
                                                 moDps.getPkYearId(),
                                                 moDps.getPkDocId(),
                                                 isDocAdvance,
+                                                finYear,
                                                 0);
                     
                     showDps();
@@ -749,10 +754,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 if (dpsKey != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_VERBOSE);
                     boolean isDocAdvance = moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected();
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(moDateApplication.getValue());
+                    int finYear = cal.get(Calendar.YEAR);
                     moDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(),
                                                     moDps.getPkYearId(),
                                                     moDps.getPkDocId(),
                                                     isDocAdvance,
+                                                    finYear,
                                                     0);
                     
                     showDps();
@@ -1126,8 +1135,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         singleEntry.setConversionRate(singleEntry.getConversionRateApplication()); // same value "at application"!
         // Monto de la partida en la moneda de la partida.del día de operación del pago.
         singleEntry.setDestinyPaymentEntryCy(singleEntry.getDestinyPaymentApplicationEntryCy()); // same value "at application"!
-        
-        singleEntry.setDocInstallment(moDps == null ? 0 : 1);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(moDateApplication.getValue());
+        int finYear = cal.get(Calendar.YEAR);
+        // Parcialidad tentativa al momento de crear el pago, al contabilizar el layout se vuelve a calcular en el pago tipo 'P'
+        // Se suma uno a la parcialidad porque el pago "sería" el siguiente
+        singleEntry.setDocInstallment(moDps == null ? 0 : 
+                                    (moRadTypePayment.isSelected() && moRadAdvanceDoc.isSelected() ? 0 : 
+                                    SPaymentUtils.getDpsNumInstallments(miClient.getSession().getStatement(), moDps.getPkYearId(), moDps.getPkDocId(), finYear) + 1));
         singleEntry.setDocBalancePreviousApplicationCy(moDps == null ? 0 : moDpsBalance.getBalanceNetCy());
         singleEntry.setDocBalanceUnpaidApplicationCy_r(moDps == null ? 0 : SLibUtils.roundAmount(moDpsBalance.getBalanceNetCy() - moCurPaymentCy.getField().getValue()));
         singleEntry.setDocBalancePreviousCy(singleEntry.getDocBalancePreviousApplicationCy()); // same value "at application"!

@@ -29,7 +29,7 @@ import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -512,7 +512,7 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
 
         try {
             OffsetDateTime utcDateTime = OffsetDateTime.parse(fechaUTC);
-            ZonedDateTime mxDateTime = utcDateTime.atZoneSameInstant(ZoneId.of("America/Mexico_City"));
+            ZonedDateTime mxDateTime = utcDateTime.atZoneSameInstant(ZoneOffset.of("-06:00"));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             return mxDateTime.format(formatter);
         } catch (Exception e) {

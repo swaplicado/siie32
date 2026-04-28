@@ -46,6 +46,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
@@ -2437,7 +2438,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     "    p.pay_tp = '" + SDbPayment.TYPE_PAYMENT + "' " +
                     "    AND id_lay_bank = " + mnPkBankLayoutId + ";";
             session.getStatement().execute(msSql);
-
+            
             for (int paymentId : maAuxOldPaymentsIds) {
                 msSql = "UPDATE fin_pay "
                         + "SET fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SUBR + ", "
@@ -2449,9 +2450,29 @@ public class SDbBankLayout extends SDbRegistryUser {
         }
         
         if (mbIsForAcc) {
-            for (SDbPayment pay : maAuxNewPayments) {
-                pay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
-                pay.save(session);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mtDateLayout);
+            int finYear = cal.get(Calendar.YEAR);
+            for (SDbPayment oPay : maAuxNewPayments) {
+                oPay.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                oPay.save(session);
+                
+                for (SDbPaymentEntry oEty : oPay.getChildEntries()) {
+                    if (oEty.getFkDocYearId_n() > 0 && oEty.getFkDocDocId_n() > 0) {
+                        int inst = SPaymentUtils.getDpsNumInstallments(session.getStatement().getConnection().createStatement(), 
+                                                            oEty.getFkDocYearId_n(), 
+                                                            oEty.getFkDocDocId_n(), 
+                                                            finYear);
+                        String msEtysSql = "UPDATE fin_pay_ety " +
+                                    "SET " +
+                                    "    install = " + inst + " " +
+                                    "WHERE " +
+                                    "    id_pay = " + oPay.getPkPaymentId() + " " +
+                                    "    AND fk_doc_year_n = " + oEty.getFkDocYearId_n() + " " +
+                                    "    AND fk_doc_doc_n = " + oEty.getFkDocDocId_n() + ";";
+                        session.getStatement().getConnection().createStatement().execute(msEtysSql);
+                    }
+                }
             }
         }
         else {
