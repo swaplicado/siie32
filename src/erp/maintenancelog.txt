@@ -4,6 +4,12 @@ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización de exportación de referencias de compra, se reduce el tiempo de ejecución de la consulta.
 
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revactorización de método de validación de estatus SAT de CFDI para invocarse indistintamente en la importación individual de CFDI como en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.
+2) Validación de estatus SAT de CFDI en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.
+3) Corrección a la validación de contabilización de documentos en la creación de solicitudes de pago en la importación de facturas desde SWAP Services.
+
 ================================================================================
 SIIE 3.2 299.14/ 2026-04-27
 Jhonatan Claudio PEÑA HERNANDEZ
