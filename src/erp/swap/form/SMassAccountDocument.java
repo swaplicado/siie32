@@ -19,6 +19,10 @@ import erp.mloc.data.SDataBolLocality;
 import erp.mloc.data.SDataBolZipCode;
 import erp.mloc.data.SDataCountry;
 import erp.mloc.data.SDataState;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SDataDpsEntryTax;
 import erp.swap.SSwapConsts;
 import erp.swap.model.account.Case;
 import erp.swap.model.account.Group;
@@ -27,10 +31,6 @@ import erp.swap.model.account.SAccountSettings;
 import erp.swap.model.account.Tax;
 import erp.swap.model.account.Unit;
 import erp.swap.utils.SImportUtils;
-import erp.mod.fin.db.SDbPayment;
-import erp.mod.trn.db.SDbSwapDataProcessing;
-import erp.mtrn.data.SDataDpsEntry;
-import erp.mtrn.data.SDataDpsEntryTax;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -355,7 +355,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
             error = "No se ha validado el estatus SAT del CFDI.";
         }
         else if (!EstatusComprobante.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
-            error = "El estatus SAT del CFDI es '" + EstatusComprobante + "', pero debe ser '" + DCfdi40Consts.CFDI_ESTATUS_VIG + "'.";
+            error = "El estatus SAT del CFDI es \"" + EstatusComprobante + "\", pero debe ser \"" + DCfdi40Consts.CFDI_ESTATUS_VIG + "\".";
         }
         else if (!isCfdiInvoice()) {
             error = "El CFDI no es de tipo Ingreso (\"" + DCfdi40Catalogs.CFD_TP_I + "\").";

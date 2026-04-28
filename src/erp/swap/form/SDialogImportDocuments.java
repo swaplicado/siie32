@@ -22,6 +22,13 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SThinDps;
+import erp.mtrn.form.SDialogDpsFinder;
+import erp.mtrn.view.SViewDps;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
@@ -32,13 +39,6 @@ import erp.swap.utils.SExportUtils;
 import erp.swap.utils.SImportUtils;
 import erp.swap.utils.SResponses;
 import erp.swap.utils.SServicesUtils;
-import erp.mod.cfg.utils.SAuthJsonUtils;
-import erp.mod.fin.db.SDbPayment;
-import erp.mod.trn.db.SDbSwapDataProcessing;
-import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SThinDps;
-import erp.mtrn.form.SDialogDpsFinder;
-import erp.mtrn.view.SViewDps;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -68,6 +68,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -2107,23 +2108,21 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SDataDps order = readOrderAndPrepareDialogDpsFinder(document);
                 boolean linkToOrder = document.hasReferences(SSwapConsts.TXN_REF_TYPE_ORDER);
 
-                // creaet DPS:
+                // create DPS (dialog DPS Finder should be previously prepared):
                 
                 int[] dpsKey = null;
                 
                 switch (creationMode) {
                     case CREATE_FROM_CFDI:
-                        // import CFDI (dialog DPS Finder should be previously prepared):
+                        // import CFDI, then create and save DPS:
                         dpsKey = SImportUtils.importCfdiAndCreateAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
                         break;
-                        
                     case CREATE_FROM_SCRATCH:
-                        // create CFDI (dialog DPS Finder should be previously prepared):
+                        // create and save DPS:
                         dpsKey = SImportUtils.createAndSaveDps((SClientInterface) miClient, true, moDialogDpsFinder, files[SImportUtils.CFDI_XML_IDX], files[SImportUtils.CFDI_PDF_IDX], linkToOrder, order, document);
                         break;
-                        
                     default:
-                        // nothing
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Modalidad de creación '" + creationMode + "'.)");
                 }
                 
                 // link DPS:
