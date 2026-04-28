@@ -12,7 +12,7 @@ import erp.lib.table.STabFilterDeleted;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
-import erp.mod.cfg.swap.SSwapConsts;
+import erp.swap.SSwapConsts;
 import erp.musr.data.SDataUser;
 import sa.gui.util.SUtilConsts;
 

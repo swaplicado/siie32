@@ -9,7 +9,7 @@ import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.form.SDocumentUtils;
+import erp.swap.form.SDocumentUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;

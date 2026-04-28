@@ -1,0 +1,155 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.swap.utils;
+
+/**
+ * Clase que representa la estructura de datos para exportar información de referencias en formato JSON.
+ * Utilizada para el intercambio de datos con sistemas externos.
+ * 
+ * Incluye anotaciones de Jackson para controlar la serialización/deserialización JSON.
+ *
+ * @author Sergio Flores
+ */
+public class SExportDataReference implements SExportData {
+
+    /**
+     * ID de la referencia en el sistema externo.
+     */
+    public String external_id;
+
+    /**
+     * ID de la empresa de la referencia en el sistema externo.
+     */
+    public int external_company_id;
+
+    /**
+     * ID del área funcional de la referencia en el sistema externo.
+     */
+    public int external_functional_area_id;
+
+    /**
+     * ID de la categoría de la transacción de la referencia (1 = Compras; 2 = Ventas).
+     */
+    public int transaction_class_id;
+
+    /**
+     * ID del tipo de referencia (22 = Pedido OC).
+     */
+    public int document_ref_type_id;
+
+    /**
+     * ID del socio de negocios en el sistema externo.
+     */
+    public int external_partner_id;
+
+    /**
+     * Referencia.
+     */
+    public String reference;
+
+    /**
+     * Fecha de la referencia.
+     */
+    public String date;
+
+    /**
+     * Código de moneda (ISO 4217) del monto de la referencia.
+     */
+    public String currency_code;
+
+    /**
+     * Monto de la referencia.
+     */
+    public double amount;
+    
+    /**
+     * Uso fiscal de la referencia (Uso de CFDI).
+     */
+    public String fiscal_use;
+    
+    /**
+     * Método de pago de la referencia.
+     */
+    public String payment_method;
+    
+    /**
+     * Naturaleza del documento.
+     */
+    public String nature;
+    
+    /**
+     * Conceptos de la referencia.
+     */
+    public String concepts;
+    
+    /**
+     * Centros de costo de la referencia.
+     */
+    public String cost_profit_centers;
+    
+    /**
+     * ID de usuario del dueño de la referencia.
+     */
+    public int owner_id;
+    
+    /**
+     * Indicador de borrada de la referencia.
+     */
+    public boolean is_deleted;
+    
+    /**
+     * Notas de autorización
+     */
+    public String auth_comments;
+    
+    /**
+     * Etiqueta contable
+     */
+    public String account_tag;
+
+    /**
+     * Peso bruto del boleto.
+     */
+    public double gross_weight;
+
+    /**
+     * Peso neto del boleto.
+     */
+    public double net_weight;
+
+    /**
+     * Origen del flete.
+     */
+    public String purchase_origin_location;
+
+    /**
+     * Origen de la fruta.
+     */
+    public String purchase_origin_zone;
+
+    /**
+     * Nombre del productor.
+     */
+    public String productor_name;
+    
+    /**
+     * Nombre del archivo del ticket de som con
+     * el que se guardó en Google Cloud
+     */
+    public String som_ticket_file_name;
+
+    /**
+     * Bucket de Google Cloud Storage donde se guarda el 
+     * archivo del ticket de som.
+     */
+    public String som_ticket_file_bucket;
+
+    /**
+    * Proyecto de Google Cloud Storage donde se guarda el 
+    * archivo del ticket de som.
+    */
+    public String som_ticket_file_project_id;
+}

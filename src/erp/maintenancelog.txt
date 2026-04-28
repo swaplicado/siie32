@@ -1,8 +1,10 @@
 ================================================================================
 SIIE 3.2 299.16/ 2026-04-28
 Edwin Omar CARMONA FIGUEROA
+Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Actualizar parcialidad y saldo del documento al crear solicitudes de pago a facturas en SIIE. PDC-637.
+2) Corrección de vistas de pagos al consultar los estatus de tabla TRN_SWAP_DATA_PRC
 
 ================================================================================
 SIIE 3.2 299.15/ 2026-04-27

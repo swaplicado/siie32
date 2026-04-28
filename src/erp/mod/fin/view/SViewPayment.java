@@ -11,16 +11,16 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.SSwapUtils;
-import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.form.SDialogPdfViewer;
-import erp.mod.cfg.swap.form.SDocumentUtils;
-import erp.mod.cfg.swap.utils.SDataRejectResource;
-import erp.mod.cfg.swap.utils.SExportDataAuthActor;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SResponses;
-import erp.mod.cfg.swap.utils.SServicesUtils;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocumentUtils;
+import erp.swap.utils.SDataRejectResource;
+import erp.swap.utils.SExportDataAuthActor;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
+import erp.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
@@ -1167,7 +1167,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
                 + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
-                + "LEFT JOIN TRN_SWAP_DATA_PRC sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
+                + "LEFT JOIN (SELECT fk_dps_year_n, fk_dps_doc_n, MAX(proc_type) AS proc_type FROM TRN_SWAP_DATA_PRC " 
+                + "GROUP BY fk_dps_year_n, fk_dps_doc_n) sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
                 + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")

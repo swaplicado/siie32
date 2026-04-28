@@ -12,7 +12,7 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.mod.cfg.swap.utils.SImportUtils;
+import erp.swap.utils.SImportUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.sql.PreparedStatement;

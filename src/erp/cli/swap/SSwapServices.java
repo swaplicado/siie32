@@ -6,9 +6,9 @@
 package erp.cli.swap;
 
 import erp.data.SDataConstantsSys;
-import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SResponses;
+import erp.swap.SSyncType;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
 import sa.lib.SLibUtils;
 
 /**

@@ -60,8 +60,8 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.form.SDialogPdfViewer;
-import erp.mod.cfg.swap.form.SDocumentInfo;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocumentInfo;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.itm.db.SDbItemDescription;
 import erp.mod.itm.form.SDialogItemDescription;
@@ -375,7 +375,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbOldIsDiscountDocApplying;
     private java.lang.String msFileXmlJustLoaded;
     private java.io.File moFilePdfJustLoaded;
-    private erp.mod.cfg.swap.form.SDialogPdfViewer moDialogPdfViewer;
+    private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
@@ -410,7 +410,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private cfd.ver33.DElementComprobante moComprobante33;
     private cfd.ver40.DElementComprobante moComprobante40;
     private java.lang.String msXmlUuid;
-    private erp.mod.cfg.swap.form.SImportedDocument moImportedDocument;
+    private erp.swap.form.SImportedDocument moImportedDocument;
     private erp.mitm.data.SDataItem moAccEntryItem;
     private SConfigurationDpsOrderFiscalData moCfgFiscalDataPurchasesOrder;
     private SConfigurationPurposeDpsNature moCfgPurposeDpsNature;

@@ -18,7 +18,7 @@ import erp.lib.gui.SGuiDatePicker;
 import erp.lib.gui.SGuiDateRangePicker;
 import erp.lib.gui.SGuiModule;
 import erp.mcfg.data.SCfgUtils;
-import erp.mod.cfg.swap.SSwapConsts;
+import erp.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.server.SSessionXXX;
 import java.sql.Statement;
