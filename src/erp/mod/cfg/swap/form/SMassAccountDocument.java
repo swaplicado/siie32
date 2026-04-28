@@ -116,7 +116,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         
         Record = false;
         IconRecordable = SGridConsts.ICON_NULL;
-        IconRecorded = SGridConsts.ICON_WAIT;
+        IconRecorded = SGridConsts.ICON_NULL;
         
         parseComprobante();
     }
@@ -285,10 +285,12 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
             if (AccountSettingsSystem != null && EstatusComprobante.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) { // CFDI must be recordable and valid!
                 AccountSettingsUser = AccountSettingsSystem.clone();
                 IconRecordable = ParsingWarningType != 0 ? SGridConsts.ICON_WARN : SGridConsts.ICON_THUMBS_UP;
+                IconRecorded = SGridConsts.ICON_WAIT;
                 ParsingError = false;
             }
             else {
                 IconRecordable = SGridConsts.ICON_ANNUL;
+                IconRecorded = SGridConsts.ICON_NULL;
             }
         }
     }
