@@ -8,7 +8,7 @@ package erp.cli;
 import erp.SClientApi;
 import erp.SParamsApp;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.utils.SFileData;
+import erp.swap.utils.SFileData;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
 import java.io.File;

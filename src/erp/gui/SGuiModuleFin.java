@@ -103,8 +103,8 @@ import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.form.SDialogImportProformas;
+import erp.swap.SSwapConsts;
+import erp.swap.form.SDialogImportProformas;
 import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
@@ -392,8 +392,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckWallet moFormCheckWallet;
     private erp.mfin.form.SFormCheckFormat moFormCheckFormat;
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
-    private erp.mod.cfg.swap.form.SDialogImportProformas moDialogImportProformas;
-    private erp.mod.cfg.swap.form.SDialogImportProformas moDialogImportCrps;
+    private erp.swap.form.SDialogImportProformas moDialogImportProformas;
+    private erp.swap.form.SDialogImportProformas moDialogImportCrps;
     private erp.mtrn.form.SFormCtr moFormCtr;
     private erp.mtrn.form.SDialogRepAccountTag moDialogRepAccTag;
 

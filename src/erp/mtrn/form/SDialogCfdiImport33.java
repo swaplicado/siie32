@@ -41,7 +41,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mod.cfg.swap.form.SDocumentUtils;
+import erp.swap.form.SDocumentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;

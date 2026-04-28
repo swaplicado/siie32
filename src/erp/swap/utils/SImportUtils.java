@@ -1,0 +1,1318 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.swap.utils;
+
+import cfd.DCfdUtils;
+import cfd.ver40.DCfdi40Catalogs;
+import cfd.ver40.DCfdi40Consts;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.data.SDataRegistry;
+import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataParamsCompany;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.cfg.db.SDbComImportLog;
+import erp.mod.cfg.db.SDbComImportLogEntry;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.form.SDocumentUtils;
+import erp.swap.form.SImportedDocument;
+import erp.mtrn.data.SCfdUtilsHandler;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataDpsCfd;
+import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SThinDps;
+import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.form.SDialogDpsFinder;
+import erp.server.SServerConstants;
+import erp.server.SServerRequest;
+import erp.server.SServerResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
+import sa.lib.srv.SSrvConsts;
+
+/**
+ * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
+ * 
+ * @author Sergio Flores, Cesar Orozco, Sergio Flores, Edwin Carmona
+ */
+public abstract class SImportUtils {
+    
+    public static final int DOC_TYPE_INVOICE = 41;
+    public static final int DOC_TYPE_PROFORMA = 52;
+    
+    private static final String FILE_PREFIX_INVOICES = "facturas compras";
+    private static final String FILE_PREFIX_PROFORMAS = "proformas compras";
+    private static final String FILE_PREFIX_RECEIPT_PAYMENTS = "CRP compras";
+    private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
+    
+    public static final int DOC_FILES_ZIP_IDX = 0;
+    public static final int CFDI_XML_IDX = 0;
+    public static final int CFDI_PDF_IDX = 1;
+    public static final int CFDI_FILES = 2;
+    
+    public static final SimpleDateFormat FormatDatetime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+    public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
+    public static final DecimalFormat FormatBizPartnerId = new DecimalFormat(SLibUtils.textRepeat("0", 6)); // 000000
+    
+    private static final int DL_MODE_DOCS_ALL_FILES_AS_ZIP = 1;
+    private static final int DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR = 11;
+    private static final int DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 12;
+    
+    /**
+     * Get file name without extension.
+     * @param fileName File name.
+     * @param extension Estension.
+     * @return 
+     */
+    private static String truncExtensionFromFilename(final String fileName, final String extension) {
+        String fileNameWithoutExtension;
+        int extensionIndex = fileName.toLowerCase().lastIndexOf(extension.toLowerCase());
+        
+        if (extensionIndex != -1) {
+            fileNameWithoutExtension = fileName.substring(0, extensionIndex);
+        }
+        else {
+            fileNameWithoutExtension = fileName;
+        }
+        
+        return fileNameWithoutExtension;
+    }
+    
+    /**
+     * Get system's currency ID from given currency code.
+     * @param currencyIso3Code Currency ISO-3-code, e.t., MXN, USD, etc.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static int getCurrencyId(final String currencyIso3Code) throws Exception {
+        int id = 0;
+        
+        switch (currencyIso3Code) {
+            case SModSysConsts.FINS_FISCAL_CUR_MXN:
+                id = SModSysConsts.CFGU_CUR_MXN;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_USD:
+                id = SModSysConsts.CFGU_CUR_USD;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_EUR:
+                id = SModSysConsts.CFGU_CUR_EUR;
+                break;
+            case SModSysConsts.FINS_FISCAL_CUR_GBP:
+                id = SModSysConsts.CFGU_CUR_GBP;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Currency code '" + currencyIso3Code + "')");
+        }
+        
+        return id;
+    }
+    
+    /**
+     * Save registry through SIIE Server.
+     * WARNING: Similar save logic as in erp.lib.gui.SGuiModule.processForm(). Keep save logic synced on any change on either of both methods!
+     * @param client GUI client.
+     * @param registry Registry to save.
+     * @return Response code get from server when registry is saved.
+     * @throws Exception 
+     */
+    public static int saveRegistry(final SClientInterface client, final SDataRegistry registry) throws Exception {
+        int result = SLibConstants.UNDEFINED;
+        
+        SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
+        request.setPacket(registry);
+        SServerResponse response = client.getSessionXXX().request(request);
+        
+        if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+            throw new Exception(response.getMessage());
+        }
+        else {
+            result = response.getResultType();
+
+            if (result != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage()));
+            }
+            else {
+                SDataRegistry registrySaved = (SDataRegistry) response.getPacket();
+                Object lastSavedPrimaryKey = registrySaved.getPrimaryKey();
+                
+                registry.setPrimaryKey(registrySaved.getPrimaryKey());
+                registry.deleteTempFile(client);
+            }
+
+            // Post-save processing:
+
+            if (result == SLibConstants.DB_ACTION_SAVE_OK) {
+                if (registry.getPostSaveTarget() != null && registry.getPostSaveMethod() != null) {
+                    SLibUtils.invoke(registry.getPostSaveTarget(), registry.getPostSaveMethod(), registry.getPostSaveMethodArgs());
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Validate status of CFDI before SAT.
+     * @param client GUI client.
+     * @param comprobante CFDI 4.0 to validate.
+     * @param tipoDeComprobante Required CFDI attribute "TipoDeComprobante", e.g., "I", "E", "T", "P", "N", etc.
+     * @param throwExceptionIfInvalid Throw exception if document status is not valid, i.e., if it is not "Vigente".
+     * @return Current status of CFDI 4.0.
+     */
+    public static String validateCfdi(final SClientInterface client, final cfd.ver40.DElementComprobante comprobante, final String tipoDeComprobante, final boolean throwExceptionIfInvalid) throws Exception {
+        String cfdiStatus = "";
+        
+        String tdc = comprobante.getAttTipoDeComprobante().getString();
+
+        if (!tdc.toUpperCase().equals(tipoDeComprobante)) {
+            throw new Exception("No se validar estatus SAT del CFDI porque su tipo es \"" + tdc + "\", pero debe ser \"" + tipoDeComprobante + "\".");
+        }
+        else if (((SDataParamsCompany) client.getSessionXXX().getParamsCompany()).getIsCfdiProduction()) {
+            int cfdType = 0;
+            
+            switch (tipoDeComprobante) {
+                case DCfdi40Catalogs.CFD_TP_I:
+                case DCfdi40Catalogs.CFD_TP_E:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_INV;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_T:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_BOL;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_P:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_PAY_REC;
+                    break;
+                case DCfdi40Catalogs.CFD_TP_N:
+                    cfdType = SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
+                    break;
+                default:
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Tipo del CFDI \"" + tipoDeComprobante + "\".)");
+            }
+            
+            cfdiStatus = new SCfdUtilsHandler(client).getCfdiSatStatus(cfdType, comprobante).getCfdiStatus();
+
+            if (throwExceptionIfInvalid && !cfdiStatus.equals(DCfdi40Consts.CFDI_ESTATUS_VIG)) {
+                throw new Exception("El estatus SAT del CFDI es \"" + cfdiStatus + "\".");
+            }
+        }
+        
+        return cfdiStatus;
+    }
+    
+    /**
+     * Create DPS from a CFDI 4.0.
+     * @param client GUI client.
+     * @param dpsTypeKey DPS type key (category, class, type) of the DPS being created.
+     * @param comprobante In-memory CFDI 4.0.
+     * @param cfdiXmlFile CFDI's XML file.
+     * @param cfdiPdfFile CFDI's PDF file.
+     * @param bpReceptor Business partner "receptor".
+     * @param bpEmisor Business partner "emisor".
+     * @param dpsEntries DPS entries.
+     * @param purchaseOrder Purchase order. Can be <code>null</code>.
+     * @param dpsNatureId DPS nature ID. Requred when purchaseOrder is <code>null</code>.
+     * @param funcAreaId Functional area ID.
+     * @param funcSubAreaId Functional sub-area ID.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static SDataDps createDps(final SClientInterface client, final int[] dpsTypeKey,
+            final cfd.ver40.DElementComprobante comprobante, final File cfdiXmlFile, final File cfdiPdfFile,
+            final SDataBizPartner bpReceptor, final SDataBizPartner bpEmisor, final ArrayList<SDataDpsEntry> dpsEntries, final SDataDps purchaseOrder, final int dpsNatureId, final int funcAreaId, final int funcSubAreaId) throws Exception {
+        Date date = SLibTimeUtils.convertToDateOnly(comprobante.getAttFecha().getDatetime());
+        int currencyId = SImportUtils.getCurrencyId(comprobante.getAttMoneda().getString());
+        boolean isCash = comprobante.getAttMetodoPago().getString().equals(DCfdi40Catalogs.MDP_PUE);
+        boolean isLocalCurrency = client.getSession().getSessionCustom().isLocalCurrency(new int[] { currencyId });
+        String uuid = comprobante.getEltOpcComplementoTimbreFiscalDigital() != null ? comprobante.getEltOpcComplementoTimbreFiscalDigital().getAttUUID().getString() : "";
+        
+        SDataDps dps = new SDataDps();
+        
+        dps.setIsRecordAutomatic(true);
+        
+        dps.setPkYearId(SLibTimeUtilities.digestYear(comprobante.getAttFecha().getDatetime())[0]);
+        //dps.setPkDocId(...);
+        
+        dps.setDate(date);
+        dps.setDateDoc(date);
+        dps.setDateStartCredit(date);
+        
+        dps.setNumberSeries(comprobante.getAttSerie() != null ? comprobante.getAttSerie().getString() : "");
+        dps.setNumber(comprobante.getAttFolio() != null ? !comprobante.getAttFolio().getString().isEmpty() ? comprobante.getAttFolio().getString() : SDocumentUtils.getUuidFirstSegment(uuid) : "");
+        dps.setNumberReference(purchaseOrder != null ? purchaseOrder.getNumberReference() : "");
+        
+        dps.setDaysOfCredit(isCash ? 0 : purchaseOrder != null ? purchaseOrder.getDaysOfCredit() : bpEmisor.getDbmsCategorySettingsSup().getDaysOfCredit());
+        dps.setIsDiscountDocApplying(comprobante.getAttDescuento().getDouble() > 0);
+        dps.setIsDiscountDocPercentage(false);
+        dps.setDiscountDocPercentage(0);
+        
+        dps.setExchangeRate(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        dps.setExchangeRateSystem(isLocalCurrency ? 1.0 : comprobante.getAttTipoCambio().getDouble());
+        
+        dps.setSubtotalProvisionalCy_r(comprobante.getAttSubTotal().getDouble());
+        dps.setDiscountDocCy_r(comprobante.getAttDescuento() == null ? 0 : comprobante.getAttDescuento().getDouble());
+        dps.setSubtotalCy_r(SLibUtils.roundAmount(dps.getSubtotalProvisionalCy_r() - dps.getDiscountDocCy_r()));
+        dps.setTaxChargedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble()); 
+        dps.setTaxRetainedCy_r(comprobante.getEltOpcImpuestos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos() == null ? 0 : comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble());
+        dps.setTotalCy_r(comprobante.getAttTotal().getDouble());
+        
+        dps.setFkDpsCategoryId(dpsTypeKey[0]);
+        dps.setFkDpsClassId(dpsTypeKey[1]);
+        dps.setFkDpsTypeId(dpsTypeKey[2]);
+        dps.setFkPaymentTypeId(isCash ? SDataConstantsSys.TRNS_TP_PAY_CASH : SDataConstantsSys.TRNS_TP_PAY_CREDIT);
+        dps.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA); // XXX remove ASAP (Sergio Flores, 2017-08-09)!
+        
+        dps.setFkDpsNatureId(purchaseOrder != null ? purchaseOrder.getFkDpsNatureId() : dpsNatureId);
+        dps.setFkCompanyBranchId(client.getSessionXXX().getCurrentCompanyBranchId());
+        
+        if (purchaseOrder != null) {
+            dps.setFkFunctionalAreaId(purchaseOrder.getFkFunctionalAreaId());
+            dps.setFkFunctionalSubAreaId(purchaseOrder.getFkFunctionalSubAreaId());
+            
+            dps.setFkTaxIdentityEmisorTypeId(purchaseOrder.getFkTaxIdentityEmisorTypeId());
+            dps.setFkTaxIdentityReceptorTypeId(purchaseOrder.getFkTaxIdentityReceptorTypeId());
+        }
+        else {
+            if (!client.getSessionXXX().getParamsCompany().getIsFunctionalAreas() || funcAreaId == 0 || funcSubAreaId == 0) {
+                dps.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NA);
+                dps.setFkFunctionalSubAreaId(SModSysConsts.CFGU_FUNC_SUB_NA);
+            }
+            else {
+                dps.setFkFunctionalAreaId(funcAreaId);
+                dps.setFkFunctionalSubAreaId(funcSubAreaId);
+            }
+            
+            dps.setFkTaxIdentityEmisorTypeId(bpEmisor.getFkTaxIdentityId());
+            dps.setFkTaxIdentityReceptorTypeId(bpReceptor.getFkTaxIdentityId());
+        }
+        
+        dps.setFkBizPartnerId_r(bpEmisor.getPkBizPartnerId());
+        dps.setFkBizPartnerBranchId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkBizPartnerAltId_r(bpEmisor.getPkBizPartnerId()); 
+        dps.setFkBizPartnerBranchAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        dps.setFkBizPartnerBranchAddressAltId(bpEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        
+        dps.setFkLanguajeId(purchaseOrder != null ? purchaseOrder.getFkLanguajeId() : (bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n() == 0 ? client.getSessionXXX().getParamsErp().getFkLanguageId() : bpEmisor.getDbmsCategorySettingsSup().getFkLanguageId_n()));
+        dps.setFkCurrencyId(currencyId);
+        
+        dps.setFkDpsStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+        dps.setFkDpsValidityStatusId(SDataConstantsSys.TRNS_ST_DPS_VAL_EFF);
+        dps.setFkDpsAuthorizationStatusId(SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA);
+        dps.setFkDpsAnnulationTypeId(SDataConstantsSys.TRNU_TP_DPS_ANN_NA);
+        
+        dps.setFkIncotermId(SModSysConsts.LOGS_INC_NA);
+        dps.setFkModeOfTransportationTypeId(SModSysConsts.LOGS_TP_MOT_NA);
+        dps.setFkCarrierTypeId(SModSysConsts.LOGS_TP_CAR_NA);
+        
+        dps.setFkUserLinkedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserClosedCommissionsId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserShippedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserDpsDeliveryAckId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuditedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserAuthorizedId(SDataConstantsSys.USRX_USER_NA);
+        dps.setFkUserNewId(client.getSession().getUser().getPkUserId());
+        dps.setFkUserEditId(SUtilConsts.USR_NA_ID);
+        dps.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
+        
+        dps.setAuxKeepDpsData(true);
+        dps.setAuxKeepExchangeRate(true); 
+        dps.setAuxFileXml(cfdiXmlFile);
+        dps.setAuxFilePdf(cfdiPdfFile);
+        
+        SDataDpsCfd dpsCfd = new SDataDpsCfd();
+        
+        dpsCfd.setVersion("" + comprobante.getVersion());
+        dpsCfd.setCfdiType(comprobante.getAttTipoDeComprobante().getString());
+        dpsCfd.setPaymentWay(comprobante.getAttFormaPago().getString());
+        dpsCfd.setPaymentMethod(comprobante.getAttMetodoPago().getString());
+        dpsCfd.setPaymentConditions(comprobante.getAttCondicionesDePago().getString());
+        dpsCfd.setExportation(comprobante.getAttExportacion().getString());
+        //dpsCfd.setGlobalPeriodocity(...);
+        //dpsCfd.setGlobalMonths(...);
+        //dpsCfd.setGlobalYear(...);
+        dpsCfd.setZipIssue(comprobante.getAttLugarExpedicion().getString());
+        dpsCfd.setConfirmation(comprobante.getAttConfirmacion().getString());
+        dpsCfd.setTaxRegimeIssuing(comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+        dpsCfd.setTaxRegimeReceiver(comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString());
+        dpsCfd.setCfdiUsage(comprobante.getEltReceptor().getAttUsoCFDI().getString());
+        dpsCfd.setAuxComprobante40(comprobante);
+        
+        dps.setDbmsDataDpsCfd(dpsCfd);
+        
+        dps.getDbmsDpsEntries().addAll(dpsEntries);
+        
+        dps.calculateTotal(client);
+        
+        return dps;
+    }
+    
+    /**
+     * Create and save a new DPS.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS finder dialog.
+     * @param dpsXml XML DPS file. Can be <code>null</code>.
+     * @param dpsPdf PDF DPS file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
+     * @return DPS key as <code>int[]</code> of new invoice created.
+     * @throws java.lang.Exception
+     */
+    public static int[] createAndSaveDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File dpsXml, final File dpsPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+        SDataDps invoice = null;
+        SDataDps order = null; 
+
+        if (linkToOrder) {
+            if (orderRequired != null) {
+                order = orderRequired;
+            }
+            else {
+                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                
+                dialogDpsFinder.formReset();
+                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
+                dialogDpsFinder.setVisible(true);
+
+                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                }
+            }
+        }
+        
+        Exception exception = null;
+
+        try {
+            if (!linkToOrder || (linkToOrder && order != null)) {
+                int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                
+                Object complement;
+                
+                if (order != null) {
+                    complement = new Object[] { invoiceTypeKey, false, order };
+                }
+                else {
+                    complement = new Object[] { invoiceTypeKey };
+                }
+                
+                SDataDps newDps = null;
+                
+                if (importedDocument != null) {
+                    newDps = importedDocument.createDps(client.getSession(), order);
+                    newDps.setAuxFileXml(dpsXml);
+                    newDps.setAuxFilePdf(dpsPdf);
+                    
+                    try {
+                        /**
+                         * Cuando el documento sea factura de compras o NC de compras, y el archivo XML del DPS no sea nulo, 
+                         * se parsea el XML para obtener los datos fiscales del CFDI 4.0 y se asignan al objeto 
+                         * comprobante auxiliar del DPS, para que posteriormente se asignen en la clase SFormDps.
+                         */
+                        String sXml = new String(Files.readAllBytes(dpsXml.toPath()), "UTF-8");
+                        cfd.ver40.DElementComprobante oCfdi = DCfdUtils.getCfdi40(sXml);
+                        if (newDps.getDbmsDataDpsCfd() == null) {
+                            SDataDpsCfd oDpsCfd = new SDataDpsCfd();
+                            oDpsCfd.setAuxComprobante40(oCfdi);
+                            newDps.setDbmsDataDpsCfd(oDpsCfd);
+                        }
+                        else {
+                            newDps.getDbmsDataDpsCfd().setAuxComprobante40(oCfdi);
+                        }
+                    }
+                    catch (Exception e) {
+                        Logger.getLogger(SImportUtils.class.getName()).
+                                log(java.util.logging.Level.SEVERE, 
+                                "Error al parsear el CFDI del documento importado.", e);
+                    }
+                }
+
+                client.getGuiModule(module).setFormComplement(complement);
+                client.getGuiModule(module).setAuxRegistry(newDps);
+
+                if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                    invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                    SDataUtilities.showDpsRecord(client, invoice);
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
+    }
+    
+    /**
+     * Import and create a new invoice.
+     * @param client GUI client.
+     * @param isPurchase Is-purchase flag.
+     * @param dialogDpsFinder DPS finder dialog.
+     * @param cfdiXml XML CFDI file. Can be <code>null</code>. When it is <code>null</code>, then a file is required in an "open" dialog.
+     * @param cfdiPdf PDF CFDI file. Can be <code>null</code>.
+     * @param linkToOrder Link-to-order flag.
+     * @param orderRequired Required order. Can be <code>null</code>. When it is <code>null</code> and an order must to be linked, then an order is required in DPS Finder dialog.
+     * @param importedDocument Imported document from SWAP Services. Can be <code>null</code>.
+     * @return DPS key as <code>int[]</code> of new invoice created.
+     * @throws java.lang.Exception
+     */
+    public static int[] importCfdiAndCreateAndSaveDps(final SClientInterface client, final boolean isPurchase, final SDialogDpsFinder dialogDpsFinder, final File cfdiXml, final File cfdiPdf, final boolean linkToOrder, final SDataDps orderRequired, final SImportedDocument importedDocument) throws Exception {
+        SDataDps invoice = null;
+        SDataDps order = null; 
+
+        if (linkToOrder) {
+            if (orderRequired != null) {
+                order = orderRequired;
+            }
+            else {
+                int[] orderTypeKey = isPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                
+                dialogDpsFinder.formReset();
+                dialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, orderTypeKey);
+                dialogDpsFinder.setVisible(true);
+
+                if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    order = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                }
+            }
+        }
+        
+        boolean chooserUsed = false;
+        Exception exception = null;
+
+        try {
+            if (!linkToOrder || (linkToOrder && order != null)) {
+                File chosenCfdiXml = cfdiXml;
+
+                if (chosenCfdiXml == null) {
+                    chooserUsed = true;
+                    FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
+                    client.getFileChooser().repaint();
+                    client.getFileChooser().setAcceptAllFileFilterUsed(false);
+                    client.getFileChooser().setFileFilter(filter);
+                    
+                    if (client.getFileChooser().showOpenDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                        chosenCfdiXml = client.getFileChooser().getSelectedFile();
+                    }
+                }
+
+                if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
+                    SCfdRenderer renderer = new SCfdRenderer(client);
+                    SDataDps newDps = renderer.renderCfd(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+
+                    if (newDps != null) {
+                        int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                        int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+
+                        newDps.setAuxFilePdf(cfdiPdf);
+                        
+                        // set dayos of credit and accounting tag:
+                        
+                        String tag = "";
+                        
+                        if (importedDocument != null) {
+                            if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument.getDueDateEffective() != null) {
+                                newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
+                            }
+                            
+                            tag = importedDocument.AccountingTag;
+                        }
+                        
+                        if (tag.isEmpty() && order != null && !order.getAccountingTag().isEmpty()) {
+                            tag = order.getAccountingTag();
+                        }
+                        
+                        newDps.setAccountingTag(tag);
+                        newDps.setXtaImportedDocument(importedDocument);
+                        
+                        // complete DPS creation:
+                        
+                        client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
+                        client.getGuiModule(module).setAuxRegistry(newDps);
+
+                        if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                            client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                            invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                            SDataUtilities.showDpsRecord(client, invoice);
+                        }
+                    }
+                }
+                else {
+                    client.showMsgBoxInformation("El archivo proporcionado debe ser " + SFileUtilities.xml.toUpperCase() + ".\n"
+                            + "(Archivo proporcionado: '" + chosenCfdiXml.getName() + "')");
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        finally {
+            if (chooserUsed) {
+                client.getFileChooser().resetChoosableFileFilters();
+                client.getFileChooser().setAcceptAllFileFilterUsed(true);
+            }
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return invoice != null ? (int[]) invoice.getPrimaryKey() : null;
+    }
+    
+    /**
+     * Convert document into a new documents list.
+     * @param document External document ID whose XML & PDF files needs to be downloaded.
+     * @return 
+     */
+    public static ArrayList<Integer> convertIntoDocumentsList(final int document) {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(document);
+        return documents;
+    }
+    
+    private static String getFilePrefix(final int documentType) {
+        String prefix = "";
+        
+        switch (documentType) {
+            case SSwapConsts.TXN_DOC_TYPE_INVOICE:
+                prefix = FILE_PREFIX_INVOICES + " ";
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_PROFORMA:
+                prefix = FILE_PREFIX_PROFORMAS + " ";
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT:
+                prefix = FILE_PREFIX_RECEIPT_PAYMENTS + " ";
+                break;
+            default:
+                // nothing
+        }
+        
+        return prefix;
+    }
+    
+    /**
+     * Choose download ZIP file.
+     * @param session GUI session.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return 
+     */
+    public static File chooseDownloadZipFile(final SGuiSession session, final int documentType) {
+        File zipFile = null;
+        String prefix = getFilePrefix(documentType);
+        String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+
+        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
+        JFileChooser fileChooser = session.getClient().getFileChooser();
+        fileChooser.repaint();
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setFileFilter(filter);
+        fileChooser.setSelectedFile(new File(prefix + companyCode + " " + FormatDatetime.format(new Date()) + "." + SFileUtilities.zip));
+
+        if (fileChooser.showSaveDialog(session.getClient().getFrame()) == JFileChooser.APPROVE_OPTION) {
+            zipFile = fileChooser.getSelectedFile();
+
+            // ensure file ends with ".zip":
+            if (!zipFile.getName().toLowerCase().endsWith("." + SFileUtilities.zip)) {
+                zipFile = new File(zipFile.getAbsolutePath() + "." + SFileUtilities.zip);
+            }
+        }
+        
+        return zipFile;
+    }
+    
+    /**
+     * Download documents files.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param downloadMode Download mode.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
+     * @param zipBatch Current batch number when downloading several documents as ZIP in a loop, can be zero. When greater than zero, this batch nomber is added to the name of the desired file, when it is available.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
+        File[] files = null;
+        File zipFile = null;
+        Path tempDir = null;
+        Path tempFile = null;
+        Exception exception = null;
+        HttpURLConnection conn = null;
+        String ids = documentExternalIds.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        
+        try {
+            // open download service connection:
+            
+            URL url = new URL(serviceUrl);
+            String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(SSwapConsts.TIME_180_SEC); // timeout para conectar
+            conn.setReadTimeout(SSwapConsts.TIME_180_SEC); // timeout para leer la respuesta
+            conn.setRequestMethod(SHttpConsts.METHOD_POST);
+            conn.setRequestProperty("Accept-Charset", charset);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+            //conn.setDoInput(true);
+
+            // send JSON body required by API:
+            
+            Date requestDatetime = new Date();
+            String requestBody = "{\"document_ids\": [" + ids + "]}"; // example payload
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+
+            // parse custom header
+            
+            Date responseDatetime = null;
+            String responseBody = "";
+            String summaryHeader = conn.getHeaderField("x-download-summary");
+
+            if (summaryHeader != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode summaryJson = mapper.readTree(summaryHeader);
+
+                responseDatetime = new Date();
+                responseBody = summaryJson.toPrettyString();
+
+                System.out.println("Download summary from header:");
+                System.out.println(responseBody);
+            }
+
+            // choose download ZIP file:
+            
+            switch (downloadMode) {
+                case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
+                    // ask for desired ZIP file:
+                    
+                    if (desiredZipFile != null) {
+                        zipFile = desiredZipFile;
+                    }
+                    else {
+                        zipFile = chooseDownloadZipFile(session, documentType);
+                    }
+                    
+                    if (zipFile != null && desiredZipFile != null && zipBatch > 0) {
+                        // add batch number to desired ZIP file:
+                        
+                        // lower case absolute path to find ZIP extension:
+                        String absolutePath = zipFile.getAbsolutePath().toLowerCase();
+                        
+                        // set absolute path in original case:
+                        if (absolutePath.endsWith("." + SFileUtilities.zip)) {
+                            absolutePath = zipFile.getAbsolutePath().substring(0, absolutePath.lastIndexOf("." + SFileUtilities.zip));
+                        }
+                        else {
+                            absolutePath = zipFile.getAbsolutePath();
+                        }
+                        
+                        // add batch number to file name:
+                        zipFile = new File(absolutePath += " (" + (zipBatch < 10 ? "0" : "") + zipBatch + ")." + SFileUtilities.zip);
+                    }
+                    break;
+                    
+                case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
+                case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                    // set ZIP file in temporal directory:
+                    
+                    String prefix = getFilePrefix(documentType);
+                    String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+                    
+                    tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
+                    System.out.println("Temporary directory created at: " + tempDir);
+                    
+                    tempFile = Files.createFile(tempDir.resolve((prefix + " " + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
+                    
+                    zipFile = tempFile.toFile();
+                    break;
+                    
+                default:
+                    throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+            }
+            
+            // download and process chosen file:
+            
+            if (zipFile != null) {
+                // save the ZIP file locally:
+                
+                String zipPath = zipFile.getAbsolutePath();
+                System.out.println("Saving file as: " + zipFile.getAbsolutePath());
+
+                try (InputStream in = conn.getInputStream(); FileOutputStream out = new FileOutputStream(zipPath)) {
+                    int bytesRead;
+                    byte[] buffer = new byte[8192];
+
+                    while ((bytesRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
+                    }
+                }
+                
+                // finish processing:
+
+                switch (downloadMode) {
+                    case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
+                        // log import downloads:
+                        
+                        System.out.println("Loging import downloads...");
+                        
+                        SImportUtils.logImportDownloads(session, requestBody, requestDatetime, SHttpConsts.RSC_SUCC_OK, responseBody, responseDatetime, documentExternalIds, documentType);
+                        
+                        files = new File[] { zipFile };
+                        break;
+
+                    case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
+                        // decompress to get aLL files:
+
+                        System.out.println("Extracting all files into temp directory...");
+
+                        ArrayList<File> extractedFiles = new ArrayList<>();
+
+                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                            ZipEntry entry;
+
+                            while ((entry = zis.getNextEntry()) != null) {
+
+                                File currentFile = new File(tempDir.toString(), entry.getName());
+                                currentFile.getParentFile().mkdirs();
+
+                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
+                                    int bytesRead;
+                                    byte[] buffer = new byte[8192];
+
+                                    while ((bytesRead = zis.read(buffer)) > 0) {
+                                        fos.write(buffer, 0, bytesRead);
+                                    }
+                                }
+
+                                extractedFiles.add(currentFile);
+
+                                zis.closeEntry();
+                            }
+                        }
+
+                        files = extractedFiles.toArray(new File[0]);
+                        break;    
+
+                    case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                        // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
+                        
+                        System.out.println("Extracting CFDI files into temp directory...");
+                        
+                        String xmlFileName = "";
+                        File xmlFile = null;
+                        File pdfFile = null;
+                        HashMap<String, File> pdfFilesMap = new HashMap<>();
+                        
+                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                            ZipEntry entry;
+
+                            while ((entry = zis.getNextEntry()) != null) {
+                                System.out.println("Extracting: " + entry.getName());
+
+                                File currentFile = new File(tempDir.toString() + "\\output", entry.getName());
+                                currentFile.getParentFile().mkdirs(); // decompress files in temporal directory
+
+                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
+                                    int bytesRead;
+                                    byte[] buffer = new byte[8192];
+
+                                    while ((bytesRead = zis.read(buffer)) > 0) {
+                                        fos.write(buffer, 0, bytesRead);
+                                    }
+                                }
+
+                                zis.closeEntry();
+                                
+                                // process current file:
+                                if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
+                                    // choose the first retrieved XML file:
+                                    xmlFile = currentFile;
+                                    xmlFileName = truncExtensionFromFilename(xmlFile.getName(), "." + SFileUtilities.xml);
+                                }
+                                else if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
+                                    // preserve all retrieved PDF files:
+                                    pdfFilesMap.put(truncExtensionFromFilename(currentFile.getName(), "." + SFileUtilities.pdf), currentFile);
+                                }
+                                
+                                // attempt to match the PDF file:
+                                if (!xmlFileName.isEmpty() && pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                    pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF file by matching the name of the XML file
+                                }
+                                
+                                // check if matching processing is done:
+                                if (xmlFile != null && pdfFile != null) {
+                                    break; // a pair of matching XML and PDF files found, no more processing needed!
+                                }
+                            }
+                            
+                            // last chance to get at least one PDF file!:
+                            if (pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                pdfFile = (File) pdfFilesMap.values().toArray()[0]; // choose the very first retrieved PDF!
+                            }
+                        }
+                        
+                        files = new File[] { xmlFile, pdfFile };
+                        break;
+                        
+                    default:
+                        // nothing
+                }
+            }
+        }
+        catch (Exception e) {
+            exception = e;
+        }
+        finally {
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                }
+                catch (Exception e) {
+                    exception = e;
+                }
+            }
+            
+            if (downloadMode == DL_MODE_DOCS_ALL_FILES_AS_ZIP) {
+                JFileChooser fileChooser = session.getClient().getFileChooser();
+                fileChooser.resetChoosableFileFilters();
+                fileChooser.setAcceptAllFileFilterUsed(true);
+            }
+        }
+        
+        if (exception != null) {
+            throw exception;
+        }
+        
+        return files;
+    }
+
+    /**
+     * Download documents' all files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
+     * @param zipBatch Current batch number when downloading several documents as ZIP in a loop, can be zero. When greater than zero, this batch nomber is added to the name of the desired file, when it is available.
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, desiredZipFile, zipBatch);
+    }
+
+    /**
+     * Download documents' all files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, null, 0);
+    }
+
+    /**
+     * Download document's all files into temporal directory.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documentExternalId External document ID whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(documentExternalId);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
+    }
+    
+    /**
+     * Download document XML & PDF files as ZIP.
+     * @param session GUI session.
+     * @param serviceUrl Download service URL.
+     * @param documentExternalId External document ID whose XML & PDF files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return File array of 2 elements: the XML (at index 0) & PDF (at index 1) files.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
+        ArrayList<Integer> documents = new ArrayList<>();
+        documents.add(documentExternalId);
+        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
+    }
+    
+    /**
+     * Create documents local temporal directory.
+     * @param fileExtension Extension of temporal files to be stored in temporal directory.
+     * @return
+     * @throws IOException 
+     */
+    public static File createDocumentsLocalTempDir(final String fileExtension) throws IOException {
+        String subdir = "";
+        
+        switch (fileExtension) {
+            case SFileUtilities.pdf:
+                subdir = TEMP_DIR_DOCS_PDF;
+                break;
+            default:
+                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Extensión de archivo: " + fileExtension + ")");
+        }
+        
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + subdir);
+        
+        if (!localTempDir.exists()) {
+            boolean ok = localTempDir.mkdirs();
+            if (!ok) {
+                throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
+            }
+        }
+        
+        System.out.println("localTempDir.getAbsolutePath()  : " + localTempDir.getAbsolutePath());
+        /* Keep for debuggin purposes:
+        System.out.println("localTempDir.getCanonicalPath() : " + localTempDir.getCanonicalPath());
+        System.out.println("localTempDir.getName()          : " + localTempDir.getName());
+        System.out.println("localTempDir.getParent()        : " + localTempDir.getParent());
+        System.out.println("localTempDir.getPath()          : " + localTempDir.getPath());
+        System.out.println("localTempDir.toString()         : " + localTempDir.toString());
+        */
+        
+        return localTempDir;
+    }
+    
+    /**
+     * Get local temporal file for required document external ID and file extension. Creates local temporal directory if not exists.
+     * @param documentExternalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @param bizPartnerId Business partner ID.
+     * @return Local temporal file.
+     * @throws IOException 
+     */
+    private static File createDocumentLocalTempFile(final int documentExternalId, final int bizPartnerId, final String fileExtension) throws IOException {
+        File localTempDir = createDocumentsLocalTempDir(fileExtension);
+        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(documentExternalId) + "." + fileExtension;
+        
+        System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
+        
+        return new File(absolutePath);
+    }
+    
+    /**
+     * Get document file from temporal directory.
+     * @param documentExternalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @param bizPartnerId Business partner ID.
+     * @return Document file from temporal directory if exists, otherwise <code>null</code>.
+     * @throws IOException 
+     */
+    public static File getDocumentFileFromTempDirIfExists(final int documentExternalId, final String fileExtension, final int bizPartnerId) throws IOException {
+        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId,fileExtension);
+        
+        if (!tempFile.exists()) {
+            tempFile = null;
+        }
+        
+        return tempFile;
+    }
+    
+    /**
+     * Copy document original file to temporal directory.
+     * @param documentExternalId Document external ID.
+     * @param fileExtension Extension of temporal file.
+     * @param originalFile Document original file.
+     * @param bizPartnerId Business partner ID.
+     * @return Just created document file from temporal directory.
+     * @throws IOException 
+     */
+    public static File copyDocumentFileToTempDir(final int documentExternalId, final String fileExtension, final File originalFile, final int bizPartnerId) throws IOException {
+        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId, fileExtension);
+        
+        Files.copy(
+            originalFile.toPath(),
+            tempFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
+        );
+        
+        return tempFile;
+    }
+    
+    /**
+     * Create prepared statement to count imports:
+     * Index:   Parameter:
+     *      1   Sync type.
+     *      2   Response code.
+     *      3   User ID.
+     *      4   Entry response code.
+     *      5   Reference ID.
+     * @param statement DB statement.
+     * @return Prepared statement.
+     * @throws Exception 
+     */
+    public static PreparedStatement createPreparedStatementToCountImports(final Statement statement) throws Exception {
+        String sql = "SELECT COUNT(*) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG) + " AS il "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG_ETY) + " AS ile ON ile.id_sync_log = il.id_sync_log "
+                + "WHERE il.sync_type = ? AND il.response_code = ? AND il.fk_usr = ? AND ile.response_code = ? AND ile.reference_id = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
+     * Count imports.
+     * @param preparedStatement
+     * @param syncType
+     * @param responseCode
+     * @param userId
+     * @param referenceId
+     * @return 
+     * @throws Exception 
+     */
+    public static int countImports(final PreparedStatement preparedStatement, final String syncType, final String responseCode, final int userId, final String referenceId) throws Exception {
+        int count = 0;
+        
+        preparedStatement.setString(1, syncType);
+        preparedStatement.setString(2, responseCode);
+        preparedStatement.setInt(3, userId);
+        preparedStatement.setString(4, responseCode);
+        preparedStatement.setString(5, referenceId);
+        
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        }
+        
+        return count;
+    }
+
+    /**
+     * Log import downloads.
+     * @param session GUI session.
+     * @param requestBody Service request body as JSON.
+     * @param requestDatetime Service request datetime.
+     * @param httpResponseStatusCode HTTP response status code.
+     * @param responseBody Service response body as JSON.
+     * @param responseDatetime Service response datetime.
+     * @param documentExternalIds List of IDs of downloaded documents.
+     * @param typeDocument Type of document (invoice, proforma).
+     * @throws Exception 
+     */
+    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documentExternalIds, final int typeDocument) throws Exception {
+        SDbComImportLog log = new SDbComImportLog();
+        
+        //log.setPkSyncLogId(...);
+        if (typeDocument == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
+            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+        }
+        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
+            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
+        }
+        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT) {
+            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PAY_RC);
+        }
+        //log.msRequestBodyFileName...
+        log.setRequestTimestamp(requestDatetime);
+        log.setResponseCode("" + httpResponseStatusCode);
+        //log.msResponseBodyFileName...
+        log.setResponseTimestamp(responseDatetime);
+        //log.mnFkUserId...
+        //log.mtTsUser...
+        
+        for (Integer document : documentExternalIds) {
+            SDbComImportLogEntry entry = new SDbComImportLogEntry();
+            
+            //entry.setPkSyncLogId(...);
+            //entry.setPkEntryId(...);
+            entry.setResponseCode("" + SHttpConsts.RSC_SUCC_OK);
+            entry.setResponseBody("");
+            entry.setReferenceId("" + document);
+            entry.setReferenceUuid("" + document);
+            //entry.setFkDpsYearId_n(...);
+            //entry.setFkDpsDocumentId_n(...);
+            //entry.setTsSync(...);
+            
+            log.getEntries().add(entry);
+        }
+        
+        log.save(session);
+        
+        SExportLogsUtils.safeWriteToLogFile(log.getRequestBodyFileName(), requestBody);
+        SExportLogsUtils.safeWriteToLogFile(log.getResponseBodyFileName(), responseBody);
+    }
+    
+    /**
+     * Update DPS days of credit by required due date.
+     * @param session GUI session.
+     * @param dpsKey DPS primary key.
+     * @param dueDate Required due date.
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public static boolean updateDpsDaysOfCreditByDueDate(final SGuiSession session, final int[] dpsKey, final Date dueDate) throws Exception {
+        boolean updated = false;
+        
+        SThinDps dps = new SThinDps();
+        dps.read(dpsKey, session.getStatement());
+        
+        if (dps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CREDIT) {
+            throw new Exception("El documento '" + dps.getDpsNumber() + "' debe tener tipo de pago 'crédito'.");
+        }
+        else if (dueDate.before(dps.getDate())) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha del documento '" + dps.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dps.getDate()) + ").");
+        }
+        else if (dueDate.before(dps.getDateStartOfCredit())) {
+            throw new Exception("La fecha requerida de vencimiento (" + SLibUtils.DateFormatDate.format(dueDate) + ") no puede ser anterior a la fecha base de crédito del documento '" + dps.getDpsNumber() + "' (" + SLibUtils.DateFormatDate.format(dps.getDateStartOfCredit()) + ").");
+        }
+        else {
+            long daysOfCredit = SLibTimeUtils.getDaysDiff(dueDate, dps.getDateStartOfCredit());
+            
+            if (dps.getDaysOfCredit() != (int) daysOfCredit) {
+                String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) +  " SET "
+                        + "days_cred = " + (int) daysOfCredit + " "
+                        + "WHERE id_year = " + dps.getPkYearId() + " AND id_doc = " + dps.getPkDocId() + ";";
+                
+                session.getStatement().execute(sql);
+                updated = true;
+            }
+        }
+        
+        return updated;
+    }
+    
+    /**
+     * Create DPS folio from reference folio for given reference prefix.
+     * @param refFolio Reference folio, e.g., "OC/A-100".
+     * @param refPrefix Reference prefix, e.g., "OC".
+     * @return DPS folio.
+     */
+    public static DpsFolio createDpsFolio(final String refFolio, final String refPrefix) {
+        DpsFolio dpsFolio = null;
+        
+        if (!refFolio.isEmpty() && !refPrefix.isEmpty()) {
+            String prefix = refPrefix + SSwapConsts.SEPARATOR_REF;
+            String folio = refFolio.substring(prefix.length());
+            String[] folioElements = folio.split("-");
+            String series = folioElements.length == 1 ? "" : folioElements[0];
+            String number = folioElements.length == 1 ? folioElements[0] : folioElements[1];
+            
+            dpsFolio = new DpsFolio(series, number);
+        }
+        
+        return dpsFolio;
+    }
+    
+    /**
+     * Create DPS key from reference key.
+     * @param refKey Reference key, e.g., "2025_1".
+     * @return 
+     */
+    public static DpsKey createDpsKey(final String refKey) {
+        DpsKey dpsKey = null;
+        
+        if (!refKey.isEmpty()) {
+            String[] keyElements = refKey.split("_");
+            
+            if (keyElements.length == 2) {
+                int yearId = SLibUtils.parseInt(keyElements[0]);
+                int docId = SLibUtils.parseInt(keyElements[1]);
+                
+                dpsKey = new DpsKey(yearId, docId);
+            }
+        }
+        
+        return dpsKey;
+    }
+    
+    /**
+     * In memory DPS folio.
+     */
+    public static class DpsFolio {
+        
+        public String Series;
+        public String Number;
+        
+        public DpsFolio(final String series, final String number) {
+            Series = series;
+            Number = number;
+        }
+        
+        public String getFolio() {
+            return Series + (Series.isEmpty() ? "" : "-") + Number;
+        }
+    }
+    
+    /**
+     * In memory DPS key.
+     */
+    public static class DpsKey {
+        
+        public int YearId;
+        public int DocId;
+        
+        public DpsKey(final int yearId, final int docId) {
+            YearId = yearId;
+            DocId = docId;
+        }
+        
+        public int[] asKey() {
+            return YearId != 0 && DocId != 0 ? new int[] { YearId, DocId } : null;
+        }
+    }
+}
