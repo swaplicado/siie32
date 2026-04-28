@@ -1167,7 +1167,8 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
                 + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
-                + "LEFT JOIN TRN_SWAP_DATA_PRC sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
+                + "LEFT JOIN (SELECT fk_dps_year_n, fk_dps_doc_n, MAX(proc_type) AS proc_type FROM TRN_SWAP_DATA_PRC " 
+                + "GROUP BY fk_dps_year_n, fk_dps_doc_n) sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
                 + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
