@@ -69,7 +69,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Sergio Flores, Rodigo Ayala
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Rodigo Ayala, Sergio Flores
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 
@@ -1210,7 +1210,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsReference.setText("Referencia obligatoria");
         jPanel39.add(jckIsReference);
 
-        jckIsPrepayment.setText("Es anticipo");
+        jckIsPrepayment.setText("Es anticipo para facturarse");
         jPanel39.add(jckIsPrepayment);
 
         jlMaterialType.setText("Familia de insumo:");

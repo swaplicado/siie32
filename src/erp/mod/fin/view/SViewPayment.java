@@ -11,6 +11,18 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.db.SDbPaymentFile;
+import erp.mod.fin.form.SDialogPaymentChangeStatus;
+import erp.mod.hrs.utils.SDocUtils;
+import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mod.trn.form.SDialogDocumentAuthornComments;
+import erp.mod.view.SViewFilter;
+import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.view.SViewDps;
+import erp.musr.data.SDataUser.Right;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
@@ -21,17 +33,6 @@ import erp.swap.utils.SExportDataAuthActor;
 import erp.swap.utils.SExportUtils;
 import erp.swap.utils.SResponses;
 import erp.swap.utils.SServicesUtils;
-import erp.mod.cfg.utils.SAuthorizationUtils;
-import erp.mod.fin.db.SDbPayment;
-import erp.mod.fin.db.SDbPaymentEntry;
-import erp.mod.fin.db.SDbPaymentFile;
-import erp.mod.fin.form.SDialogPaymentChangeStatus;
-import erp.mod.hrs.utils.SDocUtils;
-import erp.mod.trn.db.SDbSwapDataProcessing;
-import erp.mod.trn.form.SDialogDocumentAuthornComments;
-import erp.mod.view.SViewFilter;
-import erp.mtrn.view.SViewDps;
-import erp.musr.data.SDataUser.Right;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,7 +67,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona, Claudio Peña
+ * @author Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -81,6 +82,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterCurrency;
+    private SCfdRenderer moCfdRenderer;
     private SDialogPdfViewer moDialogPdfViewer;
     
     private JButton jbDocShowCfdiXml;
@@ -375,7 +377,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         if(jbDocShowCfdiXml.isEnabled()) {
             if (isRowDataSelected()) {
                 try {
-                    SViewDps.showCfdiXml((SClientInterface) miClient, getDocKeyOfSelectedPayment());
+                    if (moCfdRenderer == null) {
+                        moCfdRenderer = new SCfdRenderer((SClientInterface) miClient);
+                    }
+                    
+                    SViewDps.showCfdiXml((SClientInterface) miClient, getDocKeyOfSelectedPayment(), moCfdRenderer);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -402,7 +408,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
             if (isRowDataSelected()) {
                 try {
                     if (moDialogPdfViewer == null) {
-                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
+                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient);
                     }
                     
                     SViewDps.showDocPdf((SClientInterface) miClient, getDocKeyOfSelectedPayment(), moDialogPdfViewer);

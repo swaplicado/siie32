@@ -33,7 +33,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Claudio Peña, Sergio Flores
  */
 public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface {
 
@@ -43,7 +43,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private int mnFormResult;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
-    private boolean mbInventoriableOnly;
+    private boolean mbInventoriablesOnly;
+    private boolean mbAdvancesOnly;
     private java.lang.Object moFilterKey;
     private erp.lib.table.STablePane moOptionPane;
     private java.awt.event.KeyAdapter moKeyAdapterEnter;
@@ -106,8 +107,10 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jPanel9 = new javax.swing.JPanel();
         jlItemClass = new javax.swing.JLabel();
         jcbItemClass = new javax.swing.JComboBox();
+        jPanel10 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jckFindExactMatch = new javax.swing.JCheckBox();
+        jPanel11 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Seleccionar ítem");
@@ -256,7 +259,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de búsqueda:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -275,7 +278,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         jPanel5.add(jPanel9);
 
-        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel5.add(jPanel10);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -288,7 +292,12 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         });
         jPanel6.add(jckFindExactMatch);
 
-        jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
+        jPanel5.add(jPanel6);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel5.add(jPanel11);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
         jPanel1.add(jPanel2);
 
@@ -426,31 +435,27 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     }
 
     private void readCompanyBranch() {
-        SDataBizPartnerBranch companyBranch = new SDataBizPartnerBranch();
-
         if (!showStock()) {
             jtfCompanyBranch.setText("");
         }
         else {
             mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
-            companyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnCompanyBranchId }, SLibConstants.EXEC_MODE_SILENT);
-
+            
+            SDataBizPartnerBranch companyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnCompanyBranchId }, SLibConstants.EXEC_MODE_SILENT);
             jtfCompanyBranch.setText(companyBranch.getBizPartnerBranch());
             jtfCompanyBranch.setCaretPosition(0);
         }
     }
 
     private void readWarehouse() {
-        SDataCompanyBranchEntity warehouse = new SDataCompanyBranchEntity();
-
         if (!showStock()) {
             jtfWarehouse.setText("");
         }
         else {
             mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
             mnCompanyBranchEntityId = (Integer) ((Object[]) moFilterKey)[4];
-            warehouse = (SDataCompanyBranchEntity) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, new int[] { mnCompanyBranchId, mnCompanyBranchEntityId }, SLibConstants.EXEC_MODE_SILENT);
-
+            
+            SDataCompanyBranchEntity warehouse = (SDataCompanyBranchEntity) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, new int[] { mnCompanyBranchId, mnCompanyBranchEntityId }, SLibConstants.EXEC_MODE_SILENT);
             jtfWarehouse.setText(warehouse.getCode());
         }
     }
@@ -459,7 +464,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         int col = 0;
         int dataType = SLibConsts.UNDEFINED;
         String[] titles = null;
-        HashMap<Integer, Object> params = new HashMap<Integer, Object>();
+        HashMap<Integer, Object> params = new HashMap<>();
 
         aoTableColumns = new STableColumnForm[showStock() ? 11 : 10];
 
@@ -492,7 +497,6 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Fabricante", 100);
         }
         else if (jrbFindByBrand.isSelected() || jrbFindByManufacturer.isSelected()) {
-            
             if (jrbFindByBrand.isSelected()) {
                 dataType = SDataConstants.ITMX_ITEM_BY_BRAND;
                 titles = new String[] { "Marca", "Fabricante" };
@@ -535,7 +539,9 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             moOptionPane.addTableColumn(column);
         }
 
-        params.put(SLibConstants.VALUE_INV_ONLY, mbInventoriableOnly);
+        params.put(SLibConstants.VALUE_INV_ONLY, mbInventoriablesOnly);
+        params.put(SLibConstants.VALUE_ADV_ONLY, mbAdvancesOnly);
+        
         mvTableRows.clear();
         mvTableRows = SDataReadTableRows.getTableRows(miClient, dataType, moFilterKey, params);
         
@@ -670,6 +676,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFind;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -709,7 +717,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-        mbInventoriableOnly = false;
+        mbInventoriablesOnly = false;
+        mbAdvancesOnly = false;
         moFilterKey = null;
 
         jtfSearchText.setText("");
@@ -783,7 +792,10 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     public void setFormParam(int param, Object value) {
         switch (param) {
             case SLibConstants.VALUE_INV_ONLY:
-                mbInventoriableOnly = (Boolean) value;
+                mbInventoriablesOnly = (Boolean) value;
+                break;
+            case SLibConstants.VALUE_ADV_ONLY:
+                mbAdvancesOnly = (Boolean) value;
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);

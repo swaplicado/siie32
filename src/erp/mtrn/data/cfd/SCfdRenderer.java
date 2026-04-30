@@ -23,14 +23,16 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.swap.form.SDialogPdfViewer;
-import erp.swap.form.SDocumentInfo;
-import erp.swap.utils.SImportUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogCfdiImport33;
 import erp.mtrn.form.SDialogCfdiImport40;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocumentInfo;
+import erp.swap.utils.SImportUtils;
+import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -43,6 +45,7 @@ import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -89,35 +92,69 @@ public final class SCfdRenderer implements ActionListener {
         miClient = client;
         msCfdiXml = "";
     }
+    
+    /*
+     * Private methods.
+     */
 
     private void showCfdiViewer() {
         try {
-            moCfdiViewer = new JDialog(miClient.getFrame(),"Visor de CFDI", true);
-            moCfdiViewer.setSize(1000, 650);
-            moCfdiViewer.setLocationRelativeTo(null);
-            moCfdiViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            
-            if (mbCreateProcessingButtons) {
-                mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
-                mjViewPdf.setBounds(440, 1, 25, 25);
-                mjViewPdf.addActionListener(this);
-                mjViewPdf.setToolTipText("Ver PDF del CFDI...");
-                moCfdiViewer.add(mjViewPdf);
+            if (moCfdiViewer == null) {
+                // create dialog:
                 
-                mjProcessCfd = new JButton("Continuar");
-                mjProcessCfd.setBounds(480, 1, 100, 25);
-                mjProcessCfd.addActionListener(this);
-                mjProcessCfd.setToolTipText("Continuar con la captura del CFDI...");
-                moCfdiViewer.add(mjProcessCfd);
-                
-                mjViewPdf.setEnabled(moPdfFile != null);
-            }
+                moCfdiViewer = new JDialog(miClient.getFrame(),"Visor de CFDI", true);
+                moCfdiViewer.setSize(1000, 650);
+                moCfdiViewer.setLocationRelativeTo(null);
+                moCfdiViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-            mjClose = new JButton("Cerrar");
-            mjClose.setBounds(850, 1, 100, 25);
-            mjClose.addActionListener(this);
-            mjClose.setToolTipText("Cerrar el visor de CFDI");
-            moCfdiViewer.add(mjClose);
+                if (mbCreateProcessingButtons) {
+                    // allow further processing of CFDI, in order to be recorded:
+
+                    mjViewPdf = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png")));
+                    mjViewPdf.setBounds(440, 1, 25, 25);
+                    mjViewPdf.addActionListener(this);
+                    mjViewPdf.setToolTipText("Ver PDF del CFDI...");
+                    moCfdiViewer.add(mjViewPdf);
+
+                    mjProcessCfd = new JButton("Continuar");
+                    mjProcessCfd.setBounds(480, 1, 100, 25);
+                    mjProcessCfd.addActionListener(this);
+                    mjProcessCfd.setToolTipText("Continuar con la captura del CFDI...");
+                    moCfdiViewer.add(mjProcessCfd);
+
+                    mjViewPdf.setEnabled(moPdfFile != null);
+                }
+                else {
+                    // setup this dialog as a "floating" window, accessible all the time:
+
+                    moCfdiViewer.setModalityType(Dialog.ModalityType.MODELESS);
+                    moCfdiViewer.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+                }
+
+                mjClose = new JButton("Cerrar");
+                mjClose.setBounds(850, 1, 100, 25);
+                mjClose.addActionListener(this);
+                mjClose.setToolTipText("Cerrar el visor de CFDI");
+                moCfdiViewer.add(mjClose);
+            }
+            else {
+                // remove previous rendering panel:
+                
+                JPanel panel = null;
+                
+                for (Component component : moCfdiViewer.getContentPane().getComponents()) {
+                    if (component instanceof JPanel) {
+                        panel = (JPanel) component;
+                        break;
+                    }
+                }
+                
+                if (panel != null) {
+                    moCfdiViewer.getContentPane().remove(panel);
+                }
+            }
+            
+            // prepare CFDI rendering:
             
             File fileTemplate;
             if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
@@ -130,49 +167,15 @@ public final class SCfdRenderer implements ActionListener {
             JasperReport relatoriosJasper = (JasperReport)JRLoader.loadObject(fileTemplate);
             JasperPrint jasperPrint = JasperFillManager.fillReport(relatoriosJasper, moParamsMap, new JRBeanCollectionDataSource(mfCfdiVersion == DCfdConsts.CFDI_VER_40 ? moConceptos40 : moConceptos33));
             JasperViewer jrViewer = new JasperViewer(jasperPrint, true);
+            
+            // render CFDI:
+            
             moCfdiViewer.getContentPane().add(jrViewer.getContentPane());
             moCfdiViewer.setVisible(true);
         } 
         catch (HeadlessException | JRException e) {
             SLibUtilities.renderException(this, e);
         }
-    }
-    
-    /**
-     * Obtiene un archivo xml para la vista previa en PDF y el empate de conceptos.
-     * @param cfdiFile Archivo con el XML del CFDI.
-     * @param pdfFile Archivo con el PDF del CFDI.
-     * @param order Orden de compra, puede ser <code>null</code>.
-     * @param category
-     * @return Dps renderizado
-     * @throws Exception
-     */
-    @SuppressWarnings("deprecation")
-    public SDataDps renderCfd(final File cfdiFile, final File pdfFile, final SDataDps order, final int category) throws Exception {
-        try {
-            msCfdiXml = SXmlUtils.readXml(cfdiFile.getAbsolutePath());
-        } 
-        catch (Exception e) {
-            throw new Exception("El XML no es válido:\n" + e);
-        }
-        
-        moCfdiFile = cfdiFile;
-        moPdfFile = pdfFile;
-        moPurchaseOrder = order;
-        mnBizCategory = category;
-        mbCreateProcessingButtons = true;
-        mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
-        
-        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
-            createParamsMap40();
-        }
-        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
-            createParamsMap33();
-        }
-        
-        showCfdiViewer();
-        
-        return moDpsRendered;
     }
     
     private SDocumentInfo createDocumentInfo() throws Exception {
@@ -182,7 +185,7 @@ public final class SCfdRenderer implements ActionListener {
         
         return new SDocumentInfo(moCfdEssentials.Serie, moCfdEssentials.Folio, moCfdEssentials.Uuid, moCfdEssentials.Fecha, moCfdEssentials.Emisor);
     }
-      
+    
     private void actionPerformedViewPdf() throws Exception {
         if (moPdfFile != null && mjViewPdf.isEnabled()) {
             if (moDialogPdfViewer == null) {
@@ -531,31 +534,6 @@ public final class SCfdRenderer implements ActionListener {
         return validation;
     }
     
-    /**
-     * Recibe un archivo xml para visualizarlo en PDF.
-     * @param xml CFDI del doc.
-     */
-    public void showCfd(String xml) {
-        mbCreateProcessingButtons = false;
-        msCfdiXml = xml;
-        
-        try {
-            mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
-            
-            if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
-                createParamsMap40();
-            }
-            else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
-                createParamsMap33();
-            }
-            
-            showCfdiViewer();
-        }
-        catch (Exception e) {
-            miClient.showMsgBoxWarning(e.getMessage());
-        }
-    }
-    
     private void createParamsMap40() {
         try {
             moParamsMap = new HashMap<>();
@@ -707,6 +685,81 @@ public final class SCfdRenderer implements ActionListener {
         catch (Exception ex) {
             SLibUtilities.renderException(this, ex);
         }
+    }
+    
+    /*
+     * Public methods.
+     */
+    
+    /**
+     * Obtener el diálogo usado para mostrar el XML de un CFDI.
+     * @return Diálogo usado para mostrar el XML de un CFDI.
+     */
+    public JDialog getDialog() {
+        return moCfdiViewer;
+    }
+      
+    /**
+     * Recibe el XML de un CFDI y lo muestra en pantalla en un diálogo "flotante", accesible todo el tiempo.
+     * @param xml XML del CFDI.
+     * @param dialog Diálogo para mostrar el XML del CFDI. Puede ser <code>null</code>, y, si lo es, se crea un nuevo diálogo cada vez.
+     */
+    public void renderCfdXml(final String xml) {
+        mbCreateProcessingButtons = false;
+        msCfdiXml = xml;
+        
+        try {
+            mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
+            
+            if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+                createParamsMap40();
+            }
+            else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
+                createParamsMap33();
+            }
+            
+            showCfdiViewer();
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }
+    
+    /**
+     * Recibe los archivos XML y PDF de un CFDI, los muestra en pantalla en un diálogo "modal", para procesarlo y contabilizarlo.
+     * @param cfdiFile Archivo con el XML del CFDI.
+     * @param pdfFile Archivo con el PDF del CFDI.
+     * @param order Orden de compra principal relacionada con el CFDI, puede ser <code>null</code>.
+     * @param category
+     * @return Documento nuevo recién creado a partir del CFDI.
+     * @throws Exception
+     */
+    @SuppressWarnings("deprecation")
+    public SDataDps renderCfdAndCreateDps(final File cfdiFile, final File pdfFile, final SDataDps order, final int category) throws Exception {
+        try {
+            msCfdiXml = SXmlUtils.readXml(cfdiFile.getAbsolutePath());
+        } 
+        catch (Exception e) {
+            throw new Exception("El XML no es válido:\n" + e);
+        }
+        
+        moCfdiFile = cfdiFile;
+        moPdfFile = pdfFile;
+        moPurchaseOrder = order;
+        mnBizCategory = category;
+        mbCreateProcessingButtons = true;
+        mfCfdiVersion = DCfdUtils.getCfdiVersion(msCfdiXml);
+        
+        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+            createParamsMap40();
+        }
+        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
+            createParamsMap33();
+        }
+        
+        showCfdiViewer();
+        
+        return moDpsRendered;
     }
     
     @Override

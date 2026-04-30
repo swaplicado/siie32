@@ -96,7 +96,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, Cesar Orozco, Sergio Flores
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
@@ -2714,7 +2714,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SImportedDocument document = (SImportedDocument) row;
                 
                 if (moDialogPdfViewer == null) {
-                    moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                    moDialogPdfViewer = new SDialogPdfViewer(miClient);
                 }
                 
                 if (document.isRecorded()) {

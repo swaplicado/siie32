@@ -158,8 +158,13 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         Comprobante = DCfdUtils.getCfdi40(SXmlUtils.readXml(ImportedDocument.AuxFiles[SImportUtils.CFDI_XML_IDX].getAbsolutePath()));
         
         if (isCfdiInvoice()) {
-            // CFDI status:
-            EstatusComprobante = SImportUtils.validateCfdi(Client, Comprobante, DCfdi40Catalogs.CFD_TP_I, false);
+            // CFDI status (if validation throws exception, continue with parsing of document):
+            try {
+                EstatusComprobante = SImportUtils.validateCfdi(Client, Comprobante, DCfdi40Catalogs.CFD_TP_I, false);
+            }
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+            }
             
             // issuer settings:
             IsEmisorPerson = Comprobante.getEltEmisor().getAttRfc().getString().length() == DCfdConsts.LEN_RFC_PER;

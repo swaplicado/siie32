@@ -1659,7 +1659,7 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="jckIsPrepayment">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Es anticipo"/>
+                        <Property name="text" type="java.lang.String" value="Es anticipo para facturarse"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlMaterialType">

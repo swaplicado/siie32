@@ -15,7 +15,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona
+ * @author Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SItemUtilities {
     
@@ -32,29 +32,6 @@ public abstract class SItemUtilities {
         String sql = "SELECT code "
                 + "FROM erp.itms_cfd_prod_serv "
                 + "WHERE id_cfd_prod_serv = " + claveProdServId + ";";
-
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
-            if (resultSet.next()) {
-                clave = resultSet.getString("code");
-            }
-        }
-        
-        return clave;
-    }
-    
-    /**
-     * Obtiene el código de la unidad a travez del ID del catálogo de unidades del SAT.
-     * @param statement
-     * @param claveUnidadId
-     * @return 
-     * @throws java.lang.Exception
-     */
-    public static String getClaveUnidad(final Statement statement, final int claveUnidadId) throws Exception {
-        String clave = "";
-        
-        String sql = "SELECT code "
-                + "FROM erp.itms_cfd_unit "
-                + "WHERE id_cfd_unit = " + claveUnidadId + ";";
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {

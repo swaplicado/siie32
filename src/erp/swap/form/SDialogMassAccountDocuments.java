@@ -20,6 +20,10 @@ import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.SThinDps;
+import erp.mtrn.view.SViewDps;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.model.account.Config;
@@ -28,10 +32,6 @@ import erp.swap.utils.SExportDataAuthActor;
 import erp.swap.utils.SExportDataSomUtils;
 import erp.swap.utils.SImportUtils;
 import erp.swap.utils.SServicesUtils;
-import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataDpsEntry;
-import erp.mtrn.data.SThinDps;
-import erp.mtrn.view.SViewDps;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -2035,7 +2035,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                 SMassAccountDocument document = (SMassAccountDocument) row;
                 
                 if (moDialogPdfViewer == null) {
-                    moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                    moDialogPdfViewer = new SDialogPdfViewer(miClient);
                 }
                 
                 if (document.ImportedDocument.isRecorded()) {
@@ -2425,7 +2425,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
                             if (pdf != null) {
                                 if (moDialogPdfViewer == null) {
-                                    moDialogPdfViewer = new SDialogPdfViewer(miClient, true);
+                                    moDialogPdfViewer = new SDialogPdfViewer(miClient);
                                 }
 
                                 SDocument documentInfo = new SDocument() {

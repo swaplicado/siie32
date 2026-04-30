@@ -43,9 +43,6 @@ import erp.mitm.data.SItemUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.swap.form.SDialogPdfViewer;
-import erp.swap.form.SDocumentInfo;
-import erp.swap.utils.SImportUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
@@ -55,6 +52,9 @@ import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport40;
 import erp.mtrn.data.SRowCfdiTaxImport40;
 import erp.mtrn.data.STrnDpsUtilities;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocumentInfo;
+import erp.swap.utils.SImportUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -1201,7 +1201,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 validation.getComponent().requestFocus();
             }
             
-            moConceptTablePane.setTableRowSelection((int) validation.getComplement()); // complement is row validating
+            if (validation.getComplement() != null && validation.getComplement() instanceof Integer) {
+                moConceptTablePane.setTableRowSelection((int) validation.getComplement()); // validations's complement is the row being validated
+            }
+            
             if (!validation.getMessage().isEmpty()) {
                 miClient.showMsgBoxWarning(validation.getMessage());
             }
@@ -2065,8 +2068,6 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     
     private SFormValidation validateForm() {
         SFormValidation validation = new SFormValidation();
-        int rowValidating = 0;
-        ArrayList<LinkedQuantity> arrLinkedQuantity = new ArrayList<>();
         
         for (int i = 0; i < mvFields.size(); i++) {
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
@@ -2077,6 +2078,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         }
         
         if (!validation.getIsError()) {
+            ArrayList<LinkedQuantity> linkedQuantities = new ArrayList<>();
+            
             if (isWithPurchaseOrder()) {
                 if (jcbDpsNature.getSelectedIndex() <= 0) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDpsNature) + "'.");
@@ -2089,214 +2092,227 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 
                 for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
                     SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i);
+                    
                     if (!row.getImportedEntryDpsDpsLinks().isEmpty()) {
                         for (int j = 0; j < row.getImportedEntryDpsDpsLinks().size(); j++) {
                             int[] dpsKey = row.getImportedEntryDpsDpsLinks().get(j).getDpsEntryKey();
                             boolean found = false;
-                            for (LinkedQuantity linkedQ : arrLinkedQuantity) {
-                                if (SLibUtils.compareKeys(linkedQ.dpsKey, dpsKey)) {
+                            
+                            for (LinkedQuantity linkedQuantity : linkedQuantities) {
+                                if (SLibUtils.compareKeys(linkedQuantity.dpsKey, dpsKey)) {
                                     found = true;
-                                    linkedQ.quantity += row.getImportedEntryDpsDpsLinks().get(j).getQuantityToLink();
+                                    linkedQuantity.quantity += row.getImportedEntryDpsDpsLinks().get(j).getQuantityToLink();
                                 }
                             }
+                            
                             if (!found) {
                                 LinkedQuantity linkedQ = new LinkedQuantity(dpsKey, row.getImportedEntryDpsDpsLinks().get(j).getQuantityToLink());
-                                arrLinkedQuantity.add(linkedQ);
+                                linkedQuantities.add(linkedQ);
                             }
                         }
                     }
                 }
             }
-        }
-        
-        ROWS:
-        for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-            rowValidating = i;
             
-            SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i); // variable de conveniencia
-            DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
-            String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") + concepto.getAttDescripcion().getString();
-            String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
-            
-            if (isWithPurchaseOrder()) {
-                if (row.getImportedEntryDpsDpsLinks().isEmpty()) {
-                    validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+            int rowIndex;
+
+            ROWS:
+            for (rowIndex = 0; rowIndex < moConceptTablePane.getTableGuiRowCount(); rowIndex++) {
+                SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(rowIndex); // variable de conveniencia
+                DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
+                String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") + concepto.getAttDescripcion().getString();
+                String msgPrefix = "El concepto del renglón #" + (rowIndex + 1) + ", \"" + descripcion + "\", ";
+
+                if (isWithPurchaseOrder()) {
+                    if (row.getImportedEntryDpsDpsLinks().isEmpty()) {
+                        validation.setMessage(msgPrefix + "no tiene asignada una partida de la OC.");
+                        break;
+                    }
+                    else {
+                        for (SDataEntryDpsDpsLink entryDpsDpsLink : row.getImportedEntryDpsDpsLinks()) {
+                            try {
+                                double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                                
+                                for (LinkedQuantity linkedQuantity : linkedQuantities) {
+                                    if (SLibUtils.compareKeys(linkedQuantity.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
+                                        if (totalsupplied > linkedQuantity.quantity) {
+                                            String message = "Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                                    "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQuantity.quantity ? "mayor o " : "") + "igual a " + 
+                                                    SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene surtidos previos.\n" + 
+                                                    "¿Está seguro que desea hacer caso omiso y continuar?";
+                                            if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
+                                                validation.setMessage("La cantidad a vincular debería ser al menos " + SLibUtils.getDecimalFormatQuantity().format(linkedQuantity.quantity) + ".");
+                                            }
+                                            break ROWS;
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            catch (Exception e) {
+                                SLibUtils.showException(this, e);
+                            }
+                        }
+                    }
+
+                    if (!validation.getIsError() && !row.isLinkedAsService()) {
+                        double cantConcept = row.getConcepto().getAttCantidad().getDouble();
+                        double convFact = row.getConvFactor();
+                        double toLink = 0;
+                        toLink = SLibUtils.round(row.getImportedEntryDpsDpsLinks().stream().map((entryDpsDpsLink) -> entryDpsDpsLink.getQuantityToLink()).reduce(toLink, (accumulator, _item) -> accumulator + _item), 4);
+                        double totConcept = SLibUtils.round(cantConcept * convFact, 4);
+                        if (totConcept < toLink) {
+                            validation.setMessage(msgPrefix + "tiene vinculada una cantidad mayor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
+                        }
+                        else if (totConcept > toLink) {
+                            validation.setMessage(msgPrefix + "tiene vinculada una cantidad menor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
+                        }
+                    }
+                }
+
+                if (row.getItem() == null) {
+                    validation.setMessage(msgPrefix + "no tiene asignado un ítem.");
                     break;
                 }
                 else {
-                    for (SDataEntryDpsDpsLink entryDpsDpsLink : row.getImportedEntryDpsDpsLinks()) {
-                        try {
-                            double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
-                            for (LinkedQuantity linkedQ : arrLinkedQuantity) {
-                                if (SLibUtils.compareKeys(linkedQ.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
-                                    if (totalsupplied > linkedQ.quantity) {
-                                        String message = "Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
-                                                "la cantidad minima a vincular debe ser " + (totalsupplied < linkedQ.quantity ? "mayor o " : "") + "igual a " + 
-                                                SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene surtidos previos.\n" + 
-                                                "¿Está seguro que desea hacer caso omiso y continuar?";
-                                        if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
-                                            validation.setMessage("La cantidad a vincular debería ser al menos " + SLibUtils.getDecimalFormatQuantity().format(linkedQ.quantity) + ".");
-                                        }
-                                        break ROWS;
+                    boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
+
+                    if (isItemRefReq && row.getItemReference() == null) {
+                        validation.setMessage(msgPrefix + "no tiene asignado un ítem de referencia.");
+                        break;
+                    }
+                    else if (isItemRefReq && row.getItemReference().getPkItemId() == row.getItem().getPkItemId()) {
+                        validation.setMessage(msgPrefix + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                        break;
+                    }
+                    else if (row.getUnit() == null) {
+                        validation.setMessage(msgPrefix + "no tiene asignada una unidad.");
+                        break;
+                    }
+                    else if (row.getUnit().getDbmsClaveUnidad().isEmpty()) {
+                        validation.setMessage(msgPrefix + "su unidad asignada carece de ClaveUnidad SAT.");
+                        break;
+                    }
+                    else if (row.getTaxRegion() == null) {
+                        validation.setMessage(msgPrefix + "no tiene asignada una región de impuestos.");
+                        break;
+                    }
+                    else if (row.getOperationTypePk() == 0) {
+                        validation.setMessage(msgPrefix + "no tiene asignado un tipo de operación.");
+                        break;
+                    }
+                    else if (row.getCostCenter() == null) {
+                        validation.setMessage(msgPrefix + "no tiene asignado un centro de costo.");
+                        break;
+                    }
+                    else if (row.getConvFactor() == 0.0) {
+                        validation.setMessage(msgPrefix + "no tiene especificado un factor de conversión.");
+                        break;
+                    }
+                    else {
+                        if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
+                            ArrayList<SDataDpsEntry> invoiceEntries = row.getNewDpsEntries(); // variable de conveniencia
+                            ArrayList<SDataDpsEntry> orderEntries = row.getImportedDpsEntries(); // variable de conveniencia
+
+                            if (invoiceEntries.size() == orderEntries.size()) {
+                                for (int j = 0; j < invoiceEntries.size(); j++) {
+                                    if (invoiceEntries.get(j).getSubtotalCy_r() > orderEntries.get(j).getSubtotalCy_r()) {
+                                        validation.setMessage(msgPrefix + "tiene un importe mayor ($" + SLibUtils.getDecimalFormatAmount().format(invoiceEntries.get(j).getSubtotalCy_r()) + ") "
+                                                + "que el de la partida de la OC elegida ($" + SLibUtils.getDecimalFormatAmount().format(orderEntries.get(j).getSubtotalCy_r()) + ").");
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
-                        catch (Exception e) {
-                            SLibUtils.showException(this, e);
+
+                        if (!validation.getIsError()) {
+                            if (concepto.getEltOpcConceptoImpuestos() != null) {
+                                if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
+                                    ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
+                                    TAXES:
+                                    for (DElementConceptoImpuestoTraslado traslado : traslados) {
+                                        if (!row.getTaxChargedMatched().contains(traslado)) {
+                                            validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n" 
+                                                    + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
+                                                    + "Tipo: trasladado. \n"
+                                                    + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
+                                                    + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".");
+                                            break ROWS;
+                                        }
+                                    }
+                                }
+
+                                if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
+                                    ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
+                                    TAXES:
+                                    for (DElementConceptoImpuestoRetencion retencion : retenciones) {
+                                        if (!row.getTaxRetainedMatched().contains(retencion)) { 
+                                            validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n"
+                                                    + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
+                                                    + "Tipo: retenido. \n"
+                                                    + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
+                                                    + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".");
+                                            break ROWS;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                
-                if (!validation.getIsError() && !row.isLinkedAsService()) {
-                    double cantConcept = row.getConcepto().getAttCantidad().getDouble();
-                    double convFact = row.getConvFactor();
-                    double toLink = 0;
-                    toLink = SLibUtils.round(row.getImportedEntryDpsDpsLinks().stream().map((entryDpsDpsLink) -> entryDpsDpsLink.getQuantityToLink()).reduce(toLink, (accumulator, _item) -> accumulator + _item), 4);
-                    double totConcept = SLibUtils.round(cantConcept * convFact, 4);
-                    if (totConcept < toLink) {
-                        validation.setMessage(rowMsg + "tiene vinculada una cantidad mayor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
-                    }
-                    else if (totConcept > toLink) {
-                        validation.setMessage(rowMsg + "tiene vinculada una cantidad menor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
-                    }
-                }
             }
-            
-            if (row.getItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem.");
-                break;
+
+            if (validation.getIsError()) {
+                validation.setComplement(rowIndex);
             }
             else {
-                boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
-                
-                if (isItemRefReq && row.getItemReference() == null) {
-                    validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
-                    break;
-                }
-                else if (isItemRefReq && row.getItemReference().getPkItemId() == row.getItem().getPkItemId()) {
-                    validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
-                    break;
-                }
-                else if (row.getUnit() == null) {
-                    validation.setMessage(rowMsg + "no tiene asignada una unidad.");
-                    break;
-                }
-                else if (row.getTaxRegion() == null) {
-                    validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
-                    break;
-                }
-                else if (row.getOperationTypePk() == 0) {
-                    validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
-                    break;
-                }
-                else if (row.getCostCenter() == null) {
-                    validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
-                    break;
-                }
-                else if (row.getConvFactor() == 0.0) {
-                    validation.setMessage(rowMsg + "no tiene especificado un factor de conversión.");
-                    break;
-                }
-                else {
-                    if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
-                        ArrayList<SDataDpsEntry> invoiceEntries = row.getNewDpsEntries(); // variable de conveniencia
-                        ArrayList<SDataDpsEntry> orderEntries = row.getImportedDpsEntries(); // variable de conveniencia
-                        
-                        if (invoiceEntries.size() == orderEntries.size()) {
-                            for (int j = 0; j < invoiceEntries.size(); j++) {
-                                if (invoiceEntries.get(j).getSubtotalCy_r() > orderEntries.get(j).getSubtotalCy_r()) {
-                                    validation.setMessage(rowMsg + "tiene un importe mayor ($" + SLibUtils.getDecimalFormatAmount().format(invoiceEntries.get(j).getSubtotalCy_r()) + ") "
-                                            + "que el de la partida de la OC elegida ($" + SLibUtils.getDecimalFormatAmount().format(orderEntries.get(j).getSubtotalCy_r()) + ").");
-                                    break;
-                                }
-                            }
+                for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
+                    rowIndex = i;
+
+                    SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i); // variable de conveniencia
+                    DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
+                    String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
+                            concepto.getAttDescripcion().getString();
+                    String rowMsg = "El factor de conversión del renglón #" + (i + 1) + ", concepto \"" + descripcion + "\", ";
+
+                    if (isWithPurchaseOrder() && row.getConvFactor() != 1) {
+                        if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
+                                + "pero está asignado a una partida de la OC.\n"
+                                + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
+                            break;
                         }
                     }
 
                     if (!validation.getIsError()) {
-                        if (concepto.getEltOpcConceptoImpuestos() != null) {
-                            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
-                                ArrayList<cfd.ver40.DElementConceptoImpuestoTraslado> traslados = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados();
-                                TAXES:
-                                for (DElementConceptoImpuestoTraslado traslado : traslados) {
-                                    if (!row.getTaxChargedMatched().contains(traslado)) {
-                                        validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
-                                                + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
-                                                + "Tipo: trasladado. \n"
-                                                + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
-                                                + SLibUtils.DecimalFormatPercentage2D.format(traslado.getAttTasaOCuota().getDouble()) + ".");
-                                        break ROWS;
-                                    }
+                        if (concepto.getAttClaveUnidad().getString().equals(row.getUnit().getDbmsClaveUnidad())) {
+                            if (row.getConvFactor() != 1) {
+                                if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
+                                        + "pero las unidades SAT del concepto y del ítem seleccionado son iguales.\n"
+                                        + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                                    validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
+                                    break;
                                 }
                             }
+                        }
+                        else {
+                            if (row.getConvFactor() == 1) {
+                                if (miClient.showMsgBoxConfirm(rowMsg + "es igual a 1.0,\n"
+                                        + "pero las unidades SAT del concepto y del ítem seleccionado son diferentes.\n"
+                                        + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                                    validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " diferente a 1.0.");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
 
-                            if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones() != null) {
-                                ArrayList<cfd.ver40.DElementConceptoImpuestoRetencion> retenciones = concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones();
-                                TAXES:
-                                for (DElementConceptoImpuestoRetencion retencion : retenciones) {
-                                    if (!row.getTaxRetainedMatched().contains(retencion)) { 
-                                        validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
-                                                + "Impuesto: " + DCfdi40Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
-                                                + "Tipo: retenido. \n"
-                                                + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
-                                                + SLibUtils.DecimalFormatPercentage2D.format(retencion.getAttTasaOCuota().getDouble()) + ".");
-                                        break ROWS;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (validation.getIsError()) {
+                    validation.setComplement(rowIndex);
                 }
             }
         }
-        
-        if (!validation.getIsError()) {
-            for (int i = 0; i < moConceptTablePane.getTableGuiRowCount(); i++) {
-                rowValidating = i;
-                
-                SRowCfdiImport40 row = (SRowCfdiImport40) moConceptTablePane.getTableRow(i); // variable de conveniencia
-                DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
-                String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
-                        concepto.getAttDescripcion().getString();
-                String rowMsg = "El factor de conversión del renglón #" + (i + 1) + ", concepto \"" + descripcion + "\", ";
-                
-                if (isWithPurchaseOrder() && row.getConvFactor() != 1) {
-                    if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
-                            + "pero está asignado a una partida de la OC.\n"
-                            + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
-                        validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
-                        break;
-                    }
-                }
-                
-                if (!validation.getIsError()) {
-                    if (row.getClaveUnidadCfdi().equals(row.getClaveUnidadSiie())) {
-                        if (row.getConvFactor() != 1) {
-                            if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
-                                    + "pero las unidades SAT del concepto y del ítem seleccionado son iguales.\n"
-                                    + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " igual a 1.0.");
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        if (row.getConvFactor() == 1) {
-                            if (miClient.showMsgBoxConfirm(rowMsg + "es igual a 1.0,\n"
-                                    + "pero las unidades SAT del concepto y del ítem seleccionado son diferentes.\n"
-                                    + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage("Poner el factor de conversión del renglón #" + (i + 1) + " diferente a 1.0.");
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        validation.setComplement(rowValidating);
         
         return validation;
     }

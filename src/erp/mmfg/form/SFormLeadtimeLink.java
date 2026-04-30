@@ -6,29 +6,28 @@
 
 package erp.mmfg.form;
 
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
+import erp.data.SProcConstants;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComboBoxGroup;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mmfg.data.SDataLeadtimeCo;
+import erp.mmfg.data.SDataLeadtimeCob;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
-import erp.lib.form.SFormComboBoxGroup;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
-import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
-import erp.mmfg.data.SDataLeadtimeCo;
-import erp.mmfg.data.SDataLeadtimeCob;
-
 /**
  *
- * @author  Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -309,6 +308,7 @@ public class SFormLeadtimeLink extends javax.swing.JDialog implements erp.lib.fo
                 anFilterItem = SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO;
                 break;
         }
+        
         miClient.pickOption(nTypeLink, moFieldFkReferenceId, anFilterItem);
     }
 

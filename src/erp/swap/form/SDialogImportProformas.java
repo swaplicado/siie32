@@ -19,6 +19,9 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
+import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.fin.db.SDbPayment;
+import erp.mtrn.form.SDialogDpsFinder;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.SSyncType;
@@ -26,9 +29,6 @@ import erp.swap.model.SImportedCRP;
 import erp.swap.utils.SExportUtils;
 import erp.swap.utils.SImportUtils;
 import erp.swap.utils.SResponses;
-import erp.mod.cfg.utils.SAuthJsonUtils;
-import erp.mod.fin.db.SDbPayment;
-import erp.mtrn.form.SDialogDpsFinder;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -75,7 +75,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  *
- * @author Cesar Orozco, Sergio Flores, Edwin Carmona
+ * @author Cesar Orozco, Edwin Carmona, Sergio Flores
  */
 public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
 
@@ -109,7 +109,6 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
-    protected SDialogPdfViewer moDialogPdfViewer;
 
     /**
      * Creates new form SDialogImportDocuments

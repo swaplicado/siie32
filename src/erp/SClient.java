@@ -56,7 +56,6 @@ import erp.mod.SModuleMkt;
 import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
-import erp.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.usr.db.SDbUserGui;
 import erp.mtrn.data.SCfdUtils;
@@ -66,6 +65,7 @@ import erp.server.SLoginRequest;
 import erp.server.SLoginResponse;
 import erp.server.SServerRemote;
 import erp.server.SSessionXXX;
+import erp.swap.SSwapConsts;
 import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
@@ -120,13 +120,13 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Rodrigo Ayala, Sergio Flores, Edwin Carmona
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Rodrigo Ayala, Edwin Carmona, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 299.16"; // release date: 2026-04-28
+    public static final String APP_RELEASE = "3.2 299.17"; // release date: 2026-04-30
 
     public static final String APP_COPYRIGHT = "2007-2026";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";

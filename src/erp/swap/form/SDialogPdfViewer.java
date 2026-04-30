@@ -6,6 +6,7 @@
 package erp.swap.form;
 
 import erp.SFileUtilities;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -44,7 +45,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     protected static final String TOOL_TIP_DOCUMENT = "Folio del documento";
     protected static final String TOOL_TIP_FILE = "Archivo PDF";
     
-    protected boolean mbAllowDelettion;
+    protected boolean mbAllowPdfDelettion;
     protected SDocument miDocument;
     protected File moPdf;
     protected PDDocument moPDDocument;
@@ -56,15 +57,30 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     protected int mnCurrentZoomIndex;
 
     /**
-     * Creates new form SDialogPdfViewer
-     * @param client
-     * @param allowDeletion
+     * Creates new form SDialogPdfViewer. It is a "floating" window, accessible all the time.
+     * Allows PDF deletion by default.
+     * @param client GUI client.
      */
-    public SDialogPdfViewer(final SGuiClient client, final boolean allowDeletion) {
-        mbAllowDelettion = allowDeletion;
+    public SDialogPdfViewer(final SGuiClient client) {
+        this(client, true);
+    }
+
+    /**
+     * Creates new form SDialogPdfViewer. It is a "floating" window, accessible all the time.
+     * Allows PDF deletion by instance parameter.
+     * @param client GUI client.
+     * @param allowPdfDeletion Allows PDF deletion.
+     */
+    public SDialogPdfViewer(final SGuiClient client, final boolean allowPdfDeletion) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, "Visor de PDF");
+        mbAllowPdfDelettion = allowPdfDeletion;
+        
         initComponents();
         initComponentsCustom();
+        
+        // setup this dialog as a "floating" window, accessible all the time:
+        setModalityType(Dialog.ModalityType.MODELESS);
+        setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
 
     /**
@@ -489,7 +505,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         boolean enableFileHandling = moPdf != null;
         jbFileSave.setEnabled(enableFileHandling);
         jbFileInfo.setEnabled(enableFileHandling);
-        jbFileDeleteToUpdate.setEnabled(enableFileHandling && mbAllowDelettion);
+        jbFileDeleteToUpdate.setEnabled(enableFileHandling && mbAllowPdfDelettion);
     }
     
     @Override

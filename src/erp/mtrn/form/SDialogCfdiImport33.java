@@ -41,7 +41,6 @@ import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.swap.form.SDocumentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -51,6 +50,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport33;
 import erp.mtrn.data.SRowCfdiTaxImport33;
+import erp.swap.form.SDocumentUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -71,7 +71,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
     
@@ -1681,43 +1681,47 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
             DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
             String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
                     concepto.getAttDescripcion().getString();
-            String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
+            String msgPrefix = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
             boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
             
             if (mbWithPurchaseOrder && row.getEntryDpsDpsLink() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+                validation.setMessage(msgPrefix + "no tiene asignada una partida de la OC.");
                 break;
             }
             else if (row.getItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem.");
+                validation.setMessage(msgPrefix + "no tiene asignado un ítem.");
                 break;
             }
             else if (isItemRefReq && row.getReferenceItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
+                validation.setMessage(msgPrefix + "no tiene asignado un ítem de referencia.");
                 break;
             }
             else if (isItemRefReq && row.getReferenceItem().getPkItemId() == row.getItem().getPkItemId()) {
-                validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                validation.setMessage(msgPrefix + "tiene asignado el mismo ítem de referencia que el ítem principal.");
                 break;
             }
             else if (row.getUnit() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una unidad.");
+                validation.setMessage(msgPrefix + "no tiene asignada una unidad.");
+                break;
+            }
+            else if (row.getUnit().getDbmsClaveUnidad().isEmpty()) {
+                validation.setMessage(msgPrefix + "su unidad asignada carece de ClaveUnidad SAT.");
                 break;
             }
             else if (row.getTaxRegion() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
+                validation.setMessage(msgPrefix + "no tiene asignada una región de impuestos.");
                 break;
             }
             else if (row.getOperationTypePk() == 0) {
-                validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
+                validation.setMessage(msgPrefix + "no tiene asignado un tipo de operación.");
                 break;
             }
             else if (row.getCostCenter() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
+                validation.setMessage(msgPrefix + "no tiene asignado un centro de costo.");
                 break;
             }
             else if (row.getConvFactor() == 0.0) {
-                validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
+                validation.setMessage(msgPrefix + "no tiene factor de conversión especificado.");
                 break;
             }
             else {
@@ -1727,7 +1731,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                         TAXES:
                         for (DElementConceptoImpuestoTraslado traslado : traslados) {
                             if (!row.getTaxChargedMatched().contains(traslado)) {
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
+                                validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n" 
                                         + "Impuesto: " + DCfdi33Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
                                         + "Tipo: trasladado. \n"
                                         + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
@@ -1742,7 +1746,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                         TAXES:
                         for (DElementConceptoImpuestoRetencion retencion : retenciones) {
                             if (!row.getTaxRetainedMatched().contains(retencion)) { 
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
+                                validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n"
                                         + "Impuesto: " + DCfdi33Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
                                         + "Tipo: retenido. \n"
                                         + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
@@ -1774,7 +1778,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 }
                 
                 if (!validation.getIsError()) {
-                    if (row.getClaveUnidadCfdi().equals(row.getClaveUnidadSiie())) {
+                    if (concepto.getAttClaveUnidad().getString().equals(row.getUnit().getDbmsClaveUnidad())) {
                         if (row.getConvFactor() != 1) {
                             if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
                                     + "pero las unidades SAT del concepto y del ítem seleccionado son iguales.\n"

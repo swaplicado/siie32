@@ -74,7 +74,7 @@ import sa.lib.srv.SSrvConsts;
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
  * 
- * @author Sergio Flores, Cesar Orozco, Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Cesar Orozco, Edwin Carmona, Sergio Flores
  */
 public abstract class SImportUtils {
     
@@ -546,7 +546,7 @@ public abstract class SImportUtils {
 
                 if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                     SCfdRenderer renderer = new SCfdRenderer(client);
-                    SDataDps newDps = renderer.renderCfd(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                    SDataDps newDps = renderer.renderCfdAndCreateDps(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
                     if (newDps != null) {
                         int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;

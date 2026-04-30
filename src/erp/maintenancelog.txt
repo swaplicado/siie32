@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 299.17/ 2026-04-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de los diálogos de visor de PDF y del renderizador de XML de CFDI para que sean "flotantes".
+
+================================================================================
 SIIE 3.2 299.16/ 2026-04-28
 Edwin Omar CARMONA FIGUEROA
 Jhonatan Claudio PEÑA HERNANDEZ
@@ -12,7 +18,6 @@ Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización de exportación de referencias de compra, se reduce el tiempo de ejecución de la consulta.
 
-================================================================================
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Refactorización de método de validación de estatus SAT de CFDI para invocarse indistintamente en la importación individual de CFDI como en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.

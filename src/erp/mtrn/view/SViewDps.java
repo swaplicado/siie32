@@ -41,19 +41,6 @@ import erp.mmkt.data.SDataCustomerConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
-import erp.swap.SHttpConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.SSwapUtils;
-import erp.swap.SSyncType;
-import erp.swap.form.SDialogPdfViewer;
-import erp.swap.form.SDocument;
-import erp.swap.utils.SAuthzUtils;
-import erp.swap.utils.SDataRejectResource;
-import erp.swap.utils.SExportDataAuthActor;
-import erp.swap.utils.SExportUtils;
-import erp.swap.utils.SImportUtils;
-import erp.swap.utils.SResponses;
-import erp.swap.utils.SServicesUtils;
 import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
@@ -86,6 +73,19 @@ import erp.mtrn.form.SDialogUpdateDpsReferenceComms;
 import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocument;
+import erp.swap.utils.SAuthzUtils;
+import erp.swap.utils.SDataRejectResource;
+import erp.swap.utils.SExportDataAuthActor;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SImportUtils;
+import erp.swap.utils.SResponses;
+import erp.swap.utils.SServicesUtils;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterDnsDps;
 import erp.table.STabFilterDocumentNature;
@@ -129,8 +129,6 @@ import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Sergio Flores, Claudio Peña
- *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
  * aswell as printing them.
@@ -139,6 +137,8 @@ import sa.lib.gui.SGuiUtils;
  * PARA LA HABILITACIÓN DE ENVÍO DE ARCHIVOS CREAR UNA VARIABLE DE ENTORNO DE SISTEMA CON LAS CREDENCIALES DE GOOGLE
  * Nombre de la variable: GOOGLE_APPLICATION_CREDENTIALS
  * Valor de la variable: ruta accesible al archivo JSON.
+ * 
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
@@ -209,6 +209,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
     private erp.mod.trn.form.SDialogDocumentAuthornComments moDialogAuthComments;
+    private erp.mtrn.data.cfd.SCfdRenderer moCfdRenderer;
     private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private java.text.DecimalFormat moUsQuantityFormat;
 
@@ -2925,7 +2926,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbShowCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (moCfdRenderer == null) {
+                        moCfdRenderer = new SCfdRenderer(miClient);
+                    }
+                    
+                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moCfdRenderer);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2952,7 +2957,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (isRowSelected()) {
                 try {
                     if (moDialogPdfViewer == null) {
-                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, true);
+                        moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient);
                     }
                     
                     SViewDps.showDocPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moDialogPdfViewer);
@@ -4146,17 +4151,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
      * Retrieve and show CFDI's XML.
      * @param client GUI client.
      * @param dpsKey Document's primary key.
+     * @param renderer CFD renderer.
      * @throws Exception 
      */
-    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey) throws Exception {
+    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey, final SCfdRenderer renderer) throws Exception {
         SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            SCfdRenderer renderer = new SCfdRenderer(client);
-            renderer.showCfd(cfd.getDocXml());
+            renderer.renderCfdXml(cfd.getDocXml());
         }
     }
     
@@ -4175,10 +4180,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
      * Retrive and show document's PDF.
      * @param client GUI client.
      * @param dpsKey Document's primary key.
-     * @param dialogPdfViewer PDF viewer.
+     * @param viewer PDF viewer.
      * @throws Exception 
      */
-    public static void showDocPdf(final SClientInterface client, final int[] dpsKey, final SDialogPdfViewer dialogPdfViewer) throws Exception {
+    public static void showDocPdf(final SClientInterface client, final int[] dpsKey, final SDialogPdfViewer viewer) throws Exception {
         File pdf = SCfdUtils.getXmlPdfInTempFile(client, dpsKey);
 
         if (pdf != null) {
@@ -4198,8 +4203,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
             };
 
-            dialogPdfViewer.setPdf(document, pdf);
-            dialogPdfViewer.setVisible(true);
+            viewer.setPdf(document, pdf);
+            viewer.setVisible(true);
         }
         else {
             client.showMsgBoxWarning("El documento no tiene archivo PDF.");
