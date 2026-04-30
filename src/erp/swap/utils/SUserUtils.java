@@ -3,13 +3,14 @@
  */
 package erp.swap.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
-import erp.swap.SSwapConsts;
 import erp.musr.data.SDataUser;
 import erp.musr.data.SSyncRoles;
+import erp.swap.SSwapConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -127,8 +128,9 @@ public abstract class SUserUtils {
      * @param userId ID del usuario.
      * @return Lista de empresas a las que tiene acceso el usuario requerido. Valores: ID de la empresa.
      * @throws java.sql.SQLException
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
      */
-    public static ArrayList<Integer> getUserAccesibleCompanies(final SGuiSession session, int userId) throws SQLException {
+    public static ArrayList<Integer> getUserAccesibleCompanies(final SGuiSession session, int userId) throws SQLException, JsonProcessingException, Exception {
         SDataUser user = new SDataUser();
         user.read(new int[] { userId }, session.getStatement()); // Carga los datos del usuario desde la base de datos
         
@@ -162,8 +164,9 @@ public abstract class SUserUtils {
      * @param userId ID del usuario.
      * @return Lista de subáreas funcionales que tiene asignadas el usuario requerido. Valores (<code>int[]</code>): ID de la empresa, ID de la subárea funcional.
      * @throws java.sql.SQLException
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
      */
-    public static ArrayList<int[]> getUserAsignedFunctionalSubAreas(final SGuiSession session, int userId) throws SQLException {
+    public static ArrayList<int[]> getUserAsignedFunctionalSubAreas(final SGuiSession session, int userId) throws SQLException, JsonProcessingException, Exception {
         ArrayList<int[]> asignedFunctionalSubAreas = new ArrayList<>();
         
         HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);

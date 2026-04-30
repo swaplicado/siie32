@@ -61,7 +61,8 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
             String host = "192.168.1.233";
             String port = "3306";
             String db = sBd;
-            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN);
+            int idDefaultCompany = 2852;
+            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN, idDefaultCompany);
             SClientApi apiClient = new SClientApi(client.getSession(), client.getSession().getUser().getPkUserId());
 
             SDataBizPartner oBizPartner = new SDataBizPartner();

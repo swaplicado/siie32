@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 299.18/ 2026-04-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de la exportación de datos a Swap Services desde la clase independiente ejecutada en el servidor.
+2) Se agrega condición para que se habilite la tab de contabilización solo que sea diferente a pedido.
+
+================================================================================
 SIIE 3.2 299.17/ 2026-04-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -8,9 +8,9 @@ package erp.cli;
 import erp.SClientApi;
 import erp.SParamsApp;
 import erp.mod.SModSysConsts;
-import erp.swap.utils.SFileData;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.musr.data.SDataUser;
+import erp.swap.utils.SFileData;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -94,7 +94,7 @@ public class SCliSendAuthMails {
         // SDpsGoogleCloudUtils.uploadFiles(session, mFiles); // descomentar para envio aut.
     }
     
-    private static SClientApi createClientApi(SGuiSession session, int userId) {
+    public static SClientApi createClientApi(SGuiSession session, int userId) {
         SClientApi clientApi = new SClientApi(session, userId);
         return clientApi;
     }

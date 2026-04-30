@@ -60,8 +60,6 @@ import erp.mitm.data.SDataUnit;
 import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.swap.form.SDialogPdfViewer;
-import erp.swap.form.SDocumentInfo;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.itm.db.SDbItemDescription;
 import erp.mod.itm.form.SDialogItemDescription;
@@ -116,6 +114,8 @@ import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
+import erp.swap.form.SDialogPdfViewer;
+import erp.swap.form.SDocumentInfo;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -7670,7 +7670,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private boolean isCustomAccEnableable() {
-        return mnFormStatus == SLibConstants.FORM_STATUS_EDIT && mnCustomAccCurrentAction != 0 && jcbAccEntryItem.getSelectedIndex() > 0;
+        return mnFormStatus == SLibConstants.FORM_STATUS_EDIT 
+                && mnCustomAccCurrentAction != 0 
+                && jcbAccEntryItem.getSelectedIndex() > 0
+                && !mbIsDpsOrder;
     }
     
     private double getCustomAccEntrySubtotal() {
