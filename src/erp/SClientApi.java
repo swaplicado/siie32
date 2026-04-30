@@ -20,6 +20,7 @@ import erp.musr.data.SDataUser;
 import erp.server.SSessionXXX;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
@@ -28,13 +29,18 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import redis.clients.jedis.Jedis;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbDatabase;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
+import sa.lib.gui.SGuiUserGui;
+import sa.lib.gui.SGuiYearMonthPicker;
+import sa.lib.gui.SGuiYearPicker;
 
 /**
  *
  * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
-public class SClientApi implements SClientInterface {
+public class SClientApi implements SClientInterface, SGuiClient {
     
     protected final SGuiSession moSession;
     protected final int mnUserId;
@@ -217,7 +223,7 @@ public class SClientApi implements SClientInterface {
     }
 
     @Override
-    public HashMap<String, Object> createReportParams() { 
+    public HashMap<String, Object> createReportParams() {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("sCompanyName", moSessionXXX.getCompany().getCompany());
@@ -234,5 +240,95 @@ public class SClientApi implements SClientInterface {
         map.put("sXmlBaseDir", moSessionXXX.getParamsCompany().getXmlBaseDirectory());
 
         return map;
+    }
+
+    @Override
+    public SDbDatabase getSysDatabase() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Statement getSysStatement() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public sa.lib.gui.SGuiDatePicker getDatePicker() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public sa.lib.gui.SGuiDateRangePicker getDateRangePicker() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SGuiYearPicker getYearPicker() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SGuiYearMonthPicker getYearMonthPicker() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SGuiUserGui readUserGui(int[] key) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SGuiUserGui saveUserGui(int[] key, String gui) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getTableCompany() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getTableUser() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getAppName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getAppRelease() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getAppCopyright() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getAppProvider() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void computeSessionSettings() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void preserveSessionSettings() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showMsgBoxError(String msg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object getLockManager() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
