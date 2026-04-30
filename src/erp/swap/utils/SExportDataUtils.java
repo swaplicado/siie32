@@ -19,16 +19,16 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.db.SDbSyncLogEntry;
-import erp.swap.SHttpConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.SSwapUtils;
-import erp.swap.SSyncType;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
 import erp.musr.data.SSyncRoles;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
@@ -2532,7 +2532,7 @@ public abstract class SExportDataUtils {
                 break;
 
             case PARTNER_SUPPLIER:
-                if (((SClientInterface) session.getClient()).isDev()) {
+                if (session.getClient() != null && ((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfPartnerSuppliersToExportAeth(session);
                 }
                 else {
@@ -2563,7 +2563,7 @@ public abstract class SExportDataUtils {
                 break;
 
             case PUR_REF_ORDER:
-                if (((SClientInterface) session.getClient()).isDev()) {
+                if (session.getClient() != null && ((SClientInterface) session.getClient()).isDev()) {
                     data = getListOfRefsOfPurchaseOrderToExportAeth(session);
                 }
                 else {

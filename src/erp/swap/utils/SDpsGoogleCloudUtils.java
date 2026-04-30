@@ -7,10 +7,11 @@ import com.swaplicado.data.StorageManagerException;
 import erp.client.SClientInterface;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbSyncLogEntry;
-import erp.swap.SSyncType;
+import erp.mod.fin.utils.SPDFUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
+import erp.swap.SSyncType;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class SDpsGoogleCloudUtils {
                 oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                 File pdf;
                 if (oPdfFile == null) {
-                    File localTempDir = SDpsGoogleCloudUtils.getTemporalDir();
+                    File localTempDir = SPDFUtils.getTemporalDir();
                     pdf = new File(localTempDir, fileData.getFileName());
                     STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                 }
@@ -90,7 +91,7 @@ public class SDpsGoogleCloudUtils {
                     oDps.read(new int[] { fileData.getIdYear(), fileData.getIdDoc() }, oDb.getConnection().createStatement());
                     File pdf;
                     if (oPdfFile == null) {
-                        File localTempDir = SDpsGoogleCloudUtils.getTemporalDir();
+                        File localTempDir = SPDFUtils.getTemporalDir();
                         pdf = new File(localTempDir, fileData.getFileName());
                         STrnUtilities.createReportOrder((SClientInterface) session.getClient(), pdf, oDps, SDataConstantsPrint.PRINT_MODE_PDF_FILE, sDbName);
                     }
@@ -143,26 +144,6 @@ public class SDpsGoogleCloudUtils {
         }
         
         return null;
-    }
-
-    /**
-     * Obtiene el directorio temporal para almacenar archivos antes de subir a GCS.
-     * Si no existe, lo crea.
-     * Nota: Este método asume que el sistema operativo tiene configurado un directorio temporal válido.
-     * 
-     * @return File representando el directorio temporal local para esta aplicación.
-     */
-    private static File getTemporalDir() {
-        String sysTempDir = System.getProperty("java.io.tmpdir");
-        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + "OCS_TEMP");
-        if (!localTempDir.exists()) {
-            boolean ok = localTempDir.mkdirs();
-            if (!ok) {
-                throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
-            }
-        }
-
-        return localTempDir;
     }
 
     /**

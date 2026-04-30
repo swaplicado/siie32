@@ -16,12 +16,12 @@ import erp.mod.cfg.db.SDbComSyncLog;
 import erp.mod.cfg.db.SDbComSyncLogEntry;
 import erp.mod.cfg.db.SDbSyncLog;
 import erp.mod.cfg.db.SDbSyncLogEntry;
+import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.fin.db.SDbPayment;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
-import erp.mod.cfg.utils.SAuthJsonUtils;
-import erp.mod.fin.db.SDbPayment;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -38,14 +38,12 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
@@ -844,7 +842,7 @@ public abstract class SExportUtils {
         String testHost = "";
         String testApyKey = "";
         
-        if (((SClientInterface) session.getClient()).isDev()) {
+        if (session.getClient() != null && ((SClientInterface) session.getClient()).isDev()) {
             // hosts para pruebas:
             
             System.out.println("*** Running in dev mode! ***");
@@ -1019,7 +1017,8 @@ public abstract class SExportUtils {
             // Preparar el cuerpo de la petición en formato JSON:
 
             String requestBody = "";
-            String[] instanceArray = new String[] { "" + ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_INSTANCE) };
+            JsonNode nodeConfig = new ObjectMapper().readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+            String[] instanceArray = new String[] { SAuthJsonUtils.getValueOfElementAsText(nodeConfig, "", SSwapConsts.CFG_NVP_INSTANCE) };
 
             switch (syncType) {
                 case USER:
@@ -1145,7 +1144,7 @@ public abstract class SExportUtils {
         SResponses responses = new SResponses(syncType);
         boolean proceed = true; // si el cliente no fuera gráfico, proceder de inmediato!
 
-        if (((SClientInterface) session.getClient()).isGui()) {
+        if (session.getClient() != null && ((SClientInterface) session.getClient()).isGui()) {
             // informar al usuario sobre la demora del proceso:
             
             String message = "La exportación de registros '" + SSwapUtils.translateSyncType(syncType, SLibConsts.LAN_ISO639_ES) + "' puede durar algunos segundos.";
@@ -1305,7 +1304,7 @@ public abstract class SExportUtils {
                 String message = "Los registros '" + SSwapUtils.translateSyncType(responses.getSyncType(), SLibConsts.LAN_ISO639_ES) + "' fueron exportados correctamente "
                         + "a " + SSwapConsts.SWAP_SERVICES + ":\n\n" + responses;
                 
-                if (!((SClientInterface) session.getClient()).isGui()) {
+                if (session.getClient() == null || !((SClientInterface) session.getClient()).isGui()) {
                     System.out.println(message);
                 }
                 else {
@@ -1320,7 +1319,7 @@ public abstract class SExportUtils {
                 String message = "Ocurrió un problema al exportar los registros '" + SSwapUtils.translateSyncType(responses.getSyncType(), SLibConsts.LAN_ISO639_ES) + "' "
                         + "a " + SSwapConsts.SWAP_SERVICES + ":\n" + responses;
                 
-                if (!((SClientInterface) session.getClient()).isGui()) {
+                if (session.getClient() == null || !((SClientInterface) session.getClient()).isGui()) {
                     System.out.println(message);
                 }
                 else {
@@ -1335,10 +1334,17 @@ public abstract class SExportUtils {
      *
      * @param session Sesión de usuario.
      * @return Cadena de texto con los ID de las emresas.
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
      */
-    public static String getSwapCompaniesForSqlQuery(final SGuiSession session) {
-        int[] companies = (int[]) ((SClientInterface) session.getClient()).getSwapServicesSetting(SSwapConsts.CFG_NVP_COMPANIES);
-        return Arrays.stream(companies).mapToObj(String::valueOf).collect(Collectors.joining(", "));
+    public static String getSwapCompaniesForSqlQuery(final SGuiSession session) throws JsonProcessingException, Exception {
+        JsonNode config = new ObjectMapper().readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+        boolean bSwapServicesLinkUp = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_LINK_UP)) == 1;
+        
+        String companies = "";
+        if (bSwapServicesLinkUp) {
+            companies = SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_COMPANIES);
+        }
+        return companies;
     }
 
     /**
@@ -1348,7 +1354,7 @@ public abstract class SExportUtils {
      * @return Mapa de los nombres de las bases de datos: key = company ID; value = database name.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static HashMap<Integer, String> getSwapCompaniesDatabasesMap(final SGuiSession session) throws SQLException {
+    public static HashMap<Integer, String> getSwapCompaniesDatabasesMap(final SGuiSession session) throws SQLException, Exception {
         HashMap<Integer, String> databasesMap = new HashMap<>();
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {

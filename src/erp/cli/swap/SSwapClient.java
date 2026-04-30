@@ -18,9 +18,10 @@ import erp.lib.gui.SGuiDatePicker;
 import erp.lib.gui.SGuiDateRangePicker;
 import erp.lib.gui.SGuiModule;
 import erp.mcfg.data.SCfgUtils;
-import erp.swap.SSwapConsts;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.server.SSessionXXX;
+import erp.swap.SSwapConsts;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +52,8 @@ public class SSwapClient implements SClientInterface, SGuiClient {
     private int[] manSwapServicesCompanies;
     private int mnSwapServicesInstance;
     
-    public SSwapClient(final String dbHost, final int dbPort, final String dbName, final boolean isDev, final int userId) throws Exception {
+    public SSwapClient(final String dbHost, final int dbPort, final String dbName, 
+                        final boolean isDev, final int userId, final int defaultCompanyId) throws Exception {
         mbIsDev = isDev;
         
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
@@ -65,6 +67,10 @@ public class SSwapClient implements SClientInterface, SGuiClient {
         moSession.setSystemDate(new Date());
         moSession.setCurrentDate(moSession.getSystemDate());
         moSession.setDatabase(database);
+        
+        SDataParamsCompany params = new SDataParamsCompany();
+        params.read(new int[] { defaultCompanyId }, moSession.getStatement());
+        moSession.setConfigCompany(params);
         
         JsonNode config = new ObjectMapper().readTree(SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
 
