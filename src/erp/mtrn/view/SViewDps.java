@@ -1212,11 +1212,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     
     private void actionImportCfdi(boolean linkToOrder) {
         if (linkToOrder ? jbImportCfdiWithOrder.isEnabled() : jbImportCfdiWithOutOrder.isEnabled()) {
-            try {
-                SImportUtils.importCfdiAndCreateAndSaveDps(miClient, mbIsCategoryPur, moDialogDpsFinder, null, null, linkToOrder, null, null);
+            if (miClient.getSessionXXX().getCurrentCompanyBranchId() == 0) {
+                // no branch selected in current user session:
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH + "\n"
+                        + "No se puede importar o capturar facturas, hasta que se seleccione una sucursal de la empresa.");
             }
-            catch (Exception e) {
-                SLibUtilities.renderException(this, e);
+            else {
+                try {
+                    SImportUtils.importCfdiAndCreateAndSaveDps(miClient, mbIsCategoryPur, moDialogDpsFinder, null, null, linkToOrder, null, null);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
             }
         }
     }

@@ -518,7 +518,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbSelectReferenceItem">
+                            <Component class="javax.swing.JButton" name="jbSelectItemReference">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir &#xed;tem referencia"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">

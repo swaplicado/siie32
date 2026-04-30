@@ -544,51 +544,53 @@ public abstract class SImportUtils {
                     }
                 }
 
-                if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
-                    SDialogCfdRenderer dialogCfdRenderer = new SDialogCfdRenderer(client);
-                    SDataDps newDps = dialogCfdRenderer.renderCfdAndCreateDps(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                if (chosenCfdiXml != null) {
+                    if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
+                        SDialogCfdRenderer dialogCfdRenderer = new SDialogCfdRenderer(client);
+                        SDataDps newDps = dialogCfdRenderer.renderCfdAndCreateDps(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
-                    if (newDps != null) {
-                        int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
-                        int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                        if (newDps != null) {
+                            int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                            int[] invoiceTypeKey = isPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
 
-                        newDps.setAuxFilePdf(cfdiPdf);
-                        
-                        // set dayos of credit and accounting tag:
-                        
-                        String tag = "";
-                        
-                        if (importedDocument != null) {
-                            if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument.getDueDateEffective() != null) {
-                                newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
+                            newDps.setAuxFilePdf(cfdiPdf);
+
+                            // set dayos of credit and accounting tag:
+
+                            String tag = "";
+
+                            if (importedDocument != null) {
+                                if (newDps.getFkPaymentTypeId() == SDataConstantsSys.TRNS_TP_PAY_CREDIT && importedDocument.getDueDateEffective() != null) {
+                                    newDps.setDaysOfCreditByDueDate(importedDocument.getDueDateEffective());
+                                }
+
+                                tag = importedDocument.AccountingTag;
                             }
-                            
-                            tag = importedDocument.AccountingTag;
-                        }
-                        
-                        if (tag.isEmpty() && order != null && !order.getAccountingTag().isEmpty()) {
-                            tag = order.getAccountingTag();
-                        }
-                        
-                        newDps.setAccountingTag(tag);
-                        newDps.setXtaImportedDocument(importedDocument);
-                        
-                        // complete DPS creation:
-                        
-                        client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
-                        client.getGuiModule(module).setAuxRegistry(newDps);
 
-                        if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
-                            client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+                            if (tag.isEmpty() && order != null && !order.getAccountingTag().isEmpty()) {
+                                tag = order.getAccountingTag();
+                            }
 
-                            invoice = (SDataDps) client.getGuiModule(module).getRegistry();
-                            SDataUtilities.showDpsRecord(client, invoice);
+                            newDps.setAccountingTag(tag);
+                            newDps.setXtaImportedDocument(importedDocument);
+
+                            // complete DPS creation:
+
+                            client.getGuiModule(module).setFormComplement(new Object[] { invoiceTypeKey }); // document type key
+                            client.getGuiModule(module).setAuxRegistry(newDps);
+
+                            if (client.getGuiModule(module).showForm(SDataConstants.TRN_DPS, null) == SLibConstants.DB_ACTION_SAVE_OK) {
+                                client.getGuiModule(module).refreshCatalogues(SDataConstants.TRN_DPS);
+
+                                invoice = (SDataDps) client.getGuiModule(module).getRegistry();
+                                SDataUtilities.showDpsRecord(client, invoice);
+                            }
                         }
                     }
-                }
-                else {
-                    client.showMsgBoxInformation("El archivo proporcionado debe ser " + SFileUtilities.xml.toUpperCase() + ".\n"
-                            + "(Archivo proporcionado: '" + chosenCfdiXml.getName() + "')");
+                    else {
+                        client.showMsgBoxInformation("El archivo proporcionado debe ser " + SFileUtilities.xml.toUpperCase() + ".\n"
+                                + "(Archivo proporcionado: '" + chosenCfdiXml.getName() + "')");
+                    }
                 }
             }
         }

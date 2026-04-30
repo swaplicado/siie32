@@ -81,18 +81,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private void initComponents() {
 
         bgFind = new javax.swing.ButtonGroup();
-        jpSouth = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jlYear = new javax.swing.JLabel();
-        jtfYear = new javax.swing.JTextField();
-        jlCompanyBranchEntity = new javax.swing.JLabel();
-        jtfCompanyBranch = new javax.swing.JTextField();
-        jtfWarehouse = new javax.swing.JTextField();
-        jPanel7 = new javax.swing.JPanel();
-        jbOK = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jpOptionPane = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jpFilters = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jrbFindByItemKey = new javax.swing.JRadioButton();
         jrbFindByItemName = new javax.swing.JRadioButton();
@@ -110,7 +99,19 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         jPanel10 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jckFindExactMatch = new javax.swing.JCheckBox();
-        jPanel11 = new javax.swing.JPanel();
+        jpOptionPane = new javax.swing.JPanel();
+        jpControls = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jlYear = new javax.swing.JLabel();
+        jtfYear = new javax.swing.JTextField();
+        jlCompanyBranchEntity = new javax.swing.JLabel();
+        jtfCompanyBranch = new javax.swing.JTextField();
+        jtfWarehouse = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jtfNotes = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jbOK = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Seleccionar ítem");
@@ -121,70 +122,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             }
         });
 
-        jpSouth.setPreferredSize(new java.awt.Dimension(792, 33));
-        jpSouth.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
-
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jlYear.setText("Ejercicio:");
-        jlYear.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel8.add(jlYear);
-
-        jtfYear.setEditable(false);
-        jtfYear.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jtfYear.setText("YEAR");
-        jtfYear.setFocusable(false);
-        jtfYear.setPreferredSize(new java.awt.Dimension(40, 23));
-        jPanel8.add(jtfYear);
-
-        jlCompanyBranchEntity.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlCompanyBranchEntity.setText("Almacén:");
-        jlCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel8.add(jlCompanyBranchEntity);
-
-        jtfCompanyBranch.setEditable(false);
-        jtfCompanyBranch.setText("BRANCH");
-        jtfCompanyBranch.setFocusable(false);
-        jtfCompanyBranch.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel8.add(jtfCompanyBranch);
-
-        jtfWarehouse.setEditable(false);
-        jtfWarehouse.setText("WAREHOUSE");
-        jtfWarehouse.setFocusable(false);
-        jtfWarehouse.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel8.add(jtfWarehouse);
-
-        jpSouth.add(jPanel8);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbOK.setText("Aceptar");
-        jbOK.setPreferredSize(new java.awt.Dimension(75, 23));
-        jbOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbOKActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jbOK);
-
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jbCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbCancelActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jbCancel);
-
-        jpSouth.add(jPanel7);
-
-        getContentPane().add(jpSouth, java.awt.BorderLayout.SOUTH);
-
-        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones disponibles:"));
-        jpOptionPane.setLayout(new java.awt.BorderLayout());
-        getContentPane().add(jpOptionPane, java.awt.BorderLayout.CENTER);
-
-        jPanel1.setLayout(new java.awt.GridLayout(1, 1));
+        jpFilters.setLayout(new java.awt.GridLayout(1, 1));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda:"));
         jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 5));
@@ -254,12 +192,12 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         jPanel3.add(jPanel4);
 
-        jPanel1.add(jPanel3);
+        jpFilters.add(jPanel3);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones de búsqueda:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
+        jPanel5.setLayout(new java.awt.GridLayout(3, 1, 5, 5));
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -294,14 +232,87 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
         jPanel5.add(jPanel6);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel5.add(jPanel11);
-
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
-        jPanel1.add(jPanel2);
+        jpFilters.add(jPanel2);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
+        getContentPane().add(jpFilters, java.awt.BorderLayout.NORTH);
+
+        jpOptionPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones disponibles:"));
+        jpOptionPane.setLayout(new java.awt.BorderLayout());
+        getContentPane().add(jpOptionPane, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(792, 33));
+        jpControls.setLayout(new java.awt.BorderLayout());
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlYear.setText("Ejercicio:");
+        jlYear.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel8.add(jlYear);
+
+        jtfYear.setEditable(false);
+        jtfYear.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtfYear.setText("YEAR");
+        jtfYear.setToolTipText("Año");
+        jtfYear.setFocusable(false);
+        jtfYear.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel8.add(jtfYear);
+
+        jlCompanyBranchEntity.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlCompanyBranchEntity.setText("Almacén:");
+        jlCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel8.add(jlCompanyBranchEntity);
+
+        jtfCompanyBranch.setEditable(false);
+        jtfCompanyBranch.setText("BRANCH");
+        jtfCompanyBranch.setToolTipText("Sucursal");
+        jtfCompanyBranch.setFocusable(false);
+        jtfCompanyBranch.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel8.add(jtfCompanyBranch);
+
+        jtfWarehouse.setEditable(false);
+        jtfWarehouse.setText("WAREHOUSE");
+        jtfWarehouse.setToolTipText("Almacén");
+        jtfWarehouse.setFocusable(false);
+        jtfWarehouse.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel8.add(jtfWarehouse);
+
+        jpControls.add(jPanel8, java.awt.BorderLayout.WEST);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jtfNotes.setEditable(false);
+        jtfNotes.setText("NOTES");
+        jtfNotes.setToolTipText("Notas");
+        jtfNotes.setFocusable(false);
+        jtfNotes.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel7.add(jtfNotes);
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel7.add(jLabel1);
+
+        jbOK.setText("Aceptar");
+        jbOK.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbOKActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jbOK);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jbCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbCancelActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jbCancel);
+
+        jpControls.add(jPanel7, java.awt.BorderLayout.EAST);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(800, 500));
         setLocationRelativeTo(null);
@@ -412,7 +423,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         mbResetingForm = false;
     }
 
-    private boolean showStock() {
+    private boolean showingStock() {
         return moFilterKey != null && moFilterKey instanceof Object[];
     }
 
@@ -427,37 +438,48 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 setSelectedPrimaryKey(moPkItemId);
             }
 
-            if (showStock()) {
+            if (showingStock()) {
                 // XXX this is absolutely wrong!!!
                 jtfYear.setText("" + miClient.getSessionXXX().getWorkingYear());
             }
         }
     }
 
-    private void readCompanyBranch() {
-        if (!showStock()) {
+    private void showWarehouse() {
+        if (!showingStock()) {
             jtfCompanyBranch.setText("");
-        }
-        else {
-            mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
-            
-            SDataBizPartnerBranch companyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnCompanyBranchId }, SLibConstants.EXEC_MODE_SILENT);
-            jtfCompanyBranch.setText(companyBranch.getBizPartnerBranch());
-            jtfCompanyBranch.setCaretPosition(0);
-        }
-    }
-
-    private void readWarehouse() {
-        if (!showStock()) {
             jtfWarehouse.setText("");
         }
         else {
             mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
             mnCompanyBranchEntityId = (Integer) ((Object[]) moFilterKey)[4];
             
+            SDataBizPartnerBranch companyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnCompanyBranchId }, SLibConstants.EXEC_MODE_SILENT);
+            jtfCompanyBranch.setText(companyBranch.getBizPartnerBranch());
+            jtfCompanyBranch.setCaretPosition(0);
+            
             SDataCompanyBranchEntity warehouse = (SDataCompanyBranchEntity) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, new int[] { mnCompanyBranchId, mnCompanyBranchEntityId }, SLibConstants.EXEC_MODE_SILENT);
             jtfWarehouse.setText(warehouse.getCode());
+            jtfWarehouse.setCaretPosition(0);
         }
+    }
+    
+    private void showNotes() {
+        String notes = "";
+        
+        if (mbInventoriablesOnly || mbAdvancesOnly) {
+            if (mbInventoriablesOnly) {
+                notes = "inventariables";
+            }
+            if (mbAdvancesOnly) {
+                notes += (notes.isEmpty() ? "" : " y ") + "de anticipos";
+            }
+            
+            notes = "Solamente ítems " + notes + ".";
+        }
+        
+        jtfNotes.setText(notes);
+        jtfNotes.setCaretPosition(0);
     }
 
     private void populateTable() {
@@ -466,7 +488,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         String[] titles = null;
         HashMap<Integer, Object> params = new HashMap<>();
 
-        aoTableColumns = new STableColumnForm[showStock() ? 11 : 10];
+        aoTableColumns = new STableColumnForm[showingStock() ? 11 : 10];
 
         if (jrbFindByItemKey.isSelected() || jrbFindByItemName.isSelected() || jrbFindByPartNum.isSelected()) {
             dataType = jrbFindByItemKey.isSelected() ? SDataConstants.ITMX_ITEM_BY_KEY : (jrbFindByItemName.isSelected() ? SDataConstants.ITMX_ITEM_BY_NAME : SDataConstants.ITMX_ITEM_BY_PART_NUM);
@@ -487,7 +509,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             
-            if (showStock()) {
+            if (showingStock()) {
                 aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
@@ -519,7 +541,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             
-            if (showStock()) {
+            if (showingStock()) {
                 aoTableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Existencias", STableConstants.WIDTH_QUANTITY_2X);
                 aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             }
@@ -675,9 +697,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFind;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -694,14 +715,16 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     private javax.swing.JLabel jlItemClass;
     private javax.swing.JLabel jlSearchText;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpFilters;
     private javax.swing.JPanel jpOptionPane;
-    private javax.swing.JPanel jpSouth;
     private javax.swing.JRadioButton jrbFindByBrand;
     private javax.swing.JRadioButton jrbFindByItemKey;
     private javax.swing.JRadioButton jrbFindByItemName;
     private javax.swing.JRadioButton jrbFindByManufacturer;
     private javax.swing.JRadioButton jrbFindByPartNum;
     private javax.swing.JTextField jtfCompanyBranch;
+    private javax.swing.JTextField jtfNotes;
     private javax.swing.JTextField jtfSearchText;
     private javax.swing.JTextField jtfWarehouse;
     private javax.swing.JTextField jtfYear;
@@ -733,8 +756,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
     public void formRefreshOptionPane() {
         populateTable();
 
-        readCompanyBranch();
-        readWarehouse();
+        showWarehouse();
+        showNotes();
     }
 
     @Override

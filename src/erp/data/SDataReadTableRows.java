@@ -640,10 +640,12 @@ public abstract class SDataReadTableRows {
         java.util.Date tDate = null;
         boolean bInventoriableNot = false;
         boolean bInventoriableOnly = false;
+        boolean bAdvancesOnly = false;
 
         if (params != null) {
             bInventoriableNot = params.get(SLibConstants.VALUE_INV_NOT) == null ? false : (Boolean) params.get(SLibConstants.VALUE_INV_NOT);
             bInventoriableOnly = params.get(SLibConstants.VALUE_INV_ONLY) == null ? false : (Boolean) params.get(SLibConstants.VALUE_INV_ONLY);
+            bAdvancesOnly = params.get(SLibConstants.VALUE_ADV_ONLY) == null ? false : (Boolean) params.get(SLibConstants.VALUE_ADV_ONLY);
         }
 
         switch (pnDataType) {
@@ -1220,8 +1222,9 @@ public abstract class SDataReadTableRows {
                         (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", NULL, '" + SLibUtils.DbmsDateFormatDate.format(tDate) + "') AS f_stock ") +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
-                        (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
-                        (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
+                        (!bInventoriableNot ? "" : "AND NOT i.b_inv ") +
+                        (!bInventoriableOnly ? "" : "AND i.b_inv ") +
+                        (!bAdvancesOnly ? "" : "AND i.b_pre_pay ") +
                         "INNER JOIN erp.itmu_brd AS b ON i.fid_brd = b.id_brd " +
                         "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +

@@ -194,7 +194,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectCostCenter = new javax.swing.JButton();
         jPanel16 = new javax.swing.JPanel();
         jbSelectTaxRegion = new javax.swing.JButton();
-        jbSelectReferenceItem = new javax.swing.JButton();
+        jbSelectItemReference = new javax.swing.JButton();
         jPanel17 = new javax.swing.JPanel();
         jlIsItemNameEditable = new javax.swing.JLabel();
         jpCfdiConceptPurchaseOrder = new javax.swing.JPanel();
@@ -460,10 +460,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectTaxRegion.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jbSelectTaxRegion);
 
-        jbSelectReferenceItem.setText("Elegir ítem referencia");
-        jbSelectReferenceItem.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbSelectReferenceItem.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel16.add(jbSelectReferenceItem);
+        jbSelectItemReference.setText("Elegir ítem referencia");
+        jbSelectItemReference.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbSelectItemReference.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jbSelectItemReference);
 
         jpCfdiConceptSetup.add(jPanel16);
 
@@ -865,7 +865,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectTaxRegion.addActionListener(this);
         jbSelectOpsType.addActionListener(this); 
         jbSelectCostCenter.addActionListener(this);
-        jbSelectReferenceItem.addActionListener(this);
+        jbSelectItemReference.addActionListener(this);
         
         jbPickPurchaseOrderEntries.addActionListener(this);
         jbProcessAsService.addActionListener(this);
@@ -922,7 +922,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
         jbSelectTaxRegion.setEnabled(false);
         jbSelectOpsType.setEnabled(false);
         jbSelectCostCenter.setEnabled(false);
-        jbSelectReferenceItem.setEnabled(false); 
+        jbSelectItemReference.setEnabled(false); 
         jbPickPurchaseOrderEntries.setEnabled(isWithPurchaseOrder());
         jbProcessAsService.setEnabled(isWithPurchaseOrder());
         
@@ -1290,11 +1290,11 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     /**
-     * 
-     * @param choiceOfItem Indica el ítem deseado: ITEM_MAIN or ITEM_REF.
+     * Seleccionar ítem.
+     * @param kindOfItem Indica el ítem deseado: ITEM_MAIN or ITEM_REF.
      */
-    private void actionSelectItem(int choiceOfItem) { 
-        if (choiceOfItem == ITEM_MAIN ? jbSelectItem.isEnabled() : jbSelectReferenceItem.isEnabled()) {
+    private void actionSelectItem(int kindOfItem) {
+        if (kindOfItem == ITEM_MAIN && jbSelectItem.isEnabled() || kindOfItem == ITEM_REF && jbSelectItemReference.isEnabled()) {
             int selectedRow = moConceptTablePane.getTable().getSelectedRow();
 
             if (selectedRow == -1) {
@@ -1313,7 +1313,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
                 moPickerItems.formReset();
 
-                if (choiceOfItem == ITEM_MAIN) {
+                if (rowCfdiImport.isInvoicedAdvance()) {
+                    moPickerItems.setFormParam(SLibConstants.VALUE_ADV_ONLY, true);
+                }
+                else if (kindOfItem == ITEM_MAIN) {
                     moPickerItems.setFilterKey(SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
                 }
 
@@ -1324,7 +1327,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 if (moPickerItems.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     SDataItem item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, (int[]) moPickerItems.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                    if (choiceOfItem == ITEM_MAIN) {
+                    if (kindOfItem == ITEM_MAIN) {
                         rowCfdiImport.setItem(item);
 
                         // se busca si el ítem principal requiere un ítem de refefencia, de ser así, se asigna:
@@ -1670,8 +1673,8 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     private javax.swing.JButton jbProcessAsService;
     private javax.swing.JButton jbSelectCostCenter;
     private javax.swing.JButton jbSelectItem;
+    private javax.swing.JButton jbSelectItemReference;
     private javax.swing.JButton jbSelectOpsType;
-    private javax.swing.JButton jbSelectReferenceItem;
     private javax.swing.JButton jbSelectTaxRegion;
     private javax.swing.JButton jbSelectUnit;
     private javax.swing.JButton jbViewInvoicePdf;
@@ -1783,7 +1786,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             }
             
             jbSelectCostCenter.setEnabled(rowCfdiImport.getItem() != null);
-            jbSelectReferenceItem.setEnabled(rowCfdiImport.getItem() != null && rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired());
+            jbSelectItemReference.setEnabled(rowCfdiImport.getItem() != null && rowCfdiImport.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired());
         }
         else {
             jbSelectUnit.setEnabled(false);
@@ -1791,7 +1794,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             jbSelectOpsType.setEnabled(false); 
             
             jbSelectCostCenter.setEnabled(false);
-            jbSelectReferenceItem.setEnabled(false);
+            jbSelectItemReference.setEnabled(false);
         }    
     }
     
@@ -2126,6 +2129,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 if (isWithPurchaseOrder()) {
                     if (row.getImportedEntryDpsDpsLinks().isEmpty()) {
                         validation.setMessage(msgPrefix + "no tiene asignada una partida de la OC.");
+                        validation.setComponent(jbPickPurchaseOrderEntries);
                         break;
                     }
                     else {
@@ -2161,6 +2165,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         double toLink = 0;
                         toLink = SLibUtils.round(row.getImportedEntryDpsDpsLinks().stream().map((entryDpsDpsLink) -> entryDpsDpsLink.getQuantityToLink()).reduce(toLink, (accumulator, _item) -> accumulator + _item), 4);
                         double totConcept = SLibUtils.round(cantConcept * convFact, 4);
+                        
                         if (totConcept < toLink) {
                             validation.setMessage(msgPrefix + "tiene vinculada una cantidad mayor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
                         }
@@ -2172,6 +2177,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
                 if (row.getItem() == null) {
                     validation.setMessage(msgPrefix + "no tiene asignado un ítem.");
+                    validation.setComponent(jbSelectItem);
                     break;
                 }
                 else {
@@ -2179,34 +2185,42 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
 
                     if (isItemRefReq && row.getItemReference() == null) {
                         validation.setMessage(msgPrefix + "no tiene asignado un ítem de referencia.");
+                        validation.setComponent(jbSelectItemReference);
                         break;
                     }
                     else if (isItemRefReq && row.getItemReference().getPkItemId() == row.getItem().getPkItemId()) {
                         validation.setMessage(msgPrefix + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                        validation.setComponent(jbSelectItemReference);
                         break;
                     }
                     else if (row.getUnit() == null) {
                         validation.setMessage(msgPrefix + "no tiene asignada una unidad.");
+                        validation.setComponent(jbSelectUnit);
                         break;
                     }
                     else if (row.getUnit().getDbmsClaveUnidad().isEmpty()) {
                         validation.setMessage(msgPrefix + "su unidad asignada carece de ClaveUnidad SAT.");
+                        validation.setComponent(jbSelectUnit);
                         break;
                     }
                     else if (row.getTaxRegion() == null) {
                         validation.setMessage(msgPrefix + "no tiene asignada una región de impuestos.");
+                        validation.setComponent(jbSelectTaxRegion);
                         break;
                     }
                     else if (row.getOperationTypePk() == 0) {
                         validation.setMessage(msgPrefix + "no tiene asignado un tipo de operación.");
+                        validation.setComponent(jbSelectOpsType);
                         break;
                     }
                     else if (row.getCostCenter() == null) {
                         validation.setMessage(msgPrefix + "no tiene asignado un centro de costo.");
+                        validation.setComponent(jbSelectCostCenter);
                         break;
                     }
                     else if (row.getConvFactor() == 0.0) {
                         validation.setMessage(msgPrefix + "no tiene especificado un factor de conversión.");
+                        validation.setComponent(moConceptTablePane.getTable());
                         break;
                     }
                     else {
@@ -2607,7 +2621,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             else if (button == jbSelectCostCenter) {
                 actionSelectCostCenter();
             }
-            else if (button == jbSelectReferenceItem) {
+            else if (button == jbSelectItemReference) {
                 actionSelectItem(ITEM_REF);
             }
             else if (button == jbPickPurchaseOrderEntries) {

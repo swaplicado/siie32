@@ -186,39 +186,6 @@ public final class SDialogCfdRenderer implements ActionListener {
         return new SDocumentInfo(moCfdEssentials.Serie, moCfdEssentials.Folio, moCfdEssentials.Uuid, moCfdEssentials.Fecha, moCfdEssentials.Emisor);
     }
     
-    private void actionPerformedViewPdf() throws Exception {
-        if (moPdfFile != null && mjViewPdf.isEnabled()) {
-            if (moDialogPdfViewer == null) {
-                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
-            }
-
-            moDialogPdfViewer.setPdf(createDocumentInfo(), moPdfFile);
-            moDialogPdfViewer.setVisible(true);
-        }
-    }
-      
-    private void actionPerformedProcessCfd() throws Exception {
-        SFormValidation validation = null;
-        
-        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
-            validation = validateCfdi40();
-        }
-        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
-            validation = validateCfdi33();
-        }
-        else {
-            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nVersión CFD: " + mfCfdiVersion + ".");
-        }
-        
-        if (validation.getIsError()) {
-            miClient.showMsgBoxWarning(validation.getMessage());
-        }
-    }
-    
-    private void actionPerformedClose() {
-        moCfdiViewer.setVisible(false);
-    }
-    
     private SFormValidation validateCfdi40() throws Exception {
         SFormValidation validation = new SFormValidation();
         
@@ -687,18 +654,43 @@ public final class SDialogCfdRenderer implements ActionListener {
         }
     }
     
+    private void actionPerformedViewPdf() throws Exception {
+        if (moPdfFile != null && mjViewPdf.isEnabled()) {
+            if (moDialogPdfViewer == null) {
+                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
+            }
+
+            moDialogPdfViewer.setPdf(createDocumentInfo(), moPdfFile);
+            moDialogPdfViewer.setVisible(true);
+        }
+    }
+      
+    private void actionPerformedProcessCfd() throws Exception {
+        SFormValidation validation = null;
+        
+        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+            validation = validateCfdi40();
+        }
+        else if (mfCfdiVersion == DCfdConsts.CFDI_VER_33) {
+            validation = validateCfdi33();
+        }
+        else {
+            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nVersión CFD: " + mfCfdiVersion + ".");
+        }
+        
+        if (validation.getIsError()) {
+            miClient.showMsgBoxWarning(validation.getMessage());
+        }
+    }
+    
+    private void actionPerformedClose() {
+        moCfdiViewer.setVisible(false);
+    }
+    
     /*
      * Public methods.
      */
     
-    /**
-     * Obtener el diálogo usado para mostrar el XML de un CFDI.
-     * @return Diálogo usado para mostrar el XML de un CFDI.
-     */
-    public JDialog getDialog() {
-        return moCfdiViewer;
-    }
-      
     /**
      * Recibe el XML de un CFDI y lo muestra en pantalla en un diálogo "flotante", accesible todo el tiempo.
      * @param xml XML del CFDI.
