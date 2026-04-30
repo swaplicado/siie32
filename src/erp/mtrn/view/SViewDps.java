@@ -60,7 +60,7 @@ import erp.mtrn.data.SDataMinorChangesDps;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
-import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
@@ -209,7 +209,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
     private erp.mod.trn.form.SDialogDocumentAuthornComments moDialogAuthComments;
-    private erp.mtrn.data.cfd.SCfdRenderer moCfdRenderer;
+    private erp.mtrn.data.cfd.SDialogCfdRenderer moDialogCfdRenderer;
     private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private java.text.DecimalFormat moUsQuantityFormat;
 
@@ -2926,11 +2926,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (jbShowCfdiXml.isEnabled()) {
             if (isRowSelected()) {
                 try {
-                    if (moCfdRenderer == null) {
-                        moCfdRenderer = new SCfdRenderer(miClient);
+                    if (moDialogCfdRenderer == null) {
+                        moDialogCfdRenderer = new SDialogCfdRenderer(miClient);
                     }
                     
-                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moCfdRenderer);
+                    SViewDps.showCfdiXml(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey(), moDialogCfdRenderer);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -4154,7 +4154,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
      * @param renderer CFD renderer.
      * @throws Exception 
      */
-    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey, final SCfdRenderer renderer) throws Exception {
+    public static void showCfdiXml(final SClientInterface client, final int[] dpsKey, final SDialogCfdRenderer renderer) throws Exception {
         SDataCfd cfd = SCfdUtils.getCfd(client, SDataConstantsSys.TRNS_TP_CFD_INV, dpsKey);
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {

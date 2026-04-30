@@ -20,7 +20,7 @@ import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.view.SViewFilter;
-import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
 import erp.mtrn.view.SViewDps;
 import erp.musr.data.SDataUser.Right;
 import erp.swap.SSwapConsts;
@@ -82,7 +82,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterCurrency;
-    private SCfdRenderer moCfdRenderer;
+    private SDialogCfdRenderer moDialogCfdRenderer;
     private SDialogPdfViewer moDialogPdfViewer;
     
     private JButton jbDocShowCfdiXml;
@@ -377,11 +377,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         if(jbDocShowCfdiXml.isEnabled()) {
             if (isRowDataSelected()) {
                 try {
-                    if (moCfdRenderer == null) {
-                        moCfdRenderer = new SCfdRenderer((SClientInterface) miClient);
+                    if (moDialogCfdRenderer == null) {
+                        moDialogCfdRenderer = new SDialogCfdRenderer((SClientInterface) miClient);
                     }
                     
-                    SViewDps.showCfdiXml((SClientInterface) miClient, getDocKeyOfSelectedPayment(), moCfdRenderer);
+                    SViewDps.showCfdiXml((SClientInterface) miClient, getDocKeyOfSelectedPayment(), moDialogCfdRenderer);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

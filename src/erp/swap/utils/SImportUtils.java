@@ -30,7 +30,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SThinDps;
-import erp.mtrn.data.cfd.SCfdRenderer;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -545,8 +545,8 @@ public abstract class SImportUtils {
                 }
 
                 if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
-                    SCfdRenderer renderer = new SCfdRenderer(client);
-                    SDataDps newDps = renderer.renderCfdAndCreateDps(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                    SDialogCfdRenderer dialogCfdRenderer = new SDialogCfdRenderer(client);
+                    SDataDps newDps = dialogCfdRenderer.renderCfdAndCreateDps(chosenCfdiXml, cfdiPdf, order, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
                     if (newDps != null) {
                         int module = isPurchase ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
@@ -620,6 +620,11 @@ public abstract class SImportUtils {
         return documents;
     }
     
+    /**
+     * Get file prefix.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return 
+     */
     private static String getFilePrefix(final int documentType) {
         String prefix = "";
         

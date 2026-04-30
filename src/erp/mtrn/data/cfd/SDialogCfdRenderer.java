@@ -62,7 +62,7 @@ import sa.lib.xml.SXmlUtils;
  * Muestra el CFDI y se permite la validación cuando sea necesaria ante el SAT.
  * @author Isabel Servín, Sergio Flores
  */
-public final class SCfdRenderer implements ActionListener {
+public final class SDialogCfdRenderer implements ActionListener {
     
     private final SClientInterface miClient;
     private String msCfdiXml;
@@ -88,7 +88,7 @@ public final class SCfdRenderer implements ActionListener {
      *   al empate de los conceptos del CFDI y de SIIE.
      * @param client 
      */
-    public SCfdRenderer(final SClientInterface client) {
+    public SDialogCfdRenderer(final SClientInterface client) {
         miClient = client;
         msCfdiXml = "";
     }
