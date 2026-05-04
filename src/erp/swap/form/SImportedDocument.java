@@ -1393,31 +1393,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Retrieve XML and PDF files of document, and set class member AuxFiles.
-     * @param session GUI session.
-     * @param serviceUrl Download service URL.
-     * @return XML & PDF files, if found, otherwise <code>null</code>.
-     * @throws Exception 
-     */
-    private File[] retrieveAndSetFiles(final SGuiSession session, final String serviceUrl) throws Exception {
-        // retrieve CFDI files:
-
-        File[] files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, serviceUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
-
-        if (files == null || files.length != SImportUtils.CFDI_FILES) {
-            throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
-        }
-        else if (isBizPartnerDomestic(session.getClient()) && files[SImportUtils.CFDI_XML_IDX] == null) {
-            throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
-        }
-        else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
-            throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
-        }
-
-        return AuxFiles = files;
-    }
-    
-    /**
      * Retrieve XML and PDF files of document.
      * @param session GUI session.
      * @param serviceUrl Download service URL.
@@ -1432,17 +1407,31 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         if (files == null) {
-            files = retrieveAndSetFiles(session, serviceUrl);
+            boolean isBizPartnerDomestic = isBizPartnerDomestic(session.getClient());
             
-            if (files != null) {
-                if (files[SImportUtils.CFDI_XML_IDX] != null) {
-                    SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.xml, files[SImportUtils.CFDI_XML_IDX], BizPartnerId);
-                }
+            files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, serviceUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
 
-                if (files[SImportUtils.CFDI_PDF_IDX] != null) {
-                    SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF_IDX], BizPartnerId);
-                }
+            if (files == null || files.length != SImportUtils.CFDI_FILES) {
+                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
             }
+            else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
+            }
+            else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+            }
+
+            // copy files to local temporal directory:
+
+            if (isBizPartnerDomestic) {
+                SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.xml, files[SImportUtils.CFDI_XML_IDX], BizPartnerId);
+            }
+
+            SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF_IDX], BizPartnerId);
+
+            // preserve files:
+
+            AuxFiles = files;
         }
         
         return files;
@@ -1463,7 +1452,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         if (xml == null) {
-            retrieveAndSetFiles(session, serviceUrl);
+            retrieveFiles(session, serviceUrl);
             xml = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.xml, BizPartnerId);
         }
         
@@ -1485,7 +1474,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         if (pdf == null) {
-            retrieveAndSetFiles(session, serviceUrl);
+            retrieveFiles(session, serviceUrl);
             pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
         }
         

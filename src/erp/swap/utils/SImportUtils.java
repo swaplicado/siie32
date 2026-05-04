@@ -84,7 +84,7 @@ public abstract class SImportUtils {
     private static final String FILE_PREFIX_INVOICES = "facturas compras";
     private static final String FILE_PREFIX_PROFORMAS = "proformas compras";
     private static final String FILE_PREFIX_RECEIPT_PAYMENTS = "CRP compras";
-    private static final String TEMP_DIR_DOCS_PDF = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs_" + SFileUtilities.pdf.toUpperCase() + "\\";
+    private static final String TEMP_DIR_DOCS = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs\\";
     
     public static final int DOC_FILES_ZIP_IDX = 0;
     public static final int CFDI_XML_IDX = 0;
@@ -174,7 +174,7 @@ public abstract class SImportUtils {
             }
             else {
                 SDataRegistry registrySaved = (SDataRegistry) response.getPacket();
-                Object lastSavedPrimaryKey = registrySaved.getPrimaryKey();
+                Object lastSavedPrimaryKey = registrySaved.getPrimaryKey(); // preserve the last created PK until it is necessary
                 
                 registry.setPrimaryKey(registrySaved.getPrimaryKey());
                 registry.deleteTempFile(client);
@@ -1016,7 +1016,8 @@ public abstract class SImportUtils {
         
         switch (fileExtension) {
             case SFileUtilities.pdf:
-                subdir = TEMP_DIR_DOCS_PDF;
+            case SFileUtilities.xml:
+                subdir = TEMP_DIR_DOCS;
                 break;
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Extensión de archivo: " + fileExtension + ")");
@@ -1032,13 +1033,13 @@ public abstract class SImportUtils {
             }
         }
         
-        System.out.println("localTempDir.getAbsolutePath()  : " + localTempDir.getAbsolutePath());
+        System.out.println("localTempDir.getAbsolutePath(): " + localTempDir.getAbsolutePath());
         /* Keep for debuggin purposes:
-        System.out.println("localTempDir.getCanonicalPath() : " + localTempDir.getCanonicalPath());
-        System.out.println("localTempDir.getName()          : " + localTempDir.getName());
-        System.out.println("localTempDir.getParent()        : " + localTempDir.getParent());
-        System.out.println("localTempDir.getPath()          : " + localTempDir.getPath());
-        System.out.println("localTempDir.toString()         : " + localTempDir.toString());
+        System.out.println("localTempDir.getCanonicalPath(): " + localTempDir.getCanonicalPath());
+        System.out.println("localTempDir.getName(): " + localTempDir.getName());
+        System.out.println("localTempDir.getParent(): " + localTempDir.getParent());
+        System.out.println("localTempDir.getPath(): " + localTempDir.getPath());
+        System.out.println("localTempDir.toString(): " + localTempDir.toString());
         */
         
         return localTempDir;
@@ -1056,7 +1057,7 @@ public abstract class SImportUtils {
         File localTempDir = createDocumentsLocalTempDir(fileExtension);
         String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(documentExternalId) + "." + fileExtension;
         
-        System.out.println("DocumentTempFileAbsolutePath    : " + absolutePath);
+        System.out.println("DocumentTempFileAbsolutePath: " + absolutePath);
         
         return new File(absolutePath);
     }
@@ -1070,7 +1071,7 @@ public abstract class SImportUtils {
      * @throws IOException 
      */
     public static File getDocumentFileFromTempDirIfExists(final int documentExternalId, final String fileExtension, final int bizPartnerId) throws IOException {
-        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId,fileExtension);
+        File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId, fileExtension);
         
         if (!tempFile.exists()) {
             tempFile = null;

@@ -7,6 +7,7 @@ package erp.swap.form;
 
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -2083,6 +2084,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
                         if (xml != null) {
                             moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()));
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pudo obtener el archivo " + SFileUtilities.xml.toUpperCase() + " de la factura autorizada.");
                         }
                     }
                 }
