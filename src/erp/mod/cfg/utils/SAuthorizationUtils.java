@@ -18,13 +18,9 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.db.SDbMms;
-import erp.swap.SHttpConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.utils.SExportDataFile;
-import erp.swap.utils.SExportPayments;
-import erp.swap.utils.SExportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFileProcess;
 import erp.mod.trn.form.SDialogSelectOrderAuthornPath;
@@ -32,6 +28,11 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
 import erp.siieapp.SUserResource;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.utils.SExportDataFile;
+import erp.swap.utils.SExportPayments;
+import erp.swap.utils.SExportUtils;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -1846,25 +1847,26 @@ public abstract class SAuthorizationUtils {
         if (!hasError) {
             ArrayList<SDbPaymentFile> lFileNamesToUpload = new ArrayList<>();
             
-            for (SDbPaymentFile oFile : payment.getFiles()) {
+            for (SDbPaymentFile oPayFile : payment.getFiles()) {
                 try {
                     // Obtener bytes del archivo y generar un nombrfe único para el amacenamiento en la nube
-                    byte[] fileBytes = SDocUtils.getFileBytes(client.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
+                    byte[] fileBytes = SDocUtils.getFileBytes(client.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oPayFile.getFilevaultId());
                     String name = SDocUtils.generatePaymentFileName(client.getSession().getDatabase().getDbName(), 
-                            payment.getPkPaymentId(), oFile.getPkFileId(), oFile.getFileType());
+                            payment.getPkPaymentId(), oPayFile.getPkFileId(), oPayFile.getFileType());
                     
                     // Subir archivo a la nube
                     CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
                     if (oGcsFile != null) {
                         SExportDataFile expFile = new SExportDataFile();
-                        oFile.setFileStorageName(oGcsFile.getFileName());
-                        oFile.save(client.getSession());
-                        lFileNamesToUpload.add(oFile);
-                        expFile.filename_storage = oFile.getFileStorageName();
-                        expFile.filename_original = oFile.getFileName();
-                        expFile.url_storage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
-                        expFile.url_database = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
-                        expFile.bucket_name = oGcsFile.getBucketName();
+                        oPayFile.setFileStorageName(oGcsFile.getFileName());
+                        oPayFile.save(client.getSession());
+                        lFileNamesToUpload.add(oPayFile);
+                        expFile.filenameStorage = oPayFile.getFileStorageName();
+                        expFile.filenameOriginal = oPayFile.getFileName();
+                        expFile.urlStorage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.urlDatabase = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.bucketName = oGcsFile.getBucketName();
+                        expFile.fileTypeId = SPaymentUtils.mapPaymentFileType(oPayFile.getFileType());
                         expFiles.add(expFile);
                     }
                     else {

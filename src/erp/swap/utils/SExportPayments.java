@@ -9,16 +9,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mtrn.data.SThinDps;
+import erp.swap.SSwapConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 
