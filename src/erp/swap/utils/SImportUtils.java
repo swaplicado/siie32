@@ -852,7 +852,7 @@ public abstract class SImportUtils {
                         }
 
                         files = extractedFiles.toArray(new File[0]);
-                        break;    
+                        break;
 
                     case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
                         // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
@@ -1091,11 +1091,7 @@ public abstract class SImportUtils {
     public static File copyDocumentFileToTempDir(final int documentExternalId, final String fileExtension, final File originalFile, final int bizPartnerId) throws IOException {
         File tempFile = createDocumentLocalTempFile(documentExternalId, bizPartnerId, fileExtension);
         
-        Files.copy(
-            originalFile.toPath(),
-            tempFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING
-        );
+        Files.copy(originalFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         
         return tempFile;
     }

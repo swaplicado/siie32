@@ -53,6 +53,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -295,6 +296,21 @@ public final class SDialogCfdRenderer implements ActionListener {
                     if (tfd != null) {
                         if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0) {
                             validation.setMessage("El UUID del documento ya existe en la base de datos (" + tfd.getAttUUID().getString() + ").");
+                        }
+                    }
+                }
+
+                if (!validation.getIsError()) {
+                    int[] systemMonth = SLibTimeUtils.digestMonth(miClient.getSession().getSystemDate());
+                    
+                    if (!SLibTimeUtils.isBelongingToPeriod(comprobante.getAttFecha().getDatetime(), systemMonth[0], systemMonth[1])) {
+                        String confirm = "La fecha del documento, " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()) + ", "
+                                + "no es del mes en curso, " + SLibUtils.DateFormatDateMonthYearLong.format(miClient.getSession().getSystemDate()) + ".\n"
+                                + SGuiConsts.MSG_CNF_CONT;
+                        
+                        if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                            validation.setMessage("El documento no debería ser de " + SLibUtils.DateFormatDateMonthYearLong.format(comprobante.getAttFecha().getDatetime()) + ", "
+                                    + "sino del mes en curso, " + SLibUtils.DateFormatDateMonthYearLong.format(miClient.getSession().getSystemDate()) + ".");
                         }
                     }
                 }

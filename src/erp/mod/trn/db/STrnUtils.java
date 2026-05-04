@@ -186,8 +186,8 @@ public abstract class STrnUtils {
         double balance = 0;
         
         String sql = "SELECT "
-                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _ops_prepay, "
-                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _adj_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _ops_prepay, "
+                + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _adj_prepay, "
                 + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.disc_doc" : "de.disc_doc_cur") + ", 0.0)), 0.0) AS _ops_ops_app_prepay, "
                 + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.disc_doc" : "de.disc_doc_cur") + ", 0.0)), 0.0) AS _adj_ops_app_prepay, "
                 + "COALESCE(SUM(IF(de.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY + ", " + (idCurrency == SLibConsts.UNDEFINED ? "de.stot_r" : "de.stot_cur_r") + ", 0.0)), 0.0) AS _adj_app_prepay "
@@ -224,8 +224,8 @@ public abstract class STrnUtils {
             case SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY:
                 mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY;
                 break;
-            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC:
-                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY;
+            case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED;
                 break;
             case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:
                 mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
@@ -233,8 +233,8 @@ public abstract class STrnUtils {
             case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:
                 mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY;
                 break;
-            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:
-                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC;
+            case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED:
+                mirrowed = SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED;
                 break;
             default:
                 mirrowed = operationsType;

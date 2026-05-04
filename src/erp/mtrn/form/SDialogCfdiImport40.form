@@ -362,7 +362,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[175, 23]"/>
+                          <Dimension value="[165, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -371,7 +371,7 @@
                         <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="Naturaleza doc.:*"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[100, 23]"/>
+                          <Dimension value="[110, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -461,15 +461,15 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir &#xed;tem"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JButton" name="jbSelectOpsType">
+                            <Component class="javax.swing.JButton" name="jbSelectOperationsType">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Elegir tipo operaci&#xf3;n"/>
+                                <Property name="text" type="java.lang.String" value="Elegir tipo de operaci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -486,15 +486,15 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Elegir unidad"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JButton" name="jbSelectCostCenter">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Elegir centro costo"/>
+                                <Property name="text" type="java.lang.String" value="Elegir centro de costo"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -509,23 +509,23 @@
                           <SubComponents>
                             <Component class="javax.swing.JButton" name="jbSelectTaxRegion">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Elegir regi&#xf3;n impuestos"/>
+                                <Property name="text" type="java.lang.String" value="Elegir regi&#xf3;n de impuestos"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[2, 0, 2, 0]"/>
                                 </Property>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JButton" name="jbSelectItemReference">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Elegir &#xed;tem referencia"/>
+                                <Property name="text" type="java.lang.String" value="Elegir &#xed;tem de referencia"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[2, 0, 2, 0]"/>
                                 </Property>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -573,16 +573,16 @@
                           <SubComponents>
                             <Component class="javax.swing.JButton" name="jbPickPurchaseOrderEntries">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Elegir partidas OC"/>
+                                <Property name="text" type="java.lang.String" value="Elegir partidas de OC"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[140, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JLabel" name="jlDummy1">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[140, 23]"/>
+                                  <Dimension value="[115, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -615,14 +615,14 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Procesar servicio"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[140, 23]"/>
+                                  <Dimension value="[165, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JLabel" name="jlDummy2">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[35, 23]"/>
+                                  <Dimension value="[10, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

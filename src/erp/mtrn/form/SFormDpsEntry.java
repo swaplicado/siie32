@@ -3373,6 +3373,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkOriginalUnitId(0);
             moDpsEntry.setFkTaxRegionId(0);
             moDpsEntry.setFkThirdTaxpayerId_n(0);
+            moDpsEntry.setIsPrepayment(false);
 
             moDpsEntry.setDbmsFkItemGenericId(0);
 
@@ -3388,7 +3389,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkOriginalUnitId(moFieldFkOriginalUnitId.getKeyAsIntArray()[0]);
             moDpsEntry.setFkTaxRegionId(moFieldFkTaxRegionId.getKeyAsIntArray()[0]);
             moDpsEntry.setFkThirdTaxpayerId_n(moFieldFkThirdTaxpayerId_n.getKeyAsIntArray()[0]);
-            moDpsEntry.setIsPrepayment(moItem.getIsPrepayment());
+            moDpsEntry.setIsPrepayment(moFieldIsPrepayment.getBoolean());
 
             moDpsEntry.setDbmsFkItemGenericId(moItem.getFkItemGenericId());
 
@@ -4875,7 +4876,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
     
     private void itemChangeOperationsType() {
-        if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && moParamDps.isAdjustment() && moFieldOperationsType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) {
+        if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && moParamDps.isAdjustment() && moFieldOperationsType.getKeyAsIntArray()[0] == SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED) {
             jradAccCashAccount.setEnabled(true);
             jradAccAdvanceBilled.setEnabled(true);
             jradAccAdvanceBilled.setSelected(true);
@@ -6533,17 +6534,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moCostCenterPanel.getPanelAccountName() + "'.");
                     validation.setComponent(moCostCenterPanel.getTextNumberFirst());                    
                 }
-                else if (moItem.getIsPrepayment() && moParamDps.isDocument() && moFieldOperationsType.getKeyAsIntArray()[0] != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC) {
+                else if (moItem.getIsPrepayment() && moParamDps.isDocument() && moFieldOperationsType.getKeyAsIntArray()[0] != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
-                            + "debería ser: '" + SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC) + "'.");
+                            + "debería ser: '" + SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED) + "'.");
                     validation.setComponent(moFieldOperationsType.getComponent());
                 }
-                else if (moItem.getIsPrepayment() && moParamDps.isAdjustment() && !SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY })) {
+                else if (moItem.getIsPrepayment() && moParamDps.isAdjustment() && !SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY })) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlOperationsType.getText() + "', "
-                            + "debería ser: '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY) + "' o '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) + "'.");
+                            + "debería ser: '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED) + "' o '" + SDataConstantsSys.OperationsTypesAdjMap.get(SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY) + "'.");
                     validation.setComponent(moFieldOperationsType.getComponent());
                 }
-                else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY }) && !moItem.getIsPrepayment()) {
+                else if (SLibUtils.belongsTo(moFieldOperationsType.getKeyAsIntArray()[0], new int[] { SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED, SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY }) && !moItem.getIsPrepayment()) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkItemId.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
                     validation.setComponent(jcbFkItemId);
                 }

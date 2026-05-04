@@ -41,7 +41,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     private SDataUnit moUnit;
     private SDataTaxRegion moTaxRegion;
     private SDataCostCenter moCostCenter;
-    private int mnOperationTypePk;
+    private int mnOperationsType;
     private int mnCfdLinkType;
     
     private ArrayList<SDataEntryDpsDpsLink> moImportedEntryDpsDpsLinks;
@@ -74,7 +74,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public void setUnit(final SDataUnit o) { moUnit = o; }
     public void setTaxRegion(final SDataTaxRegion o) { moTaxRegion = o; }
     public void setCostCenter(final SDataCostCenter o) { moCostCenter = o; }
-    public void setOperationTypePk(final int i) { mnOperationTypePk = i; }
+    public void setOperationsType(final int i) { mnOperationsType = i; }
     public void setCfdLinkType(final int i) { mnCfdLinkType = i; }
     
     public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
@@ -86,7 +86,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public SDataUnit getUnit() { return moUnit; }
     public SDataTaxRegion getTaxRegion() { return moTaxRegion; }
     public SDataCostCenter getCostCenter() { return moCostCenter; }
-    public int getOperationTypePk() { return mnOperationTypePk; }
+    public int getOperationsType() { return mnOperationsType; }
     public int getCfdLinkType() { return mnCfdLinkType; }
     
     public ArrayList<SDataEntryDpsDpsLink> getImportedEntryDpsDpsLinks() { return moImportedEntryDpsDpsLinks; }
@@ -94,7 +94,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public ArrayList<SDataDpsEntry> getNewDpsEntries() { return moNewDpsEntries; }
     
     public void setConvFactor(final double d) { 
-        mdConvFactor = d; 
+        mdConvFactor = d;
+        
         if (!moNewDpsEntries.isEmpty()) {
             for (SDataDpsEntry newDpsEty : moNewDpsEntries) {
                 SDataEntryDpsDpsLink entryDpsDpsLink = null;
@@ -182,7 +183,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moCostCenter = null;
         moImportedEntryDpsDpsLinks = new ArrayList<>();
         moImportedDpsEntries = new ArrayList<>();
-        mnOperationTypePk = 0;
+        mnOperationsType = 0;
         mdConvFactor = 1;
         
         moTaxChargedMatched = new HashSet<>();
@@ -206,7 +207,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moCostCenter = costCenter;
         moImportedEntryDpsDpsLinks = new ArrayList<>();
         moImportedDpsEntries = new ArrayList<>();
-        mnOperationTypePk = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
+        mnOperationsType = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
         mdConvFactor = 1;
     }
     
@@ -333,10 +334,10 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moNewDpsEntry.setTicket("");
         moNewDpsEntry.setContainerTank("");
         moNewDpsEntry.setVgm("");
-        moNewDpsEntry.setOperationsType(mnOperationTypePk); 
+        moNewDpsEntry.setOperationsType(mnOperationsType); 
         moNewDpsEntry.setUserId(0);
         moNewDpsEntry.setSortingPosition(mnRowNumber); 
-        moNewDpsEntry.setIsPrepayment(false);
+        moNewDpsEntry.setIsPrepayment(moItem == null ? false : moItem.getIsPrepayment());
         moNewDpsEntry.setIsDiscountRetailChain(false);
         moNewDpsEntry.setIsTaxesAutomaticApplying(true);
         moNewDpsEntry.setIsPriceVariable(false);
@@ -443,7 +444,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         mvValues.add(moUnit == null ? "" : moUnit.getSymbol()); // Unidad
         mvValues.add(moUnit == null ? "" : moUnit.getDbmsClaveUnidad()); // Unidad SAT
         mvValues.add(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion()); // Región de impuestos
-        mvValues.add(mnOperationTypePk == 0 ? "" : SDataConstantsSys.OperationsTypesOpsMap.get(mnOperationTypePk)); // Tipo de operación
+        mvValues.add(mnOperationsType == 0 ? "" : SDataConstantsSys.OperationsTypesOpsMap.get(mnOperationsType)); // Tipo de operación
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX()); // Clave centro costo
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getCostCenter()); // Centro costo
         mvValues.add(moItemReference == null ? "" : moItemReference.getKey()); // Clave ítem de referencia

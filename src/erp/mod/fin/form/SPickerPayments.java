@@ -183,7 +183,7 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                 where += "AND EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") ";
                 if (mbIsAdvanceDocPayment) {
-                    where += "AND p.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + " ";
+                    where += "AND p.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " ";
                 }
             }
             else {
@@ -243,7 +243,7 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
                     row.setNotes(resultSet.getString("p.nts"));
                     row.setOperationType(resultSet.getInt("p.pay_tp_op"));
-                    row.setIsDocAdvance(row.getOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC);
+                    row.setIsDocAdvance(row.getOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED);
                     row.setDateScheduled(resultSet.getDate("p.dt_sched_n"));
                     row.setInstallment(resultSet.getInt("pe.install"));
                     row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));

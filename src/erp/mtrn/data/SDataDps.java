@@ -61,14 +61,14 @@ import erp.mfin.data.SFinMovementType;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.form.SImportedDocument;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import erp.mtrn.data.cfd.SAddendaUtils;
+import erp.swap.SSwapConsts;
+import erp.swap.form.SImportedDocument;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -954,7 +954,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double amountPrepayment = 0;
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY)) {
+            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED)) {
                 for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
                     taxAmount = SLibUtils.roundAmount(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()));
                 }
@@ -3509,8 +3509,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 if (SLibUtils.belongsTo(dpsEntry.getOperationsType(),
                                         new int[] {
-                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC,
-                                            SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY
+                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED,
+                                            SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED
                                         })) {
                                     // caso: anticipos facturados:
                                     
@@ -4100,8 +4100,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                             break;
 
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC:        // prepayments invoiced
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
+                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED:        // prepayments invoiced
+                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED:        // adjustment of prepayments invoiced
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
 
                                             boolean hasConfig = false;
@@ -4707,6 +4707,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     idAccount = config.getAccountId();
                                     idAccount = idAccount.replaceAll("0", "");
                                     idAccount = idAccount.replaceAll("-", "");
+                                    
                                     if (idAccount.length() == 0) {
                                         msDbmsError = MSG_ERR_ACC_EMP_ + "ítem:\n'" + name + "'.";
                                         throw new Exception(msDbmsError);

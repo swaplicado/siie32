@@ -14,7 +14,6 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SFinUtilities;
@@ -27,6 +26,7 @@ import erp.mod.fin.db.SDbPayment;
 import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SThinDps;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.mtrn.view.SViewDps;
 import erp.swap.SHttpConsts;
@@ -88,6 +88,7 @@ import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.xml.SXmlUtils;
 
 /**
  * Importación de documentos desde el Portal de Compras.
@@ -143,6 +144,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected boolean mbDocumentsBeingRefreshed;
     protected ImageIcon moIconEdit;
     protected ImageIcon moIconSave;
+    protected SDialogCfdRenderer moDialogCfdRenderer;
     protected SDialogPdfViewer moDialogPdfViewer;
     protected SDialogMassAccountDocuments moDialogMassAccountDocuments;
     
@@ -235,6 +237,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbRejectInvoice = new javax.swing.JButton();
         jpProcessingN6 = new javax.swing.JPanel();
         jlInvoice = new javax.swing.JLabel();
+        jbViewInvoiceXml = new javax.swing.JButton();
         jbViewInvoicePdf = new javax.swing.JButton();
         jpProcessingN7 = new javax.swing.JPanel();
         jtfInvoice = new javax.swing.JTextField();
@@ -582,8 +585,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
         jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlInvoice.setText("Factura:");
-        jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
+        jlInvoice.setPreferredSize(new java.awt.Dimension(95, 23));
         jpProcessingN6.add(jlInvoice);
+
+        jbViewInvoiceXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-xml.png"))); // NOI18N
+        jbViewInvoiceXml.setToolTipText("Ver XML de la factura...");
+        jbViewInvoiceXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN6.add(jbViewInvoiceXml);
 
         jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewInvoicePdf.setToolTipText("Ver PDF de la factura...");
@@ -856,6 +864,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbViewAdvances;
     private javax.swing.JButton jbViewInvoice;
     private javax.swing.JButton jbViewInvoicePdf;
+    private javax.swing.JButton jbViewInvoiceXml;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JButton jbViewRecord;
     private javax.swing.JLabel jlInvoice;
@@ -1183,6 +1192,30 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         return isRecorded;
     }
     
+    private boolean checkIsBizPartnerDomestic(final SImportedDocument document, final boolean showTipOnAlternativeDocCreation) throws Exception {
+        // check whether business partner of document is domestic:
+
+        Boolean isBizPartnerDomestic = null;
+
+        try {
+            isBizPartnerDomestic = document.isBizPartnerDomestic(miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+
+        if (isBizPartnerDomestic == null) {
+            throw new Exception("No se pudo determinar si el proveedor de este factura autorizada, " + document.BizPartner + ", es nacional.");
+        }
+        else if (!isBizPartnerDomestic) {
+            throw new Exception("Los CFDI solamente son emitidos por proveedores nacionales.\n"
+                    + "El proveedor de este factura autorizada, " + document.BizPartner + ", es extranjero."
+                    + (showTipOnAlternativeDocCreation ? "\nSe puede contabilizar la factura autorizada en '" + jbCreateInvoiceFromScratch.getText() + "'." : ""));
+        }
+        
+        return true;
+    }
+    
     private void populateDocumentsGrid(final ArrayList<SImportedDocument> documents, final boolean focusDocumentsGrid) {
         Collections.sort(documents);
         
@@ -1370,6 +1403,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkInvoice.setEnabled(!enable);
         jbUnlinkInvoice.setEnabled(!enable);
         jbRejectInvoice.setEnabled(!enable);
+        jbViewInvoiceXml.setEnabled(!enable);
         jbViewInvoicePdf.setEnabled(!enable);
         jbViewInvoice.setEnabled(!enable);
         jbViewOrder.setEnabled(!enable);
@@ -1864,10 +1898,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     docsAlreadyRecorded++;
                 }
                 else {
-                    // check that document's business partner is domestic:
+                    // check whether business partner of document is domestic:
 
-                    Boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
-
+                    Boolean isBizPartnerDomestic = null;
+                    
+                    try {
+                        isBizPartnerDomestic = document.isBizPartnerDomestic(miClient);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
+                    
                     if (isBizPartnerDomestic == null) {
                         bizPartnersUnknown++;
                     }
@@ -2667,15 +2708,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             else {
                 SImportedDocument document = (SImportedDocument) row;
                 
-                // check that business partner is domestic:
-                
-                boolean isBizPartnerDomestic = SDataBizPartner.checkIsDomestic(document.BizPartnerId, (SClientInterface) miClient);
-
-                if (!isBizPartnerDomestic) {
-                    throw new Exception("Los CFDI solamente son emitidos por proveedores nacionales. El proveedor de este factura autorizada es extranjero.\n"
-                            + "Se puede contabilizar la factura autorizada en '" + jbCreateInvoiceFromScratch.getText() + "'");
-                }
-                else {
+                if (checkIsBizPartnerDomestic(document, true)) {
                     createAndLinkDps(document, CREATE_FROM_CFDI);
                 }
             }
@@ -2696,6 +2729,41 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 SImportedDocument document = (SImportedDocument) row;
                 
                 createAndLinkDps(document, CREATE_FROM_SCRATCH);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedViewInvoiceXml() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                
+                if (checkIsBizPartnerDomestic(document, false)) {
+                    if (moDialogCfdRenderer == null) {
+                        moDialogCfdRenderer = new SDialogCfdRenderer((SClientInterface) miClient);
+                    }
+
+                    if (document.isRecorded()) {
+                        // if document is recorded, prefer PDF stored in ERP:
+                        SViewDps.showCfdiXml((SClientInterface) miClient, document.ProcessedDps.getDpsKey(), moDialogCfdRenderer);
+                    }
+                    else {
+                        // retrieve PDF from SWAP Services:
+                        File xml = document.retrieveXml(miClient.getSession(), msSyncUrlDownload);
+
+                        if (xml != null) {
+                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()));
+                        }
+                    }
+                }
             }
         }
         catch (Exception e) {
@@ -3111,6 +3179,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbLinkInvoice.setEnabled(false);
             jbRejectInvoice.setEnabled(false);
             jbUnlinkInvoice.setEnabled(false);
+            jbViewInvoiceXml.setEnabled(false);
             jbViewInvoicePdf.setEnabled(false);
             jbViewInvoice.setEnabled(false);
             jbViewOrder.setEnabled(false);
@@ -3152,6 +3221,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jbLinkInvoice.setEnabled(true);
             jbRejectInvoice.setEnabled(true);
             jbUnlinkInvoice.setEnabled(true);
+            jbViewInvoiceXml.setEnabled(true);
             jbViewInvoicePdf.setEnabled(true);
             jbViewInvoice.setEnabled(true);
             jbViewOrder.setEnabled(true);
@@ -3407,6 +3477,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkInvoice.addActionListener(this);
         jbRejectInvoice.addActionListener(this);
         jbUnlinkInvoice.addActionListener(this);
+        jbViewInvoiceXml.addActionListener(this);
         jbViewInvoicePdf.addActionListener(this);
         jbViewInvoice.addActionListener(this);
         jbViewOrder.addActionListener(this);
@@ -3446,6 +3517,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jbLinkInvoice.removeActionListener(this);
         jbRejectInvoice.removeActionListener(this);
         jbUnlinkInvoice.removeActionListener(this);
+        jbViewInvoiceXml.removeActionListener(this);
         jbViewInvoicePdf.removeActionListener(this);
         jbViewInvoice.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
@@ -3539,6 +3611,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else if (button == jbUnlinkInvoice) {
                 actionPerformedUnlinkInvoice();
+            }
+            else if (button == jbViewInvoiceXml) {
+                actionPerformedViewInvoiceXml();
             }
             else if (button == jbViewInvoicePdf) {
                 actionPerformedViewInvoicePdf();
