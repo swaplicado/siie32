@@ -104,7 +104,7 @@ public final class SDialogCfdRenderer implements ActionListener {
                 // create dialog:
                 
                 moCfdiViewer = new JDialog(miClient.getFrame(),"Visor de CFDI", true);
-                moCfdiViewer.setSize(1000, 650);
+                moCfdiViewer.setSize(1000, 640);
                 moCfdiViewer.setLocationRelativeTo(null);
                 moCfdiViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 

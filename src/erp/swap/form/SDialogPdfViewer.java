@@ -246,7 +246,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 1000, 600);
+        SGuiUtils.setWindowBounds(this, 1000, 640);
         setResizable(true);
         
         jbSave.setEnabled(false);
