@@ -112,7 +112,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     protected static final int ON = 1;
     protected static final int LIMIT_DAYS = 31; // 1 calendar month
     protected static final int LIMIT_WEEKS = 4; // 1 lunar month
-    protected static final int BATCH_DOWNLOADS = 100;
+    protected static final int BATCH_DOWNLOADS = 100; // prevent files download from failing due to timeout or excesive size of files
     
     protected static final int FUNC_SUB_AREA_CODES_PER_LINE = 15;
     
@@ -1732,9 +1732,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
             disableFieldsWhenRegisteringDocs();
             
-            // process download:
-            
-            startProgress("Descargando " + (documents.size() == 1 ? "una factura" : SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas") + "...");
+            // prepare download documents batches:
             
             ArrayList<List<Integer>> documentsBatches = new ArrayList<>();
             int batches = (documents.size() + BATCH_DOWNLOADS - 1)/ BATCH_DOWNLOADS; // ceilling division
@@ -1757,13 +1755,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 download = desiredZipFile != null;
             }
             
+            // process download:
+            
+            startProgress("Descargando " + (documents.size() == 1 ? "una factura" : SLibUtils.DecimalFormatInteger.format(documents.size()) + " facturas") + "...");
+            
             if (download) {
                 for (int zipBatch = 1; zipBatch <= documentsBatches.size(); zipBatch++) {
                     int docs = documentsBatches.get(zipBatch - 1).size();
                     
                     try {
                         ArrayList<Integer> documentsBatch = new ArrayList<>(documentsBatches.get(zipBatch - 1));
-                        File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documentsBatch, SSwapConsts.TXN_DOC_TYPE_INVOICE, desiredZipFile, zipBatch);
+                        File[] files = SImportUtils.downloadDocumentsFilesAsZip(miClient.getSession(), msSyncUrlDownload, SImportUtils.DWNLD_FILES_TYPE_CFDI, documentsBatch, SSwapConsts.TXN_DOC_TYPE_INVOICE, desiredZipFile, zipBatch);
 
                         if (files != null) {
                             zipsSaved++;

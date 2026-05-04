@@ -95,9 +95,11 @@ public abstract class SImportUtils {
     public static final DecimalFormat FormatExternalId = new DecimalFormat(SLibUtils.textRepeat("0", 9)); // 000000000
     public static final DecimalFormat FormatBizPartnerId = new DecimalFormat(SLibUtils.textRepeat("0", 6)); // 000000
     
-    private static final int DL_MODE_DOCS_ALL_FILES_AS_ZIP = 1;
-    private static final int DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR = 11;
-    private static final int DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR = 12;
+    public static final int DWNLD_FILES_TYPE_ALL = 0;
+    public static final int DWNLD_FILES_TYPE_CFDI = 1;
+    
+    private static final int DWNLD_MODE_DOCS_FILES_AS_ZIP = 11; // for multiple documents
+    private static final int DWNLD_MODE_DOC_FILES_IN_TEMP_DIR = 21; // for one single document
     
     /**
      * Get file name without extension.
@@ -678,18 +680,22 @@ public abstract class SImportUtils {
     }
     
     /**
-     * Download documents files.
+     * Download files of list of documents.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
-     * @param downloadMode Download mode.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @param downloadMode Download mode (DWNLD_MODE_...).
+     * @param downloadFilesType Download files type, i.e., all or CFDI files only (DWNLD_FILES_TYPE_...).
      * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
      * @param zipBatch Current batch number when downloading several documents as ZIP in a loop, can be zero. When greater than zero, this batch nomber is added to the name of the desired file, when it is available.
-     * @return 
+     * @return When downloadMode is DWNLD_MODE_DOCS_FILES_AS_ZIP, then <code>File[]</code> of length 1, i.e., the ZIP file.
+     *  When downloadMode is DWNLD_MODE_DOC_FILES_IN_TEMP_DIR:
+     *  a) When downloadFilesType is DWNLD_FILES_TYPE_DOCS_ALL, then <code>File[]</code> of variable length, i.e., all files.
+     *  a) When downloadFilesType is DWNLD_FILES_TYPE_DOCS_CFDI, then <code>File[]</code> of length 2, i.e., XML & PDF files only.
      * @throws java.lang.Exception 
      */
-    private static File[] downloadDocumentsFiles(final SGuiSession session, final String serviceUrl, final int downloadMode, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
+    private static File[] downloadDocumentsFiles(final SGuiSession session, final String filesDownloadServiceUrl, final int downloadMode, final int downloadFilesType, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
         File[] files = null;
         File zipFile = null;
         Path tempDir = null;
@@ -701,7 +707,7 @@ public abstract class SImportUtils {
         try {
             // open download service connection:
             
-            URL url = new URL(serviceUrl);
+            URL url = new URL(filesDownloadServiceUrl);
             String charset = java.nio.charset.StandardCharsets.UTF_8.name();
 
             conn = (HttpURLConnection) url.openConnection();
@@ -717,7 +723,7 @@ public abstract class SImportUtils {
             // send JSON body required by API:
             
             Date requestDatetime = new Date();
-            String requestBody = "{\"document_ids\": [" + ids + "]}"; // example payload
+            String requestBody = "{\"processing_type\": " + downloadFilesType + ", \"document_ids\": [" + ids + "]}"; // '"processing_type": 1' = solamente los archivos XML y PDF de las facturas 
 
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(requestBody.getBytes("UTF-8"));
@@ -743,7 +749,7 @@ public abstract class SImportUtils {
             // choose download ZIP file:
             
             switch (downloadMode) {
-                case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
+                case DWNLD_MODE_DOCS_FILES_AS_ZIP:
                     // ask for desired ZIP file:
                     
                     if (desiredZipFile != null) {
@@ -772,8 +778,7 @@ public abstract class SImportUtils {
                     }
                     break;
                     
-                case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
-                case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
+                case DWNLD_MODE_DOC_FILES_IN_TEMP_DIR:
                     // set ZIP file in temporal directory:
                     
                     String prefix = getFilePrefix(documentType);
@@ -811,7 +816,7 @@ public abstract class SImportUtils {
                 // finish processing:
 
                 switch (downloadMode) {
-                    case DL_MODE_DOCS_ALL_FILES_AS_ZIP:
+                    case DWNLD_MODE_DOCS_FILES_AS_ZIP:
                         // log import downloads:
                         
                         System.out.println("Loging import downloads...");
@@ -821,98 +826,107 @@ public abstract class SImportUtils {
                         files = new File[] { zipFile };
                         break;
 
-                    case DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR:
-                        // decompress to get aLL files:
+                    case DWNLD_MODE_DOC_FILES_IN_TEMP_DIR:
+                        // prepare array of files to be returned:
+                        
+                        switch (downloadFilesType) {
+                            case DWNLD_FILES_TYPE_ALL:
+                                // decompress to get aLL files:
 
-                        System.out.println("Extracting all files into temp directory...");
+                                System.out.println("Extracting all files into temp directory...");
 
-                        ArrayList<File> extractedFiles = new ArrayList<>();
+                                ArrayList<File> extractedFiles = new ArrayList<>();
 
-                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
-                            ZipEntry entry;
+                                try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                                    ZipEntry entry;
 
-                            while ((entry = zis.getNextEntry()) != null) {
+                                    while ((entry = zis.getNextEntry()) != null) {
 
-                                File currentFile = new File(tempDir.toString(), entry.getName());
-                                currentFile.getParentFile().mkdirs();
+                                        File currentFile = new File(tempDir.toString(), entry.getName());
+                                        currentFile.getParentFile().mkdirs();
 
-                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
-                                    int bytesRead;
-                                    byte[] buffer = new byte[8192];
+                                        try (FileOutputStream fos = new FileOutputStream(currentFile)) {
+                                            int bytesRead;
+                                            byte[] buffer = new byte[8192];
 
-                                    while ((bytesRead = zis.read(buffer)) > 0) {
-                                        fos.write(buffer, 0, bytesRead);
+                                            while ((bytesRead = zis.read(buffer)) > 0) {
+                                                fos.write(buffer, 0, bytesRead);
+                                            }
+                                        }
+
+                                        extractedFiles.add(currentFile);
+
+                                        zis.closeEntry();
                                     }
                                 }
 
-                                extractedFiles.add(currentFile);
+                                files = extractedFiles.toArray(new File[0]);
+                                break;
+                                
+                            case DWNLD_FILES_TYPE_CFDI:
+                                // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
 
-                                zis.closeEntry();
-                            }
-                        }
+                                System.out.println("Extracting CFDI files into temp directory...");
 
-                        files = extractedFiles.toArray(new File[0]);
-                        break;
+                                String xmlFileName = "";
+                                File xmlFile = null;
+                                File pdfFile = null;
+                                HashMap<String, File> pdfFilesMap = new HashMap<>();
 
-                    case DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR:
-                        // decompress and aim to get a pair of matching XML and PDF files, or at least any of them:
-                        
-                        System.out.println("Extracting CFDI files into temp directory...");
-                        
-                        String xmlFileName = "";
-                        File xmlFile = null;
-                        File pdfFile = null;
-                        HashMap<String, File> pdfFilesMap = new HashMap<>();
-                        
-                        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
-                            ZipEntry entry;
+                                try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(Paths.get(zipPath)))) {
+                                    ZipEntry entry;
 
-                            while ((entry = zis.getNextEntry()) != null) {
-                                System.out.println("Extracting: " + entry.getName());
+                                    while ((entry = zis.getNextEntry()) != null) {
+                                        System.out.println("Extracting: " + entry.getName());
 
-                                File currentFile = new File(tempDir.toString() + "\\output", entry.getName());
-                                currentFile.getParentFile().mkdirs(); // decompress files in temporal directory
+                                        File currentFile = new File(tempDir.toString() + "\\output", entry.getName());
+                                        currentFile.getParentFile().mkdirs(); // decompress files in temporal directory
 
-                                try (FileOutputStream fos = new FileOutputStream(currentFile)) {
-                                    int bytesRead;
-                                    byte[] buffer = new byte[8192];
+                                        try (FileOutputStream fos = new FileOutputStream(currentFile)) {
+                                            int bytesRead;
+                                            byte[] buffer = new byte[8192];
 
-                                    while ((bytesRead = zis.read(buffer)) > 0) {
-                                        fos.write(buffer, 0, bytesRead);
+                                            while ((bytesRead = zis.read(buffer)) > 0) {
+                                                fos.write(buffer, 0, bytesRead);
+                                            }
+                                        }
+
+                                        zis.closeEntry();
+
+                                        // process current file:
+                                        if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
+                                            // choose the first retrieved XML file:
+                                            xmlFile = currentFile;
+                                            xmlFileName = truncExtensionFromFilename(xmlFile.getName(), "." + SFileUtilities.xml);
+                                        }
+                                        else if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
+                                            // preserve all retrieved PDF files:
+                                            pdfFilesMap.put(truncExtensionFromFilename(currentFile.getName(), "." + SFileUtilities.pdf), currentFile);
+                                        }
+
+                                        // attempt to match the PDF file:
+                                        if (!xmlFileName.isEmpty() && pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                            pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF file by matching the name of the XML file
+                                        }
+
+                                        // check if matching processing is done:
+                                        if (xmlFile != null && pdfFile != null) {
+                                            break; // a pair of matching XML and PDF files found, no more processing needed!
+                                        }
+                                    }
+
+                                    // last chance to get at least one PDF file!:
+                                    if (pdfFile == null && !pdfFilesMap.isEmpty()) {
+                                        pdfFile = (File) pdfFilesMap.values().toArray()[0]; // choose the very first retrieved PDF!
                                     }
                                 }
 
-                                zis.closeEntry();
+                                files = new File[] { xmlFile, pdfFile };
+                                break;
                                 
-                                // process current file:
-                                if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.xml) && xmlFile == null) {
-                                    // choose the first retrieved XML file:
-                                    xmlFile = currentFile;
-                                    xmlFileName = truncExtensionFromFilename(xmlFile.getName(), "." + SFileUtilities.xml);
-                                }
-                                else if (currentFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
-                                    // preserve all retrieved PDF files:
-                                    pdfFilesMap.put(truncExtensionFromFilename(currentFile.getName(), "." + SFileUtilities.pdf), currentFile);
-                                }
-                                
-                                // attempt to match the PDF file:
-                                if (!xmlFileName.isEmpty() && pdfFile == null && !pdfFilesMap.isEmpty()) {
-                                    pdfFile = pdfFilesMap.get(xmlFileName); // choose the right PDF file by matching the name of the XML file
-                                }
-                                
-                                // check if matching processing is done:
-                                if (xmlFile != null && pdfFile != null) {
-                                    break; // a pair of matching XML and PDF files found, no more processing needed!
-                                }
-                            }
-                            
-                            // last chance to get at least one PDF file!:
-                            if (pdfFile == null && !pdfFilesMap.isEmpty()) {
-                                pdfFile = (File) pdfFilesMap.values().toArray()[0]; // choose the very first retrieved PDF!
-                            }
+                            default:
+                                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
                         }
-                        
-                        files = new File[] { xmlFile, pdfFile };
                         break;
                         
                     default:
@@ -933,7 +947,7 @@ public abstract class SImportUtils {
                 }
             }
             
-            if (downloadMode == DL_MODE_DOCS_ALL_FILES_AS_ZIP) {
+            if (downloadMode == DWNLD_MODE_DOCS_FILES_AS_ZIP) {
                 JFileChooser fileChooser = session.getClient().getFileChooser();
                 fileChooser.resetChoosableFileFilters();
                 fileChooser.setAcceptAllFileFilterUsed(true);
@@ -948,9 +962,24 @@ public abstract class SImportUtils {
     }
 
     /**
-     * Download documents' all files as ZIP.
+     * Download files of list of documents.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @param downloadFilesType Download files type, i.e., all or CFDI files only (DWNLD_FILES_TYPE_...).
+     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
+     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * @return File array of 1 element: the ZIP file.
+     * @throws java.lang.Exception 
+     */
+    public static File[] downloadDocumentsFilesAsZip(final SGuiSession session, final String filesDownloadServiceUrl, final int downloadFilesType, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
+        return downloadDocumentsFiles(session, filesDownloadServiceUrl, DWNLD_MODE_DOCS_FILES_AS_ZIP, downloadFilesType, documentExternalIds, documentType, null, 0);
+    }
+
+    /**
+     * Download files of list of documents.
+     * @param session GUI session.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @param downloadFilesType Download files type, i.e., all or CFDI files only (DWNLD_FILES_TYPE_...).
      * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @param desiredZipFile Desired ZIP file, can be <code>null</code>. When <code>null</code> and a user-defined file is required, a file chooser dialog will ask for it.
@@ -958,51 +987,24 @@ public abstract class SImportUtils {
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, desiredZipFile, zipBatch);
+    public static File[] downloadDocumentsFilesAsZip(final SGuiSession session, final String filesDownloadServiceUrl, final int downloadFilesType, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
+        return downloadDocumentsFiles(session, filesDownloadServiceUrl, DWNLD_MODE_DOCS_FILES_AS_ZIP, downloadFilesType, documentExternalIds, documentType, desiredZipFile, zipBatch);
     }
 
     /**
-     * Download documents' all files as ZIP.
+     * Download files of document.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
-     * @param documentExternalIds List of external document IDs whose files needs to be downloaded.
-     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
-     * @return File array of 1 element: the ZIP file.
-     * @throws java.lang.Exception 
-     */
-    public static File[] downloadDocumentsAllFilesAsZip(final SGuiSession session, final String serviceUrl, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOCS_ALL_FILES_AS_ZIP, documentExternalIds, documentType, null, 0);
-    }
-
-    /**
-     * Download document's all files into temporal directory.
-     * @param session GUI session.
-     * @param serviceUrl Download service URL.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @param downloadFilesType Download files type, i.e., all or CFDI files only (DWNLD_FILES_TYPE_...).
      * @param documentExternalId External document ID whose files needs to be downloaded.
      * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
      * @return File array of 1 element: the ZIP file.
      * @throws java.lang.Exception 
      */
-    public static File[] downloadDocumentAllFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
+    public static File[] downloadDocumentFilesInTempDir(final SGuiSession session, final String filesDownloadServiceUrl, final int downloadFilesType, final int documentExternalId, final int documentType) throws Exception {
         ArrayList<Integer> documents = new ArrayList<>();
         documents.add(documentExternalId);
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_ALL_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
-    }
-    
-    /**
-     * Download document XML & PDF files as ZIP.
-     * @param session GUI session.
-     * @param serviceUrl Download service URL.
-     * @param documentExternalId External document ID whose XML & PDF files needs to be downloaded.
-     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
-     * @return File array of 2 elements: the XML (at index 0) & PDF (at index 1) files.
-     * @throws java.lang.Exception 
-     */
-    public static File[] downloadDocumentCfdiFilesInTempDir(final SGuiSession session, final String serviceUrl, final int documentExternalId, final int documentType) throws Exception {
-        ArrayList<Integer> documents = new ArrayList<>();
-        documents.add(documentExternalId);
-        return downloadDocumentsFiles(session, serviceUrl, DL_MODE_DOC_CFDI_FILES_IN_TEMP_DIR, documents, documentType, null, 0);
+        return downloadDocumentsFiles(session, filesDownloadServiceUrl, DWNLD_MODE_DOC_FILES_IN_TEMP_DIR, downloadFilesType, documents, documentType, null, 0);
     }
     
     /**

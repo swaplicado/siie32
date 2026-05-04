@@ -1293,7 +1293,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         }
         else {
             try {
-                File[] files = SImportUtils.downloadDocumentsAllFilesAsZip(miClient.getSession(), msSyncUrlDownload, documents, mnFormSubtype);
+                File[] files = SImportUtils.downloadDocumentsFilesAsZip(miClient.getSession(), msSyncUrlDownload, SImportUtils.DWNLD_FILES_TYPE_ALL, documents, mnFormSubtype);
 
                 if (files != null) {
                     File zipFile = files[SImportUtils.DOC_FILES_ZIP_IDX];

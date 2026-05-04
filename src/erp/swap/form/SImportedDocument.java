@@ -672,7 +672,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Link document to given DPS, and optionally create its payment request.
      * Intenged to be used in GUI context.
      * @param session GUI session.
-     * @param docFilesDownloadSrvUrl URL of document files download service.
+     * @param filesDownloadServiceUrl URL of document files download service.
      * @param dpsKey DPS primary key of invoice to be linked to.
      * @param paymentTypeMatchigPolicy Payment type matching policy: MATCH_PAY_TP...
      * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
@@ -682,7 +682,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final String docFilesDownloadSrvUrl, final int[] dpsKey, final int paymentTypeMatchigPolicy, final boolean allowGreaterInvoice, final boolean allowLaterInvoice, final boolean ommitNumberValidation, final boolean createPaymentRequest) throws Exception {
+    public boolean link(final SGuiSession session, final String filesDownloadServiceUrl, final int[] dpsKey, final int paymentTypeMatchigPolicy, final boolean allowGreaterInvoice, final boolean allowLaterInvoice, final boolean ommitNumberValidation, final boolean createPaymentRequest) throws Exception {
         boolean linked = false;
         String prefix = "No se pudo realizar la vinculación:\n";
         
@@ -950,7 +950,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     File[] files = AuxFiles; // re-use existing files, if available
                     
                     if (files == null || files.length != SImportUtils.CFDI_FILES) {
-                        files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, docFilesDownloadSrvUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                        files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
                     }
                     
                     if (files != null && files.length == SImportUtils.CFDI_FILES) {
@@ -1395,11 +1395,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Retrieve XML and PDF files of document.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
+     * @param filesDownloadServiceUrl URL of document files download service.
      * @return XML & PDF files, if found, otherwise <code>null</code>.
      * @throws Exception 
      */
-    public File[] retrieveFiles(final SGuiSession session, final String serviceUrl) throws Exception {
+    public File[] retrieveFiles(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
         File[] files = null;
         
         if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
@@ -1409,7 +1409,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         if (files == null) {
             boolean isBizPartnerDomestic = isBizPartnerDomestic(session.getClient());
             
-            files = SImportUtils.downloadDocumentCfdiFilesInTempDir(session, serviceUrl, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
 
             if (files == null || files.length != SImportUtils.CFDI_FILES) {
                 throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
@@ -1440,11 +1440,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Retrieve XML file of document.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
+     * @param filesDownloadServiceUrl URL of document files download service.
      * @return XML file, if found, otherwise <code>null</code>.
      * @throws Exception 
      */
-    public File retrieveXml(final SGuiSession session, final String serviceUrl) throws Exception {
+    public File retrieveXml(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
         File xml = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.xml, BizPartnerId);
         
         if (xml == null && AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
@@ -1452,7 +1452,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         if (xml == null) {
-            retrieveFiles(session, serviceUrl);
+            retrieveFiles(session, filesDownloadServiceUrl);
             xml = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.xml, BizPartnerId);
         }
         
@@ -1462,11 +1462,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Retrieve PDF file of document.
      * @param session GUI session.
-     * @param serviceUrl Download service URL.
+     * @param filesDownloadServiceUrl URL of document files download service.
      * @return PDF file, if found, otherwise <code>null</code>.
      * @throws Exception 
      */
-    public File retrievePdf(final SGuiSession session, final String serviceUrl) throws Exception {
+    public File retrievePdf(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
         File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
         
         if (pdf == null && AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
@@ -1474,7 +1474,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         if (pdf == null) {
-            retrieveFiles(session, serviceUrl);
+            retrieveFiles(session, filesDownloadServiceUrl);
             pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
         }
         
