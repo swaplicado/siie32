@@ -71,7 +71,7 @@ import sa.lib.gui.SGuiParams;
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     
-    private static final String SUGGESTION_SPEED_UP = "SUGERENCIA: Si urge acelerar la aplicación de esta modificación, haga clic en el botón ";
+    private static final String SUGGESTION_SPEED_UP = "\nIMPORTANTE:\nSi urge acelerar la actualización de esta modificación, haga clic en el botón ";
     
     private JRadioButton jrbDateApp;
     private JRadioButton jrbDateReq;

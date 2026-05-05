@@ -7,6 +7,7 @@ package erp.swap.form;
 
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -23,6 +24,7 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SThinDps;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
 import erp.mtrn.view.SViewDps;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
@@ -74,6 +76,7 @@ import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
+import sa.lib.xml.SXmlUtils;
 
 /**
  * Importación de documentos desde el Portal de Compras.
@@ -120,6 +123,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     protected ImageIcon moIconEdit;
     protected ImageIcon moIconSave;
     protected SDbDatabase moSomDatabase;
+    protected SDialogCfdRenderer moDialogCfdRenderer;
     protected SDialogPdfViewer moDialogPdfViewer;
     
     /**
@@ -244,6 +248,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbRejectInvoice = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
         jlInvoice = new javax.swing.JLabel();
+        jbViewInvoiceXml = new javax.swing.JButton();
         jbViewInvoicePdf = new javax.swing.JButton();
         jpProcessingN3 = new javax.swing.JPanel();
         jtfInvoice = new javax.swing.JTextField();
@@ -813,8 +818,13 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
 
         jlInvoice.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlInvoice.setText("Factura:");
-        jlInvoice.setPreferredSize(new java.awt.Dimension(122, 23));
+        jlInvoice.setPreferredSize(new java.awt.Dimension(94, 23));
         jpProcessingN2.add(jlInvoice);
+
+        jbViewInvoiceXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-xml.png"))); // NOI18N
+        jbViewInvoiceXml.setToolTipText("Ver XML de la factura...");
+        jbViewInvoiceXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN2.add(jbViewInvoiceXml);
 
         jbViewInvoicePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewInvoicePdf.setToolTipText("Ver PDF de la factura...");
@@ -1114,6 +1124,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     private javax.swing.JButton jbSetReqPaysNewRequiredDate;
     private javax.swing.JButton jbViewAdvances;
     private javax.swing.JButton jbViewInvoicePdf;
+    private javax.swing.JButton jbViewInvoiceXml;
     private javax.swing.JButton jbViewOrder;
     private javax.swing.JLabel jlAcc;
     private javax.swing.JLabel jlBolDes;
@@ -1423,6 +1434,29 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         return isRecorded;
     }
     
+    private boolean checkIsBizPartnerDomestic(final SImportedDocument document) throws Exception {
+        // check whether business partner of document is domestic:
+
+        Boolean isBizPartnerDomestic = null;
+
+        try {
+            isBizPartnerDomestic = document.isBizPartnerDomestic(miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+
+        if (isBizPartnerDomestic == null) {
+            throw new Exception("No se pudo determinar si el proveedor de este factura autorizada, " + document.BizPartner + ", es nacional.");
+        }
+        else if (!isBizPartnerDomestic) {
+            throw new Exception("Los CFDI solamente son emitidos por proveedores nacionales.\n"
+                    + "El proveedor de este factura autorizada, " + document.BizPartner + ", es extranjero.");
+        }
+        
+        return true;
+    }
+    
     /**
      * Update filters.
      * NOTICE: It must be invoked ONLY within the scope of flag mbDocumentsBeingSet.
@@ -1682,6 +1716,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         SGridRow row = moDocumentsGrid.getSelectedGridRow();
         
         jbRejectInvoice.setEnabled(enable && row != null);
+        jbViewInvoiceXml.setEnabled(enable && row != null);
         jbViewInvoicePdf.setEnabled(enable && row != null);
         jbViewOrder.setEnabled(enable && row != null);
         
@@ -2021,6 +2056,44 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             if (rejected) {
                 evaluateClosingDialog();
             }
+        }
+    }
+    
+    private void actionPerformedViewInvoiceXml() {
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SMassAccountDocument document = (SMassAccountDocument) row;
+                
+                if (checkIsBizPartnerDomestic(document.ImportedDocument)) {
+                    if (moDialogCfdRenderer == null) {
+                        moDialogCfdRenderer = new SDialogCfdRenderer((SClientInterface) miClient);
+                    }
+
+                    if (document.ImportedDocument.isRecorded()) {
+                        // if document is recorded, prefer PDF stored in ERP:
+                        SViewDps.showCfdiXml((SClientInterface) miClient, document.ImportedDocument.ProcessedDps.getDpsKey(), moDialogCfdRenderer);
+                    }
+                    else {
+                        // retrieve PDF from SWAP Services:
+                        File xml = document.ImportedDocument.retrieveXml(miClient.getSession(), moSettings.SyncUrlDownload);
+
+                        if (xml != null) {
+                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()));
+                        }
+                        else {
+                            miClient.showMsgBoxWarning("No se pudo obtener el archivo " + SFileUtilities.xml.toUpperCase() + " de la factura autorizada.");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
         }
     }
     
@@ -2682,6 +2755,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         
         if (row == null) {
             jbRejectInvoice.setEnabled(false);
+            jbViewInvoiceXml.setEnabled(false);
             jbViewInvoicePdf.setEnabled(false);
             jbViewOrder.setEnabled(false);
             
@@ -2707,6 +2781,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             SMassAccountDocument document = (SMassAccountDocument) row;
             
             jbRejectInvoice.setEnabled(true);
+            jbViewInvoiceXml.setEnabled(true);
             jbViewInvoicePdf.setEnabled(true);
             jbViewOrder.setEnabled(true);
             
@@ -2979,6 +3054,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbDeselectAllDocs.addActionListener(this);
         
         jbRejectInvoice.addActionListener(this);
+        jbViewInvoiceXml.addActionListener(this);
         jbViewInvoicePdf.addActionListener(this);
         jbViewOrder.addActionListener(this);
         
@@ -3009,6 +3085,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         jbDeselectAllDocs.removeActionListener(this);
         
         jbRejectInvoice.removeActionListener(this);
+        jbViewInvoiceXml.removeActionListener(this);
         jbViewInvoicePdf.removeActionListener(this);
         jbViewOrder.removeActionListener(this);
         
@@ -3136,6 +3213,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
             else if (button == jbRejectInvoice) {
                 actionPerformedRejectInvoice();
+            }
+            else if (button == jbViewInvoiceXml) {
+                actionPerformedViewInvoiceXml();
             }
             else if (button == jbViewInvoicePdf) {
                 actionPerformedViewInvoicePdf();

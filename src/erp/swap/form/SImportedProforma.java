@@ -13,14 +13,14 @@ import erp.data.SDataUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
-import erp.swap.SSwapConsts;
-import erp.swap.SSwapUtils;
-import erp.swap.utils.SImportUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.utils.SImportUtils;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -472,7 +472,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         File[] externalFiles = null;
 
         if (ExternalDocumentId != 0) {
-            externalFiles = SImportUtils.downloadDocumentAllFilesInTempDir(session, urlDownload, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_PROFORMA);
+            externalFiles = SImportUtils.downloadDocumentFilesInTempDir(session, urlDownload, SImportUtils.DWNLD_FILES_TYPE_ALL, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
             System.out.println("Files downloaded: " + (externalFiles != null ? externalFiles.length : 0));
 

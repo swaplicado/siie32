@@ -1509,14 +1509,13 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
     
-    public static final int TRNX_OPS_TYPE_OPS_PREPAYMENT = 11;             // operations
     public static final int TRNX_OPS_TYPE_OPS_OPS = 11;             // operations
     public static final int TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY = 12;  // operations - application of prepayment invoiced as discount
-    public static final int TRNX_OPS_TYPE_OPS_PREPAY_DOC = 13;          // prepayment invoiced
+    public static final int TRNX_OPS_TYPE_OPS_PREPAY_INVOICED = 13; // prepayment invoiced
 
     public static final int TRNX_OPS_TYPE_ADJ_OPS = 21;             // adjustment of operations
     public static final int TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY = 22;  // adjustment of operations - application of prepayment invoiced as discount
-    public static final int TRNX_OPS_TYPE_ADJ_PREPAY = 23;          // adjustment of prepayment invoiced
+    public static final int TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED = 23; // adjustment of prepayment invoiced
     public static final int TRNX_OPS_TYPE_ADJ_APP_PREPAY = 26;      // application of prepayment invoiced
     
     public static final int MKTU_SAL_ROUTE_DEFAULT = 1;
@@ -1528,11 +1527,11 @@ public abstract class SDataConstantsSys {
     static {
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS, "Operación");
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, "Operación con aplicación anticipo facturado");
-        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY_DOC, "Facturación de anticipo");
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY_INVOICED, "Facturación de anticipo");
         
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS, "Ajuste operación");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY, "Ajuste operación con aplicación anticipo facturado");
-        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY, "Ajuste facturación de anticipo");
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED, "Ajuste facturación de anticipo");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_APP_PREPAY, "Aplicación anticipo facturado");
         
         StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_NA, "(N/A)");

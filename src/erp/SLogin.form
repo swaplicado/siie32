@@ -36,7 +36,7 @@
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
             <TitledBorder>
               <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="Par&#xe1;metros de acceso:"/>
+                <TitledBorder title="Credenciales de acceso:"/>
               </Border>
             </TitledBorder>
           </Border>
@@ -85,6 +85,9 @@
                       <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jtfUserNameActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -110,6 +113,9 @@
                       <Dimension value="[150, 23]"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jpfUserPasswordActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

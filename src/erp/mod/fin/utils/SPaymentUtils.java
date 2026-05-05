@@ -48,7 +48,7 @@ public class SPaymentUtils {
         row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
         row.setNotes(resultSet.getString("p.nts"));
         row.setOperationType(resultSet.getInt("p.pay_tp_op"));
-        row.setIsDocAdvance(row.getOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC);
+        row.setIsDocAdvance(row.getOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED);
         row.setDateScheduled(resultSet.getDate("p.dt_sched_n"));
         row.setInstallment(resultSet.getInt("pe.install"));
         row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));
@@ -358,7 +358,7 @@ public class SPaymentUtils {
             }
             sql += "WHERE pr.b_del = 0 " +
                     "AND pr.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' " +
-                    "AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + " " +
+                    "AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " " +
                     "GROUP BY pre.fk_doc_year_n, pre.fk_doc_doc_n " +
                 ") AS p ON d.id_year = p.fk_doc_year_n AND d.id_doc = p.fk_doc_doc_n ";
             sql += "WHERE EXISTS(SELECT  " +

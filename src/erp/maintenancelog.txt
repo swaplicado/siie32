@@ -5,11 +5,18 @@ Edwin Omar CARMONA FIGUEROA
 1) Se agregan tipos de documento en archivos para OC, cotizaciones y pagos.
 
 ================================================================================
+SIIE 3.2 299.19/ 2026-05-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Contabilización de facturas de anticipos de proveedores tanto en la importación individual de CFDI como en la importación de facturas autorizadas de compras desde SWAP Services.
+2) Consulta visual de XML tanto la importación de facturas autorizadas de compras como en la contabilización masiva desde SWAP Services.
+
+================================================================================
 SIIE 3.2 299.18/ 2026-04-30
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización de la exportación de datos a Swap Services desde la clase independiente ejecutada en el servidor.
-2) Se agrega condición para que se habilite la tab de contabilización solo que sea diferente a pedido.
+2) Se agrega condición para que se habilite la pestaña de contabilización solo que sea diferente a pedido en la forma de captura de documentos.
 
 ================================================================================
 SIIE 3.2 299.17/ 2026-04-30

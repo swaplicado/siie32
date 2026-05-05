@@ -215,6 +215,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
@@ -2223,9 +2224,9 @@ public abstract class SDataUtilities {
         if (dps.getIsRecordAutomatic() && !dps.getAuxIsFormerRecordAutomatic() && dps.getDbmsRecordKey() != null) {
             Object[] key = (Object[]) dps.getDbmsRecordKey();
 
-            client.showMsgBoxInformation("El documento ha sido guardado en la siguiente póliza contable:\n" +
-                    "Fecha de la póliza: " + client.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
-                    "Período contable: " + key[0] + "-" + client.getSessionXXX().getFormatters().getMonthFormat().format(key[1]) + "\n" +
+            client.showMsgBoxInformation("El documento ha sido registrado en la siguiente póliza contable:\n" +
+                    "Fecha de la póliza: " + SLibUtils.DateFormatDate.format(dps.getDbmsRecordDate()) + "\n" +
+                    "Período contable: " + key[0] + "-" + SLibUtils.DecimalFormatCalendarMonth.format(key[1]) + " (" + SLibUtils.DateFormatDateMonthYearLong.format(SLibTimeUtils.createDate((int) key[0], (int) key[1])) + ")\n" +
                     "Número de póliza: " + key[3] + "-" + key[4]);
         }
     }

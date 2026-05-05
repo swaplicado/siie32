@@ -1362,7 +1362,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         + "            tde.id_year = d.id_year "
                         + "                AND tde.id_doc = d.id_doc "
                         + "                AND tde.b_del = 0 "
-                        + "                AND tde.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + " "
+                        + "                AND tde.ops_type = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " "
                         + "        LIMIT 1) = 0) "
                         + "AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx ";
                 
@@ -1484,7 +1484,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
                     sql += "    WHERE " +
                         "        pr.b_del = 0 AND pr.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' " +
-                        "            AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC + " " +
+                        "            AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " " +
                         "            AND pr.fk_st_pay IN (" + 
                                                 SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
                                                 SModSysConsts.FINS_ST_PAY_SUBR_P + 
@@ -2352,7 +2352,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         }
                         for (SRowPayments oRowPay : row.getPayments()) {
                             if (oRowPay.isDocAdvance()) {
-                                pay.setPaymentOperationType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC);
+                                pay.setPaymentOperationType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED);
                                 break;
                             }
                         }
@@ -3320,7 +3320,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             jtfNumber.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey())); // the same value for both!
             
-            bgDocOpType.setSelected(moRegistry.getLayoutOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC ? 
+            bgDocOpType.setSelected(moRegistry.getLayoutOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED ? 
                                                 moRadAdvanceDocuments.getModel() : 
                                                 moRadDocuments.getModel(), 
                                                 true);
@@ -3484,7 +3484,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             registry.setTransactionType(mnFormSubtype);
             //registry.setAuthorizationRequests(...);
             registry.setLayoutOperationType(moRadAdvanceDocuments.isSelected() ? 
-                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_DOC : 
+                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED : 
                                             SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
             //registry.setClosedPayment(...);
             registry.setDeleted(false);
