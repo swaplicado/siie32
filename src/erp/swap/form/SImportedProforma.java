@@ -40,9 +40,9 @@ import sa.lib.gui.SGuiDatePicker;
 import sa.lib.gui.SGuiSession;
 
 /**
- * In memory document received from SWAP Services.
+ * In-memory proforma received from SWAP Services.
  *
- * @author Cesar Orozco, Edwin Carmona
+ * @author Cesar Orozco, Edwin Carmona, Sergio Flores
  */
 public class SImportedProforma implements SGridRow, Serializable, Comparable<SImportedProforma> {
 
@@ -54,10 +54,6 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
     public static final int DOC_CASE_STANDARD = 1;
     public static final int DOC_CASE_FRUIT_FREIGHT = 2;
     public static final int DOC_CASE_FRUIT_PURCHASE = 3;
-
-    public static final int PROC_TYPE_STANDARD = 0; // NA
-    public static final int PROC_TYPE_FRUIT_FREIGHT = 11;
-    public static final int PROC_TYPE_FRUIT_PURCHASE = 12;
 
     public static final int PAY_NOT_REQ = 0; // pago no requerido
     public static final int PAY_DEF_BY_AMT = 1; // pago definido por monto
@@ -122,12 +118,20 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
     public boolean IsRequiredPaymentLoc;
     public String RequiredPaymentNotes;
     public Date RevisionDatetime;
+    /** Processing type ID defined in by constants SDbSwapDataProcessing.PRC_TYPE_... */
     public int ProcessingTypeId;
     public String ProcessingTypeCode;
     public int StatusId;
     public String Status;
     public boolean Download;
     public boolean AlreadyDownloaded;
+    
+    public String DocumentUploadedBy;
+    public Date DocumentUploadedAt;
+    public String DocumentReviewedBy;
+    public Date DocumentReviewedAt;
+    public String DocumentAuthorizedBy;
+    public Date DocumentAuthorizedAt;
 
     public ProcessedProforma ProcessedProforma;
     public SDbSwapDataProcessing SwapDataProcessing;
@@ -254,6 +258,13 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         ProcessingTypeId = docNode.get("processing_type_id").asInt();
         ProcessingTypeCode = ProcTypes.get(ProcessingTypeId);
         AlreadyDownloaded = alreadyDownloaded;
+        
+        DocumentUploadedBy = docNode.get("uploaded_by").asText();
+        DocumentUploadedAt = SLibUtils.IsoFormatDatetime.parse(docNode.get("uploaded_at").asText());
+        DocumentReviewedBy = docNode.get("authz_accepted_by").asText();
+        DocumentReviewedAt = SLibUtils.IsoFormatDatetime.parse(docNode.get("authz_accepted_at").asText());
+        DocumentAuthorizedBy = docNode.get("authz_authorized_by").asText();
+        DocumentAuthorizedAt = SLibUtils.IsoFormatDatetime.parse(docNode.get("authz_authorized_at").asText());
     }
 
     /**
@@ -444,7 +455,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
      * Create and save payment request.
      *
      * @param miClient GUI Client.
-     * @param urlDownload url to download files of payment.
+     * @param urlDownload URL to download files of payment.
      * @return
      * @throws Exception
      */
@@ -598,6 +609,13 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         return payment;
     }
 
+    /**
+     * Create and save payment request.
+     *
+     * @param miClient GUI Client.
+     * @return
+     * @throws Exception
+     */
     private SDbPayment createAndSavePaymentRequest(final SGuiSession session) throws Exception {
         SDbPayment payment = null;
 
@@ -767,7 +785,13 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             //swapDataProcessing.setDpsReferences(composeReferences());
             swapDataProcessing.setDpsDescription(Description);
             swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
-            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
+            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PRC_TYPE_STANDARD);
+            swapDataProcessing.setProcessingUploadedBy(DocumentUploadedBy);
+            swapDataProcessing.setProcessingUploadedAt(DocumentUploadedAt);
+            swapDataProcessing.setProcessingReviewedBy(DocumentReviewedBy);
+            swapDataProcessing.setProcessingReviewedAt(DocumentReviewedAt);
+            swapDataProcessing.setProcessingAuthorizedBy(DocumentAuthorizedBy);
+            swapDataProcessing.setProcessingAuthorizedAt(DocumentAuthorizedAt);
             swapDataProcessing.setPaymentRequired(false);
             swapDataProcessing.setPaymentApplicationCy(0);
             swapDataProcessing.setPaymentDateRequired_n(null);
@@ -803,6 +827,14 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         return requested;
     }
 
+    /**
+     * Request payment of document.
+     *
+     * @param miClient GUI client.
+     * @param urlDownload URL to download files of payment.
+     * @return
+     * @throws Exception
+     */
     public boolean requestPayment(final SGuiClient miClient, final String urlDownload) throws Exception {
         boolean requested = false;
         if (validatePaymentRequestCreation()) {
@@ -819,7 +851,13 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             //swapDataProcessing.setDpsReferences(composeReferences());
             swapDataProcessing.setDpsDescription(Description);
             swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
-            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PROC_TYPE_STANDARD);
+            swapDataProcessing.setProcessingType(SDbSwapDataProcessing.PRC_TYPE_STANDARD);
+            swapDataProcessing.setProcessingUploadedBy(DocumentUploadedBy);
+            swapDataProcessing.setProcessingUploadedAt(DocumentUploadedAt);
+            swapDataProcessing.setProcessingReviewedBy(DocumentReviewedBy);
+            swapDataProcessing.setProcessingReviewedAt(DocumentReviewedAt);
+            swapDataProcessing.setProcessingAuthorizedBy(DocumentAuthorizedBy);
+            swapDataProcessing.setProcessingAuthorizedAt(DocumentAuthorizedAt);
             swapDataProcessing.setPaymentRequired(false);
             swapDataProcessing.setPaymentApplicationCy(0);
             swapDataProcessing.setPaymentDateRequired_n(null);
@@ -940,6 +978,31 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
 
         return changed;
     }
+
+    /**
+     * Get document information: upload, review, authorization.
+     * @return 
+     */
+    public String getProformaInfo() {
+        String info = "Información de la proforma " + getFolio() + ", del " + SLibUtils.DateFormatDate.format(Date) + " (ID externo " + ExternalDocumentId + "):"
+                + "\nNombre del proveedor: " + BizPartner + " (ID " + BizPartnerId + ").\n";
+        
+        info += "\nCarga:";
+        info += "\n+ realizada por: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy) + ";";
+        info += "\n+ realizada el " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
+        info += "\nRevisión:";
+        info += "\n+ realizada por: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy) + ";";
+        info += "\n+ realizada el " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
+        info += "\nAutorización:";
+        info += "\n+ realizada por: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy) + ";";
+        info += "\n+ realizada el " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
+        
+        return info;
+    }
+    
+    /*
+     * Implemented and overriden inherited methods
+     */
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -1081,6 +1144,10 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
                 + ".";
     }
 
+    /*
+     * Static methods and classes
+     */
+    
     public static PreparedStatement createPrepStatementToGetProcessedProformaByExternalId(final Statement statement) throws Exception {
         String sql = "SELECT sdp.id_swap_data_prc AS id_swap_data_prc, sdp.fk_pay_n AS fk_pay_n, sdp.data_type AS data_type, "
                 + "sdp.ext_data_id AS ext_data_id, un.id_usr AS id_usr, un.usr AS usr "
@@ -1174,7 +1241,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
     }
 
     /**
-     * In memory Processed Proforma.
+     * In-memory Processed Proforma.
      */
     public static class ProcessedProforma implements Serializable {
 
@@ -1211,6 +1278,9 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
 
     }
 
+    /**
+     * In-memory reference.
+     */
     public static class Reference implements Serializable {
 
         public int ReferenceType;

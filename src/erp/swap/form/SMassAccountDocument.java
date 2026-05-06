@@ -309,7 +309,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
      * @return 
      */
     public boolean isFreight() {
-        return ImportedDocument.ProcessingTypeId == SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT;
+        return ImportedDocument.ProcessingTypeId == SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT;
     }
     
     /**

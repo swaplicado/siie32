@@ -35,8 +35,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -69,15 +67,15 @@ import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
- * Importación de documentos desde el Portal de Compras. Ejemplo de la URL de
- * consulta de documentos:
+ * Importación de proformas de compras desde el Portal de Compras.
+ * Ejemplo de la URL de consulta de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=41"
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  *
  * @author Cesar Orozco, Edwin Carmona, Sergio Flores
  */
-public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
+public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener {
 
     protected static final int OFF = 0;
     protected static final int ON = 1;
@@ -169,9 +167,16 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jpDocumentsGrid1 = new javax.swing.JPanel();
         jpDocumentsGrid11 = new javax.swing.JPanel();
         jpDocumentsGrid111 = new javax.swing.JPanel();
-        jlInvoiceUserNew = new javax.swing.JLabel();
+        jlDocUserUpload = new javax.swing.JLabel();
+        jlDocUserReview = new javax.swing.JLabel();
+        jlDocUserAuthorize = new javax.swing.JLabel();
+        jlPayReqUserNew = new javax.swing.JLabel();
+        jbViewDocInfo = new javax.swing.JButton();
         jpDocumentsGrid112 = new javax.swing.JPanel();
-        jtfInvoiceUserNew = new javax.swing.JTextField();
+        jtfDocUserUpload = new javax.swing.JTextField();
+        jtfDocUserReview = new javax.swing.JTextField();
+        jtfDocUserAuthorize = new javax.swing.JTextField();
+        jtfPayReqUserNew = new javax.swing.JTextField();
         jpDocumentsGrid12 = new javax.swing.JPanel();
         jpDocumentsGrid121 = new javax.swing.JPanel();
         jlProgress = new javax.swing.JLabel();
@@ -362,19 +367,54 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jpDocumentsGrid111.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlInvoiceUserNew.setText("Usuario:");
-        jlInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jpDocumentsGrid111.add(jlInvoiceUserNew);
+        jlDocUserUpload.setText("Cargó proforma:");
+        jlDocUserUpload.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid111.add(jlDocUserUpload);
+
+        jlDocUserReview.setText("Revisó proforma:");
+        jlDocUserReview.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid111.add(jlDocUserReview);
+
+        jlDocUserAuthorize.setText("Autorizó proforma:");
+        jlDocUserAuthorize.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid111.add(jlDocUserAuthorize);
+
+        jlPayReqUserNew.setText("Creó sol. pago:");
+        jlPayReqUserNew.setPreferredSize(new java.awt.Dimension(75, 20));
+        jpDocumentsGrid111.add(jlPayReqUserNew);
+
+        jbViewDocInfo.setText("...");
+        jbViewDocInfo.setToolTipText("Ver detalles de la proforma...");
+        jbViewDocInfo.setPreferredSize(new java.awt.Dimension(20, 20));
+        jpDocumentsGrid111.add(jbViewDocInfo);
 
         jpDocumentsGrid11.add(jpDocumentsGrid111);
 
         jpDocumentsGrid112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jtfInvoiceUserNew.setEditable(false);
-        jtfInvoiceUserNew.setText("user.name");
-        jtfInvoiceUserNew.setFocusable(false);
-        jtfInvoiceUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
-        jpDocumentsGrid112.add(jtfInvoiceUserNew);
+        jtfDocUserUpload.setEditable(false);
+        jtfDocUserUpload.setText("user.name");
+        jtfDocUserUpload.setFocusable(false);
+        jtfDocUserUpload.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid112.add(jtfDocUserUpload);
+
+        jtfDocUserReview.setEditable(false);
+        jtfDocUserReview.setText("user.name");
+        jtfDocUserReview.setFocusable(false);
+        jtfDocUserReview.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid112.add(jtfDocUserReview);
+
+        jtfDocUserAuthorize.setEditable(false);
+        jtfDocUserAuthorize.setText("user.name");
+        jtfDocUserAuthorize.setFocusable(false);
+        jtfDocUserAuthorize.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid112.add(jtfDocUserAuthorize);
+
+        jtfPayReqUserNew.setEditable(false);
+        jtfPayReqUserNew.setText("user.name");
+        jtfPayReqUserNew.setFocusable(false);
+        jtfPayReqUserNew.setPreferredSize(new java.awt.Dimension(100, 20));
+        jpDocumentsGrid112.add(jtfPayReqUserNew);
 
         jpDocumentsGrid11.add(jpDocumentsGrid112);
 
@@ -384,7 +424,9 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jpDocumentsGrid121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlProgress.setBackground(java.awt.SystemColor.controlHighlight);
         jlProgress.setText("Progreso...");
+        jlProgress.setOpaque(true);
         jlProgress.setPreferredSize(new java.awt.Dimension(200, 20));
         jpDocumentsGrid121.add(jlProgress);
 
@@ -411,7 +453,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlProforma.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma" : "");
-        jlProforma.setPreferredSize(new java.awt.Dimension(122, 23));
+        jlProforma.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN1.add(jlProforma);
 
         jpProcessingN.add(jpProcessingN1);
@@ -632,9 +674,13 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbSelectAllProformas;
     private javax.swing.JButton jbSelectRemainingProformas;
     private javax.swing.JButton jbShowProformas;
-    private javax.swing.JLabel jlInvoiceUserNew;
+    private javax.swing.JButton jbViewDocInfo;
+    private javax.swing.JLabel jlDocUserAuthorize;
+    private javax.swing.JLabel jlDocUserReview;
+    private javax.swing.JLabel jlDocUserUpload;
     private javax.swing.JLabel jlPay;
     private javax.swing.JLabel jlPayExec;
+    private javax.swing.JLabel jlPayReqUserNew;
     private javax.swing.JLabel jlPaySched;
     private javax.swing.JLabel jlPeriiod1;
     private javax.swing.JLabel jlPeriod;
@@ -680,11 +726,14 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     private javax.swing.JPanel jpProcessingN7;
     private javax.swing.JPanel jpProcessingN8;
     private javax.swing.JPanel jpProcessingN9;
-    private javax.swing.JTextField jtfInvoiceUserNew;
+    private javax.swing.JTextField jtfDocUserAuthorize;
+    private javax.swing.JTextField jtfDocUserReview;
+    private javax.swing.JTextField jtfDocUserUpload;
     private javax.swing.JTextField jtfPayDate;
     private javax.swing.JTextField jtfPayExecDate;
     private javax.swing.JTextField jtfPayFolio;
     private javax.swing.JTextField jtfPayReqDate;
+    private javax.swing.JTextField jtfPayReqUserNew;
     private javax.swing.JTextField jtfPaySchedDate;
     private javax.swing.JTextField jtfPayStatus;
     private javax.swing.JTextField jtfProforma;
@@ -1358,9 +1407,9 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SImportedProforma document = (SImportedProforma) row;
+                SImportedProforma proforma = (SImportedProforma) row;
 
-                if (document.requestPayment(miClient, msSyncUrlDownload)) {
+                if (proforma.requestPayment(miClient, msSyncUrlDownload)) {
                     int index = moImportationsGrid.getTable().getSelectedRow();
                     moImportationsGrid.renderGridRows();
                     moImportationsGrid.setSelectedGridRow(index);
@@ -1382,12 +1431,12 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SImportedProforma document = (SImportedProforma) row;
+                SImportedProforma proforma = (SImportedProforma) row;
 
-                if (document.isPaymentRequested()) {
+                if (proforma.isPaymentRequested()) {
                     String message = "La " + getDocumentName("aa") + " autorizada ya tiene solicitud de pago.\n";
 
-                    switch (document.Payment.getFkStatusPaymentId()) {
+                    switch (proforma.Payment.getFkStatusPaymentId()) {
                         case SModSysConsts.FINS_ST_PAY_NEW:
                             message += "Se puede cambiar la '" + jtfPayReqDate.getToolTipText().toLowerCase() + "' en " + jbChangePaymentRequiredDate.getToolTipText().toLowerCase() + "'.";
                             break;
@@ -1401,7 +1450,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                     throw new Exception(message);
                 }
                 else {
-                    if (document.changeRequiredPaymentDate(miClient.getSession())) {
+                    if (proforma.changeRequiredPaymentDate(miClient.getSession())) {
                         int index = moImportationsGrid.getTable().getSelectedRow();
                         moImportationsGrid.renderGridRows();
                         moImportationsGrid.setSelectedGridRow(index);
@@ -1424,26 +1473,26 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SImportedProforma document = (SImportedProforma) row;
+                SImportedProforma proforma = (SImportedProforma) row;
 
-                if (!document.isPaymentRequested()) {
+                if (!proforma.isPaymentRequested()) {
                     String message = "La " + getDocumentName("aa") + " autorizada no tiene solicitud de pago.\n"
                             + "Se puede cambiar la '" + jtfReqPayReqDate.getToolTipText().toLowerCase() + "' en '" + jbChangeRequiredPaymentDate.getToolTipText().toLowerCase() + "'.";
 
                     throw new Exception(message);
                 }
-                else if (document.Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
+                else if (proforma.Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_NEW) {
                     String message = "No se puede cambiar la '" + jtfPayReqDate.getToolTipText().toLowerCase() + "', "
                             + "para poder hacerlo el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_NEW + "'.";
 
-                    if (document.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_SCHED) {
+                    if (proforma.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_SCHED) {
                         message += "\nSin embargo, como su estatus ya es '" + SDbPayment.ST_SCHED + "', se puede cambiar más bien la '" + jtfPaySchedDate.getToolTipText().toLowerCase() + "'.";
                     }
 
                     throw new Exception(message);
                 }
                 else {
-                    if (document.changeRequiredPaymentDate(miClient.getSession())) {
+                    if (proforma.changeRequiredPaymentDate(miClient.getSession())) {
                         int index = moImportationsGrid.getTable().getSelectedRow();
                         moImportationsGrid.renderGridRows();
                         moImportationsGrid.setSelectedGridRow(index);
@@ -1466,26 +1515,26 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 throw new Exception(SGridConsts.MSG_SELECT_ROW);
             }
             else {
-                SImportedProforma document = (SImportedProforma) row;
+                SImportedProforma proforma = (SImportedProforma) row;
 
-                if (!document.isPaymentRequested()) {
+                if (!proforma.isPaymentRequested()) {
                     String message = "La " + getDocumentName("aa") + " autorizada no tiene solicitud de pago.\n"
                             + "Se puede cambiar la '" + jtfReqPayReqDate.getToolTipText().toLowerCase() + "' en '" + jbChangeRequiredPaymentDate.getToolTipText() + "'.";
 
                     throw new Exception(message);
                 }
-                else if (document.Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_SCHED) {
+                else if (proforma.Payment.getFkStatusPaymentId() != SModSysConsts.FINS_ST_PAY_SCHED) {
                     String message = "No se puede cambiar la '" + jtfPaySchedDate.getToolTipText().toLowerCase() + "', "
                             + "para poder hacerlo el estatus de la solicitud de pago debe ser '" + SDbPayment.ST_SCHED + "'.";
 
-                    if (document.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) {
+                    if (proforma.Payment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW) {
                         message += "\nSin embargo su estatus es '" + SDbPayment.ST_NEW + "', y se puede cambiar más bien la '" + jtfReqPayReqDate.getToolTipText().toLowerCase() + "'.";
                     }
 
                     throw new Exception(message);
                 }
                 else {
-                    if (document.changeRequiredPaymentDate(miClient.getSession())) {
+                    if (proforma.changeRequiredPaymentDate(miClient.getSession())) {
                         int index = moImportationsGrid.getTable().getSelectedRow();
                         moImportationsGrid.renderGridRows();
                         moImportationsGrid.setSelectedGridRow(index);
@@ -1493,6 +1542,23 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                         mbExportPaymentRequests = true;
                     }
                 }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedViewDocInfo() {
+        try {
+            SGridRow row = moImportationsGrid.getSelectedGridRow();
+
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedProforma proforma = (SImportedProforma) row;
+                miClient.showMsgBoxInformation(proforma.getProformaInfo());
             }
         }
         catch (Exception e) {
@@ -1508,11 +1574,16 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jbRequestPayment.setEnabled(false);
             jbChangePaymentRequiredDate.setEnabled(false);
             jbChangePaymentScheduledDate.setEnabled(false);
+            jbViewDocInfo.setEnabled(false);
 
             jtfProforma.setText("");
             jtfProforma.setToolTipText(null);
 
-            jtfInvoiceUserNew.setText("");
+            jtfPayReqUserNew.setText("");
+            
+            jtfDocUserUpload.setText("");
+            jtfDocUserReview.setText("");
+            jtfDocUserAuthorize.setText("");
 
             jtfReqPayAmount.setText("");
             jtfReqPayAmountPct.setText("");
@@ -1533,17 +1604,30 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jbRequestPayment.setEnabled(true);
             jbChangePaymentRequiredDate.setEnabled(true);
             jbChangePaymentScheduledDate.setEnabled(true);
+            jbViewDocInfo.setEnabled(true);
 
-            jtfProforma.setText(proforma.getFolio()); // show folio of current document as a visual indicator that is an invoice already linked!
+            jtfProforma.setText(proforma.getFolio()); // show folio of current proforma as a visual indicator that is an invoice already linked!
             jtfProforma.setToolTipText(getDocumentName("Aa") + ": " + proforma.getFolio());
 
-            if (proforma.ProcessedProforma != null) {
-                jtfInvoiceUserNew.setText(proforma.ProcessedProforma.Usr);
+            jtfProforma.setCaretPosition(0);
+
+            if (proforma.ProcessedProforma == null) {
+                jtfPayReqUserNew.setText("");
+            }
+            else {
+                jtfPayReqUserNew.setText(proforma.ProcessedProforma.Usr);
+                
+                jtfPayReqUserNew.setCaretPosition(0);
             }
 
-            jtfProforma.setCaretPosition(0);
-            jtfInvoiceUserNew.setCaretPosition(0);
+            jtfDocUserUpload.setText(proforma.DocumentUploadedBy);
+            jtfDocUserReview.setText(proforma.DocumentReviewedBy);
+            jtfDocUserAuthorize.setText(proforma.DocumentAuthorizedBy);
 
+            jtfDocUserUpload.setCaretPosition(0);
+            jtfDocUserReview.setCaretPosition(0);
+            jtfDocUserAuthorize.setCaretPosition(0);
+            
             if (!proforma.isPaymentRequestDataAvailable()) {
                 jtfReqPayAmount.setText("");
                 jtfReqPayAmountPct.setText("");
@@ -1582,9 +1666,6 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 jtfPaySchedDate.setCaretPosition(0);
                 jtfPayExecDate.setCaretPosition(0);
             }
-        }
-        else {
-        
         }
     }
 
@@ -1666,7 +1747,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jbRequestPayment.addActionListener(this);
         jbChangePaymentRequiredDate.addActionListener(this);
         jbChangePaymentScheduledDate.addActionListener(this);
-
+        jbViewDocInfo.addActionListener(this);
     }
 
     @Override
@@ -1682,7 +1763,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jbRequestPayment.removeActionListener(this);
         jbChangePaymentRequiredDate.removeActionListener(this);
         jbChangePaymentScheduledDate.removeActionListener(this);
-
+        jbViewDocInfo.removeActionListener(this);
     }
 
     @Override
@@ -1747,6 +1828,9 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             else if (button == jbChangePaymentScheduledDate) {
                 actionPerformedChangePaymentScheduledDate();
             }
+            else if (button == jbViewDocInfo) {
+                actionPerformedViewDocInfo();
+            }
         }
     }
 
@@ -1755,10 +1839,5 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         if (!e.getValueIsAdjusting()) {
             renderCurrentProforma();
         }
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-
     }
 }

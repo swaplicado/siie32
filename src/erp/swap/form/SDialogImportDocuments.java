@@ -93,7 +93,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 import sa.lib.xml.SXmlUtils;
 
 /**
- * Importación de documentos desde el Portal de Compras.
+ * Importación de documentos (facturas y notas de crédito de compras) desde el Portal de Compras.
  * Ejemplo de la URL de consulta de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=41"
  * Ejemplo de la URL de descarga de documentos:
@@ -513,13 +513,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jlRefUserAuthorize.setPreferredSize(new java.awt.Dimension(100, 20));
         jpDocsPanel111.add(jlRefUserAuthorize);
 
-        jlRefUserCreate.setText("Creó factura:");
-        jlRefUserCreate.setPreferredSize(new java.awt.Dimension(72, 20));
+        jlRefUserCreate.setText("Creó <ref>:");
+        jlRefUserCreate.setPreferredSize(new java.awt.Dimension(75, 20));
         jpDocsPanel111.add(jlRefUserCreate);
 
         jbViewRefInfo.setText("...");
-        jbViewRefInfo.setToolTipText("Ver detalles <reference>...");
-        jbViewRefInfo.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbViewRefInfo.setToolTipText("Ver detalles de la referencia...");
+        jbViewRefInfo.setPreferredSize(new java.awt.Dimension(20, 20));
         jpDocsPanel111.add(jbViewRefInfo);
 
         jlDocUserUpload.setText("Cargó <doc>:");
@@ -535,15 +535,17 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         jpDocsPanel111.add(jlDocUserAuthorize);
 
         jlDocUserCreate.setText("Creó <doc>:");
-        jlDocUserCreate.setPreferredSize(new java.awt.Dimension(72, 20));
+        jlDocUserCreate.setPreferredSize(new java.awt.Dimension(75, 20));
         jpDocsPanel111.add(jlDocUserCreate);
 
         jbViewDocInfo.setText("...");
-        jbViewDocInfo.setToolTipText("Ver detalles <document>");
-        jbViewDocInfo.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbViewDocInfo.setToolTipText("Ver detalles de la <document>...");
+        jbViewDocInfo.setPreferredSize(new java.awt.Dimension(20, 20));
         jpDocsPanel111.add(jbViewDocInfo);
 
+        jlProgress.setBackground(java.awt.SystemColor.controlHighlight);
         jlProgress.setText("Progreso...");
+        jlProgress.setOpaque(true);
         jlProgress.setPreferredSize(new java.awt.Dimension(200, 20));
         jpDocsPanel111.add(jlProgress);
 
@@ -1820,7 +1822,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.RevisionDatetime = revisionDatetime;
                                     document.Priority = docNode.get("priority").asInt();
                                     document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
-                                    document.ProcessingTypeCode = SDbSwapDataProcessing.ProcTypes.get(document.ProcessingTypeId);
+                                    document.ProcessingTypeCode = SDbSwapDataProcessing.ProcessingTypes.get(document.ProcessingTypeId);
                                     document.StatusId = 0;
                                     document.Status = "";
                                     document.Download = false;
@@ -3053,14 +3055,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             }
             else {
                 SImportedDocument document = (SImportedDocument) row;
-                
-                if (!document.isRecorded()) {
-                    throw new Exception(SImportedDocument.EXC_DOC_NOT_RECORDED);
-                }
-                else {
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
-                    ((SClientInterface) miClient).getGuiModule(SDataConstants.MOD_PUR).showForm(SDataConstants.TRNX_DPS_RO, document.ProcessedDps.getDpsKey());
-                }
+                miClient.showMsgBoxInformation(document.getDocumentInfo());
             }
         }
         catch (Exception e) {
@@ -3069,7 +3064,20 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     }
     
     private void actionPerformedViewRefInfo() {
-        
+        try {
+            SGridRow row = moDocumentsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedDocument document = (SImportedDocument) row;
+                miClient.showMsgBoxInformation(document.getReferenceInfo(isDocTypeInvoice() ? SSwapConsts.TXN_REF_TYPE_ORDER : 0));
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
     
     private void actionPerformedViewRecord() {
@@ -3602,13 +3610,13 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 
                 switch (moKeyDocModeCase.getValue()[0]) {
                     case SImportedDocument.DOC_CASE_STANDARD:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_STANDARD;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_STANDARD;
                         break;
                     case SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT;
                         break;
                     case SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE;
                         break;
                     default:
                         // nothing

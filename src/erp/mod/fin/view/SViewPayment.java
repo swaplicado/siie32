@@ -1132,9 +1132,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ve.doc_bal_unpd_app_cur_r, "
                 + "ce.cur_key, "
                 + "CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps, "
-                + "CASE WHEN d.id_doc IS NOT NULL THEN "
-                + "CASE sw.proc_type WHEN " + SDbSwapDataProcessing.PROC_TYPE_STANDARD + " THEN 'Estándar' WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT + " THEN 'Fletes MP' "
-                + "WHEN " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE + " THEN 'Compras MP' ELSE 'Sin tipo' END ELSE NULL END AS _proc_type,"
+                + "COALESCE("
+                + "CASE sw._prc_type "
+                + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT) + "' "
+                + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE) + "' "
+                + "ELSE '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_STANDARD) + "' END, NULL) AS _prc_type, "
                 + "v.ts_usr_sched, "
                 + "v.ts_usr_resched, "
                 + "v.ts_usr_exec, "
@@ -1173,8 +1175,10 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
                 + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
-                + "LEFT JOIN (SELECT fk_dps_year_n, fk_dps_doc_n, MAX(proc_type) AS proc_type FROM TRN_SWAP_DATA_PRC " 
-                + "GROUP BY fk_dps_year_n, fk_dps_doc_n) sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
+                + "LEFT JOIN ("
+                + "SELECT fk_dps_year_n, fk_dps_doc_n, MAX(prc_type) AS _prc_type "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " " 
+                + "GROUP BY fk_dps_year_n, fk_dps_doc_n) AS sw ON ve.fk_doc_year_n = sw.fk_dps_year_n AND ve.fk_doc_doc_n = sw.fk_dps_doc_n "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.ser, LPAD(v.num, 9, '0'), "
                 + (jrbDateApp.isSelected() ? "v.dt_app" : jrbDateReq.isSelected() ? "v.dt_req" : "CASE WHEN v.dt_sched_n IS NOT NULL THEN v.dt_sched_n ELSE v.dt_req END")
@@ -1218,7 +1222,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func", "Área funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_func_sub", "Subárea funcional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_proc_type", "Tipo carga"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_prc_type", "Tipo carga"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_sched", "Usr aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_sched", "Usr TS aut pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_resched", "Reprogramado"));

@@ -2375,7 +2375,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.FIN_PAY, SModSysConsts.FINS_ST_PAY_SCHED, null);
             }
             else if (item == jmiAccRecPaymentsSchedReport) {
-                miClient.getSession().showView(SModConsts.FIN_PAY_REP, SLibConsts.UNDEFINED, null);
+                miClient.getSession().showView(SModConsts.FINX_PAY_REP, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiAccRecPaymentsInTreas) {
                 miClient.getSession().showView(SModConsts.FINX_PAY_ST, SModSysConsts.FINS_ST_PAY_IN_TREAS, null);

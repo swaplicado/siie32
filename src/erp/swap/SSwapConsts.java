@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Cesar Orozco, Edwin Carmona
+ * @author Sergio Flores, Cesar Orozco, Edwin Carmona, Sergio Flores
  */
 public abstract class SSwapConsts {
 
@@ -95,11 +95,11 @@ public abstract class SSwapConsts {
     public static final String TXN_REF_TYPE_SCALE_IN_CODE = "BB";
     
     /** Reference type options. */
-    public static final HashMap<Integer, String> RefTypes = new HashMap<>();
+    public static final HashMap<Integer, String> ReferenceTypes = new HashMap<>();
     
     static {
-        RefTypes.put(TXN_REF_TYPE_ORDER, "órden de compra");
-        RefTypes.put(TXN_REF_TYPE_SCALE_IN, "boleto de báscula de entrada");
+        ReferenceTypes.put(TXN_REF_TYPE_ORDER, "órden de compra");
+        ReferenceTypes.put(TXN_REF_TYPE_SCALE_IN, "boleto de báscula de entrada");
     }
     
     // Definition of required payment:

@@ -1647,7 +1647,7 @@ public class SDialogImportDocuments_20260505 extends SBeanFormDialog implements 
                                     document.RevisionDatetime = revisionDatetime;
                                     document.Priority = docNode.get("priority").asInt();
                                     document.ProcessingTypeId = docNode.get("processing_type_id").asInt();
-                                    document.ProcessingTypeCode = SDbSwapDataProcessing.ProcTypes.get(document.ProcessingTypeId);
+                                    document.ProcessingTypeCode = SDbSwapDataProcessing.ProcessingTypes.get(document.ProcessingTypeId);
                                     document.StatusId = 0;
                                     document.Status = "";
                                     document.Download = false;
@@ -3359,13 +3359,13 @@ public class SDialogImportDocuments_20260505 extends SBeanFormDialog implements 
                 
                 switch (moKeyDocModeCase.getValue()[0]) {
                     case SImportedDocument.DOC_CASE_STANDARD:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_STANDARD;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_STANDARD;
                         break;
                     case SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT;
                         break;
                     case SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE:
-                        processingTypeId = SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE;
+                        processingTypeId = SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE;
                         break;
                     default:
                         // nothing

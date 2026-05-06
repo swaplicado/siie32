@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 300.0/ 2026-05-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de consulta de información de carga, revisión y autorización de facturas y proformas en SWAP Services en los diálogos correspondientes para su procesamiento y registro.
+2) Trabajo en proceso para el procesamiento y registro de notas de crédito desde SWAP Services.
+
+================================================================================
 SIIE 3.2 299.20/ 2026-05-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

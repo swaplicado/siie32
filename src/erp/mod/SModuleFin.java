@@ -88,7 +88,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Isabel Servín, Claudio Peña, Sergio Flores
  */
 public class SModuleFin extends SGuiModule {
 
@@ -627,7 +627,7 @@ public class SModuleFin extends SGuiModule {
                 }
                 view = new SViewPayment(miClient, subtype, title);
                 break;
-            case SModConsts.FIN_PAY_REP:
+            case SModConsts.FINX_PAY_REP:
                 switch (subtype) {
                     case SLibConsts.UNDEFINED:
                         title = "Consulta solicitudes pago";

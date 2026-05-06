@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiSession;
 
 /**
- * In memory document received from SWAP Services.
+ * In-memory document (purchase invoice or credit note) received from SWAP Services.
  * @author Sergio Flores
  */
 public class SImportedDocument implements SGridRow, Serializable, Comparable<SImportedDocument> {
@@ -141,7 +141,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int RevisionWeek;
     public Date RevisionDatetime;
     public int Priority;
-    /** Processing type ID defined in by constants SDbSwapDataProcessing.PROC_TYPE_... */
+    /** Processing type ID defined in by constants SDbSwapDataProcessing.PRC_TYPE_... */
     public int ProcessingTypeId;
     public String ProcessingTypeCode;
     public int StatusId;
@@ -915,6 +915,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 swapDataProcessing.setDpsDescription(Description);
                 swapDataProcessing.setDpsPaymentLocal(IsRequiredPaymentLoc);
                 swapDataProcessing.setProcessingType(ProcessingTypeId);
+                swapDataProcessing.setProcessingUploadedBy(DocumentUploadedBy);
+                swapDataProcessing.setProcessingUploadedAt(DocumentUploadedAt);
+                swapDataProcessing.setProcessingReviewedBy(DocumentReviewedBy);
+                swapDataProcessing.setProcessingReviewedAt(DocumentReviewedAt);
+                swapDataProcessing.setProcessingAuthorizedBy(DocumentAuthorizedBy);
+                swapDataProcessing.setProcessingAuthorizedAt(DocumentAuthorizedAt);
                 
                 swapDataProcessing.setPaymentRequired(isPaymentRequired());
                 if (isPaymentRequired() && isPaymentRequestDataAvailable()) {
@@ -1087,6 +1093,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
         if (ProcessedDps != null) {
             SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
+            
+            DocumentUploadedBy = SwapDataProcessing.getProcessingUploadedBy();
+            DocumentUploadedAt = SwapDataProcessing.getProcessingUploadedAt();
+            DocumentReviewedBy = SwapDataProcessing.getProcessingReviewedBy();
+            DocumentReviewedAt = SwapDataProcessing.getProcessingReviewedAt();
+            DocumentAuthorizedBy = SwapDataProcessing.getProcessingAuthorizedBy();
+            DocumentAuthorizedAt = SwapDataProcessing.getProcessingAuthorizedAt();
 
             if (SwapDataProcessing.getFkPaymentId_n() != 0) {
                 Payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { SwapDataProcessing.getFkPaymentId_n() });
@@ -1535,14 +1548,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public String getDocumentInfo() {
-        String info = "Información del documento " + getFolio() + ":";
+        String info = "Información del documento " + getFolio() + ", del " + SLibUtils.DateFormatDate.format(Date) + " (ID externo " + ExternalDocumentId + "):"
+                + "\nNombre del proveedor: " + BizPartner + " (ID " + BizPartnerId + ").\n";
         
-        info += "\nCargó: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy);
-        info += "\nCarga: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt));
-        info += "\nRevisó: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy);
-        info += "\nRevisión: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt));
-        info += "\nAutorizó: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy);
-        info += "\nAutorización: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt));
+        info += "\nCarga:";
+        info += "\n+ realizada por: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy) + ";";
+        info += "\n+ realizada el " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
+        info += "\nRevisión:";
+        info += "\n+ realizada por: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy) + ";";
+        info += "\n+ realizada el " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
+        info += "\nAutorización:";
+        info += "\n+ realizada por: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy) + ";";
+        info += "\n+ realizada el " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
         
         return info;
     }
@@ -1553,19 +1570,22 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @return 
      */
     public String getReferenceInfo(final int referenceType) {
-        String info = "Información de la referencia del documento " + getFolio() + ":";
+        String info = "Información de la referencia del documento " + getFolio() + ", del " + SLibUtils.DateFormatDate.format(Date) + " (ID externo " + ExternalDocumentId + "):"
+                + "\nNombre del proveedor: " + BizPartner + " (ID " + BizPartnerId + ").\n";
         
         if (!hasReferences(referenceType)) {
-            String name = SSwapConsts.RefTypes.get(referenceType);
-            info += "\n+ ¡El documento no tiene referencias de tipo " + (name == null || name.isEmpty() ? "desconocido" : name) + "!";
+            String name = SSwapConsts.ReferenceTypes.get(referenceType);
+            info += "\n+ ¡El documento no tiene referencias de tipo " + (name == null || name.isEmpty() ? "desconocido (" + referenceType + ")" : name) + "!";
         }
         else {
-            info += "\n+ Cargó: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy);
-            info += "\n+ Carga: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt));
-            info += "\n+ Revisó: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy);
-            info += "\n+ Revisión: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt));
-            info += "\n+ Autorizó: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy);
-            info += "\n+ Autorización: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt));
+            String name = SSwapConsts.ReferenceTypes.get(referenceType);
+            info += "\nReferencia " + References[0].Reference + ", de tipo " + (name == null || name.isEmpty() ? "desconocido (" + referenceType + ")" : name) + ":";
+            info += "\nCreación:";
+            info += "\n+ realizada por: " + (References[0].ReferenceCreatedBy.isEmpty() ? "ND" : References[0].ReferenceCreatedBy) + ";";
+            info += "\n+ realizada el: " + (References[0].ReferenceCreatedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(References[0].ReferenceCreatedAt)) + ".";
+            info += "\nAutorización:";
+            info += "\n+ realizada por: " + (References[0].ReferenceAuthorizedBy.isEmpty() ? "ND" : References[0].ReferenceAuthorizedBy) + ";";
+            info += "\n+ realizada el: " + (References[0].ReferenceAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(References[0].ReferenceAuthorizedAt)) + ".";
         }
         
         return info;
@@ -1992,7 +2012,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * In memory Processed DPS.
+     * In-memory Processed DPS.
      */
     public static class ProcessedDps implements Serializable {
         
@@ -2066,7 +2086,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * In memory reference.
+     * In-memory reference.
      */
     public static class Reference implements Serializable {
         
@@ -2076,7 +2096,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         public int DpsDocId;
         
         public String ReferenceCreatedBy;
-        public Date ReferenceCreateedAt;
+        public Date ReferenceCreatedAt;
         public String ReferenceAuthorizedBy;
         public Date ReferenceAuthorizedAt;
         
@@ -2087,7 +2107,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             DpsDocId = dpsDocId;
             
             ReferenceCreatedBy = "";
-            ReferenceCreateedAt = null;
+            ReferenceCreatedAt = null;
             ReferenceAuthorizedBy = "";
             ReferenceAuthorizedAt = null;
             
@@ -2099,7 +2119,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     try (ResultSet resultSet = prepStatementToGetDpsHandlingData.executeQuery()) {
                         if (resultSet.next()) {
                             ReferenceCreatedBy = resultSet.getString("created_by");
-                            ReferenceCreateedAt = resultSet.getTimestamp("created_at");
+                            ReferenceCreatedAt = resultSet.getTimestamp("created_at");
                             ReferenceAuthorizedBy = resultSet.getString("authorized_by");
                             ReferenceAuthorizedAt = resultSet.getTimestamp("authorized_at");
                         }

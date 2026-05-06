@@ -921,7 +921,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
         if (mbIsDoc || mbIsDocAdj) {
             if (mbSwapDataProcessing) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_data_prc", "Caso documento", 50);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_prc_type", "Caso documento", 50);
             }
             
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_ord_num", "Pedidos", STableConstants.WIDTH_DOC_NUM);
@@ -3853,11 +3853,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
         if (mbIsDoc || mbIsDocAdj) {
             if (mbSwapDataProcessing) {
-                msSql += ", (SELECT CASE "
-                        + "WHEN sdp.proc_type = " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT + " THEN '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_FREIGHT) + "' "
-                        + "WHEN sdp.proc_type = " + SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE + " THEN '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_RAW_MAT_PURCHASE) + "' "
-                        + "ELSE '" + SDbSwapDataProcessing.ProcTypes.get(SDbSwapDataProcessing.PROC_TYPE_STANDARD) + "' END "
-                        + "FROM trn_swap_data_prc AS sdp WHERE sdp.fk_dps_year_n = d.id_year AND sdp.fk_dps_doc_n = d.id_doc AND NOT b_del LIMIT 1) AS f_data_prc ";
+                msSql += ", (SELECT CASE sdp.prc_type "
+                        + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT) + "' "
+                        + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE) + "' "
+                        + "ELSE '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_STANDARD) + "' END "
+                        + "FROM trn_swap_data_prc AS sdp WHERE sdp.fk_dps_year_n = d.id_year AND sdp.fk_dps_doc_n = d.id_doc AND NOT b_del LIMIT 1) AS f_prc_type ";
             }
             
             msSql += ", xu.usr, " +

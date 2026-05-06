@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña, Rodrigo Ayala, Sergio Flores
  */
 public abstract class SModConsts {
 
@@ -361,7 +361,6 @@ public abstract class SModConsts {
     public static final int FIN_REP_CUS_ACC_USR = 2013494;
     public static final int FIN_PAY = 2013496;
     public static final int FIN_PAY_ETY = 2013497;
-    public static final int FIN_PAY_REP = 2013498;
     public static final int FIN_PAY_LAY_BANK = 2013498;
     public static final int FIN_PAY_FILE = 2013499;
 
@@ -373,6 +372,7 @@ public abstract class SModConsts {
     public static final int FINX_ACC_CASH_PAY = 2014004;
     public static final int FINX_PAY_ST = 2014005;
     public static final int FINX_PAY_AUTH_PATH = 2014006;
+    public static final int FINX_PAY_REP = 2014011;
     public static final int FINX_CUST_REPS_EXPS = 2014100; // custom reports expenses
 
     public static final int FINR_CSH_FLW_EXP = 2015001;

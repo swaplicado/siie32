@@ -18,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Adrián Avilés
+ * @author Sergio Flores, Adrián Avilés, Sergio Flores
  */
 public class SDbSwapDataProcessing extends SDbRegistryUser {
     
@@ -30,9 +30,9 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static final String DATA_TYPE_RP = "RP"; // receipt of payment
     public static final String DATA_TYPE_PRF = "PRF"; // proforma
     
-    public static final int PROC_TYPE_STANDARD = 0;
-    public static final int PROC_TYPE_RAW_MAT_FREIGHT = 11;
-    public static final int PROC_TYPE_RAW_MAT_PURCHASE = 12;
+    public static final int PRC_TYPE_STANDARD = 0;
+    public static final int PRC_TYPE_RAW_MAT_FREIGHT = 11;
+    public static final int PRC_TYPE_RAW_MAT_PURCHASE = 12;
     
     public static final int ACC_METHOD_UNDEFINED = 0;
     public static final int ACC_METHOD_MANUAL = 1;
@@ -40,14 +40,14 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public static final int ACC_METHOD_AUTOMATIC = 3;
     
     /** Processing types (in SWAP Services). */
-    public static final HashMap<Integer, String> ProcTypes = new HashMap<>();
+    public static final HashMap<Integer, String> ProcessingTypes = new HashMap<>();
     
     private static final int LEN_REFS = 100;
     
     static {
-        ProcTypes.put(PROC_TYPE_STANDARD, "STD");
-        ProcTypes.put(PROC_TYPE_RAW_MAT_FREIGHT, "FLT-MP");
-        ProcTypes.put(PROC_TYPE_RAW_MAT_PURCHASE, "CPA-MP");
+        ProcessingTypes.put(PRC_TYPE_STANDARD, "STD");
+        ProcessingTypes.put(PRC_TYPE_RAW_MAT_FREIGHT, "FLT-MP");
+        ProcessingTypes.put(PRC_TYPE_RAW_MAT_PURCHASE, "CPA-MP");
     }
     
     protected int mnPkSwapDataProcessingId;
@@ -60,6 +60,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     protected String msDpsDescription;
     protected boolean mbDpsPaymentLocal;
     protected int mnProcessingType;
+    protected String msProcessingUploadedBy;
+    protected Date mtProcessingUploadedAt;
+    protected String msProcessingReviewedBy;
+    protected Date mtProcessingReviewedAt;
+    protected String msProcessingAuthorizedBy;
+    protected Date mtProcessingAuthorizedAt;
     protected boolean mbPaymentRequired;
     protected double mdPaymentApplicationCy;
     protected Date mtPaymentDateRequired_n;
@@ -105,6 +111,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public void setDpsDescription(String s) { msDpsDescription = s; }
     public void setDpsPaymentLocal(boolean b) { mbDpsPaymentLocal = b; }
     public void setProcessingType(int n) { mnProcessingType = n; }
+    public void setProcessingUploadedBy(String s) { msProcessingUploadedBy = s; }
+    public void setProcessingUploadedAt(Date t) { mtProcessingUploadedAt = t; }
+    public void setProcessingReviewedBy(String s) { msProcessingReviewedBy = s; }
+    public void setProcessingReviewedAt(Date t) { mtProcessingReviewedAt = t; }
+    public void setProcessingAuthorizedBy(String s) { msProcessingAuthorizedBy = s; }
+    public void setProcessingAuthorizedAt(Date t) { mtProcessingAuthorizedAt = t; }
     public void setPaymentRequired(boolean b) { mbPaymentRequired = b; }
     public void setPaymentApplicationCy(double d) { mdPaymentApplicationCy = d; }
     public void setPaymentDateRequired_n(Date t) { mtPaymentDateRequired_n = t; }
@@ -142,6 +154,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
     public String getDpsDescription() { return msDpsDescription; }
     public boolean isDpsPaymentLocal() { return mbDpsPaymentLocal; }
     public int getProcessingType() { return mnProcessingType; }
+    public String getProcessingUploadedBy() { return msProcessingUploadedBy; }
+    public Date getProcessingUploadedAt() { return mtProcessingUploadedAt; }
+    public String getProcessingReviewedBy() { return msProcessingReviewedBy; }
+    public Date getProcessingReviewedAt() { return mtProcessingReviewedAt; }
+    public String getProcessingAuthorizedBy() { return msProcessingAuthorizedBy; }
+    public Date getProcessingAuthorizedAt() { return mtProcessingAuthorizedAt; }
     public boolean isPaymentRequired() { return mbPaymentRequired; }
     public double getPaymentApplicationCy() { return mdPaymentApplicationCy; }
     public Date getPaymentDateRequired_n() { return mtPaymentDateRequired_n; }
@@ -193,6 +211,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         msDpsDescription = "";
         mbDpsPaymentLocal = false;
         mnProcessingType = 0;
+        msProcessingUploadedBy = "";
+        mtProcessingUploadedAt = null;
+        msProcessingReviewedBy = "";
+        mtProcessingReviewedAt = null;
+        msProcessingAuthorizedBy = "";
+        mtProcessingAuthorizedAt = null;
         mbPaymentRequired = false;
         mdPaymentApplicationCy = 0;
         mtPaymentDateRequired_n = null;
@@ -273,7 +297,13 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
             msDpsReferences = resultSet.getString("dps_refs");
             msDpsDescription = resultSet.getString("dps_descrip");
             mbDpsPaymentLocal = resultSet.getBoolean("b_dps_pay_loc");
-            mnProcessingType = resultSet.getInt("proc_type");
+            mnProcessingType = resultSet.getInt("prc_type");
+            msProcessingUploadedBy = resultSet.getString("prc_upl_by");
+            mtProcessingUploadedAt = resultSet.getTimestamp("prc_upl_at_n");
+            msProcessingReviewedBy = resultSet.getString("prc_rev_by");
+            mtProcessingReviewedAt = resultSet.getTimestamp("prc_rev_at_n");
+            msProcessingAuthorizedBy = resultSet.getString("prc_aut_by");
+            mtProcessingAuthorizedAt = resultSet.getTimestamp("prc_aut_at_n");
             mbPaymentRequired = resultSet.getBoolean("b_pay_req");
             mdPaymentApplicationCy = resultSet.getDouble("pay_app_cur");
             mtPaymentDateRequired_n = resultSet.getDate("pay_dt_req_n");
@@ -329,6 +359,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "'" + msDpsDescription + "', " + 
                     (mbDpsPaymentLocal ? 1 : 0) + ", " + 
                     mnProcessingType + ", " + 
+                    "'" + msProcessingUploadedBy + "', " + 
+                    (mtProcessingUploadedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingUploadedAt) + "'") + ", " + 
+                    "'" + msProcessingReviewedBy + "', " + 
+                    (mtProcessingReviewedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingReviewedAt) + "'") + ", " + 
+                    "'" + msProcessingAuthorizedBy + "', " + 
+                    (mtProcessingAuthorizedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingAuthorizedAt) + "'") + ", " + 
                     (mbPaymentRequired ? 1 : 0) + ", " + 
                     mdPaymentApplicationCy + ", " + 
                     (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " + 
@@ -370,7 +406,13 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
                     "dps_refs = '" + msDpsReferences + "', " +
                     "dps_descrip = '" + msDpsDescription + "', " +
                     "b_dps_pay_loc = " + (mbDpsPaymentLocal ? 1 : 0) + ", " +
-                    "proc_type = " + mnProcessingType + ", " +
+                    "prc_type = " + mnProcessingType + ", " +
+                    "prc_upl_by = '" + msProcessingUploadedBy + "', " +
+                    "prc_upl_at_n = " + (mtProcessingUploadedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingUploadedAt) + "'") + ", " +
+                    "prc_rev_by = '" + msProcessingReviewedBy + "', " +
+                    "prc_rev_at_n = " + (mtProcessingReviewedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingReviewedAt) + "'") + ", " +
+                    "prc_aut_by = '" + msProcessingAuthorizedBy + "', " +
+                    "prc_aut_at_n = " + (mtProcessingAuthorizedAt == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDatetime.format(mtProcessingAuthorizedAt) + "'") + ", " +
                     "b_pay_req = " + (mbPaymentRequired ? 1 : 0) + ", " +
                     "pay_app_cur = " + mdPaymentApplicationCy + ", " +
                     "pay_dt_req_n = " + (mtPaymentDateRequired_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtPaymentDateRequired_n) + "'") + ", " +
@@ -420,6 +462,12 @@ public class SDbSwapDataProcessing extends SDbRegistryUser {
         registry.setDpsDescription(this.getDpsDescription());
         registry.setDpsPaymentLocal(this.isDpsPaymentLocal());
         registry.setProcessingType(this.getProcessingType());
+        registry.setProcessingUploadedBy(this.getProcessingUploadedBy());
+        registry.setProcessingUploadedAt(this.getProcessingUploadedAt());
+        registry.setProcessingReviewedBy(this.getProcessingReviewedBy());
+        registry.setProcessingReviewedAt(this.getProcessingReviewedAt());
+        registry.setProcessingAuthorizedBy(this.getProcessingAuthorizedBy());
+        registry.setProcessingAuthorizedAt(this.getProcessingAuthorizedAt());
         registry.setPaymentRequired(this.isPaymentRequired());
         registry.setPaymentApplicationCy(this.getPaymentApplicationCy());
         registry.setPaymentDateRequired_n(this.getPaymentDateRequired_n());
