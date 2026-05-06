@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Sergio Flores
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -38,6 +38,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public static final int CASE_RESCHEDULE = 2; // payment must be scheduled
     public static final int CASE_CHANGE_CURRENCY = 3; // payment must be scheduled
     public static final int CASE_MARK_AS_PAID = 4; // payment must be scheduled
+    public static final int CASE_CHANGE_BANK_ACCOUNT = 5; // payment must be operated
     
     public final static int VALUE_PAYMENT = 1;
     public final static int VALUE_DATE = 2;
@@ -458,6 +459,12 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
                 break;
                 
+            case CASE_CHANGE_BANK_ACCOUNT: // payment is operated
+                setTitle("Cambiar cuenta bancaria");
+                jlPaymentCy.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -465,6 +472,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDateNewDate.setFieldName(SGuiUtils.getLabelName(jlDateNewDate)); // update field name of "new date" component
         
         mnFormCase = formCase;
+    }
+    
+    public int getFormCase() {
+        return mnFormCase;
     }
     
     @Override
@@ -522,6 +533,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         boolean rescheduling = false;
         boolean changingCurrency = false;
         boolean markingAsPaid = false;
+        boolean changingAccountBank = false;
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
@@ -541,6 +553,14 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 rescheduling = mnFormCase == CASE_RESCHEDULE;
                 changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
                 markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
+                moDateNewDate.setValue(moRegistry.getDateSchedule_n());
+                break;
+                
+            case CASE_CHANGE_BANK_ACCOUNT:
+                rescheduling = mnFormCase == CASE_RESCHEDULE;
+                changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
+                markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
+                changingAccountBank = mnFormCase == CASE_CHANGE_BANK_ACCOUNT;
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
                 break;
                 
@@ -570,10 +590,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
         moCurPaymentCy.setEditable(markingAsPaid);
-        moDateNewDate.setEditable(!changingCurrency);
+        moDateNewDate.setEditable(!changingCurrency && !changingAccountBank);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
-        moKeyPaymentBank.setEditable(markingAsPaid);
-        moKeyBeneffBank.setEditable(markingAsPaid);
+        moKeyPaymentBank.setEditable(markingAsPaid || changingAccountBank);
+        moKeyBeneffBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyPriority.setEditable(reactivating);
         moTextNotes.setEditable(reactivating || rescheduling);
         moTextNotesAuthorization.setEditable(reactivating);
@@ -641,7 +661,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                                 validation.setComponent(moCurPaymentCy.getField().getComponent());
                             }
                         }
-                        
+                    
+                    case CASE_CHANGE_BANK_ACCOUNT:
                         if (moKeyPaymentBank.getSelectedIndex() <= 0 && moKeyBeneffBank.getSelectedIndex() <= 0) {
                             String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + "\'" + moKeyPaymentBank.getFieldName() + "\' y \'" + moKeyBeneffBank.getFieldName() + "\'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
                             if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {

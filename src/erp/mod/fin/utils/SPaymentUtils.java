@@ -3,17 +3,23 @@ package erp.mod.fin.utils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.db.SRowPayments;
+import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.swap.SSwapConsts;
+import erp.swap.form.SDocumentUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Date;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiConsts;
 
 /**
  * Utilidades para la consulta y mapeo de pagos del módulo financiero.
@@ -21,6 +27,8 @@ import sa.lib.SLibUtils;
  * @author Edwin Carmona
  */
 public class SPaymentUtils {
+    
+    public static final String SUGGESTION_SPEED_UP = "\nIMPORTANTE:\nSi urge acelerar la actualización de esta modificación, haga clic en el botón ";
 
     /**
      * Mapea una fila del {@link ResultSet} a un objeto {@link SRowPayments}.
@@ -478,6 +486,94 @@ public class SPaymentUtils {
      * @see SDbPaymentFile
      * @see SSwapConsts
      */
+    /**
+     * Ejecuta la acción de marcar un pago como operado.
+     *
+     * @param miClient                   cliente de sesión
+     * @param primaryKey
+     * @param oDialogPaymentChangeStatus  diálogo para capturar los datos de la operación
+     * @param exportButtonTooltip        tooltip del botón de exportar (para el mensaje informativo)
+     * @param gridType                   tipo de grid para notificar suscriptores
+     * @return {@code true} si el pago fue marcado como operado exitosamente
+     * @throws Exception si ocurre un error durante el proceso
+     */
+    public static boolean markAsPaid(SClientInterface miClient,
+                                     int[] primaryKey,
+                                     SDialogPaymentChangeStatus oDialogPaymentChangeStatus,
+                                     String exportButtonTooltip,
+                                     int gridType) throws Exception {
+        SDbPayment oPayment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, primaryKey);
+        int status = oPayment.getFkStatusPaymentId();
+
+        if (status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_EXEC) {
+            if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
+                oDialogPaymentChangeStatus.setFormCase(SDialogPaymentChangeStatus.CASE_MARK_AS_PAID);
+            }
+            else {
+                oDialogPaymentChangeStatus.setFormCase(SDialogPaymentChangeStatus.CASE_CHANGE_BANK_ACCOUNT);
+            }
+            
+            oDialogPaymentChangeStatus.setRegistry(oPayment);
+            oDialogPaymentChangeStatus.setVisible(true);
+
+            if (oDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                Date date = (Date) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
+                double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), oPayment.getFkCurrencyId(), date);
+                double amount = (double) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
+                int[] paymentBankKey = (int[]) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
+                int[] benefBankKey = (int[]) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
+                SDbPaymentEntry oSingleEntry = oPayment.getSingleEntry();
+                
+                if (oDialogPaymentChangeStatus.getFormCase() == SDialogPaymentChangeStatus.CASE_MARK_AS_PAID) {
+                    oPayment.setAuxReloadEntries(false);
+                    oPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                    oPayment.setDateExecution_n(date);
+                    oPayment.setExecutedManually(true);
+                    oPayment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                }
+
+                if (paymentBankKey != null) {
+                    oPayment.setFkPayerCashBizPartnerBranchId_n(paymentBankKey[0]);
+                    oPayment.setFkPayerCashAccountingCashId_n(paymentBankKey[1]);
+                }
+                else {
+                    oPayment.setFkPayerCashBizPartnerBranchId_n(0);
+                    oPayment.setFkPayerCashAccountingCashId_n(0);
+                }
+
+                if (benefBankKey != null) {
+                    oPayment.setFkBeneficiaryBankBizParterBranchId_n(benefBankKey[0]);
+                    oPayment.setFkBeneficiaryBankAccountCashId_n(benefBankKey[1]);
+                }
+                else {
+                    oPayment.setFkBeneficiaryBankBizParterBranchId_n(0);
+                    oPayment.setFkBeneficiaryBankAccountCashId_n(0);
+                }
+                
+                if (oDialogPaymentChangeStatus.getFormCase() == SDialogPaymentChangeStatus.CASE_MARK_AS_PAID) {
+                    oPayment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, oSingleEntry.getDocInstallment(), oSingleEntry.getDocBalancePreviousCy());
+                }
+
+                miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                        + SUGGESTION_SPEED_UP + "'" + exportButtonTooltip + "'.");
+
+                oPayment.save(miClient.getSession());
+                miClient.getSession().notifySuscriptors(gridType);
+                return true;
+            }
+        } else {
+            switch (status) {
+                case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                default:
+                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+        return false;
+    }
+
     public static int mapPaymentFileType(String paymentFileType) {
         switch (paymentFileType) {
             case SDbPaymentFile.FILE_TP_EF:
