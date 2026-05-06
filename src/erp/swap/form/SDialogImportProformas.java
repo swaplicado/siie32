@@ -452,7 +452,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlProforma.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma" : "");
+        jlProforma.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma:" : "");
         jlProforma.setPreferredSize(new java.awt.Dimension(150, 23));
         jpProcessingN1.add(jlProforma);
 
