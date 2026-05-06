@@ -483,8 +483,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersMailPending);
         jmOrd.add(jmiOrdersMailSent);
-//        jmOrd.addSeparator(); XXX 2026-05-06, Sergio Flores: to be enabled shortly
-//        jmOrd.add(jmiOrdersPurchasingProcess); XXX 2026-05-06, Sergio Flores: to be enabled shortly
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersPurchasingProcess);
 
         jmDps = new JMenu("Facturas");
         jmiDpsDoc = new JMenuItem("Facturas de compras");
@@ -557,8 +557,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjDocAnn);
-        jmDpsAdj.addSeparator();
-        jmDpsAdj.add(jmiDpsAdjImportCreditNotes);
+//        jmDpsAdj.addSeparator();
+//        jmDpsAdj.add(jmiDpsAdjImportCreditNotes);
 
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyOrdPend = new JMenuItem("Pedidos de compras sin factura por surtir");
