@@ -104,8 +104,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     private static final DecimalFormat RecPeriodFormat = new DecimalFormat("00");
     private static final DecimalFormat RecNumberFormat = new DecimalFormat(SLibUtils.textRepeat("0", SDataConstantsSys.NUM_LEN_FIN_REC));
 
-    private SServicesUtils.ConfigSettings ConfigSettings;
+    private final SServicesUtils.ConfigSettings ConfigSettings;
     
+    public int DocumentType;
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
     public int BizPartnerId;
@@ -148,6 +149,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public boolean Download;
     public boolean AlreadyDownloaded;
     
+    public String DocumentUploadedBy;
+    public Date DocumentUploadedAt;
+    public String DocumentReviewedBy;
+    public Date DocumentReviewedAt;
+    public String DocumentAuthorizedBy;
+    public Date DocumentAuthorizedAt;
+    
     public ProcessedDps ProcessedDps;
     public SDbSwapDataProcessing SwapDataProcessing;
     public SDbPayment Payment;
@@ -168,9 +176,15 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public double AccUnits;
     public int AccUnitId;
     
-    public SImportedDocument(final SServicesUtils.ConfigSettings configSettings) {
+    /**
+     * Creates a new imported document.
+     * @param configSettings SWAP-Services configuration settings, can be <code>null</code> when there is no need to process and record this document.
+     * @param documentType Document type. Either SDataConstantsSys.TRNX_TP_DPS_DOC (invoice) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit note)
+     */
+    public SImportedDocument(final SServicesUtils.ConfigSettings configSettings, final int documentType) {
         ConfigSettings = configSettings;
         
+        DocumentType = documentType;
         ExternalDocumentId = 0;
         ExternalDocumentUuid = "";
         BizPartnerId = 0;
@@ -210,6 +224,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         Download = false;
         AlreadyDownloaded = false;
         
+        DocumentUploadedBy = "";
+        DocumentUploadedAt = null;
+        DocumentReviewedBy = "";
+        DocumentReviewedAt = null;
+        DocumentAuthorizedBy = "";
+        DocumentAuthorizedAt = null;
+    
         ProcessedDps = null;
         SwapDataProcessing = null;
         Payment = null;
@@ -378,12 +399,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Check if document has references and if they are of the given reference document type.
-     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
+     * Check if document has references and if they are of the given reference type.
+     * @param referenceType Reference type (SSwapConsts.TXN_DOC_TYPE_...).
      * @return 
      */
-    public boolean hasReferences(final int refDocType) {
-        return References != null && References.length > 0 && ReferencesType == refDocType;
+    public boolean hasReferences(final int referenceType) {
+        return References != null && References.length > 0 && ReferencesType == referenceType;
     }
     
     /**
@@ -438,25 +459,25 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get key of first reference if it matches the given document type.
+     * Get key of first reference if it matches the given reference type.
      * @param client GUI client.
-     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
+     * @param referenceType Reference type (SSwapConsts.TXN_REF_TYPE_...).
      * @return 
      * @throws java.lang.Exception 
      */
-    public int[] getFirstReferenceKey(final SGuiClient client, final int refDocType) throws Exception {
+    public int[] getFirstReferenceKey(final SGuiClient client, final int referenceType) throws Exception {
         int[] orderKey = null;
         String refPrefix = "";
         
-        switch (refDocType) {
+        switch (referenceType) {
             case SSwapConsts.TXN_REF_TYPE_ORDER:
                 refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
                 break;
             default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + refDocType + ".)");
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + referenceType + ".)");
         }
         
-        if (hasReferences(refDocType)) {
+        if (hasReferences(referenceType)) {
             SImportUtils.DpsKey orderDpsKey = References[0].createDpsKey();
 
             if (orderDpsKey != null) {
@@ -1230,6 +1251,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @param session GUI session.
      * @param order Order, can be <code>null</code>.
      * @return 
+     * @throws java.lang.Exception 
      */
     public SDataDps createDps(final SGuiSession session, final SDataDps order) throws Exception {
         int year = SLibTimeUtils.digestYear(Date)[0];
@@ -1508,6 +1530,47 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         return string;
     }
     
+    /**
+     * Get document information: upload, review, authorization.
+     * @return 
+     */
+    public String getDocumentInfo() {
+        String info = "Información del documento " + getFolio() + ":";
+        
+        info += "\nCargó: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy);
+        info += "\nCarga: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt));
+        info += "\nRevisó: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy);
+        info += "\nRevisión: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt));
+        info += "\nAutorizó: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy);
+        info += "\nAutorización: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt));
+        
+        return info;
+    }
+    
+    /**
+     * Get document information: upload, review, authorization.
+     * @param referenceType Reference type (SSwapConsts.TXN_DOC_TYPE_...).
+     * @return 
+     */
+    public String getReferenceInfo(final int referenceType) {
+        String info = "Información de la referencia del documento " + getFolio() + ":";
+        
+        if (!hasReferences(referenceType)) {
+            String name = SSwapConsts.RefTypes.get(referenceType);
+            info += "\n+ ¡El documento no tiene referencias de tipo " + (name == null || name.isEmpty() ? "desconocido" : name) + "!";
+        }
+        else {
+            info += "\n+ Cargó: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy);
+            info += "\n+ Carga: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt));
+            info += "\n+ Revisó: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy);
+            info += "\n+ Revisión: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt));
+            info += "\n+ Autorizó: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy);
+            info += "\n+ Autorización: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt));
+        }
+        
+        return info;
+    }
+    
     /*
      * Implemented and overriden inherited methods
      */
@@ -1774,7 +1837,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * Create prepared statement to get Processed DPS from Payable or Receivable Accounts by its own document data.
      * @param statement DB statement.
      * @param dpsTypeKey Key of DPS type: (category, class & type).
-     * @return A prepared statment with these columns: dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @return A prepared statment with these columns: dps_id_year and dps_id_doc.
      * @throws Exception 
      */
     public static PreparedStatement createPrepStatementToGetDpsKeyByDocData(final Statement statement, final int[] dpsTypeKey) throws Exception {
@@ -1819,16 +1882,34 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
+     * Create prepared statement to get DPS handling data: creation and authorization.
+     * @param statement DB statement.
+     * @return A prepared statment with these columns: created_by (java.lang.String), created_at (java.sql.Date), authorized_by (java.lang.String), authorized_at (java.sql.Date).
+     * @throws Exception 
+     */
+    public static PreparedStatement createPrepStatementToGetDpsHandlingData(final Statement statement) throws Exception {
+        String sql = "SELECT un.usr AS created_by, d.ts_new AS created_at, ua.usr AS authorized_by, d.ts_authorn AS authorized_at "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON un.id_usr = d.fid_usr_new "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ua ON ua.id_usr = d.fid_usr_authorn "
+                + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                + "AND d.id_year = ? AND d.id_doc = ?;";
+        
+        return statement.getConnection().prepareStatement(sql);
+    }
+    
+    /**
      * Create a basic and elemental version of an imported document from SWAP data processed DPS to be used in SFormDps.
      * @param statement DB statement.
      * @param dpsKey DPS key.
      * @return 
+     * @throws java.lang.Exception 
      */
     public static SImportedDocument createBasicImportedDocumentFromProcessedDps(final Statement statement, final int[] dpsKey) throws Exception {
         SImportedDocument importedDocument = null;
         
         String sql = "SELECT sdp.ext_data_id, sdp.ext_data_uuid, sdp.dps_refs, sdp.dps_descrip, "
-                + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.acc_tag, d.fid_func, d.fid_func_sub, "
+                + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.acc_tag, d.fid_func, d.fid_func_sub, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
                 + "CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS _func_sub, "
                 + "b.id_bp, b.bp, c.id_cur, c.cur_key, dc.cfd_use "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
@@ -1843,7 +1924,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
-                importedDocument = new SImportedDocument(null);
+                importedDocument = new SImportedDocument(null, SImportedDocument.getDocumentType(new int[] { resultSet.getInt("d.fid_ct_dps"), resultSet.getInt("d.fid_cl_dps"), resultSet.getInt("d.fid_tp_dps") }));
                 importedDocument.ExternalDocumentId = resultSet.getInt("sdp.ext_data_id");
                 importedDocument.ExternalDocumentUuid = resultSet.getString("sdp.ext_data_uuid");
                 importedDocument.BizPartnerId = resultSet.getInt("b.id_bp");
@@ -1890,6 +1971,24 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
         
         return importedDocument;
+    }
+    
+    /**
+     * Get document type for the given DPS type.
+     * @param dpsTypeKey DPS type key.
+     * @return When DPS type key is supported, either SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes), otherwise SLibConstants.UNDEFINED.
+     */
+    public static int getDocumentType(final int[] dpsTypeKey) {
+        int type = SLibConstants.UNDEFINED;
+        
+        if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_INV)) {
+            type = SDataConstantsSys.TRNX_TP_DPS_DOC;
+        }
+        else if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
+            type = SDataConstantsSys.TRNX_TP_DPS_ADJ;
+        }
+            
+        return type;
     }
     
     /**
@@ -1966,6 +2065,9 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         }
     }
     
+    /**
+     * In memory reference.
+     */
     public static class Reference implements Serializable {
         
         public int ReferenceType;
@@ -1973,15 +2075,40 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         public int DpsYearId;
         public int DpsDocId;
         
-        public Reference(final int referenceType, final String reference, final SImportUtils.DpsKey dpsKey) {
-            this(referenceType, reference, dpsKey != null ? dpsKey.YearId : 0, dpsKey != null ? dpsKey.DocId : 0);
-        }
+        public String ReferenceCreatedBy;
+        public Date ReferenceCreateedAt;
+        public String ReferenceAuthorizedBy;
+        public Date ReferenceAuthorizedAt;
         
-        public Reference(final int referenceType, final String reference, final int dpsYearId, final int dpsDocId) {
+        public Reference(final int referenceType, final String reference, final int dpsYearId, final int dpsDocId, final PreparedStatement prepStatementToGetDpsHandlingData) {
             ReferenceType = referenceType;
             Reference = reference;
             DpsYearId = dpsYearId;
             DpsDocId = dpsDocId;
+            
+            ReferenceCreatedBy = "";
+            ReferenceCreateedAt = null;
+            ReferenceAuthorizedBy = "";
+            ReferenceAuthorizedAt = null;
+            
+            if (prepStatementToGetDpsHandlingData != null && ReferenceType == SSwapConsts.TXN_REF_TYPE_ORDER && DpsYearId != 0 && DpsDocId != 0) {
+                try {
+                    prepStatementToGetDpsHandlingData.setInt(1, DpsYearId);
+                    prepStatementToGetDpsHandlingData.setInt(2, DpsDocId);
+
+                    try (ResultSet resultSet = prepStatementToGetDpsHandlingData.executeQuery()) {
+                        if (resultSet.next()) {
+                            ReferenceCreatedBy = resultSet.getString("created_by");
+                            ReferenceCreateedAt = resultSet.getTimestamp("created_at");
+                            ReferenceAuthorizedBy = resultSet.getString("authorized_by");
+                            ReferenceAuthorizedAt = resultSet.getTimestamp("authorized_at");
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
+            }
         }
         
         public SImportUtils.DpsKey createDpsKey() {

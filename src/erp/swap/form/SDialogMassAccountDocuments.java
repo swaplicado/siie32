@@ -2820,12 +2820,12 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     }
     
     private void itemStateChangedReqPayRequire() {
-        boolean enable = false;
+        boolean updateStatus = false;
         boolean require = moBoolReqPayRequire.isSelected(); // convenience variable
         
         if (mbDocumentsBeingRendered) {
             // rendering current document:
-            enable = true;
+            updateStatus = true;
         }
         else {
             // editing current document:
@@ -2842,7 +2842,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                     refreshDocumentsGrid();
                     recountDocsToProcess();
 
-                    enable = true;
+                    updateStatus = true;
                 }
             }
             catch (Exception e) {
@@ -2850,7 +2850,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
         }
         
-        if (enable) {
+        if (updateStatus) {
             jbEditAndSaveReqPayAmount.setEnabled(require);
             jbCancelEditReqPayAmount.setEnabled(false);
             jbChangeReqPayRequiredDate.setEnabled(require);

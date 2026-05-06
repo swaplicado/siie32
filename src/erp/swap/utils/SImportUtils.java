@@ -1266,14 +1266,14 @@ public abstract class SImportUtils {
     
     /**
      * Create DPS key from reference key.
-     * @param refKey Reference key, e.g., "2025_1".
+     * @param referenceKey Reference key, e.g., "2025_1".
      * @return 
      */
-    public static DpsKey createDpsKey(final String refKey) {
+    public static DpsKey createDpsKey(final String referenceKey) {
         DpsKey dpsKey = null;
         
-        if (!refKey.isEmpty()) {
-            String[] keyElements = refKey.split("_");
+        if (!referenceKey.isEmpty()) {
+            String[] keyElements = referenceKey.split("_");
             
             if (keyElements.length == 2) {
                 int yearId = SLibUtils.parseInt(keyElements[0]);

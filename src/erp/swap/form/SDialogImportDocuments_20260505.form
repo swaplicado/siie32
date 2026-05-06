@@ -32,7 +32,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="B&#xfa;squeda de &lt;documents&gt; autorizadas:"/>
+            <TitledBorder title="B&#xfa;squeda de facturas autorizadas:"/>
           </Border>
         </Property>
       </Properties>
@@ -278,7 +278,7 @@
               <SubComponents>
                 <Component class="javax.swing.JButton" name="jbShowDocs">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Mostrar &lt;documents&gt;"/>
+                    <Property name="text" type="java.lang.String" value="Mostrar facturas"/>
                     <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                       <Insets value="[2, 2, 2, 2]"/>
                     </Property>
@@ -334,7 +334,7 @@
               <SubComponents>
                 <Component class="javax.swing.JButton" name="jbClearDocs">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Limpiar &lt;documents&gt;"/>
+                    <Property name="text" type="java.lang.String" value="Limpiar facturas"/>
                     <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                       <Insets value="[2, 2, 2, 2]"/>
                     </Property>
@@ -395,7 +395,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolExcludeRecordedDocs">
+                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolExcludeRecorded">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Excluir contabilizadas"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -463,11 +463,11 @@
         <Property name="horizontalGap" type="int" value="5"/>
       </Layout>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="jpDocsPanel">
+        <Container class="javax.swing.JPanel" name="jpDocumentsPanel">
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="&lt;Documents&gt; autorizadas:"/>
+                <TitledBorder title="Facturas autorizadas:"/>
               </Border>
             </Property>
           </Properties>
@@ -479,7 +479,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jpDocsPanel1">
+            <Container class="javax.swing.JPanel" name="jpDocumentsGrid1">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                   <BorderConstraints direction="South"/>
@@ -488,7 +488,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jpDocsPanel11">
+                <Container class="javax.swing.JPanel" name="jpDocumentsGrid11">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
                       <BorderConstraints direction="Center"/>
@@ -501,79 +501,64 @@
                     <Property name="verticalGap" type="int" value="2"/>
                   </Layout>
                   <SubComponents>
-                    <Container class="javax.swing.JPanel" name="jpDocsPanel111">
+                    <Container class="javax.swing.JPanel" name="jpDocumentsGrid111">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                         <Property name="alignment" type="int" value="0"/>
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlRefUserAuthorize">
+                        <Component class="javax.swing.JLabel" name="jlInvoiceUserNew">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Autoriz&#xf3; &lt;ref&gt;:"/>
+                            <Property name="text" type="java.lang.String" value="Usr. factura:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 20]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="jlRefUserCreate">
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jpDocumentsGrid112">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JTextField" name="jtfInvoiceUserNew">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Cre&#xf3; factura:"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[72, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="jbViewRefInfo">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="..."/>
-                            <Property name="toolTipText" type="java.lang.String" value="Ver detalles &lt;reference&gt;..."/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[23, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlDocUserUpload">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Carg&#xf3; &lt;doc&gt;:"/>
+                            <Property name="editable" type="boolean" value="false"/>
+                            <Property name="text" type="java.lang.String" value="user.name"/>
+                            <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 20]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="jlDocUserReview">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Revis&#xf3; &lt;doc&gt;:"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlDocUserAuthorize">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Autoriz&#xf3; &lt;doc&gt;:"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JLabel" name="jlDocUserCreate">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Cre&#xf3; &lt;doc&gt;:"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[72, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JButton" name="jbViewDocInfo">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="..."/>
-                            <Property name="toolTipText" type="java.lang.String" value="Ver detalles &lt;document&gt;"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[23, 23]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jpDocumentsGrid12">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="East"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                    <Property name="columns" type="int" value="1"/>
+                    <Property name="rows" type="int" value="2"/>
+                    <Property name="verticalGap" type="int" value="2"/>
+                  </Layout>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jpDocumentsGrid121">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
                         <Component class="javax.swing.JLabel" name="jlProgress">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Progreso..."/>
@@ -584,73 +569,13 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jpDocsPanel112">
+                    <Container class="javax.swing.JPanel" name="jpDocumentsGrid122">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                         <Property name="alignment" type="int" value="0"/>
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JTextField" name="jtfRefUserAuthorize">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jtfRefUserCreate">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jtfDocUserUpload">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jtfDocUserReview">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jtfDocUserAuthorize">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jtfDocUserCreate">
-                          <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
-                            <Property name="text" type="java.lang.String" value="user.name"/>
-                            <Property name="focusable" type="boolean" value="false"/>
-                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 20]"/>
-                            </Property>
-                          </Properties>
-                        </Component>
                         <Component class="javax.swing.JProgressBar" name="jProgressBar">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -666,7 +591,7 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="javax.swing.JPanel" name="jpDocsProcessing">
+        <Container class="javax.swing.JPanel" name="jpDocumentsProcessing">
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -702,7 +627,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbCreateDocFromCfdi">
+                    <Component class="javax.swing.JButton" name="jbCreateInvoiceFromCfdi">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
@@ -725,12 +650,12 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbCreateDocFromScratch">
+                    <Component class="javax.swing.JButton" name="jbCreateInvoiceFromScratch">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Crear &lt;document&gt;"/>
+                        <Property name="text" type="java.lang.String" value="Crear factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -748,12 +673,12 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbLinkDoc">
+                    <Component class="javax.swing.JButton" name="jbLinkInvoice">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Vincular &lt;document&gt;"/>
+                        <Property name="text" type="java.lang.String" value="Vincular factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -771,12 +696,12 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbUnlinkDoc">
+                    <Component class="javax.swing.JButton" name="jbUnlinkInvoice">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Desvincular &lt;document&gt;"/>
+                        <Property name="text" type="java.lang.String" value="Desvincular factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -794,12 +719,12 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbRejectDoc">
+                    <Component class="javax.swing.JButton" name="jbRejectInvoice">
                       <Properties>
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="0" green="0" id="red" palette="1" red="ff" type="palette"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="Rechazar &lt;document&gt;"/>
+                        <Property name="text" type="java.lang.String" value="Rechazar factura"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[2, 2, 2, 2]"/>
                         </Property>
@@ -817,34 +742,34 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlDoc">
+                    <Component class="javax.swing.JLabel" name="jlInvoice">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Tahoma" size="11" style="1"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="&lt;Document&gt;:"/>
+                        <Property name="text" type="java.lang.String" value="Factura:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[95, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbViewDocXml">
+                    <Component class="javax.swing.JButton" name="jbViewInvoiceXml">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon-file-xml.png"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver XML de la &lt;document&gt;..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver XML de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbViewDocPdf">
+                    <Component class="javax.swing.JButton" name="jbViewInvoicePdf">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon-file-pdf.png"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver PDF de la &lt;document&gt;..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver PDF de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -859,34 +784,34 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JTextField" name="jtfDoc">
+                    <Component class="javax.swing.JTextField" name="jtfInvoice">
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="ABC-000000"/>
-                        <Property name="toolTipText" type="java.lang.String" value="&lt;Document&gt;"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Factura"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[95, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbViewDoc">
+                    <Component class="javax.swing.JButton" name="jbViewInvoice">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_look.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver &lt;document&gt;..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jbViewRef">
+                    <Component class="javax.swing.JButton" name="jbViewOrder">
                       <Properties>
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_seek.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver &lt;reference&gt; de la &lt;document&gt;..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver pedido de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -905,7 +830,7 @@
                       <Properties>
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="2001-01 SUC C-000000"/>
-                        <Property name="toolTipText" type="java.lang.String" value="P&#xf3;liza contable de la &lt;document&gt;"/>
+                        <Property name="toolTipText" type="java.lang.String" value="P&#xf3;liza contable de la factura"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[122, 23]"/>
@@ -917,7 +842,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/erp/img/icon_std_look.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Ver p&#xf3;liza contable de la &lt;document&gt;..."/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ver p&#xf3;liza contable de la factura..."/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[23, 23]"/>
                         </Property>
@@ -1077,7 +1002,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JButton" name="jbRequestPay">
+                    <Component class="javax.swing.JButton" name="jbRequestPayment">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Solicitar pago"/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">

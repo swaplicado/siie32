@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 import sa.lib.srv.SSrvCompany;
 
 /**
@@ -203,6 +204,18 @@ public class SLogin extends JDialog {
     }//GEN-LAST:event_jpfUserPasswordActionPerformed
 
     private void initComponentsExtra() {
+        // let a pressed key ENTER on companies list move focus to OK button:
+        
+        AbstractAction actionCompaniesKeyEnter = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jbOk.requestFocusInWindow();
+            }
+        };
+        
+        jltCompanies.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterAction");
+        jltCompanies.getActionMap().put("enterAction", actionCompaniesKeyEnter);
+        
         AbstractAction actionOk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

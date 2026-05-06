@@ -94,6 +94,14 @@ public abstract class SSwapConsts {
     /** Boleto de báscula (de entrada). */
     public static final String TXN_REF_TYPE_SCALE_IN_CODE = "BB";
     
+    /** Reference type options. */
+    public static final HashMap<Integer, String> RefTypes = new HashMap<>();
+    
+    static {
+        RefTypes.put(TXN_REF_TYPE_ORDER, "órden de compra");
+        RefTypes.put(TXN_REF_TYPE_SCALE_IN, "boleto de báscula de entrada");
+    }
+    
     // Definition of required payment:
     
     public static final int PAY_NOT_REQ = 0; // pago no requerido
