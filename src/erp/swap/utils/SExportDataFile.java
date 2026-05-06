@@ -5,19 +5,29 @@
  */
 package erp.swap.utils;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Edwin Carmona
  */
 public class SExportDataFile implements SExportData {
     
-    public String filename_storage;
+    @JsonProperty("filename_storage")
+    public String filenameStorage;
     
-    public String filename_original;
+    @JsonProperty("filename_original")
+    public String filenameOriginal;
     
-    public String url_storage;
+    @JsonProperty("url_storage")
+    public String urlStorage;
     
-    public String url_database;
+    @JsonProperty("url_database")
+    public String urlDatabase;
     
-    public String bucket_name;
+    @JsonProperty("bucket_name")
+    public String bucketName;
+    
+    @JsonProperty("file_type_id")
+    public int fileTypeId;
 }

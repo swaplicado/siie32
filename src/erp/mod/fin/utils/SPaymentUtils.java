@@ -5,7 +5,9 @@ import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPayment;
+import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.db.SRowPayments;
+import erp.swap.SSwapConsts;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -450,5 +452,44 @@ public class SPaymentUtils {
         }
 
         return installments;
+    }
+    
+    /**
+     * Mapea un tipo de archivo de pago interno a un tipo de archivo compatible con SWAP Services.
+     *
+     * <p>Esta función traduce los códigos de tipo de archivo definidos en {@link SDbPaymentFile}
+     * a las constantes de tipo de archivo definidas en {@link SSwapConsts} que se utilizan
+     * en la integración con SWAP Services.</p>
+     *
+     * <p>Los mapeos son los siguientes:</p>
+     * <ul>
+     *   <li><strong>FILE_TP_EF</strong> (Evidencia Final) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE}</li>
+     *   <li><strong>FILE_TP_RA</strong> (Reporte Avance) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE_PARTIAL}</li>
+     *   <li><strong>FILE_TP_PF</strong> (Papel Fiscal) → {@link SSwapConsts#FILE_TYPE_PAY_VOUCHER}</li>
+     *   <li><strong>FILE_TP_OS</strong> (Otros Soportes) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
+     *   <li><strong>Otros</strong> (Defecto) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
+     * </ul>
+     *
+     * @param paymentFileType código de tipo de archivo de pago a mapear
+     * @return constante entera que representa el tipo de archivo en SWAP Services;
+     *         retorna {@link SSwapConsts#FILE_TYPE_PAY_SUPP} como valor por defecto
+     *         si el tipo de archivo no coincide con ninguno de los casos definidos
+     * 
+     * @see SDbPaymentFile
+     * @see SSwapConsts
+     */
+    public static int mapPaymentFileType(String paymentFileType) {
+        switch (paymentFileType) {
+            case SDbPaymentFile.FILE_TP_EF:
+                return SSwapConsts.FILE_TYPE_GRAPHIC_EVIDENCE;
+            case SDbPaymentFile.FILE_TP_RA:
+                return SSwapConsts.FILE_TYPE_GRAPHIC_EVIDENCE_PARTIAL;
+            case SDbPaymentFile.FILE_TP_PF:
+                return SSwapConsts.FILE_TYPE_PAY_VOUCHER;
+            case SDbPaymentFile.FILE_TP_OS:
+                return SSwapConsts.FILE_TYPE_PAY_SUPP;
+            default:
+                return SSwapConsts.FILE_TYPE_PAY_SUPP;
+        }
     }
 }

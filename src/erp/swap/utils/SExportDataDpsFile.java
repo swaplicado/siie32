@@ -23,6 +23,7 @@ public class SExportDataDpsFile implements SExportData {
         url_database = "#";
         bucket_name = "";
         project_id = "";
+        file_type_id = 1;
     }
     
     /*
@@ -59,4 +60,9 @@ public class SExportDataDpsFile implements SExportData {
      * ID del proyecto en cloud storage
      */
     public String project_id;
+    
+    /**
+     * Tipo de archivo, del catálogo:
+     */
+    public int file_type_id;
 }

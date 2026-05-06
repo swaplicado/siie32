@@ -770,9 +770,10 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         populateGridFiles();
         
         if (moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW || 
-                moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC) { 
+                moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC) {
             mbCanCapture = true;
             enablePayComponets(true);
+            jbSave.setEnabled(true);
         }
         else {
             mbCanCapture = false;

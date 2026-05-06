@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, Cesar Orozco, Edwin Carmona
  */
 public abstract class SSwapConsts {
 
@@ -223,4 +223,129 @@ public abstract class SSwapConsts {
      * Tipo de entidad organización (persona moral).
      */
     public static final String PURCHASER_AGENT = "PURCHASER_AGENT";
+
+    // Constantes de tipos de archivo ordenadas numéricamente
+    
+    /** Desconocido */
+    public final static int FILE_TYPE_UNKNOWN = 1;
+    
+    // Facturas (11-13)
+    /** XML de factura */
+    public final static int FILE_TYPE_INVOICE_XML = 11;
+    /** PDF de factura */
+    public final static int FILE_TYPE_INVOICE_PDF = 12;
+    /** Soporte de factura */
+    public final static int FILE_TYPE_INVOICE_SUPP = 13;
+    
+    // Notas de crédito (16-18)
+    /** XML de nota de crédito */
+    public final static int FILE_TYPE_CREDIT_NOTE_XML = 16;
+    /** PDF de nota de crédito */
+    public final static int FILE_TYPE_CREDIT_NOTE_PDF = 17;
+    /** Soporte de nota de crédito */
+    public final static int FILE_TYPE_CREDIT_NOTE_SUPP = 18;
+    
+    // Órdenes de compra (21-22)
+    /** PDF de orden de compra */
+    public final static int FILE_TYPE_PUR_ORD_PDF = 21;
+    /** Soporte de orden de compra */
+    public final static int FILE_TYPE_PUR_ORD_SUPP = 22;
+    
+    // Contratos de compra (26-27)
+    /** PDF de contrato de compra */
+    public final static int FILE_TYPE_PUR_CONTRACT_PDF = 26;
+    /** Soporte de contrato de compra */
+    public final static int FILE_TYPE_PUR_CONTRACT_SUPP = 27;
+    
+    // Cotizaciones (31-32)
+    /** PDF de cotización de compra */
+    public final static int FILE_TYPE_PUR_QUOTE_PDF = 31;
+    /** Soporte de cotización de compra */
+    public final static int FILE_TYPE_PUR_QUOTE_SUPP = 32;
+    
+    // Requisiciones (36)
+    /** PDF de requisición */
+    public final static int FILE_TYPE_PUR_MAT_REQ_PDF = 36;
+    
+    // Boleto de báscula (41)
+    /** Boleto de báscula */
+    public final static int FILE_TYPE_SCALE_TICKET = 41;
+    
+    // Proforma (51)
+    /** Proforma */
+    public final static int FILE_TYPE_PROFORMA = 51;
+    
+    // Pagos (56, 61, 66-68)
+    /** Soporte de pago */
+    public final static int FILE_TYPE_PAY_SUPP = 56;
+    /** Comprobante de pago */
+    public final static int FILE_TYPE_PAY_VOUCHER = 61;
+    /** XML de comprobante de recepción de pagos */
+    public final static int FILE_TYPE_PAY_RECEIPT_XML = 66;
+    /** PDF de comprobante de recepción de pagos */
+    public final static int FILE_TYPE_PAY_RECEIPT_PDF = 67;
+    /** Soporte de comprobante de recepción de pagos */
+    public final static int FILE_TYPE_PAY_RECEIPT_SUPP = 68;
+    
+    // Contratos, diseños y documentos legales (71-73)
+    /** Contrato */
+    public final static int FILE_TYPE_CONTRACT = 71;
+    /** Diseños o planos */
+    public final static int FILE_TYPE_DESIGNS = 72;
+    /** Legales o reglamentarios */
+    public final static int FILE_TYPE_LEGAL = 73;
+    
+    // Evidencia gráfica (81-84)
+    /** Evidencia gráfica */
+    public final static int FILE_TYPE_GRAPHIC_EVIDENCE = 81;
+    /** Evidencia gráfica inicial */
+    public final static int FILE_TYPE_GRAPHIC_EVIDENCE_INITIAL = 82;
+    /** Evidencia gráfica parcial */
+    public final static int FILE_TYPE_GRAPHIC_EVIDENCE_PARTIAL = 83;
+    /** Evidencia gráfica final */
+    public final static int FILE_TYPE_GRAPHIC_EVIDENCE_FINAL = 84;
+    
+    // Evidencia de realización (86-89)
+    /** Evidencia de realización */
+    public final static int FILE_TYPE_REALIZATION_EVIDENCE = 86;
+    /** Evidencia de realización inicial */
+    public final static int FILE_TYPE_REALIZATION_EVIDENCE_INITIAL = 87;
+    /** Evidencia de realización parcial */
+    public final static int FILE_TYPE_REALIZATION_EVIDENCE_PARTIAL = 88;
+    /** Evidencia de realización final */
+    public final static int FILE_TYPE_REALIZATION_EVIDENCE_FINAL = 89;
+    
+    // Documentos de identificación y constitutiva (101-102)
+    /** Acta constitutiva */
+    public final static int FILE_TYPE_ARTICLE = 101;
+    /** Poder notarial */
+    public final static int FILE_TYPE_POWER_OF_ATTORNEY = 102;
+    
+    // Identificación (106-107)
+    /** Identificación oficial */
+    public final static int FILE_TYPE_OFFICIAL_ID = 106;
+    /** Identificación fiscal */
+    public final static int FILE_TYPE_FISCAL_ID = 107;
+    
+    // Documentos fiscales (111-112)
+    /** Constancia de situación fiscal */
+    public final static int FILE_TYPE_FISCAL_SITUATION = 111;
+    /** Opinión del cumplimiento de obligaciones fiscales */
+    public final static int FILE_TYPE_FISCAL_COMPLIANCE = 112;
+    
+    // Comprobantes (116-117)
+    /** Comprobante de domicilio */
+    public final static int FILE_TYPE_PROOF_OF_ADDRESS = 116;
+    /** Estado de cuenta bancario */
+    public final static int FILE_TYPE_BANK_STATEMENT = 117;
+    
+    // Cartas comerciales (121, 126)
+    /** Carta de propuesta comercial */
+    public final static int FILE_TYPE_COMMERCIAL_PROPOSAL = 121;
+    /** Carta de confirmación de datos */
+    public final static int FILE_TYPE_DATA_CONFIRMATION = 126;
+    
+    // Otros archivos (129)
+    /** Otro archivo del expediente */
+    public final static int FILE_TYPE_OTHER = 129;
 }

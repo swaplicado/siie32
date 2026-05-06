@@ -21,6 +21,7 @@ import erp.mod.cfg.db.SDbFunctionalSubArea;
 import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.trn.api.data.SWebDpsFile;
 import erp.mod.trn.api.db.STrnDBDocuments;
@@ -1303,6 +1304,7 @@ public abstract class SExportDataUtils {
                                 oFile.title = "PDF de la OC";
                                 oFile.bucket_name = sBucketName;
                                 oFile.project_id = sProjectID;
+                                oFile.file_type_id = SSwapConsts.FILE_TYPE_PUR_ORD_PDF;
                                 oContainer.file.add(oFile);
                             }
                         } // Si no existe en la bitácora de siie, se sube
@@ -1330,6 +1332,7 @@ public abstract class SExportDataUtils {
                                             oFile.title = "PDF de la OC";
                                             oFile.bucket_name = sBucketName;
                                             oFile.project_id = sProjectID;
+                                            oFile.file_type_id = SSwapConsts.FILE_TYPE_PUR_ORD_PDF;
                                             oContainer.file.add(oFile);
                                         }
                                     } else {
@@ -1369,7 +1372,18 @@ public abstract class SExportDataUtils {
                                     ? oDpsFile.getoWebFile().getUserFileName() : oDpsFileExport.filename_storage;
                             oDpsFileExport.bucket_name = sBucketName;
                             oDpsFileExport.project_id = sProjectID;
-
+                            switch (oDpsFile.getFileType()) {
+                                case SModSysConsts.TRN_SUP_FILE_DPS_TYPE_PICK_Q:
+                                    oDpsFileExport.file_type_id = SSwapConsts.FILE_TYPE_PUR_QUOTE_PDF;
+                                    break;
+                                case SModSysConsts.TRN_SUP_FILE_DPS_TYPE_T:
+                                    oDpsFileExport.file_type_id = SSwapConsts.FILE_TYPE_PUR_ORD_SUPP;
+                                    break;
+                                default:
+                                    oDpsFileExport.file_type_id = SSwapConsts.FILE_TYPE_PUR_QUOTE_SUPP;
+                                    break;
+                            
+                            }
                             oContainer.file.add(oDpsFileExport);
                         }
                     }
@@ -1393,6 +1407,7 @@ public abstract class SExportDataUtils {
                                     oRmFile.title = "PDF de la requisición";
                                     oRmFile.bucket_name = sBucketName;
                                     oRmFile.project_id = sProjectID;
+                                    oRmFile.file_type_id = SSwapConsts.FILE_TYPE_PUR_MAT_REQ_PDF;
 
                                     oContainer.file.add(oRmFile);
                                 }
@@ -2331,7 +2346,7 @@ public abstract class SExportDataUtils {
                             .map(String::valueOf)
                             .collect(java.util.stream.Collectors.joining(","));
 
-                    String sqlFiles = "SELECT id_pay, file_storage_name, file_name, filevault_id "
+                    String sqlFiles = "SELECT id_pay, file_storage_name, file_name, filevault_id, pay_file_type "
                             + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_FILE) + " "
                             + "WHERE id_pay IN (" + ids + ") "
                             + "AND NOT b_del";
@@ -2343,12 +2358,13 @@ public abstract class SExportDataUtils {
 
                         SExportDataFile file = new SExportDataFile();
 
-                        file.filename_storage = rsFiles.getString("file_storage_name");
-                        file.filename_original = rsFiles.getString("file_name");
+                        file.filenameStorage = rsFiles.getString("file_storage_name");
+                        file.filenameOriginal = rsFiles.getString("file_name");
+                        file.fileTypeId = SPaymentUtils.mapPaymentFileType(rsFiles.getString("pay_file_type"));
 
-                        file.url_storage = "#";
-                        file.url_database = "#";
-                        file.bucket_name = CloudStorageManager.getBucketName();
+                        file.urlStorage = "#";
+                        file.urlDatabase = "#";
+                        file.bucketName = CloudStorageManager.getBucketName();
 
                         ArrayList<SExportDataFile> files = paymentFilesMap.get(payId);
 
