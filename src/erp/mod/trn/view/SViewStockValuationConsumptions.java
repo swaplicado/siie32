@@ -90,7 +90,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbSearchItemKey = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query_doc.gif")), "Filtrar ítem", this);
         mjbViewCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Filtrar ítem", this);
         
-        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_REM));
+        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
