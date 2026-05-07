@@ -16,6 +16,7 @@ import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.form.SDialogPaymentChangeStatus;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
@@ -27,7 +28,6 @@ import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
 import erp.swap.form.SDialogPdfViewer;
-import erp.swap.form.SDocumentUtils;
 import erp.swap.utils.SDataRejectResource;
 import erp.swap.utils.SExportDataAuthActor;
 import erp.swap.utils.SExportUtils;
@@ -67,12 +67,9 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
-    
-    private static final String SUGGESTION_SPEED_UP = "\nIMPORTANTE:\nSi urge acelerar la actualización de esta modificación, haga clic en el botón ";
-    
     private JRadioButton jrbDateApp;
     private JRadioButton jrbDateReq;
     private JRadioButton jrbDateSched;
@@ -176,7 +173,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         jbAuthWebViewAuthLog = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")),
                 "Ver estatus de autorización de la solicitud en app web", this);
         jbAuthWebViewAuthComments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")),
-                "Ver historial de autorización de la orden en app web", this);
+                "Ver historial de autorización del pago en app web", this);
         jbAuthWebDownloadSupportFiles = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_down_ora.gif")),
                 "Descargar archivos de soporte de la solicitud", this);
         jbAuthWebClearSupportFiles = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_rem_ora.gif")),
@@ -686,7 +683,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
 
                                     if (payment.isSystem()) {
                                         miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                                + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
+                                                + SPaymentUtils.SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
                                     }
                                     else {
                                         miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' requiere enviarse nuevamente a autorizar de manera manual.\n"
@@ -709,7 +706,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                                     payment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
 
                                     miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                            + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
+                                            + SPaymentUtils.SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
                                     break;
 
                                 default:
@@ -790,71 +787,15 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
         if (jbPaymentMarkAsPaid.isEnabled()) {
             if (isRowDataUpdatableSelected()) {
                 try {
+                    if (moDialogPaymentChangeStatus == null) {
+                        moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
+                    }
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = payment.getFkStatusPaymentId(); // convenience variable
-
-                    if (status == SModSysConsts.FINS_ST_PAY_SCHED) {
-                        if (moDialogPaymentChangeStatus == null) {
-                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
-                        }
-
-                        moDialogPaymentChangeStatus.setFormCase(SDialogPaymentChangeStatus.CASE_MARK_AS_PAID);
-                        moDialogPaymentChangeStatus.setRegistry(payment);
-                        moDialogPaymentChangeStatus.setVisible(true);
-
-                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            Date date = (Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
-                            double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), payment.getFkCurrencyId(), date);
-                            double amount = (double) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
-                            int[] paymentBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
-                            int[] benefBankKey = (int[]) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
-                            SDbPaymentEntry singleEntry = payment.getSingleEntry();
-
-                            payment.setAuxReloadEntries(false);
-
-                            payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
-                            payment.setDateExecution_n(date);
-                            payment.setExecutedManually(true);
-                            payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
-                            
-                            if (paymentBankKey != null) {
-                                payment.setFkPayerCashBizPartnerBranchId_n(paymentBankKey[0]);
-                                payment.setFkPayerCashAccountingCashId_n(paymentBankKey[1]);    
-                            }
-                            else {
-                                payment.setFkPayerCashBizPartnerBranchId_n(0);
-                                payment.setFkPayerCashAccountingCashId_n(0);
-                            }
-                            
-                            if (benefBankKey != null) {
-                                payment.setFkBeneficiaryBankBizParterBranchId_n(benefBankKey[0]);
-                                payment.setFkBeneficiaryBankAccountCashId_n(benefBankKey[1]);
-                            }
-                            else {
-                                payment.setFkBeneficiaryBankBizParterBranchId_n(0);
-                                payment.setFkBeneficiaryBankAccountCashId_n(0);
-                            }
-
-                            payment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, singleEntry.getDocInstallment(), singleEntry.getDocBalancePreviousCy());
-
-                            miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                    + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
-
-                            payment.save(miClient.getSession());
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                    }
-                    else {
-                        switch (status) {
-                            case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            default:
-                                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                    }
+                    SPaymentUtils.markAsPaid((erp.client.SClientInterface) miClient, 
+                                                gridRow.getRowPrimaryKey(), 
+                                                moDialogPaymentChangeStatus, 
+                                                jbExportDataToSwapServices.getToolTipText(), 
+                                                mnGridType);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -933,7 +874,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED || status == SModSysConsts.FINS_ST_PAY_BLOC) {
                         String confirm = "La solicitud de pago '" + payment.getFolio()+ "' será cancelada, y esta acción no se puede revertir.\n"
                                 + "La solicitud de pago se eliminará de manera automática del " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                + SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.\n"
+                                + SPaymentUtils.SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.\n"
                                 + SGuiConsts.MSG_CNF_CONT;
 
                         if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.OK_OPTION) {

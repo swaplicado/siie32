@@ -5,17 +5,31 @@
  */
 package erp.mod.fin.view;
 
+import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.form.SDialogPaymentChangeStatus;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.view.SViewFilter;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -23,6 +37,7 @@ import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -31,9 +46,9 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés
+ * @author Isabel Servín, Sergio Flores, Adrián Avilés, Edwin Carmona
  */
-public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
+public class SViewPaymentStatus extends SGridPaneView implements ItemListener, ActionListener {
     
     public static final int DETAILED = 1;
     public static final int PENDING = 2;
@@ -47,6 +62,11 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SViewFilter moFilterFuncArea;
     private SViewFilter moFilterCurrency;
+
+    private JButton jbPaymentMarkAsPaid;
+    private JButton jbExportDataToSwapServices;
+
+    private SDialogPaymentChangeStatus moDialogPaymentChangeStatus;
     
     private boolean mbIsDetailed;
     private boolean mbIsPending;
@@ -83,7 +103,11 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
         moFilterFuncArea.initFilter(null);
         moFilterCurrency = new SViewFilter(miClient, this, SModConsts.CFGU_CUR);
         moFilterCurrency.initFilter(null);
-        
+
+        jbPaymentMarkAsPaid = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_close_to_qtn.gif")),
+                "Cambiar cuenta bancaria", this);
+        jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
+                "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PUR_PAYMENT, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
         if (mnGridSubtype == SModSysConsts.FINS_ST_PAY_EXEC || (mnGridSubtype == SModSysConsts.FINS_ST_PAY_EXEC && !mbIsPending)) {
             mbAppliesFilterDatePeriod = true;
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
@@ -103,6 +127,49 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterCurrency);
+        
+        if (mnGridSubtype == SModSysConsts.FINS_ST_PAY_EXEC) {
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPaymentMarkAsPaid);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExportDataToSwapServices);
+        }
+    }
+
+    private void actionPaymentMarkAsPaid() {
+        if (jbPaymentMarkAsPaid.isEnabled()) {
+            if (isRowDataUpdatableSelected()) {
+                try {
+                    if (moDialogPaymentChangeStatus == null) {
+                        moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
+                    }
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    SPaymentUtils.markAsPaid((erp.client.SClientInterface) miClient, 
+                                                    gridRow.getRowPrimaryKey(), 
+                                                    moDialogPaymentChangeStatus, 
+                                                    jbExportDataToSwapServices.getToolTipText(), 
+                                                    mnGridType);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+
+    private void actionExportDataToSwapServices() {
+        if (jbExportDataToSwapServices.isEnabled()) {
+            try {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+                miClient.getSession().notifySuscriptors(mnGridType);
+            }
+            catch (Exception e) {
+                SLibUtilities.printOutException(this, e);
+            }
+            finally {
+                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        }
     }
     
     @Override
@@ -315,6 +382,20 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener {
             
             if (radioButton == jrbDateApp || radioButton == jrbDateExec) {
                 refreshGridWithRefresh();
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+         if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbPaymentMarkAsPaid) {
+                actionPaymentMarkAsPaid();
+            }
+            else if (button == jbExportDataToSwapServices) {
+                actionExportDataToSwapServices();
             }
         }
     }

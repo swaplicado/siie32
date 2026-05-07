@@ -5,16 +5,24 @@
  */
 package erp.mod.itm.view;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.trn.form.SDialogItemPriceCardex;
 import erp.mod.trn.view.SViewMaterialRequest;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -28,12 +36,20 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Isabel Servin, Sergio Flores
+ * @author Isabel Servin, Sergio Flores, Edwin Carmona
  */
 public class SViewPriceCommercialLog extends SGridPaneView implements ActionListener {
     
-    JButton jbItemPriceCardex;
-    SDialogItemPriceCardex moDialogItemPriceCardex;
+    private JButton jbItemPriceCardex;
+    private JButton mjbToSearch;
+    private JButton mjbCleanSearch;
+    private JButton mjbSearchItemKey;
+    private JButton mjbViewDps;
+
+    private String msSeekQueryText;
+    private JTextField moTextToSearch;
+
+    private SDialogItemPriceCardex moDialogItemPriceCardex;
 
     /**
      * Creates view of Price commercial log.
@@ -47,7 +63,23 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
     
     private void initComponetsCustom() {
         jbItemPriceCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver tarjeta auxiliar de precios comerciales del ítem", this);
+        mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
+        mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
+        mjbSearchItemKey = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query_doc.gif")), "Filtrar ítem", this);
+        mjbViewDps = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Ver documento", this);
+        
+        moTextToSearch = new JTextField("");
+        moTextToSearch.setPreferredSize(new Dimension(150, 23));
+        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbItemPriceCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbSearchItemKey);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(new JPopupMenu.Separator());
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
+        
+        msSeekQueryText = "";
         
         moDialogItemPriceCardex = new SDialogItemPriceCardex(miClient, "Tarjeta auxiliar de precios comerciales del ítem");
     }
@@ -80,9 +112,103 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
         }
     }
 
+    private int[] getDpsPrimaryKey(int[] itemLogPk) {
+        String sql = "SELECT fk_dps_year_n, fk_dps_doc_n "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_PRICE_COMM_LOG) + " "
+                + "WHERE id_item = " + itemLogPk[0] + " AND id_unit = " + itemLogPk[1] + " AND id_log = " + itemLogPk[2] + " ";
+        ResultSet resultSet = null;
+        int[] dpsKey = null;
+        try {
+            resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                dpsKey = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SViewPriceCommercialLog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally {
+            try { resultSet.close(); } catch (Exception e) {}
+        }
+        return dpsKey != null ? dpsKey : new int[] { SLibConsts.UNDEFINED, SLibConsts.UNDEFINED };
+    }
+
+    private void actionSearch() {
+        if (jtTable.getRowCount() > 1) {
+            String text = moTextToSearch.getText().trim();
+            if (text.length() > 0) {
+                msSeekQueryText = "(DATE_FORMAT(v.dt, '%d/%m/%Y') LIKE '%" + text + "%' OR "
+                        + "DATE_FORMAT(d.dt, '%d/%m/%Y') LIKE '%" + text + "%' OR "
+                        + "i.item_key LIKE '%" + text + "%' OR "
+                        + "i.item LIKE '%" + text + "%' OR "
+                        + "u.symbol LIKE '%" + text + "%' OR "
+                        + "CONCAT(d.num_ser, "
+                        + " IF(LENGTH(d.num_ser) = 0, '', '-'), "
+                        + " d.num) LIKE '%" + text + "%' OR "
+                        + "b.bp LIKE '%" + text + "%' ";
+                
+                msSeekQueryText += ") ";
+            }
+            else {
+                msSeekQueryText = "";
+            }
+
+            moTextToSearch.requestFocus();
+            actionGridReload();
+        }
+    }
+    
+    private void actionCleanSearch() {
+        moTextToSearch.setText("");
+        msSeekQueryText = "";
+        moTextToSearch.requestFocus();
+        actionGridReload();
+    }
+    
+    private void actionFilterItem() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                String sItemKey = gridRow.getRowCode();
+                moTextToSearch.setText(sItemKey);
+                actionSearch();
+            }
+        }
+    }
+    
+    private void actionViewDps() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                int gui = SDataConstants.MOD_PUR;    // GUI module
+                int dpsKey[] = getDpsPrimaryKey(gridRow.getRowPrimaryKey());
+                if (dpsKey == null || dpsKey[0] == 0) {
+                    miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
+                    return;
+                }
+                ((SClientInterface) miClient).getGuiModule(gui).setFormComplement(SDataConstantsSys.TRNU_TP_DPS_PUR_INV);
+                ((SClientInterface) miClient).getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, dpsKey);
+            }
+        }
+    }
+
     @Override
     public void prepareSqlQuery() {
-        String sql = "";
+        String where = "";
         Object filter;
 
         moPaneSettings = new SGridPaneSettings(3);
@@ -92,7 +218,11 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
         
         filter = (Boolean) moFiltersMap.get(SGridConsts.FILTER_DELETED).getValue();
         if ((Boolean) filter) {
-            sql += (sql.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
+            where += (where.isEmpty() ? "" : "AND ") + "NOT v.b_del ";
+        }
+
+        if (msSeekQueryText.length() > 0) {
+            where += (where.isEmpty() ? "" : "AND ") + msSeekQueryText;
         }
         
         String from = "FROM (SELECT pcl.* " 
@@ -145,7 +275,7 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
                 + "v.fk_dps_year_n = d.id_year AND v.fk_dps_doc_n = d.id_doc " 
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON " 
                 + "d.fid_bp_r = b.id_bp " 
-                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + (where.isEmpty() ? "" : "WHERE " + where)
                 + "ORDER BY v.dt, i.item ";
     }
 
@@ -188,6 +318,18 @@ public class SViewPriceCommercialLog extends SGridPaneView implements ActionList
             
             if (button == jbItemPriceCardex) {
                 actionCardex();
+            }
+            else if (button == mjbToSearch) {
+                actionSearch();
+            }
+            else if (button == mjbCleanSearch) {
+                actionCleanSearch();
+            }
+            else if (button == mjbSearchItemKey) {
+                actionFilterItem();
+            }
+            else if (button == mjbViewDps) {
+                actionViewDps();
             }
         }
     }
