@@ -24,6 +24,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -184,6 +185,11 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         jftWorkingDate.setText("yyyy/mm/dd");
         jftWorkingDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jftWorkingDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jftWorkingDateActionPerformed(evt);
+            }
+        });
         jPanel6.add(jftWorkingDate);
 
         jbWorkingDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -329,8 +335,8 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-648)/2, (screenSize.height-434)/2, 648, 434);
+        setSize(new java.awt.Dimension(648, 434));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -338,14 +344,18 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        jcbCompanyBranch.requestFocus();
+        jcbCompanyBranch.requestFocusInWindow();
     }//GEN-LAST:event_formWindowOpened
+
+    private void jftWorkingDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jftWorkingDateActionPerformed
+        jbOk.requestFocusInWindow();
+    }//GEN-LAST:event_jftWorkingDateActionPerformed
 
     private void initComponentsExtra() {
         moFieldWorkingDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftWorkingDate, jlWorkingDate);
         moFieldWorkingDate.setPickerButton(jbWorkingDate);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldWorkingDate);
 
         jbOk.addActionListener(this);
@@ -354,6 +364,16 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         jcbCompanyBranch.addItemListener(this);
 
+        AbstractAction actionCompaniesKeyEnter = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jftWorkingDate.requestFocusInWindow();
+            }
+        };
+        
+        jcbCompanyBranch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterAction");
+        jcbCompanyBranch.getActionMap().put("enterAction", actionCompaniesKeyEnter);
+        
         AbstractAction actionOk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) { actionOk(); }
