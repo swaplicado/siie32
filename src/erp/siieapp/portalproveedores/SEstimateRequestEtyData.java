@@ -6,17 +6,47 @@
 package erp.siieapp.portalproveedores;
 
 /**
+ * Representa una partida de una solicitud de cotización.
+ * <p>
+ * Contiene el artículo solicitado, la cantidad y la unidad de medida
+ * correspondientes a una línea de la solicitud ({@link SEstimateRequestData}).
+ * </p>
  *
  * @author César Orozco
  */
 public class SEstimateRequestEtyData {
+
+    /**
+     * ID de la solicitud de cotización a la que pertenece esta partida.
+     */
     int idEstimateRequest;
+    /**
+     * Número de partida dentro de la solicitud.
+     */
     int idEty;
+    /**
+     * Cantidad solicitada.
+     */
     double qty;
+    /**
+     * ID del artículo solicitado.
+     */
     int idItem;
+    /**
+     * Nombre del artículo solicitado.
+     */
     String nameItem;
+    /**
+     * ID de la unidad de medida.
+     */
     int idUnit;
+    /**
+     * Nombre de la unidad de medida.
+     */
     String nameUnit;
+    /**
+     * Símbolo de la unidad de medida (ej. {@code kg}, {@code pza}).
+     */
     String symbol;
 
     public int getIdEstimateRequest() {

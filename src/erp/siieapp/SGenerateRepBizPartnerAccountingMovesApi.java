@@ -31,21 +31,52 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * Generador de reportes PDF de movimientos contables de asociados de negocios.
+ * 
+ * Utiliza JasperReports para generar reportes en PDF mostrando los movimientos
+ * contables de un asociado de negocios (proveedor) para un período específico.
+ * Integra datos del ERP incluyendo información de crédito, moneda y parámetros
+ * configurables del sistema.
+ * 
  * @author Adrian Aviles
+ * @version 1.0
  */
 public class SGenerateRepBizPartnerAccountingMovesApi {
 
+    /** Sesión del usuario para acceso a datos */
     private SGuiSession oSession;
 
+    /**
+     * Constructor que inicializa el generador con una sesión específica.
+     * @param session sesión del usuario
+     */
     public SGenerateRepBizPartnerAccountingMovesApi(SGuiSession session) {
         oSession = session;
     }
 
+    /**
+     * Constructor por defecto. Sesión será nula hasta que se configure.
+     */
     public SGenerateRepBizPartnerAccountingMovesApi() {
 
     }
 
+    /**
+     * Genera un reporte PDF con los movimientos contables de un asociado de negocios.
+     * 
+     * Obtiene información del asociado de negocios (proveedor) desde la base de datos,
+     * junto con parámetros del sistema y detalles de crédito. Llena un template
+     * JasperReports con estos datos y exporta el resultado como PDF.
+     * 
+     * Nota: Actualmente utiliza una conexión hardcodeada a IP 192.168.1.233 para
+     * un usuario y empresa específicos. Considerar parametrizar en futuras versiones.
+     * 
+     * @param pkBizPartner identificador del asociado de negocios (proveedor)
+     * @param sBd nombre de la base de datos
+     * @param year año fiscal para el cual generar el reporte
+     * @return contenido del PDF como arreglo de bytes
+     * @throws Exception si hay error en generación de reporte o acceso a datos
+     */
     public byte[] generateReportPdf(int pkBizPartner, String sBd, int year) throws Exception {
         try {
             Map<String, Object> map = null;

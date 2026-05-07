@@ -6,33 +6,113 @@
 package erp.siieapp.portalproveedores;
 
 /**
+ * Representa la cabecera de una orden de compra expuesta al portal de
+ * proveedores.
+ * <p>
+ * Contiene los datos generales del documento: proveedor, fechas, importes en
+ * moneda local y extranjera, y datos de identificación fiscal. Las partidas de
+ * la orden se manejan en {@link SPurcharseOrderEtyData}.
+ * </p>
  *
  * @author César Orozco
  */
 public class SPurcharseOrdersData {
+
+    /**
+     * Año fiscal del documento.
+     */
     int idYear;
+    /**
+     * ID del documento (orden de compra).
+     */
     int idDoc;
-    String  date;
+    /**
+     * Fecha del documento.
+     */
+    String date;
+    /**
+     * Fecha de inicio del crédito.
+     */
     String dateStartCred;
+    /**
+     * Fecha de entrega pactada del documento.
+     */
     String dateDocDelivery;
+    /**
+     * Serie del folio del documento.
+     */
     String serie;
+    /**
+     * Número de folio del documento.
+     */
     String folio;
+    /**
+     * Referencia completa del documento (serie + folio).
+     */
     String numRef;
+    /**
+     * Días de crédito pactados.
+     */
     int daysCred;
+    /**
+     * Tipo de cambio aplicado al documento.
+     */
     float excRate;
+    /**
+     * Subtotal en moneda local.
+     */
     double stot;
+    /**
+     * Impuestos trasladados en moneda local.
+     */
     double taxCharged;
+    /**
+     * Impuestos retenidos en moneda local.
+     */
     double taxRetained;
+    /**
+     * Total en moneda local.
+     */
     double tot;
+    /**
+     * Subtotal en moneda extranjera.
+     */
     double stotCur;
+    /**
+     * Impuestos trasladados en moneda extranjera.
+     */
     double taxChargedCur;
+    /**
+     * Impuestos retenidos en moneda extranjera.
+     */
     double taxRetainedCur;
+    /**
+     * Total en moneda extranjera.
+     */
     double totCur;
+    /**
+     * ID del socio de negocio (proveedor).
+     */
     int idBP;
+    /**
+     * Nombre del proveedor.
+     */
     String bp;
+    /**
+     * Nombre de la sucursal del proveedor.
+     */
     String bpb;
+    /**
+     * RFC o identificador fiscal del proveedor.
+     */
     String fiscalId;
+    /**
+     * Clave de la moneda del documento (ej. {@code USD}).
+     */
     String fCurKey;
+    /**
+     * Clave de la moneda local (ej. {@code MXN}).
+     */
     String fCurKeyLocal;
 
     public int getIdYear() {
@@ -130,7 +210,7 @@ public class SPurcharseOrdersData {
     public String getFolio() {
         return folio;
     }
-    
+
     public void setIdYear(int idYear) {
         this.idYear = idYear;
     }
@@ -225,5 +305,5 @@ public class SPurcharseOrdersData {
 
     public void setFolio(String folio) {
         this.folio = folio;
-    }    
+    }
 }
