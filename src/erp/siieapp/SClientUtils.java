@@ -57,7 +57,7 @@ public class SClientUtils {
     public SGuiSession setSession(String sjon) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet = null;
-        SMySqlClass mdb = new SMySqlClass(sjon);
+        SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
 
         if (conn == null) {
@@ -234,7 +234,7 @@ public class SClientUtils {
     public SGuiSession setSession(String sjon, String sConfig) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet = null;
-        SMySqlClass mdb = new SMySqlClass(sjon);
+        SMySqlClass mdb = new SMySqlClass();
         int idDB = 0;
         Connection conn = mdb.connect("", "", "", "", "");
 

@@ -1408,11 +1408,11 @@ public abstract class SExportDataUtils {
         for (SExportData oDps : lDps) {
             SExportDataDpsContainer wDps = (SExportDataDpsContainer) oDps;
             if (withJsonData || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_OK || wDps.document.authz_authorization == SSwapConsts.AUTHZ_STATUS_REJECTED) {
-                wDps.document.document_json = oSD.getDpsByPk(wDps.document.id_year,
-                        wDps.document.id_doc,
-                        wDps.document.company,
-                        withUrl,
-                        session);
+//                wDps.document.document_json = oSD.getDpsByPk(wDps.document.id_year,
+//                        wDps.document.id_doc,
+//                        wDps.document.company,
+//                        withUrl,
+//                        session);
             }
         }
 

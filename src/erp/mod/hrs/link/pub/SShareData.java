@@ -1,30 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package erp.mod.hrs.link.pub;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.mod.SModConsts;
-import erp.mod.cfg.swap.SPublicInterface;
-import erp.mod.cfg.swap.utils.SExportDataUser;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.link.utils.SPrepayroll;
 import erp.mod.hrs.link.utils.SUtilsJSON;
 import erp.mod.hrs.utils.SCAPResponse;
-import erp.mod.trn.api.data.SWebAuthorization;
-import erp.mod.trn.api.data.SWebDps;
-import erp.mod.trn.api.data.SWebDpsEty;
-import erp.mod.trn.api.data.SWebDpsFile;
-import erp.mod.trn.api.data.SWebDpsNote;
-import erp.mod.trn.api.data.SWebDpsRow;
-import erp.mod.trn.api.data.SWebMaterialRequest;
-import erp.mod.trn.api.db.STrnDBCore;
-import erp.mod.trn.api.db.STrnDBDocuments;
-import erp.mod.trn.api.db.STrnDBMaterialRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -52,366 +35,150 @@ import sa.lib.gui.SGuiSession;
 public class SShareData {
     
     public static String PATH_JSON_DIR = "prenomina/";
+
     public static String PATH_CSV_DIR = "prenomina/";
+
     public static String PATH_JSON_DESP_DIR = "vales/";
+
     public static String PATH_CSV_DESP_DIR = "vales/";
-    
-    private String msJsonConfig;
-    private SMySqlClass oMysql;
 
-    public SShareData() {
-        this.oMysql = null;
+    public void setJsonConn(String sjon) {
+        SMySqlClass.setJsonConn(sjon);
     }
-
-    public SShareData(String msJsonConfig) throws SConfigException {
-        this.msJsonConfig = msJsonConfig;
-        this.oMysql = new SMySqlClass(this.msJsonConfig);
-    }
-    
-    /**
-     * 
-     * @param sLastSyncDate
-     * @return JSON String
-     * {
-        lastSyncTimeStamp: time stamp (aaaa-MM-dd HH:mm:ss),
-        employees : [  
-                    {
-                        name: string,
-                        lastname: string,
-                        num_employee: integer,
-                        external_id: integer,
-                        admission_date: date,
-                        leave_date: date,
-                        company_id: integer,
-                        extra_time: boolean,
-                        way_pay: integer,
-                        is_active: boolean
-                    }
-                ],
-        firstDayOfYear: [{
-                            year: integer,
-                            date: date
-                        }],
-        absences: [
-                    {
-                        external_id: integer,
-                        num_incidents: integer,
-                        fecha_ini: date,
-                        fecha_fin: date,
-                        type_incident: integer,
-                        employee_id: integer,
-                        efective_day: integer
-                    }
-                ],
-        holidays: [
-                {
-                    name: string,
-                    year: integer,
-                    dt_date: date,
-                    application_date: date
-                }
-        ]
-    }
-     * @throws java.text.ParseException
-     * @throws java.sql.SQLException
-     * @throws java.lang.ClassNotFoundException
-     * @throws com.fasterxml.jackson.core.JsonProcessingException
-     * @throws erp.mod.hrs.link.db.SConfigException
-
-     */
-    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
+  
+    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         formatterd.parse(sLastSyncDate);
-        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-        return oUtils.getData(sLastSyncDate);
+
+        return SUtilsJSON.getData(sLastSyncDate);
     }
-    
-    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, ParseException, Exception {
+
+    public String getEmployeesSiieData() throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        return SUtilsJSON.getEmployeesSiieData();
+    }
+
+    public String getPGHData(String sJSon) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, org.json.simple.parser.ParseException {
         try {
-            //SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
-            //formatterd.parse(sLastSyncDate);
-            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-            return oUtils.getDataPGH(sJSon);
+            return SUtilsJSON.getDataPGH(sJSon);
         } catch (org.json.simple.parser.ParseException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
-            return ex.getMessage();
-        }
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, (Throwable)ex);
+          return ex.getMessage();
+        } 
+      }
+
+    public String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, IOException {
+        return SUtilsJSON.getPhotos(head);
     }
-    
-    /**
-     * Obtiene las fotos de los empleados subordinados del empleado que corresponde al id recibido.
-     * 
-     * {
-        "photos" : [ {
-          "photo" : null,
-          "idEmployee" : 4785,
-          "numEmployee" : 1426
-        }, {
-          "photo" : null,
-          "idEmployee" : 4359,
-          "numEmployee" : 1314
-        }, {
-          "photo" : null,
-          "idEmployee" : 5021,
-          "numEmployee" : 1512
-        }, {
-          "photo" : "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a\r\nHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy\r\nMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCABtAGQDASIA\r\nAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA\r\nAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3\r\nODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm\r\np6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA\r\nAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx\r\nBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK\r\nU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3\r\nuLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD34kAZ\r\nPSgHIz2pH+4fpSL9xcelAD6KQnAzjNV4ZhKPusr7QxRhyue36UAWKWs7UNRs9MtHur64jggTq8jY\r\nH09z7VwOq/GbR7RilhbT3bA/ec+Wv8if0FAm0j0/NJxXmeifGLSb7zBqcJstoyrIxkDe2AMg10ei\r\n+PPD2vXYtLO8xcNkLHKhQv8ATPWgXMjp1YOMjPpyMU+mDO7j7uOlPoKCiiigAooooAa3KH6Uif6t\r\nfoKeelMj/wBWv+6KAHVWvryDT7Ga8uX2QwoXdvQCrNeQfGnxG9tb2+iQtgSjzpyD1APyr+fNAm7H\r\nn3jnxvP4g1M3E7MlumVggVshB/ie5/CuMa8d/uwFQem5+f0qW0s5tW1ERRnnsSK9R0PwFaQRJJc5\r\n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\r\npcU1SSdwc21YKKKK1JP/2Q==",
-          "idEmployee" : 3774,
-          "numEmployee" : 1117
-        }
-     * }
-     * 
-     * @param head entero id del empleado "jefe" (id de siie)
-     * @return un string con el json que contiene las fotos de los empleados subordinados al recibido
-     * @throws SConfigException
-     * @throws ClassNotFoundException
-     * @throws SQLException
-     * @throws JsonProcessingException
-     * @throws IOException 
-     */
-    public String getPhotos(int head) throws SConfigException, ClassNotFoundException, SQLException, JsonProcessingException, IOException, Exception {
-        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-        return oUtils.getPhotos(head);
-    }
-    
-    /**
-     * 
-     * @param sURL
-     * @param tStartDate
-     * @param tEndDate
-     * @param lEmployees
-     * @param payType
-     * @param dataType Policy for requesting information from external time clock: 1 = all; 2 = official; 3 = non-official
-     * @param companyKey
-     * 
-     * @return 
-     */
-    public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
-                                    int payType, int dataType, String companyKey) {
+
+    public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, int payType, int dataType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            
-            String employees = lEmployees.stream().map(Object::toString)
-                                                .collect(Collectors.joining(","));
-            
-            String charset = java.nio.charset.StandardCharsets.UTF_8.name();
+            String employees = lEmployees.stream().map(Object::toString).collect(Collectors.joining(","));
+            String charset = StandardCharsets.UTF_8.name();
             String startDate = df.format(tStartDate);
             String endDate = df.format(tEndDate);
-            
-            String query = String.format("start_date=%s&end_date=%s&employees=%s&pay_type=%s&data_type=%s",
-                                    URLEncoder.encode(startDate, charset),
-                                    URLEncoder.encode(endDate, charset),
-                                    URLEncoder.encode(employees, charset),
-                                    URLEncoder.encode(payType + "", charset),
-                                    URLEncoder.encode(dataType + "", charset)
-                            );
-            
-            URLConnection connection = new URL(sURL + "?" + query).openConnection();
+            String query = String.format("start_date=%s&end_date=%s&employees=%s&pay_type=%s&data_type=%s", new Object[] { URLEncoder.encode(startDate, charset), 
+                URLEncoder.encode(endDate, charset), 
+                URLEncoder.encode(employees, charset), 
+                URLEncoder.encode(payType + "", charset), 
+                URLEncoder.encode(dataType + "", charset) });
+
+            URLConnection connection = (new URL(sURL + "?" + query)).openConnection();
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");
             InputStream response = connection.getInputStream();
-            
+
             try (Scanner scanner = new Scanner(response)) {
+                SPrepayroll prepayroll;
                 String responseBody = scanner.useDelimiter("\\A").next();
-                System.out.println("Respuesta desde " + sURL);
-//                System.out.println(responseBody);
-                
+                System.out.println(responseBody);
                 ObjectMapper mapper = new ObjectMapper();
-                SCAPResponse resp = mapper.readValue(responseBody, SCAPResponse.class);
+                SCAPResponse resp = (SCAPResponse)mapper.readValue(responseBody, SCAPResponse.class);
                 switch (resp.getCode()) {
-                    case SCAPResponse.RESPONSE_OK:
-                        SPrepayroll prepayroll = resp.getPrepayrollData();
-                        SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
-                        
+                    case 200:
+                        prepayroll = resp.getPrepayrollData();
+                        SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, 2);
                         return prepayroll;
-                        
-                    case SCAPResponse.RESPONSE_NOT_VOBO:
-                    case SCAPResponse.RESPONSE_ERROR:
-                        JOptionPane.showMessageDialog(null, resp.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                    case 500:
+                    case 550:
+                        JOptionPane.showMessageDialog(null, resp.getMessage(), "ERROR", 0);
                         break;
-                }
-            }
-        }
-        catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (MalformedURLException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (IOException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+                } 
+            } 
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
+        } 
+
         return null;
     }
-    
-    /**
-     * 
-     * @param sJsonInc
-     * @return 
-     */
-    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
-        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-        return oUtils.insertData(sJsonInc);
+
+    public String insertIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        return SUtilsJSON.insertData(sJsonInc);
     }
-    
-    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
-        SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-        return oUtils.cancelData(sJsonInc);
+
+    public String cancelIncidents(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        return SUtilsJSON.cancelData(sJsonInc);
     }
-    
-    /**
-     * 
-     * @param employees
-     * @return 
-     */
-    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
+
+    public String getMissingPhotos(String employees) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         try {
-            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-            return oUtils.missingPhotos(employees);
+            return SUtilsJSON.missingPhotos(employees);
         } catch (IOException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
             return null;
-        }
+        } 
     }
-    
-    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
+
+    public String getEarnings(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         try {
-            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-            return oUtils.earningData(sJsonInc);
+            return SUtilsJSON.earningData(sJsonInc);
         } catch (IOException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
             return null;
-        }
+        } 
     }
-    
-    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException, Exception {
-      try {
-            SUtilsJSON oUtils = new SUtilsJSON(this.oMysql);
-            return oUtils.personalData(idEmp);
+
+    public String getDataPersonal(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.personalData(idEmp);
         } catch (IOException ex) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
             return null;
         }
     }
-    
-    /**
-     * 
-     * @param startDate
-     * @param endDate
-     * @param idUser
-     * @param idSessionUser
-     * @param statusFilter
-     * @param idCompany
-     * @return 
-     * @throws java.lang.Exception 
-     */
-    public ArrayList<SWebDpsRow> getDpsList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
-        if (this.oMysql == null) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener los DPS");
-            throw new Exception("No existe la conexión a la base de datos al obtener los DPS");
-        }
-        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
-        ArrayList<SWebDpsRow> lDocs = oTrnCore.getDocuments(startDate, endDate, idUser, idSessionUser, statusFilter);
 
-        return lDocs;
-    }
-    
-    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idCompany, boolean withUrl, SGuiSession oSession) throws Exception {
-        if (this.oMysql == null && oSession == null) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener un DPS");
-            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
-        }
-        SWebDps oWebDocument = new SWebDps(idCompany, idYear, idDoc);
-        STrnDBCore oTrnCore;
-        STrnDBDocuments oDocCore;
-        if (this.oMysql != null) {
-            oTrnCore = new STrnDBCore(this.oMysql, idCompany);
-            oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
-        }
-        else {
-            oTrnCore = new STrnDBCore(oSession);
-            oDocCore = new STrnDBDocuments(oSession);
-        }
-        /**
-         * Se obtiene el DPS
-         */
-        SWebDpsRow oDps = oTrnCore.getDocumentByPk(idYear, idDoc);
-        if (oDps == null) {
+    public String getPersonalInfo(String idEmp) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.personalInfo(idEmp);
+        } catch (IOException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
             return null;
-        }
-        oWebDocument.setoDpsHeader(oDps);
-        
-        /**
-         * Entries del DPS
-         */
-        ArrayList<SWebDpsEty> lEties = oTrnCore.getWebDpsEtiesFull(idYear, idDoc, oWebDocument.getoDpsHeader().getDt());
-        oWebDocument.getlEtys().clear();
-        oWebDocument.getlEtys().addAll(lEties);
-
-        /**
-         * Notas del DPS
-         */
-        ArrayList<SWebDpsNote> lNotes = oTrnCore.getWebDpsNotes(idYear, idDoc);
-        oWebDocument.getlNotes().clear();
-        oWebDocument.getlNotes().addAll(lNotes);
-        
-        /**
-         * Documentos
-         */
-        // se manda el statement en null para que tome la conexión del JSON
-        ArrayList<SWebDpsFile> lDpsFiles = oDocCore.getDpsFiles(idYear, idDoc, withUrl, null, null);
-        oWebDocument.getlFiles().clear();
-        oWebDocument.getlFiles().addAll(lDpsFiles);
-        
-        /**
-         * Autorización
-         */
-        SWebAuthorization oAuthorization = oTrnCore.getAuthorization(SModConsts.TRN_DPS, idYear, idDoc);
-        oWebDocument.setoWebAuthorization(oAuthorization);
-        
-        return oWebDocument;
-    }
-    
-    public ArrayList<SWebMaterialRequest> getMaterialRequestList(String startDate, String endDate, Integer idUser, Integer idSessionUser, Integer statusFilter, Integer idCompany) throws Exception {
-        if (this.oMysql == null) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener una lista de requisiciones");
-            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
-        }
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(this.oMysql, idCompany);
-        ArrayList<SWebMaterialRequest> lMRs = oMatReqCore.getMatReqs(startDate, endDate, idUser, idSessionUser, statusFilter);
-
-        return lMRs;
+        } 
     }
 
-    public SWebMaterialRequest getMaterialRequestByPk(Integer idMaterialRequest, Integer idCompany) throws Exception {
-        if (this.oMysql == null) {
-            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener una Requisición");
-            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
-        }
-        STrnDBMaterialRequest oMatReqCore = new STrnDBMaterialRequest(this.oMysql, idCompany);
-        STrnDBCore oTrnCore = new STrnDBCore(this.oMysql, idCompany);
-        /**
-         * Se obtiene el DPS
-         */
-        SWebMaterialRequest oMatReq = oMatReqCore.getMatReqById(idMaterialRequest);
-        oMatReq.getlEtys().clear();
-        oMatReq.getlEtys().addAll(oMatReqCore.loadMaterialRequestEtys(oMatReq.getIdMaterialRequest()));
-
-        /**
-         * Autorización
-         */
-        SWebAuthorization oAuthorization = oTrnCore.getAuthorization(SModConsts.TRN_MAT_REQ, oMatReq.getIdMaterialRequest(), 0);
-        oMatReq.setoWebAuthorization(oAuthorization);
-
-        return oMatReq;
+    public String insertPersonalInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        return SUtilsJSON.insertPersonalInfo(sJsonInc);
     }
-    
-    public SExportDataUser getSupplierByFiscalId(String fiscalId) throws Exception {
-        SPublicInterface oInterface = new SPublicInterface(this.msJsonConfig);
-        
-        return oInterface.getSupplierByFiscalId(fiscalId);
+
+    public String getBreachInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.breachInfo(sJsonInc);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, (Throwable)ex);
+            return "fallo";
+        } 
+    }
+
+    public String getAdmRecInfo(String sJsonInc) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
+        try {
+            return SUtilsJSON.docAdmRecInfo(sJsonInc);
+        } catch (org.json.simple.parser.ParseException ex) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, (Throwable)ex);
+            return "fallo";
+        } 
     }
 }

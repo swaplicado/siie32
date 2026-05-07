@@ -29,17 +29,17 @@ public class SPublicInterface {
     String msMainDatabase;
 
     public SPublicInterface(String sjon) throws Exception {
-        try {
-            this.oDbObj = new SMySqlClass(sjon);
-            this.msMainDatabase = this.oDbObj.getMainDatabaseName(0);
-        }
-        catch (SConfigException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-            throw new Exception(ex.getMessage());
-        }
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            //this.oDbObj = new SMySqlClass(sjon);
+//            //this.msMainDatabase = this.oDbObj.getMainDatabaseName(0);
+//        }
+//        catch (SConfigException ex) {
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+//            throw new Exception(ex.getMessage());
+//        }
+//        catch (ClassNotFoundException ex) {
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     /**
@@ -48,22 +48,22 @@ public class SPublicInterface {
      * @return Objeto {@code Connection} si la conexión es exitosa, de lo contrario {@code null}.
      */
     private Connection getConnection(final int idCo) {
-        try {
+        //try {
             String db;
             if (idCo > 0) {
-                db = this.oDbObj.getMainDatabaseName(idCo);
+                //db = this.oDbObj.getMainDatabaseName(idCo);
             }
             else {
                 db = this.msMainDatabase;
             }
-            return this.oDbObj.connect("", "", db, "", "");
-        }
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            //return this.oDbObj.connect("", "", db, "", "");
+        //}
+//        catch (ClassNotFoundException ex) {
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        catch (SQLException ex) {
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         return null;
     }
@@ -99,7 +99,7 @@ public class SPublicInterface {
                                                             final String notes,
                                                             final double newAmount,
                                                             final String newDate) {
-        try {
+        //try {
             SResourceStatusResponse oResponse;
             Connection conn = this.getConnection(companyId);
 
@@ -113,21 +113,21 @@ public class SPublicInterface {
                 return oResponse;
             }
             
-            return SExportDataUtils.updateResourceStatus(conn.createStatement(), 
-                                                        this.oDbObj.getMainDatabaseName(companyId), 
-                                                        resourceType, 
-                                                        resourceId, 
-                                                        authStatusId,
-                                                        userId,
-                                                        notes,
-                                                        newAmount,
-                                                        newDate);
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SPublicInterface.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//            return SExportDataUtils.updateResourceStatus(conn.createStatement(), 
+//                                                        this.oDbObj.getMainDatabaseName(companyId), 
+//                                                        resourceType, 
+//                                                        resourceId, 
+//                                                        authStatusId,
+//                                                        userId,
+//                                                        notes,
+//                                                        newAmount,
+//                                                        newDate);
+        //}
+//        catch (SQLException ex) {
+//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(SPublicInterface.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         return null;
     }

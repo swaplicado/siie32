@@ -15,181 +15,114 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Edwin Carmona
- */
 public class SEmployeesUtils {
-    
-    private SMySqlClass oMysql;
-
-    public SEmployeesUtils(SMySqlClass oMysql) {
-        this.oMysql = oMysql;
-    }
-    
-    /**
-     * Obtiene los empleados subordinados que correspondan al id del empleado recibido
-     * 
-     * @param head entero correspondiente al id del empleado "jefe"
-     * 
-     * @return ArrayList<Integer> de los ids de los empleados subordinados
-     * 
-     * @throws SConfigException
-     * @throws ClassNotFoundException
-     * @throws SQLException 
-     */
     public ArrayList<Integer> getEmployeesOfHead(int head) throws SConfigException, ClassNotFoundException, SQLException {
-        Connection conn = this.oMysql.connect("", "", "", "", "");
-
-        if (conn == null) {
-            return null;
-        }
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
         
-        ArrayList<Integer> depts = this.getDeptsOfHead(head);
+        if (conn == null)
+            return null; 
         
+        ArrayList<Integer> depts = getDeptsOfHead(head);
         String sDepts = "";
-        for (Integer dept : depts) {
-            sDepts += dept + ",";
-        }
         
-        if (sDepts.isEmpty()) {
-            return new ArrayList<>();
-        }
+        for (Integer dept : depts)
+            sDepts = sDepts + dept + ","; 
+        
+        if (sDepts.isEmpty())
+            return new ArrayList<>(); 
         
         sDepts = sDepts.substring(0, sDepts.length() - 1);
-
-        String query = "SELECT " +
-                        "    id_emp " +
-                        "FROM " +
-                        "    erp.hrsu_emp " +
-                        "WHERE " +
-                        "    fk_dep IN (" + sDepts + ");";
-
+        String query = "SELECT     id_emp FROM     erp.hrsu_emp WHERE     fk_dep IN (" + sDepts + ");";
         ArrayList<Integer> lEmps = null;
+        
         try {
             Statement st = conn.createStatement();
-            
             ResultSet res = st.executeQuery(query);
-            
             lEmps = new ArrayList<>();
-            while (res.next()) {
-                lEmps.add(res.getInt("id_emp"));
-            }
-
+            
+            while (res.next())
+                lEmps.add(Integer.valueOf(res.getInt("id_emp"))); 
+            
             conn.close();
             st.close();
             res.close();
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, (String)null, ex);
             return new ArrayList<>();
         }
-
+        
         return lEmps;
     }
-    
-    /**
-     * Obtiene la lista de ids de departamentos al que el empleado tiene acceso
-     * 
-     * @param head
-     * 
-     * @return
-     * @throws SConfigException
-     * @throws ClassNotFoundException
-     * @throws SQLException 
-     */
+  
     private ArrayList<Integer> getDeptsOfHead(int head) throws SConfigException, ClassNotFoundException, SQLException {
-        Connection conn = this.oMysql.connect("", "", "", "", "");
-
-        if (conn == null) {
-            return null;
-        }
-
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+    
+        if (conn == null)
+            return null; 
+    
         String query = "SELECT id_dep FROM erp.hrsu_dep WHERE fk_emp_head_n = " + head + ";";
-
         ArrayList<Integer> lDepts = null;
-        
+    
         try {
             Statement st = conn.createStatement();
-            
             ResultSet res = st.executeQuery(query);
-            
             lDepts = new ArrayList<>();
-            while (res.next()) {
-                lDepts.add(res.getInt("id_dep"));
-            }
-
+            
+            while (res.next())
+                lDepts.add(Integer.valueOf(res.getInt("id_dep"))); 
+            
             conn.close();
             st.close();
             res.close();
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, (String)null, ex);
             return new ArrayList<>();
-        }
+        } 
         
         ArrayList<Integer> lAllDepts = new ArrayList<>();
-        for (Integer dept : lDepts) {
-            lAllDepts.addAll(this.getDeptsOfDept(dept));
-        }
+        
+        for (Integer dept : lDepts)
+            lAllDepts.addAll(getDeptsOfDept(dept.intValue())); 
         
         lAllDepts.addAll(lDepts);
-
         return lAllDepts;
-    }
-    
-    /**
-     * 
-     * @param dept
-     * @return
-     * @throws SConfigException
-     * @throws ClassNotFoundException
-     * @throws SQLException 
-     */
+  }
+  
     private ArrayList<Integer> getDeptsOfDept(int dept) throws SConfigException, ClassNotFoundException, SQLException {
-        Connection conn = this.oMysql.connect("", "", "", "", "");
-
-        if (conn == null) {
-            return null;
-        }
-
-        String query = "SELECT " +
-                        "    id_dep " +
-                        "FROM " +
-                        "    erp.hrsu_dep " +
-                        "WHERE " +
-                        "    fk_dep_sup_n = " + dept + ";";
-
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+        
+        if (conn == null)
+            return null; 
+        
+        String query = "SELECT     id_dep FROM     erp.hrsu_dep WHERE     fk_dep_sup_n = " + dept + ";";
         ArrayList<Integer> lDepts = null;
         
         try {
             Statement st = conn.createStatement();
-            
             ResultSet res = st.executeQuery(query);
-            
             lDepts = new ArrayList<>();
-            while (res.next()) {
-                lDepts.add(res.getInt("id_dep"));
-            }
-
+            
+            while (res.next())
+                lDepts.add(Integer.valueOf(res.getInt("id_dep"))); 
+            
             conn.close();
             st.close();
             res.close();
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(SEmployeesUtils.class.getName()).log(Level.SEVERE, (String)null, ex);
             return new ArrayList<>();
-        }
-        
+        } 
         ArrayList<Integer> depts = new ArrayList<>();
-        for (Integer iDept : lDepts) {
-            depts.addAll(this.getDeptsOfDept(iDept));
-        }
+        
+        for (Integer iDept : lDepts)
+            depts.addAll(getDeptsOfDept(iDept.intValue())); 
         
         depts.addAll(lDepts);
-
+        
         return depts;
     }
-    
-    
 }
+

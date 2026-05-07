@@ -42,7 +42,7 @@ public class STrnDBDocuments {
     
     public STrnDBDocuments(SMySqlClass oDbObj, int idCompany) throws Exception {
         this.oDbObj = oDbObj;
-        this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
+        //this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
         this.mnIdCompany = this.oDbObj.getMainBb();
         Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
     }
