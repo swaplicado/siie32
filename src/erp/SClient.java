@@ -773,7 +773,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         moIconDocType = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif"));
         moIconDocImport = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import.gif"));
         moIconDocImportCfd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"));
-        moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif"));
+        moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_dps.gif"));
         moIconDocImportMatReq = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_mat_req.gif"));
         moIconDocOpen = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif"));
         moIconDocClose = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif"));
@@ -2282,7 +2282,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
             case SLibConstants.ICON_DOC_IMPORT_CFD:
                 imageIcon = moIconDocImportCfd;
                 break;
-            case SLibConstants.ICON_DOC_IMPORT_CFD_ORD:
+            case SLibConstants.ICON_DOC_IMPORT_CFD_DPS:
                 imageIcon = moIconDocImportCfdOrd;
                 break;
             case SLibConstants.ICON_DOC_IMPORT_MAT_REQ:

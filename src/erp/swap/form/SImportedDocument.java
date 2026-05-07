@@ -91,8 +91,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     // Exception messages:
     
-    public static final String EXC_DOC_NOT_RECORDED = "Este documento no ha sido procesado, no tiene factura " + SSwapConsts.SIIE + ".";
-    public static final String EXC_DOC_ALREADY_RECORDED_IN_ = "Este documento ya fue procesado, tiene factura " + SSwapConsts.SIIE + " en la póliza contable: ";
+    public static final String EXC_DOC_NOT_RECORDED = "Este documento no ha sido procesado, no tiene registro en " + SSwapConsts.SIIE + ".";
+    public static final String EXC_DOC_ALREADY_RECORDED_IN_ = "Este documento ya fue procesado, tiene registro en " + SSwapConsts.SIIE + " en la póliza contable: ";
 
     public static final String EXC_PAY_NOT_REQUIRED = "Este documento no requiere pago.";
     public static final String EXC_PAY_NOT_REQUESTABLE = "Este documento no tiene información para solicitar su pago.";
@@ -106,7 +106,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
     private final SServicesUtils.ConfigSettings ConfigSettings;
     
-    public int DocumentType;
+    final public int DocumentType;
+    final public String DocumentName;
     public int ExternalDocumentId;
     public String ExternalDocumentUuid;
     public int BizPartnerId;
@@ -166,6 +167,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public int AuxPaymentType;
     /** Files of document: XML & PDF. */
     public File[] AuxFiles;
+    /** Available payment advances. */
     public SFinUtilities.Balance[] AuxAdvances;
     
     public int AccMethod;
@@ -185,6 +187,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         ConfigSettings = configSettings;
         
         DocumentType = documentType;
+        DocumentName = DocumentType == SDataConstantsSys.TRNX_TP_DPS_DOC ? "factura" : "nota de crédito";
         ExternalDocumentId = 0;
         ExternalDocumentUuid = "";
         BizPartnerId = 0;
@@ -244,6 +247,24 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         setMassAccountSettings(SDbSwapDataProcessing.ACC_METHOD_MANUAL, 0, 0, 0, 0, 0, 0);
     }
     
+    private int getTxnDocumentType() {
+        return SImportedDocument.getTxnDocumentType(DocumentType);
+    }
+    
+    private String getPrcDataType() {
+        return SImportedDocument.getPrcDataType(DocumentType);
+    }
+    
+    /**
+     * Set mass account settings.
+     * @param method
+     * @param accountId
+     * @param costCenterId
+     * @param itemId
+     * @param itemAuxId
+     * @param units
+     * @param unitId 
+     */
     public final void setMassAccountSettings(final int method, final int accountId, final int costCenterId, final int itemId, final int itemAuxId, double units, final int unitId) {
         AccMethod = method;
         AccAccountId = accountId;
@@ -459,40 +480,43 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get key of first reference if it matches the given reference type.
+     * Get key of first reference DPS key if it matches the given reference type.
      * @param client GUI client.
      * @param referenceType Reference type (SSwapConsts.TXN_REF_TYPE_...).
      * @return 
      * @throws java.lang.Exception 
      */
-    public int[] getFirstReferenceKey(final SGuiClient client, final int referenceType) throws Exception {
-        int[] orderKey = null;
+    public int[] getFirstReferenceDpsKey(final SGuiClient client, final int referenceType) throws Exception {
+        int[] referenceDpsKey = null;
         String refPrefix = "";
         
         switch (referenceType) {
             case SSwapConsts.TXN_REF_TYPE_ORDER:
                 refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
                 break;
+            case SSwapConsts.TXN_REF_TYPE_INVOICE:
+                refPrefix = "";
+                break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + referenceType + ".)");
         }
         
         if (hasReferences(referenceType)) {
-            SImportUtils.DpsKey orderDpsKey = References[0].createDpsKey();
+            SImportUtils.DpsKey dpsKey = References[0].createDpsKey();
 
-            if (orderDpsKey != null) {
-                orderKey = orderDpsKey.asKey();
+            if (dpsKey != null) {
+                referenceDpsKey = dpsKey.asKey();
             }
-            else {
-                SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
+            else if (referenceType == SSwapConsts.TXN_REF_TYPE_ORDER) {
+                SImportUtils.DpsFolio orderFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
 
-                if (orderDpsFolio != null) {
-                    orderKey = SDataUtilities.obtainDpsKey((SClientInterface) client, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+                if (orderFolio != null) {
+                    referenceDpsKey = SDataUtilities.obtainDpsKey((SClientInterface) client, orderFolio.Series, orderFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
                 }
             }
         }
         
-        return orderKey;
+        return referenceDpsKey;
     }
     
     /**
@@ -721,36 +745,36 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             // Validate DPS:
             
             if (dps.getDbmsRecordKey() == null) {
-                throw new Exception(prefix + "La factura a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
+                throw new Exception(prefix + "La " + DocumentName + " a vincular a este documento, '" + dps.getDpsNumber() + "', no está contabilizada.");
             }
             else if (BizPartnerId != dps.getFkBizPartnerId_r()) {
                 // business partner does not match:
                 throw new Exception(prefix + "El asociado de negocios de este documento, '" + BizPartner + "' (ID = " + BizPartnerId + "), "
-                        + "es distinto al de la factura a vincular '" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
+                        + "es distinto al de la " + DocumentName + " a vincular '" + (String) session.readField(SModConsts.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SDbRegistry.FIELD_NAME) + "' (ID = " + dps.getFkBizPartnerId_r() + ").");
             }
             else if (CurrencyId != dps.getFkCurrencyId()) {
                 // currency does not match:
                 throw new Exception(prefix + "La moneda de este documento, " + CurrencyCode + ", "
-                        + "es distinta a la de la factura a vincular, " + dps.getDbmsCurrencyCode() + ".");
+                        + "es distinta a la de la " + DocumentName + " a vincular, " + dps.getDbmsCurrencyCode() + ".");
             }
             else if ((AuxPaymentType == SDataConstantsSys.TRNS_TP_PAY_CASH && AuxPaymentType != dps.getFkPaymentTypeId()) &&
                     (paymentTypeMatchigPolicy == MATCH_PAY_TP_MAND || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONF_DIFF &&
-                    session.getClient().showMsgBoxConfirm("Este documento es de contado, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
+                    session.getClient().showMsgBoxConfirm("Este documento es de contado, pero la " + DocumentName + " a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
-                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de contado.");
+                throw new Exception(prefix + "Tanto este documento como la " + DocumentName + " a vincular, '" + dps.getDpsNumber() + "', deben ser de contado.");
             }
             else if ((AuxPaymentType == SDataConstantsSys.TRNS_TP_PAY_CREDIT && AuxPaymentType != dps.getFkPaymentTypeId()) &&
                     (paymentTypeMatchigPolicy == MATCH_PAY_TP_MAND || (paymentTypeMatchigPolicy == MATCH_PAY_TP_CONF_DIFF &&
-                    session.getClient().showMsgBoxConfirm("Este documento es de crédito, pero la factura a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
+                    session.getClient().showMsgBoxConfirm("Este documento es de crédito, pero la " + DocumentName + " a vincular '" + dps.getDpsNumber() + "' no lo es.\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION))) {
-                throw new Exception(prefix + "Tanto este documento como la factura a vincular, '" + dps.getDpsNumber() + "', deben ser de crédito.");
+                throw new Exception(prefix + "Tanto este documento como la " + DocumentName + " a vincular, '" + dps.getDpsNumber() + "', deben ser de crédito.");
             }
             else if (!SLibUtils.compareAmount(Total, dps.getTotalCy_r()) && (
                     (Math.abs(Total - dps.getTotalCy_r()) < 1d && session.getClient().showMsgBoxConfirm(
-                            "Hay una diferencia entre el total de este documento y el de la factura a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
+                            "Hay una diferencia entre el total de este documento y el de la " + DocumentName + " a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION) ||
                     (Math.abs(Total - dps.getTotalCy_r()) >= 1d && Total > dps.getTotalCy_r() && (!allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
-                            "El total de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
+                            "El total de la " + DocumentName + " a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 /*
                 total does not match AND
@@ -758,21 +782,21 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 (absolute difference is >= $1.00 AND this total is > document's AND (no greater invoices allowed OR user user doesn't accept))
                 */
                 throw new Exception(prefix + "El total de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
-                        + "es distinto al de la factura a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
+                        + "es distinto al de la " + DocumentName + " a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
             else if ((!allowLaterInvoice && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
-                    (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la factura a vincular, "
+                    (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la " + DocumentName + " a vincular, "
                             + SLibUtils.DateFormatDate.format(dps.getDate()) + ", es posterior a la de este documento, " + SLibUtils.DateFormatDate.format(Date) + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 // match required:
                 throw new Exception(prefix + "La fecha de este documento, " + SLibUtils.DateFormatDate.format(Date) + ", "
-                        + "es distinta a la de la factura a vincular, " + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
+                        + "es distinta a la de la " + DocumentName + " a vincular, " + SLibUtils.DateFormatDate.format(dps.getDate()) + ".");
             }
             else {
                 if (!ommitNumberValidation) {
                     // validate folio of document:
 
-                    String msgChooseOtherInvoice = "Favor de elegir una factura distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
+                    String msgChooseOtherInvoice = "Favor de elegir una " + DocumentName + " distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
                     // check folio number: it must match its counterpart in document, in DPS it is allways available:
 
@@ -787,7 +811,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                         if (!Number.toUpperCase().equals(dps.getNumber().toUpperCase())) {
                             // match required:
-                            msgError = msgMatter + "es distinto al de la factura a vincular, '" + dps.getNumber() + "'.";
+                            msgError = msgMatter + "es distinto al de la " + DocumentName + " a vincular, '" + dps.getNumber() + "'.";
                         }
                     }
                     else {
@@ -800,23 +824,23 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                             // match required:
                             msgError = " ni UUID,\n"
-                                    + "mientras que el número de folio de la factura a vincular es '" + dps.getNumber() + "'.";
+                                    + "mientras que el número de folio de la " + DocumentName + " a vincular es '" + dps.getNumber() + "'.";
                         }
                         else {
                             // UUID available, attempt to find similitudes:
 
                             if (ExternalDocumentUuid.toUpperCase().equals(dps.getNumber().toUpperCase())) {
                                 msgConfirm = msgMatter + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
-                                        + "es igual al número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                                        + "es igual al número del folio de la " + DocumentName + " a vincular, '" + dps.getNumber() + "'.";
                             }
                             else if (dps.getNumber().length() >= DCfdVer4Consts.LEN_UUID_1ST_SEGMENT && dps.getNumber().length() < ExternalDocumentUuid.length() && ExternalDocumentUuid.toUpperCase().startsWith(dps.getNumber().toUpperCase())) {
                                 msgConfirm = msgMatter + ", pero su UUID, '" + ExternalDocumentUuid + "',\n"
-                                        + "inicia como el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                                        + "inicia como el número del folio de la " + DocumentName + " a vincular, '" + dps.getNumber() + "'.";
                             }
                             else {
                                 // match required:
                                 msgError = msgMatter + ", y su UUID, '" + ExternalDocumentUuid + "',\n"
-                                        + "no tiene similitud con el número del folio de la factura a vincular, '" + dps.getNumber() + "'.";
+                                        + "no tiene similitud con el número del folio de la " + DocumentName + " a vincular, '" + dps.getNumber() + "'.";
                             }
                         }
                     }
@@ -828,7 +852,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     }
                     else if (!msgConfirm.isEmpty()) {
                         if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                                + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                                + "Sin embargo, es posible vincular la " + DocumentName + " '" + dps.getDpsNumber() + "' a este documento.\n"
                                 + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                             throw new Exception(msgChooseOtherInvoice);
                         }
@@ -847,11 +871,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
                         if (!NumberSeries.toUpperCase().equals(dps.getNumberSeries().toUpperCase())) {
                             // match required:
-                            msgError = msgMatter + "es distinta a la de la factura a vincular, '" + dps.getNumberSeries()+ "'.";
+                            msgError = msgMatter + "es distinta a la de la " + DocumentName + " a vincular, '" + dps.getNumberSeries()+ "'.";
                         }
                         else if (dps.getNumberSeries().isEmpty()) {
                             // match required:
-                            msgConfirm = msgMatter + "no corresponde a la de la factura a vincular porque esta carece de serie.";
+                            msgConfirm = msgMatter + "no corresponde a la de la " + DocumentName + " a vincular porque esta carece de serie.";
                         }
                     }
                     else {
@@ -860,7 +884,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         msgMatter = "Este documento no tiene serie de folio";
 
                         if (!dps.getNumberSeries().isEmpty()) {
-                            msgConfirm = msgMatter + ", y no corresponde a la de la factura a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
+                            msgConfirm = msgMatter + ", y no corresponde a la de la " + DocumentName + " a vincular porque su serie es '" + dps.getNumberSeries() + "'.";
                         }
                     }
 
@@ -871,7 +895,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     }
                     else if (!msgConfirm.isEmpty()) {
                         if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
-                                + "Sin embargo, es posible vincular la factura '" + dps.getDpsNumber() + "' a este documento.\n"
+                                + "Sin embargo, es posible vincular la " + DocumentName + " '" + dps.getDpsNumber() + "' a este documento.\n"
                                 + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                             throw new Exception(msgChooseOtherInvoice);
                         }
@@ -906,7 +930,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 SDbSwapDataProcessing swapDataProcessing = new SDbSwapDataProcessing();
 
                 //swapDataProcessing.setPkSwapDataProcessingId(...);
-                swapDataProcessing.setDataType(SDbSwapDataProcessing.DATA_TYPE_INV);
+                swapDataProcessing.setDataType(getPrcDataType());
                 swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
                 swapDataProcessing.setExternalDataId(ExternalDocumentId);
                 swapDataProcessing.setExternalDataUuid(ExternalDocumentUuid);
@@ -977,7 +1001,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     File[] files = AuxFiles; // re-use existing files, if available
                     
                     if (files == null || files.length != SImportUtils.CFDI_FILES) {
-                        files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+                        files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getTxnDocumentType());
                     }
                     
                     if (files != null && files.length == SImportUtils.CFDI_FILES) {
@@ -1080,16 +1104,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Retrieve document existing provessiog.
+     * Retrieve document's existing processiog data.
      * @param session GUI session.
-     * @param preparedStatement Prepared statement.
-     * @param dataType Constants DATA_TYPE...: INV = invoice; DB = debit note; CN = credit note.
+     * @param prepStatement Prepared statement.
+     * @param dataType Supported options: SDbSwapDataProcessing.DATA_TYPE_INV and SDbSwapDataProcessing.DATA_TYPE_CN.
      * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
      * @param externalId External ID.
      * @throws Exception 
      */
-    public void retrieveProcessing(final SGuiSession session, final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
-        ProcessedDps = SImportedDocument.getProcessedDpsByExternalId(preparedStatement, dataType, txnCategory, externalId);
+    public void retrieveProcessing(final SGuiSession session, final PreparedStatement prepStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+        ProcessedDps = SImportedDocument.getProcessedDpsByExternalId(prepStatement, dataType, txnCategory, externalId);
 
         if (ProcessedDps != null) {
             SwapDataProcessing = (SDbSwapDataProcessing) session.readRegistry(SModConsts.TRN_SWAP_DATA_PRC, new int[] { ProcessedDps.SwapDataProcessingId });
@@ -1444,16 +1468,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         if (files == null) {
             boolean isBizPartnerDomestic = isBizPartnerDomestic(session.getClient());
             
-            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, SSwapConsts.TXN_DOC_TYPE_INVOICE);
+            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getTxnDocumentType());
 
             if (files == null || files.length != SImportUtils.CFDI_FILES) {
-                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta factura autorizada.");
+                throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta " + DocumentName + " autorizada.");
             }
             else if (isBizPartnerDomestic && files[SImportUtils.CFDI_XML_IDX] == null) {
-                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta factura autorizada.");
+                throw new Exception("No se pudo descargar o no existe el archivo XML del CFDI de esta " + DocumentName + " autorizada.");
             }
             else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
-                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta factura autorizada.");
+                throw new Exception("No se pudo descargar o no existe el archivo PDF de esta " + DocumentName + " autorizada.");
             }
 
             // copy files to local temporal directory:
@@ -1553,13 +1577,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         info += "\nCarga:";
         info += "\n+ realizada por: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy) + ";";
-        info += "\n+ realizada el " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
         info += "\nRevisión:";
         info += "\n+ realizada por: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy) + ";";
-        info += "\n+ realizada el " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
         info += "\nAutorización:";
         info += "\n+ realizada por: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy) + ";";
-        info += "\n+ realizada el " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
         
         return info;
     }
@@ -1794,9 +1818,96 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     
     /**
-     * Create prepared statement to get Processed DPS from SWAP processed data by its external ID.
+     * Get GUI document type for the given DPS type.
+     * @param dpsTypeKey DPS type key.
+     * @return When DPS type key is supported, either SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes), otherwise SLibConstants.UNDEFINED.
+     */
+    public static int getDocumentType(final int[] dpsTypeKey) {
+        int type = SLibConstants.UNDEFINED;
+        
+        if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_INV)) {
+            type = SDataConstantsSys.TRNX_TP_DPS_DOC;
+        }
+        else if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
+            type = SDataConstantsSys.TRNX_TP_DPS_ADJ;
+        }
+            
+        return type;
+    }
+    
+    /**
+     * Get SWAP Services transactions document type for the given GUI document type.
+     * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static int getTxnDocumentType(final int documentType) {
+        int type = 0;
+        
+        switch (documentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SSwapConsts.TXN_DOC_TYPE_INVOICE;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
+    }
+    
+    /**
+     * Get standard SWAP reference type for the given GUI document type.
+     * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static int getStdReferenceType(final int documentType) {
+        int type = 0;
+        
+        switch (documentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SSwapConsts.TXN_REF_TYPE_ORDER;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SSwapConsts.TXN_REF_TYPE_INVOICE;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
+    }
+    
+    /**
+     * Get SWAP processing data type for the given GUI document type.
+     * @param documentType TUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static String getPrcDataType(final int documentType) {
+        String type = "";
+        
+        switch (documentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SDbSwapDataProcessing.DATA_TYPE_INV;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SDbSwapDataProcessing.DATA_TYPE_CN;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
+    }
+    
+    /**
+     * Create prepared statement to get Processed DPS, by its external ID, from SWAP processed data.
      * @param statement DB statement.
-     * @return A prepared statment with these columns: id_swap_data_prc, dps_id_year, dps_id_doc, rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code.
+     * @return A prepared statment with these columns:
+     * id_swap_data_prc, dps_id_year, dps_id_doc, dps_folio, dps_date, dps_tot_cur, dps_cur_code,
+     * rec_id_year, rec_id_per, rec_id_bkc, rec_id_tp_rec, rec_id_num, rec_cob_code,
+     * id_usr, usr, id_cfd, and pdf.doc_pdf_name.
      * @throws Exception 
      */
     public static PreparedStatement createPrepStatementToGetProcessedDpsByExternalId(final Statement statement) throws Exception {
@@ -1827,40 +1938,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get Processed DPS from SWAP processed data, if any, by its external ID.
-     * @param preparedStatement Prepared statement.
-     * @param dataType Constants DATA_TYPE...: INV = invoice; DB = debit note; CN = credit note.
-     * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
-     * @param externalId External ID.
-     * @return A Processed DPS if found, otherwise <code>null</code>.
-     * @throws Exception 
-     */
-    public static SImportedDocument.ProcessedDps getProcessedDpsByExternalId(final PreparedStatement preparedStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
-        SImportedDocument.ProcessedDps processedDps = null;
-        
-        preparedStatement.setString(1, dataType);
-        preparedStatement.setInt(2, txnCategory);
-        preparedStatement.setInt(3, externalId);
-        
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                processedDps = new SImportedDocument.ProcessedDps(resultSet.getInt("id_swap_data_prc"), resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), resultSet.getString("dps_folio"), resultSet.getDate("dps_date"), resultSet.getDouble("dps_tot_cur"), resultSet.getString("dps_cur_code"), 
-                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"), 
-                        resultSet.getInt("un.id_usr"), resultSet.getString("un.usr"), resultSet.getInt("id_cfd") != 0, resultSet.getString("doc_pdf_name") != null);
-            }
-        }
-        
-        return processedDps;
-    }
-    
-    /**
-     * Create prepared statement to get Processed DPS from Payable or Receivable Accounts by its own document data.
+     * Create prepared statement to get DPS primary key, by its own document data, from Payable or Receivable Accounts.
      * @param statement DB statement.
      * @param dpsTypeKey Key of DPS type: (category, class & type).
-     * @return A prepared statment with these columns: dps_id_year and dps_id_doc.
+     * @return A prepared statment with these columns:
+     * dps_id_year and dps_id_doc.
      * @throws Exception 
      */
-    public static PreparedStatement createPrepStatementToGetDpsKeyByDocData(final Statement statement, final int[] dpsTypeKey) throws Exception {
+    public static PreparedStatement createPrepStatementToGetDpsKeyByDocumentData(final Statement statement, final int[] dpsTypeKey) throws Exception {
         String sql = "SELECT d.id_year AS dps_id_year, d.id_doc AS dps_id_doc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                 + "WHERE NOT d.b_del AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
@@ -1871,40 +1956,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get DPS primary key from Payable or Receivable Accounts, if any, by its own document data.
-     * @param preparedStatement Prepared statement.
-     * @param bizPartnerId Document's ID of business partner.
-     * @param date Document's date.
-     * @param numberSeries Document's folio series.
-     * @param number Document's folio number.
-     * @param total Document's net total.
-     * @param currencyId Document's ID of currency.
-     * @return A DPS primary key if found, otherwise <code>null</code>.
-     * @throws Exception 
-     */
-    public static int[] getDpsKeyByDocData(final PreparedStatement preparedStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
-        int[] dpsKey = null;
-        
-        preparedStatement.setInt(1, bizPartnerId);
-        preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
-        preparedStatement.setString(3, numberSeries);
-        preparedStatement.setString(4, number);
-        preparedStatement.setDouble(5, total);
-        preparedStatement.setInt(6, currencyId);
-        
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                dpsKey = new int[] { resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc") };
-            }
-        }
-        
-        return dpsKey;
-    }
-    
-    /**
      * Create prepared statement to get DPS handling data: creation and authorization.
      * @param statement DB statement.
-     * @return A prepared statment with these columns: created_by (java.lang.String), created_at (java.sql.Date), authorized_by (java.lang.String), authorized_at (java.sql.Date).
+     * @return A prepared statment with these columns:
+     * created_by (java.lang.String), created_at (java.sql.Date), authorized_by (java.lang.String) and authorized_at (java.sql.Date).
      * @throws Exception 
      */
     public static PreparedStatement createPrepStatementToGetDpsHandlingData(final Statement statement) throws Exception {
@@ -1919,13 +1974,72 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Create a basic and elemental version of an imported document from SWAP data processed DPS to be used in SFormDps.
+     * Get Processed DPS, by its external ID, from SWAP processed data.
+     * @param prepStatement Prepared statement.
+     * @param dataType Supported options: SDbSwapDataProcessing.DATA_TYPE_INV and SDbSwapDataProcessing.DATA_TYPE_CN.
+     * @param txnCategory Transaction category: 1 = purchase; 2 = sales.
+     * @param externalId External ID.
+     * @return A Processed DPS if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static SImportedDocument.ProcessedDps getProcessedDpsByExternalId(final PreparedStatement prepStatement, final String dataType, final int txnCategory, final int externalId) throws Exception {
+        SImportedDocument.ProcessedDps processedDps = null;
+        
+        prepStatement.setString(1, dataType);
+        prepStatement.setInt(2, txnCategory);
+        prepStatement.setInt(3, externalId);
+        
+        try (ResultSet resultSet = prepStatement.executeQuery()) {
+            if (resultSet.next()) {
+                processedDps = new SImportedDocument.ProcessedDps(resultSet.getInt("id_swap_data_prc"), resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc"), resultSet.getString("dps_folio"), resultSet.getDate("dps_date"), resultSet.getDouble("dps_tot_cur"), resultSet.getString("dps_cur_code"), 
+                        resultSet.getInt("rec_id_year"), resultSet.getInt("rec_id_per"), resultSet.getInt("rec_id_bkc"), resultSet.getString("rec_id_tp_rec"), resultSet.getInt("rec_id_num"), resultSet.getString("rec_cob_code"), 
+                        resultSet.getInt("un.id_usr"), resultSet.getString("un.usr"), resultSet.getInt("id_cfd") != 0, resultSet.getString("doc_pdf_name") != null);
+            }
+        }
+        
+        return processedDps;
+    }
+    
+    /**
+     * Get DPS primary key, by its own document data, from Payable or Receivable Accounts.
+     * @param prepStatement Prepared statement.
+     * @param bizPartnerId Document's ID of business partner.
+     * @param date Document's date.
+     * @param numberSeries Document's folio series.
+     * @param number Document's folio number.
+     * @param total Document's net total.
+     * @param currencyId Document's ID of currency.
+     * @return A DPS primary key if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public static int[] getDpsKeyByDocumentData(final PreparedStatement prepStatement, final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) throws Exception {
+        int[] dpsKey = null;
+        
+        prepStatement.setInt(1, bizPartnerId);
+        prepStatement.setDate(2, new java.sql.Date(date.getTime()));
+        prepStatement.setString(3, numberSeries);
+        prepStatement.setString(4, number);
+        prepStatement.setDouble(5, total);
+        prepStatement.setInt(6, currencyId);
+        
+        try (ResultSet resultSet = prepStatement.executeQuery()) {
+            if (resultSet.next()) {
+                dpsKey = new int[] { resultSet.getInt("dps_id_year"), resultSet.getInt("dps_id_doc") };
+            }
+        }
+        
+        return dpsKey;
+    }
+    
+    /**
+     * Create a minimal version of an imported document from SWAP data processed DPS to be used in SFormDps.
      * @param statement DB statement.
+     * @param dataType Data type, supported options: SDbSwapDataProcessing.DATA_TYPE_...
      * @param dpsKey DPS key.
      * @return 
      * @throws java.lang.Exception 
      */
-    public static SImportedDocument createBasicImportedDocumentFromProcessedDps(final Statement statement, final int[] dpsKey) throws Exception {
+    public static SImportedDocument createImportedDocumentFromProcessedDps(final Statement statement, final String dataType, final int[] dpsKey) throws Exception {
         SImportedDocument importedDocument = null;
         
         String sql = "SELECT sdp.ext_data_id, sdp.ext_data_uuid, sdp.dps_refs, sdp.dps_descrip, "
@@ -1939,7 +2053,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC) + " AS f ON f.id_func = d.fid_func "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_FUNC_SUB) + " AS fs ON fs.id_func_sub = d.fid_func_sub "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dc ON dc.id_year = d.id_year AND dc.id_doc = d.id_doc "
-                + "WHERE NOT sdp.b_del AND sdp.data_type = '" + SDbSwapDataProcessing.DATA_TYPE_INV + "' "
+                + "WHERE NOT sdp.b_del AND sdp.data_type = '" + dataType + "' "
                 + "AND sdp.fk_dps_year_n = " + dpsKey[0] + " AND sdp.fk_dps_doc_n = " + dpsKey[1] + ";";
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
@@ -1994,21 +2108,25 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get document type for the given DPS type.
-     * @param dpsTypeKey DPS type key.
-     * @return When DPS type key is supported, either SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes), otherwise SLibConstants.UNDEFINED.
+     * In-memory minimal DPS.
      */
-    public static int getDocumentType(final int[] dpsTypeKey) {
-        int type = SLibConstants.UNDEFINED;
+    public static class MinimalDps {
         
-        if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_INV)) {
-            type = SDataConstantsSys.TRNX_TP_DPS_DOC;
+        public int BizPartnerId;
+        public Date Date;
+        public String NumberSeries;
+        public String Number;
+        public double Total;
+        public int CurrencyId;
+        
+        public MinimalDps(final int bizPartnerId, final Date date, final String numberSeries, final String number, final double total, final int currencyId) {
+            BizPartnerId = bizPartnerId;
+            Date = date;
+            NumberSeries = numberSeries;
+            Number = number;
+            Total = total;
+            CurrencyId = currencyId;
         }
-        else if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_CN)) {
-            type = SDataConstantsSys.TRNX_TP_DPS_ADJ;
-        }
-            
-        return type;
     }
     
     /**
@@ -2094,24 +2212,103 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         public String Reference;
         public int DpsYearId;
         public int DpsDocId;
+        public int DocExternalId;
         
         public String ReferenceCreatedBy;
         public Date ReferenceCreatedAt;
         public String ReferenceAuthorizedBy;
         public Date ReferenceAuthorizedAt;
         
-        public Reference(final int referenceType, final String reference, final int dpsYearId, final int dpsDocId, final PreparedStatement prepStatementToGetDpsHandlingData) {
+        /**
+         * Create a new reference.
+         * @param referenceType Reference type, supported options in SSwapConsts.TXN_REF_TYPE_...
+         * @param reference Reference.
+         * @param dpsKey DPS primary key of the reference.
+         * @param prepStatementToGetDpsHandlingData Prepared statement to get DPS handling data.
+         */
+        public Reference(final int referenceType, final String reference, final int[] dpsKey,
+                final PreparedStatement prepStatementToGetDpsHandlingData) {
+            this(referenceType, reference, dpsKey, 0, null, null, null, prepStatementToGetDpsHandlingData);
+        }
+        
+        /**
+         * Create a new reference.
+         * @param referenceType Reference type, supported options in SSwapConsts.TXN_REF_TYPE_...
+         * @param reference Reference.
+         * @param docExternalId Document external ID (that of SWAP Services).
+         * @param minimalDps Minimal DPS data, as a second option to search for DPS.
+         * @param prepStatementToGetProcessedDpsByExternalId Prepared statement to get Processed DPS, by its external ID, from SWAP processed data.
+         * @param prepStatementToGetDpsKeyByDocumentData Prepared statement to get DPS primary key, by its own document data, from Payable or Receivable Accounts.
+         * @param prepStatementToGetDpsHandlingData Prepared statement to get DPS handling data: creation and authorization.
+         */
+        public Reference(final int referenceType, final String reference, final int docExternalId, SImportedDocument.MinimalDps minimalDps,
+                final PreparedStatement prepStatementToGetProcessedDpsByExternalId, final PreparedStatement prepStatementToGetDpsKeyByDocumentData, final PreparedStatement prepStatementToGetDpsHandlingData) {
+            this(referenceType, reference, null, docExternalId, minimalDps, prepStatementToGetProcessedDpsByExternalId, prepStatementToGetDpsKeyByDocumentData, prepStatementToGetDpsHandlingData);
+        }
+        
+        /**
+         * Create a new reference.
+         * @param referenceType Reference type, supported options in SSwapConsts.TXN_REF_TYPE_...
+         * @param reference Reference.
+         * @param dpsKey DPS primary key of the reference.
+         * @param docExternalId Document external ID (that of SWAP Services).
+         * @param minimalDps Minimal DPS data, as a second option to search for DPS.
+         * @param prepStatementToGetProcessedDpsByExternalId Prepared statement to get Processed DPS, by its external ID, from SWAP processed data.
+         * @param prepStatementToGetDpsKeyByDocumentData Prepared statement to get DPS primary key, by its own document data, from Payable or Receivable Accounts.
+         * @param prepStatementToGetDpsHandlingData Prepared statement to get DPS handling data: creation and authorization.
+         */
+        private Reference(final int referenceType, final String reference, final int[] dpsKey, final int docExternalId, SImportedDocument.MinimalDps minimalDps,
+                final PreparedStatement prepStatementToGetProcessedDpsByExternalId, final PreparedStatement prepStatementToGetDpsKeyByDocumentData, final PreparedStatement prepStatementToGetDpsHandlingData) {
             ReferenceType = referenceType;
             Reference = reference;
-            DpsYearId = dpsYearId;
-            DpsDocId = dpsDocId;
+            
+            if (dpsKey != null) {
+                DpsYearId = dpsKey[0];
+                DpsDocId = dpsKey[1];
+                DocExternalId = 0;
+            }
+            else {
+                DpsYearId = 0;
+                DpsDocId = 0;
+                DocExternalId = docExternalId;
+            }
             
             ReferenceCreatedBy = "";
             ReferenceCreatedAt = null;
             ReferenceAuthorizedBy = "";
             ReferenceAuthorizedAt = null;
             
-            if (prepStatementToGetDpsHandlingData != null && ReferenceType == SSwapConsts.TXN_REF_TYPE_ORDER && DpsYearId != 0 && DpsDocId != 0) {
+            boolean retrieveHandlingData = false;
+            
+            if (ReferenceType == SSwapConsts.TXN_REF_TYPE_INVOICE && DocExternalId != 0 && prepStatementToGetProcessedDpsByExternalId != null && prepStatementToGetDpsKeyByDocumentData != null && prepStatementToGetDpsHandlingData != null) {
+                try {
+                    // first attemt to get DPS key: from its external ID:
+                    
+                    SImportedDocument.ProcessedDps processedDps = SImportedDocument.getProcessedDpsByExternalId(prepStatementToGetProcessedDpsByExternalId, SDbSwapDataProcessing.DATA_TYPE_INV, SDataConstantsSys.TRNS_CT_DPS_PUR, DocExternalId);
+                    
+                    if (processedDps != null) {
+                        DpsYearId = processedDps.DpsYearId;
+                        DpsDocId = processedDps.DpsDocId;
+                        retrieveHandlingData = true;
+                    }
+                    else if (minimalDps != null) {
+                        // second attemt to get DPS key: from its external ID:
+                    
+                        int[] key = SImportedDocument.getDpsKeyByDocumentData(prepStatementToGetDpsKeyByDocumentData, minimalDps.BizPartnerId, minimalDps.Date, minimalDps.NumberSeries, minimalDps.Number, minimalDps.Total, minimalDps.CurrencyId);
+                        
+                        if (key != null) {
+                            DpsYearId = key[0];
+                            DpsDocId = key[1];
+                            retrieveHandlingData = true;
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
+            }
+            
+            if ((retrieveHandlingData || ReferenceType == SSwapConsts.TXN_REF_TYPE_ORDER) && DpsYearId != 0 && DpsDocId != 0 && prepStatementToGetDpsHandlingData != null) {
                 try {
                     prepStatementToGetDpsHandlingData.setInt(1, DpsYearId);
                     prepStatementToGetDpsHandlingData.setInt(2, DpsDocId);

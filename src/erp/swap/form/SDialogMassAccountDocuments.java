@@ -1411,11 +1411,11 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         moIconSave = new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"));
     }
     
-    private boolean isDocAlreadyRecorded(final SImportedDocument document, boolean refreshDocumentsGrid) throws Exception {
+    private boolean checkIsDocAlreadyRecorded(final SImportedDocument document, boolean refreshDocumentsGrid) throws Exception {
         boolean isRecorded = document.isRecorded();
         
         if (!isRecorded) {
-            int[] dpsKey = SImportedDocument.getDpsKeyByDocData(moSettings.PrepStatToGetDpsKeyByDocData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
+            int[] dpsKey = SImportedDocument.getDpsKeyByDocumentData(moSettings.PrepStatementToGetDpsKeyByDocumentData, document.BizPartnerId, SLibTimeUtils.convertToDateOnly(document.Date), document.NumberSeries, document.Number, document.Total, document.CurrencyId);
 
             if (dpsKey != null) {
                 isRecorded = true;
@@ -1807,7 +1807,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                             throw new Exception(SImportedDocument.EXC_DOC_ALREADY_RECORDED_IN_ + document.ImportedDocument.ProcessedDps.composeRecord() + ".");
                         }
                         else {
-                            if (isDocAlreadyRecorded(document.ImportedDocument, true)) {
+                            if (checkIsDocAlreadyRecorded(document.ImportedDocument, true)) {
                                 docsAlreadyRecorded++;
                             }
                             else {
@@ -2001,7 +2001,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                             + SGuiConsts.MSG_CNF_CONT;
                     
                     if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
-                        if (!isDocAlreadyRecorded(document, true)) {
+                        if (!checkIsDocAlreadyRecorded(document, true)) {
                             SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
                             
                             if (rejectData != null) {
@@ -2140,7 +2140,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
             }
             else {
                 SMassAccountDocument document = (SMassAccountDocument) row;
-                int[] orderKey = document.ImportedDocument.getFirstReferenceKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
+                int[] orderKey = document.ImportedDocument.getFirstReferenceDpsKey(miClient, SSwapConsts.TXN_REF_TYPE_ORDER);
 
                 if (orderKey == null) {
                     throw new Exception("La factura autorizada '" + document.ImportedDocument.getFolio() + "' no está relacionada con ningún pedido.");

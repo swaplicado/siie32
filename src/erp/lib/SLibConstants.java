@@ -95,7 +95,7 @@ public abstract class SLibConstants {
     public static final int ICON_DOC_XML_SIGN = 1111;
     public static final int ICON_DOC_DELIVERY = 1112;
     public static final int ICON_DOC_IMPORT_CFD = 1113;
-    public static final int ICON_DOC_IMPORT_CFD_ORD = 1114;
+    public static final int ICON_DOC_IMPORT_CFD_DPS = 1114;
     public static final int ICON_DOC_IMPORT_MAT_REQ = 1117;
     public static final int ICON_DOC_XML_DIRECT = 1115;
     public static final int ICON_DOC_XML_INDIRECT = 1116;

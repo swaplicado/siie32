@@ -557,6 +557,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjDocAnn);
+// XXX 2026-05-07, Sergio Flores: WIP!
 //        jmDpsAdj.addSeparator();
 //        jmDpsAdj.add(jmiDpsAdjImportCreditNotes);
 

@@ -910,7 +910,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             mnSyncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_LIMIT));
 
             // Instanciar prepared statements:
-            moPrepStatToCountImports = SImportUtils.createPreparedStatementToCountImports(miClient.getSession().getStatement());
+            moPrepStatToCountImports = SImportUtils.createPrepStatementToCountImports(miClient.getSession().getStatement());
             moPrepStatToGetProcessedProformaByExternalId = SImportedProforma.createPrepStatementToGetProcessedProformaByExternalId(miClient.getSession().getStatement());
             //considerar quitarlo
             //moPrepStatToGetDpsKeyByDocData = SImportedProforma.createPrepStatementToGetDpsKeyByDocData(miClient.getSession().getStatement(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV);

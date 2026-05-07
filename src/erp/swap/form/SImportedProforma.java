@@ -7,9 +7,7 @@ package erp.swap.form;
 
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
-import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -400,55 +398,6 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
      */
     public boolean isPaymentRequestDataAvailable() {
         return getRequiredPaymentDateEffective() != null && (getRequiredPaymentAmount() > 0 || (getRequiredPaymentPct() > 0 && getRequiredPaymentPct() <= 1));
-    }
-
-    /**
-     * Check if document has references and if they are of the given reference
-     * document type.
-     *
-     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
-     * @return
-     */
-    public boolean hasReferences(final int refDocType) {
-        return References != null && References.length > 0 && ReferencesType == refDocType;
-    }
-
-    /**
-     * Get key of first reference if it matches the given document type.
-     *
-     * @param client GUI client.
-     * @param refDocType Reference document type (SSwapConsts.TXN_DOC_TYPE_...).
-     * @return
-     * @throws java.lang.Exception
-     */
-    public int[] getFirstReferenceKey(final SGuiClient client, final int refDocType) throws Exception {
-        int[] orderKey = null;
-        String refPrefix = "";
-
-        switch (refDocType) {
-            case SSwapConsts.TXN_REF_TYPE_ORDER:
-                refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo no soportado de documento de la referencia: " + refDocType + ".)");
-        }
-
-        if (hasReferences(refDocType)) {
-            SImportUtils.DpsKey orderDpsKey = References[0].createDpsKey();
-
-            if (orderDpsKey != null) {
-                orderKey = orderDpsKey.asKey();
-            }
-            else {
-                SImportUtils.DpsFolio orderDpsFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
-
-                if (orderDpsFolio != null) {
-                    orderKey = SDataUtilities.obtainDpsKey((SClientInterface) client, orderDpsFolio.Series, orderDpsFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
-                }
-            }
-        }
-
-        return orderKey;
     }
 
     /**
@@ -989,13 +938,13 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         
         info += "\nCarga:";
         info += "\n+ realizada por: " + (DocumentUploadedBy.isEmpty() ? "ND" : DocumentUploadedBy) + ";";
-        info += "\n+ realizada el " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentUploadedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentUploadedAt)) + ".";
         info += "\nRevisión:";
         info += "\n+ realizada por: " + (DocumentReviewedBy.isEmpty() ? "ND" : DocumentReviewedBy) + ";";
-        info += "\n+ realizada el " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentReviewedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentReviewedAt)) + ".";
         info += "\nAutorización:";
         info += "\n+ realizada por: " + (DocumentAuthorizedBy.isEmpty() ? "ND" : DocumentAuthorizedBy) + ";";
-        info += "\n+ realizada el " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
+        info += "\n+ realizada el: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
         
         return info;
     }

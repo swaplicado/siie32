@@ -62,6 +62,7 @@ import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
@@ -2927,7 +2928,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 if (isDocumentOrAdjustmentPur()) {
-                    moXtaImportedDocument = SImportedDocument.createBasicImportedDocumentFromProcessedDps(statement, anKey);
+                    String dataType = isDocument() ? SDbSwapDataProcessing.DATA_TYPE_INV : SDbSwapDataProcessing.DATA_TYPE_CN;
+                    moXtaImportedDocument = SImportedDocument.createImportedDocumentFromProcessedDps(statement, dataType, anKey);
                 }
                 
                 mbIsRegistryNew = false;

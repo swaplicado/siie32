@@ -24,9 +24,10 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbComImportLog extends SDbRegistryUser {
     
-    public static final String SYNC_TYPE_PUR_INV = "PUR_INV";
-    public static final String SYNC_TYPE_PUR_PAY_RC = "PUR_PAY_RC"; // Comprobante de recepción de pago de compra
-    public static final String SYNC_TYPE_PUR_PROF = "PUR_PROF";
+    public static final String SYNC_TYPE_PUR_INV = "PUR_INV"; // factura de compra
+    public static final String SYNC_TYPE_PUR_CN = "PUR_CN"; // nota de crédito de compra
+    public static final String SYNC_TYPE_PUR_PAY_RC = "PUR_PAY_RC"; // comprobante de recepción de pagos (CRP) de compra
+    public static final String SYNC_TYPE_PUR_PROF = "PUR_PROF"; // proforma de compra
     
     protected static final String SUFIX_REQUEST_BODY = "_request_body";
     protected static final String SUFIX_RESPONSE_BODY = "_response_body";

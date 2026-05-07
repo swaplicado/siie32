@@ -103,7 +103,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         jbChangeItemConcept.setToolTipText("Modificar ítem/concepto(Ordenes compra)");
         
         //falta solo para ordenes de servicio
-        jbChangeItemDocAll = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif")));
+        jbChangeItemDocAll = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_dps.gif")));
         jbChangeItemDocAll.setPreferredSize(new Dimension(23, 23));
         jbChangeItemDocAll.addActionListener(this);
         jbChangeItemDocAll.setToolTipText("Modificar ítem en todos los documentos(Ordenes servicio)");

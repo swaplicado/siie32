@@ -84,10 +84,13 @@ public abstract class SSwapConsts {
     public static final int TXN_CAT_PURCHASE = 1;
     public static final int TXN_DOC_TYPE_ORDER = 22;
     public static final int TXN_DOC_TYPE_INVOICE = 41;
+    public static final int TXN_DOC_TYPE_CREDIT_NOTE = 46;
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
     public static final int TXN_DOC_TYPE_PROFORMA = 52;
+    
     public static final int TXN_REF_TYPE_ORDER = 22;
     public static final int TXN_REF_TYPE_SCALE_IN = 91;
+    public static final int TXN_REF_TYPE_INVOICE = 41;
     
     /** Órden de compra. */
     public static final String TXN_REF_TYPE_ORDER_CODE = "OC";
@@ -98,8 +101,9 @@ public abstract class SSwapConsts {
     public static final HashMap<Integer, String> ReferenceTypes = new HashMap<>();
     
     static {
-        ReferenceTypes.put(TXN_REF_TYPE_ORDER, "órden de compra");
+        ReferenceTypes.put(TXN_REF_TYPE_ORDER, "orden de compra");
         ReferenceTypes.put(TXN_REF_TYPE_SCALE_IN, "boleto de báscula de entrada");
+        ReferenceTypes.put(TXN_REF_TYPE_INVOICE, "factura de compra");
     }
     
     // Definition of required payment:

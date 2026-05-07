@@ -82,6 +82,7 @@ public abstract class SImportUtils {
     public static final int DOC_TYPE_PROFORMA = 52;
     
     private static final String FILE_PREFIX_INVOICES = "facturas compras";
+    private static final String FILE_PREFIX_CREDIT_NOTES = "notas crédito compras";
     private static final String FILE_PREFIX_PROFORMAS = "proformas compras";
     private static final String FILE_PREFIX_RECEIPT_PAYMENTS = "CRP compras";
     private static final String TEMP_DIR_DOCS = SSwapConsts.SIIE + "\\" + SSwapConsts.SWAP_SERVICES.replaceAll(" ", "_") + "\\Docs\\";
@@ -625,16 +626,19 @@ public abstract class SImportUtils {
     }
     
     /**
-     * Get file prefix.
-     * @param documentType Document type (DOC_TYPE_INVOICE or DOC_TYPE_PROFORMA).
+     * Get file name prefix.
+     * @param documentType Document type, supported options: SSwapConsts.DOC_TYPE_INVOICE, SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE, SSwapConsts.TXN_DOC_TYPE_PROFORMA and SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT.
      * @return 
      */
-    private static String getFilePrefix(final int documentType) {
+    private static String getFileNamePrefix(final int documentType) {
         String prefix = "";
         
         switch (documentType) {
             case SSwapConsts.TXN_DOC_TYPE_INVOICE:
                 prefix = FILE_PREFIX_INVOICES + " ";
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE:
+                prefix = FILE_PREFIX_CREDIT_NOTES + " ";
                 break;
             case SSwapConsts.TXN_DOC_TYPE_PROFORMA:
                 prefix = FILE_PREFIX_PROFORMAS + " ";
@@ -657,7 +661,7 @@ public abstract class SImportUtils {
      */
     public static File chooseDownloadZipFile(final SGuiSession session, final int documentType) {
         File zipFile = null;
-        String prefix = getFilePrefix(documentType);
+        String prefix = getFileNamePrefix(documentType);
         String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
 
         FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.zip);
@@ -781,7 +785,7 @@ public abstract class SImportUtils {
                 case DWNLD_MODE_DOC_FILES_IN_TEMP_DIR:
                     // set ZIP file in temporal directory:
                     
-                    String prefix = getFilePrefix(documentType);
+                    String prefix = getFileNamePrefix(documentType);
                     String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
                     
                     tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
@@ -1111,7 +1115,7 @@ public abstract class SImportUtils {
      * @return Prepared statement.
      * @throws Exception 
      */
-    public static PreparedStatement createPreparedStatementToCountImports(final Statement statement) throws Exception {
+    public static PreparedStatement createPrepStatementToCountImports(final Statement statement) throws Exception {
         String sql = "SELECT COUNT(*) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG) + " AS il "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFG_COM_IMP_LOG_ETY) + " AS ile ON ile.id_sync_log = il.id_sync_log "
@@ -1122,7 +1126,7 @@ public abstract class SImportUtils {
     
     /**
      * Count imports.
-     * @param preparedStatement
+     * @param prepStatement
      * @param syncType
      * @param responseCode
      * @param userId
@@ -1130,16 +1134,16 @@ public abstract class SImportUtils {
      * @return 
      * @throws Exception 
      */
-    public static int countImports(final PreparedStatement preparedStatement, final String syncType, final String responseCode, final int userId, final String referenceId) throws Exception {
+    public static int countImports(final PreparedStatement prepStatement, final String syncType, final String responseCode, final int userId, final String referenceId) throws Exception {
         int count = 0;
         
-        preparedStatement.setString(1, syncType);
-        preparedStatement.setString(2, responseCode);
-        preparedStatement.setInt(3, userId);
-        preparedStatement.setString(4, responseCode);
-        preparedStatement.setString(5, referenceId);
+        prepStatement.setString(1, syncType);
+        prepStatement.setString(2, responseCode);
+        prepStatement.setInt(3, userId);
+        prepStatement.setString(4, responseCode);
+        prepStatement.setString(5, referenceId);
         
-        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (ResultSet resultSet = prepStatement.executeQuery()) {
             if (resultSet.next()) {
                 count = resultSet.getInt(1);
             }
@@ -1157,22 +1161,31 @@ public abstract class SImportUtils {
      * @param responseBody Service response body as JSON.
      * @param responseDatetime Service response datetime.
      * @param documentExternalIds List of IDs of downloaded documents.
-     * @param typeDocument Type of document (invoice, proforma).
+     * @param documentType Document type, supported options: SSwapConsts.DOC_TYPE_INVOICE, SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE, SSwapConsts.TXN_DOC_TYPE_PROFORMA and SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT.
      * @throws Exception 
      */
-    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documentExternalIds, final int typeDocument) throws Exception {
+    public static void logImportDownloads(final SGuiSession session, final String requestBody, final Date requestDatetime, final int httpResponseStatusCode, final String responseBody, final Date responseDatetime, final ArrayList<Integer> documentExternalIds, final int documentType) throws Exception {
         SDbComImportLog log = new SDbComImportLog();
         
         //log.setPkSyncLogId(...);
-        if (typeDocument == SSwapConsts.TXN_DOC_TYPE_INVOICE) {
-            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+        
+        switch (documentType) {
+            case SSwapConsts.TXN_DOC_TYPE_INVOICE:
+                log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_INV);
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE:
+                log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_CN);
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_PROFORMA:
+                log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
+                break;
+            case SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT:
+                log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PAY_RC);
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n(Tipo de documento " + documentType + ".)");
         }
-        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
-            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PROF);
-        }
-        else if (typeDocument == SSwapConsts.TXN_DOC_TYPE_RECEIPT_PAYMENT) {
-            log.setSyncType(SDbComImportLog.SYNC_TYPE_PUR_PAY_RC);
-        }
+
         //log.msRequestBodyFileName...
         log.setRequestTimestamp(requestDatetime);
         log.setResponseCode("" + httpResponseStatusCode);
@@ -1244,6 +1257,7 @@ public abstract class SImportUtils {
     
     /**
      * Create DPS folio from reference folio for given reference prefix.
+     * Please notice: when hyphens present in folio, it will be splitted by the last hyphen in folio!
      * @param refFolio Reference folio, e.g., "OC/A-100".
      * @param refPrefix Reference prefix, e.g., "OC".
      * @return DPS folio.
@@ -1251,12 +1265,13 @@ public abstract class SImportUtils {
     public static DpsFolio createDpsFolio(final String refFolio, final String refPrefix) {
         DpsFolio dpsFolio = null;
         
-        if (!refFolio.isEmpty() && !refPrefix.isEmpty()) {
-            String prefix = refPrefix + SSwapConsts.SEPARATOR_REF;
+        if (!refFolio.isEmpty()) {
+            String prefix = refPrefix.isEmpty() ? "" : refPrefix + SSwapConsts.SEPARATOR_REF;
             String folio = refFolio.substring(prefix.length());
-            String[] folioElements = folio.split("-");
-            String series = folioElements.length == 1 ? "" : folioElements[0];
-            String number = folioElements.length == 1 ? folioElements[0] : folioElements[1];
+            
+            int hyphenIndex = folio.lastIndexOf("-"); // major dilemma: split by last or first hyphen in folio!
+            String series = hyphenIndex == -1 ? "" : folio.substring(0, hyphenIndex);
+            String number = hyphenIndex == -1 ? folio : hyphenIndex + 1 < folio.length() ? folio.substring(hyphenIndex + 1) : "";
             
             dpsFolio = new DpsFolio(series, number);
         }
