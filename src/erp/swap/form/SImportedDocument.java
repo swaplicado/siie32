@@ -533,7 +533,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         if (!isPaymentRequestDataAvailable()) {
             string += (!string.isEmpty() ? "; " : "");
             
-            string += "¡No nay información disponible para solicitar pago!";
+            string += "¡No hay información disponible para solicitar pago!";
         }
         else {
             string += (!string.isEmpty() ? "; " : "");
@@ -1566,6 +1566,20 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         
         return string;
     }
+
+    /**
+     * Format date.
+     * @param oDate Date to format.
+     * @return Formatted date, or "ND" if date is <code>null</code>.
+     */
+    private String formatDate(final Date oDate) {
+        if (oDate == null) {
+            return "ND";
+        }
+
+        String sDateAt = SLibUtils.DateFormatDatetime.format(oDate);
+        return sDateAt;
+    }
     
     /**
      * Get document information: upload, review, authorization.
@@ -1810,6 +1824,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 + "total: $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode // allways available
                 + (!FunctionalSubArea.isEmpty() ? "; subárea funcional: " + FunctionalSubArea : "") // may not be available
                 + (ExternalDocumentId != 0 ? "; ID documento: " + ExternalDocumentId : "") // may not be available
+                + "; cargado por: " + (DocumentUploadedBy != null && !DocumentUploadedBy.isEmpty() ? " " + DocumentUploadedBy : "ND") // may not be available
+                + "; fecha carga: " + formatDate(DocumentUploadedAt)
+                + "; revisado por: " + (DocumentReviewedBy != null && !DocumentReviewedBy.isEmpty() ? " " + DocumentReviewedBy : "ND")
+                + "; fecha revisión: " + formatDate(DocumentReviewedAt)
+                + "; autorizado por: " + (DocumentAuthorizedBy != null && !DocumentAuthorizedBy.isEmpty() ? " " + DocumentAuthorizedBy : "ND")
+                + "; fecha autorización: " + formatDate(DocumentAuthorizedAt)
                 + ".";
     }
     
@@ -2045,7 +2065,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         String sql = "SELECT sdp.ext_data_id, sdp.ext_data_uuid, sdp.dps_refs, sdp.dps_descrip, "
                 + "d.id_year, d.id_doc, d.num_ser, d.num, d.dt, d.tot_cur_r, d.acc_tag, d.fid_func, d.fid_func_sub, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, "
                 + "CONCAT(f.code, '" + SDbFunctionalSubArea.SEPARATOR + "', fs.name) AS _func_sub, "
-                + "b.id_bp, b.bp, c.id_cur, c.cur_key, dc.cfd_use "
+                + "b.id_bp, b.bp, c.id_cur, c.cur_key, dc.cfd_use, "
+                + "sdp.prc_upl_by, sdp.prc_upl_at_n, sdp.prc_rev_by, sdp.prc_rev_at_n, sdp.prc_aut_by, sdp.prc_aut_at_n "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = sdp.fk_dps_year_n AND d.id_doc = sdp.fk_dps_doc_n "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = d.fid_bp_r "
@@ -2095,6 +2116,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 importedDocument.Status = "";
                 importedDocument.Download = false;
                 importedDocument.AlreadyDownloaded = false;
+
+                importedDocument.DocumentUploadedBy = resultSet.getString("sdp.prc_upl_by");
+                importedDocument.DocumentUploadedAt = resultSet.getTimestamp("sdp.prc_upl_at_n");
+                importedDocument.DocumentReviewedBy = resultSet.getString("sdp.prc_rev_by");
+                importedDocument.DocumentReviewedAt = resultSet.getTimestamp("sdp.prc_rev_at_n");
+                importedDocument.DocumentAuthorizedBy = resultSet.getString("sdp.prc_aut_by");
+                importedDocument.DocumentAuthorizedAt = resultSet.getTimestamp("sdp.prc_aut_at_n");
 
                 importedDocument.ProcessedDps = null;
                 importedDocument.SwapDataProcessing = null;
