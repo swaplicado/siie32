@@ -3605,7 +3605,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             
                             switch (mnCfgParamCfdRequired) {
                                 case SBankLayoutConsts.CFD_REQ_YES:
-//                                    validation.setMessage(message);
+                                    validation.setMessage(message);
                                     break;
                                 case SBankLayoutConsts.CFD_REQ_OPC:
                                     if (miClient.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
