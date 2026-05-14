@@ -181,13 +181,13 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     /**
      * Creates a new imported document.
      * @param configSettings SWAP-Services configuration settings, can be <code>null</code> when there is no need to process and record this document.
-     * @param documentType Document type. Either SDataConstantsSys.TRNX_TP_DPS_DOC (invoice) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit note)
+     * @param documentType GUI document type. Either SDataConstantsSys.TRNX_TP_DPS_DOC (invoice) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit note)
      */
     public SImportedDocument(final SServicesUtils.ConfigSettings configSettings, final int documentType) {
         ConfigSettings = configSettings;
         
         DocumentType = documentType;
-        DocumentName = DocumentType == SDataConstantsSys.TRNX_TP_DPS_DOC ? "factura" : "nota de crédito";
+        DocumentName = isInvoice() ? "factura" : "nota de crédito";
         ExternalDocumentId = 0;
         ExternalDocumentUuid = "";
         BizPartnerId = 0;
@@ -253,6 +253,14 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     
     private String getPrcDataType() {
         return SImportedDocument.getPrcDataType(DocumentType);
+    }
+    
+    /**
+     * Inform whether this document is an invoice.
+     * @return 
+     */
+    public boolean isInvoice() {
+        return DocumentType == SDataConstantsSys.TRNX_TP_DPS_DOC;
     }
     
     /**
@@ -714,20 +722,20 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Link document to given DPS, and optionally create its payment request.
+     * Link document to its given matching DPS, and optionally and only when it is an invoice, create its payment request.
      * Intenged to be used in GUI context.
      * @param session GUI session.
      * @param filesDownloadServiceUrl URL of document files download service.
-     * @param dpsKey DPS primary key of invoice to be linked to.
+     * @param dpsKey DPS primary key of invoice or credit note to be linked to.
      * @param paymentTypeMatchigPolicy Payment type matching policy: MATCH_PAY_TP...
-     * @param allowGreaterInvoice Allow linking an invoice whose total is greater.
-     * @param allowLaterInvoice Allow linking an invoice wich is issued later.
-     * @param ommitNumberValidation Ommit number validation of invoice to be linked to.
+     * @param allowGreaterDocToLink Allow linking an invoice or credit note whose total is greater.
+     * @param allowLaterDocToLink Allow linking an invoice or credit note wich is issued later.
+     * @param ommitNumberValidation Ommit number validation of invoice or credit note to be linked to.
      * @param createPaymentRequest Create-payment-request flag.
      * @return
      * @throws Exception 
      */
-    public boolean link(final SGuiSession session, final String filesDownloadServiceUrl, final int[] dpsKey, final int paymentTypeMatchigPolicy, final boolean allowGreaterInvoice, final boolean allowLaterInvoice, final boolean ommitNumberValidation, final boolean createPaymentRequest) throws Exception {
+    public boolean link(final SGuiSession session, final String filesDownloadServiceUrl, final int[] dpsKey, final int paymentTypeMatchigPolicy, final boolean allowGreaterDocToLink, final boolean allowLaterDocToLink, final boolean ommitNumberValidation, final boolean createPaymentRequest) throws Exception {
         boolean linked = false;
         String prefix = "No se pudo realizar la vinculación:\n";
         
@@ -773,19 +781,19 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     (Math.abs(Total - dps.getTotalCy_r()) < 1d && session.getClient().showMsgBoxConfirm(
                             "Hay una diferencia entre el total de este documento y el de la " + DocumentName + " a vincular de $" + SLibUtils.getDecimalFormatAmount().format(Total - dps.getTotalCy_r()) + " " + CurrencyCode + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION) ||
-                    (Math.abs(Total - dps.getTotalCy_r()) >= 1d && Total > dps.getTotalCy_r() && (!allowGreaterInvoice || session.getClient().showMsgBoxConfirm(
+                    (Math.abs(Total - dps.getTotalCy_r()) >= 1d && Total > dps.getTotalCy_r() && (!allowGreaterDocToLink || session.getClient().showMsgBoxConfirm(
                             "El total de la " + DocumentName + " a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + CurrencyCode + ", es mayor al de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", por $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r() - Total) + " " + CurrencyCode + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 /*
                 total does not match AND
                 (absolute difference is < $1.00 AND user doesn't accept) OR
-                (absolute difference is >= $1.00 AND this total is > document's AND (no greater invoices allowed OR user user doesn't accept))
+                (absolute difference is >= $1.00 AND this total is > document's AND (no greater invoices or credit notes allowed OR user user doesn't accept))
                 */
                 throw new Exception(prefix + "El total de este documento, $" + SLibUtils.getDecimalFormatAmount().format(Total) + " " + CurrencyCode + ", "
                         + "es distinto al de la " + DocumentName + " a vincular, $" + SLibUtils.getDecimalFormatAmount().format(dps.getTotalCy_r()) + " " + dps.getDbmsCurrencyCode() + ".");
             }
-            else if ((!allowLaterInvoice && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
-                    (allowLaterInvoice && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la " + DocumentName + " a vincular, "
+            else if ((!allowLaterDocToLink && !SLibTimeUtils.isSameDate(Date, dps.getDate())) ||
+                    (allowLaterDocToLink && (dps.getDate().before(Date) || (dps.getDate().after(Date) && session.getClient().showMsgBoxConfirm("La fecha de la " + DocumentName + " a vincular, "
                             + SLibUtils.DateFormatDate.format(dps.getDate()) + ", es posterior a la de este documento, " + SLibUtils.DateFormatDate.format(Date) + ".\n"
                             + "¿Está seguro que desea hacer caso omiso y continuar?") != JOptionPane.YES_OPTION)))) {
                 // match required:
@@ -796,7 +804,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 if (!ommitNumberValidation) {
                     // validate folio of document:
 
-                    String msgChooseOtherInvoice = "Favor de elegir una " + DocumentName + " distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
+                    String msgChooseOtherDocToLink = "Favor de elegir una " + DocumentName + " distinta a la '" + dps.getDpsNumber() + "' para vincularla a este documento.";
 
                     // check folio number: it must match its counterpart in document, in DPS it is allways available:
 
@@ -854,7 +862,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
                                 + "Sin embargo, es posible vincular la " + DocumentName + " '" + dps.getDpsNumber() + "' a este documento.\n"
                                 + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                            throw new Exception(msgChooseOtherInvoice);
+                            throw new Exception(msgChooseOtherDocToLink);
                         }
                     }
 
@@ -897,12 +905,12 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         if (session.getClient().showMsgBoxConfirm(msgConfirm + "\n"
                                 + "Sin embargo, es posible vincular la " + DocumentName + " '" + dps.getDpsNumber() + "' a este documento.\n"
                                 + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                            throw new Exception(msgChooseOtherInvoice);
+                            throw new Exception(msgChooseOtherDocToLink);
                         }
                     }
                 }
 
-                // link document to invoice:
+                // link document to its matching invoice or credit note:
 
                 Object[] recKey = (Object[]) dps.getDbmsRecordKey();
 
@@ -917,13 +925,18 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                         recYearId, recPeriodId, recBokkeepingCenterId, recRecordTypeId, recNumberId, recCompanyBranchCode, 
                         dps.getFkUserNewId(), dps.getDbmsUserNew(), dps.getThinCfd() != null, dps.getThinPdf() != null);
 
-                // check if first payment request already exists:
+                // check if first payment request already exists (applying only to invoices):
 
-                SDbPayment payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
-
-                if (createPaymentRequest && payment == null && isPaymentRequired() && isPaymentRequestDataAvailable()) {
-                    payment = createAndSavePaymentRequest(session, dps, false);
+                SDbPayment payment = null;
+                
+                if (isInvoice()) {
+                    payment = getPaymentRequestByDpsKey(session, ProcessedDps.getDpsKey());
+                    
+                    if (createPaymentRequest && payment == null && isPaymentRequired() && isPaymentRequestDataAvailable()) {
+                        payment = createAndSavePaymentRequest(session, dps, false);
+                    }
                 }
+
 
                 // create DPS processing:
 
@@ -946,8 +959,10 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 swapDataProcessing.setProcessingAuthorizedBy(DocumentAuthorizedBy);
                 swapDataProcessing.setProcessingAuthorizedAt(DocumentAuthorizedAt);
                 
-                swapDataProcessing.setPaymentRequired(isPaymentRequired());
-                if (isPaymentRequired() && isPaymentRequestDataAvailable()) {
+                boolean isPaymentRequired = isInvoice() && isPaymentRequired();
+                
+                swapDataProcessing.setPaymentRequired(isPaymentRequired);
+                if (isPaymentRequired && isPaymentRequestDataAvailable()) {
                     swapDataProcessing.setPaymentApplicationCy(getRequiredPaymentAmountEffective(dps));
                     swapDataProcessing.setPaymentDateRequired_n(getRequiredPaymentDateEffective());
                 }
@@ -1836,7 +1851,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get SWAP Services transactions document type for the given GUI document type.
+     * Get SWAP-Services-transactions document type for the given GUI document type.
      * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
      * @return 
      */
@@ -1858,11 +1873,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get standard SWAP reference type for the given GUI document type.
+     * Get default SWAP-Services-transactions reference type for the given GUI document type.
      * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
      * @return 
      */
-    public static int getStdReferenceType(final int documentType) {
+    public static int getDefaultTxnReferenceType(final int documentType) {
         int type = 0;
         
         switch (documentType) {
@@ -1880,7 +1895,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
-     * Get SWAP processing data type for the given GUI document type.
+     * Get SWAP-processing data type for the given GUI document type.
      * @param documentType TUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
      * @return 
      */

@@ -557,9 +557,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsAdj.add(jmiDpsAdjEntry);
         jmDpsAdj.addSeparator();
         jmDpsAdj.add(jmiDpsAdjDocAnn);
-// XXX 2026-05-07, Sergio Flores: WIP!
-//        jmDpsAdj.addSeparator();
-//        jmDpsAdj.add(jmiDpsAdjImportCreditNotes);
+        jmDpsAdj.addSeparator();
+        jmDpsAdj.add(jmiDpsAdjImportCreditNotes);
 
         jmStkDvy = new JMenu("Surtidos");
         jmiStkDvyOrdPend = new JMenuItem("Pedidos de compras sin factura por surtir");
@@ -1083,6 +1082,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsAdjEntry.setEnabled(hasRightDocTransactionAdjust); 
         jmiDpsAdjDocAnn.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjImportCreditNotes.setEnabled((Boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP) && (hasRightDocTransactionAdjust && levelRightDocTransactionAdjust >= SUtilConsts.LEV_CAPTURE));
+        jmiDpsAdjImportCreditNotes.setEnabled(false);
 
         jmStkDvy.setEnabled(hasRightInventoryIn);
         jmiStkDvyOrdPend.setEnabled(hasRightInventoryIn);

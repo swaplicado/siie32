@@ -103,7 +103,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     private SFormField moFieldTaxRegionDps; 
     private SFormOptionPicker moPickerOpsType;
     private final File moCfdiFile;
-    private SDialogCfdiPurchaseOrder33 moDialogCfdiPurchaseOrder;
+    private SDialogCfdiConceptsLinker33 moDialogCfdiPurchaseOrder;
     
     SRowCfdiImport33 moRowCfdiCopy;
 
@@ -972,7 +972,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         */
         
         DElementConcepto concepto = rowCfdiImport.getConcepto();
-        int matchId = SItemUtilities.getMatchItemBizPartnerId(miClient, concepto.getAttNoIdentificacion().getString(), concepto.getAttClaveProdServ().getString(), moBizPartnerEmisor.getPkBizPartnerId());
+        int matchId = SItemUtilities.getMatchingItemBizPartnerConceptId(miClient, concepto.getAttNoIdentificacion().getString(), concepto.getAttClaveProdServ().getString(), moBizPartnerEmisor.getPkBizPartnerId());
         
         if (matchId != 0) {
             // Se cargan los datos del empate anterior:
@@ -1542,7 +1542,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 SRowCfdiImport33 rowCfdiImport = (SRowCfdiImport33) moConceptTablePane.getSelectedTableRow();
                 
                 if (moDialogCfdiPurchaseOrder == null) {
-                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder33(miClient);
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiConceptsLinker33(miClient);
                 }
                 moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
                 
@@ -1563,16 +1563,16 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                     }
                 }
                 
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
+                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
+                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
                 
                 moDialogCfdiPurchaseOrder.setFormVisible(true);
                 
                 if (moDialogCfdiPurchaseOrder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_ENTRY_DPS_DPS_LINK);
+                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_ENTRY_DPS_DPS_LINK);
                     rowCfdiImport.setEntryDpsDpsLink(entryDpsDpsLink); 
                     
-                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_FACTOR_CONV));
+                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_FACTOR_CONV));
                     setMatchDataByPurchaseOrder(rowCfdiImport, (SDataDpsEntry) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
                     setSiieTaxes(rowCfdiImport);
                     rowCfdiImport.prepareTableRow();
@@ -2053,7 +2053,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         try {
             SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
             
-            int key = SItemUtilities.getMatchItemBizPartnerId(miClient, 
+            int key = SItemUtilities.getMatchingItemBizPartnerConceptId(miClient, 
                 rowCfdiImport.getConcepto().getAttNoIdentificacion().getString(), 
                 rowCfdiImport.getConcepto().getAttClaveProdServ().getString(),
                 moBizPartnerEmisor.getPkBizPartnerId(), 

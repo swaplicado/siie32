@@ -7,6 +7,7 @@ package erp.swap.model.account;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import sa.lib.SLibUtils;
 
 /**
@@ -18,6 +19,7 @@ public class Case {
     private String caseName;
     private String caseCode;
     private List<ProdServ> prodServs;
+    /** Lower-case key words. */
     private List<String> keyWords;
     private int item;
     private String itemDesc;
@@ -38,8 +40,10 @@ public class Case {
     public List<ProdServ> getProdServs() { return prodServs; }
     public void setProdServs(List<ProdServ> prodServs) { this.prodServs = prodServs; }
 
+    /** Get lower-case key words. */
     public List<String> getKeyWords() { return keyWords; }
-    public void setKeyWords(List<String> keyWords) { this.keyWords = keyWords; }
+    /** Set lower-case key words. All passed key words will be converted to lowercased. */
+    public void setKeyWords(List<String> keyWords) { this.keyWords = keyWords.stream().map(s -> s == null ? null : s.toLowerCase()).collect(Collectors.toList()); }
 
     public int getItem() { return item; }
     public void setItem(int item) { this.item = item; }
@@ -91,7 +95,7 @@ public class Case {
     }
 
     /**
-     * Check if any set of key words matches the given text to be evaluated, using only ASCII characters.
+     * Check if any set of lower-case key words matches the given text to be evaluated also in lower case, using only ASCII characters.
      * Format of set of every key words: word1+word2+word3
      * @param textToEvaluate Text to evaluate for matching.
      * @return Returns <code>true</code> when key words are unavailable or the text to be evaluated matches any set of key words, that is, all words of the set in the defined order; otherwise <code>false</code>.
@@ -100,7 +104,7 @@ public class Case {
         boolean matches = keyWords.isEmpty(); // matches when key words are unavailable!
         
         if (!matches) {
-            String asciiTextToEvaluate = SLibUtils.textToAscii(textToEvaluate);
+            String asciiTextToEvaluateInLowerCase = SLibUtils.textToAscii(textToEvaluate).toLowerCase();
             
             for (String keyWord : keyWords) {
                 if (keyWord.isEmpty()) {
@@ -113,7 +117,7 @@ public class Case {
                     String[] asciiWords = SLibUtils.textToAscii(keyWord).split(Pattern.quote("+"));
 
                     for (String asciiWord : asciiWords) {
-                        index = asciiTextToEvaluate.indexOf(asciiWord, index);
+                        index = asciiTextToEvaluateInLowerCase.indexOf(asciiWord, index);
 
                         if (index == -1) {
                             perfectMatch = false;

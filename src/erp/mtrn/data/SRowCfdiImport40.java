@@ -32,6 +32,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public static final int LINK_AS_SERVICE = 2;
     
     private final SClientInterface miClient;
+    private final int mnDocumentType;
     private final cfd.ver40.DElementConcepto moConcepto;
     private final int mnRowNumber;
     private final boolean mbIsInvoicedAdvance;
@@ -43,6 +44,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     private SDataCostCenter moCostCenter;
     private int mnOperationsType;
     private int mnCfdLinkType;
+    private int[] manAdjustmentSubtypeKey;
+    private String msAdjustmentSubtypeName;
     
     private ArrayList<SDataEntryDpsDpsLink> moImportedEntryDpsDpsLinks;
     private ArrayList<SDataDpsEntry> moImportedDpsEntries;
@@ -54,13 +57,15 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     private double mdLinkedPercentage;
     
     /**
-     * 
-     * @param client Cliente GUI.
-     * @param concepto Concepto del CFDI.
+     * Creates new CFDI 4.0 row to be imported.
+     * @param client GUI client.
+     * @param documentType GUI document type. Either SDataConstantsSys.TRNX_TP_DPS_DOC (invoice) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit note)
+     * @param concepto CFDI Concepto.
      * @param rowNumber Row number.
      */
-    public SRowCfdiImport40(SClientInterface client, cfd.ver40.DElementConcepto concepto, int rowNumber) {
+    public SRowCfdiImport40(final SClientInterface client, final int documentType, final cfd.ver40.DElementConcepto concepto, final int rowNumber) {
         miClient = client;
+        mnDocumentType = documentType;
         moConcepto = concepto;
         mnRowNumber = rowNumber;
         mbIsInvoicedAdvance = moConcepto.getAttClaveProdServ().getString().equals(DCfdi40Catalogs.ClaveProdServServsFacturacion);
@@ -69,6 +74,10 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         prepareTableRow();
     }
 
+    private boolean isInvoice() {
+        return mnDocumentType == SDataConstantsSys.TRNX_TP_DPS_DOC;
+    }
+    
     public void setItem(final SDataItem o) { moItem = o; }
     public void setItemReference(final SDataItem o) { moItemReference = o; }
     public void setUnit(final SDataUnit o) { moUnit = o; }
@@ -76,6 +85,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public void setCostCenter(final SDataCostCenter o) { moCostCenter = o; }
     public void setOperationsType(final int i) { mnOperationsType = i; }
     public void setCfdLinkType(final int i) { mnCfdLinkType = i; }
+    public void setAdjustmentSubtypeKey(int[] key) { manAdjustmentSubtypeKey = key != null ? key.clone() : null; }
+    public void setAdjustmentSubtypeName(String s) { msAdjustmentSubtypeName = s; }
     
     public cfd.ver40.DElementConcepto getConcepto() { return moConcepto; }
     public int getRowNumber() { return mnRowNumber; }
@@ -88,6 +99,8 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public SDataCostCenter getCostCenter() { return moCostCenter; }
     public int getOperationsType() { return mnOperationsType; }
     public int getCfdLinkType() { return mnCfdLinkType; }
+    public int[] getAdjustmentSubtypeKey() { return manAdjustmentSubtypeKey != null ? manAdjustmentSubtypeKey.clone() : null; }
+    public String getAdjustmentSubtypeName() { return msAdjustmentSubtypeName; }
     
     public ArrayList<SDataEntryDpsDpsLink> getImportedEntryDpsDpsLinks() { return moImportedEntryDpsDpsLinks; }
     public ArrayList<SDataDpsEntry> getImportedDpsEntries() { return moImportedDpsEntries; }
@@ -96,19 +109,19 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public void setConvFactor(final double d) { 
         mdConvFactor = d;
         
-        if (!moNewDpsEntries.isEmpty()) {
-            for (SDataDpsEntry newDpsEty : moNewDpsEntries) {
-                SDataEntryDpsDpsLink entryDpsDpsLink = null;
-                for (SDataEntryDpsDpsLink dpsLink : moImportedEntryDpsDpsLinks) {
-                    if (SLibUtils.compareKeys(dpsLink.getDpsEntryKey(), (int[]) newDpsEty.getPrimaryKey())) {
-                        entryDpsDpsLink = dpsLink;
-                        break;
-                    }
+        for (SDataDpsEntry newDpsEty : moNewDpsEntries) {
+            SDataEntryDpsDpsLink entryDpsDpsLink = null;
+
+            for (SDataEntryDpsDpsLink dpsLink : moImportedEntryDpsDpsLinks) {
+                if (SLibUtils.compareKeys(dpsLink.getDpsEntryKey(), (int[]) newDpsEty.getPrimaryKey())) {
+                    entryDpsDpsLink = dpsLink;
+                    break;
                 }
-                newDpsEty.setOriginalQuantity(entryDpsDpsLink == null ? getEquivalentQuantity() : entryDpsDpsLink.getQuantityToLink());
-                newDpsEty.setOriginalPriceUnitaryCy(getPriceUnitary());
-                newDpsEty.setOriginalPriceUnitarySystemCy(getPriceUnitary());
             }
+
+            newDpsEty.setOriginalQuantity(entryDpsDpsLink == null ? getEquivalentQuantity() : entryDpsDpsLink.getQuantityToLink());
+            newDpsEty.setOriginalPriceUnitaryCy(getPriceUnitary());
+            newDpsEty.setOriginalPriceUnitarySystemCy(getPriceUnitary());
         }
     }
     
@@ -119,37 +132,37 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     public HashSet<cfd.ver40.DElementConceptoImpuestoTraslado> getTaxChargedMatched() { return moTaxChargedMatched; }
     public HashSet<cfd.ver40.DElementConceptoImpuestoRetencion> getTaxRetainedMatched() { return moTaxRetainedMatched; }
     
-    public void addTaxChargedMatched(cfd.ver40.DElementConceptoImpuestoTraslado o) {
+    public void addTaxChargedMatched(cfd.ver40.DElementConceptoImpuestoTraslado traslado) {
         boolean found = false;
         
         for (cfd.ver40.DElementConceptoImpuestoTraslado tax : moTaxChargedMatched) {
-            if (tax.getAttImpuesto().getString().equals(o.getAttImpuesto().getString()) &&
-                    tax.getAttTipoFactor().getString().equals(o.getAttTipoFactor().getString()) &&
-                    tax.getAttTasaOCuota().getDouble() == o.getAttTasaOCuota().getDouble()) {
+            if (tax.getAttImpuesto().getString().equals(traslado.getAttImpuesto().getString()) &&
+                    tax.getAttTipoFactor().getString().equals(traslado.getAttTipoFactor().getString()) &&
+                    tax.getAttTasaOCuota().getDouble() == traslado.getAttTasaOCuota().getDouble()) {
                 found = true;
                 break;
             }
         }
         
         if (!found) {
-            moTaxChargedMatched.add(o);
+            moTaxChargedMatched.add(traslado);
         }
     }
     
-    public void addTaxRetainedMatched(cfd.ver40.DElementConceptoImpuestoRetencion o) {
+    public void addTaxRetainedMatched(cfd.ver40.DElementConceptoImpuestoRetencion retención) {
         boolean found = false;
         
         for (cfd.ver40.DElementConceptoImpuestoRetencion tax : moTaxRetainedMatched) {
-            if (tax.getAttImpuesto().getString().equals(o.getAttImpuesto().getString()) &&
-                    tax.getAttTipoFactor().getString().equals(o.getAttTipoFactor().getString()) &&
-                    tax.getAttTasaOCuota().getDouble() == o.getAttTasaOCuota().getDouble()) {
+            if (tax.getAttImpuesto().getString().equals(retención.getAttImpuesto().getString()) &&
+                    tax.getAttTipoFactor().getString().equals(retención.getAttTipoFactor().getString()) &&
+                    tax.getAttTasaOCuota().getDouble() == retención.getAttTasaOCuota().getDouble()) {
                 found = true;
                 break;
             }
         }
         
         if (!found) {
-            moTaxRetainedMatched.add(o);
+            moTaxRetainedMatched.add(retención);
         }
     }
     
@@ -162,11 +175,17 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     }
     
     public double getServicePriceUnitary(SDataDpsEntry importedDps) {
-        /* Se toma el subtotal ya que en los servicios solo se puede vincular partidas con cantidad 1, por lo que es equivalente a tomar el precio unitario 
-            pero se contempla la posibilidad de un descuento */
+        /*
+        Se toma el subtotal, ya que en los servicios solo se puede vincular partidas con cantidad 1,
+        por lo que es equivalente a tomar el precio unitario, pero se contempla la posibilidad de un descuento.
+        */
         return importedDps != null ? SLibUtils.round(importedDps.getSubtotalCy_r() * mdLinkedPercentage, SErpConsts.VAL_QTY_MAX_DECS) : getPriceUnitary();
     }
     
+    /**
+     * Verifica si el renglón está vinculado como servicio.
+     * @return 
+     */
     public boolean isLinkedAsService() {
         return mnCfdLinkType == LINK_AS_SERVICE;
     }
@@ -184,48 +203,74 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         moImportedEntryDpsDpsLinks = new ArrayList<>();
         moImportedDpsEntries = new ArrayList<>();
         mnOperationsType = 0;
+        mnCfdLinkType = LINK_1_ON_1;
+        manAdjustmentSubtypeKey = null;
+        msAdjustmentSubtypeName = "";
+
         mdConvFactor = 1;
         
         moTaxChargedMatched = new HashSet<>();
         moTaxRetainedMatched = new HashSet<>();
     }
     
-    /**
-     * Asigna Asigna todos los valores de la clase.
-     * @param item
-     * @param unit
-     * @param taxRegion
-     * @param costCenter
-     * @param reference
-     */
-    public void setMatchingSettings(final SDataItem item, final SDataUnit unit, final SDataTaxRegion taxRegion, final SDataCostCenter costCenter, final SDataItem reference) {
-        moNewDpsEntries = new ArrayList<>();
-        moItem = item;
-        moItemReference = reference;
-        moUnit = unit;
-        moTaxRegion = taxRegion;
-        moCostCenter = costCenter;
-        moImportedEntryDpsDpsLinks = new ArrayList<>();
-        moImportedDpsEntries = new ArrayList<>();
-        mnOperationsType = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
-        mdConvFactor = 1;
+    private void updateDpsDpsSupplyAsDestiny() {
+        if (!moImportedEntryDpsDpsLinks.isEmpty()) {
+            for (int i = 0; i < moImportedEntryDpsDpsLinks.size(); i++) {
+                SDataEntryDpsDpsLink importedEntryDpsDpsLink = moImportedEntryDpsDpsLinks.get(i);
+                
+                SDataDpsDpsLink link = new SDataDpsDpsLink();
+                link.setPkSourceYearId(importedEntryDpsDpsLink.getPkYearId());
+                link.setPkSourceDocId(importedEntryDpsDpsLink.getPkDocId());
+                link.setPkSourceEntryId(importedEntryDpsDpsLink.getPkEntryId());
+                link.setOriginalQuantity(importedEntryDpsDpsLink.getQuantityToLink()); 
+                
+                try {
+                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().clear();
+                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().add(link);
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void updateDpsDpsAdjustmentAsDps() {
+        if (!moImportedEntryDpsDpsLinks.isEmpty()) {
+            for (int i = 0; i < moImportedEntryDpsDpsLinks.size(); i++) {
+                SDataEntryDpsDpsLink importedEntryDpsDpsLink = moImportedEntryDpsDpsLinks.get(i);
+                
+                SDataDpsDpsAdjustment adjustment = new SDataDpsDpsAdjustment();
+                adjustment.setPkDpsYearId(importedEntryDpsDpsLink.getPkYearId());
+                adjustment.setPkDpsDocId(importedEntryDpsDpsLink.getPkDocId());
+                adjustment.setPkDpsEntryId(importedEntryDpsDpsLink.getPkEntryId());
+                adjustment.setOriginalQuantity(importedEntryDpsDpsLink.getQuantityToLink()); 
+                
+                try {
+                    moNewDpsEntries.get(i).getDbmsDpsAdjustmentsAsDps().clear();
+                    moNewDpsEntries.get(i).getDbmsDpsAdjustmentsAsDps().add(adjustment);
+                }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                }
+            }
+        }
     }
     
     /**
      * Refresca el registro DpsEntry a partir de los datos y componentes ya asignados.
      */
-    
     public void refreshDpsEntries() {
         moNewDpsEntries.clear();
         
         if (moImportedDpsEntries.isEmpty()) {
-            SDataDpsEntry moNewDpsEntry = createNewDpsEntry(null);
-            moNewDpsEntry.setOriginalQuantity(getEquivalentQuantity());
+            SDataDpsEntry newDpsEntry = createNewDpsEntry(null);
+            newDpsEntry.setOriginalQuantity(getEquivalentQuantity());
             
-            moNewDpsEntry.setFkCostCenterId_n(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX());
-            moNewDpsEntry.setDbmsCostCenterCode(moCostCenter == null ? "" : moCostCenter.getCode());
-            moNewDpsEntry.setDbmsCostCenter_n(moCostCenter == null ? "" : moCostCenter.getCostCenter());
-            moNewDpsEntries.add(moNewDpsEntry);
+            newDpsEntry.setFkCostCenterId_n(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX());
+            newDpsEntry.setDbmsCostCenterCode(moCostCenter == null ? "" : moCostCenter.getCode());
+            newDpsEntry.setDbmsCostCenter_n(moCostCenter == null ? "" : moCostCenter.getCostCenter());
+            moNewDpsEntries.add(newDpsEntry);
         }
         else {
             if (isLinkedAsService()) {
@@ -233,142 +278,156 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
             }
             
             for (SDataDpsEntry importedDps : moImportedDpsEntries) {
-                SDataDpsEntry moNewDpsEntry = createNewDpsEntry(importedDps);
                 SDataEntryDpsDpsLink entryDpsDpsLink = null;
+                
                 for (SDataEntryDpsDpsLink dpsLink : moImportedEntryDpsDpsLinks) {
                     if (SLibUtils.compareKeys(dpsLink.getDpsEntryKey(), (int[]) importedDps.getPrimaryKey())) {
                         entryDpsDpsLink = dpsLink;
                         break;
                     }
                 }
-                moNewDpsEntry.setOriginalQuantity(entryDpsDpsLink == null ? getEquivalentQuantity() : entryDpsDpsLink.getQuantityToLink());
+                
+                SDataDpsEntry newDpsEntry = createNewDpsEntry(importedDps);
+                newDpsEntry.setOriginalQuantity(entryDpsDpsLink == null ? getEquivalentQuantity() : entryDpsDpsLink.getQuantityToLink());
                 
                 SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new String[] { importedDps.getFkCostCenterId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                moNewDpsEntry.setFkCostCenterId_n(costCenter == null ? "" : costCenter.getPkCostCenterIdXXX());
-                moNewDpsEntry.setDbmsCostCenterCode(costCenter == null ? "" : costCenter.getCode());
-                moNewDpsEntry.setDbmsCostCenter_n(costCenter == null ? "" : costCenter.getCostCenter());
+                newDpsEntry.setFkCostCenterId_n(costCenter == null ? "" : costCenter.getPkCostCenterIdXXX());
+                newDpsEntry.setDbmsCostCenterCode(costCenter == null ? "" : costCenter.getCode());
+                newDpsEntry.setDbmsCostCenter_n(costCenter == null ? "" : costCenter.getCostCenter());
 
-                moNewDpsEntry.setDbmsDpsEntryMatRequest(importedDps.getDbmsDpsEntryMatRequestLink());
-                moNewDpsEntries.add(moNewDpsEntry);
+                newDpsEntry.setDbmsDpsEntryMatRequest(importedDps.getDbmsDpsEntryMatRequestLink());
+                moNewDpsEntries.add(newDpsEntry);
             }
-            updateDpsDpsLinkAsDestiny();
+            
+            if (isInvoice()) {
+                updateDpsDpsSupplyAsDestiny();
+            }
+            else {
+                updateDpsDpsAdjustmentAsDps();
+            }
         }
     }
     
     private SDataDpsEntry createNewDpsEntry(SDataDpsEntry importedDps) {
-        SDataDpsEntry moNewDpsEntry = new SDataDpsEntry();
+        SDataDpsEntry newDpsEntry = new SDataDpsEntry();
         
         /*
-        moDpsEntry.setPkYearId(...);
-        moDpsEntry.setPkDocId(...);
-        moDpsEntry.setPkEntryId(...)
+        newDpsEntry.setPkYearId(...);
+        newDpsEntry.setPkDocId(...);
+        newDpsEntry.setPkEntryId(...)
         */
-        moNewDpsEntry.setConceptKey(moItem == null ? "" : moItem.getKey());
-        moNewDpsEntry.setConcept(moItem == null ? "" : moItem.getItem());
+        newDpsEntry.setConceptKey(moItem == null ? "" : moItem.getKey());
+        newDpsEntry.setConcept(moItem == null ? "" : moItem.getItem());
         /*
-        moDpsEntry.setReference(...);
-        moDpsEntry.setQuantity(...);
+        newDpsEntry.setReference(...);
+        newDpsEntry.setQuantity(...);
         */
-        moNewDpsEntry.setIsDiscountDocApplying(moConcepto.getAttDescuento().getDouble() != 0);
-        moNewDpsEntry.setIsDiscountUnitaryPercentage(false); 
-        moNewDpsEntry.setIsDiscountUnitaryPercentageSystem(false);
-        moNewDpsEntry.setIsDiscountEntryPercentage(false);
-        moNewDpsEntry.setDiscountUnitaryPercentage(0.0);
-        moNewDpsEntry.setDiscountUnitaryPercentageSystem(0.0);
-        moNewDpsEntry.setDiscountEntryPercentage(0.0);
+        newDpsEntry.setIsDiscountDocApplying(moConcepto.getAttDescuento().getDouble() != 0);
+        newDpsEntry.setIsDiscountUnitaryPercentage(false); 
+        newDpsEntry.setIsDiscountUnitaryPercentageSystem(false);
+        newDpsEntry.setIsDiscountEntryPercentage(false);
+        newDpsEntry.setDiscountUnitaryPercentage(0.0);
+        newDpsEntry.setDiscountUnitaryPercentageSystem(0.0);
+        newDpsEntry.setDiscountEntryPercentage(0.0);
         /*
-        moDpsEntry.setPriceUnitary(...);
-        moDpsEntry.setPriceUnitarySystem(...);
-        moDpsEntry.setDiscountUnitary(...);
-        moDpsEntry.setDiscountUnitarySystem(...);
-        moDpsEntry.setDiscountEntry(...);
-        moDpsEntry.setSubtotalProvisional_r(...);
-        moDpsEntry.setDiscountDoc(...);
-        moDpsEntry.setSubtotal_r(...);
-        moDpsEntry.setTaxCharged_r(...);
-        moDpsEntry.setTaxRetained_r(...);
-        moDpsEntry.setTotal_r(...);
-        moDpsEntry.setPriceUnitaryReal_r(...);
-        moDpsEntry.setCommissions_r(...);
-        moDpsEntry.setPriceUnitaryCy(...);
-        moDpsEntry.setPriceUnitarySystemCy(...);
-        moDpsEntry.setDiscountUnitaryCy(...);
-        moDpsEntry.setDiscountUnitarySystemCy(...);
-        moDpsEntry.setDiscountEntryCy(...);
-        moDpsEntry.setSubtotalProvisionalCy_r(...);
+        newDpsEntry.setPriceUnitary(...);
+        newDpsEntry.setPriceUnitarySystem(...);
+        newDpsEntry.setDiscountUnitary(...);
+        newDpsEntry.setDiscountUnitarySystem(...);
+        newDpsEntry.setDiscountEntry(...);
+        newDpsEntry.setSubtotalProvisional_r(...);
+        newDpsEntry.setDiscountDoc(...);
+        newDpsEntry.setSubtotal_r(...);
+        newDpsEntry.setTaxCharged_r(...);
+        newDpsEntry.setTaxRetained_r(...);
+        newDpsEntry.setTotal_r(...);
+        newDpsEntry.setPriceUnitaryReal_r(...);
+        newDpsEntry.setCommissions_r(...);
+        newDpsEntry.setPriceUnitaryCy(...);
+        newDpsEntry.setPriceUnitarySystemCy(...);
+        newDpsEntry.setDiscountUnitaryCy(...);
+        newDpsEntry.setDiscountUnitarySystemCy(...);
+        newDpsEntry.setDiscountEntryCy(...);
+        newDpsEntry.setSubtotalProvisionalCy_r(...);
         */
-        moNewDpsEntry.setDiscountDocCy(moConcepto.getAttDescuento().getDouble());
+        newDpsEntry.setDiscountDocCy(moConcepto.getAttDescuento().getDouble());
         /*
-        moDpsEntry.setSubtotalCy_r(...);
-        moDpsEntry.setTaxChargedCy_r(...) 
-        moDpsEntry.setTaxRetainedCy_r(...) 
-        moDpsEntry.setTotalCy_r(...);
-        moDpsEntry.setPriceUnitaryRealCy_r(...);
-        moDpsEntry.setCommissionsCy_r(...);
+        newDpsEntry.setSubtotalCy_r(...);
+        newDpsEntry.setTaxChargedCy_r(...) 
+        newDpsEntry.setTaxRetainedCy_r(...) 
+        newDpsEntry.setTotalCy_r(...);
+        newDpsEntry.setPriceUnitaryRealCy_r(...);
+        newDpsEntry.setCommissionsCy_r(...);
         */
-        moNewDpsEntry.setOriginalPriceUnitaryCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
-        moNewDpsEntry.setOriginalPriceUnitarySystemCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
-        //moDpsEntry.setOriginalDiscountUnitaryCy(moConcepto.getAttDescuento().getDouble());
-        //moDpsEntry.setOriginalDiscountUnitarySystemCy(moConcepto.getAttDescuento().getDouble());
+        newDpsEntry.setOriginalPriceUnitaryCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
+        newDpsEntry.setOriginalPriceUnitarySystemCy(!isLinkedAsService() ? getPriceUnitary() : getServicePriceUnitary(importedDps));
+        //newDpsEntry.setOriginalDiscountUnitaryCy(moConcepto.getAttDescuento().getDouble());
+        //newDpsEntry.setOriginalDiscountUnitarySystemCy(moConcepto.getAttDescuento().getDouble());
         /*
-        moDpsEntry.setSalesPriceUnitaryCy(...);
-        moDpsEntry.setSalesFreightUnitaryCy(...);
+        newDpsEntry.setSalesPriceUnitaryCy(...);
+        newDpsEntry.setSalesFreightUnitaryCy(...);
         */
-        moNewDpsEntry.setLength(0.0);
-        moNewDpsEntry.setSurface(0.0);
-        moNewDpsEntry.setVolume(0.0);
-        moNewDpsEntry.setMass(0.0);
-        moNewDpsEntry.setWeightPackagingExtra(0.0);
-        moNewDpsEntry.setWeightGross(0.0);
-        moNewDpsEntry.setWeightDelivery(0.0);
-        moNewDpsEntry.setSurplusPercentage(0.0);
-        moNewDpsEntry.setContractBase(0.0);
-        moNewDpsEntry.setContractFuture(0.0);
-        moNewDpsEntry.setContractFactor(0.0);
-        moNewDpsEntry.setContractPriceYear(0);
-        moNewDpsEntry.setContractPriceMonth(0);
-        moNewDpsEntry.setSealQuality("");
-        moNewDpsEntry.setSealSecurity("");
-        moNewDpsEntry.setDriver("");
-        moNewDpsEntry.setPlate("");
-        moNewDpsEntry.setTicket("");
-        moNewDpsEntry.setContainerTank("");
-        moNewDpsEntry.setVgm("");
-        moNewDpsEntry.setOperationsType(mnOperationsType); 
-        moNewDpsEntry.setUserId(0);
-        moNewDpsEntry.setSortingPosition(mnRowNumber); 
-        moNewDpsEntry.setIsPrepayment(moItem == null ? false : moItem.getIsPrepayment());
-        moNewDpsEntry.setIsDiscountRetailChain(false);
-        moNewDpsEntry.setIsTaxesAutomaticApplying(true);
-        moNewDpsEntry.setIsPriceVariable(false);
-        moNewDpsEntry.setIsPriceConfirm(false);
-        moNewDpsEntry.setIsSalesFreightRequired(false);
-        moNewDpsEntry.setIsSalesFreightConfirm(false);
-        moNewDpsEntry.setIsSalesFreightAdd(false);
-        moNewDpsEntry.setIsInventoriable(moItem == null ? false : moItem.getIsInventoriable()); 
-        moNewDpsEntry.setIsDeleted(false);
-        moNewDpsEntry.setFkItemId(moItem == null ? 0 : moItem.getPkItemId());
-        moNewDpsEntry.setFkUnitId(moItem == null ? 0 : moItem.getFkUnitId());
-        moNewDpsEntry.setFkOriginalUnitId(moUnit == null ? 0 : moUnit.getPkUnitId());
-        moNewDpsEntry.setFkTaxRegionId(moTaxRegion == null ? 0 :moTaxRegion.getPkTaxRegionId());
-        //moDpsEntry.setFkThirdTaxCausingId_n(...);
-        moNewDpsEntry.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
-        moNewDpsEntry.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
-        moNewDpsEntry.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY);
+        newDpsEntry.setLength(0.0);
+        newDpsEntry.setSurface(0.0);
+        newDpsEntry.setVolume(0.0);
+        newDpsEntry.setMass(0.0);
+        newDpsEntry.setWeightPackagingExtra(0.0);
+        newDpsEntry.setWeightGross(0.0);
+        newDpsEntry.setWeightDelivery(0.0);
+        newDpsEntry.setSurplusPercentage(0.0);
+        newDpsEntry.setContractBase(0.0);
+        newDpsEntry.setContractFuture(0.0);
+        newDpsEntry.setContractFactor(0.0);
+        newDpsEntry.setContractPriceYear(0);
+        newDpsEntry.setContractPriceMonth(0);
+        newDpsEntry.setSealQuality("");
+        newDpsEntry.setSealSecurity("");
+        newDpsEntry.setDriver("");
+        newDpsEntry.setPlate("");
+        newDpsEntry.setTicket("");
+        newDpsEntry.setContainerTank("");
+        newDpsEntry.setVgm("");
+        newDpsEntry.setOperationsType(mnOperationsType); 
+        newDpsEntry.setUserId(0);
+        newDpsEntry.setSortingPosition(mnRowNumber); 
+        newDpsEntry.setIsPrepayment(moItem == null ? false : moItem.getIsPrepayment());
+        newDpsEntry.setIsDiscountRetailChain(false);
+        newDpsEntry.setIsTaxesAutomaticApplying(true);
+        newDpsEntry.setIsPriceVariable(false);
+        newDpsEntry.setIsPriceConfirm(false);
+        newDpsEntry.setIsSalesFreightRequired(false);
+        newDpsEntry.setIsSalesFreightConfirm(false);
+        newDpsEntry.setIsSalesFreightAdd(false);
+        newDpsEntry.setIsInventoriable(moItem == null ? false : moItem.getIsInventoriable()); 
+        newDpsEntry.setIsDeleted(false);
+        newDpsEntry.setFkItemId(moItem == null ? 0 : moItem.getPkItemId());
+        newDpsEntry.setFkUnitId(moItem == null ? 0 : moItem.getFkUnitId());
+        newDpsEntry.setFkOriginalUnitId(moUnit == null ? 0 : moUnit.getPkUnitId());
+        newDpsEntry.setFkTaxRegionId(moTaxRegion == null ? 0 :moTaxRegion.getPkTaxRegionId());
+        //newDpsEntry.setFkThirdTaxCausingId_n(...);
+        if (manAdjustmentSubtypeKey != null) {
+            newDpsEntry.setFkDpsAdjustmentTypeId(manAdjustmentSubtypeKey[0]);
+            newDpsEntry.setFkDpsAdjustmentSubtypeId(manAdjustmentSubtypeKey[1]);
+        }
+        else {
+            newDpsEntry.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
+            newDpsEntry.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
+        }
+        newDpsEntry.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_ORDY);
         /*
-        moDpsEntry.setFkVehicleTypeId_n(...);
-        moDpsEntry.setFkCashCompanyBranchId_n(...);
-        moDpsEntry.setFkCashAccountId_n(...);
+        newDpsEntry.setFkVehicleTypeId_n(...);
+        newDpsEntry.setFkCashCompanyBranchId_n(...);
+        newDpsEntry.setFkCashAccountId_n(...);
         */
-        moNewDpsEntry.setFkItemRefId_n(moItemReference == null ? 0 : moItemReference.getPkItemId());
-        moNewDpsEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        moNewDpsEntry.setDbmsOriginalUnitSymbol(moUnit == null ? "" : moUnit.getSymbol());
-        moNewDpsEntry.setDbmsTaxRegion(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion());
-        moNewDpsEntry.setDbmsItemRef_n(moItemReference == null ? "" : moItemReference.getItem()); 
+        newDpsEntry.setFkItemRefId_n(moItemReference == null ? 0 : moItemReference.getPkItemId());
+        newDpsEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+        newDpsEntry.setDbmsOriginalUnitSymbol(moUnit == null ? "" : moUnit.getSymbol());
+        newDpsEntry.setDbmsTaxRegion(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion());
+        newDpsEntry.setDbmsItemRef_n(moItemReference == null ? "" : moItemReference.getItem()); 
         
-        moNewDpsEntry.setAuxIsLinkedAsService(isLinkedAsService());
+        newDpsEntry.setAuxIsLinkedAsService(isLinkedAsService());
         
-        return moNewDpsEntry;
+        return newDpsEntry;
     }
     
     /**
@@ -389,30 +448,11 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         }
     }
     
-    private void updateDpsDpsLinkAsDestiny() {
-        if (!moImportedEntryDpsDpsLinks.isEmpty()) {
-            for (int i = 0; i < moImportedEntryDpsDpsLinks.size(); i++) {
-                SDataEntryDpsDpsLink moImportedEntryDpsDpsLink = moImportedEntryDpsDpsLinks.get(i);
-                SDataDpsDpsLink dpsLink = new SDataDpsDpsLink();
-                dpsLink.setPkSourceYearId(moImportedEntryDpsDpsLink.getPkYearId());
-                dpsLink.setPkSourceDocId(moImportedEntryDpsDpsLink.getPkDocId());
-                dpsLink.setPkSourceEntryId(moImportedEntryDpsDpsLink.getPkEntryId());
-                dpsLink.setOriginalQuantity(moImportedEntryDpsDpsLink.getQuantityToLink()); 
-                
-                try {
-                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().clear();
-                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().add(dpsLink);
-                }
-                catch (Exception e) {}
-            }
-        }
-    }
-    
     @Override
     public void prepareTableRow() {
         mvValues.clear();        
         
-        // CFDI:
+        // CFDI cols:
         
         mvValues.add(mnRowNumber); //#
         mvValues.add(moConcepto.getAttNoIdentificacion().getString());
@@ -422,7 +462,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         mvValues.add(moConcepto.getAttUnidad().getString());
         mvValues.add(moConcepto.getAttClaveUnidad().getString());
         
-        // SIIE:
+        // Matching cols:
         
         String claveProdServ = "";
         
@@ -435,7 +475,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
             }
         }
         
-        mvValues.add(moItem == null ? "" : moItem.getKey()); // Código ítem
+        mvValues.add(moItem == null ? "" : moItem.getKey()); // Clave ítem
         mvValues.add(moItem == null ? "" : moItem.getItem()); // Nombre ítem
         mvValues.add(claveProdServ); // ProdServ SAT
         mvValues.add(moItem == null ? "" : moItem.getDbmsDataUnit().getSymbol()); // Unidad ítem
@@ -444,16 +484,20 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         mvValues.add(moUnit == null ? "" : moUnit.getSymbol()); // Unidad
         mvValues.add(moUnit == null ? "" : moUnit.getDbmsClaveUnidad()); // Unidad SAT
         mvValues.add(moTaxRegion == null ? "" : moTaxRegion.getTaxRegion()); // Región de impuestos
-        mvValues.add(mnOperationsType == 0 ? "" : SDataConstantsSys.OperationsTypesOpsMap.get(mnOperationsType)); // Tipo de operación
+        mvValues.add(mnOperationsType == 0 ? "" : (isInvoice() ? SDataConstantsSys.OperationsTypesOpsMap.get(mnOperationsType) : SDataConstantsSys.OperationsTypesAdjMap.get(mnOperationsType))); // Tipo de operación
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getPkCostCenterIdXXX()); // Clave centro costo
         mvValues.add(moCostCenter == null ? "" : moCostCenter.getCostCenter()); // Centro costo
         mvValues.add(moItemReference == null ? "" : moItemReference.getKey()); // Clave ítem de referencia
         mvValues.add(moItemReference == null ? "" : moItemReference.getItem()); // ítem de referencia
         
-        // CFDI (complemento):
+        // CFDI (complemento) cols:
         
         mvValues.add(getPriceUnitary()); // Valor unitario
         mvValues.add(moConcepto.getAttImporte().getDouble()); // Importe
         mvValues.add(moConcepto.getAttDescuento().getDouble()); // Descuento
+        
+        // Other cols:
+        
+        mvValues.add(msAdjustmentSubtypeName); // Subtipo de ajuste
     }
 }

@@ -4,7 +4,7 @@
  */
 
 /*
- * SDialogCfdiPurchaseOrder33.java
+ * SDialogCfdiConceptLinker33.java
  *
  * Created on 27/05/2020, 02:58:00 PM
  */
@@ -41,9 +41,9 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
-public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
+public class SDialogCfdiConceptsLinker33 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
 
     public static final int VALUE_TYPE_PURCHASE_ORDER_ENTRIES = 1;
     public static final int VALUE_TYPE_ROW_CFDI = 2;
@@ -71,9 +71,9 @@ public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements e
     private HashMap<String, Double> moPurchaseOrderEntriesMap;
     private SRowCfdiImport33 moRowCfdiImport; 
     
-    /** Creates new form SDialogDpsLink
+    /** Creates new form SDialogCfdiConceptLinker33.
      * @param client */
-    public SDialogCfdiPurchaseOrder33(erp.client.SClientInterface client) {
+    public SDialogCfdiConceptsLinker33(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
         initComponents();
@@ -295,7 +295,6 @@ public class SDialogCfdiPurchaseOrder33 extends javax.swing.JDialog implements e
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);

@@ -107,7 +107,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
     protected ArrayList<SMassAccountDocument> maDocumentsRejected;
     protected HashMap<Integer, SFinUtilities.Balance[]> moAdvancesMap; // key: business partner ID; value: balances
     protected Date mtNewRequiredDate;
-    protected Pattern moPatternScaleTicketBol;
+    protected Pattern moPatternScaleTicketBolStrict;
+    protected Pattern moPatternScaleTicketBolFallback;
     protected Pattern moPatternScaleTicketRef;
     protected Pattern moPatternWarehouse;
     protected JLabel jlStatus;
@@ -1403,7 +1404,8 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         maDocuments = new ArrayList<>();
         maDocumentsRejected = new ArrayList<>();
         moAdvancesMap = new HashMap<>();
-        moPatternScaleTicketBol = SMassAccountUtils.createPatternForScaleTicketBol();
+        moPatternScaleTicketBolStrict = SMassAccountUtils.createPatternForScaleTicketBolStrict();
+        moPatternScaleTicketBolFallback = SMassAccountUtils.createPatternForScaleTicketBolFallback();
         moPatternScaleTicketRef = SMassAccountUtils.createPatternForScaleTicketRef();
         moPatternWarehouse = SMassAccountUtils.createPatternForWarehouse();
         
@@ -2947,8 +2949,12 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
         return moConfig;
     }
 
-    public Pattern getPatternScaleTicketBol() {
-        return moPatternScaleTicketBol;
+    public Pattern getPatternScaleTicketBolStrict() {
+        return moPatternScaleTicketBolStrict;
+    }
+    
+    public Pattern getPatternScaleTicketBolFallback() {
+        return moPatternScaleTicketBolFallback;
     }
     
     public Pattern getPatternScaleTicketRef() {

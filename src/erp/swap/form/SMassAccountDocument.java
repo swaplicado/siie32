@@ -160,7 +160,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
         if (isCfdiInvoice()) {
             // CFDI status (if validation throws exception, continue with parsing of document):
             try {
-                EstatusComprobante = SImportUtils.validateCfdi(Client, Comprobante, DCfdi40Catalogs.CFD_TP_I, false);
+                EstatusComprobante = SImportUtils.validateCfdi40(Client, Comprobante, DCfdi40Catalogs.CFD_TP_I, false);
             }
             catch (Exception e) {
                 SLibUtils.printException(this, e);
@@ -215,8 +215,14 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                     ParsingWarningType = WARN_CCP_MULT_MERC_TRAN; // error: multiple BienesTransp
                 }
 
-                ScaleTicketBol = SMassAccountUtils.extractScaleTicket(Comprobante.getEltConceptos().getEltConceptos().get(0).getAttDescripcion().getString(), DialogMassAccountDocuments.getPatternScaleTicketBol(), false);
-                ScaleTicketRef = SMassAccountUtils.extractScaleTicket(ImportedDocument.ReferencesAsText, DialogMassAccountDocuments.getPatternScaleTicketRef(), false);
+                ScaleTicketBol = SMassAccountUtils.extractScaleTicket(Comprobante.getEltConceptos().getEltConceptos().get(0).getAttDescripcion().getString(),
+                        DialogMassAccountDocuments.getPatternScaleTicketBolStrict(),
+                        DialogMassAccountDocuments.getPatternScaleTicketBolFallback(),
+                        false);
+                
+                ScaleTicketRef = SMassAccountUtils.extractScaleTicket(ImportedDocument.ReferencesAsText,
+                        DialogMassAccountDocuments.getPatternScaleTicketRef(),
+                        false);
             }
 
             // determine invoice main configuration elements for accounting:
@@ -235,13 +241,13 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
                 InvoicePartner = InvoiceGroup.getPartner(IsEmisorPerson);
 
                 if (InvoicePartner != null) {
-                    if (!conceptoProdServClavesSet.isEmpty()) {
-                        ComprobanteUnidadCode = conceptoUnidadClavesSet.toArray()[0].toString();
+                    if (!conceptoUnidadClavesSet.isEmpty()) {
+                        ComprobanteUnidadCode = conceptoUnidadClavesSet.toArray()[0].toString(); // take the first code
                         InvoiceUnit = InvoicePartner.getUnit(ComprobanteUnidadCode);
 
                         if (InvoiceUnit != null) {
-                            if (!conceptoUnidadClavesSet.isEmpty()) {
-                                ComprobanteProdServCode = conceptoProdServClavesSet.toArray()[0].toString();
+                            if (!conceptoProdServClavesSet.isEmpty()) {
+                                ComprobanteProdServCode = conceptoProdServClavesSet.toArray()[0].toString(); // take the first code
                                 InvoiceCase = InvoicePartner.getCase(ComprobanteProdServCode, descriptions);
 
                                 if (InvoiceCase != null) {
@@ -260,7 +266,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
 
                         if (GoodsPartner != null) {
                             if (!cartaPorteBienesTranspsSet.isEmpty()) {
-                                CartaPorteBienesTranspsCode = cartaPorteBienesTranspsSet.toArray()[0].toString();
+                                CartaPorteBienesTranspsCode = cartaPorteBienesTranspsSet.toArray()[0].toString(); // take the first code
                                 GoodsCase = GoodsPartner.getCase(CartaPorteBienesTranspsCode, descriptions);
 
                                 if (GoodsCase != null) {

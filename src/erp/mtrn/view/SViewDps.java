@@ -212,7 +212,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private java.text.DecimalFormat moUsQuantityFormat;
 
-    private boolean mbIsCatPurchasing;
+    private boolean mbIsCatPurchase;
     private boolean mbIsCatSales;
     private boolean mbIsEstEstimates;
     private boolean mbIsEstContracts;
@@ -251,7 +251,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private void initComponents() {
         // Init view settings and user rights:
         
-        mbIsCatPurchasing = mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
+        mbIsCatPurchase = mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
         mbIsCatSales = mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL;
         mbIsEstEstimates = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_EST_EST;
         mbIsEstContracts = mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_EST_CON;
@@ -262,7 +262,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         int rightLevel = 0;
         boolean canAnnul = false;
         
-        if (mbIsCatPurchasing) {
+        if (mbIsCatPurchase) {
             mnModule = SDataConstants.MOD_PUR;
             
             if (mbIsEstEstimates || mbIsEstContracts) {
@@ -506,7 +506,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
         
         // Check availability of web app for purchasing authorization:
-        if (mbIsCatPurchasing) {
+        if (mbIsCatPurchase) {
             try {
                 String sAuxAuthWebConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB);
                 mbIsAuthWebPurchasing = SLibUtils.parseInt(sAuxAuthWebConfig) == SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_WEB_ACT;
@@ -517,7 +517,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         
         // Enable SWAP Services:
-        if (mbIsCatPurchasing && (mbIsDocOrders || mbIsDocInvoices || mbIsDocCreditNotes)) { // purchase orders, invoices and credit notes only!
+        if (mbIsCatPurchase && (mbIsDocOrders || mbIsDocInvoices || mbIsDocCreditNotes)) { // purchase orders, invoices and credit notes only!
             boolean isLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
             
             mbSwapServicesLinkUp = isLinkUp && mbIsDocOrders;
@@ -610,21 +610,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
         
-        int finderType = 0;
-        boolean createFinder = false;
-        
         if (mbIsDocOrders || mbIsDocInvoices || mbIsDocCreditNotes) {
-            createFinder = true;
-
-            if (mbIsDocOrders || mbIsDocInvoices) {
-                finderType = SDataConstants.TRNX_DPS_PEND_LINK;
-            }
-            else {
-                finderType = SDataConstants.TRNX_DPS_PEND_ADJ;
-            }
+            int type = mbIsDocOrders || mbIsDocInvoices ? SDataConstants.TRNX_DPS_PEND_LINK : SDataConstants.TRNX_DPS_PEND_ADJ;
+            moDialogDpsFinder = new SDialogDpsFinder(miClient, type);
         }
-
-        moDialogDpsFinder = !createFinder ? null : new SDialogDpsFinder(miClient, finderType);
 
         addTaskBarUpperComponent(jbAnnul);
         addTaskBarUpperSeparator();
@@ -722,10 +711,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbDelete.setEnabled(mbHasRightDelete);
         jbAnnul.setEnabled(mbHasRightAnnul && mbHasRightEdit && (mbIsDocInvoices || mbIsDocCreditNotes));
         jbCopy.setEnabled(mbHasRightNew && !mbIsDocCreditNotes);
-        jbImport.setEnabled(mbHasRightNew && createFinder);
-        jbImportCfdiWithOutDps.setEnabled(mbIsCatPurchasing && mbIsDocInvoices);
-        jbImportCfdiWithDps.setEnabled(mbIsCatPurchasing && (mbIsDocInvoices/* || mbIsDocCreditNotes*/)); // XXX 2026-05-07, Sergio Flores: WIP!
-        jbImportMatRequest.setEnabled(mbIsCatPurchasing);
+        jbImport.setEnabled(mbHasRightNew && moDialogDpsFinder != null);
+        jbImportCfdiWithOutDps.setEnabled(mbIsCatPurchase && mbIsDocInvoices);
+        jbImportCfdiWithDps.setEnabled(mbIsCatPurchase && (mbIsDocInvoices || mbIsDocCreditNotes));
+        jbImportMatRequest.setEnabled(mbIsCatPurchase);
         jbChangeDpsEntryItem.setEnabled(mbIsDocOrders);
         jbChangeDeliveryAddress.setEnabled(mbIsCatSales && mbIsDocInvoices && mbHasRightLogistics);
         jbChangeAgentSupervisor.setEnabled(mbIsCatSales && mbIsDocInvoices && mbHasRightLogistics);
@@ -739,23 +728,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbViewAccountingRecord.setEnabled(mbIsDocInvoices || mbIsDocCreditNotes);
         jbViewAccountingDetailsDps.setEnabled(mbIsDocInvoices);
         jbViewAccountingDetailsBizPartner.setEnabled(mbIsDocInvoices);
-        jbPrint.setEnabled(mbIsDocOrders || mbIsCatSales && (mbIsEstEstimates || mbIsEstContracts || mbIsDocInvoices || mbIsDocCreditNotes) || (mbIsCatPurchasing && mbIsEstContracts));
+        jbPrint.setEnabled(mbIsDocOrders || mbIsCatSales && (mbIsEstEstimates || mbIsEstContracts || mbIsDocInvoices || mbIsDocCreditNotes) || (mbIsCatPurchase && mbIsEstContracts));
         jbPrintByRange.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes));
         jbPrintAcknowledgmentCancellation.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes));
         jbPrintPhotoInvoice.setEnabled(mbIsCatSales && mbIsDocInvoices);
         jbPrintEnglish.setEnabled(mbIsCatSales && ( mbIsDocInvoices || mbIsDocCreditNotes || mbIsEstContracts));
-        jbPrintContractKgAsTon.setEnabled((mbIsCatSales || mbIsCatPurchasing) && mbIsEstContracts);
+        jbPrintContractKgAsTon.setEnabled((mbIsCatSales || mbIsCatPurchase) && mbIsEstContracts);
         jbPrintContractMoves.setEnabled(mbIsCatSales && mbIsEstContracts);
         jbPrintOrderGoods.setEnabled(mbIsCatSales && mbIsDocOrders);
         jbShowCfdiXml.setEnabled(mbIsDocInvoices || mbIsDocCreditNotes);
         jbGetCfdiXml.setEnabled(mbIsDocInvoices || mbIsDocCreditNotes);
-        jbShowDocPdf.setEnabled(mbIsCatPurchasing && (mbIsDocInvoices || mbIsDocCreditNotes));
-        jbGetDocPdf.setEnabled(mbIsCatPurchasing && (mbIsDocInvoices || mbIsDocCreditNotes));
+        jbShowDocPdf.setEnabled(mbIsCatPurchase && (mbIsDocInvoices || mbIsDocCreditNotes));
+        jbGetDocPdf.setEnabled(mbIsCatPurchase && (mbIsDocInvoices || mbIsDocCreditNotes));
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes));
         jbSignXml.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
         jbValidateCfdi.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
         jbGetCfdiStatus.setEnabled((mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
-        jbSendByEmail.setEnabled(((mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes)) || (mbIsCatPurchasing && mbIsDocOrders)) && mbHasRightEdit);
+        jbSendByEmail.setEnabled(((mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes)) || (mbIsCatPurchase && mbIsDocOrders)) && mbHasRightEdit);
         jbRestoreCfdStamped.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
         jbRestoreCfdCancelAck.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
         jbResetPacFlags.setEnabled(mbIsCatSales && (mbIsDocInvoices || mbIsDocCreditNotes) && mbHasRightEdit);
@@ -813,7 +802,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
         i = 0;
         if (getDpsSortingType() == SDataConstantsSys.CFGS_TP_SORT_BIZ_P_DOC) {
-            if (mbIsCatPurchasing) {
+            if (mbIsCatPurchase) {
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave proveedor", 50);
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Proveedor", 200);
@@ -866,7 +855,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "x.can_st", "Estatus cancelación", 35);
             }
 
-            if (mbIsCatPurchasing) {
+            if (mbIsCatPurchase) {
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpc.bp_key", "Clave proveedor", 50);
                     aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Proveedor", 200);
@@ -991,7 +980,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private int getDpsSortingType() {
         int type = SLibConstants.UNDEFINED;
 
-        if (mbIsCatPurchasing && (mbIsDocInvoices || mbIsDocCreditNotes)) {
+        if (mbIsCatPurchase && (mbIsDocInvoices || mbIsDocCreditNotes)) {
             type = miClient.getSessionXXX().getParamsErp().getFkSortingDpsSupplierTypeId();
         }
         else {
@@ -1006,19 +995,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
         switch (mnTabTypeAux02) {
             case SDataConstantsSys.TRNX_TP_DPS_EST_EST:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNU_TP_DPS_PUR_EST : SDataConstantsSys.TRNU_TP_DPS_SAL_EST;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_EST : SDataConstantsSys.TRNU_TP_DPS_SAL_EST;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_EST_CON:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNU_TP_DPS_PUR_CON : SDataConstantsSys.TRNU_TP_DPS_SAL_CON;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_CON : SDataConstantsSys.TRNU_TP_DPS_SAL_CON;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_SAL_INV;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN : SDataConstantsSys.TRNU_TP_DPS_SAL_CN;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNU_TP_DPS_PUR_CN : SDataConstantsSys.TRNU_TP_DPS_SAL_CN;
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -1032,13 +1021,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
         switch (mnTabTypeAux02) {
             case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNS_CL_DPS_PUR_EST : SDataConstantsSys.TRNS_CL_DPS_SAL_EST;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_EST : SDataConstantsSys.TRNS_CL_DPS_SAL_EST;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD : SDataConstantsSys.TRNS_CL_DPS_SAL_ORD;
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                key = mbIsCatPurchasing ? SDataConstantsSys.TRNS_CL_DPS_PUR_DOC : SDataConstantsSys.TRNS_CL_DPS_SAL_DOC;
+                key = mbIsCatPurchase ? SDataConstantsSys.TRNS_CL_DPS_PUR_DOC : SDataConstantsSys.TRNS_CL_DPS_SAL_DOC;
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
@@ -1230,16 +1219,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionImportCfdi(boolean linkToOrder) {
-        if (linkToOrder ? jbImportCfdiWithDps.isEnabled() : jbImportCfdiWithOutDps.isEnabled()) {
+    private void actionImportCfdi(boolean linkToDps) {
+        if (linkToDps ? jbImportCfdiWithDps.isEnabled() : jbImportCfdiWithOutDps.isEnabled()) {
             if (miClient.getSessionXXX().getCurrentCompanyBranchId() == 0) {
                 // no branch selected in current user session:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH + "\n"
-                        + "No se puede importar o capturar facturas, hasta que se seleccione una sucursal de la empresa.");
+                        + "No se puede importar o capturar " + (mbIsDocInvoices ? "facturas" : "notas de crédito") + ", hasta que se seleccione una sucursal de la empresa.");
             }
             else {
                 try {
-                    SImportUtils.importCfdiAndCreateAndSaveDps(miClient, mbIsCatPurchasing, moDialogDpsFinder, null, null, linkToOrder, null, null);
+                    SImportUtils.importCfdiAndCreateAndSaveDps(miClient, getDpsTypeKey(), null, null, linkToDps, null, moDialogDpsFinder, null);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2840,24 +2829,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         map.put("nIdDoc", oDps.getPkDocId());
                         map.put("sTitle", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { oDps.getFkDpsCategoryId(),
                         oDps.getFkDpsClassId(), oDps.getFkDpsTypeId() }));
-                        map.put("bIsSupplier", mbIsCatPurchasing ? true : false);
+                        map.put("bIsSupplier", mbIsCatPurchase ? true : false);
                         map.put("sAddressLine1", addressOficial[0]);
                         map.put("sAddressLine2", addressOficial[1]);
                         map.put("sAddressLine3", addressOficial[2]);
                         map.put("sAddressLine4", addressOficial.length > 3 ? addressOficial[3] : "");
-                        map.put("sAddressDelivery1", mbIsCatPurchasing ? addressDeliveryCompany[0] : addressDelivery[0]);
-                        map.put("sAddressDelivery2", mbIsCatPurchasing ? addressDeliveryCompany[1] : addressDelivery[1]);
-                        map.put("sAddressDelivery3", mbIsCatPurchasing ? addressDeliveryCompany[2] : addressDelivery[2]);
-                        map.put("sAddressDelivery4", mbIsCatPurchasing ? addressDeliveryCompany.length > 3 ? addressDeliveryCompany[3] : "" :
+                        map.put("sAddressDelivery1", mbIsCatPurchase ? addressDeliveryCompany[0] : addressDelivery[0]);
+                        map.put("sAddressDelivery2", mbIsCatPurchase ? addressDeliveryCompany[1] : addressDelivery[1]);
+                        map.put("sAddressDelivery3", mbIsCatPurchase ? addressDeliveryCompany[2] : addressDelivery[2]);
+                        map.put("sAddressDelivery4", mbIsCatPurchase ? addressDeliveryCompany.length > 3 ? addressDeliveryCompany[3] : "" :
                             addressDelivery.length > 3 ? addressDelivery[3] : "");
                         map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
                         map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
-                        map.put("nBizPartnerCategory", mbIsCatPurchasing ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                        map.put("nBizPartnerCategory", mbIsCatPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
                         map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
 
                         jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_ORD_GDS, map);
                         jasperViewer = new JasperViewer(jasperPrint, false);
-                        jasperViewer.setTitle("Impresión de orden de " + (mbIsCatPurchasing ? "entrada" : "salida") + " de mercancias");
+                        jasperViewer.setTitle("Impresión de orden de " + (mbIsCatPurchase ? "entrada" : "salida") + " de mercancias");
                         jasperViewer.setVisible(true);
                     }
                     catch (Exception e) {
@@ -3734,7 +3723,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         boolean dnsRight = false; 
         
         if (mbIsDocOrders) {
-            if (mbIsCatPurchasing) {
+            if (mbIsCatPurchase) {
                 dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
             }
             else if (mbIsCatSales) {
@@ -3886,43 +3875,43 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         msSql +=
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (mbIsCatPurchasing ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
+                "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + (mbIsCatPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND ";
 
         switch (mnTabTypeAux02) {
             case SDataConstantsSys.TRNX_TP_DPS_EST_EST:
             case SDataConstantsSys.TRNX_TP_DPS_EST_CON:
-                msSql += (mbIsCatPurchasing ?
+                msSql += (mbIsCatPurchase ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_EST[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_EST[1] + " " :
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_EST[1] + " ");
 
                 if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_EST_EST) {
-                    msSql += (mbIsCatPurchasing ?
+                    msSql += (mbIsCatPurchase ?
                             "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_EST[2] + " " :
                             "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_EST[2] + " ");
                 }
                 else if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_EST_CON) {
-                    msSql += (mbIsCatPurchasing ?
+                    msSql += (mbIsCatPurchase ?
                             "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CON[2] + " " :
                             "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CON[2] + " ");
                 }
                 break;
 
             case SDataConstantsSys.TRNX_TP_DPS_ORD:
-                msSql += (mbIsCatPurchasing ?
+                msSql += (mbIsCatPurchase ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] + " " :
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1] + " ");
                 break;
 
             case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                msSql += (mbIsCatPurchasing ?
+                msSql += (mbIsCatPurchase ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " " :
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1] + " ");
                 break;
 
             case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                msSql += (mbIsCatPurchasing ?
+                msSql += (mbIsCatPurchase ?
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + " " :
                         "d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1] + " ");
                 break;
@@ -3971,7 +3960,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (getDpsSortingType() == SDataConstantsSys.CFGS_TP_SORT_BIZ_P_DOC) {
             msSql += "ORDER BY ";
 
-            if ((mbIsCatPurchasing && miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) ||
+            if ((mbIsCatPurchase && miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) ||
                 (mbIsCatSales && miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME)) {
                 msSql += "bpc.bp_key, bp.bp, ";
             }
@@ -3984,7 +3973,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         else {
             msSql += "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, ";
 
-            if ((mbIsCatPurchasing && miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) ||
+            if ((mbIsCatPurchase && miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) ||
                 (mbIsCatSales && miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME)) {
                 msSql += "bpc.bp_key, bp.bp, ";
             }

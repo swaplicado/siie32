@@ -346,21 +346,31 @@ public abstract class SMassAccountUtils {
     }
     
     /**
-     * Create Regex Pattern to extract scale ticket numbers within a text.
+     * Create Regex Pattern to extract scale ticket numbers within a text in strict mode.
      * Expected format: [BOLETO|BOL|B|TICKET|TIC|T][.] [NÚMERO|NÚM|#][.][:] (999999|999,999|999 999)
      * @return 
      */
-    public static Pattern createPatternForScaleTicketBol() {
+    public static Pattern createPatternForScaleTicketBolStrict() {
         String regex =
-                "(?i)\\b(?:" +
+                "(?i)\\b" +
                 "(?:BOL(?:ETO)?\\.?|B\\.?|TICKETE?|TIKETE?|TIQUETE?|TI[CKQ]\\.?|T\\.?)" +
                 "\\s*" +
                 "(?:N[ÚU]M(?:ERO)?\\.?|NO\\.?|N\\.?|#)?" +
                 "\\s*:?" +
                 "\\s*" +
-                ")?" +
                 "(\\d{5,7}|\\d{1,3}(?:[ ,]\\d{3}){1,2})\\b";
         
+        return Pattern.compile(regex);
+    }
+    
+    /**
+     * Create Regex Pattern to extract scale ticket numbers within a text in fallback mode.
+     * Expected format: [BOLETO|BOL|B|TICKET|TIC|T][.] [NÚMERO|NÚM|#][.][:] (999999|999,999|999 999)
+     * @return 
+     */
+    public static Pattern createPatternForScaleTicketBolFallback() {
+        String regex =
+            "\\b(\\d{5,7}|\\d{1,3}(?:[ ,]\\d{3}){1,2})\\b";
         return Pattern.compile(regex);
     }
     
@@ -383,15 +393,27 @@ public abstract class SMassAccountUtils {
      * @return Scale ticket number, when found, other wise an empty string is returned.
      */
     public static String extractScaleTicket(final String text, final Pattern pattern, final boolean verbose) {
+        return extractScaleTicket(text, pattern, null, verbose);
+    }
+    /**
+     * Extract the scale ticket number within a text.
+     * @param text Text that has a scale ticket number.
+     * @param pattern1 1st Regex Pattern to extract scale ticket numbers.
+     * @param pattern2 2nd Regex Pattern to extract scale ticket numbers (fallback).
+     * @param verbose Whether processing messages are required to be displayed in system's console.
+     * @return Scale ticket number, when found, other wise an empty string is returned.
+     */
+    public static String extractScaleTicket(final String text, final Pattern pattern1, final Pattern pattern2, final boolean verbose) {
+        String scaleTicket = "";
+        
         if (verbose) {
             System.out.println("Given text: \"" + text + "\"");
         }
         
-        String scaleTicket = "";
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher1 = pattern1.matcher(text);
         
-        if (matcher.find()) {
-            String rawNumber = matcher.group(1);
+        if (matcher1.find()) {
+            String rawNumber = matcher1.group(1);
 
             // Normalize: remove spaces or commas
             scaleTicket = rawNumber.replaceAll("[, ]", ""); // normalize (remove commas and blanks) before returning scale ticket
@@ -400,7 +422,22 @@ public abstract class SMassAccountUtils {
                 System.out.println("Found: \"" + rawNumber + "\" -> \"" + scaleTicket + "\".");
             }
         }
-        else if (verbose) {
+        else if (pattern2 != null) {
+            Matcher matcher2 = pattern2.matcher(text);
+
+            if (matcher2.find()) {
+                String rawNumber = matcher2.group(1);
+
+                // Normalize: remove spaces or commas
+                scaleTicket = rawNumber.replaceAll("[, ]", ""); // normalize (remove commas and blanks) before returning scale ticket
+
+                if (verbose) {
+                    System.out.println("Found: \"" + rawNumber + "\" -> \"" + scaleTicket + "\".");
+                }
+            }
+        }
+        
+        if (verbose && scaleTicket.isEmpty()) {
             System.out.println("No match!");
         }
         
