@@ -1297,12 +1297,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (!sPaymentDates.isEmpty()) {
                 // Quitar la coma y espacio al final de la cadena:
                 sPaymentDates = sPaymentDates.substring(0, sPaymentDates.length() - 2) + ".";
-                if (miClient.showMsgBoxConfirm("Los pagos\n"
+                if (miClient.showMsgBoxConfirm("Los siguientes pagos no tienen la misma fecha programada que la póliza seleccionada (" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + "):\n"
                         + " " + sPaymentDates + " \n"
-                        + "No tienen la misma fecha programada que la póliza seleccionada "
-                        + "(" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + ").\n"
                         + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
-                    throw new Exception("Revise los pagos: \n " + sPaymentDates);
+                    throw new Exception("Revise la fecha de la póliza contra la fecha de los pagos: \n " + sPaymentDates);
                 }
             }
         }
@@ -3607,7 +3605,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             
                             switch (mnCfgParamCfdRequired) {
                                 case SBankLayoutConsts.CFD_REQ_YES:
-                                    validation.setMessage(message);
+//                                    validation.setMessage(message);
                                     break;
                                 case SBankLayoutConsts.CFD_REQ_OPC:
                                     if (miClient.showMsgBoxConfirm(message + "\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
