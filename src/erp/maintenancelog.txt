@@ -1,4 +1,28 @@
 ================================================================================
+SIIE 3.2 300.6/ 2026-05-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Formateo de mensaje de validación de fecha programada de pagos vs fecha de póliza contable.
+
+================================================================================
+SIIE 3.2 300.5/ 2026-05-13
+Cesar Ivan OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) El calculo de las fechas solo se hacia para mostrarlo en el mensaje internamente no se hacia correctamente
+
+================================================================================
+SIIE 3.2 300.4/ 2026-05-08
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Habilitar la visualización de datos de importación de DPS y permitir visualización de XML y PDF en forma de captura de DPS en SIIE. PDC-826.
+
+================================================================================
+SIIE 3.2 300.3/ 2026-05-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Documentar y formatear todas las clases del paquete erp.siieapp en SIIE. PDC-825.
+
+================================================================================
 SIIE 3.2 300.2/ 2026-05-07
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -9,7 +33,7 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 300.1/ 2026-05-06
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Cambio de cuenta bancaria pagadora y de beneficiario en vista de pagos operados.
+1) Cambio de cuenta bancaria pagadora y de beneficiario en vista de pagos operados. PDC-823.
 
 ================================================================================
 SIIE 3.2 300.0/ 2026-05-06
@@ -22,7 +46,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 299.20/ 2026-05-04
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Se agregan tipos de documento en archivos para OC, cotizaciones y pagos.
+1) Se agregan tipos de documento en archivos para OC, cotizaciones y pagos. PDC-821.
 
 ================================================================================
 SIIE 3.2 299.19/ 2026-05-04

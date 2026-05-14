@@ -204,11 +204,17 @@ public class SPayrollUtils {
                         return null;
                     }
 
-                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
-                    DateTime dateTime = new DateTime(dtDate);
-                    Date endDatePrevious = dateTime.plusDays(-7).toDate();
-                    Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
-                    dates[0] = dates1[0];
+                    if (SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 1) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
+                        DateTime dateTime = new DateTime(dtDate);
+                    }
+                    else if(SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 2) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
+                        DateTime dateTime = new DateTime(dtDate);
+                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                        Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
+                        dates[0] = dates1[0];
+                    }
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(client, payType, yearPeriod, payrollNumber);

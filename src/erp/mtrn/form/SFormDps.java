@@ -109,6 +109,8 @@ import erp.mtrn.data.cfd.SAddendaAmc71CompanyBranch;
 import erp.mtrn.data.cfd.SAddendaAmc71Manager;
 import erp.mtrn.data.cfd.SAddendaAmc71Supplier;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
+import erp.mtrn.data.cfd.SDialogCfdRenderer;
+import erp.mtrn.view.SViewDps;
 import erp.musr.data.SUserUtils;
 import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
@@ -375,6 +377,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbOldIsDiscountDocApplying;
     private java.lang.String msFileXmlJustLoaded;
     private java.io.File moFilePdfJustLoaded;
+    private SDialogCfdRenderer moDialogCfdRenderer;
     private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
@@ -458,6 +461,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlDpsType = new javax.swing.JLabel();
         jtfDpsTypeRo = new javax.swing.JTextField();
         jbViewImportedDocument = new javax.swing.JButton();
+        jbViewDocumentXml = new javax.swing.JButton();
         jbViewDocumentPdf = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
@@ -1079,13 +1083,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfDpsTypeRo.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfDpsTypeRo.setText("DOCUMENT TYPE");
         jtfDpsTypeRo.setFocusable(false);
-        jtfDpsTypeRo.setPreferredSize(new java.awt.Dimension(214, 23));
+        jtfDpsTypeRo.setPreferredSize(new java.awt.Dimension(189, 23));
         jPanel6.add(jtfDpsTypeRo);
 
         jbViewImportedDocument.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_custom_acc_on.gif"))); // NOI18N
         jbViewImportedDocument.setToolTipText("Ver documento importado...");
         jbViewImportedDocument.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel6.add(jbViewImportedDocument);
+
+        jbViewDocumentXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbViewDocumentXml.setToolTipText("Ver documento importado...");
+        jbViewDocumentXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel6.add(jbViewDocumentXml);
 
         jbViewDocumentPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
         jbViewDocumentPdf.setToolTipText("Ver PDF de la factura...");
@@ -4320,6 +4329,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDateStartCredit.addActionListener(this);
         jbDateMaturity.addActionListener(this);
         jbViewImportedDocument.addActionListener(this);
+        jbViewDocumentXml.addActionListener(this);
         jbViewDocumentPdf.addActionListener(this);
         jbBizPartnerBalance.addActionListener(this);
         jbRecordManualSelect.addActionListener(this);
@@ -7900,7 +7910,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void setFilePdfJustLoaded(final File pdf) {
         moFilePdfJustLoaded = pdf;
-        jbViewDocumentPdf.setEnabled(moFilePdfJustLoaded != null);
+        jbViewDocumentPdf.setEnabled(moDps.isDocumentOrAdjustmentPur());
     }
 
     private void actionDate() {
@@ -7971,23 +7981,60 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void actionViewDocumentPdf() {
-        if (moFilePdfJustLoaded != null) {
-            if (moDialogPdfViewer == null) {
-                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient, false);
+    private void actionShowCfdiXml() {
+        if (jbViewDocumentXml.isEnabled()) {
+            try {
+                if (moDialogCfdRenderer == null) {
+                    moDialogCfdRenderer = new SDialogCfdRenderer(miClient);
+                }
+
+                if (msFileXmlJustLoaded != null && !msFileXmlJustLoaded.isEmpty()) {
+                    // extraer el texto del xml en la ruta:
+                    // validar que el archivo exista:
+                    if (!new File(msFileXmlJustLoaded).exists()) {
+                        miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento.");
+                    }
+                    else {
+                        String xmlContent = SXmlUtils.readXml(msFileXmlJustLoaded);
+                        moDialogCfdRenderer.renderCfdXml(xmlContent);
+                    }
+                }
+                else {
+                    SViewDps.showCfdiXml(miClient, (int[]) moDps.getPrimaryKey(), moDialogCfdRenderer);
+                }
             }
-            
-            SDocumentInfo documentInfo;
-            
-            if (moImportedDocument != null) {
-                documentInfo = new SDocumentInfo(moImportedDocument);
+            catch (Exception ex) {
+                miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento.");
+                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void actionViewDocumentPdf() {
+        try {
+            if (moDialogPdfViewer == null) {
+                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient);
+            }
+            if (moFilePdfJustLoaded != null) {
+                SDocumentInfo documentInfo;
+
+                if (moImportedDocument != null) {
+                    documentInfo = new SDocumentInfo(moImportedDocument);
+                }
+                else {
+                    documentInfo = new SDocumentInfo(moFieldNumberSeries.getString(), moFieldNumber.getString(), "", moFieldDateDoc.getDate(), moBizPartner.getBizPartner());
+                }
+
+                moDialogPdfViewer.setPdf(documentInfo, moFilePdfJustLoaded);
+                moDialogPdfViewer.setVisible(true);
             }
             else {
-                documentInfo = new SDocumentInfo(moFieldNumberSeries.getString(), moFieldNumber.getString(), "", moFieldDateDoc.getDate(), moBizPartner.getBizPartner());
+                SViewDps.showDocPdf(miClient, (int[]) moDps.getPrimaryKey(), moDialogPdfViewer);
             }
-
-            moDialogPdfViewer.setPdf(documentInfo, moFilePdfJustLoaded);
-            moDialogPdfViewer.setVisible(true);
+        }
+        catch (Exception ex) {
+            miClient.showMsgBoxWarning("No se encontró el PDF del documento");
+            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -11573,6 +11620,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbSetTime;
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JButton jbViewDocumentPdf;
+    private javax.swing.JButton jbViewDocumentXml;
     private javax.swing.JButton jbViewImportedDocument;
     private javax.swing.JComboBox jcbAccEntryItem;
     private javax.swing.JComboBox jcbAccEntryItemRef_n;
@@ -12061,6 +12109,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         msXmlUuid = "";
         moImportedDocument = null;
         jbViewImportedDocument.setEnabled(false);
+        jbViewDocumentXml.setEnabled(false);
+        jbViewDocumentPdf.setEnabled(false);
         
         moPaneGridEntries.createTable();
         moPaneGridEntries.clearTableRows();
@@ -13281,6 +13331,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         moImportedDocument = moDps.getXtaImportedDocument();
         jbViewImportedDocument.setEnabled(moImportedDocument != null);
+        jbViewDocumentXml.setEnabled(moDps.isDocumentOrAdjustmentPur());
         
         // set business partner, set aswell business partner default preferences when document is new:
 
@@ -14122,6 +14173,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbViewImportedDocument) {
                     actionViewImportedDocument();
+                }
+                else if (button == jbViewDocumentXml) {
+                    actionShowCfdiXml();
                 }
                 else if (button == jbViewDocumentPdf) {
                     actionViewDocumentPdf();

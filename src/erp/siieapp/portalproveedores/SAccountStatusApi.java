@@ -18,23 +18,68 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sa.lib.gui.SGuiSession;
-import erp.siieapp.portalproveedores.*;
 
 /**
+ * API para consultar el estado de cuenta de un proveedor en el portal de
+ * proveedores.
+ * <p>
+ * Genera un JSON con los movimientos contables del proveedor en un rango de
+ * fechas, incluyendo un renglón de saldo inicial calculado con los movimientos
+ * anteriores al periodo.
+ * </p>
  *
  * @author César Orozco
  */
 public class SAccountStatusApi {
+
+    /**
+     * Sesión activa del cliente, usada para obtener la conexión a la base de
+     * datos.
+     */
     private SGuiSession oSession;
 
+    /**
+     * Crea una instancia de la API con la sesión del cliente.
+     *
+     * @param session sesión activa del cliente
+     */
     public SAccountStatusApi(SGuiSession session) {
         oSession = session;
     }
 
+    /**
+     * Constructor por defecto no soportado. Se debe usar
+     * {@link #SAccountStatusApi(SGuiSession)}.
+     */
     public SAccountStatusApi() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    /**
+     * Consulta el estado de cuenta de un proveedor y lo retorna como JSON.
+     * <p>
+     * La respuesta incluye dos bloques:
+     * <ul>
+     * <li>Un renglón de <b>saldo inicial</b> con el acumulado de movimientos
+     * anteriores a {@code dateIni}.</li>
+     * <li>Los <b>movimientos del periodo</b> entre {@code dateIni} y
+     * {@code dateFin}.</li>
+     * </ul>
+     * </p>
+     *
+     * @param sJson JSON con los parámetros de consulta. Campos esperados:
+     * <ul>
+     * <li>{@code idBp} – ID del socio de negocio (proveedor)</li>
+     * <li>{@code idYear} – Año fiscal a consultar</li>
+     * <li>{@code dateIni} – Fecha de inicio del periodo (formato
+     * {@code YYYY-MM-DD})</li>
+     * <li>{@code dateFin} – Fecha de fin del periodo (formato
+     * {@code YYYY-MM-DD})</li>
+     * </ul>
+     * @return JSON con la lista de movimientos del estado de cuenta
+     * ({@link SDataAccountStatusResponse}), o cadena vacía si ocurre un error
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
     public String getResources(String sJson) throws SQLException {
         String jsonDr = "";
         ArrayList<SAccountStatusData> lASData = new ArrayList<>();
@@ -42,8 +87,7 @@ public class SAccountStatusApi {
         String idYear = "";
         String dateIni = "";
         String dateFin = "";
-        
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
@@ -52,15 +96,14 @@ public class SAccountStatusApi {
             idYear = root.get("idYear").toString();
             dateIni = root.get("dateIni").toString();
             dateFin = root.get("dateFin").toString();
-            
-        } catch (ParseException ex) {
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
+
         String msSql = "SELECT '2023' AS id_year, '0' AS id_per, '0' AS id_bkc, '' AS id_tp_rec, '0' AS id_num, 0 AS sort_pos, "
-                + "ADDDATE('"+ dateIni +"', -1) AS dt, 'SALDO INICIAL' concept, "
+                + "ADDDATE('" + dateIni + "', -1) AS dt, 'SALDO INICIAL' concept, "
                 + "0.0 AS debit, SUM(re.credit - re.debit) AS credit, "
                 + "'0' AS exc_rate, "
                 + "0.0 AS debit_cur, SUM(re.credit_cur - re.debit_cur)AS credit_cur, "
@@ -68,7 +111,7 @@ public class SAccountStatusApi {
                 + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
                 + "WHERE NOT r.b_del AND NOT re.b_del "
-                + "AND r.id_year = " + idYear + " " 
+                + "AND r.id_year = " + idYear + " "
                 + "AND r.dt < '" + dateIni + "' "
                 + "AND re.fid_ct_sys_mov_xxx = 4 AND re.fid_tp_sys_mov_xxx = 2 AND re.fid_bp_nr = 887 "
                 + "UNION ALL "
@@ -79,15 +122,13 @@ public class SAccountStatusApi {
                 + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
                 + "WHERE NOT r.b_del AND NOT re.b_del "
                 + "AND r.id_year = " + idYear + " "
-                + "AND r.dt BETWEEN '"+ dateIni +"' AND '" + dateFin + "' "
+                + "AND r.dt BETWEEN '" + dateIni + "' AND '" + dateFin + "' "
                 + "AND re.fid_ct_sys_mov_xxx = 4 AND re.fid_tp_sys_mov_xxx = 2 AND re.fid_bp_nr = " + idBp + " "
                 + "ORDER BY dt, id_year, id_per, id_bkc, id_tp_rec, id_num ";
-                
-                
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataAccountStatusResponse aux = new SDataAccountStatusResponse();
-                        
+
             while (res.next()) {
                 SAccountStatusData asd = new SAccountStatusData();
 
@@ -97,19 +138,20 @@ public class SAccountStatusApi {
                 asd.setDebit(res.getDouble("debit"));
                 asd.setCredit(res.getDouble("credit"));
                 asd.setExcRate(res.getFloat("exc_rate"));
-                asd.setImportForeignCurrency(res.getDouble("debit_cur")+res.getDouble("credit_cur"));
+                asd.setImportForeignCurrency(res.getDouble("debit_cur") + res.getDouble("credit_cur"));
                 asd.setCurrencyCode(res.getString("f_cur_key"));
-               
+
                 lASData.add(asd);
             }
-            
+
             aux.setlASData(lASData);
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(aux);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 

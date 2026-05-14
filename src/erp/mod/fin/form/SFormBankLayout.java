@@ -1229,6 +1229,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else {
             String sPaymentDates = "";
             String sPaymentDocs = "";
+            int paymentDateCount = 0;
             HashSet<Integer> processedIds = new HashSet<>();
             for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
                 SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
@@ -1277,7 +1278,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         if (oPayment.getQueryResultId() == SDbConsts.READ_OK) {
                             if (!oPayment.getDateSchedule_n().equals(moCurrentRecord.getDate())) {
                                 sPaymentDates += "Folio: " + oPayment.getFolio()
-                                        + ", Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + " \n";
+                                        + " - Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + ", ";
+                                if (++paymentDateCount % 5 == 0) {
+                                    sPaymentDates += "\n";
+                                }
                             }
                         }
                     }
@@ -1291,12 +1295,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
 
             if (!sPaymentDates.isEmpty()) {
-                if (miClient.showMsgBoxConfirm("Los pagos\n"
-                        + " " + sPaymentDates + " "
-                        + "No tienen la misma fecha programada que la póliza seleccionada "
-                        + "(" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + ").\n"
+                // Quitar la coma y espacio al final de la cadena:
+                sPaymentDates = sPaymentDates.substring(0, sPaymentDates.length() - 2) + ".";
+                if (miClient.showMsgBoxConfirm("Los siguientes pagos no tienen la misma fecha programada que la póliza seleccionada (" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + "):\n"
+                        + " " + sPaymentDates + " \n"
                         + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
-                    throw new Exception("Revise los pagos: \n " + sPaymentDates);
+                    throw new Exception("Revise la fecha de la póliza contra la fecha de los pagos: \n " + sPaymentDates);
                 }
             }
         }
