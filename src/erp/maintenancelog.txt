@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 300.6/ 2026-05-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Formateo de mensaje de validación de fecha programada de pagos vs fecha de póliza contable.
+
+================================================================================
+SIIE 3.2 300.5/ 2026-05-13
+Cesar Ivan OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) El calculo de las fechas solo se hacia para mostrarlo en el mensaje internamente no se hacia correctamente
+
+================================================================================
 SIIE 3.2 300.4/ 2026-05-08
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

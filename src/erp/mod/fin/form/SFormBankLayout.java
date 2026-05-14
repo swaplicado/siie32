@@ -1229,6 +1229,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else {
             String sPaymentDates = "";
             String sPaymentDocs = "";
+            int paymentDateCount = 0;
             HashSet<Integer> processedIds = new HashSet<>();
             for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
                 SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
@@ -1277,7 +1278,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         if (oPayment.getQueryResultId() == SDbConsts.READ_OK) {
                             if (!oPayment.getDateSchedule_n().equals(moCurrentRecord.getDate())) {
                                 sPaymentDates += "Folio: " + oPayment.getFolio()
-                                        + ", Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + " \n";
+                                        + " - Fecha prog.: " + SLibUtils.DateFormatDate.format(oPayment.getDateSchedule_n()) + ", ";
+                                if (++paymentDateCount % 5 == 0) {
+                                    sPaymentDates += "\n";
+                                }
                             }
                         }
                     }
@@ -1291,8 +1295,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
 
             if (!sPaymentDates.isEmpty()) {
+                // Quitar la coma y espacio al final de la cadena:
+                sPaymentDates = sPaymentDates.substring(0, sPaymentDates.length() - 2) + ".";
                 if (miClient.showMsgBoxConfirm("Los pagos\n"
-                        + " " + sPaymentDates + " "
+                        + " " + sPaymentDates + " \n"
                         + "No tienen la misma fecha programada que la póliza seleccionada "
                         + "(" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + ").\n"
                         + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
