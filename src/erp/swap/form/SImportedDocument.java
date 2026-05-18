@@ -29,6 +29,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SThinDps;
 import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
 import erp.swap.utils.SImportUtils;
 import erp.swap.utils.SServicesUtils;
 import java.io.File;
@@ -247,20 +248,20 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         setMassAccountSettings(SDbSwapDataProcessing.ACC_METHOD_MANUAL, 0, 0, 0, 0, 0, 0);
     }
     
-    private int getTxnDocumentType() {
-        return SImportedDocument.getTxnDocumentType(DocumentType);
-    }
-    
-    private String getPrcDataType() {
-        return SImportedDocument.getPrcDataType(DocumentType);
-    }
-    
     /**
      * Inform whether this document is an invoice.
      * @return 
      */
-    public boolean isInvoice() {
+    private boolean isInvoice() {
         return DocumentType == SDataConstantsSys.TRNX_TP_DPS_DOC;
+    }
+    
+    private int getSwapTxnDocType() {
+        return SSwapUtils.getSwapTxnDocumentType(DocumentType);
+    }
+    
+    private String getSwapPrcDataType() {
+        return SSwapUtils.getSwapPrcDataType(DocumentType);
     }
     
     /**
@@ -496,13 +497,16 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      */
     public int[] getFirstReferenceDpsKey(final SGuiClient client, final int referenceType) throws Exception {
         int[] referenceDpsKey = null;
+        int[] dpsClassKey = null;
         String refPrefix = "";
         
         switch (referenceType) {
             case SSwapConsts.TXN_REF_TYPE_ORDER:
+                dpsClassKey = SDataConstantsSys.TRNS_CL_DPS_PUR_ORD;
                 refPrefix = SSwapConsts.TXN_REF_TYPE_ORDER_CODE;
                 break;
             case SSwapConsts.TXN_REF_TYPE_INVOICE:
+                dpsClassKey = SDataConstantsSys.TRNS_CL_DPS_PUR_DOC;
                 refPrefix = "";
                 break;
             default:
@@ -515,11 +519,11 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             if (dpsKey != null) {
                 referenceDpsKey = dpsKey.asKey();
             }
-            else if (referenceType == SSwapConsts.TXN_REF_TYPE_ORDER) {
-                SImportUtils.DpsFolio orderFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
+            else if (referenceType == SSwapConsts.TXN_REF_TYPE_ORDER || referenceType == SSwapConsts.TXN_REF_TYPE_INVOICE) {
+                SImportUtils.DpsFolio dpsFolio = SImportUtils.createDpsFolio(References[0].Reference, refPrefix);
 
-                if (orderFolio != null) {
-                    referenceDpsKey = SDataUtilities.obtainDpsKey((SClientInterface) client, orderFolio.Series, orderFolio.Number, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+                if (dpsFolio != null) {
+                    referenceDpsKey = SDataUtilities.obtainDpsKey((SClientInterface) client, dpsFolio.Series, dpsFolio.Number, dpsClassKey);
                 }
             }
         }
@@ -943,7 +947,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                 SDbSwapDataProcessing swapDataProcessing = new SDbSwapDataProcessing();
 
                 //swapDataProcessing.setPkSwapDataProcessingId(...);
-                swapDataProcessing.setDataType(getPrcDataType());
+                swapDataProcessing.setDataType(getSwapPrcDataType());
                 swapDataProcessing.setTransactionCategory(SDataConstantsSys.TRNS_CT_DPS_PUR);
                 swapDataProcessing.setExternalDataId(ExternalDocumentId);
                 swapDataProcessing.setExternalDataUuid(ExternalDocumentUuid);
@@ -1016,7 +1020,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
                     File[] files = AuxFiles; // re-use existing files, if available
                     
                     if (files == null || files.length != SImportUtils.CFDI_FILES) {
-                        files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getTxnDocumentType());
+                        files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getSwapTxnDocType());
                     }
                     
                     if (files != null && files.length == SImportUtils.CFDI_FILES) {
@@ -1483,7 +1487,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
         if (files == null) {
             boolean isBizPartnerDomestic = isBizPartnerDomestic(session.getClient());
             
-            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getTxnDocumentType());
+            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getSwapTxnDocType());
 
             if (files == null || files.length != SImportUtils.CFDI_FILES) {
                 throw new Exception("No se pudieron descargar o no existen los archivos XML y/o PDF del CFDI de esta " + DocumentName + " autorizada.");
@@ -1857,7 +1861,7 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
      * @param dpsTypeKey DPS type key.
      * @return When DPS type key is supported, either SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) or SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes), otherwise SLibConstants.UNDEFINED.
      */
-    public static int getDocumentType(final int[] dpsTypeKey) {
+    public static int getGuiDocumentType(final int[] dpsTypeKey) {
         int type = SLibConstants.UNDEFINED;
         
         if (SLibUtils.compareKeys(dpsTypeKey, SDataConstantsSys.TRNU_TP_DPS_PUR_INV)) {
@@ -1867,72 +1871,6 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
             type = SDataConstantsSys.TRNX_TP_DPS_ADJ;
         }
             
-        return type;
-    }
-    
-    /**
-     * Get SWAP-Services-transactions document type for the given GUI document type.
-     * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
-     * @return 
-     */
-    public static int getTxnDocumentType(final int documentType) {
-        int type = 0;
-        
-        switch (documentType) {
-            case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                type = SSwapConsts.TXN_DOC_TYPE_INVOICE;
-                break;
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                type = SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE;
-                break;
-            default:
-                // nothing
-        }
-        
-        return type;
-    }
-    
-    /**
-     * Get default SWAP-Services-transactions reference type for the given GUI document type.
-     * @param documentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
-     * @return 
-     */
-    public static int getDefaultTxnReferenceType(final int documentType) {
-        int type = 0;
-        
-        switch (documentType) {
-            case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                type = SSwapConsts.TXN_REF_TYPE_ORDER;
-                break;
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                type = SSwapConsts.TXN_REF_TYPE_INVOICE;
-                break;
-            default:
-                // nothing
-        }
-        
-        return type;
-    }
-    
-    /**
-     * Get SWAP-processing data type for the given GUI document type.
-     * @param documentType TUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
-     * @return 
-     */
-    public static String getPrcDataType(final int documentType) {
-        String type = "";
-        
-        switch (documentType) {
-            case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                type = SDbSwapDataProcessing.DATA_TYPE_INV;
-                break;
-            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                type = SDbSwapDataProcessing.DATA_TYPE_CN;
-                break;
-            default:
-                // nothing
-        }
-        
         return type;
     }
     
@@ -2094,7 +2032,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
 
         try (ResultSet resultSet = statement.executeQuery(sql)) {
             if (resultSet.next()) {
-                importedDocument = new SImportedDocument(null, SImportedDocument.getDocumentType(new int[] { resultSet.getInt("d.fid_ct_dps"), resultSet.getInt("d.fid_cl_dps"), resultSet.getInt("d.fid_tp_dps") }));
+                int[] dpsTypeKey = new int[] { resultSet.getInt("d.fid_ct_dps"), resultSet.getInt("d.fid_cl_dps"), resultSet.getInt("d.fid_tp_dps") };
+                importedDocument = new SImportedDocument(null, SImportedDocument.getGuiDocumentType(dpsTypeKey));
                 importedDocument.ExternalDocumentId = resultSet.getInt("sdp.ext_data_id");
                 importedDocument.ExternalDocumentUuid = resultSet.getString("sdp.ext_data_uuid");
                 importedDocument.BizPartnerId = resultSet.getInt("b.id_bp");

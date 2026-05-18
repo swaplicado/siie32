@@ -11,6 +11,7 @@ import cfd.DCfdUtils;
 import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver40.DCfdi40Catalogs;
+import erp.SFileUtilities;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -24,6 +25,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogCfdiImport33;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -57,7 +60,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.xml.SXmlUtils;
 
 /**
- * Muestra el CFDI y se permite la validación cuando sea necesaria ante el SAT.
+ * Muestra un CFDI y, si se requiere, permite su captura y contabilización, previa validación de su estatus ante el SAT.
  * @author Isabel Servín, Sergio Flores
  */
 public final class SDialogCfdRenderer implements ActionListener {
@@ -68,6 +71,7 @@ public final class SDialogCfdRenderer implements ActionListener {
     private File moCfdiFile;
     private File moPdfFile;
     private SDataDps moDpsToLink;
+    private int[] manAdjustmentSubtypeKey;
     private int mnBizPartnerCategory;
     private float mfCfdiVersion;
     private cfd.ver40.DElementComprobante moComprobante40;
@@ -78,6 +82,7 @@ public final class SDialogCfdRenderer implements ActionListener {
     private boolean mbCreateProcessingButtons;
     private JButton mjViewPdf;
     private JButton mjProcessCfd;
+    private JButton mjSaveCfd;
     private JButton mjClose;
     private SDataDps moDpsRendered;
     private JDialog moCfdiViewer;
@@ -128,7 +133,7 @@ public final class SDialogCfdRenderer implements ActionListener {
                 mjProcessCfd = new JButton("Continuar");
                 mjProcessCfd.setBounds(480, 1, 100, 25);
                 mjProcessCfd.addActionListener(this);
-                    mjProcessCfd.setToolTipText("Continuar con la captura del CFDI...");
+                mjProcessCfd.setToolTipText("Continuar con la captura del CFDI...");
                 moCfdiViewer.add(mjProcessCfd);
 
                 mjViewPdf.setEnabled(moPdfFile != null);
@@ -140,8 +145,14 @@ public final class SDialogCfdRenderer implements ActionListener {
                 moCfdiViewer.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
             }
 
+            mjSaveCfd = new JButton("Guardar XML");
+            mjSaveCfd.setBounds(750, 1, 100, 25);
+            mjSaveCfd.addActionListener(this);
+            mjSaveCfd.setToolTipText("Guardar archivo XML del CFDI...");
+            moCfdiViewer.add(mjSaveCfd);
+
             mjClose = new JButton("Cerrar");
-            mjClose.setBounds(850, 1, 100, 25);
+            mjClose.setBounds(865, 1, 100, 25);
             mjClose.addActionListener(this);
             mjClose.setToolTipText("Cerrar el visor de CFDI");
             moCfdiViewer.add(mjClose);
@@ -356,7 +367,7 @@ public final class SDialogCfdRenderer implements ActionListener {
                         moCfdiViewer.setVisible(false);
 
                         SDialogCfdiImport40 dialog = new SDialogCfdiImport40(miClient, moDpsToLink, moCfdiFile, moPdfFile, createDocumentInfo());
-                        dialog.setComprobante(moComprobante40);
+                        dialog.setComprobante(moComprobante40, manAdjustmentSubtypeKey);
                         dialog.setVisible(true);
                         moDpsRendered = dialog.getNewDps();
                     }
@@ -709,6 +720,29 @@ public final class SDialogCfdRenderer implements ActionListener {
         }
     }
     
+    private void actionPerformedSaveCfd() throws Exception {
+        String name;
+        
+        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+            name = moComprobante40.getEltEmisor().getAttRfc().getString();
+            name += "_" + moComprobante40.getAttTipoDeComprobante().getString();
+            name += "_" + STrnUtils.formatDocNumber(moComprobante40.getAttSerie().getString(), moComprobante40.getAttFolio().getString());
+            name += "." + SFileUtilities.xml;
+        }
+        else {
+            name = moComprobante33.getEltEmisor().getAttRfc().getString();
+            name += "_" + moComprobante33.getAttTipoDeComprobante().getString();
+            name += "_" + STrnUtils.formatDocNumber(moComprobante33.getAttSerie().getString(), moComprobante33.getAttFolio().getString());
+            name += "." + SFileUtilities.xml;
+        }
+        
+        miClient.getFileChooser().setSelectedFile(new File(name));
+        if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            SXmlUtils.writeXml(msCfdiXml, miClient.getFileChooser().getSelectedFile().getAbsolutePath());
+            miClient.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + miClient.getFileChooser().getSelectedFile().getAbsolutePath());
+        }
+    }
+    
     private void actionPerformedClose() {
         moCfdiViewer.setVisible(false);
     }
@@ -730,6 +764,7 @@ public final class SDialogCfdRenderer implements ActionListener {
         moCfdiFile = null;
         moPdfFile = null;
         moDpsToLink = null;
+        manAdjustmentSubtypeKey = null;
         mnBizPartnerCategory = 0;
         
         showCfdiViewer();
@@ -741,12 +776,13 @@ public final class SDialogCfdRenderer implements ActionListener {
      * @param cfdiFile Archivo con el XML del CFDI.
      * @param pdfFile Archivo con el PDF del CFDI.
      * @param dpsToLink Documento a vincular, orden de compra o factura, relacionado con el CFDI. Puede ser <code>null</code>.
+     * @param adjustmentSubtypeKey Subtipo de ajuste. Es opcional al crear notas de crédito;; en caso contrario debe ser <code>null</code>.
      * @param bizPartnerCategory
      * @return Documento nuevo recién creado a partir del CFDI.
      * @throws Exception
      */
     @SuppressWarnings("deprecation")
-    public SDataDps renderCfdAndCreateDps(final int documentType, final File cfdiFile, final File pdfFile, final SDataDps dpsToLink, final int bizPartnerCategory) throws Exception {
+    public SDataDps renderCfdAndCreateDps(final int documentType, final File cfdiFile, final File pdfFile, final SDataDps dpsToLink, final int[] adjustmentSubtypeKey, final int bizPartnerCategory) throws Exception {
         mbCreateProcessingButtons = true;
         
         if (SLibUtils.belongsTo(documentType, new int[] { SDataConstantsSys.TRNX_TP_DPS_DOC, SDataConstantsSys.TRNX_TP_DPS_ADJ })) {
@@ -770,6 +806,7 @@ public final class SDialogCfdRenderer implements ActionListener {
                 moCfdiFile = cfdiFile;
                 moPdfFile = pdfFile;
                 moDpsToLink = dpsToLink;
+                manAdjustmentSubtypeKey = adjustmentSubtypeKey;
                 mnBizPartnerCategory = bizPartnerCategory;
 
                 showCfdiViewer();
@@ -790,6 +827,9 @@ public final class SDialogCfdRenderer implements ActionListener {
                 }
                 else if (button == mjProcessCfd) {
                     actionPerformedProcessCfd();
+                }
+                else if (button == mjSaveCfd) {
+                    actionPerformedSaveCfd();
                 }
                 else if (button == mjClose) {
                     actionPerformedClose();

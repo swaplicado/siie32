@@ -19,7 +19,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Uriel Castañeda, Adrián Avilés, Isabel Servín
+ * @author Uriel Castañeda, Adrián Avilés, Isabel Servín, Sergio Flores
  */
 public abstract class STrnDpsUtilities {
  
@@ -252,5 +252,75 @@ public abstract class STrnDpsUtilities {
         double sumPricesUnitary = 0;
         sumPricesUnitary = dpsEntries.stream().map((importedDps) -> importedDps.getOriginalPriceUnitaryCy()).reduce(sumPricesUnitary, (accumulator, _item) -> accumulator + _item);
         return SLibUtils.round(priceUnitary / sumPricesUnitary, SErpConsts.VAL_QTY_MAX_DECS);
+    }
+    
+    /**
+     * Prepara la partida complementaria a agregarse a la factura afectada por descuentos de cadenas comerciales o aplicación de anticipos facturados.
+     * @param client Cliente GUI.
+     * @param creditNote Nota de crédito a la que pertenece la partida de ajuste.
+     * @param creditNoteEntry Partida de la nota de crédito para descuentos comerciales o aplicación de anticipos facturados.
+     * @param invoiceEntryComplementary Partida complementaria a agregarse a la factura afectada.
+     */
+    public static void prepareDpsEntryComplementaryAndCreateAdjustment(final erp.client.SClientInterface client, final SDataDps creditNote, final SDataDpsEntry creditNoteEntry, final SDataDpsEntry invoiceEntryComplementary) {
+        invoiceEntryComplementary.setConceptKey(creditNoteEntry.getConceptKey());
+        invoiceEntryComplementary.setConcept(creditNoteEntry.getConcept());
+        invoiceEntryComplementary.setOriginalQuantity(0);
+        invoiceEntryComplementary.setOriginalPriceUnitaryCy(0);
+        invoiceEntryComplementary.setOriginalPriceUnitarySystemCy(0);
+        invoiceEntryComplementary.setOriginalDiscountUnitaryCy(0);
+        invoiceEntryComplementary.setOriginalDiscountUnitarySystemCy(0);
+
+        invoiceEntryComplementary.setLength(0);
+        invoiceEntryComplementary.setSurface(0);
+        invoiceEntryComplementary.setVolume(0);
+        invoiceEntryComplementary.setMass(0);
+        invoiceEntryComplementary.setWeightGross(0);
+        invoiceEntryComplementary.setWeightDelivery(0);
+        invoiceEntryComplementary.setSurplusPercentage(0);
+        invoiceEntryComplementary.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+        invoiceEntryComplementary.setUserId(SLibConstants.UNDEFINED);
+        invoiceEntryComplementary.setSortingPosition(0);
+        invoiceEntryComplementary.setIsTaxesAutomaticApplying(true);
+        invoiceEntryComplementary.setIsInventoriable(false);
+        invoiceEntryComplementary.setIsDeleted(false);
+        invoiceEntryComplementary.setFkItemId(creditNoteEntry.getFkItemId());
+        invoiceEntryComplementary.setFkUnitId(creditNoteEntry.getFkUnitId());
+        invoiceEntryComplementary.setFkOriginalUnitId(creditNoteEntry.getFkOriginalUnitId());
+        invoiceEntryComplementary.setFkTaxRegionId(creditNoteEntry.getFkTaxRegionId());
+        invoiceEntryComplementary.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
+        invoiceEntryComplementary.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
+        invoiceEntryComplementary.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT);
+        invoiceEntryComplementary.setFkItemRefId_n(creditNoteEntry.getFkItemRefId_n());
+        invoiceEntryComplementary.setFkCostCenterId_n(creditNoteEntry.getFkCostCenterId_n());
+        invoiceEntryComplementary.setFkUserNewId(client.getSession().getUser().getPkUserId());
+
+        /* XXX Sergio Flores, 2026-05-15: Revisar si tiene caso seguir preservando este bloque de código. Al parecer ya no sirve.
+        oDpsEntryComplementary.setDbmsFkItemGenericId(oDpsEntry.getDbmsFkItemGenericId());
+        oDpsEntryComplementary.setDbmsUnitSymbol(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.ITMU_UNIT, new int[] { oDpsEntryComplementary.getFkUnitId() }, SLibConstants.DESCRIPTION_CODE));
+        oDpsEntryComplementary.setDbmsOriginalUnitSymbol(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.ITMU_UNIT, new int[] { oDpsEntryComplementary.getFkOriginalUnitId() }, SLibConstants.DESCRIPTION_CODE));
+        oDpsEntryComplementary.setDbmsTaxRegion(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_REG, new int[] { oDpsEntryComplementary.getFkTaxRegionId() }));
+        oDpsEntryComplementary.setDbmsDpsAdjustmentType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_DPS_ADJ, new int[] { oDpsEntryComplementary.getFkDpsAdjustmentTypeId() }));
+        oDpsEntryComplementary.setDbmsDpsEntryType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_DPS_ETY, new int[] { oDpsEntryComplementary.getFkDpsEntryTypeId() }));
+        */
+
+        invoiceEntryComplementary.calculateTotal(client, creditNote.getDate(),
+                creditNote.getFkTaxIdentityEmisorTypeId(), creditNote.getFkTaxIdentityReceptorTypeId(),
+                creditNote.getIsDiscountDocPercentage(), creditNote.getDiscountDocPercentage(), creditNote.getExchangeRate());
+
+        SDataDpsDpsAdjustment adjustment = new SDataDpsDpsAdjustment();
+        adjustment.setPkDpsYearId(invoiceEntryComplementary.getPkYearId());
+        adjustment.setPkDpsDocId(invoiceEntryComplementary.getPkDocId());
+        adjustment.setPkDpsEntryId(invoiceEntryComplementary.getPkEntryId());
+        adjustment.setPkDpsAdjustmentYearId(creditNoteEntry.getPkYearId());
+        adjustment.setPkDpsAdjustmentDocId(creditNoteEntry.getPkDocId());
+        adjustment.setPkDpsAdjustmentEntryId(creditNoteEntry.getPkEntryId());
+        adjustment.setQuantity(0);
+        adjustment.setOriginalQuantity(0);
+        adjustment.setValue(creditNoteEntry.getTotal_r());
+        adjustment.setValueCy(creditNoteEntry.getTotalCy_r());
+        adjustment.setAuxDpsEntryComplementary(invoiceEntryComplementary);
+
+        creditNoteEntry.getDbmsDpsAdjustmentsAsAdjustment().clear();
+        creditNoteEntry.getDbmsDpsAdjustmentsAsAdjustment().add(adjustment);
     }
 }

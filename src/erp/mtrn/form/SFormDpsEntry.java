@@ -247,7 +247,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.mtrn.form.SDialogTankCarPicker moDialogTankCarPicker;
     private erp.mtrn.form.SFormDpsEntryNotes moFormNotes;
     private erp.mtrn.form.SFormDpsComEntry moFormComEntry;
-    //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
 
     private erp.mtrn.data.SDataDps moParamDps;
     private erp.mbps.data.SDataBizPartner moParamBizPartner;
@@ -3065,19 +3064,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         // Miscellaneous:
 
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        try {
-            moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
-            moPanelFkCostCenterId_n.setLabelsWidth(100);
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-
-        jpCostCenter.remove(jlDummyCostCenter);
-        jpCostCenter.add(moPanelFkCostCenterId_n, BorderLayout.NORTH);
-        */
-        
         moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
         moCostCenterPanel.setRetrieveDataCostCenters(true);
 
@@ -3668,7 +3654,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         
         // Reset other controls:
 
-        //moPanelFkCostCenterId_n.resetPanel();//XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moCostCenterPanel.initPanel();
         
         // Default values:
@@ -4186,12 +4171,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jcbFkItemReferenceId_n.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemReferenceRequired());
             jbFkItemReferenceId_n.setEnabled(moItem.getDbmsDataItemGeneric().getIsItemReferenceRequired());
 
-            //moPanelFkCostCenterId_n.enableFields(true); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             moCostCenterPanel.setPanelEditable(true);
 
             try {
-                //moPanelFkCostCenterId_n.getFieldAccount().setString(SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId())); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId())}, SLibConstants.EXEC_MODE_SILENT);
+                
                 if (costCenter != null) {
                     moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
                     jcbFkItemId.requestFocus();
@@ -4202,9 +4186,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
-            }
-            finally {
-                //moPanelFkCostCenterId_n.refreshPanel();//XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             }
 
             jtfLength.setEnabled(moItem.getDbmsDataItemGeneric().getIsLengthApplying() && (moItem.getIsLengthVariable() || moItem.getDbmsDataItemGeneric().getIsLengthVariable()));
@@ -4507,7 +4488,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jcbOperationsType.setEnabled(false);
 
-            //moPanelFkCostCenterId_n.enableFields(false);//XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             moCostCenterPanel.setPanelEditable(false);
 
             jcbFkTaxRegionId.setEnabled(false);
@@ -6524,12 +6504,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
                     validation.setComponent(jtfSalesFreightUnitaryCy);
                 }
-                /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-                else if (moPanelFkCostCenterId_n.isEmptyAccountId()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moPanelFkCostCenterId_n.getFieldAccountLabel().getText() + "'.");
-                    validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
-                }
-                */
                 else if (moCostCenterPanel.getSelectedDataCostCenter() == null) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + moCostCenterPanel.getPanelAccountName() + "'.");
                     validation.setComponent(moCostCenterPanel.getTextNumberFirst());                    
@@ -6679,7 +6653,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     if (msgValidation.isEmpty()) {
                         // Validate cost center:
 
-                        //msgValidation = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), moParamDps.getDate()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                         msgValidation = SDataUtilities.validateCostCenter(miClient, moCostCenterPanel.getSelectedDataCostCenter(), moParamDps.getDate());
                         
                         if (!msgValidation.isEmpty()) {
@@ -6996,11 +6969,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (moParamDps.isDpsTypeContractSal()) {
             renderQualityAnalysisConfiguration();
         }
-        /* //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moDpsEntry.getFkCostCenterId_n().isEmpty() ? moPanelFkCostCenterId_n.getEmptyAccountId() : moDpsEntry.getFkCostCenterId_n());
-        moPanelFkCostCenterId_n.refreshPanel();
-        */
-        SDataCostCenter costCenter; 
+        
+        SDataCostCenter costCenter;
+        
         if (!moDpsEntry.getFkCostCenterId_n().isEmpty()) {
             costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { moDpsEntry.getFkCostCenterId_n() }, SLibConstants.EXEC_MODE_SILENT);
             moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
@@ -7109,7 +7080,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setOperationsType(moFieldOperationsType.getKeyAsIntArray()[0]);
 
         moDpsEntry.setFkItemRefId_n(moFieldFkItemReferenceId_n.getKeyAsIntArray()[0]);
-        //moDpsEntry.setFkCostCenterId_n(moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         moDpsEntry.setFkCostCenterId_n(moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX());
         moDpsEntry.setIsPrepayment(moFieldIsPrepayment.getBoolean());
         moDpsEntry.setIsInventoriable(moFieldIsInventoriable.getBoolean());
@@ -7141,10 +7111,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setDbmsUnitSymbol(jtfUnitSymbolRo.getText());
         moDpsEntry.setDbmsTaxRegion(((SFormComponentItem) jcbFkTaxRegionId.getSelectedItem()).getItem());
         moDpsEntry.setDbmsItemRef_n(!jcbFkItemReferenceId_n.isEnabled() || jcbFkItemReferenceId_n.getSelectedIndex() <= 0 ? "" : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemReferenceId_n.getKeyAsIntArray()));
-        /* //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        moDpsEntry.setDbmsCostCenter_n(!moPanelFkCostCenterId_n.getFieldAccount().getComponent().isEnabled() ? "" : (moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCostCenter()));
-        moDpsEntry.setDbmsCostCenterCode(!moPanelFkCostCenterId_n.getFieldAccount().getComponent().isEnabled() ? "" : (moPanelFkCostCenterId_n.getCurrentInputCostCenter() == null ? "" : moPanelFkCostCenterId_n.getCurrentInputCostCenter().getCode()));
-        */
         moDpsEntry.setDbmsCostCenter_n(!moCostCenterPanel.isPanelEditable() ? "" : (moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getCostCenter()));
         moDpsEntry.setDbmsCostCenterCode(!moCostCenterPanel.isPanelEditable() ? "" : (moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getCode()));
         
@@ -7190,6 +7156,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             cfdEntry.setPredial(moFieldComplPredial.getString());
         }
         
+        cfdEntry.setTaxObject(moPaneTaxes.getTableModel().getRowCount() > 0 ? DCfdi40Catalogs.ClaveObjetoImpSí : DCfdi40Catalogs.ClaveObjetoImpNo);
+
+        moDpsEntry.setDbmsDpsCfdEntry(cfdEntry);
+        
+        // Item composition:
+        
         if (((int[]) moFieldItemCompositionItem.getFieldValue())[0] != SLibConstants.UNDEFINED) {
             SDataDpsEntryItemComposition comp = new SDataDpsEntryItemComposition();
             comp.setPkItemId(((int[]) moFieldItemCompositionItem.getFieldValue())[0]);
@@ -7199,20 +7171,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setDbmsDpsEntryItemComposition(comp);
         }
         
-        // Is sales contract
+        // Is sales contract:
+        
         ArrayList<SDataDpsEntryAnalysis> configurations = new ArrayList<>();
+        
         if (moParamDps.isDpsTypeContractSal()) {
             for (SGridRow row : moGridAnalysis.getModel().getGridRows()) {
                 configurations.add((SDataDpsEntryAnalysis) row);
             }
         }
+        
         moDpsEntry.getDbmsDpsEntryAnalysis().clear();
         moDpsEntry.getDbmsDpsEntryAnalysis().addAll(configurations);
 
-        cfdEntry.setTaxObject(moPaneTaxes.getTableModel().getRowCount() > 0 ? DCfdi40Catalogs.ClaveObjetoImpSí : DCfdi40Catalogs.ClaveObjetoImpNo);
-
-        moDpsEntry.setDbmsDpsCfdEntry(cfdEntry);
-        
         moDpsEntry.setFlagMinorChangesEdited(mbPostEmissionEditionDone);
         
         if (jckIsQuantityChg.isSelected()) {
@@ -7234,7 +7205,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.getDbmsScaleTicketsEty().add(ety);
         }
         
-        moDpsEntry.setFlagDpsEtyOpened(true);
+        moDpsEntry.setFlagDpsEtyOpened(true); // entry was really opened in this form!
+        
         return moDpsEntry;
     }
 

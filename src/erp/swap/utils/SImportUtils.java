@@ -567,6 +567,7 @@ public abstract class SImportUtils {
     public static int[] importCfdiAndCreateAndSaveDps(final SClientInterface client, final int[] dpsTypeKey, final File cfdiXml, final File cfdiPdf, final boolean linkToDps, final SDataDps requiredDpsToLink, final SDialogDpsFinder dialogDpsFinder, final SImportedDocument importedDocument) throws Exception {
         SDataDps dps = null;
         SDataDps dpsToLink = null;
+        int[] adjustmentSubtypeKey = null;
         boolean isInvoice = SLibUtils.belongsTo(dpsTypeKey, new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_INV });
         boolean isPurchase = dpsTypeKey[0] == SDataConstantsSys.TRNS_CT_DPS_PUR;
 
@@ -585,6 +586,11 @@ public abstract class SImportUtils {
 
                 if (dialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     dpsToLink = (SDataDps) dialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+                    
+                    if (!isInvoice) {
+                        // only when creatig credit notes:
+                        adjustmentSubtypeKey = (int[]) dialogDpsFinder.getValue(SDataConstants.TRNS_STP_DPS_ADJ);
+                    }
                 }
             }
         }
@@ -600,7 +606,7 @@ public abstract class SImportUtils {
                     chooserUsed = true;
                     FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
                     client.getFileChooser().repaint();
-                    client.getFileChooser().setSelectedFile(null);
+                    client.getFileChooser().setSelectedFile(new File(""));
                     client.getFileChooser().setAcceptAllFileFilterUsed(false);
                     client.getFileChooser().setFileFilter(filter);
                     
@@ -612,7 +618,7 @@ public abstract class SImportUtils {
                 if (chosenCfdiXml != null) {
                     if (chosenCfdiXml.getName().toLowerCase().contains("." + SFileUtilities.xml)) {
                         int documentType = isInvoice ? SDataConstantsSys.TRNX_TP_DPS_DOC : SDataConstantsSys.TRNX_TP_DPS_ADJ;
-                        SDataDps newDps = new SDialogCfdRenderer(client).renderCfdAndCreateDps(documentType, chosenCfdiXml, cfdiPdf, dpsToLink, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                        SDataDps newDps = new SDialogCfdRenderer(client).renderCfdAndCreateDps(documentType, chosenCfdiXml, cfdiPdf, dpsToLink, adjustmentSubtypeKey, isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
 
                         if (newDps != null) {
                             newDps.setAuxFilePdf(cfdiPdf);

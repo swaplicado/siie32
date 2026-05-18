@@ -222,11 +222,15 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
                 link.setPkSourceYearId(importedEntryDpsDpsLink.getPkYearId());
                 link.setPkSourceDocId(importedEntryDpsDpsLink.getPkDocId());
                 link.setPkSourceEntryId(importedEntryDpsDpsLink.getPkEntryId());
+                //link.setPkDestinyYearId(...);
+                //link.setPkDestinyDocId(...);
+                //link.setPkDestinyEntryId(...);
                 link.setOriginalQuantity(importedEntryDpsDpsLink.getQuantityToLink()); 
                 
                 try {
-                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().clear();
-                    moNewDpsEntries.get(i).getDbmsDpsLinksAsDestiny().add(link);
+                    SDataDpsEntry entry = moNewDpsEntries.get(i);
+                    entry.getDbmsDpsLinksAsDestiny().clear();
+                    entry.getDbmsDpsLinksAsDestiny().add(link);
                 }
                 catch (Exception e) {
                     SLibUtils.printException(this, e);
@@ -235,7 +239,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
         }
     }
     
-    private void updateDpsDpsAdjustmentAsDps() {
+    private void updateDpsDpsAdjustmentAsAdjustment() {
         if (!moImportedEntryDpsDpsLinks.isEmpty()) {
             for (int i = 0; i < moImportedEntryDpsDpsLinks.size(); i++) {
                 SDataEntryDpsDpsLink importedEntryDpsDpsLink = moImportedEntryDpsDpsLinks.get(i);
@@ -244,11 +248,15 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
                 adjustment.setPkDpsYearId(importedEntryDpsDpsLink.getPkYearId());
                 adjustment.setPkDpsDocId(importedEntryDpsDpsLink.getPkDocId());
                 adjustment.setPkDpsEntryId(importedEntryDpsDpsLink.getPkEntryId());
+                //adjustment.setPkAdjustmentYearId(...);
+                //adjustment.setPkAdjustmentDocId(...);
+                //adjustment.setPkAdjustmentEntryId(...);
                 adjustment.setOriginalQuantity(importedEntryDpsDpsLink.getQuantityToLink()); 
                 
                 try {
-                    moNewDpsEntries.get(i).getDbmsDpsAdjustmentsAsDps().clear();
-                    moNewDpsEntries.get(i).getDbmsDpsAdjustmentsAsDps().add(adjustment);
+                    SDataDpsEntry entry = moNewDpsEntries.get(i);
+                    entry.getDbmsDpsAdjustmentsAsAdjustment().clear();
+                    entry.getDbmsDpsAdjustmentsAsAdjustment().add(adjustment);
                 }
                 catch (Exception e) {
                     SLibUtils.printException(this, e);
@@ -303,7 +311,7 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
                 updateDpsDpsSupplyAsDestiny();
             }
             else {
-                updateDpsDpsAdjustmentAsDps();
+                updateDpsDpsAdjustmentAsAdjustment();
             }
         }
     }

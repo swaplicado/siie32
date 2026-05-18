@@ -77,7 +77,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
     public cfd.ver40.DElementComprobante Comprobante;
     public String EstatusComprobante;
     public cfd.ver4.ccp31.DElementCartaPorte CartaPorte;
-    public ArrayList<SCfdiConcepto> Conceptos;
+    public ArrayList<SRowCfdiConcepto> Conceptos;
     public boolean IsEmisorPerson;
     public String EmisorFiscalId;
     public String EmisorDescripByName; // ID + " - " + name
@@ -183,7 +183,7 @@ public class SMassAccountDocument implements SGridRow, Comparable<SMassAccountDo
             HashSet<String> cartaPorteBienesTranspsSet = null;
 
             for (cfd.ver40.DElementConcepto concepto : Comprobante.getEltConceptos().getEltConceptos()) {
-                Conceptos.add(new SCfdiConcepto(concepto));
+                Conceptos.add(new SRowCfdiConcepto(concepto));
                 conceptoProdServClavesSet.add(concepto.getAttClaveProdServ().getString());
                 conceptoUnidadClavesSet.add(concepto.getAttClaveUnidad().getString());
             }

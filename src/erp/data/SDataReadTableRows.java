@@ -1927,6 +1927,26 @@ public abstract class SDataReadTableRows {
                 sSql += "ORDER BY id_ct_dps, id_cl_dps, id_tp_dps, tp_dps ";
                 break;
 
+            case SDataConstants.TRNS_STP_DPS_ADJ:
+                aoPkFields = new STableField[2];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_tp_dps_adj");
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_stp_dps_adj");
+
+                i = 0;
+                aoQueryFields = new STableField[1];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "stp_dps_adj");
+
+                sSql = "SELECT id_tp_dps_adj, id_stp_dps_adj, stp_dps_adj " +
+                        "FROM erp.trns_stp_dps_adj WHERE b_del = 0 ";
+                if (filterKey != null) {
+                    if (((int[]) filterKey).length >= 1) {
+                        sSql += " AND id_tp_dps_adj = " + ((int[]) filterKey)[0] + " ";
+                    }
+                }
+
+                sSql += "ORDER BY id_tp_dps_adj, id_stp_dps_adj, stp_dps_adj ";
+                break;
+
             case SDataConstants.TRNS_TP_IOG:
                 aoPkFields = new STableField[3];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_ct_iog");

@@ -185,11 +185,6 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         jftWorkingDate.setText("yyyy/mm/dd");
         jftWorkingDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jftWorkingDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jftWorkingDateActionPerformed(evt);
-            }
-        });
         jPanel6.add(jftWorkingDate);
 
         jbWorkingDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -347,10 +342,6 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
         jcbCompanyBranch.requestFocusInWindow();
     }//GEN-LAST:event_formWindowOpened
 
-    private void jftWorkingDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jftWorkingDateActionPerformed
-        jbOk.requestFocusInWindow();
-    }//GEN-LAST:event_jftWorkingDateActionPerformed
-
     private void initComponentsExtra() {
         moFieldWorkingDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftWorkingDate, jlWorkingDate);
         moFieldWorkingDate.setPickerButton(jbWorkingDate);
@@ -364,29 +355,43 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         jcbCompanyBranch.addItemListener(this);
 
-        AbstractAction actionCompaniesKeyEnter = new AbstractAction() {
+        AbstractAction actionEnterCompanyBranchKey = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jftWorkingDate.requestFocusInWindow();
             }
         };
         
-        jcbCompanyBranch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterAction");
-        jcbCompanyBranch.getActionMap().put("enterAction", actionCompaniesKeyEnter);
+        jcbCompanyBranch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterCompanyBranch");
+        jcbCompanyBranch.getActionMap().put("enterCompanyBranch", actionEnterCompanyBranchKey);
+        
+        AbstractAction actionEnterWorkingDate = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jbOk.requestFocusInWindow();
+            }
+        };
+        
+        jftWorkingDate.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterWorkingDate");
+        jftWorkingDate.getActionMap().put("enterWorkingDate", actionEnterWorkingDate);
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionOk(); }
+            public void actionPerformed(ActionEvent e) {
+                actionOk();
+            }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.putActionMap(getRootPane(), actionOk, "ctrlEnter", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionCancel = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) {
+                actionCancel();
+            }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "escape", KeyEvent.VK_ESCAPE, 0);
     }
 
     private void windowActivated() {

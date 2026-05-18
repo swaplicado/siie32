@@ -808,6 +808,12 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 setTitle("Seleccionar tipo de documento");
                 break;
 
+            case SDataConstants.TRNS_STP_DPS_ADJ:
+                aoTableColumns = new STableColumnForm[1];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Subtipo de ajuste", 300);
+                setTitle("Seleccionar subtipo de ajuste");
+                break;
+
             case SDataConstants.TRN_DNS_DPS:
                 aoTableColumns = new STableColumnForm[1];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Series folios compras-ventas", 300);

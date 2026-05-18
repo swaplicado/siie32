@@ -12,11 +12,11 @@ import sa.lib.grid.SGridRow;
  *
  * @author Sergio Flores
  */
-public class SCfdiConcepto implements SGridRow {
+public class SRowCfdiConcepto implements SGridRow {
     
     public cfd.ver40.DElementConcepto Concepto;
     
-    public SCfdiConcepto(final cfd.ver40.DElementConcepto concepto) {
+    public SRowCfdiConcepto(final cfd.ver40.DElementConcepto concepto) {
         Concepto = concepto;
     }
 
@@ -107,5 +107,4 @@ public class SCfdiConcepto implements SGridRow {
     public void setRowValueAt(Object value, int col) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

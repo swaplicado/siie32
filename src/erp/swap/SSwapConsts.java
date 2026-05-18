@@ -136,9 +136,17 @@ public abstract class SSwapConsts {
     public static final int AUTHZ_STATUS_REJECTED = 8;
     public static final int AUTHZ_STATUS_OK = 9;
     
+    public static final int RESOURCE_TYPE_REQUISITION = 1;
+    public static final int RESOURCE_TYPE_PUR_QUOTE = 2;
     public static final int RESOURCE_TYPE_PUR_ORDER = 3;
     public static final int RESOURCE_TYPE_PUR_INVOICE = 4;
+    public static final int RESOURCE_TYPE_PUR_DEBIT_NOTE = 5;
+    public static final int RESOURCE_TYPE_PUR_CREDIT_NOTE = 6;
     public static final int RESOURCE_TYPE_PUR_PAYMENT = 11;
+    public static final int RESOURCE_TYPE_PUR_PROFORMA = 12;
+    public static final int RESOURCE_TYPE_PUR_PAYMENT_RECEIPT_VOUCHER = 16;
+    public static final int RESOURCE_TYPE_BP_SUPPLIER = 21;
+    public static final int RESOURCE_TYPE_BP_SUPPLIER_DOC = 26;
     
     public static final int FLOW_MODEL_TYPE = 1;
     public static final int FLOW_TYPE_INVOICE = 1;

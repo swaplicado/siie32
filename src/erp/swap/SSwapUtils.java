@@ -5,7 +5,9 @@
  */
 package erp.swap;
 
+import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -89,6 +91,11 @@ public abstract class SSwapUtils {
         return sanitized;
     }
     
+    /**
+     * Get currency ID from given SWAP-Services currendy ID.
+     * @param swapServicesCurrencyId SWAP-Services currendy ID to witch the currency ID is required.
+     * @return 
+     */
     public static int getCurrencyId(final int swapServicesCurrencyId) {
         int currencyId = 0;
         
@@ -110,6 +117,72 @@ public abstract class SSwapUtils {
         }
         
         return currencyId;
+    }
+    
+    /**
+     * Get SWAP-Services-transactions document type for the given GUI document type.
+     * @param guiDocumentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static int getSwapTxnDocumentType(final int guiDocumentType) {
+        int type = 0;
+        
+        switch (guiDocumentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SSwapConsts.TXN_DOC_TYPE_INVOICE;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SSwapConsts.TXN_DOC_TYPE_CREDIT_NOTE;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
+    }
+    
+    /**
+     * Get default SWAP-Services-transactions reference type for the given GUI document type.
+     * @param guiDocumentType GUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static int getDefaultSwapTxnReferenceType(final int guiDocumentType) {
+        int type = 0;
+        
+        switch (guiDocumentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SSwapConsts.TXN_REF_TYPE_ORDER;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SSwapConsts.TXN_REF_TYPE_INVOICE;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
+    }
+    
+    /**
+     * Get SWAP-processing data type for the given GUI document type.
+     * @param guiDocumentType TUI document type. Supported options: SDataConstantsSys.TRNX_TP_DPS_DOC (invoices) and SDataConstantsSys.TRNX_TP_DPS_ADJ (credit notes).
+     * @return 
+     */
+    public static String getSwapPrcDataType(final int guiDocumentType) {
+        String type = "";
+        
+        switch (guiDocumentType) {
+            case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                type = SDbSwapDataProcessing.DATA_TYPE_INV;
+                break;
+            case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                type = SDbSwapDataProcessing.DATA_TYPE_CN;
+                break;
+            default:
+                // nothing
+        }
+        
+        return type;
     }
     
     /**

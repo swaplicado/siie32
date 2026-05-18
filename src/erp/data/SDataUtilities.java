@@ -1624,14 +1624,14 @@ public abstract class SDataUtilities {
     }
 
     @SuppressWarnings("unchecked")
-    public static int obtainNextNumberForDps(erp.client.SClientInterface client, java.lang.String series, java.lang.Object docClassOrTypeKey) throws java.lang.Exception {
+    public static int obtainNextNumberForDps(erp.client.SClientInterface client, java.lang.String series, java.lang.Object dpsClassOrTypeKey) throws java.lang.Exception {
         int number = 0;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT MAX(CONVERT(num, UNSIGNED INTEGER)) + 1 AS f_num FROM trn_dps " +
-                "WHERE fid_ct_dps = " + ((int[]) docClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassOrTypeKey)[1] + " AND " +
-                (((int[]) docClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassOrTypeKey)[2] + " AND ") +
+                "WHERE fid_ct_dps = " + ((int[]) dpsClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) dpsClassOrTypeKey)[1] + " AND " +
+                (((int[]) dpsClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) dpsClassOrTypeKey)[2] + " AND ") +
                 "num_ser = '" + series + "' AND b_del = 0 ";
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
@@ -1701,8 +1701,8 @@ public abstract class SDataUtilities {
     }
 
     @SuppressWarnings("unchecked")
-    public static int[] obtainDpsKey(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object docClassOrTypeKey) throws java.lang.Exception {
-        return obtainDpsKeyForBizPartner(client, series, number, docClassOrTypeKey, null);
+    public static int[] obtainDpsKey(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object dpsClassOrTypeKey) throws java.lang.Exception {
+        return obtainDpsKeyForBizPartner(client, series, number, dpsClassOrTypeKey, null);
     }
 /**
  * 
@@ -1712,11 +1712,11 @@ public abstract class SDataUtilities {
  * @param folioIni Initial 
  * @param folioEnd
  * @param date
- * @param docClassOrTypeKey
+ * @param dpsClassOrTypeKey
  * @return
  * @throws Exception 
  */
-    public static ArrayList<int[]> obtainDpsIds(final SClientInterface client, String serieIni, String serieEnd, String folioIni, String folioEnd, Date date, java.lang.Object docClassOrTypeKey) throws Exception {
+    public static ArrayList<int[]> obtainDpsIds(final SClientInterface client, String serieIni, String serieEnd, String folioIni, String folioEnd, Date date, java.lang.Object dpsClassOrTypeKey) throws Exception {
         int[] pk = new int[2];
         String sql = "";
         ResultSet resultSet = null;
@@ -1729,16 +1729,16 @@ public abstract class SDataUtilities {
                 + "FROM trn_dps WHERE NOT b_del "
                 + "AND num_ser >= '" + serieIni + "' AND num_ser <= '" + serieEnd + "' " 
                 + "AND num >= '" + folioIni + "' "
-                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) docClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassOrTypeKey)[1] + " AND " +
-                (((int[]) docClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassOrTypeKey)[2] + " ") 
+                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) dpsClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) dpsClassOrTypeKey)[1] + " AND " +
+                (((int[]) dpsClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) dpsClassOrTypeKey)[2] + " ") 
                 + "AND dt = '" + SLibUtils.DbmsDateFormatDate.format(date) + "';";
         }
         else if (serieIni.compareTo("") == 0 && serieEnd.compareTo("") == 0) {
             sql = "SELECT id_year, id_doc "
                 + "FROM trn_dps WHERE NOT b_del "
                 + "AND num >= '" + folioIni + "' "
-                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) docClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassOrTypeKey)[1] + " AND " +
-                (((int[]) docClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassOrTypeKey)[2] + " ") 
+                + "AND num <= '" + folioEnd + "' AND fid_ct_dps = " + ((int[]) dpsClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) dpsClassOrTypeKey)[1] + " AND " +
+                (((int[]) dpsClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) dpsClassOrTypeKey)[2] + " ") 
                 + "AND dt = '" + SLibUtils.DbmsDateFormatDate.format(date) + "';";
         }
 
@@ -1754,14 +1754,14 @@ public abstract class SDataUtilities {
     }
         
     @SuppressWarnings("unchecked")
-    public static int[] obtainDpsKeyForBizPartner(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object docClassOrTypeKey, java.lang.Object bizPartnerKey_n) throws java.lang.Exception {
+    public static int[] obtainDpsKeyForBizPartner(erp.client.SClientInterface client, java.lang.String series, java.lang.String number, java.lang.Object dpsClassOrTypeKey, java.lang.Object bizPartnerKey_n) throws java.lang.Exception {
         int[] key = null;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_year, id_doc FROM trn_dps " +
-                "WHERE fid_ct_dps = " + ((int[]) docClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) docClassOrTypeKey)[1] + " AND " +
-                (((int[]) docClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) docClassOrTypeKey)[2] + " AND ") +
+                "WHERE fid_ct_dps = " + ((int[]) dpsClassOrTypeKey)[0] + " AND fid_cl_dps = " + ((int[]) dpsClassOrTypeKey)[1] + " AND " +
+                (((int[]) dpsClassOrTypeKey).length <= 2 ? "" : "fid_tp_dps = " + ((int[]) dpsClassOrTypeKey)[2] + " AND ") +
                 "num_ser = '" + series + "' AND num = '" + number + "' AND b_del = 0 " +
                 (bizPartnerKey_n == null ? "" : "AND fid_bp_r = " + ((int[]) bizPartnerKey_n)[0] + " ") +
                 "ORDER BY id_year, id_doc ";
@@ -1786,7 +1786,8 @@ public abstract class SDataUtilities {
      * @param ptDateDoc Document date.
      * @param pnItemId Item ID.
      * @param pnFkCurrencyId Currency id.
-* @return double array with item price and discount percentage.
+     * @return double array with item price and discount percentage.
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static SParamsItemPriceList obtainItemPrice(erp.client.SClientInterface client, int pnBizPartnerId, int pnBizPartnerBranchId, int pnBizPartnerCategoryId, int pnBizPartnerTypeId,
@@ -2043,7 +2044,8 @@ public abstract class SDataUtilities {
      * @param client SClientInterface.
      * @param pnItemId Item ID.
      * @param psBizPartnersIds Suppliers IDs.
-     * @return supplier id, date docto, item total.
+     * @return supplier ID, date of document, item total.
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static java.lang.Object[] obtainLastPriceForSupplierItem(erp.client.SClientInterface client, int pnItemId, java.lang.String psBizPartnersIds) throws java.lang.Exception {

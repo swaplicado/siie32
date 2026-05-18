@@ -17,14 +17,13 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCostCenterPicker extends javax.swing.JDialog implements ActionListener {
     
     public static final int DESCRIPTION = 1; 
 
     private final SClientInterface miClient;
-    //private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n; //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
     
     private int mnFormResult;
     
@@ -80,19 +79,6 @@ public class SDialogCostCenterPicker extends javax.swing.JDialog implements Acti
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponentsExtra() {
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        try {
-            moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
-            moPanelFkCostCenterId_n.setLabelsWidth(100);
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-        moPanelFkCostCenterId_n.resetPanel();
-        jPanel1.remove(jLabel1);
-        jPanel1.add(moPanelFkCostCenterId_n);
-        */
-
         moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
         moCostCenterPanel.setRetrieveDataCostCenters(true);
 
@@ -128,15 +114,18 @@ public class SDialogCostCenterPicker extends javax.swing.JDialog implements Acti
 
     public Object getValue(int value) {
         Object obj = null;
+        
         switch (value) {
             case SDataConstants.FIN_CC:
-                //obj = moPanelFkCostCenterId_n.getCurrentInputCostCenter();//XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 obj = moCostCenterPanel.getSelectedDataCostCenter();
                 break;
             case DESCRIPTION:
                 obj = moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getAccountDescription();
                 break;
+            default:
+                // nothing
         }
+        
         return obj;
     }
     

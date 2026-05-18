@@ -1283,7 +1283,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moPrepStatementToCountImports = SImportUtils.createPrepStatementToCountImports(miClient.getSession().getStatement());
             moPrepStatementToGetProcessedDpsByExternalId = SImportedDocument.createPrepStatementToGetProcessedDpsByExternalId(miClient.getSession().getStatement());
             moPrepStatementToGetDpsKeyByDocumentData = SImportedDocument.createPrepStatementToGetDpsKeyByDocumentData(miClient.getSession().getStatement(), getDpsTypeKeyForDoc());
-            moPrepStatementToGetDpsKeyByInvoiceData = !isDocTypeInvoice() ? SImportedDocument.createPrepStatementToGetDpsKeyByDocumentData(miClient.getSession().getStatement(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV) : null;
+            moPrepStatementToGetDpsKeyByInvoiceData = !isInvoice() ? SImportedDocument.createPrepStatementToGetDpsKeyByDocumentData(miClient.getSession().getStatement(), SDataConstantsSys.TRNU_TP_DPS_PUR_INV) : null;
             moPrepStatementToGetDpsHandlingData = SImportedDocument.createPrepStatementToGetDpsHandlingData(miClient.getSession().getStatement());
         }
         catch (Exception e) {
@@ -1342,32 +1342,32 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         ((TitledBorder) jpDocsPanel.getBorder()).setTitle(((TitledBorder) jpDocsPanel.getBorder()).getTitle().replaceAll("<Documents>", msDocUcNames));
     }
     
-    private int[] getDpsTypeKeyForDoc() {
-        return isDocTypeInvoice() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_PUR_CN;
-    }
-    
-    private int[] getDpsTypeKeyForRef() {
-        return isDocTypeInvoice() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : SDataConstantsSys.TRNU_TP_DPS_PUR_INV;
-    }
-    
-    private int getTxnDocType() {
-        return SImportedDocument.getTxnDocumentType(mnFormSubtype);
-    }
-    
-    private int getDefaultTxtRefType() {
-        return SImportedDocument.getDefaultTxnReferenceType(mnFormSubtype);
-    }
-    
-    private String getPrcDataType() {
-        return SImportedDocument.getPrcDataType(mnFormSubtype);
-    }
-    
-    private boolean isDocTypeInvoice() {
+    private boolean isInvoice() {
         return mnFormSubtype == SDataConstantsSys.TRNX_TP_DPS_DOC;
     }
     
+    private int getSwapTxnDocType() {
+        return SSwapUtils.getSwapTxnDocumentType(mnFormSubtype);
+    }
+    
+    private String getSwapPrcDataType() {
+        return SSwapUtils.getSwapPrcDataType(mnFormSubtype);
+    }
+    
+    private int getDefaultTxtRefType() {
+        return SSwapUtils.getDefaultSwapTxnReferenceType(mnFormSubtype);
+    }
+    
+    private int[] getDpsTypeKeyForDoc() {
+        return isInvoice() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV : SDataConstantsSys.TRNU_TP_DPS_PUR_CN;
+    }
+    
+    private int[] getDpsTypeKeyForRef() {
+        return isInvoice() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD : SDataConstantsSys.TRNU_TP_DPS_PUR_INV;
+    }
+    
     private boolean isMassAccountingElegible() {
-        return isDocTypeInvoice() && mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
+        return isInvoice() && mnShowingDocsMode == ON && moRadDocModeCase.isSelected() && (moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_FREIGHT || moKeyDocModeCase.getValue()[0] == SImportedDocument.DOC_CASE_RAW_MAT_PURCHASE);
     }
     
     private boolean checkIsDocAlreadyRecorded(final SImportedDocument document, boolean refreshDocumentsGrid) throws Exception {
@@ -1698,7 +1698,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
     
     private SDataDps readDpsToLinkAndPrepareDialogDpsFinder(final SImportedDocument document) throws Exception {
         SDataDps dpsToLink = null;
-        boolean linkToDps = document.hasReferences(getDefaultTxtRefType());
+        boolean hasReferences = document.hasReferences(getDefaultTxtRefType());
+        boolean linkToDps = hasReferences || !isInvoice(); // credit notes always require a DPS to link, but invoices don't, because they can be stand alone documents
 
         if (linkToDps) {
             int[] dpsKey = document.getFirstReferenceDpsKey(miClient, getDefaultTxtRefType());
@@ -1709,12 +1710,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Documento PK " + SLibUtils.textKey(dpsKey) + ".)");
                 }
             }
+            else if (!isInvoice()) {
+                // credit notes always require a DPS to link:
+                
+                if (!hasReferences) {
+                    throw new Exception("La " + msDocLcName + " autorizada requiere " + msRefArt + " " + msRefName + " como referencia, pero no la tiene.");
+                }
+                else {
+                    throw new Exception("La referencia de tipo " + msRefName + ", '" + document.References[0].Reference + "', de la " + msDocLcName + " autorizada no existe o no ha sido registrada aún.");
+                }
+            }
         }
 
         // prepare DPS finder dialog:
 
         if (linkToDps && dpsToLink == null && moDialogDpsFinder == null) {
-            moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, isDocTypeInvoice() ? SDataConstants.TRNX_DPS_PEND_LINK : SDataConstants.TRNX_DPS_PEND_ADJ);
+            moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, isInvoice() ? SDataConstants.TRNX_DPS_PEND_LINK : SDataConstants.TRNX_DPS_PEND_ADJ);
         }
         
         return dpsToLink;
@@ -1743,7 +1754,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                         if (companyNode.get("external_id").asInt() == companyId &&
                                 docNode.get("transaction_class").asInt() == SSwapConsts.TXN_CAT_PURCHASE &&
-                                docNode.get("document_type").asInt() == getTxnDocType()) {
+                                docNode.get("document_type").asInt() == getSwapTxnDocType()) {
                             countElegible++;
 
                             int externalDocumentId = docNode.get("id").asInt();
@@ -1757,7 +1768,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                 SImportedDocument document = new SImportedDocument(moServicesConfigSettings, mnFormSubtype);
 
                                 document.ExternalDocumentId = externalDocumentId;
-                                document.retrieveProcessing(miClient.getSession(), moPrepStatementToGetProcessedDpsByExternalId, getPrcDataType(), SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
+                                document.retrieveProcessing(miClient.getSession(), moPrepStatementToGetProcessedDpsByExternalId, getSwapPrcDataType(), SDataConstantsSys.TRNS_CT_DPS_PUR, document.ExternalDocumentId);
 
                                 if (!moBoolExcludeRecordedDocs.isSelected() || !document.isRecorded()) {
                                     if (docNode.has("uuid") && !docNode.path("uuid").isNull()) {
@@ -1783,7 +1794,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     String dueDateAsText = docNode.has("due_date") && !docNode.path("due_date").isNull() ? docNode.get("due_date").asText() : "";
                                     document.DueDate = dueDateAsText == null || dueDateAsText.isEmpty() || dueDateAsText.equals("null") ? null : SLibUtils.IsoFormatDate.parse(dueDateAsText);
 
-                                    if (isDocTypeInvoice()) {
+                                    if (isInvoice()) {
                                         // importing invoices, references are usually purchase orders:
                                         
                                         JsonNode referencesNode = docNode.path("references");
@@ -1853,7 +1864,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                                     document.CurrencyId = SSwapUtils.getCurrencyId(currencyNode.get("id").asInt());
                                     document.CurrencyCode = currencyNode.get("code").asText();
 
-                                    if (isDocTypeInvoice()) {
+                                    if (isInvoice()) {
                                         // importing invoices
                                         
                                         int requiredPaymentDefinition = docNode.has("payment_definition") ? docNode.get("payment_definition").asInt() : SSwapConsts.PAY_NOT_REQ;
@@ -2001,7 +2012,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             
             if (documentsBatches.size() > 1) {
                 // get the desired ZIP file once when there are several download batches:
-                desiredZipFile = SImportUtils.chooseDownloadZipFile(miClient.getSession(), getTxnDocType());
+                desiredZipFile = SImportUtils.chooseDownloadZipFile(miClient.getSession(), getSwapTxnDocType());
                 download = desiredZipFile != null;
             }
             
@@ -2015,7 +2026,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     
                     try {
                         ArrayList<Integer> documentsBatch = new ArrayList<>(documentsBatches.get(zipBatch - 1));
-                        File[] files = SImportUtils.downloadDocumentsFilesAsZip(miClient.getSession(), msSyncUrlDownload, SImportUtils.DWNLD_FILES_TYPE_CFDI, documentsBatch, getTxnDocType(), desiredZipFile, zipBatch);
+                        File[] files = SImportUtils.downloadDocumentsFilesAsZip(miClient.getSession(), msSyncUrlDownload, SImportUtils.DWNLD_FILES_TYPE_CFDI, documentsBatch, getSwapTxnDocType(), desiredZipFile, zipBatch);
 
                         if (files != null) {
                             zipsSaved++;
@@ -2408,7 +2419,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
                 throw new Exception(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH); // no branch selected in current user session
             }
-            else if (!isDocTypeInvoice() || document.checkAdvancesOnUpcommingPaymentRequest(miClient, false)) { // skip checking advances on credit notes, but apply in on invoices
+            else if (!isInvoice() || document.checkAdvancesOnUpcommingPaymentRequest(miClient, false)) { // skip checking advances on credit notes, but apply in on invoices
                 // validate availability of exchange rate, if needed:
 
                 if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { document.CurrencyId })) {
@@ -2419,8 +2430,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
 
                 // retrieve DPS to link (either an order or an invoice), if available:
-                SDataDps dpsToLink = readDpsToLinkAndPrepareDialogDpsFinder(document);
                 boolean linkToDps = document.hasReferences(getDefaultTxtRefType());
+                SDataDps dpsToLink = readDpsToLinkAndPrepareDialogDpsFinder(document);
 
                 // create DPS (dialog DPS Finder should be previously prepared):
                 
@@ -2442,7 +2453,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                 // link DPS:
                 
                 if (dpsKey != null) {
-                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, isDocTypeInvoice())) {
+                    if (document.link(miClient.getSession(), msSyncUrlDownload, dpsKey, SImportedDocument.MATCH_PAY_TP_CONF_DIFF, false, false, false, isInvoice())) {
                         refreshDocumentsGrid();
 
                         if (document.isPaymentRequested()) {
@@ -2502,14 +2513,14 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                     urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_START_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodStart.getValue()));
                     urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_END_DATE + ">", SLibUtils.IsoFormatDate.format(moDatePeriodEnd.getValue()));
-                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + getTxnDocType());
+                    urlQuery = urlQuery.replace("<" + SSwapConsts.QRY_DOCUMENT_TYPE + ">", "" + getSwapTxnDocType());
                 }
                 else if (moRadSearchByWeek.isSelected()) {
                     urlQuery = msSyncUrlRetrieveByWeek
                             + "year_revision=" + moCalWeekYear.getValue()
                             + "&week_revision_start=" + moCalWeekStart.getValue()
                             + "&week_revision_end=" + moCalWeekEnd.getValue()
-                            + "&document_type=" + getTxnDocType();
+                            + "&document_type=" + getSwapTxnDocType();
                 }
                 
                 urlQuery += "&company_id=" + miClient.getSession().getConfigCompany().getCompanyId();
@@ -2909,7 +2920,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
 
                                     data.id_external_system = SSwapConsts.SIIE_EXT_SYS_ID;
                                     data.id_company = miClient.getSession().getConfigCompany().getCompanyId();
-                                    data.id_resource_type = SSwapConsts.RESOURCE_TYPE_PUR_INVOICE;
+                                    data.id_resource_type = isInvoice() ? SSwapConsts.RESOURCE_TYPE_PUR_INVOICE : SSwapConsts.RESOURCE_TYPE_PUR_CREDIT_NOTE;
                                     data.external_resource_id = "" + document.ExternalDocumentId;
                                     data.external_resource_uuid = document.ExternalDocumentUuid; // UUID (not required in SWAP Services!)
                                     data.id_actor_type = SExportDataAuthActor.ACTOR_TYPE_USER;
@@ -3533,7 +3544,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             jtfPayExecutionDate.setText("");
         }
         else {
-            boolean isInvoice = isDocTypeInvoice();
+            boolean isInvoice = isInvoice();
             SImportedDocument document = (SImportedDocument) row;
             
             jbCreateDocFromCfdi.setEnabled(true);
@@ -3793,8 +3804,8 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         mbFirstActivation = true;
         
         mbExportPaymentRequests = false;
-        moBoolExportPaymentRequestsOnClose.setEnabled(isDocTypeInvoice());
-        moBoolExportPaymentRequestsOnClose.setSelected(isDocTypeInvoice());
+        moBoolExportPaymentRequestsOnClose.setEnabled(isInvoice());
+        moBoolExportPaymentRequestsOnClose.setSelected(isInvoice());
         
         Date date = miClient.getSession().getCurrentDate();
         int week = SLibTimeUtils.getIsoWeekOfWeekBasedYear(date);
@@ -4055,6 +4066,9 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
         }
     }
     
+    /**
+     * Dialog main settings to be shared with other related dialogs.
+     */
     public static class Settings {
         
         public String UserName;
