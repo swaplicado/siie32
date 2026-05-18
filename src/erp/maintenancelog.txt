@@ -1,16 +1,12 @@
 ================================================================================
-SIIE 3.2 300.10/ 2026-05-18
-Jhonatan Claudio PEÑA HERNANDEZ
---------------------------------------------------------------------------------
-1) Importación proveedores desde PC
-================================================================================
 SIIE 3.2 300.9/ 2026-05-18
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Corrección al rechazar y autorizar OC en empresas sin esquema en línea
-2) Vistas de seguimientos de almacén sin vistos de áreas funcionales
-3) Adición de consulta de solicitudes de pago en em modulo de compras
-4) Adicción de pantalla de carga cuando se exportan datos manualmente a los servicios de Google
+1) Corrección al rechazar y autorizar pedidos de compras en empresas sin autorización vía APP/WEB.
+2) Vistas de surtidos, devoluciones y seguimientos de almacén sin filtro de áreas funcionales.
+3) Adición de consulta de solicitudes de pago en em modulo de compras.
+4) Adición de pantalla de carga cuando se exportan datos manualmente a SWAP Services.
+5) Importación proveedores desde portal de compras a SIIE.
 
 ================================================================================
 SIIE 3.2 300.8/ 2026-05-18
