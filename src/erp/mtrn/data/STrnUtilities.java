@@ -4145,6 +4145,64 @@ public abstract class STrnUtilities {
         
         return updated;
     }
+
+    /**
+     * Actualiza el destinatario del negocio en un documento de venta.
+     * 
+     * @param oConn Conexión a la base de datos.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idUser ID del usuario que realiza la actualización.
+     * 
+     * @return <code>true</code> si la actualización fue exitosa, <code>false</code> en caso contrario.
+     */
+    public static boolean updateDpsBizPartnerAddressee(Connection oConn, int[] pkTrnDps, int idBizPartnerAddressee, int idUser) {
+        String sql = "";
+        Statement statement = null;
+        boolean updated = false;
+
+        try {
+            sql = "UPDATE trn_dps "
+                    + "SET fid_bp_addee_n = " + (idBizPartnerAddressee == 0 ? "NULL" : idBizPartnerAddressee) + ", "
+                    + "fid_usr_edit = " + idUser + ", "
+                    + "ts_edit = NOW() "
+                    + "WHERE id_year = " + pkTrnDps[0] + " AND id_doc = " + pkTrnDps[1] + ";";
+
+            statement = oConn.createStatement();
+            statement.executeUpdate(sql);
+            updated = true;
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+        }
+
+        return updated;
+    }
+    
+    /**
+     * Guarda el registro de cambios en el destinatario del negocio para un documento de venta.
+     * @param oConn Conexión a la base de datos.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idUser ID del usuario que realiza la actualización.
+     * @return <code>true</code> si la actualización fue exitosa, <code>false</code> en caso contrario.
+     */
+    public static boolean saveDpsBizPartnerAddresseeChangeLog(Connection oConn, int[] pkTrnDps, int idBizPartnerAddressee, int idUser) {
+        try {
+            SDataDpsDestinyChangesLog oLog = new SDataDpsDestinyChangesLog();
+            oLog.setPkYearId(pkTrnDps[0]);
+            oLog.setPkDocId(pkTrnDps[1]);
+            oLog.setFkBizPartnerAddresseeId_n(idBizPartnerAddressee);
+            oLog.setFkUserChangedId(idUser);
+            oLog.save(oConn);
+        }
+        catch (Exception e) {
+            Logger.getLogger(STrnUtilities.class.getName()).log(Level.SEVERE, null, e);
+            return false;
+        }
+
+        return true;
+    }
     
     /**
      * Processes a stock move and generates a entry for a diog
