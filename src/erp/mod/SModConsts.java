@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Claudio Peña, Rodrigo Ayala, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Rodrigo Ayala, Sergio Flores, Claudio Peña
  */
 public abstract class SModConsts {
 
@@ -23,6 +23,7 @@ public abstract class SModConsts {
     public static final int VIEW_SC_DET = 22;       // detail
     public static final int OPC_BAL_ALL = 1;        // balance: all registries
     public static final int OPC_BAL_BAL = 2;        // balance: registries with balance
+    public static final int TRNX_MAT_FUN_ARE_ALL = 1001; // Without functional areas stock
 
     public static final int MOD_CFG = 101000;
     public static final int MOD_FIN = 102000;

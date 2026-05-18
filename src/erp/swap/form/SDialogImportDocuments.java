@@ -99,7 +99,7 @@ import sa.lib.xml.SXmlUtils;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Sergio Flores, Cesar Orozco, Sergio Flores
+ * @author Sergio Flores, Cesar Orozco, Sergio Flores, Claudio Peña
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
@@ -1610,7 +1610,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
             moDecReqPayAmount.resetField();
         }
     }
-    
+
     private void exportPaymentRequestsIfNeeded() {
         if (moBoolExportPaymentRequestsOnClose.isSelected()) {
             if (!mbExportPaymentRequests) {
@@ -1623,20 +1623,22 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                     }
                 }
             }
-
             if (mbExportPaymentRequests) {
-                // export payment requests to SWAP Services:
-                try {
-                    miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                    SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
-                }
-                catch (Exception e) {
-                    SLibUtilities.printOutException(this, e);
-                }
-                finally {
-                    miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
+                SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Exportando solicitudes de pago...",
+                        () -> {
+                            try {
+                                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                                SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.printOutException(this, e);
+                            }
+                            finally {
+                                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                            }
+                        }
+                );
             }
         }
     }

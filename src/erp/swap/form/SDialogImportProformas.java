@@ -73,7 +73,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  *
- * @author Cesar Orozco, Edwin Carmona, Sergio Flores
+ * @author Cesar Orozco, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener {
 
@@ -997,21 +997,24 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             }
 
             if (mbExportPaymentRequests) {
-                try {
-                    miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                    SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
-                }
-                catch (Exception e) {
-                    SLibUtilities.printOutException(this, e);
-                }
-                finally {
-                    miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
+                SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Exportando solicitudes de pago...", () -> {
+                        try {
+                            miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                            SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                            SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.printOutException(this, e);
+                        }
+                        finally {
+                            miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        }
+                    }
+                );
             }
         }
     }
-
+    
     private void initProgress() {
         jlProgress.setText("Preparando la petición...");
 

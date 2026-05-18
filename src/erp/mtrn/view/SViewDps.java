@@ -112,6 +112,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -138,7 +139,7 @@ import sa.lib.gui.SGuiUtils;
  * Nombre de la variable: GOOGLE_APPLICATION_CREDENTIALS
  * Valor de la variable: ruta accesible al archivo JSON.
  * 
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
@@ -3217,20 +3218,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            try {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_ORDER, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                SExportUtils.processResponses(miClient.getSession(), responses, mnModule, mnTabType);
-            }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
-            }
-            finally {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
+            SExportUtils.showProcessDialog(miClient.getFrame(),"Procesando...","Enviando datos a servicios SWAP...",() -> {
+                    try {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                        SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_ORDER, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                        SExportUtils.processResponses(miClient.getSession(), responses, mnModule, mnTabType);
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.printOutException(this, e);
+                    }
+                    finally {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            );
         }
     }
-
+   
     private void actionRestoreCfdStamped() throws Exception {
         if (jbRestoreCfdStamped.isEnabled()) {
             if (isRowSelected()) {
@@ -3321,7 +3325,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
                         
                         if (moAuthWebFileChooser.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                            //
+                            
                             JDialog progressDialog = new JDialog(miClient.getFrame(), "Descargando...", true);
                             JProgressBar progressBar = new JProgressBar(0, 100);
                             progressBar.setStringPainted(true);
@@ -3332,7 +3336,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                             progressDialog.setSize(300, 100);
                             progressDialog.setLocationRelativeTo(miClient.getFrame());
-                            //
+                            
                             int files = 0;
                             
                             for (SDbSupplierFile file : fileProcess.getSuppFiles()) {

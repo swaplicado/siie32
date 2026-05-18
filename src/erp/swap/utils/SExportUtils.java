@@ -22,6 +22,9 @@ import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -44,8 +47,12 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -1534,4 +1541,43 @@ public abstract class SExportUtils {
             UserId = userId;
         }
     }
+    
+    /**
+    * Muestra un diálogo modal de progreso mientras se ejecuta un proceso
+    * en segundo plano.
+    * El método crea una ventana con una barra de progreso indeterminada
+    * para indicar al usuario que una operación está en ejecución.
+    * 
+    * @param parent Ventana padre sobre la cual se centrará el diálogo.
+    * @param title Título del diálogo de progreso.
+    * @param message Mensaje descriptivo mostrado al usuario.
+    * @param process Proceso o tarea a ejecutar en segundo plano.
+    */ 
+    public static void showProcessDialog(Frame parent, String title, String message, Runnable process) {
+        JDialog progressDialog = new JDialog(parent, title, true);
+        progressDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        progressDialog.getRootPane().registerKeyboardAction(e -> { }, KeyStroke.getKeyStroke("ESCAPE"), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setStringPainted(true);
+        progressBar.setString("Procesando...");
+        progressBar.setPreferredSize(new Dimension(300, 10));
+        progressDialog.setLayout(new BorderLayout());
+        progressDialog.add(new JLabel(message), BorderLayout.NORTH);
+        progressDialog.add(progressBar, BorderLayout.CENTER);
+        progressDialog.setSize(300, 85);
+        progressDialog.setLocationRelativeTo(parent);
+
+        new Thread(() -> {
+            try {
+                process.run();
+            }
+            finally {
+                SwingUtilities.invokeLater(progressDialog::dispose);
+            }
+        }).start();
+
+        progressDialog.setVisible(true);
+    }
 }
+

@@ -16,6 +16,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mbps.form.SDialogBizPartnerExport;
+import erp.mbps.form.SDialogImportBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.swap.SSwapConsts;
@@ -33,6 +34,8 @@ import erp.table.SFilterConstants;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeConsts;
@@ -53,7 +57,7 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Alfonso Flores, Claudio Peña, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -62,6 +66,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbStatusEmployeeChange;
     private javax.swing.JButton jbStatusEmployeeModify;
     private javax.swing.JButton jbStatusEmployeeRevert;
+    private javax.swing.JButton jbImportBizPartner;
     private javax.swing.JToggleButton jtbViewEmployeeActive;
     private javax.swing.JToggleButton jtbViewEmployeeInactive;
     private javax.swing.JToggleButton jtbViewEmployeeAll;
@@ -76,6 +81,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private java.lang.String msOrderKey;
 
     private erp.mbps.form.SDialogBizPartnerExport moDialogBizPartnerExport;
+    private erp.mbps.form.SDialogImportBizPartner moDialogImportBizPartner;
     private boolean mbIsViewEmployees;
     private boolean mbIsViewBizPartnersSimple;
     private boolean mbHasRightEmpWage;
@@ -136,6 +142,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             addTaskBarUpperComponent(jbStatusEmployeeChange);
             addTaskBarUpperComponent(jbStatusEmployeeModify);
             addTaskBarUpperComponent(jbStatusEmployeeRevert);
+            addTaskBarUpperSeparator();
+            jbImportBizPartner = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importar proveedores desde PC", this);
+            addTaskBarUpperComponent(jbImportBizPartner);
             
             if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP_CON_EXP) {
                 // render cutoff date:
@@ -275,15 +284,20 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_ct.co_key", "Clave empresa", 100);
 
                 rightLevelBpCatCreate = rightLevelBpCatEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
-
+                
                 // Enable SWAP Services:
                 mbSwapServicesLinkUp = (boolean) miClient.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP);
                 if (mbSwapServicesLinkUp) {
                     jbExportDataToSwapServices = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_up_ind.gif")),
                     "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PARTNER_SUPPLIER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
+                    moDialogImportBizPartner = new SDialogImportBizPartner((SGuiClient) miClient.getSession().getClient(), mnTabTypeAux01, "Importar proveedores");
+                    jbImportBizPartner = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importar proveedores desde PC", this);
+
                     addTaskBarUpperSeparator();
                     addTaskBarUpperComponent(jbExportDataToSwapServices);
+                    addTaskBarUpperSeparator();
+                    addTaskBarUpperComponent(jbImportBizPartner);
                 }
                 break;
 
@@ -635,22 +649,38 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
     }
 
+
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            try {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-            }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
-            }
-            finally {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
+            SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Enviando datos a servicios SWAP...", () -> {
+                    SResponses responses;
+                    try {
+                        SwingUtilities.invokeLater(() ->
+                            miClient.getFrame().getRootPane().setCursor(
+                                new Cursor(Cursor.WAIT_CURSOR)
+                            )
+                        );
+
+                        responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                            } catch (Exception ex) {
+                                Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        });
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.printOutException(this, e);
+                    }
+                    finally {
+                        SwingUtilities.invokeLater(() -> miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR)));
+                    }
+                }
+            );
         }
     }
-    
+      
     private void itemStateChangedViewEmployee() {
         if (!mbIsViewEmployees) {
             mnFilterStatusEmployee = SLibConstants.UNDEFINED;
@@ -844,11 +874,16 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                         }
                     }
                 }
-                catch (Exception e) {
+                catch (Exception e) { 
                     SLibUtilities.renderException(this, e);
                 }
             }
         }
+    }
+    
+    private void actionBizPartnerImport() {
+        SDialogImportBizPartner dialog = new SDialogImportBizPartner(miClient.getSession().getClient(), SDataConstants.BPSX_BP_SUP,"Importar proveedor");
+        dialog.setVisible(true);
     }
 
     @Override
@@ -990,6 +1025,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             }
             else if (button == jbExportDataToSwapServices) {
                 actionExportDataToSwapServices();
+            }
+            else if (button == jbImportBizPartner) {
+                actionBizPartnerImport();
             }
         }
     }

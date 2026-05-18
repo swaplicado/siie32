@@ -67,7 +67,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  */
 public class SViewPayment extends SGridPaneView implements ActionListener, ItemListener {
     private JRadioButton jrbDateApp;
@@ -896,18 +896,21 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices.isEnabled()) {
-            try {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
-                miClient.getSession().notifySuscriptors(mnGridType);
-            }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
-            }
-            finally {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
+            SExportUtils.showProcessDialog(miClient.getFrame(),"Procesando...","Enviando datos a servicios SWAP...",() -> {
+                    try {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                        SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PUR_PAYMENT, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                        SExportUtils.processResponses(miClient.getSession(), responses, 0, 0);
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.printOutException(this, e);
+                    }
+                    finally {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            );    
         }
     }
 

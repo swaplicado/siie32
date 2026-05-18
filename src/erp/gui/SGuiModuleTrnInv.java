@@ -49,7 +49,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Claudio Peña, Sergio Flores, Rodrigo Ayala
+ * @author Sergio Flores, Uriel Castañeda, César Orozco, Gil De Jesús, Sergio Flores, Sergio Flores, Rodrigo Ayala, Claudio Peña
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -127,6 +127,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogStockValueByWarehouse;
     private javax.swing.JMenuItem jmiIogStockValueByItem;
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
+    private javax.swing.JMenuItem jmiSViewPurchasingProcess;
     
     private javax.swing.JMenu jmMenuMaint;
     private javax.swing.JMenuItem jmiMaintStockPart;
@@ -562,6 +563,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByWarehouse = new JMenuItem("Valor de inventarios por almacén");
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
+        jmiSViewPurchasingProcess = new JMenuItem("Seguimiento al proceso de compras");
         
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
@@ -593,6 +595,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogStockValueByItem);
         //jmMenuIog.add(jmiIogStockValueByDiogType); sflores, 2016-03-09, evaluating to remove it
         jmMenuIog.add(jmiIogStockTheoricalCost);
+        jmMenuIog.addSeparator();
+        jmMenuIog.add(jmiSViewPurchasingProcess);
         
         jmiIogStock.addActionListener(this);
         jmiIogMfgRmAssign.addActionListener(this);
@@ -614,6 +618,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByWarehouse.addActionListener(this);
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
+        jmiSViewPurchasingProcess.addActionListener(this);
         
         jmMenuMaint = new JMenu("Mantto.");
         jmiMaintStockPart = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
@@ -1024,6 +1029,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiSViewPurchasingProcess.setEnabled(hasRightInAdj || hasRightOutAdj);
         
         jmMenuMaint.setEnabled(hasRightMaint);
         jmiMaintStockPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
@@ -1346,7 +1352,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     public void showView(int viewType, int auxType) {
         showView(viewType, auxType, 0);
     }
-
+    
     @Override
     public void showView(int viewType, int auxType01, int auxType02) {
         String title = "";
@@ -2301,6 +2307,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiIogStockTheoricalCost) {
                 miClient.getSession().showView(SModConsts.TRNX_INV_VAL_COST_QRY, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiSViewPurchasingProcess) {
+                miClient.getSession().showView(SModConsts.TRNX_MAT_REQ_PUR_PROC, SModConsts.TRNX_MAT_FUN_ARE_ALL, null);
             }
         }
     }

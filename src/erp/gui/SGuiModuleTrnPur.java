@@ -78,7 +78,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -1116,7 +1116,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiAccPaymentsInAuth.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsRejc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsSched.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsSchedReport.setEnabled(false);
+        jmiAccPaymentsSchedReport.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsInTreas.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsInTreasDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
         jmiAccPaymentsExec.setEnabled(hasRightDocOrder || hasRightDocTransaction);
@@ -2119,7 +2119,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiStkDvyPend) {
-                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1]);
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SModConsts.TRNX_MAT_FUN_ARE_ALL);
             }
             else if (item == jmiStkDvyPendEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0], SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1]);
@@ -2140,7 +2140,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_SUPPLIED_ORDER, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
             else if (item == jmiStkRetPending) {
-                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);
+                miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SModConsts.TRNX_MAT_FUN_ARE_ALL);
             }
             else if (item == jmiStkRetPendingEntry) {
                 miClient.getGuiModule(SDataConstants.MOD_INV).showView(SDataConstants.TRNX_DPS_RETURN_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]);

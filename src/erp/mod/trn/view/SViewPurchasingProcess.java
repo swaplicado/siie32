@@ -46,7 +46,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Adrian Aviles
+ * @author Adrian Aviles, Claudio Peña
  */
 public class SViewPurchasingProcess extends SGridPaneView implements ActionListener, ItemListener {
     
@@ -61,8 +61,11 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
     private String sFilterInit;
     private SGuiDate moFilterTimeInit;
     
+    private boolean mbApplyFuncFilter;
+    
     public SViewPurchasingProcess(SGuiClient client, int subType, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.TRNX_MAT_REQ_PUR_PROC , subType, title, params);
+           mbApplyFuncFilter = subType != SModConsts.TRNX_MAT_FUN_ARE_ALL;
         initComponetsCustom();
     }
     
@@ -96,9 +99,11 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         
-        moFilterFuncArea = new SViewFilter(miClient, this, SModConsts.CFGU_FUNC);
-        moFilterFuncArea.initFilter(null);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
+        if (mbApplyFuncFilter) {
+            moFilterFuncArea = new SViewFilter(miClient, this, SModConsts.CFGU_FUNC);
+            moFilterFuncArea.initFilter(null);
+            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFuncArea);
+        }
         
         jbRowNew.setEnabled(false);
         jbRowCopy.setEnabled(false);
@@ -106,8 +111,9 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         jbRowDelete.setEnabled(false);
         jbRowEdit.setEnabled(false);
         jtbFilterDeleted.setEnabled(false);
-        
-        sFilterInit = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue().toString();
+        if (mbApplyFuncFilter) {
+            sFilterInit = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue().toString();
+        }
         moFilterTimeInit = new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime());
         
     }
@@ -229,6 +235,19 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
             stmt.execute(createTableSQL);
             // System.out.println("Tabla temporal creada");
         }
+        //Saber si los ítem son inventariables
+        String sqlInvFilter = "";
+        if (mbApplyFuncFilter == false) {
+                sqlInvFilter =    " INNER JOIN trn_dps_ety oc_e\n" +
+                "    ON oc_e.id_year = oc_r.id_year\n" +
+                "    AND oc_e.id_doc = oc_r.id_doc\n" +
+                "    AND NOT oc_e.b_del\n" +
+                "\n" +
+                " INNER JOIN erp.itmu_item i\n" +
+                "    ON i.id_item = oc_e.fid_item\n" +
+                "    AND i.b_inv = 1\n";
+        }
+        
         // System.out.println("Insertando datos en tabla temporal");
         // 3. Insertar los datos
         String insertSQL = "INSERT INTO tmp_reporte_compras " +
@@ -465,6 +484,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                                 "       AND oc_r.fid_ct_dps = 1\n" +
                                 "       AND oc_r.fid_cl_dps = 2\n" +
                                 "       AND oc_r.fid_tp_dps = 1\n" +
+//                                sqlInvFilter +
                                 ") r\n" +
                                 "    ON v.id_mat_req = r.fid_mat_req\n" +
                                 "\n" +
@@ -975,17 +995,22 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
             }
             moFilterTimeInit = new SGuiDate(oFilter.getGuiType(), oFilter.getTime());
         }
-        
-        filter = ((SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC)).getValue();
-        if (filter != null && !((String) filter).isEmpty()) {
-            if (sFilterInit.equals(filter.toString())) {
-                where += (where.isEmpty() ? "" : " AND ") + " ( oc.fid_func IN (" + filter + ") OR oc.fid_func IS NULL ) ";
-            }
-            else {
-                where += (where.isEmpty() ? "" : " AND ") + " oc.fid_func IN (" + filter + ") ";
+        if (mbApplyFuncFilter) {
+            SGridFilterValue filterValue = (SGridFilterValue) moFiltersMap.get(SModConsts.CFGU_FUNC);
+            if (filterValue != null) {
+                filter = filterValue.getValue();
+                if (filter != null && !((String) filter).isEmpty()) {
+                    if (sFilterInit.equals(filter.toString())) {
+                        where += (where.isEmpty() ? "" : " AND ")
+                                + " ( oc.fid_func IN (" + filter + ") OR oc.fid_func IS NULL ) ";
+                    }
+                    else {
+                        where += (where.isEmpty() ? "" : " AND ")
+                                + " oc.fid_func IN (" + filter + ") ";
+                    }
+                }
             }
         }
-        
         try {
             crearYInsertarTablaTemporal(where);
         } catch (SQLException ex) {

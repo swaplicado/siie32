@@ -13192,7 +13192,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
-        mbUpdatingForm = true; // 🔒 AGREGAR ESTA LÍNEA  
+        mbUpdatingForm = true;
 
         moDps = (SDataDps) registry;
         mbNewRegistryAlreadySet = moDps.getIsRegistryNew() && moDps.getXtaImportedDocument() != null;
