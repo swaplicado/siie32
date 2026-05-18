@@ -1,5 +1,12 @@
 ================================================================================
-SIIE 3.2 301.0/ 2026-05-15
+SIIE 3.2 300.8/ 2026-05-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Importación y contabilización de notas de crédito autorizadas de operaciones, de ajuste de facturación de anticipos y de aplicación de anticipos facturados desde SWAP Services.
+2) Vinculación, desvinculación de notas de crédito autorizadas y notas de crédito SIIE, y rechazo de notas de crédito autorizadas de SWAP Services.
+
+================================================================================
+SIIE 3.2 301.7/ 2026-05-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Cambio de destinatario propio para facturas y notas de crédito de ventas, se agrega log de cambios al guardar DPS.
