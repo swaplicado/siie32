@@ -104,7 +104,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -1829,6 +1829,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public boolean isDpsTypeContractSal() {
         return moXtaDpsType.isDpsTypeContractSal();
+    }
+    
+    public boolean isDpsTypeInvoiceSal() {
+        return moXtaDpsType.isDpsTypeInvoiceSal();
     }
     
     public boolean isPrepaymentOnly() {
@@ -4562,6 +4566,14 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (mnAuxInitiativeId != 0) {
                     sSql = "INSERT INTO trn_init_dps VALUES(" + mnAuxInitiativeId + ", " + mnPkYearId + ", " + mnPkDocId + ");";
                     oStatement.execute(sSql);
+                }
+                
+                // Save fid_bp_addee_n changes log
+                if (isDpsTypeInvoiceSal() || isAdjustmentSal()) {
+                    STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(connection, 
+                                            new int[] { mnPkYearId, mnPkDocId }, 
+                                            mnFkBizPartnerAddresseeId_n, 
+                                            mnFkUserEditId);
                 }
                         
                 mbIsRegistryNew = false;

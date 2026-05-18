@@ -487,6 +487,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
     public static final int TRN_DPS_CUSTOM_ACC_ETY = 207251;
+    public static final int TRN_DPS_DESTINY_CHANGES_LOG = 207252;
     public static final int TRN_SCA_TIC_DPS = 207291;
     public static final int TRN_SCA_TIC_DPS_ETY = 207292;
     public static final int TRN_INIT = 207361;
