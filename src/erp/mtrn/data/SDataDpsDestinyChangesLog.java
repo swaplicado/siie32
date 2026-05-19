@@ -22,6 +22,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
     protected int mnPkDocId;
     protected int mnPkLogId;
     protected int mnFkBizPartnerAddresseeId_n;
+    protected int mnFkAddresseeBizPartnerId_nr;
+    protected int mnFkAddresseeBizPartnerBranchId_n;
+    protected int mnFkAddresseeBizPartnerBranchAddressId_n;
     protected int mnFkUserChangedId;
     protected java.util.Date mtUserChangedTs;
 
@@ -34,6 +37,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
     public void setPkDocId(int n) { mnPkDocId = n; }
     public void setPkLogId(int n) { mnPkLogId = n; }
     public void setFkBizPartnerAddresseeId_n(int n) { mnFkBizPartnerAddresseeId_n = n; }
+    public void setFkAddresseeBizPartnerId_nr(int n) { mnFkAddresseeBizPartnerId_nr = n; }
+    public void setFkAddresseeBizPartnerBranchId_n(int n) { mnFkAddresseeBizPartnerBranchId_n = n; }
+    public void setFkAddresseeBizPartnerBranchAddressId_n(int n) { mnFkAddresseeBizPartnerBranchAddressId_n = n; }
     public void setFkUserChangedId(int n) { mnFkUserChangedId = n; }
     public void setUserChangedTs(java.util.Date t) { mtUserChangedTs = t; }
 
@@ -41,6 +47,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
     public int getPkDocId() { return mnPkDocId; }
     public int getPkLogId() { return mnPkLogId; }
     public int getFkBizPartnerAddresseeId_n() { return mnFkBizPartnerAddresseeId_n; }
+    public int getFkAddresseeBizPartnerId_nr() { return mnFkAddresseeBizPartnerId_nr; }
+    public int getFkAddresseeBizPartnerBranchId_n() { return mnFkAddresseeBizPartnerBranchId_n; }
+    public int getFkAddresseeBizPartnerBranchAddressId_n() { return mnFkAddresseeBizPartnerBranchAddressId_n; }
     public int getFkUserChangedId() { return mnFkUserChangedId; }
     public java.util.Date getUserChangedTs() { return mtUserChangedTs; }
 
@@ -91,6 +100,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
                 mnPkDocId = resultSet.getInt("l.id_doc");
                 mnPkLogId = resultSet.getInt("l.id_log");
                 mnFkBizPartnerAddresseeId_n = resultSet.getInt("l.fid_bp_addee_n");
+                mnFkAddresseeBizPartnerId_nr = resultSet.getInt("l.fid_add_bp_nr");
+                mnFkAddresseeBizPartnerBranchId_n = resultSet.getInt("l.fid_add_bpb_n");
+                mnFkAddresseeBizPartnerBranchAddressId_n = resultSet.getInt("l.fid_add_add_n");
                 mnFkUserChangedId = resultSet.getInt("l.fid_usr_chg");
                 mtUserChangedTs = resultSet.getTimestamp("l.ts_chg");
 
@@ -135,6 +147,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
                             + mnPkDocId + ", "
                             + mnPkLogId + ", "
                             + (mnFkBizPartnerAddresseeId_n == 0 ? "NULL" : mnFkBizPartnerAddresseeId_n) + ", "
+                            + (mnFkAddresseeBizPartnerId_nr == 0 ? "NULL" : mnFkAddresseeBizPartnerId_nr) + ", "
+                            + (mnFkAddresseeBizPartnerBranchId_n == 0 ? "NULL" : mnFkAddresseeBizPartnerBranchId_n) + ", "
+                            + (mnFkAddresseeBizPartnerBranchAddressId_n == 0 ? "NULL" : mnFkAddresseeBizPartnerBranchAddressId_n) + ", "
                             + mnFkUserChangedId + ", "
                             + "NOW() "
                             + ");";
@@ -145,6 +160,9 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
                             //+ "id_doc = " + mnPkDocId + ", "
                             //+ "id_log = " + mnPkLogId + ", "
                             + "fid_bp_addee_n = " + (mnFkBizPartnerAddresseeId_n == 0 ? "NULL" : mnFkBizPartnerAddresseeId_n) + ", "
+                            + "fid_add_bp_nr = " + (mnFkAddresseeBizPartnerId_nr == 0 ? "NULL" : mnFkAddresseeBizPartnerId_nr) + ", "
+                            + "fid_add_bpb_n = " + (mnFkAddresseeBizPartnerBranchId_n == 0 ? "NULL" : mnFkAddresseeBizPartnerBranchId_n) + ", "
+                            + "fid_add_add_n = " + (mnFkAddresseeBizPartnerBranchAddressId_n == 0 ? "NULL" : mnFkAddresseeBizPartnerBranchAddressId_n) + ", "
                             + "fid_usr_chg = " + mnFkUserChangedId + ", "
                             + "ts_chg = " + "NOW() "
                             + "WHERE id_year = " + mnPkYearId + " "

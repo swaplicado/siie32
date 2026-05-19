@@ -13,6 +13,7 @@ package erp.mtrn.form;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
@@ -31,7 +32,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 
 /**
  *
@@ -46,6 +49,10 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
 
     private erp.lib.form.SFormField moFieldNewDeliveryAddress;
     private erp.lib.form.SFormField moFieldCfdCceBizPartnerAddressee;
+    private erp.lib.form.SFormField moFieldCfdBizPartner;
+    private erp.lib.form.SFormField moFieldCfdBizPartnerBranch;
+    private erp.lib.form.SFormField moFieldCfdBizPartnerBranchAdd;
+    private erp.lib.form.SFormComboBoxGroup moComboBoxGroupCfdCceGroupAddressee;
     private erp.mtrn.data.SDataDps moDps;
     private erp.mtrn.form.SPanelDps moPanelDps;
 
@@ -77,6 +84,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jlCurrentOperationAddress1 = new javax.swing.JLabel();
         moRadAddress = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOwnDestiny = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOtherBp = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel11 = new javax.swing.JPanel();
         jlCurrentOperationAddress = new javax.swing.JLabel();
         jtfCurrentOperationAddress = new javax.swing.JTextField();
@@ -86,6 +94,15 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jPanel121 = new javax.swing.JPanel();
         jlCfdCceFkBizPartnerAddressee = new javax.swing.JLabel();
         jcbCfdCceFkBizPartnerAddressee = new javax.swing.JComboBox();
+        jPanel107 = new javax.swing.JPanel();
+        jlCfdCceFkAddresseeBizPartner = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartner = new javax.swing.JComboBox();
+        jPanel112 = new javax.swing.JPanel();
+        jlCfdCceFkAddresseeBizPartnerBranch = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartnerBranch = new javax.swing.JComboBox();
+        jPanel113 = new javax.swing.JPanel();
+        jlCfdCceFkAddresseeBizPartnerBranchAddress = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress = new javax.swing.JComboBox();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -110,7 +127,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jpDpsLogistics.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del domicilio de entrega:"));
         jpDpsLogistics.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel1.setLayout(new java.awt.GridLayout(7, 1, 0, 3));
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -127,6 +144,11 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         moRadOwnDestiny.setText("Destinatario propio");
         moRadOwnDestiny.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(moRadOwnDestiny);
+
+        destinyChange.add(moRadOtherBp);
+        moRadOtherBp.setText("Otro asociado de negocios como destinatario");
+        moRadOtherBp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel12.add(moRadOtherBp);
 
         jPanel1.add(jPanel12);
 
@@ -168,6 +190,39 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
 
         jPanel1.add(jPanel121);
 
+        jPanel107.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceFkAddresseeBizPartner.setText("Asociado destinatario:");
+        jlCfdCceFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel107.add(jlCfdCceFkAddresseeBizPartner);
+
+        jcbCfdCceFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel107.add(jcbCfdCceFkAddresseeBizPartner);
+
+        jPanel1.add(jPanel107);
+
+        jPanel112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceFkAddresseeBizPartnerBranch.setText("Sucursal destinatario:");
+        jlCfdCceFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel112.add(jlCfdCceFkAddresseeBizPartnerBranch);
+
+        jcbCfdCceFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel112.add(jcbCfdCceFkAddresseeBizPartnerBranch);
+
+        jPanel1.add(jPanel112);
+
+        jPanel113.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlCfdCceFkAddresseeBizPartnerBranchAddress.setText("Domicilio destinatario:");
+        jlCfdCceFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel113.add(jlCfdCceFkAddresseeBizPartnerBranchAddress);
+
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel113.add(jcbCfdCceFkAddresseeBizPartnerBranchAddress);
+
+        jPanel1.add(jPanel113);
+
         jpDpsLogistics.add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jpDps.add(jpDpsLogistics, java.awt.BorderLayout.CENTER);
@@ -199,10 +254,18 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
     private void initComponentsExtra() {
         moFieldNewDeliveryAddress = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbNewOperationAddress, jlNewOperationAddress);
         moFieldCfdCceBizPartnerAddressee = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkBizPartnerAddressee, jlCfdCceFkBizPartnerAddressee);
+        moFieldCfdBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartner, jlCfdCceFkAddresseeBizPartner);
+        moFieldCfdBizPartnerBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartnerBranch, jlCfdCceFkAddresseeBizPartnerBranch);
+        moFieldCfdBizPartnerBranchAdd = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartnerBranchAddress, jlCfdCceFkAddresseeBizPartnerBranchAddress);
 
         mvFields = new java.util.Vector<erp.lib.form.SFormField>();
         mvFields.add(moFieldNewDeliveryAddress);
         mvFields.add(moFieldCfdCceBizPartnerAddressee);
+        mvFields.add(moFieldCfdBizPartner);
+        mvFields.add(moFieldCfdBizPartnerBranch);
+        mvFields.add(moFieldCfdBizPartnerBranchAdd);
+        
+        moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
 
         moPanelDps = new SPanelDps(miClient, "entregado");
         jpDps.remove(jlPanelDps);
@@ -237,29 +300,79 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
     private void addListeners() {
         moRadAddress.addItemListener(this);
         moRadOwnDestiny.addItemListener(this);
+        moRadOtherBp.addItemListener(this);
     }
 
     private void removeListeners() {
         moRadAddress.removeItemListener(this);
         moRadOwnDestiny.removeItemListener(this);
+        moRadOtherBp.removeItemListener(this);
     }
     
-    private void enableOrDisableFileds() {
+    private void enableOrDisableFields() {
         if (moRadAddress.isSelected()) {
             jcbNewOperationAddress.setEnabled(true);
+            
             jcbCfdCceFkBizPartnerAddressee.setEnabled(false);
+            
+            moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[]{moDps.getFkBizPartnerAddresseeId_n()});
+            
+            moFieldCfdBizPartner.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerId_nr()});
+            moFieldCfdBizPartnerBranch.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerBranchId_n()});
+            moFieldCfdBizPartnerBranchAdd.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerBranchId_n(), 
+                                                                moDps.getFkAddresseeBizPartnerBranchAddressId_n()});
+            onJcbBizPartnerChange(true);
+            
+            jcbCfdCceFkAddresseeBizPartner.setEnabled(false);
+            jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(false);
+            jcbCfdCceFkAddresseeBizPartnerBranchAddress.setEnabled(false);
         }
-        else {
+        else if (moRadOwnDestiny.isSelected()) {
             jcbNewOperationAddress.setEnabled(false);
+            
             jcbCfdCceFkBizPartnerAddressee.setEnabled(true);
+            
+            jcbCfdCceFkAddresseeBizPartner.setEnabled(false);
+            jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(false);
+            jcbCfdCceFkAddresseeBizPartnerBranchAddress.setEnabled(false);
+            
+            moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[]{moDps.getFkBizPartnerAddresseeId_n()});
+            
+            moFieldCfdBizPartner.setFieldValue(new int[]{0});
+            moFieldCfdBizPartnerBranch.setFieldValue(new int[]{0});
+            moFieldCfdBizPartnerBranchAdd.setFieldValue(new int[]{0,0});
+        }
+        else if (moRadOtherBp.isSelected()) {
+            jcbNewOperationAddress.setEnabled(false);
+            
+            jcbCfdCceFkBizPartnerAddressee.setEnabled(false);
+            
+            jcbCfdCceFkAddresseeBizPartner.setEnabled(true);
+            jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(true);
+            jcbCfdCceFkAddresseeBizPartnerBranchAddress.setEnabled(true);
+
+            moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[]{0});
+
+            moFieldCfdBizPartner.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerId_nr()});
+            moFieldCfdBizPartnerBranch.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerBranchId_n()});
+            moFieldCfdBizPartnerBranchAdd.setFieldValue(new int[]{moDps.getFkAddresseeBizPartnerBranchId_n(), 
+                                                                moDps.getFkAddresseeBizPartnerBranchAddressId_n()});
+            onJcbBizPartnerChange(true);
         }
         
         moFieldNewDeliveryAddress.setFieldValue(new int[] {moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId()});
-        moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[]{moDps.getFkBizPartnerAddresseeId_n()});
+    }
+    
+    private void onJcbBizPartnerChange(boolean enableFields) {
+        jcbCfdCceFkAddresseeBizPartner.setEnabled(enableFields);
+        jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(enableFields && jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0);
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress.setEnabled(enableFields && jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0);
     }
 
     private void actionOk() {
         SFormValidation validation = formValidate();
+        String sUpdated = "";
+        String sSaved = "";
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -270,26 +383,60 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
             }
         }
         else {
-            if (moRadAddress.isSelected()) {
-                STrnUtilities.updateDeliveryAddress(miClient, (int[]) ((SFormComponentItem) jcbNewOperationAddress.getSelectedItem()).getPrimaryKey(), (int[]) moDps.getPrimaryKey());
-            }
-            else {
-                try {
+            try {
+                if (moRadAddress.isSelected()) {
+                    STrnUtilities.updateDeliveryAddress(miClient, (int[]) ((SFormComponentItem) jcbNewOperationAddress.getSelectedItem()).getPrimaryKey(), (int[]) moDps.getPrimaryKey());
+                }
+                else if (moRadOwnDestiny.isSelected()) {
                     int idBizPartnerAddressee = jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray()[0];
-                    STrnUtilities.updateDpsBizPartnerAddressee(miClient.getSession().getStatement().getConnection(),
-                            (int[]) moDps.getPrimaryKey(),
-                            idBizPartnerAddressee, miClient.getSession().getUser().getPkUserId());
-                    STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(miClient.getSession().getStatement().getConnection(),
-                            (int[]) moDps.getPrimaryKey(),
-                            idBizPartnerAddressee, miClient.getSession().getUser().getPkUserId());
+                    sUpdated = STrnUtilities.updateDpsBizPartnerAddressee(miClient.getSession().getStatement().getConnection(),
+                                    (int[]) moDps.getPrimaryKey(),
+                                    idBizPartnerAddressee,
+                                    SLibConstants.UNDEFINED,
+                                    SLibConstants.UNDEFINED,
+                                    SLibConstants.UNDEFINED,
+                                    miClient.getSession().getUser().getPkUserId());
+                    sSaved = STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(miClient.getSession().getStatement().getConnection(),
+                                    (int[]) moDps.getPrimaryKey(),
+                                    idBizPartnerAddressee,
+                                    SLibConstants.UNDEFINED,
+                                    SLibConstants.UNDEFINED,
+                                    SLibConstants.UNDEFINED,
+                                    miClient.getSession().getUser().getPkUserId());
                 }
-                catch (SQLException ex) {
-                    Logger.getLogger(SDialogUpdateDpsDeliveryAddress.class.getName()).log(Level.SEVERE, null, ex);
+                else if (moRadOtherBp.isSelected()) {
+                    int idBizPartnerBpDest = jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() <= 0 ? 0 : moFieldCfdBizPartner.getKeyAsIntArray()[0];
+                    int idBizPartnerBranchDest = jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 ? 0 : moFieldCfdBizPartnerBranch.getKeyAsIntArray()[0];
+                    int idBizPartnerBranchAddressDest = jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdBizPartnerBranchAdd.getKeyAsIntArray()[1];
+                    sUpdated = STrnUtilities.updateDpsBizPartnerAddressee(miClient.getSession().getStatement().getConnection(),
+                                    (int[]) moDps.getPrimaryKey(),
+                                    SLibConstants.UNDEFINED,
+                                    idBizPartnerBpDest,
+                                    idBizPartnerBranchDest,
+                                    idBizPartnerBranchAddressDest,
+                                    miClient.getSession().getUser().getPkUserId());
+                    sSaved = STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(miClient.getSession().getStatement().getConnection(),
+                                    (int[]) moDps.getPrimaryKey(),
+                                    SLibConstants.UNDEFINED,
+                                    idBizPartnerBpDest,
+                                    idBizPartnerBranchDest,
+                                    idBizPartnerBranchAddressDest,
+                                    miClient.getSession().getUser().getPkUserId());
                 }
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(SDialogUpdateDpsDeliveryAddress.class.getName()).log(Level.SEVERE, null, ex);
+                sUpdated += ex.getMessage();
             }
             
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+            if (sUpdated.length() > 0 || sSaved.length() > 0) {
+                miClient.showMsgBoxWarning(sUpdated + sSaved);
+            }
+
+            if (sUpdated.isEmpty() && sSaved.isEmpty()) {
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
+                setVisible(false);
+            }
         }
     }
 
@@ -318,19 +465,34 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
         jcbCfdCceFkBizPartnerAddressee.removeAllItems();
         SFormUtilities.populateComboBox(miClient, jcbCfdCceFkBizPartnerAddressee, SDataConstants.BPSU_BP_ADDEE, new int[]{moDps.getFkBizPartnerId_r()});
         moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[]{moDps.getFkBizPartnerAddresseeId_n()});
+        
+        moComboBoxGroupCfdCceGroupAddressee.reset();
+        moComboBoxGroupCfdCceGroupAddressee.clear();
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSX_BP_INT_CUS, jcbCfdCceFkAddresseeBizPartner);
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB, jcbCfdCceFkAddresseeBizPartnerBranch);
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB_ADD, jcbCfdCceFkAddresseeBizPartnerBranchAddress);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup destinyChange;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel107;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel112;
+    private javax.swing.JPanel jPanel113;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel121;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartner;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartnerBranch;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartnerBranchAddress;
     private javax.swing.JComboBox jcbCfdCceFkBizPartnerAddressee;
     private javax.swing.JComboBox jcbNewOperationAddress;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartner;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartnerBranch;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartnerBranchAddress;
     private javax.swing.JLabel jlCfdCceFkBizPartnerAddressee;
     private javax.swing.JLabel jlCurrentOperationAddress;
     private javax.swing.JLabel jlCurrentOperationAddress1;
@@ -341,6 +503,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
     private javax.swing.JPanel jpDpsLogistics;
     private javax.swing.JTextField jtfCurrentOperationAddress;
     private sa.lib.gui.bean.SBeanFieldRadio moRadAddress;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadOtherBp;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOwnDestiny;
     // End of variables declaration//GEN-END:variables
 
@@ -360,29 +523,26 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
 
     @Override
     public void formRefreshCatalogues() {
-
+        
     }
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
 
-        if (moRadAddress.isSelected()) {
-            moFieldNewDeliveryAddress.setIsMandatory(true);
-            for (SFormField field : mvFields) {
-                if (!field.validateField()) {
-                    validation.setIsError(true);
-                    validation.setComponent(field.getComponent());
-                }
+        for (SFormField field : mvFields) {
+            if (!field.validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(field.getComponent());
             }
         }
-        else {
-            if (moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray().length > 0 && 
-                moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray()[0] > 0) {
-                SDataBizPartner oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
-                                                                                SDataConstants.BPSU_BP, 
-                                                                                new int[] { moDps.getFkBizPartnerId_r() }, 
-                                                                                SLibConstants.EXEC_MODE_SILENT);
+        if (moRadOwnDestiny.isSelected()) {
+            if (moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray().length > 0
+                    && moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray()[0] > 0) {
+                SDataBizPartner oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient,
+                        SDataConstants.BPSU_BP,
+                        new int[]{moDps.getFkBizPartnerId_r()},
+                        SLibConstants.EXEC_MODE_SILENT);
                 SDataBizPartnerBranchAddress oAddress = null;
                 if (oBizPartner.getDbmsBizPartnerBranchHq() != null) {
                     oAddress = oBizPartner.getDbmsBizPartnerBranchHq().getDbmsBizPartnerBranchAddressOfficial();
@@ -438,7 +598,7 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
                 moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, value, SLibConstants.EXEC_MODE_VERBOSE);
                 moPanelDps.setDps(moDps, null);
                 populateElements();
-                enableOrDisableFileds();
+                enableOrDisableFields();
                 addListeners();
                 break;
 
@@ -505,7 +665,44 @@ public class SDialogUpdateDpsDeliveryAddress extends javax.swing.JDialog impleme
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof javax.swing.JRadioButton) {
-            enableOrDisableFileds();
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JRadioButton radioButton = (JRadioButton) e.getSource();
+                if (radioButton == moRadAddress) {
+                    moFieldNewDeliveryAddress.setIsMandatory(true);
+                    moFieldCfdCceBizPartnerAddressee.setIsMandatory(false);
+                    moFieldCfdBizPartner.setIsMandatory(false);
+                    moFieldCfdBizPartnerBranch.setIsMandatory(false);
+                    moFieldCfdBizPartnerBranchAdd.setIsMandatory(false);
+                    enableOrDisableFields();
+                }
+                else if (radioButton == moRadOwnDestiny) {
+                    moFieldNewDeliveryAddress.setIsMandatory(false);
+                    moFieldCfdCceBizPartnerAddressee.setIsMandatory(true);
+                    moFieldCfdBizPartner.setIsMandatory(false);
+                    moFieldCfdBizPartnerBranch.setIsMandatory(false);
+                    moFieldCfdBizPartnerBranchAdd.setIsMandatory(false);
+
+                    enableOrDisableFields();
+                }
+                else if (radioButton == moRadOtherBp) {
+                    moFieldNewDeliveryAddress.setIsMandatory(false);
+                    moFieldCfdCceBizPartnerAddressee.setIsMandatory(false);
+                    moFieldCfdBizPartner.setIsMandatory(true);
+                    moFieldCfdBizPartnerBranch.setIsMandatory(true);
+                    moFieldCfdBizPartnerBranchAdd.setIsMandatory(true);
+                    enableOrDisableFields();
+                }
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JComboBox) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JComboBox comboBox = (JComboBox) e.getSource();
+                if (comboBox == jcbCfdCceFkAddresseeBizPartner || 
+                    comboBox == jcbCfdCceFkAddresseeBizPartnerBranch ||
+                    comboBox == jcbCfdCceFkAddresseeBizPartnerBranchAddress) {
+                    onJcbBizPartnerChange(moRadOtherBp.isSelected());
+                }
+            }
         }
     }
 }

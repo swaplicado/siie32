@@ -125,6 +125,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -7841,7 +7842,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void setFilePdfJustLoaded(final File pdf) {
         moFilePdfJustLoaded = pdf;
-        jbViewDocumentPdf.setEnabled(moDps.isDocumentOrAdjustmentPur());
+        jbViewDocumentPdf.setEnabled(moDps.isDocumentOrAdjustmentPur() && 
+                                        pdf != null && pdf.exists());
     }
 
     private void actionDate() {
@@ -7923,7 +7925,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     // extraer el texto del xml en la ruta:
                     // validar que el archivo exista:
                     if (!new File(msFileXmlJustLoaded).exists()) {
-                        miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento.");
+                        miClient.showMsgBoxWarning("No existe el XML del documento que se acaba de descargar.");
                     }
                     else {
                         String xmlContent = SXmlUtils.readXml(msFileXmlJustLoaded);
@@ -7934,8 +7936,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     SViewDps.showCfdiXml(miClient, (int[]) moDps.getPrimaryKey(), moDialogCfdRenderer);
                 }
             }
+            catch (FileNotFoundException fnfe) {
+                miClient.showMsgBoxWarning(fnfe.getMessage());
+                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, fnfe);
+            }
             catch (Exception ex) {
-                miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento.");
+                miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento. "
+                        + "" + ex.getMessage());
                 Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -13264,7 +13271,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         moImportedDocument = moDps.getXtaImportedDocument();
         jbViewImportedDocument.setEnabled(moImportedDocument != null);
-        jbViewDocumentXml.setEnabled(moDps.isDocumentOrAdjustmentPur());
+        if (moDps.isDocumentOrAdjustmentPur() && (moDps.getDbmsDataCfd() != null 
+            || (msFileXmlJustLoaded != null && !msFileXmlJustLoaded.isEmpty()))) {
+            jbViewDocumentXml.setEnabled(true);
+        }
+        else {
+            jbViewDocumentXml.setEnabled(false);
+        }
         
         // set business partner, set aswell business partner default preferences when document is new:
 
