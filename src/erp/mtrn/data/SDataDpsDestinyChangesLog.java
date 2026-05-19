@@ -29,7 +29,7 @@ public class SDataDpsDestinyChangesLog extends erp.lib.data.SDataRegistry implem
     protected java.util.Date mtUserChangedTs;
 
     public SDataDpsDestinyChangesLog() {
-        super(SDataConstants.TRN_DPS_DESTINY_CHANGES_LOG);
+        super(SDataConstants.TRN_DPS_DEST_CHG_LOG);
         reset();
     }
 
