@@ -4570,10 +4570,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Save fid_bp_addee_n changes log
                 if (isDpsTypeInvoiceSal() || isAdjustmentSal()) {
-                    STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(connection, 
-                                            new int[] { mnPkYearId, mnPkDocId }, 
-                                            mnFkBizPartnerAddresseeId_n, 
-                                            mnFkUserEditId);
+                    String sSaved = STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(connection, 
+                                                new int[] { mnPkYearId, mnPkDocId }, 
+                                                mnFkBizPartnerAddresseeId_n, 
+                                                mnFkBizPartnerId_r,
+                                                mnFkBizPartnerBranchId,
+                                                mnFkBizPartnerBranchAddressId,
+                                                mnFkUserEditId);
+                    if (!sSaved.isEmpty()) {
+                        Logger.getLogger(SDataDps.class.getName()).log(Level.SEVERE, sSaved);
+                    }
                 }
                         
                 mbIsRegistryNew = false;

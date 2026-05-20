@@ -4127,20 +4127,30 @@ public abstract class STrnUtilities {
         return sent;
     }
     
-    public static boolean updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {
+    /**
+     * Actualiza la dirección de entrega en un documento de venta.
+     * 
+     * @param client Cliente GUI.
+     * @param idBranchAddress ID de la dirección de la sucursal.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * 
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
+     */
+    public static String updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {
         String sql = "";
         Statement statement = null;
-        boolean updated = false;
+        String updated = "";
         
         try {
             sql = "UPDATE trn_dps SET fid_add = " + idBranchAddress[1] + " WHERE id_year = " + pkTrnDps[0] + " and id_doc = " + pkTrnDps[1] + ";";
 
             statement = client.getSession().getDatabase().getConnection().createStatement();
             statement.executeUpdate(sql);
-            updated = true;
+            updated = "";
         }
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            updated = "Ocurrió un error al actualizar el destinatario del negocio. " + e.getMessage();
         }
         
         return updated;
@@ -4152,31 +4162,53 @@ public abstract class STrnUtilities {
      * @param oConn Conexión a la base de datos.
      * @param pkTrnDps Clave primaria del documento de venta.
      * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idBizPartnerDes ID del negocio destinatario.
+     * @param idBizPartnerDesBranch ID de la sucursal del negocio destinatario.
+     * @param idBizPartnerDesBranchAddress ID de la dirección de la sucursal del negocio destinatario.
      * @param idUser ID del usuario que realiza la actualización.
      * 
-     * @return <code>true</code> si la actualización fue exitosa, <code>false</code> en caso contrario.
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
      */
-    public static boolean updateDpsBizPartnerAddressee(Connection oConn, int[] pkTrnDps, int idBizPartnerAddressee, int idUser) {
+    public static String updateDpsBizPartnerAddressee(Connection oConn, 
+                                                        int[] pkTrnDps, 
+                                                        int idBizPartnerAddressee,
+                                                        int idBizPartnerDes,
+                                                        int idBizPartnerDesBranch,
+                                                        int idBizPartnerDesBranchAddress,
+                                                        int idUser) {
         String sql = "";
         Statement statement = null;
-        boolean updated = false;
 
         try {
             sql = "UPDATE trn_dps "
-                    + "SET fid_bp_addee_n = " + (idBizPartnerAddressee == 0 ? "NULL" : idBizPartnerAddressee) + ", "
-                    + "fid_usr_edit = " + idUser + ", "
+                    + "SET ";
+            if (idBizPartnerAddressee > 0) {
+                   sql += "fid_bp_addee_n = " + idBizPartnerAddressee + ", "
+                    + "fid_add_bp_nr = NULL, "
+                    + "fid_add_bpb_n = NULL, "
+                    + "fid_add_add_n = NULL, ";
+            }
+            else if (idBizPartnerDes > 0) {
+                sql += "fid_bp_addee_n = NULL, "
+                    + "fid_add_bp_nr = " + idBizPartnerDes + ", "
+                    + "fid_add_bpb_n = " + idBizPartnerDesBranch + ","
+                    + "fid_add_add_n = " + idBizPartnerDesBranchAddress + ", ";
+            }
+            else {
+                return "Ocurrió un error al actualizar el destinatario del negocio, no se especificó un destinatario válido.";
+            }
+            sql += "fid_usr_edit = " + idUser + ", "
                     + "ts_edit = NOW() "
                     + "WHERE id_year = " + pkTrnDps[0] + " AND id_doc = " + pkTrnDps[1] + ";";
 
             statement = oConn.createStatement();
             statement.executeUpdate(sql);
-            updated = true;
+            return "";
         }
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            return "Ocurrió un error al actualizar el destinatario del negocio. " + e.getMessage();
         }
-
-        return updated;
     }
     
     /**
@@ -4184,24 +4216,36 @@ public abstract class STrnUtilities {
      * @param oConn Conexión a la base de datos.
      * @param pkTrnDps Clave primaria del documento de venta.
      * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idBizPartnerDes ID del negocio destinatario.
+     * @param idBizPartnerDesBranch ID de la sucursal del negocio destinatario.
+     * @param idBizPartnerDesBranchAddress ID de la dirección de la sucursal del negocio destinatario.
      * @param idUser ID del usuario que realiza la actualización.
-     * @return <code>true</code> si la actualización fue exitosa, <code>false</code> en caso contrario.
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
      */
-    public static boolean saveDpsBizPartnerAddresseeChangeLog(Connection oConn, int[] pkTrnDps, int idBizPartnerAddressee, int idUser) {
+    public static String saveDpsBizPartnerAddresseeChangeLog(Connection oConn, 
+                                                                int[] pkTrnDps, 
+                                                                int idBizPartnerAddressee,
+                                                                int idBizPartnerDes,
+                                                                int idBizPartnerDesBranch,
+                                                                int idBizPartnerDesBranchAddress,
+                                                                int idUser) {
         try {
             SDataDpsDestinyChangesLog oLog = new SDataDpsDestinyChangesLog();
             oLog.setPkYearId(pkTrnDps[0]);
             oLog.setPkDocId(pkTrnDps[1]);
             oLog.setFkBizPartnerAddresseeId_n(idBizPartnerAddressee);
+            oLog.setFkAddresseeBizPartnerId_nr(idBizPartnerDes);
+            oLog.setFkAddresseeBizPartnerBranchId_n(idBizPartnerDesBranch);
+            oLog.setFkAddresseeBizPartnerBranchAddressId_n(idBizPartnerDesBranchAddress);
             oLog.setFkUserChangedId(idUser);
             oLog.save(oConn);
         }
         catch (Exception e) {
             Logger.getLogger(STrnUtilities.class.getName()).log(Level.SEVERE, null, e);
-            return false;
+            return "Ocurrió un error al guardar el registro de cambios en el destinatario del negocio. " + e.getMessage();
         }
 
-        return true;
+        return "";
     }
     
     /**

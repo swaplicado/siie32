@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 301.1/ 2026-05-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio de asociado de negocios como destinatario para facturas y notas de crédito de ventas, se agrega al log de cambios al guardar DPS.
+2) Mejorar claridad del mensaje cuando no es posible mostrar XML de CFDI y revisar habilitación del botón en forma de captura de documentos en SIIE. PDC-839
+
+================================================================================
 SIIE 3.2 300.9/ 2026-05-18
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
@@ -16,7 +23,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 2) Vinculación, desvinculación de notas de crédito autorizadas y notas de crédito SIIE, y rechazo de notas de crédito autorizadas de SWAP Services.
 
 ================================================================================
-SIIE 3.2 301.7/ 2026-05-15
+SIIE 3.2 301.0/ 2026-05-15
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Cambio de destinatario propio para facturas y notas de crédito de ventas, se agrega log de cambios al guardar DPS.

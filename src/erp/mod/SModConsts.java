@@ -441,6 +441,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_SND_LOG = 2023012;
     public static final int TRN_DPS_CFD = 2023201;
     public static final int TRN_DPS_CFD_ETY = 2023202;
+    public static final int TRN_DPS_DEST_CHG_LOG = 2023261;
     public static final int TRN_DPS_ADD = 2023013;
     public static final int TRN_DPS_ADD_ETY = 2023014;
     public static final int TRN_DPS_EVT = 2023016;
@@ -1331,6 +1332,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_SND_LOG, "trn_dps_snd_log");
         TablesMap.put(TRN_DPS_CFD, "trn_dps_cfd");
         TablesMap.put(TRN_DPS_CFD_ETY, "trn_dps_cfd_ety");
+        TablesMap.put(TRN_DPS_DEST_CHG_LOG, "trn_dps_dest_chg_log");
         TablesMap.put(TRN_DPS_ADD, "trn_dps_add");
         TablesMap.put(TRN_DPS_ADD_ETY, "trn_dps_add_ety");
         TablesMap.put(TRN_DPS_EVT, "trn_dps_evt");
