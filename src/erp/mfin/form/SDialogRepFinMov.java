@@ -15,23 +15,23 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataCurrency;
+import erp.mfin.data.SDataAccountCash;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -43,22 +43,23 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
-    private erp.lib.form.SFormField moFieldFkCobId;
-    private erp.lib.form.SFormField moFieldFkEntityId;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
+    private erp.lib.form.SFormField moFieldFkCobId;
+    private erp.lib.form.SFormField moFieldFkEntityId;
 
-    private erp.mbps.data.SDataBizPartner moBizPartner;
-
-    private int mnParamPkYearId;
-    private int mnParamPkDocId;
-    private int mnParamFkEntityId;
-    private int mnParamReportTypePerDay;
-    private int[] mnParamTpSysMovId;
+    private int[] manParamTpSysMovKey;
     private int mnParamTpAccSys;
+    private boolean mbIsForAccountCash;
+    private erp.mfin.data.SDataAccountCash moAccountCash;
+    private erp.mcfg.data.SDataCurrency moCurrency;
 
-    /** Creates new form DFormCompany */
-    public SDialogRepFinMov(erp.client.SClientInterface client, java.lang.Object oType) {
+    /**
+     * Creates new form SDialogRepFinMov
+     * @param client
+     * @param repTypeKey
+     */
+    public SDialogRepFinMov(final erp.client.SClientInterface client, final int[] repTypeKey) {
         super(client.getFrame(), true);
         miClient = client;
 
@@ -67,7 +68,7 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
         formRefreshCatalogues();
         formReset();
-        setValue(1, oType);
+        setRepType(repTypeKey);
     }
 
     /** This method is called from within the constructor to
@@ -80,38 +81,37 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
         bgCurrency = new javax.swing.ButtonGroup();
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jpData = new javax.swing.JPanel();
-        jpReg = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
+        buttonGroup2 = new javax.swing.ButtonGroup();
+        jpReport = new javax.swing.JPanel();
+        jpReport1 = new javax.swing.JPanel();
+        jpPeriod = new javax.swing.JPanel();
+        jpPeriod1 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
-        jPanel38 = new javax.swing.JPanel();
         jtfDateStart = new javax.swing.JFormattedTextField();
-        jpStartDate = new javax.swing.JPanel();
         jbDateStart = new javax.swing.JButton();
-        jPanel5 = new javax.swing.JPanel();
+        jpPeriod2 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
-        jPanel42 = new javax.swing.JPanel();
         jtfDateEnd = new javax.swing.JFormattedTextField();
-        jPanel43 = new javax.swing.JPanel();
         jbDateEnd = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel15 = new javax.swing.JPanel();
+        jpFilters = new javax.swing.JPanel();
+        jpFilters1 = new javax.swing.JPanel();
         jlFkCobId = new javax.swing.JLabel();
-        jPanel99 = new javax.swing.JPanel();
         jcbFkCobId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel9 = new javax.swing.JPanel();
-        jbFkCobId = new javax.swing.JButton();
-        jPanel98 = new javax.swing.JPanel();
+        jbPickFkCobId = new javax.swing.JButton();
+        jpFilters2 = new javax.swing.JPanel();
         jlFkEntityId = new javax.swing.JLabel();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jbFkEntityId = new javax.swing.JButton();
         jcbFkEntityId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jbReport = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
+        jbPickFkEntityId = new javax.swing.JButton();
+        jpFilters3 = new javax.swing.JPanel();
+        jlCurrency = new javax.swing.JLabel();
+        jtfCurrencyRo = new javax.swing.JTextField();
+        jpFilters4 = new javax.swing.JPanel();
+        jlReportCurrency = new javax.swing.JLabel();
+        jrbCurrencyLocal = new javax.swing.JRadioButton();
+        jrbCurrencyAccountCash = new javax.swing.JRadioButton();
+        jpControls = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);
@@ -122,78 +122,60 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
             }
         });
 
-        jpData.setLayout(new java.awt.BorderLayout());
+        jpReport.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
+        jpReport.setLayout(new java.awt.BorderLayout());
 
-        jpReg.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
-        jpReg.setLayout(new java.awt.BorderLayout(5, 5));
+        jpReport1.setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 5, 2));
+        jpPeriod.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
+        jpPeriod.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
 
-        jPanel4.setLayout(new java.awt.BorderLayout(0, 2));
+        jpPeriod1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial: *");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel4.add(jlDateStart, java.awt.BorderLayout.WEST);
-
-        jPanel38.setLayout(new java.awt.BorderLayout(2, 0));
+        jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpPeriod1.add(jlDateStart);
 
         jtfDateStart.setText("dd/mm/yyyy");
-        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 20));
-        jPanel38.add(jtfDateStart, java.awt.BorderLayout.WEST);
-
-        jpStartDate.setLayout(new java.awt.BorderLayout(2, 0));
+        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPeriod1.add(jtfDateStart);
 
         jbDateStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateStart.setToolTipText("Seleccionar fecha inicial");
         jbDateStart.setFocusable(false);
         jbDateStart.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpStartDate.add(jbDateStart, java.awt.BorderLayout.WEST);
+        jpPeriod1.add(jbDateStart);
 
-        jPanel38.add(jpStartDate, java.awt.BorderLayout.CENTER);
+        jpPeriod.add(jpPeriod1);
 
-        jPanel4.add(jPanel38, java.awt.BorderLayout.CENTER);
-
-        jPanel8.add(jPanel4);
-
-        jPanel5.setLayout(new java.awt.BorderLayout());
+        jpPeriod2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final: *");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel5.add(jlDateEnd, java.awt.BorderLayout.WEST);
-
-        jPanel42.setLayout(new java.awt.BorderLayout(2, 0));
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpPeriod2.add(jlDateEnd);
 
         jtfDateEnd.setText("dd/mm/yyyy");
-        jtfDateEnd.setPreferredSize(new java.awt.Dimension(75, 20));
-        jPanel42.add(jtfDateEnd, java.awt.BorderLayout.WEST);
-
-        jPanel43.setLayout(new java.awt.BorderLayout());
+        jtfDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpPeriod2.add(jtfDateEnd);
 
         jbDateEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateEnd.setToolTipText("Seleccionar fecha final");
         jbDateEnd.setFocusable(false);
         jbDateEnd.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel43.add(jbDateEnd, java.awt.BorderLayout.WEST);
+        jpPeriod2.add(jbDateEnd);
 
-        jPanel42.add(jPanel43, java.awt.BorderLayout.CENTER);
+        jpPeriod.add(jpPeriod2);
 
-        jPanel5.add(jPanel42, java.awt.BorderLayout.CENTER);
+        jpReport1.add(jpPeriod, java.awt.BorderLayout.PAGE_START);
 
-        jPanel8.add(jPanel5);
+        jpFilters.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro:"));
+        jpFilters.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
 
-        jpReg.add(jPanel8, java.awt.BorderLayout.PAGE_START);
-
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro:"));
-        jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
-
-        jPanel15.setLayout(new java.awt.BorderLayout());
+        jpFilters1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCobId.setText("Sucursal de la empresa:");
         jlFkCobId.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel15.add(jlFkCobId, java.awt.BorderLayout.WEST);
-
-        jPanel99.setLayout(new java.awt.BorderLayout(2, 5));
+        jpFilters1.add(jlFkCobId);
 
         jcbFkCobId.setPreferredSize(new java.awt.Dimension(325, 23));
         jcbFkCobId.addItemListener(new java.awt.event.ItemListener() {
@@ -201,70 +183,91 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
                 jcbFkCobIdItemStateChanged(evt);
             }
         });
-        jPanel99.add(jcbFkCobId, java.awt.BorderLayout.WEST);
+        jpFilters1.add(jcbFkCobId);
 
-        jPanel9.setLayout(new java.awt.BorderLayout(5, 5));
+        jbPickFkCobId.setText("...");
+        jbPickFkCobId.setToolTipText("Seleccionar sucursal de la empresa...");
+        jbPickFkCobId.setFocusable(false);
+        jbPickFkCobId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilters1.add(jbPickFkCobId);
 
-        jbFkCobId.setText("...");
-        jbFkCobId.setToolTipText("Seleccionar sucursal");
-        jbFkCobId.setFocusable(false);
-        jbFkCobId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel9.add(jbFkCobId, java.awt.BorderLayout.WEST);
+        jpFilters.add(jpFilters1);
 
-        jPanel99.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jpFilters2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel15.add(jPanel99, java.awt.BorderLayout.CENTER);
-
-        jPanel7.add(jPanel15);
-
-        jPanel98.setLayout(new java.awt.BorderLayout(0, 5));
-
-        jlFkEntityId.setText("[Asoc. de neg.:]");
+        jlFkEntityId.setText("<Entidad>:");
         jlFkEntityId.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel98.add(jlFkEntityId, java.awt.BorderLayout.WEST);
-
-        jPanel10.setLayout(new java.awt.BorderLayout(2, 0));
-
-        jPanel6.setLayout(new java.awt.BorderLayout(5, 5));
-
-        jbFkEntityId.setText("...");
-        jbFkEntityId.setFocusable(false);
-        jbFkEntityId.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel6.add(jbFkEntityId, java.awt.BorderLayout.WEST);
-
-        jPanel10.add(jPanel6, java.awt.BorderLayout.CENTER);
+        jpFilters2.add(jlFkEntityId);
 
         jcbFkEntityId.setPreferredSize(new java.awt.Dimension(325, 23));
-        jPanel10.add(jcbFkEntityId, java.awt.BorderLayout.WEST);
+        jcbFkEntityId.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbFkEntityIdItemStateChanged(evt);
+            }
+        });
+        jpFilters2.add(jcbFkEntityId);
 
-        jPanel98.add(jPanel10, java.awt.BorderLayout.CENTER);
+        jbPickFkEntityId.setText("...");
+        jbPickFkEntityId.setToolTipText("Seleccionar <entidad>...");
+        jbPickFkEntityId.setFocusable(false);
+        jbPickFkEntityId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpFilters2.add(jbPickFkEntityId);
 
-        jPanel7.add(jPanel98);
+        jpFilters.add(jpFilters2);
 
-        jpReg.add(jPanel7, java.awt.BorderLayout.CENTER);
+        jpFilters3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jpData.add(jpReg, java.awt.BorderLayout.PAGE_START);
+        jlCurrency.setText("Moneda:");
+        jlCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpFilters3.add(jlCurrency);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpData.add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jtfCurrencyRo.setEditable(false);
+        jtfCurrencyRo.setText("CURRENCY NAME");
+        jtfCurrencyRo.setFocusable(false);
+        jtfCurrencyRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpFilters3.add(jtfCurrencyRo);
 
-        getContentPane().add(jpData, java.awt.BorderLayout.CENTER);
+        jpFilters.add(jpFilters3);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpFilters4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbReport.setText("Imprimir");
-        jbReport.setToolTipText("[Ctrl + Enter]");
-        jbReport.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel2.add(jbReport);
+        jlReportCurrency.setText("Moneda del reporte:");
+        jlReportCurrency.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpFilters4.add(jlReportCurrency);
 
-        jbCancel.setText("Cerrar"); // NOI18N
-        jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel2.add(jbCancel);
+        bgCurrency.add(jrbCurrencyLocal);
+        jrbCurrencyLocal.setText("Moneda local");
+        jrbCurrencyLocal.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpFilters4.add(jrbCurrencyLocal);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
+        bgCurrency.add(jrbCurrencyAccountCash);
+        jrbCurrencyAccountCash.setText("Moneda de la <entidad>");
+        jrbCurrencyAccountCash.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpFilters4.add(jrbCurrencyAccountCash);
 
-        setSize(new java.awt.Dimension(522, 259));
+        jpFilters.add(jpFilters4);
+
+        jpReport1.add(jpFilters, java.awt.BorderLayout.CENTER);
+
+        jpReport.add(jpReport1, java.awt.BorderLayout.PAGE_START);
+
+        getContentPane().add(jpReport, java.awt.BorderLayout.CENTER);
+
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbPrint);
+
+        jbClose.setText("Cerrar"); // NOI18N
+        jbClose.setToolTipText("[Escape]");
+        jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbClose);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
+
+        setSize(new java.awt.Dimension(536, 364));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -276,45 +279,94 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         itemStateChangedFkCobId();
     }//GEN-LAST:event_jcbFkCobIdItemStateChanged
 
-    private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+    private void jcbFkEntityIdItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkEntityIdItemStateChanged
+        itemStateChangedFkEntityId();
+    }//GEN-LAST:event_jcbFkEntityIdItemStateChanged
 
-        moFieldFkEntityId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkEntityId, jlFkEntityId);
-        moFieldFkEntityId.setPickerButton(jbFkEntityId);
-        moFieldFkCobId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCobId, jlFkCobId);
-        moFieldFkCobId.setPickerButton(jbFkCobId);
+    private void initComponentsExtra() {
+        mvFields = new Vector<>();
+
         moFieldDateStart = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateStart, jlDateStart);
         moFieldDateStart.setPickerButton(jbDateStart);
         moFieldDateEnd = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbDateEnd);
+        moFieldFkEntityId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkEntityId, jlFkEntityId);
+        moFieldFkEntityId.setPickerButton(jbPickFkEntityId);
+        moFieldFkCobId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkCobId, jlFkCobId);
+        moFieldFkCobId.setPickerButton(jbPickFkCobId);
 
-        mvFields.add(moFieldFkEntityId);
-        mvFields.add(moFieldFkCobId);
         mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
+        mvFields.add(moFieldFkEntityId);
+        mvFields.add(moFieldFkCobId);
 
-        jbCancel.addActionListener(this);
         jbDateStart.addActionListener(this);
         jbDateEnd.addActionListener(this);
-        jbFkEntityId.addActionListener(this);
-        jbFkCobId.addActionListener(this);
-        jbReport.addActionListener(this);
+        jbPickFkEntityId.addActionListener(this);
+        jbPickFkCobId.addActionListener(this);
+        jbPrint.addActionListener(this);
+        jbClose.addActionListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionReport(); }
+            public void actionPerformed(ActionEvent e) { actionPrint(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.putActionMap(getRootPane(), actionOk, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionCancel = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) { actionClose(); }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "close", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
+    }
+
+    private void setRepType(final int[] repTypeKey) {
+        manParamTpSysMovKey = repTypeKey.clone();
+        mnParamTpAccSys = 0;
+        mbIsForAccountCash = false;
+
+        if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
+            mbIsForAccountCash = true;
+            
+            setTitle("Movimientos contables de cajas");
+            jlFkEntityId.setText("Caja:");
+            jbPickFkEntityId.setToolTipText("Seleccionar caja...");
+            jrbCurrencyAccountCash.setText("Moneda de la caja");
+            jlCurrency.setEnabled(true);
+            jlReportCurrency.setEnabled(true);
+        }
+        else if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
+            mbIsForAccountCash = true;
+            
+            setTitle("Movimientos contables de cuentas bancarias");
+            jlFkEntityId.setText("Cuenta bancaria:");
+            jbPickFkEntityId.setToolTipText("Seleccionar cuenta bancaria...");
+            jrbCurrencyAccountCash.setText("Moneda de la cuenta bancaria");
+            jlCurrency.setEnabled(true);
+            jlReportCurrency.setEnabled(true);
+        }
+        else if (manParamTpSysMovKey[0] == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
+            // System account type prof loss:
+
+            mnParamTpAccSys = manParamTpSysMovKey[0];
+
+            setTitle("Movimientos contables de pérdidas y ganancias");
+            jlFkEntityId.setText("Ejercicio:");
+            jbPickFkEntityId.setToolTipText("Seleccionar ejercicio...");
+            jrbCurrencyAccountCash.setText("Moneda de la entidad");
+            jlCurrency.setEnabled(false);
+            jlReportCurrency.setEnabled(false);
+            
+            SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FIN_YEAR);
+        }
+
+        if (miClient.getSessionXXX().getCurrentCompanyBranch() != null) {
+            moFieldFkCobId.setKey(miClient.getSessionXXX().getCurrentCompanyBranch().getPrimaryKey());
+        }
     }
 
     private void windowActivated() {
@@ -323,44 +375,109 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
             jtfDateStart.requestFocus();
         }
     }
-
+    
     private void itemStateChangedFkCobId() {
+        if (mbIsForAccountCash) {
+            jcbFkEntityId.setEnabled(false);
+        }
+        
         if (jcbFkCobId.getSelectedIndex() > 0) {
-
-            if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
+            if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
+                jcbFkEntityId.setEnabled(true);
                 SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FINX_ACC_CASH_CASH, new int[] { moFieldFkCobId.getKeyAsIntArray()[0] });
             }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
+            else if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
+                jcbFkEntityId.setEnabled(true);
                 SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FINX_ACC_CASH_BANK, new int[] { moFieldFkCobId.getKeyAsIntArray()[0] });
             }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) { // XXX
-                populateComboBoxEntity();
+        }
+        else {
+            if (mbIsForAccountCash) {
+                jcbFkEntityId.removeAllItems();
             }
         }
     }
-
-    private void actionFkEntityId() {
-
-        if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
-            miClient.pickOption(SDataConstants.CFGU_COB_ENT, moFieldFkEntityId, new int[]{moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_CASH, SDataConstantsSys.CFGS_TP_ENT_CASH_CASH[1] });
-        }
-        else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
-            miClient.pickOption(SDataConstants.CFGU_COB_ENT, moFieldFkEntityId, new int[]{moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_CASH, SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[1] });
-        }
-        else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT) ||
-                SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-            miClient.pickOption(SDataConstants.FINU_TAX, moFieldFkEntityId, null);
-        }
-        else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) { // XXX
-            miClient.pickOption(SDataConstants.CFGU_COB_ENT, moFieldFkEntityId, new int[]{moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_CASH, SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[1] });
-        }
-        else if (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
-            miClient.pickOption(SDataConstants.FIN_YEAR, moFieldFkEntityId, null);
+    
+    private void itemStateChangedFkEntityId() {
+        if (mbIsForAccountCash) {
+            resetAccountCash();
+            
+            if (jcbFkEntityId.getSelectedIndex() > 0) {
+                moAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldFkEntityId.getKey(), SLibConstants.EXEC_MODE_SILENT);
+                moCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { moAccountCash.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                jtfCurrencyRo.setText(moCurrency.getCurrency() + " (" + moCurrency.getKey() + ")");
+                jrbCurrencyLocal.setEnabled(true);
+                jrbCurrencyAccountCash.setEnabled(true);
+                jrbCurrencyAccountCash.setSelected(true);
+            }
         }
     }
+    
+    private void resetAccountCash() {
+        moAccountCash = null;
+        moCurrency = null;
+        
+        jtfCurrencyRo.setText("");
+        jrbCurrencyLocal.setEnabled(false);
+        jrbCurrencyAccountCash.setEnabled(false);
+        bgCurrency.setSelected(jrbCurrencyLocal.getModel(), true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void renderReport(String sReportTitle, String sSqlCob_n, String sSqlItem, String sSqlInner1, String sSqlInner2, String sSqlAnd1, String sSqlAnd2, String sSqlId1, String sSqlId2, String sPeriod, String sBranch, String sEntity, int nCurrencyId, String sCurrency, boolean otherMvmtsWarning) {
+        Cursor oCursor = getCursor();
+        JasperPrint oPrint = null;
+        JasperViewer oViewer = null;
+        Map<String, Object> oMap = null;
+        boolean isProfitLoss = mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS;
 
-    private void actionFkCobId() {
-        miClient.pickOption(SDataConstants.BPSU_BPB, moFieldFkCobId, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
+        try {
+            // Report params:
+
+            oMap = miClient.createReportParams();
+            oMap.put("sReportTitle", sReportTitle);
+            oMap.put("tDateBalOp", isProfitLoss ?
+                    SLibTimeUtilities.addDate(SLibTimeUtilities.getBeginOfYear(moFieldDateStart.getDate()), 0, 0, -1) :
+                    SLibTimeUtilities.addDate(moFieldDateStart.getDate(), 0, 0, -1));
+            oMap.put("tDateStart", moFieldDateStart.getDate());
+            oMap.put("tDateEnd", moFieldDateEnd.getDate());
+            oMap.put("sPeriod", sPeriod);
+            oMap.put("sCob", sBranch);
+            oMap.put("nCurrencyId", nCurrencyId);
+            oMap.put("sCurrency", sCurrency);
+            oMap.put("bOtherMvmtsWarning", otherMvmtsWarning);
+            oMap.put("sEntity", sEntity);
+            oMap.put("nFkYearId", SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]);
+            oMap.put("sSqlCob_n", sSqlCob_n);
+            oMap.put("sSqlItem", sSqlItem);
+            oMap.put("sSqlInner1", sSqlInner1);
+            oMap.put("sSqlInner2", sSqlInner2);
+            oMap.put("sSqlAnd1", isProfitLoss ? "" : sSqlId1.length() == 0 ? "" : sSqlAnd1);
+            oMap.put("sSqlAnd2", isProfitLoss ? "" : sSqlId2.length() == 0 ? "" : sSqlAnd2);
+            oMap.put("sSqlSubRepAnd1", isProfitLoss ? "" : sSqlAnd1);
+            oMap.put("sSqlSubRepAnd2", isProfitLoss ? "" : sSqlAnd2);
+            oMap.put("sSqlId1", sSqlId1);
+            oMap.put("sSqlId2", sSqlId2);
+            oMap.put("sSqlCurrency", "re.fid_cur " + (nCurrencyId == 0 ? "<> 0" : "= " + nCurrencyId));
+            oMap.put("nFkCtSysMovId", manParamTpSysMovKey[0]);
+            oMap.put("nFkTpSysMovId", manParamTpSysMovKey[1]);
+            oMap.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
+            oMap.put("bWithDetail", true);
+
+            // Report view:
+
+            oPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_CASH_MOV, oMap);
+            oViewer = new JasperViewer(oPrint, false);
+            oViewer.setTitle("Reporte de " + getTitle().toLowerCase());
+            oViewer.setVisible(true);
+        }
+        catch(Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        finally {
+            setCursor(oCursor);
+        }
     }
 
     private void actionDateStart() {
@@ -385,74 +502,69 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         }
     }
 
-    private void actionReport() {
-        String sSqlItem = " CONCAT(e.ent) AS f_item, CONCAT(re.fid_cob_n) AS f_id_1, CONCAT(re.fid_ent_n) AS f_id_2 ";
-        String sSqlCob_n = "";
-        // String sSqlEntity = "";
-        String sSqlInner1 = "";
-        String sSqlInner2 = "";
-        String sSqlAnd1 = "";
-        String sSqlAnd2 = "";
-        String sSqlId1 = "";
-        String sSqlId2 = "";
-        String sCob = "";
-        String sEntity = "";
-        String sEntityTitle = "";
-        String sPeriod = "";
-        String sReportTitle = "MOVIMIENTOS DE ";
+    private void actionPickFkEntityId() {
+        if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
+            miClient.pickOption(SDataConstants.CFGU_COB_ENT, moFieldFkEntityId, new int[]{moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_CASH, SDataConstantsSys.CFGS_TP_ENT_CASH_CASH[1] });
+        }
+        else if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
+            miClient.pickOption(SDataConstants.CFGU_COB_ENT, moFieldFkEntityId, new int[]{moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_CASH, SDataConstantsSys.CFGS_TP_ENT_CASH_BANK[1] });
+        }
+        else if (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
+            miClient.pickOption(SDataConstants.FIN_YEAR, moFieldFkEntityId, null);
+        }
+    }
 
-        SFormValidation validation = new SFormValidation();
+    private void actionPickFkCobId() {
+        miClient.pickOption(SDataConstants.BPSU_BPB, moFieldFkCobId, new int[] { miClient.getSessionXXX().getCompany().getPkCompanyId() });
+    }
 
-        validation = formValidate();
+    private void actionPrint() {
+        SFormValidation validation = formValidate();
 
         if (!validation.getIsError()) {
-
             // By company branch (cob) or to all companies branches:
+            
+            String sBranch = "<b>SUCURSAL:</b> ";
+            String sSqlCob_n = "";
 
             if (jcbFkCobId.getSelectedIndex() > 0) {
                 sSqlCob_n = " AND r.fid_cob = " + moFieldFkCobId.getKeyAsIntArray()[0] + " ";
-                sCob = jcbFkCobId.getSelectedItem().toString();
+                sBranch += jcbFkCobId.getSelectedItem().toString();
             }
             else {
-                sCob = "(TODAS)";
+                sBranch += "(TODAS)";
             }
 
             // Get title entity:
+            
+            String sTitle = "MOVIMIENTOS DE ";
+            String sEntity = "";
+            String sSqlItem = " CONCAT(e.ent) AS f_item, CONCAT(re.fid_cob_n) AS f_id_1, CONCAT(re.fid_ent_n) AS f_id_2 ";
 
-            if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
-                sEntityTitle = "CAJA: ";
-                sReportTitle += "CAJAS ";
+            if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
+                sTitle += "CAJAS";
+                sEntity = "<b>CAJA:</b> ";
             }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
-                sEntityTitle = "CUENTA BANCARIA: ";
-                sReportTitle += "BANCOS ";
-            }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
-                sEntityTitle = "ALMACEN: ";
-                sReportTitle += "INVENTARIOS ";
-            }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT) ||
-                    SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                sEntityTitle = "IMPUESTO: ";
-
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
-                    sReportTitle += "IMPUESTOS A FAVOR ";
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                    sReportTitle += "IMPUESTOS A CARGO ";
-                }
+            else if (SLibUtilities.compareKeys(manParamTpSysMovKey, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
+                sTitle += "CUENTAS BANCARIAS";
+                sEntity = "<b>CUENTA BANCARIA:</b> ";
             }
             else if (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
-                sEntityTitle = "EJERCICIO: ";
-                sReportTitle += "PÉRDIDAS Y GANANCIAS ";
+                sTitle += "PÉRDIDAS Y GANANCIAS";
+                sEntity = "<b>EJERCICIO:</b> ";
                 sSqlItem = " CONCAT(r.id_year) AS f_item, CONCAT(re.fid_cob_n) AS f_id_1, CONCAT(re.fid_ent_n) AS f_id_2 ";
             }
 
             // Render sentences Inner Joins:
 
-            if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH) ||
-                    SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK) ||
-                    SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
+            String sSqlInner1 = "";
+            String sSqlInner2 = "";
+            String sSqlAnd1 = "";
+            String sSqlAnd2 = "";
+            String sSqlId1 = "";
+            String sSqlId2 = "";
+            
+            if (mbIsForAccountCash) {
                 sSqlInner1 = "INNER JOIN erp.cfgu_cob_ent AS e ON re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent ";
                 sSqlInner2 = "INNER JOIN erp.bpsu_bpb AS bb ON e.id_cob = bb.id_bpb ";
                 sSqlAnd1 = "AND re.fid_cob_n = ";
@@ -462,65 +574,47 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
                     sSqlCob_n = " AND re.fid_cob_n = " + moFieldFkCobId.getKeyAsIntArray()[0] + " ";
                 }
             }
-            else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT) ||
-                    SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                sSqlInner1 = "INNER JOIN erp.finu_tax AS t ON re.fid_tax_bas_n = t.id_tax_bas AND re.fid_tax_n = t.id_tax ";
-                sSqlInner2 = "INNER JOIN erp.finu_tax_bas AS tb ON t.id_tax_bas = tb.id_tax_bas ";
-                sSqlAnd1 = "AND t.id_tax_bas = ";
-                sSqlAnd2 = "AND t.id_tax = ";
-                sSqlItem = " CONCAT(t.tax) AS f_item, CONCAT(re.fid_tax_bas_n) AS f_id_1, CONCAT(re.fid_tax_n) AS f_id_2 ";
-            }
             else if (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
                 sSqlInner1 = "INNER JOIN fin_year AS y ON re.fid_year_n = y.id_year ";
             }
 
             // Check if is for entity or all entities:
-
+            
+            int nCurrencyId = 0;
+            String sCurrency = "<b>MONEDA:</b> MONEDA LOCAL (" + miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey() + ")";
+            boolean otherMvmtsWarning = false;
+            
             if (jcbFkEntityId.getSelectedIndex() > 0) {
-
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
+                if (mbIsForAccountCash) {
                     sSqlId1 = "" + moFieldFkEntityId.getKeyAsIntArray()[0];
                     sSqlId2 = "" + moFieldFkEntityId.getKeyAsIntArray()[1];
                     // sSqlEntity += " AND re.fid_cob_n = " + moFieldFkEntityId.getKeyAsIntArray()[0] + " AND re.fid_ent_n = " + moFieldFkEntityId.getKeyAsIntArray()[1] + " ";
-                    sEntity = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_COB_ENT, moFieldFkEntityId.getKey());
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                    sSqlId1 = "" + moFieldFkEntityId.getKeyAsIntArray()[0];
-                    sSqlId2 = "" + moFieldFkEntityId.getKeyAsIntArray()[1];
-                    // sSqlEntity += " AND t.id_tax_bas = " + moFieldFkEntityId.getKeyAsIntArray()[0] + " AND t.id_tax = " + moFieldFkEntityId.getKeyAsIntArray()[1] + " ";
-                    sEntity = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, moFieldFkEntityId.getKey());
+                    sEntity += SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.CFGU_COB_ENT, moFieldFkEntityId.getKey());
+                    
+                    if (jrbCurrencyAccountCash.isSelected()) {
+                        nCurrencyId = moAccountCash.getFkCurrencyId();
+                        sCurrency = "<b>MONEDA:</b> " + moCurrency.getCurrency() + " (" + moCurrency.getKey() + ")";
+                        otherMvmtsWarning = true;
+                    }
                 }
                 else if (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS) {
-                    sEntity += moFieldFkEntityId.getKeyAsIntArray()[0];
+                    sEntity += "" + moFieldFkEntityId.getKeyAsIntArray()[0];
                 }
             }
             else {
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
-                    sEntity = "(TODAS)";
+                if (mbIsForAccountCash) {
+                    sEntity += "(TODAS)";
                 }
                 else {
-                    sEntity = "(TODOS)";
+                    sEntity += "(TODOS)";
                 }
             }
 
-            // Period by date start to date end or per day:
+            // Period by date start to date end:
 
-            switch (mnParamReportTypePerDay) {
-                case SDataConstants.TRNR_ACCOUNT_CASH_PDAY:
-                case SDataConstants.TRNR_ACCOUNT_BANK_PDAY:
-                    moFieldDateEnd.setDate(moFieldDateStart.getDate());
-                    sReportTitle += "POR DÍA";
-                    sPeriod = "DEL " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateStart.getDate());
-                    break;
-                default:
-                    sPeriod = "DEL " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateStart.getDate()) + " AL " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateEnd.getDate());
-            }
+            String sPeriod = "<b>PERÍODO:</b> DEL " + SLibUtils.DateFormatDate.format(moFieldDateStart.getDate()) + " AL " + SLibUtils.DateFormatDate.format(moFieldDateEnd.getDate());
 
-            renderReport(sReportTitle, sSqlCob_n, sSqlItem, sSqlInner1, sSqlInner2, sSqlAnd1, sSqlAnd2, sSqlId1, sSqlId2, sCob, sEntity, sEntityTitle, sPeriod);
+            renderReport(sTitle, sSqlCob_n, sSqlItem, sSqlInner1, sSqlInner2, sSqlAnd1, sSqlAnd2, sSqlId1, sSqlId2, sPeriod, sBranch, sEntity, nCurrencyId, sCurrency, otherMvmtsWarning);
         }
         else {
             miClient.showMsgBoxWarning(validation.getMessage());
@@ -528,118 +622,7 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void renderReport(java.lang.String sReportTitle, java.lang.String sSqlCob_n, java.lang.String sSqlItem, java.lang.String sSqlInner1, java.lang.String sSqlInner2,
-            java.lang.String sSqlAnd1, java.lang.String sSqlAnd2, java.lang.String sSqlId1, java.lang.String sSqlId2, java.lang.String sCob, java.lang.String sEntity,
-            java.lang.String sEntityTitle, java.lang.String sPeriod) {
-        Cursor oCursor = getCursor();
-        JasperPrint oPrint = null;
-        JasperViewer oViewer = null;
-        Map<String, Object> oMap = null;
-
-        try {
-
-            // Report params:
-
-            oMap = miClient.createReportParams();
-            oMap.put("sReportTitle", sReportTitle);
-            oMap.put("tDateBalOp", (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS ?
-                    SLibTimeUtilities.addDate(SLibTimeUtilities.getBeginOfYear(moFieldDateStart.getDate()), 0, 0, -1) :
-                    SLibTimeUtilities.addDate(moFieldDateStart.getDate(), 0, 0, -1)));
-            oMap.put("tDateStart", moFieldDateStart.getDate());
-            oMap.put("tDateEnd", moFieldDateEnd.getDate());
-            oMap.put("sPeriod", sPeriod);
-            oMap.put("sCob", sCob);
-            oMap.put("sCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
-            oMap.put("sEntity", sEntity);
-            oMap.put("sEntityTitle", sEntityTitle);
-            oMap.put("nFkYearId", SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]);
-            oMap.put("sSqlCob_n", sSqlCob_n);
-            oMap.put("sSqlItem", sSqlItem);
-            oMap.put("sSqlInner1", sSqlInner1);
-            oMap.put("sSqlInner2", sSqlInner2);
-            oMap.put("sSqlAnd1", (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS ? "" : sSqlId1.length() == 0 ? "" : sSqlAnd1));
-            oMap.put("sSqlAnd2", (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS ? "" : sSqlId2.length() == 0 ? "" : sSqlAnd2));
-            oMap.put("sSqlSubRepAnd1", (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS ? "" : sSqlAnd1));
-            oMap.put("sSqlSubRepAnd2", (mnParamTpAccSys == SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS ? "" : sSqlAnd2));
-            oMap.put("sSqlId1", sSqlId1);
-            oMap.put("sSqlId2", sSqlId2);
-            oMap.put("nFkCtSysMovId", mnParamTpSysMovId[0]);
-            oMap.put("nFkTpSysMovId", mnParamTpSysMovId[1]);
-            oMap.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
-            oMap.put("bWithDetail", true);
-
-            // Report view:
-
-            oPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_CASH_MOV, oMap);
-            oViewer = new JasperViewer(oPrint, false);
-            oViewer.setTitle("Reporte de " + this.getTitle().toLowerCase());
-            oViewer.setVisible(true);
-        }
-        catch(Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-        finally {
-            setCursor(oCursor);
-        }
-    }
-
-    private void getBizPartner(int nBizPartnerId) {
-        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { nBizPartnerId }, SLibConstants.EXEC_MODE_SILENT);
-    }
-
-    private void populateComboBoxEntity() {
-        int i = 0;
-        int j = 0;
-
-        if (moFieldFkCobId.getKeyAsIntArray()[0] > 0) {
-            if (miClient.getSessionXXX().getUser().getIsUniversal()) {
-                SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.CFGU_COB_ENT, new int[] { moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_WH });
-            }
-            else {
-                for (i = 0; i < miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranches().size(); i++) {
-                    if (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranches().get(i).getPkCompanyBranchId() == moFieldFkCobId.getKeyAsIntArray()[0]) {
-                        if (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranches().get(i).getIsUniversal() || isUniversalAccessEntity()) {
-                            SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.CFGU_COB_ENT, new int[] { moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_WH });
-                        }
-                        else {
-                            jcbFkEntityId.removeAllItems();
-                            jcbFkEntityId.addItem(new SFormComponentItem(new int[] { 0 }, "Seleccionar almacen "));
-                            for (j = 0; j < miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntities().size(); j++) {
-                                if (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntities().get(j).getDbmsCompanyBranchEntity().getFkEntityCategoryId() == SDataConstantsSys.CFGS_CT_ENT_WH) {
-                                    jcbFkEntityId.addItem(new SFormComponentItem(new int[] { miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntities().get(j).getPkCompanyBranchId(),
-                                        miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntities().get(j).getPkEntityId() }, miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntities().get(j).getDbmsCompanyBranchEntity().getEntity()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean isUniversalAccessEntity() {
-        int i = 0;
-        boolean isUniv = false;
-
-        for (i = 0; i < miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntitiesUniversal().size(); i++) {
-            if (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntitiesUniversal().get(i).getPkCompanyBranchId() == moFieldFkCobId.getKeyAsIntArray()[0]) {
-                if (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranchEntitiesUniversal().get(i).getPkEntityCategoryId() == SDataConstantsSys.CFGS_CT_ENT_CASH ||
-                        (miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranches().get(i).getPkCompanyBranchId() == moFieldFkCobId.getKeyAsIntArray()[0] && miClient.getSessionXXX().getUser().getDbmsAccessCompanyBranches().get(i).getIsUniversal())) {
-                    isUniv = true;
-                    break;
-                }
-            }
-        }
-
-        return isUniv;
-    }
-
-    private void actionEdit(boolean edit) {
-
-    }
-
-    private void actionCancel() {
+    private void actionClose() {
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
@@ -647,36 +630,35 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCurrency;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel38;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel42;
-    private javax.swing.JPanel jPanel43;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JPanel jPanel98;
-    private javax.swing.JPanel jPanel99;
-    private javax.swing.JButton jbCancel;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JButton jbClose;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateStart;
-    private javax.swing.JButton jbFkCobId;
-    private javax.swing.JButton jbFkEntityId;
-    private javax.swing.JButton jbReport;
+    private javax.swing.JButton jbPickFkCobId;
+    private javax.swing.JButton jbPickFkEntityId;
+    private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCobId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkEntityId;
+    private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlFkCobId;
     private javax.swing.JLabel jlFkEntityId;
-    private javax.swing.JPanel jpData;
-    private javax.swing.JPanel jpReg;
-    private javax.swing.JPanel jpStartDate;
+    private javax.swing.JLabel jlReportCurrency;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpFilters;
+    private javax.swing.JPanel jpFilters1;
+    private javax.swing.JPanel jpFilters2;
+    private javax.swing.JPanel jpFilters3;
+    private javax.swing.JPanel jpFilters4;
+    private javax.swing.JPanel jpPeriod;
+    private javax.swing.JPanel jpPeriod1;
+    private javax.swing.JPanel jpPeriod2;
+    private javax.swing.JPanel jpReport;
+    private javax.swing.JPanel jpReport1;
+    private javax.swing.JRadioButton jrbCurrencyAccountCash;
+    private javax.swing.JRadioButton jrbCurrencyLocal;
+    private javax.swing.JTextField jtfCurrencyRo;
     private javax.swing.JFormattedTextField jtfDateEnd;
     private javax.swing.JFormattedTextField jtfDateStart;
     // End of variables declaration//GEN-END:variables
@@ -695,6 +677,10 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         for (int i = 0; i < mvFields.size(); i++) {
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
+        
+        manParamTpSysMovKey = null;
+        mnParamTpAccSys = 0;
+        resetAccountCash();
 
         moFieldDateStart.setDate(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setDate(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
@@ -753,87 +739,12 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-
         return null;
     }
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        switch (type) {
-            case 1:
-                mnParamTpSysMovId = (int[])((Object []) value)[0];
-                mnParamReportTypePerDay = (Integer)((Object []) value)[1];
-
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH)) {
-                    jlFkEntityId.setText("Caja:");
-                    this.setTitle("Movimientos contables de cajas ");
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK)) {
-                    jlFkEntityId.setText("Cuenta bancaria:");
-                    this.setTitle("Movimientos contables de cuentas bancarias ");
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT)) {
-                    jlFkEntityId.setText("Impuesto a favor:");
-                    this.setTitle("Movimientos contables de impuestos a favor ");
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                    jlFkEntityId.setText("Impuesto a cargo:");
-                    this.setTitle("Movimientos contables de impuestos a cargo ");
-                }
-                else if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
-                    jlFkEntityId.setText("Almacen:");
-                    this.setTitle("Movimientos contables de almacenes ");
-                }
-                else {
-
-                    // System account type prof loss:
-
-                    mnParamTpAccSys = mnParamTpSysMovId[0];
-                    jlFkEntityId.setText("Ejercicio:");
-                    this.setTitle("Movimientos contables de pérdidas y ganancias ");
-                    SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FIN_YEAR);
-                }
-
-                // Populate comboBox with normal process 'populateComboBox':
-
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_TAX_CDT)) {
-                    SFormUtilities.populateComboBox(miClient, jcbFkEntityId, SDataConstants.FINX_TAX_BAS_TAX);
-                }
-
-                if (mnParamReportTypePerDay != SDataConstants.UNDEFINED) {
-                    jlDateStart.setText("Fecha del: *");
-                    jlDateEnd.setEnabled(false);
-                    jtfDateEnd.setEnabled(false);
-                    jbDateEnd.setEnabled(false);
-                    this.setTitle("Movimientos contables de por día");
-                }
-
-                if (miClient.getSessionXXX().getCurrentCompanyBranch() != null)
-                    moFieldFkCobId.setKey(miClient.getSessionXXX().getCurrentCompanyBranch().getPrimaryKey());
-
-                break;
-            case 2:
-                mnParamPkYearId = ((int []) value)[0];
-                mnParamPkDocId = ((int []) value)[1];
-                break;
-            case 3:
-                mnParamFkEntityId = (Integer) value;
-
-                if (SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK) ||
-                        SLibUtilities.compareKeys(mnParamTpSysMovId, SDataConstantsSys.FINS_TP_SYS_MOV_ASSET_STOCK)) {
-                    moFieldFkEntityId.setKey(new int[] { (Integer) value });
-                    getBizPartner(mnParamFkEntityId);
-                }
-                break;
-            case 4:
-                moFieldDateStart.setDate(SLibTimeUtilities.getBeginOfMonth((Date) value));
-                break;
-            case 5:
-                moFieldDateEnd.setDate(SLibTimeUtilities.getEndOfMonth((Date) value));
-                break;
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -851,23 +762,23 @@ public class SDialogRepFinMov extends javax.swing.JDialog implements erp.lib.for
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbCancel) {
-                actionCancel();
-            }
-            else if (button == jbDateStart) {
+            if (button == jbDateStart) {
                 actionDateStart();
             }
             else if (button == jbDateEnd) {
                 actionDateEnd();
             }
-            else if (button == jbReport) {
-                actionReport();
+            else if (button == jbPickFkEntityId) {
+                actionPickFkEntityId();
             }
-            else if (button == jbFkEntityId) {
-                actionFkEntityId();
+            else if (button == jbPickFkCobId) {
+                actionPickFkCobId();
             }
-            else if (button == jbFkCobId) {
-                actionFkCobId();
+            else if (button == jbPrint) {
+                actionPrint();
+            }
+            else if (button == jbClose) {
+                actionClose();
             }
         }
     }

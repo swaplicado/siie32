@@ -103,8 +103,6 @@ import erp.mfin.form.SFormYear;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.swap.SSwapConsts;
-import erp.swap.form.SDialogImportProformas;
 import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
@@ -127,6 +125,8 @@ import erp.mtrn.form.SDialogRepAccountTag;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormCtr;
+import erp.swap.SSwapConsts;
+import erp.swap.form.SDialogImportProformas;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -139,7 +139,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Claudio Peña, Sergio Flores, Cesar Orozco, Edwin Carmona
+ * @author Sergio Flores, Isabel Servín, Claudio Peña, Cesar Orozco, Edwin Carmona, Sergio Flores
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -2499,10 +2499,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepAccountCashBalance(miClient).setVisible(true);
             }
             else if (item == jmiRepCashAccMovsCash) {
-                new SDialogRepFinMov(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstants.UNDEFINED }).setVisible(true);
+                new SDialogRepFinMov(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH).setVisible(true);
             }
             else if (item == jmiRepCashAccMovsBank) {
-                new SDialogRepFinMov(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, SDataConstants.UNDEFINED }).setVisible(true);
+                new SDialogRepFinMov(miClient, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK).setVisible(true);
             }
             else if (item == jmiRepCashAccMovsCashDay) {
                 new SDialogRepFinMovBankDayDet(miClient, new Object[] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH, SDataConstants.TRNR_ACCOUNT_CASH_PDAY }).setVisible(true);
@@ -2592,7 +2592,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepTaxesMoves(miClient).setFormVisible(true);
             }
             else if (item == jmiRepAccMovsProfitLoss) {
-                new SDialogRepFinMov(miClient, new Object[] { new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA } , SDataConstants.UNDEFINED }).setVisible(true);
+                new SDialogRepFinMov(miClient, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PROF_LOSS, SDataConstantsSys.FINS_TP_ACC_SYS_NA }).setVisible(true);
             }
             else if (item == jmiRepAccMovsExcDiff) {
                 new SDialogRepExchangeRateDiff(miClient).setVisible(true);
