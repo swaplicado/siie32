@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 301.2/ 2026-05-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de la generación de los reportes de movimientos contables de cuentas de dinero (caja y cuentas bancarias) en la moneda propia de la cuenta.
+
+================================================================================
 SIIE 3.2 301.1/ 2026-05-19
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
