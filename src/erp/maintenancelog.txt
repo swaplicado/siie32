@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 301.3/ 2026-05-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de la generación de los reportes de flujo de efectivo de cobros y pagos por período en la moneda de la transacción (de las facturas y anticipos).
+
+================================================================================
 SIIE 3.2 301.2/ 2026-05-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

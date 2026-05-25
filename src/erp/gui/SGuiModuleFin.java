@@ -804,14 +804,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepAccAccTagSup = new JMenuItem("Reporte de documentos de compras con etiqueta contable...");
         
         jmRepCashFlow = new JMenu("Flujo de efectivo");
-        jmiRepCashFlowPaysCus = new JMenuItem("Reporte de cobros por periodo...");
-        jmiRepCashFlowPaysSup = new JMenuItem("Reporte de pagos por periodo...");
-        jmiQryCashFlowPaysCusSum = new JMenuItem("Consulta de cobros por periodo");
-        jmiQryCashFlowPaysCusDet = new JMenuItem("Consulta de cobros por periodo a detalle");
-        jmiQryCashFlowPaysSupSum = new JMenuItem("Consulta de pagos por periodo");
-        jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por periodo a detalle"); //ORIGINAL
-        jmiQryCashFlowPaysSupPayDet = new JMenuItem("Consulta de pagos por periodo a detalle");
-        jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
+        jmiRepCashFlowPaysCus = new JMenuItem("Reporte de cobros por período...");
+        jmiRepCashFlowPaysSup = new JMenuItem("Reporte de pagos por período...");
+        jmiQryCashFlowPaysCusSum = new JMenuItem("Consulta de cobros por período");
+        jmiQryCashFlowPaysCusDet = new JMenuItem("Consulta de cobros por período a detalle");
+        jmiQryCashFlowPaysSupSum = new JMenuItem("Consulta de pagos por período");
+        jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por período a detalle"); //ORIGINAL
+        jmiQryCashFlowPaysSupPayDet = new JMenuItem("Consulta de pagos por período a detalle");
+        jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por período...");
         
         jmRepAccIncExp = new JMenu("Reportes de ingresos y egresos contables");
         jmiRepAccIncNet = new JMenuItem("Reporte de ingresos contables netos");
@@ -1998,10 +1998,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.TRNX_DPS_PAYS:
                     if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                        sViewTitle = "Pagos periodo";
+                        sViewTitle = "Pagos período";
                     }
                     else if (auxType01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                        sViewTitle = "Cobros periodo";
+                        sViewTitle = "Cobros período";
                     }
                     if (auxType02 == SUtilConsts.QRY_DET) {
                         sViewTitle += " (detalle)";

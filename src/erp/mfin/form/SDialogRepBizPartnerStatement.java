@@ -41,7 +41,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores, Isabel Servín
+ * @author Néstor Ávalos, Isabel Servín, Sergio Flores
  */
 public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -104,7 +104,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlCoBranch = new javax.swing.JLabel();
-        jcbCoBranch = new javax.swing.JComboBox<>();
+        jcbCoBranch = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickCoBranch = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jrbBizPartner = new javax.swing.JRadioButton();
@@ -112,11 +112,11 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jrbSalesAgent = new javax.swing.JRadioButton();
         jPanel98 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<>();
+        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel99 = new javax.swing.JPanel();
         jlSalesAgent = new javax.swing.JLabel();
-        jcbSalesAgent = new javax.swing.JComboBox<>();
+        jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
         jbPickSalesAgent = new javax.swing.JButton();
         jPanel19 = new javax.swing.JPanel();
         jrbLanLoc = new javax.swing.JRadioButton();
@@ -130,7 +130,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jlCurrencyDocWarning = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
-        jcbCurrency = new javax.swing.JComboBox();
+        jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel1 = new javax.swing.JPanel();
         jckAdvancePayments = new javax.swing.JCheckBox();
         jpControls = new javax.swing.JPanel();
@@ -284,7 +284,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jPanel16.add(jrbCurrencyLoc);
 
         jlCurrencyLocWarning.setForeground(new java.awt.Color(255, 0, 0));
-        jlCurrencyLocWarning.setText("NOTA: ¡Contiene todos los movimientos.!");
+        jlCurrencyLocWarning.setText("NOTA: Incluye todos los movimientos.");
         jlCurrencyLocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
         jPanel16.add(jlCurrencyLocWarning);
 
@@ -293,7 +293,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         bgCur.add(jrbCurrencyDoc);
-        jrbCurrencyDoc.setText("Moneda transacción");
+        jrbCurrencyDoc.setText("Moneda de transacción");
         jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel17.add(jrbCurrencyDoc);
 
@@ -349,7 +349,6 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    @SuppressWarnings("unchecked")
     private void initComponentsCustom() {
         String name = "";
         
@@ -445,6 +444,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
             mbFirstTime = false;
             jftDateStart.requestFocus();
         }
+
         itemStateChangedCurrencyOptions();
     }
 
@@ -696,7 +696,7 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox<SFormComponentItem> jcbCoBranch;
-    private javax.swing.JComboBox jcbCurrency;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCurrency;
     private javax.swing.JComboBox<SFormComponentItem> jcbSalesAgent;
     private javax.swing.JCheckBox jckAdvancePayments;
     private javax.swing.JFormattedTextField jftDateEnd;
@@ -874,7 +874,6 @@ public class SDialogRepBizPartnerStatement extends javax.swing.JDialog implement
                 }
             }
         }
-        
         else if (e.getSource() instanceof JComboBox) {
             JComboBox comboBox = (JComboBox) e.getSource();
             
