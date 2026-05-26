@@ -15,16 +15,16 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRowCustom;
 import erp.mod.SModConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.model.ActionHistory;
-import erp.swap.model.FlowResponse;
-import erp.swap.utils.SExportUtils;
 import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.trn.db.SRowDocumentAuthornComments;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
+import erp.swap.SSwapConsts;
+import erp.swap.model.ActionHistory;
+import erp.swap.model.FlowResponse;
+import erp.swap.utils.SExportUtils;
 import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -711,32 +711,53 @@ public class SDialogDocumentAuthornComments extends SBeanFormDialog {
             else {
                 // Si no hay pasos de autorización en SWAP, consultar la base de datos local
                 Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
-                String sql = "SELECT * FROM( " +
-                        "SELECT " +
-                        "us.usr AS usr_step, " + 
-                        "IF(s.b_authorn, s.dt_time_authorn_n, s.dt_time_reject_n) dt_mov, " +
-                        "IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) folio, " +
-                        "IF(s.comments = '', " +
-                        "IF(NOT s.b_authorn AND NOT s.b_reject, 'AUTORIZACIÓN PENDIENTE', 'SIN COMENTARIOS'), s.comments) comments, " +
-                        "IF(s.b_authorn, ua.usr, ur.usr) usr_auth, " +
-                        "s.b_authorn, s.b_reject, s.b_del, s.ts_usr_ins, s.lev " +
-                        "FROM cfgu_authorn_step s " +
-                        "INNER JOIN trn_dps AS d ON s.res_pk_n1_n = d.id_year AND s.res_pk_n2_n = d.id_doc " +
-                        "INNER JOIN erp.usru_usr AS us ON s.fk_usr_step = us.id_usr " +
-                        "LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
-                        "LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
-                        "WHERE s.res_tab_name_n = 'trn_dps' "
-                        + "AND s.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " " +
-                        "AND s.res_pk_n1_n = " + resourcePk[0] + " AND s.res_pk_n2_n = " + resourcePk[1] + " " +
-                        ") AS a " +
-                        "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
+                String sql = "SELECT * " +
+                            "FROM ( " +
+                            "    SELECT  " +
+                            "        us.usr AS usr_step, " +
+                            "        IF(s.b_authorn, s.dt_time_authorn_n, s.dt_time_reject_n) AS dt_mov, " +
+                            "        IF( " +
+                            "            CONVERT(d.num_ser USING utf8mb4) <> '', " +
+                            "            CONCAT(CONVERT(d.num_ser USING utf8mb4), '-', CONVERT(d.num USING utf8mb4)), " +
+                            "            CONVERT(d.num USING utf8mb4) " +
+                            "        ) AS folio, " +
+                            "        IF( " +
+                            "            CONVERT(s.comments USING utf8mb4) = '', " +
+                            "            IF(NOT s.b_authorn AND NOT s.b_reject, 'AUTORIZACIÓN PENDIENTE', 'SIN COMENTARIOS'), " +
+                            "            CONVERT(s.comments USING utf8mb4) " +
+                            "        ) AS comments, " +
+                            "        IF( " +
+                            "            s.b_authorn, " +
+                            "            CONVERT(ua.usr USING utf8mb4), " +
+                            "            CONVERT(ur.usr USING utf8mb4) " +
+                            "        ) AS usr_auth, " +
+                            "        s.b_authorn, " +
+                            "        s.b_reject, " +
+                            "        s.b_del, " +
+                            "        s.ts_usr_ins, " +
+                            "        s.lev " +
+                            "    FROM cfgu_authorn_step s " +
+                            "    INNER JOIN trn_dps AS d  " +
+                            "        ON s.res_pk_n1_n = d.id_year " +
+                            "        AND s.res_pk_n2_n = d.id_doc " +
+                            "    INNER JOIN erp.usru_usr AS us ON s.fk_usr_step = us.id_usr " +
+                            "    LEFT JOIN erp.usru_usr AS ua ON s.fk_usr_authorn_n = ua.id_usr " +
+                            "    LEFT JOIN erp.usru_usr AS ur ON s.fk_usr_reject_n = ur.id_usr " +
+                            "    WHERE " +
+                            "        s.res_tab_name_n = 'trn_dps' " +
+                            "        AND s.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_DPS + " " +
+                            "        AND s.res_pk_n1_n = " + resourcePk[0] + " " +
+                            "        AND s.res_pk_n2_n = " + resourcePk[1] + " " +
+                            ") AS a " +
+                            "ORDER BY b_del DESC, ts_usr_ins, lev, dt_mov DESC;";
+                
                 // Ejecutar consulta y procesar resultados                
                 ResultSet resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     // Mapear datos del resultado de la consulta a la fila
                     SRowDocumentAuthornComments row = new SRowDocumentAuthornComments();
                     row.setDateMov(formatDatetime(resultSet.getString("dt_mov")));
-                    row.setNum(resultSet.getString("s.lev"));
+                    row.setNum(resultSet.getString("lev"));
                     row.setUserStep(resultSet.getString("usr_step"));
                     row.setComments(resultSet.getString("comments"));
                     row.setAuthorn(resultSet.getBoolean("b_authorn"));

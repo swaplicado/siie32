@@ -18,6 +18,7 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.mbps.data.SDataBizPartner;
@@ -59,6 +60,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
 
     private erp.lib.form.SFormField moFieldYear;
     private erp.lib.form.SFormField moFieldBizPartner;
+    private erp.lib.form.SFormField moFieldFkCurrencyId;
     private erp.lib.form.SFormField moFieldDateRef;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
@@ -106,7 +108,10 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox();
         jbPickBizPartner = new javax.swing.JButton();
-        jPanel9 = new javax.swing.JPanel();
+        jpValue1 = new javax.swing.JPanel();
+        jlFkCurrencyId = new javax.swing.JLabel();
+        jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkCurrencyIdHint = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jckShowPayDays = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
@@ -165,8 +170,21 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
 
         jPanel6.add(jPanel4);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel6.add(jPanel9);
+        jpValue1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkCurrencyId.setText("Moneda: *");
+        jlFkCurrencyId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpValue1.add(jlFkCurrencyId);
+
+        jcbFkCurrencyId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpValue1.add(jcbFkCurrencyId);
+
+        jlFkCurrencyIdHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlFkCurrencyIdHint.setText("(moneda de la partida)");
+        jlFkCurrencyIdHint.setPreferredSize(new java.awt.Dimension(130, 23));
+        jpValue1.add(jlFkCurrencyIdHint);
+
+        jPanel6.add(jpValue1);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -271,6 +289,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
         
+        SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR);
+        
         moFieldYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfYear, jlYear);
         moFieldYear.setIntegerMin(2000);
         moFieldYear.setIntegerMax(2100);
@@ -279,6 +299,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         moFieldYear.setDecimalFormat(miClient.getSessionXXX().getFormatters().getYearFormat());
         moFieldBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbBizPartner, jlBizPartner);
         moFieldBizPartner.setPickerButton(jbPickBizPartner);
+        moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldDateRef = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateRef, jlDateRef);
         moFieldDateRef.setPickerButton(jbPickDateRef);
 
@@ -288,6 +309,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         mvFields.add(moFieldDateRef);
 
         jbPickBizPartner.addActionListener(this);
+        jcbFkCurrencyId.addItemListener(this);
+        jcbFkCurrencyId.addFocusListener(this);
         jbPickDateRef.addActionListener(this);
         jbPrint.addActionListener(this);
         jbClose.addActionListener(this);
@@ -369,12 +392,26 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
                 default:
             }
 
+            if (bizPartnerCategory == null) {
+                throw new Exception("No se han definido las condiciones comerciales para el asociado de negocios.");
+            }
+
+            int idCurrency = moFieldFkCurrencyId.getKeyAsIntArray()[0];
+            String sCurrency = "";
+
             map.put("dCreditLimit", bizPartnerCategory.getEffectiveCreditLimit());
             map.put("nDaysCredit", bizPartnerCategory.getEffectiveDaysOfCredit());
             map.put("nDaysGrace", bizPartnerCategory.getEffectiveDaysOfGrace());
             map.put("sCreditType", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_TP_CRED, new int[] { bizPartnerCategory.getEffectiveCreditTypeId() }));
             map.put("sFuncText", jtfFunctionalArea.getText());
             map.put("sFilterFunctionalArea", areasFilter);
+            map.put("sAndJoinRecordCurrency1", idCurrency > 0 ? (" AND re1.fid_cur = " + idCurrency + " ") : "");
+            map.put("sAndJoinRecordCurrency", idCurrency > 0 ? (" AND re.fid_cur = " +  + idCurrency + " ") : "");
+            map.put("nRecordCurrencyId", idCurrency);
+            if (idCurrency > 0) {
+                sCurrency = miClient.getSession().getSessionCustom().getCurrencyCode(moFieldFkCurrencyId.getKeyAsIntArray());
+            }
+            map.put("sRecordCurrencyCode", sCurrency);
             
             if (jckShowFolioOrders.isSelected()) {
                 jasperPrint = SDataUtilities.fillReport(miClient,SDataConstantsSys.REP_FIN_BPS_ACC_MOV_ORD , map);
@@ -516,20 +553,23 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPickBizPartner;
     private javax.swing.JButton jbPickDateRef;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox jcbBizPartner;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
     private javax.swing.JCheckBox jckShowFolioOrders;
     private javax.swing.JCheckBox jckShowPayDays;
     private javax.swing.JFormattedTextField jftDateRef;
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlDateRef;
+    private javax.swing.JLabel jlFkCurrencyId;
+    private javax.swing.JLabel jlFkCurrencyIdHint;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpValue1;
     private javax.swing.JTextField jtfFunctionalArea;
     private javax.swing.JTextField jtfYear;
     // End of variables declaration//GEN-END:variables
