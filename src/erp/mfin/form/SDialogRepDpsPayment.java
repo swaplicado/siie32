@@ -83,31 +83,33 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
         jbDateEnd = new javax.swing.JButton();
         jckShowAgent = new javax.swing.JCheckBox();
         jpFilters = new javax.swing.JPanel();
-        jPanel14 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
+        jpFilters1 = new javax.swing.JPanel();
+        jpFilters11 = new javax.swing.JPanel();
         jrbInvoicesAll = new javax.swing.JRadioButton();
-        jPanel10 = new javax.swing.JPanel();
+        jpFilters12 = new javax.swing.JPanel();
         jrbInvoicesYear = new javax.swing.JRadioButton();
-        jPanel11 = new javax.swing.JPanel();
+        jpFilters13 = new javax.swing.JPanel();
         jrbInvoicesPeriod = new javax.swing.JRadioButton();
-        jPanel12 = new javax.swing.JPanel();
+        jpFilters14 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         jtfYear = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
+        jpFilters15 = new javax.swing.JPanel();
         jlDateDpsBegin = new javax.swing.JLabel();
         jftDateDpsBegin = new javax.swing.JFormattedTextField();
         jbDateDpsBegin = new javax.swing.JButton();
-        jPanel13 = new javax.swing.JPanel();
+        jpFilters16 = new javax.swing.JPanel();
         jlDateDpsEnd = new javax.swing.JLabel();
         jftDateDpsEnd = new javax.swing.JFormattedTextField();
         jbDateDpsEnd = new javax.swing.JButton();
-        jPanel16 = new javax.swing.JPanel();
+        jpFilters2 = new javax.swing.JPanel();
+        jpFilters21 = new javax.swing.JPanel();
+        jpFilters211 = new javax.swing.JPanel();
         jrbCurrencyLoc = new javax.swing.JRadioButton();
         jlCurrencyLocWarning = new javax.swing.JLabel();
-        jPanel17 = new javax.swing.JPanel();
+        jpFilters212 = new javax.swing.JPanel();
         jrbCurrencyDoc = new javax.swing.JRadioButton();
         jlCurrencyDocWarning = new javax.swing.JLabel();
-        jPanel18 = new javax.swing.JPanel();
+        jpFilters213 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
         jpControls = new javax.swing.JPanel();
@@ -177,60 +179,60 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
 
         getContentPane().add(jpPeriod, java.awt.BorderLayout.NORTH);
 
-        jpFilters.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de facturas:"));
         jpFilters.setLayout(new java.awt.BorderLayout());
 
-        jPanel14.setLayout(new java.awt.GridLayout(9, 1, 0, 1));
+        jpFilters1.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtro de facturas:"));
+        jpFilters1.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgInvoice.add(jrbInvoicesAll);
         jrbInvoicesAll.setText("Todos los movimientos");
         jrbInvoicesAll.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel9.add(jrbInvoicesAll);
+        jpFilters11.add(jrbInvoicesAll);
 
-        jPanel14.add(jPanel9);
+        jpFilters1.add(jpFilters11);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgInvoice.add(jrbInvoicesYear);
-        jrbInvoicesYear.setText("Solo movimientos de facturas de un ejercicio");
+        jrbInvoicesYear.setText("<html>Solo movimientos de facturas de un <b>ejercicio</b></html>");
         jrbInvoicesYear.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel10.add(jrbInvoicesYear);
+        jpFilters12.add(jrbInvoicesYear);
 
-        jPanel14.add(jPanel10);
+        jpFilters1.add(jpFilters12);
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgInvoice.add(jrbInvoicesPeriod);
-        jrbInvoicesPeriod.setText("Solo movimientos de facturas de un período");
+        jrbInvoicesPeriod.setText("<html>Solo movimientos de facturas de un <b>período</b><html>");
         jrbInvoicesPeriod.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel11.add(jrbInvoicesPeriod);
+        jpFilters13.add(jrbInvoicesPeriod);
 
-        jPanel14.add(jPanel11);
+        jpFilters1.add(jpFilters13);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlYear.setText("Ejercicio de facturas:");
         jlYear.setToolTipText("");
         jlYear.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jlYear);
+        jpFilters14.add(jlYear);
 
         jtfYear.setText("2000");
         jtfYear.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jtfYear);
+        jpFilters14.add(jtfYear);
 
-        jPanel14.add(jPanel12);
+        jpFilters1.add(jpFilters14);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateDpsBegin.setText("Fecha inicial de facturas:");
         jlDateDpsBegin.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel4.add(jlDateDpsBegin);
+        jpFilters15.add(jlDateDpsBegin);
 
         jftDateDpsBegin.setText("dd/mm/yyyy");
         jftDateDpsBegin.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jftDateDpsBegin);
+        jpFilters15.add(jftDateDpsBegin);
 
         jbDateDpsBegin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateDpsBegin.setToolTipText("Seleccionar fecha");
@@ -241,19 +243,19 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
                 jbDateDpsBeginActionPerformed(evt);
             }
         });
-        jPanel4.add(jbDateDpsBegin);
+        jpFilters15.add(jbDateDpsBegin);
 
-        jPanel14.add(jPanel4);
+        jpFilters1.add(jpFilters15);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateDpsEnd.setText("Fecha final de facturas:");
         jlDateDpsEnd.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(jlDateDpsEnd);
+        jpFilters16.add(jlDateDpsEnd);
 
         jftDateDpsEnd.setText("dd/mm/yyyy");
         jftDateDpsEnd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel13.add(jftDateDpsEnd);
+        jpFilters16.add(jftDateDpsEnd);
 
         jbDateDpsEnd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
         jbDateDpsEnd.setToolTipText("Seleccionar fecha");
@@ -264,51 +266,60 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
                 jbDateDpsEndActionPerformed(evt);
             }
         });
-        jPanel13.add(jbDateDpsEnd);
+        jpFilters16.add(jbDateDpsEnd);
 
-        jPanel14.add(jPanel13);
+        jpFilters1.add(jpFilters16);
 
-        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters.add(jpFilters1, java.awt.BorderLayout.NORTH);
+
+        jpFilters2.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
+        jpFilters2.setLayout(new java.awt.BorderLayout());
+
+        jpFilters21.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+
+        jpFilters211.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgCurrency.add(jrbCurrencyLoc);
         jrbCurrencyLoc.setSelected(true);
         jrbCurrencyLoc.setText("Moneda local");
         jrbCurrencyLoc.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel16.add(jrbCurrencyLoc);
+        jpFilters211.add(jrbCurrencyLoc);
 
         jlCurrencyLocWarning.setForeground(new java.awt.Color(255, 0, 0));
-        jlCurrencyLocWarning.setText("NOTA: Incluye todos los movimientos.");
+        jlCurrencyLocWarning.setText("<html><b>NOTA:</b> Incluye todos los movimientos.<html>");
         jlCurrencyLocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
-        jPanel16.add(jlCurrencyLocWarning);
+        jpFilters211.add(jlCurrencyLocWarning);
 
-        jPanel14.add(jPanel16);
+        jpFilters21.add(jpFilters211);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters212.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgCurrency.add(jrbCurrencyDoc);
         jrbCurrencyDoc.setText("Moneda de transacción");
         jrbCurrencyDoc.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel17.add(jrbCurrencyDoc);
+        jpFilters212.add(jrbCurrencyDoc);
 
         jlCurrencyDocWarning.setForeground(new java.awt.Color(255, 0, 0));
-        jlCurrencyDocWarning.setText("NOTA: ¡Solo operaciones en la moneda seleccionada!");
+        jlCurrencyDocWarning.setText("<html><b>NOTA:</b> ¡Solo operaciones en la moneda seleccionada!</html>");
         jlCurrencyDocWarning.setPreferredSize(new java.awt.Dimension(370, 23));
-        jPanel17.add(jlCurrencyDocWarning);
+        jpFilters212.add(jlCurrencyDocWarning);
 
-        jPanel14.add(jPanel17);
+        jpFilters21.add(jpFilters212);
 
-        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpFilters213.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurrency.setText("Moneda:*");
+        jlCurrency.setText("Moneda del reporte:*");
         jlCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel18.add(jlCurrency);
+        jpFilters213.add(jlCurrency);
 
         jcbCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel18.add(jcbCurrency);
+        jpFilters213.add(jcbCurrency);
 
-        jPanel14.add(jPanel18);
+        jpFilters21.add(jpFilters213);
 
-        jpFilters.add(jPanel14, java.awt.BorderLayout.NORTH);
+        jpFilters2.add(jpFilters21, java.awt.BorderLayout.NORTH);
+
+        jpFilters.add(jpFilters2, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpFilters, java.awt.BorderLayout.CENTER);
 
@@ -638,16 +649,6 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCurrency;
     private javax.swing.ButtonGroup bgInvoice;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbDateBegin;
     private javax.swing.JButton jbDateDpsBegin;
@@ -670,6 +671,18 @@ public class SDialogRepDpsPayment extends javax.swing.JDialog implements java.aw
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpFilters;
+    private javax.swing.JPanel jpFilters1;
+    private javax.swing.JPanel jpFilters11;
+    private javax.swing.JPanel jpFilters12;
+    private javax.swing.JPanel jpFilters13;
+    private javax.swing.JPanel jpFilters14;
+    private javax.swing.JPanel jpFilters15;
+    private javax.swing.JPanel jpFilters16;
+    private javax.swing.JPanel jpFilters2;
+    private javax.swing.JPanel jpFilters21;
+    private javax.swing.JPanel jpFilters211;
+    private javax.swing.JPanel jpFilters212;
+    private javax.swing.JPanel jpFilters213;
     private javax.swing.JPanel jpPeriod;
     private javax.swing.JPanel jpPeriod1;
     private javax.swing.JPanel jpPeriod2;
