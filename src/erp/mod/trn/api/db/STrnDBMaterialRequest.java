@@ -437,7 +437,7 @@ public class STrnDBMaterialRequest {
         String authInnerJoin = "INNER JOIN ( "
                 + "        SELECT  "
                 + "            res_pk_n1_n AS id_mat_req, "
-                + "            CFG_GET_ST_AUTHORN(1, 'trn_mat_req', res_pk_n1_n, NULL, NULL, NULL, NULL) AS auth_status_id, "
+                + "            CFG_GET_ST_AUTHORN(1, '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', res_pk_n1_n, NULL, NULL, NULL, NULL) AS auth_status_id, "
                 + "            (SELECT MIN(lev) "
                 + "             FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
                 + "             WHERE NOT step2.b_del "
