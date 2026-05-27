@@ -39,6 +39,20 @@ public class STrnDBDocuments {
         this.oSession = session;
         this.oDbObj = null;
     }
+
+    public STrnDBDocuments(SGuiSession session, int idCompany) throws Exception {
+        this.oSession = session;
+        this.oDbObj = null;
+        if (idCompany > 0) {
+            ResultSet rs = session.getStatement().executeQuery(
+                "SELECT bd FROM erp.cfgu_co WHERE id_co = " + idCompany);
+            if (rs.next()) {
+                this.msMainDatabase = rs.getString("bd");
+            }
+            rs.close();
+        }
+        Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD (session): {0}", this.msMainDatabase);
+    }
     
     public STrnDBDocuments(SMySqlClass oDbObj, int idCompany) throws Exception {
         this.oDbObj = oDbObj;
@@ -64,6 +78,14 @@ public class STrnDBDocuments {
         return null;
     }
     
+    private String tbl(int tableKey) {
+        String name = SModConsts.TablesMap.get(tableKey);
+        if (msMainDatabase != null && !name.contains(".")) {
+            return msMainDatabase + "." + name;
+        }
+        return name;
+    }
+
     /**
      * Obtiene los archivos de un documento
      * 
@@ -106,22 +128,22 @@ public class STrnDBDocuments {
                     "    IF(LENGTH(f.ext_bp_name) > 0, f.ext_bp_name, COALESCE(bp.bp, '')) AS bp_name, " +
                     "    CASE " + 
                     "        WHEN ety_count.count = 1 THEN CONCAT('Precio unitario: ', (SELECT FORMAT(ROUND(price_u, 2), 2) "
-                                                                                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " "
+                                                                                        + "FROM " + tbl(SModConsts.TRN_DPS_ETY) + " "
                                                                                         + "WHERE id_year = " + idYear + " AND id_doc = " + idDoc + " AND id_ety = ety_count.id_ety), ' MXN') " +
                     "        WHEN ety_count.count > 1 THEN CONCAT('Número partidas: ', ety_count.count) " +
                     "        ELSE '' " + 
                     "    END AS f_etys " + 
                     "FROM " +
-                    "    " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
+                    "    " + tbl(SModConsts.TRN_SUP_FILE_DPS) + " AS fdps " +
                     "        INNER JOIN " +
-                    "    " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE) + " AS f ON fdps.id_sup_file = f.id_sup_file " +
+                    "    " + tbl(SModConsts.TRN_SUP_FILE) + " AS f ON fdps.id_sup_file = f.id_sup_file " +
                     "        LEFT JOIN " +
                     "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON f.fid_bp_n = bp.id_bp " +
                     "        LEFT JOIN " +
                     "    (SELECT  " +
                     "        id_sup_file, COUNT(*) AS count, id_ety " +
                     "     FROM " +
-                    "        " + (oStatement == null ? "" : (dbName == null ? "" : (dbName + "."))) + SModConsts.TablesMap.get(SModConsts.TRN_SUP_FILE_DPS_ETY) + " " +
+                    "        " + tbl(SModConsts.TRN_SUP_FILE_DPS_ETY) + " " +
                     "     WHERE " +
                     "        id_year = " + idYear + " " +
                     "        AND id_doc = " + idDoc + " " +

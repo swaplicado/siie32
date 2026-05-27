@@ -7255,7 +7255,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     link.setOriginalQuantity(entry.getOriginalQuantity());
                     
                     try{
-                        link.setDbmsIsSouceOrderSupplied(STrnDpsUtilities.isSourceOrderSupplied(miClient, dpsSource, dpsSourceEntry));
+                        link.setDbmsIsSouceOrderSupplied(STrnDpsUtilities.isSourceOrderSupplied(miClient.getSession().getStatement(), (int[]) dpsSourceEntry.getPrimaryKey()));
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

@@ -1518,9 +1518,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         }
                         
                         // Redirect inventory movements references
-                        
-                        if (link.getDbmsIsSourceOrderSupplied()) {
-                            aSql = new String[] { 
+                        int[] entryOrderPk = new int[] { link.getPkSourceYearId(), link.getPkSourceDocId(), link.getPkSourceEntryId() };
+                        if (STrnDpsUtilities.isSourceOrderSupplied(connection.createStatement(), entryOrderPk)) {
+                            aSql = new String[] {
                                 "UPDATE trn_diog SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + " " +
                                 "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " ",
                                 "UPDATE trn_diog_ety SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + ", fid_dps_ety_n = " + mnPkEntryId + " " +

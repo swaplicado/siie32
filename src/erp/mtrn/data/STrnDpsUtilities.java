@@ -25,12 +25,12 @@ public abstract class STrnDpsUtilities {
  
     /**
      * Obtain total quantity supplied for a DPS in inventory.
-     * @param client GUI client.
+     * @param statement
      * @param entryKey Entry key.
      * @return Total quantity supplied in inventory movements
      * @throws Exception
      */
-    public static double obtainEntryTotalQuantitySupplied(final SClientInterface client, final int[] entryKey) throws Exception {
+    public static double obtainEntryTotalQuantitySupplied(final Statement statement, final int[] entryKey) throws Exception {
         String sql;
         ResultSet resulSet;
         double totalSupplied = 0;
@@ -41,7 +41,7 @@ public abstract class STrnDpsUtilities {
                 + "WHERE NOT d.b_del AND NOT de.b_del AND "
                 + "de.fid_dps_year_n = " + entryKey[0] + " AND de.fid_dps_doc_n = " + entryKey[1] + " AND de.fid_dps_ety_n = " + entryKey[2] + " ";
 
-        resulSet = client.getSession().getStatement().executeQuery(sql);
+        resulSet = statement.getConnection().createStatement().executeQuery(sql);
         if (resulSet.next()) {
             totalSupplied = resulSet.getDouble("tot_qty_sup");
         }
@@ -103,18 +103,38 @@ public abstract class STrnDpsUtilities {
     
     /**
      * Verify is a DPS is an order and if it has any inventory document
-     * @param client
-     * @param dps
-     * @param entry
+     * @param statement
+     * @param entryPk
      * @return 
      * @throws Exception 
      */
-    public static boolean isSourceOrderSupplied(final SClientInterface client, final SDataDps dps, final SDataDpsEntry entry) throws Exception {
-        double totalQtySupplied = 0;    
-        
-        totalQtySupplied = obtainEntryTotalQuantitySupplied(client, new int[] { entry.getPkYearId(), entry.getPkDocId(), entry.getPkEntryId() });
-       
-        return dps.isOrder() && totalQtySupplied > 0;
+    public static boolean isSourceOrderSupplied(final Statement statement, final int[] entryPk) throws Exception {
+        double totalQtySupplied = 0;
+        if (entryPk == null || entryPk.length != 3) {
+            Logger.getLogger(STrnDpsUtilities.class.getName()).log(Level.SEVERE, "No se pudo obtener la cantidad suministrada del documento. El arreglo de la clave de la partida no es correcto.");
+            throw new Exception("No se pudo obtener la cantidad suministrada del documento.");
+        }
+        if (entryPk[0] == 0 || entryPk[1] == 0 || entryPk[2] == 0) {
+            Logger.getLogger(STrnDpsUtilities.class.getName()).log(Level.SEVERE, "No se pudo obtener la cantidad suministrada del documento. La clave de la partida no es válida.");
+            throw new Exception("No se pudo obtener la cantidad suministrada del documento.");
+        }
+
+        totalQtySupplied = obtainEntryTotalQuantitySupplied(statement, new int[]{entryPk[0], entryPk[1], entryPk[2]});
+
+        String sql = "SELECT 1 FROM trn_dps AS d "
+                + "WHERE d.id_year = " + entryPk[0] + " AND d.id_doc = " + entryPk[1] + " "
+                + "AND d.b_del = 0 "
+                + "AND ((d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] + ")"
+                + "     OR (d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1] + ")"
+                + "     )";
+        boolean isOrder = false;
+        try (ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                isOrder = true;
+            }
+        }
+
+        return isOrder && totalQtySupplied > 0;
     }
 
     /**

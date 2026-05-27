@@ -1,4 +1,23 @@
 ================================================================================
+SIIE 3.2 301.6/ 2026-05-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Modificación de proceso en OC para soporte de multiempresa en exportación masiva (JSON).
+
+================================================================================
+SIIE 3.2 301.5/ 2026-05-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Modificación en la determinación de surtidos existentes en un pedio al guardar una factura.
+
+================================================================================
+SIIE 3.2 301.4/ 2026-05-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Habilitar obtención del reporte de movimientos contables de clientes y proveedores por documento, mostrando los movimientos y saldos en la moneda de los movimientos. Y agregar al pie advertencia de existencia de movimientos en otras monedas. DMS-77
+2) Corrección en diálogo de historial de autorización de OC con proceso anterior.
+
+================================================================================
 SIIE 3.2 301.3/ 2026-05-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

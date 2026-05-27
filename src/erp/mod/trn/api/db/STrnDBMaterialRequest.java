@@ -34,7 +34,8 @@ import sa.lib.gui.SGuiSession;
  */
 public class STrnDBMaterialRequest {
     
-    private static final String BASE_QUERY_ALL = 
+    private String buildBaseQueryAll() {
+        return
         "SELECT " +
         "    mr.id_mat_req, mr.cl_req AS _mr_class, mr.tp_req AS _mr_type, mr.num AS _mr_folio, " +
         "    mr.dt AS _mr_dt, mr.dt_req_n, mr.tot_r AS _mr_total, pe.name AS _mr_prov_ent, " +
@@ -50,7 +51,7 @@ public class STrnDBMaterialRequest {
         "   auth.auth_status_id, " +
         "    COALESCE(( " +
         "        SELECT GROUP_CONCAT(u.usr SEPARATOR ', ') " +
-        "        FROM cfgu_authorn_step AS steps1 " +
+        "        FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 " +
         "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr " +
         "        WHERE NOT steps1.b_del " +
         "            AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
@@ -60,15 +61,17 @@ public class STrnDBMaterialRequest {
         "            AND steps1.lev = auth.min_lev " +
         "    ), 'NA') AS user_in_turn " +
         "FROM " +
-        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr " +
-        "INNER JOIN trn_mat_prov_ent AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
+        tbl(SModConsts.TRN_MAT_REQ) + " AS mr " +
+        "INNER JOIN " + tbl(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
         "INNER JOIN erp.trnu_mat_req_pty AS pty ON mr.fk_mat_req_pty = pty.id_mat_req_pty " +
         "INNER JOIN erp.trns_st_mat_req AS st ON st.id_st_mat_req = mr.fk_st_mat_req " +
         "INNER JOIN erp.trnu_dps_nat AS nat ON nat.id_dps_nat = mr.fk_dps_nat " +
         "INNER JOIN erp.usru_usr AS usr ON usr.id_usr = mr.fk_usr_req " +
         "LEFT JOIN erp.itmu_item AS itm ON itm.id_item = mr.fk_item_ref_n ";
+    }
 
-    private static final String BASE_QUERY = 
+    private String buildBaseQuery() {
+        return
         "SELECT " +
         "    mr.id_mat_req, mr.cl_req AS _mr_class, mr.tp_req AS _mr_type, mr.num AS _mr_folio, " +
         "    mr.dt AS _mr_dt, mr.dt_req_n, mr.tot_r AS _mr_total, pe.name AS _mr_prov_ent, " +
@@ -94,7 +97,7 @@ public class STrnDBMaterialRequest {
         "   NULL, NULL, NULL, NULL) AS auth_status_id, " +
         "    COALESCE(( " +
         "        SELECT GROUP_CONCAT(u.usr SEPARATOR ', ') " +
-        "        FROM cfgu_authorn_step AS steps1 " +
+        "        FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 " +
         "        INNER JOIN erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr " +
         "        WHERE NOT steps1.b_del " +
         "            AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
@@ -103,7 +106,7 @@ public class STrnDBMaterialRequest {
         "            AND NOT steps1.b_reject " +
         "            AND steps1.lev = ( " +
         "                SELECT step2.lev " +
-        "                FROM cfgu_authorn_step AS step2 " +
+        "                FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 " +
         "                WHERE NOT step2.b_del " +
         "                    AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' " +
         "                    AND step2.res_pk_n1_n = mr.id_mat_req " +
@@ -114,16 +117,16 @@ public class STrnDBMaterialRequest {
         "            ) " +
         "    ), 'NA') AS user_in_turn " +
         "FROM " +
-        SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr " +
-        "INNER JOIN trn_mat_prov_ent AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
+        tbl(SModConsts.TRN_MAT_REQ) + " AS mr " +
+        "INNER JOIN " + tbl(SModConsts.TRN_MAT_PROV_ENT) + " AS pe ON pe.id_mat_prov_ent = mr.fk_mat_prov_ent " +
         "INNER JOIN erp.trnu_mat_req_pty AS pty ON mr.fk_mat_req_pty = pty.id_mat_req_pty " +
         "INNER JOIN erp.trns_st_mat_req AS st ON st.id_st_mat_req = mr.fk_st_mat_req " +
         "INNER JOIN erp.trnu_dps_nat AS nat ON nat.id_dps_nat = mr.fk_dps_nat " +
         "INNER JOIN erp.usru_usr AS usr ON usr.id_usr = mr.fk_usr_req " +
         "LEFT JOIN erp.itmu_item AS itm ON itm.id_item = mr.fk_item_ref_n ";
+    }
 
     private static final String WHERE_NOT_DELETED = "WHERE mr.b_del = 0 ";
-
     private static final String ORDER_BY_ID = "ORDER BY mr.id_mat_req DESC ";
 
     SMySqlClass oDbObj;
@@ -143,6 +146,20 @@ public class STrnDBMaterialRequest {
         this.oDbObj = null;
         this.lMaterialRequests = new ArrayList<>();
     }
+
+    public STrnDBMaterialRequest(SGuiSession session, int idCompany) throws Exception {
+        this.oSession = session;
+        this.oDbObj = null;
+        if (idCompany > 0) {
+            ResultSet rs = session.getStatement().executeQuery(
+                "SELECT bd FROM erp.cfgu_co WHERE id_co = " + idCompany);
+            if (rs.next()) {
+                this.msMainDatabase = rs.getString("bd");
+            }
+            rs.close();
+        }
+        this.lMaterialRequests = new ArrayList<>();
+    }
     
     public STrnDBMaterialRequest(SMySqlClass oDbObj, int idCompany) throws Exception {
         this.oDbObj = oDbObj;
@@ -153,6 +170,14 @@ public class STrnDBMaterialRequest {
         this.lMaterialRequests = new ArrayList<>();
     }
     
+    private String tbl(int tableKey) {
+        String name = SModConsts.TablesMap.get(tableKey);
+        if (msMainDatabase != null && !name.contains(".")) {
+            return msMainDatabase + "." + name;
+        }
+        return name;
+    }
+
     private Connection getConnection() {
         try {
             if (this.oDbObj != null) {
@@ -186,7 +211,7 @@ public class STrnDBMaterialRequest {
     }
 
     private ArrayList<SWebMatReqNote> loadMaterialRequestNotes(final int materialRequestId) throws SQLException {
-        String notesQuery = "SELECT id_nts, nts FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_NTS) + " "
+        String notesQuery = "SELECT id_nts, nts FROM " + tbl(SModConsts.TRN_MAT_REQ_NTS) + " "
                             + "WHERE id_mat_req = " + materialRequestId + ";";
     
         try {
@@ -220,7 +245,7 @@ public class STrnDBMaterialRequest {
 
     private ArrayList<SWebMatReqEtyNote> getMaterialRequestEntryNotes(final int materialRequestId, final int idEty) {
         String etyQuery = "SELECT id_mat_req, id_ety, id_nts, notes FROM " + 
-            SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY_NTS) + " " +
+            tbl(SModConsts.TRN_MAT_REQ_ETY_NTS) + " " +
             "WHERE id_mat_req = " + materialRequestId + " ";
 
             if (idEty > 0) {
@@ -277,7 +302,7 @@ public class STrnDBMaterialRequest {
             String query = "SELECT " +
                     "    dpsmr.fid_mat_req " +
                     "FROM " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " AS dpsmr " +
+                    "    " + tbl(SModConsts.TRN_DPS_MAT_REQ) + " AS dpsmr " +
                     "WHERE " +
                     "    dpsmr.fid_dps_year = " + idYear + " " +
                     "    AND dpsmr.fid_dps_doc = " + idDoc + " " +
@@ -350,7 +375,7 @@ public class STrnDBMaterialRequest {
      */
     public ArrayList<SWebMaterialRequest> getMatReqs(String startDate, String endDate, int idUser, int idSessionUser, int statusFilter) {
         ArrayList<SWebMaterialRequest> materialRequests = new ArrayList<>();
-        StringBuilder query = new StringBuilder(BASE_QUERY_ALL);
+        StringBuilder query = new StringBuilder(buildBaseQueryAll());
 
         try (Connection conn = this.getConnection()) {
             if (conn == null) {
@@ -412,16 +437,16 @@ public class STrnDBMaterialRequest {
         String authInnerJoin = "INNER JOIN ( "
                 + "        SELECT  "
                 + "            res_pk_n1_n AS id_mat_req, "
-                + "            CFG_GET_ST_AUTHORN(1, 'trn_mat_req', res_pk_n1_n, NULL, NULL, NULL, NULL) AS auth_status_id, "
+                + "            CFG_GET_ST_AUTHORN(1, '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', res_pk_n1_n, NULL, NULL, NULL, NULL) AS auth_status_id, "
                 + "            (SELECT MIN(lev) "
-                + "             FROM cfgu_authorn_step AS step2 "
+                + "             FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
                 + "             WHERE NOT step2.b_del "
                 + "               AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' "
                 + "               AND step2.res_pk_n1_n = res_pk_n1_n "
                 + "               AND NOT step2.b_authorn "
                 + "               AND NOT step2.b_reject "
                 + "            ) AS min_lev "
-                + "        FROM cfgu_authorn_step "
+                + "        FROM " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " "
                 + "        WHERE NOT b_del "
                 + "        AND res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "' ";
         if ((statusFilter == -1 || statusFilter == 0) && whereUsers.isEmpty()) {
@@ -471,7 +496,7 @@ public class STrnDBMaterialRequest {
      * @return 
      */
     public SWebMaterialRequest getMatReqById(int idMaterialRequest) {
-        String query = BASE_QUERY + WHERE_NOT_DELETED + "AND mr.id_mat_req = " + idMaterialRequest + " LIMIT 1;";
+        String query = buildBaseQuery() + WHERE_NOT_DELETED + "AND mr.id_mat_req = " + idMaterialRequest + " LIMIT 1;";
 
         try (Connection conn = this.getConnection();
              Statement st = conn.createStatement();
@@ -576,11 +601,11 @@ public class STrnDBMaterialRequest {
                             "    cc.cc, " +
                             "    cc.id_cc " +
                             "FROM " +
-                            SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " AS mre  " +
+                            tbl(SModConsts.TRN_MAT_REQ_ETY) + " AS mre  " +
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON mre.fk_item = i.id_item  " +
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON mre.fk_unit = u.id_unit  " +
                             "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON mre.fk_item_ref_n = iref.id_item  " +
-                            "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
+                            "LEFT JOIN " + tbl(SModConsts.FIN_CC) + " AS cc ON mre.fk_cc_n = cc.pk_cc  " +
                             // Agregar la tabla de notas de partidas de requisición
                             // INNER JOIN erp.trn_mat_req_ety_nts AS mre_nts ON mre.id_mat_req = mre_nts.fid_mat_req AND mre.id_ety = mre_nts.fid_mat_req_ety  "
                             // Agregar la tabla de notas de requisición
@@ -643,9 +668,9 @@ public class STrnDBMaterialRequest {
         String costCenterQuery = "SELECT  " +
                 "    mrcc.*, cc.pk_cc, mrcc.per, cc.cc, cc.id_cc " +
                 "FROM " +
-                "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_CC) + " AS mrcc " +
+                "    " + tbl(SModConsts.TRN_MAT_REQ_CC) + " AS mrcc " +
                 "        INNER JOIN " +
-                "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS cc ON mrcc.id_cc = cc.pk_cc " +
+                "    " + tbl(SModConsts.FIN_CC) + " AS cc ON mrcc.id_cc = cc.pk_cc " +
                 "    WHERE mrcc.id_mat_req = " + materialRequestId + ";";
 
         try {

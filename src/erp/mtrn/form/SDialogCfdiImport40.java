@@ -2105,7 +2105,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                     else {
                         for (SDataEntryDpsDpsLink entryDpsDpsLink : row.getImportedEntryDpsDpsLinks()) {
                             try {
-                                double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                                double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient.getSession().getStatement(), (int[]) entryDpsDpsLink.getDpsEntryKey());
                                 
                                 for (LinkedQuantity linkedQuantity : linkedQuantities) {
                                     if (SLibUtils.compareKeys(linkedQuantity.dpsKey, entryDpsDpsLink.getDpsEntryKey())) {
