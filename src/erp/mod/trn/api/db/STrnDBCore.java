@@ -47,7 +47,21 @@ public class STrnDBCore {
 
     public STrnDBCore(SGuiSession session) {
         oDbObj = null;
-        this.oSession = session;   
+        this.oSession = session;
+    }
+
+    public STrnDBCore(SGuiSession session, int idCompany) throws Exception {
+        this.oDbObj = null;
+        this.oSession = session;
+        if (idCompany > 0) {
+            ResultSet rs = session.getStatement().executeQuery(
+                "SELECT bd FROM erp.cfgu_co WHERE id_co = " + idCompany);
+            if (rs.next()) {
+                this.msMainDatabase = rs.getString("bd");
+            }
+            rs.close();
+        }
+        Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD (session): {0}", this.msMainDatabase);
     }
 
     public STrnDBCore(SMySqlClass oDbObj, int idCompany) throws Exception {
@@ -55,6 +69,18 @@ public class STrnDBCore {
         this.msMainDatabase = this.oDbObj.getMainDatabaseName(idCompany);
         this.mnIdCompany = this.oDbObj.getMainBb();
         Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, "Conexi\u00f3n a BD: {0}", this.msMainDatabase);
+    }
+
+    /**
+     * Devuelve el nombre de tabla con prefijo de BD de empresa cuando corresponde.
+     * Las tablas con prefijo 'erp.' ya están calificadas; las demás son de empresa.
+     */
+    private String tbl(int tableKey) {
+        String name = SModConsts.TablesMap.get(tableKey);
+        if (msMainDatabase != null && !name.contains(".")) {
+            return msMainDatabase + "." + name;
+        }
+        return name;
     }
 
     /**
@@ -80,7 +106,8 @@ public class STrnDBCore {
     }
 
     // Consulta base para la obtención de un DPS
-    final static String BASE_QUERY_FIRST = "SELECT  "
+    private String buildBaseQueryFirst() {
+        return "SELECT  "
             + "    dps.id_year, "
             + "    dps.id_doc, "
             + "    dps.dt, "
@@ -96,7 +123,7 @@ public class STrnDBCore {
             + "                    GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
             + "                            SEPARATOR '/ ') AS ref_items "
             + "                FROM "
-            + "                    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " etys "
+            + "                    " + tbl(SModConsts.TRN_DPS_ETY) + " etys "
             + "                        LEFT JOIN "
             + "                    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " r_itm ON etys.fid_item_ref_n = r_itm.id_item "
             + "                WHERE "
@@ -107,7 +134,7 @@ public class STrnDBCore {
             + "                    GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
             + "                            SEPARATOR '/ ') AS ref_items "
             + "                FROM "
-            + "                    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " etys "
+            + "                    " + tbl(SModConsts.TRN_DPS_ETY) + " etys "
             + "                        LEFT JOIN "
             + "                    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " r_itm ON etys.fid_item = r_itm.id_item "
             + "                WHERE "
@@ -118,9 +145,9 @@ public class STrnDBCore {
             + "                    GROUP_CONCAT(DISTINCT CONCAT(f_cc.id_cc, ' - ', f_cc.cc) "
             + "                            SEPARATOR '/ ') AS cecos "
             + "                FROM "
-            + "                    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " etys "
+            + "                    " + tbl(SModConsts.TRN_DPS_ETY) + " etys "
             + "                        INNER JOIN "
-            + "                    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " f_cc ON "
+            + "                    " + tbl(SModConsts.FIN_CC) + " f_cc ON "
             + "                        etys.fid_cc_n = f_cc.id_cc "
             + "                WHERE "
             + "                    etys.id_year = dps.id_year "
@@ -159,7 +186,7 @@ public class STrnDBCore {
             + "                        GROUP_CONCAT(usr "
             + "                                SEPARATOR ', ') "
             + "                    FROM "
-            + "                        cfgu_authorn_step AS steps1 "
+            + "                        " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
             + "                            INNER JOIN "
             + "                        erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
             + "                    WHERE "
@@ -172,7 +199,7 @@ public class STrnDBCore {
             + "                            AND steps1.lev = (SELECT  "
             + "                                step2.lev "
             + "                            FROM "
-            + "                                cfgu_authorn_step AS step2 "
+            + "                                " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
             + "                            WHERE "
             + "                                NOT step2.b_del "
             + "                                    AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -189,7 +216,7 @@ public class STrnDBCore {
             + "                            GROUP_CONCAT(usr "
             + "                                    SEPARATOR ', ') "
             + "                        FROM "
-            + "                            cfgu_authorn_step AS steps1 "
+            + "                            " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
             + "                                INNER JOIN "
             + "                            erp.usru_usr AS u ON steps1.fk_usr_step = u.id_usr "
             + "                        WHERE "
@@ -202,7 +229,7 @@ public class STrnDBCore {
             + "                                AND steps1.lev = (SELECT  "
             + "                                    step2.lev "
             + "                                FROM "
-            + "                                    cfgu_authorn_step AS step2 "
+            + "                                    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
             + "                                WHERE "
             + "                                    NOT step2.b_del "
             + "                                        AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -216,7 +243,7 @@ public class STrnDBCore {
             + "    COALESCE((SELECT  "
             + "                    priority "
             + "                FROM "
-            + "                    cfgu_authorn_step AS steps1 "
+            + "                    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
             + "                WHERE "
             + "                    NOT steps1.b_del "
             + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -229,33 +256,34 @@ public class STrnDBCore {
             + "            'RECHAZADO', "
             + "            COALESCE(aust.name, 'NA')))) AS auth_st_name, "
             + "    tda.id_authorn, ";
-    
-    final static String BASE_QUERY = "    tda.nts AS dta_notes, "
+    }
+
+    private String buildBaseQuery() {
+        return "    tda.nts AS dta_notes, "
             + "    tda.fid_st_authorn AS tda_st, "
             + "    tda.fid_usr_new AS tda_usr_new, "
             + "    tda.fid_usr_edit AS tda_usr_edit "
             + "FROM "
-            + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
+            + "    " + tbl(SModConsts.TRN_DPS) + " AS dps "
             + "        INNER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON dps.fid_bp_r = bp.id_bp "
             + "        INNER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS tcur ON dps.fid_cur = tcur.id_cur "
             + "        INNER JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS dusr ON dps.fid_usr_new = dusr.id_usr "
-            //            + "        INNER JOIN "
-            //            + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS_AUTHORN) + " AS dpsauth ON dps.fid_st_dps_authorn = dpsauth.id_st_dps_authorn "
             + "        LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dps_mr ON dps.id_year = dps_mr.fid_dps_year "
+            + "    " + tbl(SModConsts.TRN_DPS_MAT_REQ) + " dps_mr ON dps.id_year = dps_mr.fid_dps_year "
             + "        AND dps.id_doc = dps_mr.fid_dps_doc "
             + "        LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " AS mr ON dps_mr.fid_mat_req = mr.id_mat_req "
+            + "    " + tbl(SModConsts.TRN_MAT_REQ) + " AS mr ON dps_mr.fid_mat_req = mr.id_mat_req "
             + "        LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS mrusr ON mr.fk_usr_ins = mrusr.id_usr "
             + "        LEFT JOIN "
-            + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " AS tda ON dps.id_year = tda.id_year "
+            + "    " + tbl(SModConsts.TRN_DPS_AUTHORN) + " AS tda ON dps.id_year = tda.id_year "
             + "        AND dps.id_doc = tda.id_doc AND NOT tda.b_del "
             + "        LEFT JOIN "
             + "    " + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS aust ON tda.fid_st_authorn = aust.id_st_authorn ";
+    }
 
     /**
      * Obtiene documentos entre un rango de fechas y para un usuario específico.
@@ -283,11 +311,11 @@ public class STrnDBCore {
                 throw new Exception("El ID del usuario de la sesión no puede ser negativo o 0.");
             }
 
-            String query = BASE_QUERY_FIRST 
+            String query = buildBaseQueryFirst()
                     + "    COALESCE((SELECT  "
                     + "                    COUNT(*) "
                     + "                FROM "
-                    + "                    cfgu_authorn_step AS steps1 "
+                    + "                    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
                     + "                WHERE "
                     + "                    steps1.b_del "
                     + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -297,8 +325,8 @@ public class STrnDBCore {
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
                     + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
                     + "    cfd.*, "
-                    + BASE_QUERY
-                    + "     LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS cfd " 
+                    + buildBaseQuery()
+                    + "     LEFT JOIN " + tbl(SModConsts.TRN_DPS_CFD) + " AS cfd " 
                     + "     ON dps.id_year = cfd.id_year AND dps.id_doc = cfd.id_doc "
                     + "WHERE "
                     + "    NOT dps.b_del AND dps.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
@@ -442,11 +470,11 @@ public class STrnDBCore {
                 return null;
             }
 
-            String query = BASE_QUERY_FIRST
+            String query = buildBaseQueryFirst()
                     + "    COALESCE((SELECT  "
                     + "                    COUNT(*) "
                     + "                FROM "
-                    + "                    cfgu_authorn_step AS steps1 "
+                    + "                    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
                     + "                WHERE "
                     + "                    steps1.b_del "
                     + "                        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + "' "
@@ -454,8 +482,8 @@ public class STrnDBCore {
                     + "                        AND steps1.res_pk_n1_n = dps.id_year "
                     + "                        AND steps1.res_pk_n2_n = dps.id_doc), 0) AS was_returned, "
                     + "     cfd.*, "
-                    + BASE_QUERY
-                    + "     LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS cfd " 
+                    + buildBaseQuery()
+                    + "     LEFT JOIN " + tbl(SModConsts.TRN_DPS_CFD) + " AS cfd " 
                     + "     ON dps.id_year = cfd.id_year AND dps.id_doc = cfd.id_doc "
                     + "WHERE "
                     + "    dps.id_year = " + idYear + " "
@@ -584,6 +612,7 @@ public class STrnDBCore {
         }
         else {
             oMrCore = new STrnDBMaterialRequest(this.oSession);
+            oMrCore.msMainDatabase = this.msMainDatabase;
         }
         
         for (SWebDpsEty oEty : lEties) {
@@ -620,16 +649,16 @@ public class STrnDBCore {
                     + "    COALESCE(CONCAT(fcc.id_cc, ' - ', fcc.cc), '') AS ceco, "
                     + "    COALESCE(CONCAT(ritm.item_key, ' - ', ritm.item), '') AS item_ref "
                     + "FROM "
-                    + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
+                    + "    " + tbl(SModConsts.TRN_DPS) + " AS dps "
                     + "        INNER JOIN "
-                    + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS ety ON dps.id_year = ety.id_year "
+                    + "    " + tbl(SModConsts.TRN_DPS_ETY) + " AS ety ON dps.id_year = ety.id_year "
                     + "        AND dps.id_doc = ety.id_doc " 
                     + "        INNER JOIN " 
                     + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON ety.fid_item = i.id_item "
                     + "        INNER JOIN " 
                     + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " AS u ON ety.fid_unit = u.id_unit "
                     + "        LEFT JOIN " 
-                    + "    " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
+                    + "    " + tbl(SModConsts.FIN_CC) + " AS fcc ON ety.fid_cc_n = fcc.id_cc "
                     + "        LEFT JOIN "
                     + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS ritm ON ety.fid_item_ref_n = ritm.id_item "
                     + "WHERE "
@@ -693,7 +722,7 @@ public class STrnDBCore {
                     + "    nts.id_nts, "
                     + "    nts.nts "
                     + "FROM "
-                    + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_NTS) + " AS nts "
+                    + "    " + tbl(SModConsts.TRN_DPS_NTS) + " AS nts "
                     + "WHERE "
                     + "    NOT nts.b_del "
                     + "    AND nts.id_year = " + idYear + " "
@@ -754,9 +783,9 @@ public class STrnDBCore {
                                 + "    cur.cur, " 
                                 + "    cur.cur_key " 
                                 + "FROM " 
-                                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " 
+                                + "    " + tbl(SModConsts.TRN_DPS) + " AS d " 
                                 + "        INNER JOIN " 
-                                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " de ON (d.id_year = de.id_year " 
+                                + "    " + tbl(SModConsts.TRN_DPS_ETY) + " de ON (d.id_year = de.id_year " 
                                 + "        AND d.id_doc = de.id_doc) " 
                                 + "        INNER JOIN " 
                                 + "    " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON (d.fid_bp_r = bp.id_bp) " 
@@ -820,12 +849,12 @@ public class STrnDBCore {
     /**
      * Obtiene la autorización de un documento o requisición.
      *
-     * @param tableName Nombre de la tabla (e.g., SModConsts.TRN_DPS o SModConsts.TRN_MAT_REQ).
+     * @param tableNameId Nombre de la tabla (e.g., SModConsts.TRN_DPS o SModConsts.TRN_MAT_REQ).
      * @param idPrimaryKey1 Primera clave primaria (obligatoria para TRN_DPS, opcional para TRN_MAT_REQ).
      * @param idPrimaryKey2 Segunda clave primaria (solo para TRN_DPS, ignorada para TRN_MAT_REQ).
      * @return Objeto {@code SWebAuthorization} con los datos de la autorización.
      */
-    public SWebAuthorization getAuthorization(final int tableName, final int idPrimaryKey1, final int idPrimaryKey2) {
+    public SWebAuthorization getAuthorization(final int tableNameId, final int idPrimaryKey1, final int idPrimaryKey2) {
         try {
             Connection oCconn = this.getConnection();
             
@@ -834,14 +863,14 @@ public class STrnDBCore {
             }
             
             SWebAuthorization oAuth = new SWebAuthorization();
-            int authorizationType = tableName == SModConsts.TRN_DPS ? SAuthorizationUtils.AUTH_TYPE_DPS : SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
+            int authorizationType = tableNameId == SModConsts.TRN_DPS ? SAuthorizationUtils.AUTH_TYPE_DPS : SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST;
 
             // Construcción dinámica de la consulta según la tabla y claves primarias:
             String whereClause = "s.fk_tp_authorn = " + authorizationType + " "
-                    + "AND s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' ";
-            if (tableName == SModConsts.TRN_DPS) {
+                    + "AND s.res_tab_name_n = '" + SModConsts.TablesMap.get(tableNameId) + "' ";
+            if (tableNameId == SModConsts.TRN_DPS) {
                 whereClause += "AND s.res_pk_n1_n = " + idPrimaryKey1 + " AND s.res_pk_n2_n = " + idPrimaryKey2 + " ";
-            } else if (tableName == SModConsts.TRN_MAT_REQ) {
+            } else if (tableNameId == SModConsts.TRN_MAT_REQ) {
                 whereClause += "AND s.res_pk_n1_n = " + idPrimaryKey1 + " ";
             }
 
@@ -860,7 +889,7 @@ public class STrnDBCore {
                     + "    s.fk_usr_reject_n, "
                     + "    u.usr "
                     + "FROM "
-                    + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS s "
+                    + "    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS s "
                     + "        INNER JOIN "
                     + "    " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS u ON s.fk_usr_step = u.id_usr "
                     + "WHERE "
@@ -895,27 +924,27 @@ public class STrnDBCore {
             // Consulta para obtener el estado de autorización:
             String queryStatus = "SELECT "
                     + "CFG_GET_ST_AUTHORN(" + authorizationType + ", "
-                    + "'" + SModConsts.TablesMap.get(tableName) + "', "
+                    + "'" + SModConsts.TablesMap.get(tableNameId) + "', "
                     + idPrimaryKey1 + ", "
-                    + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
+                    + (tableNameId == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
                     + "NULL, NULL, NULL) AS auth_st, "
                     + "tb.name AS auth_st_name, "
                     + "(SELECT "
                     + "            ts_usr_upd "
                     + "        FROM "
-                    + " " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " "
+                    + " " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " "
                     + "        WHERE "
-                    + "            NOT b_del AND res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "            NOT b_del AND res_tab_name_n = '" + SModConsts.TablesMap.get(tableNameId) + "' "
                     + "                AND res_pk_n1_n = " + idPrimaryKey1 + " "
-                    + (tableName == SModConsts.TRN_DPS ? "AND res_pk_n2_n = " + idPrimaryKey2 + " " : "")
+                    + (tableNameId == SModConsts.TRN_DPS ? "AND res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "ORDER BY fk_usr_upd DESC LIMIT 1) AS last_action_at "
                     + "FROM "
                     + SModConsts.TablesMap.get(SModConsts.CFGS_ST_AUTHORN) + " AS tb "
                     + "WHERE "
                     + "tb.id_st_authorn = CFG_GET_ST_AUTHORN(" + authorizationType + ", "
-                    + "'" + SModConsts.TablesMap.get(tableName) + "', "
+                    + "'" + SModConsts.TablesMap.get(tableNameId) + "', "
                     + idPrimaryKey1 + ", "
-                    + (tableName == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
+                    + (tableNameId == SModConsts.TRN_DPS ? idPrimaryKey2 : "NULL") + ", "
                     + "NULL, NULL, NULL);";
 
             Statement stStatus = oCconn.createStatement();
@@ -931,25 +960,25 @@ public class STrnDBCore {
             String queryUsersInTurn = "SELECT  "
                     + "    steps1.fk_usr_step "
                     + "FROM "
-                    + "    " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
+                    + "    " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS steps1 "
                     + "WHERE "
                     + "    NOT steps1.b_del "
-                    + "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "        AND steps1.res_tab_name_n = '" + SModConsts.TablesMap.get(tableNameId) + "' "
                     + "        AND steps1.fk_tp_authorn = " + authorizationType + " "
                     + "        AND steps1.res_pk_n1_n = " + idPrimaryKey1 + " "
-                    + (tableName == SModConsts.TRN_DPS ? "AND steps1.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
+                    + (tableNameId == SModConsts.TRN_DPS ? "AND steps1.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "        AND NOT steps1.b_authorn "
                     + "        AND NOT steps1.b_reject "
                     + "        AND steps1.lev = (SELECT  "
                     + "            step2.lev "
                     + "        FROM "
-                    + "            " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
+                    + "            " + tbl(SModConsts.CFGU_AUTHORN_STEP) + " AS step2 "
                     + "        WHERE "
                     + "            NOT step2.b_del "
-                    + "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(tableName) + "' "
+                    + "                AND step2.res_tab_name_n = '" + SModConsts.TablesMap.get(tableNameId) + "' "
                     + "                AND step2.fk_tp_authorn = " + authorizationType + " "
                     + "                AND step2.res_pk_n1_n = " + idPrimaryKey1 + " "
-                    + (tableName == SModConsts.TRN_DPS ? "AND step2.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
+                    + (tableNameId == SModConsts.TRN_DPS ? "AND step2.res_pk_n2_n = " + idPrimaryKey2 + " " : "")
                     + "                AND NOT step2.b_authorn "
                     + "                AND NOT step2.b_reject "
                     + "        ORDER BY step2.lev ASC "

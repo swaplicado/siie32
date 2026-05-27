@@ -332,8 +332,8 @@ public class SShareData {
             oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
         }
         else {
-            oTrnCore = new STrnDBCore(oSession);
-            oDocCore = new STrnDBDocuments(oSession);
+            oTrnCore = new STrnDBCore(oSession, idCompany);
+            oDocCore = new STrnDBDocuments(oSession, idCompany);
         }
         /**
          * Se obtiene el DPS
