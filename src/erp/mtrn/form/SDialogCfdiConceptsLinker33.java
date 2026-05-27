@@ -613,7 +613,7 @@ public class SDialogCfdiConceptsLinker33 extends javax.swing.JDialog implements 
 
                     if (!validation.getIsError() && moParamPurchaseOrder.isOrder()) {
                         try {
-                            double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                            double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient.getSession().getStatement(), (int[]) entryDpsDpsLink.getDpsEntryKey());
                             if (totalsupplied > entryDpsDpsLink.getQuantityToLink()) {
                                 validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
                                         "la cantidad minima a vincular debe ser " + (totalsupplied < entryDpsDpsLink.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
