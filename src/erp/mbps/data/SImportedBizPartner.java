@@ -52,10 +52,11 @@ public class SImportedBizPartner implements SGridRow {
     private String locality;
     private String zipCode;
     private int countryId;
-
+    private String countryCode;
+    
     private String partnerFiscalId;
     private int entityType;
-    private int fiscalRegime;
+    private String fiscalRegime;
     
     /**
      *
@@ -93,29 +94,34 @@ public class SImportedBizPartner implements SGridRow {
         this.partnerFiscalId = getString(partner, "partner_fiscal_id");
         this.entityType = getInt(partner, "entity_type");
         this.countryId = getInt(partner, "country");
-        this.fiscalRegime = getInt(partner, "fiscal_regime");
-
+        this.countryCode = getString(partner, "country_code");
+        this.fiscalRegime = getString(partner, "fiscal_regime_code");
+        
         try {
-            Object addrObj = partner.get("partner_address_partner_applying");
+    Object addrObj = partner.get("partner_address_partner_applying");
 
-            if (addrObj instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<Map<String, Object>> addresses = (List<Map<String, Object>>) addrObj;
+    if (addrObj instanceof List) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> addresses = (List<Map<String, Object>>) addrObj;
 
-                if (!addresses.isEmpty()) {
-                    Map<String, Object> addr = addresses.get(0);
-                    this.street = getString(addr, "street");
-                    this.streetNumberExt = getString(addr, "number");
-                    this.county = getString(addr, "county");
-                    this.state = getString(addr, "state");
-                    this.locality = getString(addr, "city");
-                    this.zipCode = getString(addr, "postal_code");
-                    this.countryId = addr.get("country") != null ? Integer.parseInt(addr.get("country").toString()) : 0;
-                }
-            }
+        if (!addresses.isEmpty()) {
+            Map<String, Object> addr = addresses.get(0);
+
+            this.street = getString(addr, "street");
+            this.streetNumberExt = getString(addr, "number");
+            this.county = getString(addr, "county");
+            this.state = getString(addr, "state");
+            this.locality = getString(addr, "city");
+            this.zipCode = getString(addr, "postal_code");
+
+            this.countryId = addr.get("country") != null
+                    ? Integer.parseInt(addr.get("country").toString())
+                    : 0;
         }
-        catch (Exception e) {
-        }
+    }
+}
+catch (Exception e) {
+}
     }
 
     private String getString(Map<String, Object> map, String key) {
@@ -155,10 +161,11 @@ public class SImportedBizPartner implements SGridRow {
     public String getState() { return state; }
     public String getLocality() { return locality; }
     public String getZipCode() { return zipCode; }
+    public String getCountryCode() { return countryCode; }
     public int getCountryId() { return countryId; }
     public String getPartnerFiscalId() { return partnerFiscalId; }
     public int getEntityType() { return entityType; }
-    public int getFiscalRegime() { return fiscalRegime; }
+    public String getFiscalRegime() { return fiscalRegime; }
 
     public boolean isImported() { return isImported; }
     public void setIsImported(boolean isImported) { this.isImported = isImported; }

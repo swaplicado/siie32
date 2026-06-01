@@ -52,6 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -540,6 +542,7 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
         mnShowingDocsMode = OFF;
 
         moImportationsGrid = new SGridPaneForm(miClient, 0, 0, "Proveedores", null) {
+            
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -564,6 +567,8 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
         moImportationsGrid.setForm(null);
         moImportationsGrid.setPaneFormOwner(null);
         jpDocumentsGrid.add(moImportationsGrid, BorderLayout.CENTER);
+        moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(false);
+        moImportationsGrid.getTable().getTableHeader().setResizingAllowed(false);
 
         jlStatus = new JLabel();
         jpCommandLeft.add(jlStatus);
@@ -799,6 +804,31 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
         return id;
     }
     
+    private int getCountryIdByCode(String code) {
+        int id = 0;
+        try (Statement stmt = miClient.getSession().getStatement()) {
+
+            String sql =
+                    "SELECT id_cty "
+                    + "FROM erp.LOCU_CTY "
+                    + "WHERE cty_code = '" + code + "' "
+                    + "AND NOT b_del "
+                    + "LIMIT 1";
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                id = rs.getInt("id_cty");
+            }
+            rs.close();
+        }
+        catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+        }
+
+        return id;
+    }
+
     private void actionPerformedImportBizPartner() {
         try {
             if (moImportationsGrid.getTable().getSelectedRow() == -1) {
@@ -816,17 +846,20 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
             SDataBizPartner bp = new SDataBizPartner();
             bp.setIsRegistryNew(true);
             bp.setBizPartner(row.getName());
-            if (row.getCountryId() == idCountryMexPC) {
+
+            if ("MEX".equals(row.getCountryCode())) {
                 bp.setFiscalId(row.getFiscalId());
                 bp.setFiscalFrgId("");
-            } 
+            }
             else {
                 bp.setFiscalId("XAXX010101000");
                 bp.setFiscalFrgId(row.getFiscalId());
             }
+
             bp.setFirstname(row.getFirstName());
             bp.setLastname(row.getLastName());
             bp.setBizPartnerCommercial(row.getTradeName());
+
             if (row.getEntityType() == idBizPartnerIdentityTypeId) {
                 bp.setFkBizPartnerIdentityTypeId(SDataConstantsSys.BPSS_TP_BP_IDY_PER);
                 bp.setFkTaxIdentityId(SDataConstantsSys.BPSS_TP_BP_IDY_PER);
@@ -835,19 +868,22 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
                 bp.setFkBizPartnerIdentityTypeId(SDataConstantsSys.BPSS_TP_BP_IDY_ORG);
                 bp.setFkTaxIdentityId(SDataConstantsSys.BPSS_TP_BP_IDY_ORG);
             }
+
             bp.setFkBizAreaId(row.getFunctionalAreaId());
             bp.setIsSupplier(row.isVendor());
             bp.setIsCustomer(row.isCustomer());
-            // Sucursal
+
             SDataBizPartnerBranch branch = new SDataBizPartnerBranch();
+
             branch.setIsRegistryNew(true);
             branch.setPkBizPartnerBranchId(0);
             branch.setBizPartnerBranch("Matriz");
             branch.setFkBizPartnerBranchTypeId(SDataConstantsSys.BPSS_TP_BPB_HQ);
             branch.setIsAddressPrintable(true);
             branch.setIsDeleted(false);
-            //Dirección
+
             SDataBizPartnerBranchAddress address = new SDataBizPartnerBranchAddress();
+
             address.setIsRegistryNew(true);
             address.setPkBizPartnerBranchId(0);
             address.setFkAddressTypeId(SDataConstantsSys.BPSS_TP_ADD_OFF);
@@ -858,15 +894,9 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
             address.setLocality(row.getLocality());
             address.setCounty(row.getCounty());
             address.setZipCode(row.getZipCode());
-            address.setFkCountryId_n(row.getCountryId());
             int countryId = row.getCountryId();
-            if (countryId == idCountryMexPC) {
-                address.setFkCountryId_n(idCountryMexSiie);
-            } 
-            else {
-               address.setFkCountryId_n(countryId);
-            }
-            if (countryId == idCountryMexPC) {
+
+            if (countryId == 150) {
                 address.setFkCountryId_n(idCountryMexSiie);
                 int stateId = getStateIdByName(row.getState());
                 if (stateId > 0) {
@@ -876,10 +906,20 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
                     address.setFkStateId_n(0);
                 }
             }
+            else {
+            int foreignCountryId = getCountryIdByCode(row.getCountryCode());
+                if (foreignCountryId > 0) {
+                    address.setFkCountryId_n(foreignCountryId);
+                }
+                else {
+                    address.setFkCountryId_n(countryId);
+                }
+            }
+
             branch.getDbmsBizPartnerBranchAddresses().add(address);
-            
-            if ((row.getEmail() != null && !row.getEmail().isEmpty()) ||
-                (row.getPhone() != null && !row.getPhone().isEmpty())) {
+
+            if ((row.getEmail() != null && !row.getEmail().isEmpty())
+                    || (row.getPhone() != null && !row.getPhone().isEmpty())) {
 
                 SDataBizPartnerBranchContact contact = new SDataBizPartnerBranchContact();
                 contact.setIsRegistryNew(true);
@@ -888,13 +928,20 @@ public class SDialogImportBizPartner extends SBeanFormDialog implements ActionLi
                 contact.setEmail01(row.getEmail());
                 contact.setTelNumber01(row.getPhone());
                 contact.setIsDeleted(false);
-
                 branch.getDbmsBizPartnerBranchContacts().add(contact);
-            }                
-            bp.getDbmsBizPartnerBranches().add(branch);            
+            }
+
+            SDataBizPartnerCategory category = new SDataBizPartnerCategory();
+            category.setIsRegistryNew(true);
+            category.setPkBizPartnerId(0);
+            category.setPkBizPartnerCategoryId(SDataConstantsSys.BPSS_CT_BP_SUP);
+            category.setFkBizPartnerCategoryId(SDataConstantsSys.BPSS_CT_BP_SUP);
+            category.setTaxRegime(row.getFiscalRegime());
+            bp.setDbmsCategorySettingsSup(category);
+            bp.getDbmsBizPartnerBranches().add(branch);
+
             SFormBizPartner form = new SFormBizPartner((SClientInterface) miClient);
             form.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { SDataConstants.BPSX_BP_SUP });
-
             form.formRefreshCatalogues();
             form.formReset();
             form.setRegistry(bp);

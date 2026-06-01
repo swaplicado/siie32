@@ -327,6 +327,98 @@ public abstract class SServicesUtils {
         return authFlowStatus;
     }
     
+      /**
+     * Obtener el estatus de un flujo de autorización facturas.
+     * @param session Sesión de usuario.
+     * @param resourceType Tipo de recurso (SSwapConsts.RESOURCE_TYPE_...)
+     * @param externalId  ID de la factura.
+     * @return 
+     * @throws java.lang.Exception
+     */
+    public static AuthFlowStatus getHistoryAuthorization(
+        final SGuiSession session,
+        final int resourceType,
+        final int externalId) throws Exception {
+
+        switch (resourceType) {
+            case SSwapConsts.RESOURCE_TYPE_PUR_ORDER:
+            case SSwapConsts.RESOURCE_TYPE_PUR_INVOICE:
+            case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
+                break;
+
+            default:
+                throw new UnsupportedOperationException(
+                        SLibConsts.ERR_MSG_OPTION_UNKNOWN
+                        + "\n(Tipo de recurso: " + resourceType + ")");
+        }
+
+        AuthFlowStatus authFlowStatus = null;
+        ObjectMapper mapper = new ObjectMapper();
+        SyncSettings syncSettings = getSyncSettings(session, mapper, SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG, SSwapConsts.CFG_OBJ_TXN_SRV);
+        syncSettings.Url += "/api/get-history-authorization";
+
+        String urlQuery =
+                "external_id=" + externalId + "&"
+                + "resource_type=" + resourceType + "&"
+                + "id_company=" + session.getConfigCompany().getCompanyId();
+
+        String responseBody = SExportUtils.requestSwapService(
+                urlQuery,
+                syncSettings.Url,
+                SHttpConsts.METHOD_GET,
+                "",
+                syncSettings.Token,
+                syncSettings.ApiKey,
+                SSwapConsts.TIME_30_SEC);
+
+        JsonNode responseJson = mapper.readTree(responseBody);
+
+        if (responseJson.isObject()
+                && responseJson.has("code")
+                && responseJson.has("message")) {
+
+            return new AuthFlowStatus(
+                    responseJson.path("code").asInt(),
+                    responseJson.path("message").asText());
+        }
+
+        if (responseJson.isArray() && responseJson.size() > 0) {
+            authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_SUCC_OK, "");
+            JsonNode currAction = responseJson.get(responseJson.size() - 1);
+            JsonNode currActionStatus = currAction.path("flow_status");
+            JsonNode currActionActionedBy = currAction.path("actioned_by");
+            JsonNode currActionActionedAllActors = currAction.path("all_actors");
+            authFlowStatus.FlowId = 1;
+            authFlowStatus.FlowStatusId = currActionStatus.path("id").asInt();
+            authFlowStatus.FlowStatusCode = currActionStatus.path("code").asText();
+            authFlowStatus.FlowStatusName = currActionStatus.path("name").asText();
+            authFlowStatus.FlowPriority = SDbPayment.PRIORITY_NORMAL;
+            authFlowStatus.FlowNotes = currAction.path("notes").asText();
+            authFlowStatus.CurrActionId = currAction.path("id").asInt();
+            authFlowStatus.CurrActionSequence = currAction.path("sequence").asInt();
+            authFlowStatus.CurrActionStatusId = currActionStatus.path("id").asInt();
+            authFlowStatus.CurrActionStatusCode = currActionStatus.path("code").asText();
+            authFlowStatus.CurrActionStatusName = currActionStatus.path("name").asText();
+            authFlowStatus.CurrActionNotes = currAction.path("notes").asText();
+            authFlowStatus.CurrActionActionedAt = currAction.path("actioned_at").asText();
+  
+            if (!currActionActionedBy.isMissingNode() && !currActionActionedBy.isNull()) {
+                authFlowStatus.CurrActionActionedById = currActionActionedBy.path("external_id").asInt();
+                authFlowStatus.CurrActionActionedByName = currActionActionedBy.path("full_name").asText();
+            }
+
+            if (currActionActionedAllActors.isArray()) {
+                for (JsonNode actor : currActionActionedAllActors) {
+                    authFlowStatus.CurrActionAllActors += (authFlowStatus.CurrActionAllActors.isEmpty() ? "" : "; ") + actor.path("full_name").asText();
+                }
+            }
+        }
+        else {
+            authFlowStatus = new AuthFlowStatus(SHttpConsts.RSC_ERR_SERVER, "No se encontró historial de autorización.");
+        }
+        return authFlowStatus;
+    }
+    
     /**
      * Leer la configuración para SWAP Services en la empresa actual, y devolverla a un nuevo objeto <code>ConfigSettings</code>.
      * @param session Sesión de usuario.

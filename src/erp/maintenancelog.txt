@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 301.8/ 2026-06-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Habilitación de la importación de proveedores
+2) Corrección de validación de XML activos solo a los pagos seleccionados
+3) Adición de los botones de ver detalle en el seguimiento de compras
+
+================================================================================
 SIIE 3.2 301.7/ 2026-05-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

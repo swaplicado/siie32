@@ -10,14 +10,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.gui.SModuleUtilities;
+import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.utils.SExportUtils;
 import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.cfg.utils.SAuthorizationUtils;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.form.SFormMaterialRequest;
 import erp.mod.view.SViewFilter;
+import erp.mtrn.data.STrnUtilities;
+import erp.swap.utils.SServicesUtils;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -30,14 +39,18 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
+import sa.lib.SLibUtils;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -60,6 +73,12 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
     
     private String sFilterInit;
     private SGuiDate moFilterTimeInit;
+    
+    private javax.swing.JButton jbViewRM;
+    private javax.swing.JButton jbAuthWebViewAuthLog;
+    private javax.swing.JButton jbPrintWarehouse;
+    private javax.swing.JButton jbAuthWebViewAuthLogInvoice;
+    private javax.swing.JButton jbAuthWebViewAuthLogPay;
     
     private boolean mbApplyFuncFilter;
     
@@ -91,6 +110,31 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateReq);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jrbDateOc);
         
+        jbViewRM = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT_MAT_REQ));
+        jbViewRM.setPreferredSize(new Dimension(23, 23));
+        jbViewRM.addActionListener(this);
+        jbViewRM.setToolTipText("Ver requicisión");
+        
+        jbAuthWebViewAuthLog = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_upl_notes_ora.gif")));
+        jbAuthWebViewAuthLog.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebViewAuthLog.addActionListener(this);
+        jbAuthWebViewAuthLog.setToolTipText("Ver estatus de autorización de la orden en app web");
+        
+        jbPrintWarehouse = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
+        jbPrintWarehouse.setPreferredSize(new Dimension(23, 23));
+        jbPrintWarehouse.addActionListener(this);
+        jbPrintWarehouse.setToolTipText("Imprimir documento de entrada al almacén");
+        
+        jbAuthWebViewAuthLogInvoice = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_auth_notes_ora.gif")));
+        jbAuthWebViewAuthLogInvoice.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebViewAuthLogInvoice.addActionListener(this);
+        jbAuthWebViewAuthLogInvoice.setToolTipText("Ver estatus de autorización de la factura en app web");
+
+        jbAuthWebViewAuthLogPay = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")));
+        jbAuthWebViewAuthLogPay.setPreferredSize(new Dimension(23, 23));
+        jbAuthWebViewAuthLogPay.addActionListener(this);
+        jbAuthWebViewAuthLogPay.setToolTipText("Ver historial de autorización del pago en app web");
+        
         setRowButtonsEnabled(false);
         
         jbRowDelete.setEnabled(false);
@@ -116,6 +160,18 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         }
         moFilterTimeInit = new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime());
         
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbViewRM);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintWarehouse);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLogInvoice);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLogPay);
+
+        jbViewRM.setEnabled(true);
+        jbAuthWebViewAuthLog.setEnabled(true);
+        jbPrintWarehouse.setEnabled(true);
+        jbAuthWebViewAuthLogInvoice.setEnabled(true);
+        jbAuthWebViewAuthLogPay.setEnabled(true);
+
     }
     
     /**
@@ -527,7 +583,7 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
                                 "    WHERE data_type = 'INV'\n" +
                                 ") fac_pc\n" +
                                 "    ON fac_pc.fk_dps_doc_n = fac.id_doc\n" +
-                                "    AND fac_pc.fk_dps_year_n = fac.id_year" +
+                                "    AND fac_pc.fk_dps_year_n = fac.id_year \n" +
                                 "\n" +
                                 "LEFT JOIN (\n" +
                                 "    SELECT DISTINCT\n" +
@@ -890,12 +946,13 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
             stmt.executeUpdate(sqlEntradaNo);
 
             // Si existe registro en trn_stk marcar "Si"
-            String sqlEntradaSi =
-                "UPDATE tmp_reporte_compras t " +
-                "INNER JOIN trn_stk stk ON stk.fid_dps_year_n = t.id_year_oc " +
-                "AND stk.fid_dps_doc_n = t.id_doc_oc " +
-                "AND stk.b_del = 0 " +
-                "SET t.entrada_almacen = '1'";
+            String sqlEntradaSi =               
+                    "UPDATE tmp_reporte_compras t " +
+                    "INNER JOIN trn_diog d " +
+                    "ON d.fid_dps_year_n = t.id_year_oc " +
+                    "AND d.fid_dps_doc_n = t.id_doc_oc " +
+                    "AND d.b_del = 0 " +
+                    "SET t.entrada_almacen = '1'";
 
             int rowsEntrada = stmt.executeUpdate(sqlEntradaSi);
             // System.out.println("Entradas a almacén detectadas: " + rowsEntrada);
@@ -969,6 +1026,122 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         return sql.toString();
     }
 
+    private int[] getSelectedPurchaseOrderPk() {
+        int[] pk = null;
+
+        if (getSelectedGridRow() == null) {
+            return null;
+        }
+
+        try {
+            String folioOc = getSelectedGridRow().getRowValueAt(4).toString();
+            try (Statement stmt = miClient.getSession().getStatement()) {
+                ResultSet rs = stmt.executeQuery(
+                    "SELECT id_year_oc, id_doc_oc " +
+                    "FROM tmp_reporte_compras " +
+                    "WHERE folio_oc = '" + folioOc + "' " +
+                    "LIMIT 1");
+
+                if (rs.next()) {
+                    pk = new int[] {
+                        rs.getInt("id_year_oc"),
+                        rs.getInt("id_doc_oc")
+                    };
+                }
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SViewPurchasingProcess.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return pk;
+    }
+    
+    private int[] getSelectedDiogPk() {
+        int[] pk = null;
+        if (getSelectedGridRow() == null) {
+            return null;
+        }
+        try {
+            String folioOc = getSelectedGridRow().getRowValueAt(4).toString();
+            try (Statement stmt = miClient.getSession().getStatement()) {
+                String sql =
+                    "SELECT d.id_year, d.id_doc " +
+                    "FROM tmp_reporte_compras t " +
+                    "INNER JOIN trn_diog d " +
+                    "ON d.fid_dps_year_n = t.id_year_oc " +
+                    "AND d.fid_dps_doc_n = t.id_doc_oc " +
+                    "AND d.b_del = 0 " +
+                    "WHERE t.folio_oc = '" + folioOc + "' " +
+                    "LIMIT 1";
+
+                ResultSet rs = stmt.executeQuery(sql);
+                if (rs.next()) {
+                    pk = new int[] {
+                        rs.getInt("id_year"),
+                        rs.getInt("id_doc")
+                    };
+                }
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SViewPurchasingProcess.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return pk;
+    }
+    
+    private int[] getSelectedInvoicePk() {
+        int[] pk = null;
+        if (getSelectedGridRow() == null) {
+            return null;
+        }
+        try {
+            Object value = getSelectedGridRow().getRowValueAt(11);
+            if (value == null || value.toString().trim().isEmpty()) {
+                miClient.showMsgBoxWarning("Error al obtener la factura.");
+                return null;
+            }
+            String folioFac = value.toString();
+            try (Statement stmt = miClient.getSession().getStatement()) {
+                String sql =
+                        "SELECT id_year_fac, id_doc_fac " +
+                        "FROM tmp_reporte_compras " +
+                        "WHERE folio_fac = '" + folioFac + "' " +
+                        "LIMIT 1";
+
+                ResultSet rs = stmt.executeQuery(sql);
+                if (rs.next()) {
+                    pk = new int[] {
+                        rs.getInt("id_year_fac"),
+                        rs.getInt("id_doc_fac")
+                    };
+                }
+                else {
+                    miClient.showMsgBoxWarning("Este movimiento no cuenta con factura.");
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        return pk;
+    }
+    
+    private void actionAuthWebViewPayLog() {
+    int idPay = getSelectedPayId();
+        if (idPay <= 0) {
+            miClient.showMsgBoxWarning("Aún no se cuenta con pago.");
+            return;
+        }
+        try {
+            String sPk = String.valueOf(idPay);
+            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT, sPk);
+            miClient.showMsgBoxInformation(authFlowStatus.toString());
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String where = "";
@@ -1017,7 +1190,19 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
             Logger.getLogger(SViewPurchasingProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        msSql = "SELECT * from tmp_reporte_compras";
+        
+        msSql = "SELECT " +
+        "CONCAT(" +
+        "IFNULL(id_rm, 0), '_'," +
+        "IFNULL(id_year_oc, 0), '_'," +
+        "IFNULL(id_doc_oc, 0), '_'," +
+        "IFNULL(id_year_fac, 0), '_'," +
+        "IFNULL(id_doc_fac, 0)" +
+        ") AS id1, " +
+        "id_rm, " +
+        "tmp_reporte_compras.* " +
+        "FROM tmp_reporte_compras";
+
     }
 
     @Override
@@ -1053,15 +1238,207 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         return columns;
     }
 
-    @Override
+//    private void actionViewRm() {
+//        if (getSelectedGridRow() == null) {
+//            miClient.showMsgBoxWarning("Debe seleccionar un registro.");
+//            return;
+//        }
+//        try {
+//            String folioRm = getSelectedGridRow().getRowValueAt(0).toString();
+//
+//            int idRm = -1;
+//            try (Statement stmt = miClient.getSession().getStatement()) {
+//                ResultSet rs = stmt.executeQuery("SELECT id_rm FROM tmp_reporte_compras WHERE folio_rm = '" + folioRm + "' LIMIT 1");
+//                if (rs.next()) {
+//                    idRm = rs.getInt("id_rm");
+//                }
+//            }
+//            if (idRm <= 0) {
+//                miClient.showMsgBoxWarning("No se pudo obtener el ID de la requisición.");
+//                return;
+//            }
+//            SDbMaterialRequest registry = new SDbMaterialRequest();
+//            registry.read(miClient.getSession(), new int[]{idRm});
+//            SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición (visualización)", SModConsts.TRNX_MAT_REQ_EST);
+//            form.setRegistry(registry);
+//            form.setVisible(true);
+//
+//        }
+//        catch (Exception e) {
+//            miClient.showMsgBoxError(e.getMessage());
+//        }
+//    }
+    private void actionViewRm() {
+    if (getSelectedGridRow() == null) {
+        miClient.showMsgBoxWarning("Debe seleccionar un registro.");
+        return;
+    }
 
+    try {
+        String folioRm = getSelectedGridRow().getRowValueAt(0).toString();
+
+        int idRm = -1;
+
+        try (Statement stmt = miClient.getSession().getStatement()) {
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT id_rm FROM tmp_reporte_compras WHERE folio_rm = '" + folioRm + "' LIMIT 1");
+
+            if (rs.next()) {
+                idRm = rs.getInt("id_rm");
+            }
+        }
+
+        if (idRm <= 0) {
+            miClient.showMsgBoxWarning("No se pudo obtener el ID de la requisición.");
+            return;
+        }
+
+        SDbMaterialRequest registry = new SDbMaterialRequest();
+        registry.read(miClient.getSession(), new int[] { idRm });
+
+        SFormMaterialRequest form = new SFormMaterialRequest(
+                miClient,
+                "Requisición (visualización)",
+                SModConsts.TRNX_MAT_REQ_EST);
+
+        form.setRegistry(registry);
+        java.lang.reflect.Field field = SFormMaterialRequest.class.getDeclaredField("moDateDelivery");
+        field.setAccessible(true);
+        sa.lib.gui.bean.SBeanFieldDate dateField = (sa.lib.gui.bean.SBeanFieldDate) field.get(form);
+        dateField.setEnabled(false);
+        form.setVisible(true);
+    }
+    catch (Exception e) {
+        miClient.showMsgBoxError(e.getMessage());
+    }
+}
+    
+    private void actionAuthWebViewAuthLog() {
+        int[] pkOc = getSelectedPurchaseOrderPk();
+        if (pkOc == null) {
+            miClient.showMsgBoxWarning("No se pudo obtener la llave de la orden de compra.");
+            return;
+        }
+
+        if (SAuthorizationUtils.hasStepsOfAuthorization(miClient.getSession(), SAuthorizationUtils.AUTH_TYPE_DPS, pkOc)) {
+            SModuleUtilities.showSendsAuthAppWebLog((erp.client.SClientInterface) miClient, getSelectedGridRow());
+        }
+        else {
+            try {
+                String sPk = pkOc[0] + "_" + pkOc[1];
+                SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getAuthFlowStatus(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_ORDER, sPk);
+                miClient.showMsgBoxInformation(authFlowStatus.toString());
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    private void actionPrint() {
+        if (getSelectedGridRow() == null) {
+            miClient.showMsgBoxWarning("Debe seleccionar un registro.");
+            return;
+        }
+        try {
+            Boolean entrada = (Boolean) getSelectedGridRow().getRowValueAt(10);
+            if (!entrada) {
+                miClient.showMsgBoxWarning("El registro no tiene entrada de almacén.");
+                return;
+            }
+            int[] pkDiog = getSelectedDiogPk();
+            if (pkDiog == null) {
+                miClient.showMsgBoxWarning("No se encontró el documento de almacén.");
+                return;
+            }
+            STrnUtilities.printDiog((SClientInterface) miClient, pkDiog);
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+    }
+    
+    private void actionAuthWebViewAuthLogInvoice() {
+        int[] pkFac = getSelectedInvoicePk();
+        if (pkFac == null) {
+            miClient.showMsgBoxWarning("Este movimiento no cuenta con factura.");
+            return;
+        }
+
+        try (Statement stmt = miClient.getSession().getStatement()) {
+            String sql =
+                    "SELECT ext_data_id " +
+                    "FROM trn_swap_data_prc " +
+                    "WHERE fk_dps_year_n = " + pkFac[0] + " " +
+                    "AND fk_dps_doc_n = " + pkFac[1] + " " +
+                    "AND data_type = 'INV' " +
+                    "LIMIT 1";
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (!rs.next()) {
+                miClient.showMsgBoxWarning("La factura no cuenta con external_id.");
+                return;
+            }
+
+            int externalId = rs.getInt("ext_data_id");
+            SServicesUtils.AuthFlowStatus authFlowStatus = SServicesUtils.getHistoryAuthorization(miClient.getSession(), SSwapConsts.RESOURCE_TYPE_PUR_INVOICE, externalId);
+            miClient.showMsgBoxInformation(authFlowStatus.toString());
+          
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private int getSelectedPayId() {
+        int idPay = -1;
+        if (getSelectedGridRow() == null) {
+            return -1;
+        }
+        try {
+            String folioPago = getSelectedGridRow().getRowValueAt(16).toString();
+            try (Statement stmt = miClient.getSession().getStatement()) {
+                String sql =
+                        "SELECT id_pay " +
+                        "FROM tmp_reporte_compras " +
+                        "WHERE folio_pago = '" + folioPago + "' " +
+                        "LIMIT 1";
+
+                ResultSet rs = stmt.executeQuery(sql);
+                if (rs.next()) {
+                    idPay = rs.getInt("id_pay");
+                }
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SViewPurchasingProcess.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return idPay;
+    }
+    
+    
+    @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("No supported yet"); //To change body of generated methods, choose Tools | Templates.
+       if (e.getSource() == jbViewRM) {
+           actionViewRm();
+       } else if (e.getSource() == jbAuthWebViewAuthLog) {
+           actionAuthWebViewAuthLog();
+       } 
+       else if (e.getSource() == jbPrintWarehouse) {
+           actionPrint();
+       } 
+       else if (e.getSource() == jbAuthWebViewAuthLogInvoice) {
+           actionAuthWebViewAuthLogInvoice();
+       }        
+       else if (e.getSource() == jbAuthWebViewAuthLogPay) {
+           actionAuthWebViewPayLog();
+       }        
     }
 
     @Override

@@ -3198,6 +3198,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             try {
                 for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                     SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
+                    
+                    if (!row.isForPayment()) {
+                        continue;
+                    }
+                    
                     if (row.isXml() && !row.getXmlUuid().isEmpty()) {
                         cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(row.getXml());
                         cfd.ver33.DElementTimbreFiscalDigital tfd = comprobante.getEltOpcComplementoTimbreFiscalDigital();

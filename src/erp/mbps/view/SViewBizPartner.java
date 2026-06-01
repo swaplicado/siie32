@@ -292,12 +292,12 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     "Exportar registros '" + SSwapUtils.translateSyncType(SSyncType.PARTNER_SUPPLIER, SLibConsts.LAN_ISO639_ES) + "' a " + SSwapConsts.SWAP_SERVICES, this);
 
                     moDialogImportBizPartner = new SDialogImportBizPartner((SGuiClient) miClient.getSession().getClient(), mnTabTypeAux01, "Importar proveedores");
-//                    jbImportBizPartner = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importar proveedores desde PC", this);
+                    jbImportBizPartner = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_col.gif")), "Importar proveedores desde PC", this);
 
                     addTaskBarUpperSeparator();
                     addTaskBarUpperComponent(jbExportDataToSwapServices);
-//                    addTaskBarUpperSeparator();
-//                    addTaskBarUpperComponent(jbImportBizPartner);
+                    addTaskBarUpperSeparator();
+                    addTaskBarUpperComponent(jbImportBizPartner);
                 }
                 break;
 
