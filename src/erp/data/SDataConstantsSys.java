@@ -153,6 +153,8 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG = "SWAP_SERVICES_AUTH_CONFIG";
     public static final String CFG_PARAM_SWAP_SOM = "SWAP_SOM";
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";
+    public static final String CFG_PARAM_CLOUD_STORAGE_CONFIG = "GCS_JSON_CONFIG";
+    public static final String CFG_PARAM_CLOUD_STORAGE_CREDENTIALS = "GCS_JSON_CREDENTIALS";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";

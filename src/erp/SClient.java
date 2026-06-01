@@ -10,6 +10,7 @@ import cfd.DCfdConsts;
 import cfd.DCfdSignature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -120,13 +121,13 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Rodrigo Ayala, Edwin Carmona, Sergio Flores
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Rodrigo Ayala, Sergio Flores, Edwin Carmona
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 301.7"; // release date: 2026-05-27
+    public static final String APP_RELEASE = "3.2 302.0"; // release date: 2026-06-01
 
     public static final String APP_COPYRIGHT = "2007-2026";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
@@ -1457,6 +1458,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             createSession();
                             retrieveSwapServicesSettings();
                             SCfdUtils.resetDataSetForPayroll();
+                            initCloudStorageManager(); 
 
                             boolean actionOk = actionFileSession(true);
                             
@@ -1856,6 +1858,17 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                 manSwapServicesCompanies = SLibUtils.textExplodeAsIntArray(companies, ",");
                 mnSwapServicesInstance = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, "", SSwapConsts.CFG_NVP_INSTANCE));
             }
+        }
+        catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+        }
+    }
+
+    private void initCloudStorageManager() {
+        try {
+            String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CONFIG);
+            String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CREDENTIALS);
+            CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
         }
         catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
