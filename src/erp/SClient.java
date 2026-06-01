@@ -1868,7 +1868,12 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         try {
             String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CONFIG);
             String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CREDENTIALS);
-            CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+            if (config != null && !config.isEmpty() && credentials != null && !credentials.isEmpty()) {
+                CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+            }
+            else {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING, "Cloud Storage Manager no está configurado.");
+            }
         }
         catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
