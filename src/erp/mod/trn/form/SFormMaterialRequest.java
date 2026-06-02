@@ -1833,7 +1833,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         if (moKeyConsSubentEty.getSelectedIndex() <= 0) {
             moKeyCostCenterEty.removeAllItems();
             moKeyCostCenterEty.setEnabled(false);
-        }
+        }   
         else {
             SGuiParams params = new SGuiParams();
             params.getParamsMap().put(SModConsts.USRU_USR, miClient.getSession().getUser().getPkUserId());
@@ -2290,6 +2290,34 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             mnLastSelectedRow = moGridMatReqList.getTable().getSelectedRow();
             
             if (SGuiUtils.computeValidation(miClient, validation)) {
+                
+                // Validación de precio al guardar:
+                
+                if (!moRegistry.isRegistryNew() && !isEtyNew && moItemEty != null && moUnitEty != null) {
+                    SDbMaterialRequestEntry originalEty = (SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow();
+                    
+                    if (originalEty.getFkItemId() == moItemEty.getPkItemId() && originalEty.getFkUnitId() == moUnitEty.getPkUnitId()) {
+                        double oldPrice = originalEty.getPriceUnitarySystem();
+                        double currentCommercialPrice = moDecUnitPriceSis.getValue(); //SMaterialRequestUtils.getItemPriceCommercial(miClient.getSession(), moItemEty.getPkItemId(), moUnitEty.getPkUnitId());
+
+                        if (!SLibUtils.compareAmount(currentCommercialPrice, oldPrice)) {
+                            String msg = "<html><body style='text-align: justify;'>"
+                                       + "El precio comercial actual del ítem ha cambiado en el catálogo.<br><br>"
+                                       + "Precio anterior: <b>$" + SLibUtils.getDecimalFormatAmount().format(oldPrice) + ".</b><br>"
+                                       + "Nuevo precio: <b><font color='blue'>$" + SLibUtils.getDecimalFormatAmount().format(currentCommercialPrice) + ".</font></b><br><br>"
+                                       + "<center><b>" + "Se guardará el nuevo precio. " + SLibConstants.MSG_CNF_MSG_CONT + "</b></center><br>"
+                                       + "</body></html>";
+
+                            if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
+                                //los cambios hechos al presionar edit se mantienen
+                            }
+                            else {
+                                return; //permite seguir editando
+                            }
+                        }
+                    }
+                }
+                
                 if (isEtyNew) {
                     SDbMaterialRequestEntry ety = new SDbMaterialRequestEntry();
                     ety = setEtyValues(ety);
@@ -2339,6 +2367,27 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
                 jbEditEty.setEnabled(false);
                 jbDeleteEty.setEnabled(false);
                 enableEntryControls(true);
+                
+                // Actualizar precio comercial:
+                
+                if (!moRegistry.isRegistryNew() && moItemEty != null && moUnitEty != null) {
+                    double oldPrice = moDecUnitPriceSis.getValue();
+                    double currentCommercialPrice = SMaterialRequestUtils.getItemPriceCommercial(miClient.getSession(), moItemEty.getPkItemId(), moUnitEty.getPkUnitId());
+                    
+                    if (!SLibUtils.compareAmount(oldPrice, currentCommercialPrice)) {
+                        moDecUnitPriceSis.setValue(currentCommercialPrice);
+                        moDecUnitPriceUsr.setValue(currentCommercialPrice);
+                        actionUnitPriceUsr();
+                        actionUpdateQtyPrice();
+                        
+                        String msg = "<html><body style='text-align: justify;'>"
+                                       + "Se ha actualizado el precio comercial del ítem.<br><br>"
+                                       + "Precio anterior: <b>$" + SLibUtils.getDecimalFormatAmount().format(oldPrice) + ".</b><br>"
+                                       + "Nuevo precio: <b><font color='blue'>$" + SLibUtils.getDecimalFormatAmount().format(currentCommercialPrice) + ".</font></b><br><br>";
+
+                        miClient.showMsgBoxInformation(msg);
+                    }
+                }
             }
             else if (isProvPurForm && hasUserProvPurRight) {
                 jbPickItem.setEnabled(!((SDbMaterialRequestEntry) moGridMatReqList.getSelectedGridRow()).getItemNewDescription().isEmpty() && !hasLinkMatReq);

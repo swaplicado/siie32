@@ -15,8 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.ResultSet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -28,7 +30,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implements ActionListener, ItemListener {
 
@@ -60,9 +62,6 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel23 = new javax.swing.JPanel();
-        jPanel24 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        moDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel25 = new javax.swing.JPanel();
         jlItem = new javax.swing.JLabel();
         moKeyItem = new sa.lib.gui.bean.SBeanFieldKey();
@@ -70,6 +69,9 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         jPanel26 = new javax.swing.JPanel();
         jlUnit = new javax.swing.JLabel();
         moKeyUnit = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel24 = new javax.swing.JPanel();
+        jlDate = new javax.swing.JLabel();
+        moDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel27 = new javax.swing.JPanel();
         jlPrice = new javax.swing.JLabel();
         moCurPrice = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -80,19 +82,9 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
 
         jPanel23.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDate.setText("Fecha:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel24.add(jlDate);
-
-        moDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel24.add(moDate);
-
-        jPanel23.add(jPanel24);
-
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlItem.setForeground(java.awt.Color.blue);
         jlItem.setText("Ítem:*");
         jlItem.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlItem);
@@ -110,6 +102,7 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlUnit.setForeground(java.awt.Color.blue);
         jlUnit.setText("Unidad:*");
         jlUnit.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlUnit);
@@ -118,6 +111,17 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         jPanel26.add(moKeyUnit);
 
         jPanel23.add(jPanel26);
+
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDate.setText("Vigente desde:*");
+        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel24.add(jlDate);
+
+        moDate.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel24.add(moDate);
+
+        jPanel23.add(jPanel24);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -206,11 +210,22 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
 
         removeAllListeners();
         reloadCatalogues();
+        
+        // Guardamos los IDs en caso de ser un duplicado
+        int idItem = moRegistry.getPkItemId();
+        int idUnit = moRegistry.getPkUnitId();
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
             moDate.setValue(miClient.getSession().getCurrentDate());
+            moRegistry.setSystem(false); //Quitamos que sea de sistema si en una duplicación
+            
+            // Si hay IDs los regresamos al objeto
+            if (idItem > 0) {
+                moRegistry.setPkItemId(idItem);
+                moRegistry.setPkUnitId(idUnit);
+            }
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
@@ -222,9 +237,13 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
         moCurPrice.getField().setValue(moRegistry.getPrice());
         
         setFormEditable(true);
+        jbPickItem.setEnabled(true);
 
-        if (moRegistry.isRegistryNew()) { }
-
+        if (!moRegistry.isRegistryNew()) {
+            moKeyItem.setEnabled(false);
+            moKeyUnit.setEnabled(false);
+            jbPickItem.setEnabled(false);
+        }
         addAllListeners();
     }
 
@@ -232,10 +251,11 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
     public SDbRegistry getRegistry() throws Exception {
         SDbPriceCommercialLog registry = moRegistry.clone();
 
-        if (registry.isRegistryNew()) {}
-
-        registry.setPkItemId(moKeyItem.getValue()[0]);
-        registry.setPkUnitId(moKeyUnit.getValue()[0]);
+        if (registry.isRegistryNew()) {
+            registry.setPkItemId(moKeyItem.getValue()[0]);
+            registry.setPkUnitId(moKeyUnit.getValue()[0]);
+        }
+        
         registry.setDate(moDate.getValue());
         registry.setPrice(moCurPrice.getField().getValue());
         
@@ -245,6 +265,45 @@ public class SFormPriceCommercialLog extends sa.lib.gui.bean.SBeanForm implement
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            try {
+            String sql = "SELECT id_log FROM itmu_price_comm_log " + 
+                            "WHERE id_item = " + moKeyItem.getValue()[0] + " " +
+                            "AND id_unit = " + moKeyUnit.getValue()[0] + " " +
+                            "AND dt = '" + SLibUtils.DbmsDateFormatDate.format(moDate.getValue()) + "' " +
+                            "AND NOT b_del";
+            
+            if (!moRegistry.isRegistryNew()) {
+                sql += " AND id_log <> " + moRegistry.getPkLogId();
+            }
+            
+            ResultSet resulSet = miClient.getSession().getStatement().executeQuery(sql);
+                if (resulSet.next()) {
+                    validation.setMessage("El ítem y unidad seleccionados ya cuentan con un precio para esta fecha: " + SLibUtils.DbmsDateFormatDate.format(moDate.getValue()) + "");
+                    validation.setComponent(moDate);
+                }
+                else {
+                    sql = "SELECT fid_unit FROM erp.itmu_item WHERE id_item = " + moKeyItem.getValue()[0];
+                    resulSet = miClient.getSession().getStatement().executeQuery(sql);
+                    
+                    if(resulSet.next()) {
+                        int idUnitCatalog = resulSet.getInt(1);
+                        int idUnitSelected = moKeyUnit.getValue()[0];
+                        
+                        if (idUnitCatalog != idUnitSelected) {
+                            if (miClient.showMsgBoxConfirm("La unidad seleccionada es diferente a la unidad base del catálogo del ítem. \n\n¿Desea continuar?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Guardado cancelado.");
+                                validation.setComponent(moKeyUnit);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
         
         return validation;
     }

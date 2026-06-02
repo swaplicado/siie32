@@ -26,10 +26,17 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePane;
 import erp.mfin.data.SDataCostCenter;
 import erp.mitm.data.SDataItem;
+import erp.mod.SModConsts;
 import erp.mod.fin.db.SFinUtils;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestEntry;
+import erp.mod.trn.db.SMaterialRequestUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryEdit;
+import erp.mtrn.data.SDataDpsEntryNotes;
+import erp.mtrn.data.SDataDpsEntryQuantityChange;
 import erp.mtrn.data.SRowDpsEdit;
 import erp.redis.SLockUtils;
 import erp.server.SServerConstants;
@@ -43,13 +50,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SLock;
 import sa.lib.srv.SSrvConsts;
 
 /**
  * Modificar el ítem de referencia y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
- * @author Isabel Servín, Adrián Avilés
+ * @author Isabel Servín, Adrián Avilés, Rodrigo Ayala
  */
 public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
     
@@ -66,16 +74,21 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private SFormDpsEditQty moFormDpsEditQty;
     private SFormOptionPicker moPickerCostCenter;
     private SFormOptionPickerItems moPickerItems;
+    private erp.mtrn.form.SFormDpsEntryNotes moFormNotes;
     
     private int mnFormStatus;
     private final int mnFormType;
     
     private ArrayList<SDataDps> moDocuments;
+    private ArrayList<SDbMaterialRequest> moMaterialRequests;
     private ArrayList<int[]> moUpdateDocumentEntryKeys;
+    private ArrayList<int[]> moUpdateMaterialRequestEntryKeys;
     
     private double mdTotalDpsOld;
     
     private DecimalFormat moAmountFormat;
+    
+    private java.util.Vector<SLock> mvMatReqLocks;
 
     /** Creates new form SFormCfdiChangeItem
      * @param client
@@ -110,6 +123,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jbSelectCostCenter = new javax.swing.JButton();
         jbSelectReferenceItem = new javax.swing.JButton();
         jbDeleteReferenceItem = new javax.swing.JButton();
+        jbAddNote = new javax.swing.JButton();
+        jbEditNote = new javax.swing.JButton();
         jpDpsTotal = new javax.swing.JPanel();
         jlTotalDpsOld = new javax.swing.JLabel();
         jtfTotalDpsOld = new javax.swing.JTextField();
@@ -161,20 +176,29 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jpConceptSetup.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbEditQty.setText("Cambiar cantidad");
-        jbEditQty.setPreferredSize(new java.awt.Dimension(180, 23));
+        jbEditQty.setPreferredSize(new java.awt.Dimension(160, 23));
         jpConceptSetup.add(jbEditQty);
 
         jbSelectCostCenter.setText("Cambiar centro costo");
-        jbSelectCostCenter.setPreferredSize(new java.awt.Dimension(180, 23));
+        jbSelectCostCenter.setPreferredSize(new java.awt.Dimension(160, 23));
         jpConceptSetup.add(jbSelectCostCenter);
 
         jbSelectReferenceItem.setText("Cambiar ítem referencia");
-        jbSelectReferenceItem.setPreferredSize(new java.awt.Dimension(180, 23));
+        jbSelectReferenceItem.setPreferredSize(new java.awt.Dimension(160, 23));
         jpConceptSetup.add(jbSelectReferenceItem);
 
         jbDeleteReferenceItem.setText("Eliminar ítem referencia");
-        jbDeleteReferenceItem.setPreferredSize(new java.awt.Dimension(180, 23));
+        jbDeleteReferenceItem.setPreferredSize(new java.awt.Dimension(160, 23));
         jpConceptSetup.add(jbDeleteReferenceItem);
+
+        jbAddNote.setText("Agregar nota");
+        jbAddNote.setPreferredSize(new java.awt.Dimension(160, 23));
+        jpConceptSetup.add(jbAddNote);
+
+        jbEditNote.setText("Modificar nota");
+        jbEditNote.setToolTipText("Modificar última nota agregada");
+        jbEditNote.setPreferredSize(new java.awt.Dimension(160, 23));
+        jpConceptSetup.add(jbEditNote);
 
         jpConceptsDataNorth.add(jpConceptSetup, java.awt.BorderLayout.CENTER);
 
@@ -249,7 +273,6 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jbCancel.setPreferredSize(new java.awt.Dimension(75, 23));
         jpControls.add(jbCancel);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
@@ -261,7 +284,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
-
+                                   
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
@@ -276,11 +299,13 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             releaseDpsUserRedisLock();
             */
             releaseDpsUserSLock();
+            releaseMaterialRequestLocks();
             setVisible(false);
         }
         else if (! SDataUtilities.isPeriodOpen(miClient, moDps.getDateDoc())) {
             miClient.showMsgBoxWarning("¡El periodo contable de la fecha del documento está cerrado!");
             releaseDpsUserSLock();
+            releaseMaterialRequestLocks();
             setVisible(false);
         }
     }
@@ -295,7 +320,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         moDocEntriesTablePane = new STablePane(miClient);
         jpConceptsGrid.add(moDocEntriesTablePane, BorderLayout.CENTER);
 
-        columns = new STableColumnForm[19];
+        columns = new STableColumnForm[20];
       
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave concepto", STableConstants.WIDTH_ITEM_KEY);
@@ -303,12 +328,16 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Precio u. $", STableConstants.WIDTH_VALUE_UNITARY);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad anterior", STableConstants.WIDTH_QUANTITY);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad anterior", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total partida anterior $", STableConstants.WIDTH_VALUE_2X);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cantidad nueva", STableConstants.WIDTH_QUANTITY);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total partida anterior $", STableConstants.WIDTH_VALUE_2X);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad nueva", STableConstants.WIDTH_QUANTITY);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Total partida nuevo $", STableConstants.WIDTH_VALUE_2X);
+        columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total partida nuevo $", STableConstants.WIDTH_VALUE_2X);
+        columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitaryFixed4());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo anterior", STableConstants.WIDTH_ACCOUNT_ID);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo anterior", STableConstants.WIDTH_ACCOUNT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo nuevo", STableConstants.WIDTH_ACCOUNT_ID);
@@ -317,6 +346,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia anterior", 250);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código ítem referencia nuevo", STableConstants.WIDTH_ITEM_KEY);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem referencia nuevo", 250);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nota nueva", 250);
         
         for (i = 0; i < columns.length; i++) {
             moDocEntriesTablePane.addTableColumn(columns[i]);
@@ -330,6 +360,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jbSelectCostCenter.addActionListener(this);
         jbSelectReferenceItem.addActionListener(this);
         jbDeleteReferenceItem.addActionListener(this);
+        jbAddNote.addActionListener(this);
+        jbEditNote.addActionListener(this);
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -350,6 +382,8 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         jbSelectReferenceItem.setEnabled(true);
         jbSelectCostCenter.setEnabled(true); 
         jbDeleteReferenceItem.setEnabled(true); 
+        jbAddNote.setEnabled(true); 
+        jbEditNote.setEnabled(true); 
         
         moPanelDps = new SPanelDps(miClient);
         jpHeader.remove(jlPanelDps); 
@@ -414,29 +448,130 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
     }
     
+    private void getAssociatedMaterialRequests(SDataDps dps) {
+        ArrayList<int[]> assocMatReqs = new ArrayList<>();
+        
+        try {
+            String sql = "SELECT fid_mat_req AS mat_req "
+                    + "FROM trn_dps_mat_req " + "WHERE fid_dps_year = " + dps.getPkYearId() + " " + "AND fid_dps_doc = " + dps.getPkDocId() + "";
+
+            assocMatReqs = getMaterialRequests(sql, assocMatReqs, false);
+            
+            for (int[] matReqKey : assocMatReqs) {
+                boolean exists = false;
+
+                // Revisar si la requisición no está ya cargada
+                for (SDbMaterialRequest req : moMaterialRequests) {
+                    if (SLibUtilities.compareKeys(req.getPrimaryKey(), matReqKey)) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    SDbMaterialRequest req = new SDbMaterialRequest();
+                    req.read(miClient.getSession(), matReqKey);
+                    moMaterialRequests.add(req);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    }        
+    
     private ArrayList<int[]> getDocuments(String sql, ArrayList<int[]> docs, boolean isToUpdate) throws Exception {
         try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+            
             while (resultSet.next()) {
-                int auxKey[];
+                int[] auxKey;
+                
                 if (isToUpdate) {
                     auxKey = new int[] { resultSet.getInt("year"), resultSet.getInt("doc"), resultSet.getInt("ety") };
                 }
                 else {
                     auxKey = new int[] { resultSet.getInt("year"), resultSet.getInt("doc") };
                 }
+                
                 boolean insert = true;
+                
                 for (int[] doc : docs) {
                     if (SLibUtilities.compareKeys(doc, auxKey)) {
                         insert = false;
                         break;
                     }
                 }
+                
                 if (insert) {
                     docs.add(auxKey);
                 }
             }
         }
         return docs;
+    }
+    
+    private ArrayList<int[]> getMaterialRequests(String sql, ArrayList<int[]> matReqs, boolean isToUpdate) throws Exception {
+        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+            
+            while (resultSet.next()) {
+                int[] auxKey;
+                
+                if (isToUpdate) {
+                    auxKey = new int[] { resultSet.getInt("mat_req"), resultSet.getInt("ety") };
+                }
+                else {
+                    auxKey = new int[] { resultSet.getInt("mat_req") };
+                }
+                
+                boolean insert = true;
+                
+                for (int[] doc : matReqs) {
+                    if (SLibUtilities.compareKeys(doc, auxKey)) {
+                        insert = false;
+                        break;
+                    }
+                }
+                
+                if (insert) {
+                    matReqs.add(auxKey);
+                }
+            }
+        }
+        return matReqs;
+    }
+    
+    private int[] getMatReqEntryKeyForDpsEntry(int[] dpsEntryKey) {
+        int[] matReqEtyKey = null;
+        try {
+            // Consultamos la tabla puente directamente
+            String sql = "SELECT fid_mat_req, fid_mat_req_ety FROM trn_dps_mat_req " +
+                         "WHERE fid_dps_year = " + dpsEntryKey[0] + 
+                         " AND fid_dps_doc = " + dpsEntryKey[1] + 
+                         " AND fid_dps_ety = " + dpsEntryKey[2];
+
+            ResultSet rs = miClient.getSession().getStatement().executeQuery(sql);
+            if (rs.next()) {
+                matReqEtyKey = new int[] { rs.getInt(1), rs.getInt(2) };
+            }
+        } catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        return matReqEtyKey;
+    }
+    
+    private SDbMaterialRequestEntry getReqEntryFromLink(int[] matReqLinkKey) {
+        if (matReqLinkKey == null) return null;
+        
+        for (SDbMaterialRequest req : moMaterialRequests) {
+            if (req.getPkMatRequestId() == matReqLinkKey[0]) {
+                for (SDbMaterialRequestEntry reqEty : req.getChildEntries()) {
+                    if (reqEty.getPkEntryId() == matReqLinkKey[1]) {
+                        return reqEty;
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     private boolean lockDocuments() {
@@ -449,6 +584,28 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
         return error;
     }
+    
+    private boolean lockMaterialRequests() {
+    boolean error = false;
+    for (SDbMaterialRequest req : moMaterialRequests) {
+        try {
+            // Pedimos el candado a Redis
+            SLock slock = SLockUtils.gainLock(miClient, SModConsts.TRN_MAT_REQ, req.getPrimaryKey(), 1000 * 60 * 15);
+            if (slock != null) {
+                mvMatReqLocks.add(slock); // Lo guardamos en el formulario, NO en la requisición
+            } else {
+                error = true;
+                miClient.showMsgBoxWarning("No fue posible obtener el acceso exclusivo de la requisición '" + req.getNumber() + "'.");
+                break;
+            }
+        } catch (Exception e) {
+            error = true;
+            SLibUtils.showException(this, e);
+            break;
+        }
+    }
+    return error;
+}
     
     private boolean readDpsUser(SDataDps dps) {
         boolean error = true;
@@ -480,7 +637,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
         return error;
     }
-
+    
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     private sa.lib.srv.SSrvLock gainDpsUserLock(SDataDps dps) {
         SSrvLock lock;
@@ -578,6 +735,17 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         });
     }
     
+    private void releaseMaterialRequestLocks() {
+        for (SLock lock : mvMatReqLocks) {
+            try {
+                SLockUtils.releaseLock(miClient, lock);
+            } catch (Exception e) {
+                // ignorar silenciosamente
+            }
+        }
+        mvMatReqLocks.clear();
+    }
+    
     private void populateTable() {
         moDocEntriesTablePane.createTable();
         
@@ -641,6 +809,24 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
             else {
                 SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
+                
+                // Validar si el documento tiene una requisición asociada y un Subcentro de consumo seleccionado: 
+                
+                int[] dpsEtyKey = (int[]) rowDpsEdit.getDpsEntryPK();
+                int[] matReqEtyKey = getMatReqEntryKeyForDpsEntry(dpsEtyKey);
+                SDbMaterialRequestEntry reqEty = null; 
+                
+                if (matReqEtyKey != null) {
+                    reqEty = getReqEntryFromLink(matReqEtyKey);
+                    
+                    if (reqEty != null) {
+                        if (reqEty.getFkSubentMatConsumptionEntityId_n() == 0 || reqEty.getFkSubentMatConsumptionSubentityId_n() == 0) {
+                            miClient.showMsgBoxWarning("No se puede cambiar el Centro de Costo. La partida tiene una partida de requisición asociada sin un Subcentro de Consumo seleccionado. \n\nPor favor asigne uno en la requisición original primero.");
+                            return;
+                        }
+                    }
+                }
+                
                 if (moPickerCostCenter == null) {        
                     moPickerCostCenter = SFormOptionPicker.createOptionPicker(miClient, SDataConstants.FIN_CC, moPickerCostCenter);
                 }
@@ -658,8 +844,33 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 Object key;
                 if (moPickerCostCenter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     key = moPickerCostCenter.getSelectedPrimaryKey();
+                    
+                    // Validar si la requisición asociada tiene un CC válido:
+                    try {
+                        if (matReqEtyKey != null) {
+                            if (reqEty != null) {
+                                String idCcPicker = (String) ((Object[]) key)[0];
+                                
+                                int idCcInt = Integer.parseInt(idCcPicker.replaceAll("[^0-9]", ""));
+                                
+                                // Validar contra la DB si este CC está autorizado para el Subcentro:
+                                ArrayList<erp.mod.trn.db.SDbMaterialCostCenterGroup> ccg;
+                                ccg = SMaterialRequestUtils.getCostCenterGroupByUser( miClient.getSession(), 
+                                        new int[] { reqEty.getFkSubentMatConsumptionEntityId_n(), reqEty.getFkSubentMatConsumptionSubentityId_n() }, idCcInt);
+                        
+                                if (ccg == null || ccg.isEmpty()) {
+                                    miClient.showMsgBoxWarning("El Centro de Costo seleccionado no está autorizado para el Subcentro de Consumo de la Requisición asociada.\n\nPor favor, seleccione un Centro de Costo válido.");
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        SLibUtils.printException(this, e);                            
+                    }
+                    
                     SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient,
                             SDataConstants.FIN_CC, key, SLibConstants.EXEC_MODE_SILENT);
+                            
                     if (costCenter != null && SFinUtils.isCostCenterMaxLevel(miClient.getSession(), costCenter.getPkCostCenterIdXXX())) {
                         rowDpsEdit.setCostCenterNew(costCenter);
                         rowDpsEdit.prepareTableRow();
@@ -673,7 +884,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         }
     }
-    
+
     private void actionSelectItemReference() { 
         if (jbSelectReferenceItem.isEnabled()) {
             int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
@@ -683,7 +894,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
             else {
                 SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
-
+                
                 if (moPickerItems == null) {
                     moPickerItems = SFormOptionPickerItems.createOptionPicker(miClient, SDataConstants.ITMX_ITEM_IOG, moPickerItems);
                 }
@@ -728,6 +939,98 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         }
     }
     
+    private void actionAddNote() {
+        if (jbAddNote.isEnabled()) {
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
+                SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) rowDpsEdit.getDpsEntryPK());
+                
+                if (moFormNotes == null) {
+                    moFormNotes = new SFormDpsEntryNotes(miClient);
+                }
+                
+                moFormNotes.formReset();
+                moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, true);
+                moFormNotes.setFormVisible(true);
+                
+                if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    
+                    SDataDpsEntryNotes newNote = ((SDataDpsEntryNotes) moFormNotes.getRegistry());
+                    
+                    newNote.setPkYearId(entry.getPkYearId());
+                    newNote.setPkDocId(entry.getPkDocId());
+                    newNote.setPkEntryId(entry.getPkEntryId());
+                    newNote.setPkNotesId(0);
+                    newNote.setIsRegistryNew(true);
+                    
+                    entry.getDbmsEntryNotes().add(newNote);
+                    entry.setIsRegistryEdited(true);
+                    
+                    rowDpsEdit.setNewNote(newNote.getNotes());
+                    rowDpsEdit.prepareTableRow();
+                    moDocEntriesTablePane.renderTableRows();
+                    moDocEntriesTablePane.setTableRowSelection(selectedRow);
+                }
+            }
+        }
+    }
+    
+    private void actionEditNote() {
+        if (jbAddNote.isEnabled()) {
+            int selectedRow = moDocEntriesTablePane.getTable().getSelectedRow();
+            
+            if (selectedRow == -1) {
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+            }
+            else {
+
+                SRowDpsEdit rowDpsEdit = (SRowDpsEdit) moDocEntriesTablePane.getSelectedTableRow();
+                SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) rowDpsEdit.getDpsEntryPK());
+
+                if (entry.getDbmsEntryNotes().isEmpty()) {
+                    miClient.showMsgBoxInformation("La partida no tiene notas para modificar.");
+                    return;
+                }
+
+                // Ultima nota de la partida:
+
+                SDataDpsEntryNotes lastNote = null;
+                lastNote = entry.getDbmsEntryNotes().get(entry.getDbmsEntryNotes().size() - 1);
+
+                if (moFormNotes == null) {
+                    moFormNotes = new SFormDpsEntryNotes(miClient);
+                }
+
+                moFormNotes.formReset();
+
+                moFormNotes.setRegistry(lastNote);
+
+                moFormNotes.setValue(SLibConstants.VALUE_POST_EMIT_EDIT, true);
+                moFormNotes.setFormVisible(true);
+
+                if (moFormNotes.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+
+                    SDataDpsEntryNotes editedNote = (SDataDpsEntryNotes) moFormNotes.getRegistry();
+
+                    lastNote.setNotes(editedNote.getNotes());
+                    lastNote.setIsRegistryEdited(true);
+
+                    entry.setIsRegistryEdited(true);
+
+                    rowDpsEdit.setNewNote(lastNote.getNotes());
+                    rowDpsEdit.prepareTableRow();
+                    moDocEntriesTablePane.renderTableRows();
+                    moDocEntriesTablePane.setTableRowSelection(selectedRow);
+                }
+            }
+        }
+    }
+    
     private void updateAssocDocuments(Object primaryKey, SRowDpsEdit rowDpsEdit) {
         int[] entryKey = (int[]) primaryKey;
         moUpdateDocumentEntryKeys = new ArrayList<>();
@@ -737,6 +1040,22 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 SDataDpsEntry entry = document.getDbmsDpsEntry(updateDocumentEntryKey);
                 if (entry != null) {
                     if (rowDpsEdit.getOriginalQuantityNew() != 0) {
+                        
+                        // Datos para la bitácora de cambio de cantidad:
+                        SDataDpsEntryQuantityChange qtyChg = new SDataDpsEntryQuantityChange();
+                        qtyChg.setDate(miClient.getSessionXXX().getWorkingDate());
+                        qtyChg.setOriginalQuantityOld(rowDpsEdit.getOriginalQuantityOld());
+                        qtyChg.setOriginalQuantityNew(rowDpsEdit.getOriginalQuantityNew());
+                        qtyChg.setFkOriginalUnitOldId(entry.getFkOriginalUnitId());
+                        qtyChg.setFkOriginalUnitNewId(entry.getFkOriginalUnitId());
+                        qtyChg.setFkUnitOldId(entry.getFkUnitId());
+                        qtyChg.setFkUnitNewId(entry.getFkUnitId());
+                        qtyChg.setFkOriginalUnitOldId(entry.getFkOriginalUnitId());
+                        qtyChg.setFkOriginalUnitNewId(entry.getFkOriginalUnitId());
+                        qtyChg.setIsRegistryNew(true);
+                        
+                        entry.getDbmsDpsEntryQuantityChange().add(qtyChg);
+                        
                         entry.setOriginalQuantity(rowDpsEdit.getOriginalQuantityNew());
                         entry.setIsRegistryEdited(true);
                     }
@@ -751,6 +1070,43 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                         entry.setIsRegistryEdited(true);
                     }
                     break;
+                }
+            }
+        });
+    }
+    
+    private void updateAssocMaterialRequestEntries(Object primaryKey, SRowDpsEdit rowDpsEdit) {
+        int[] entryKey = (int[]) primaryKey;
+
+        moUpdateMaterialRequestEntryKeys = new ArrayList<>();
+        getUpdateMatRequestEntryKeys(entryKey);
+
+        moUpdateMaterialRequestEntryKeys.stream().forEach((int[] updateEntryKey) -> {
+            for (SDbMaterialRequest materialRequest : moMaterialRequests) {
+                for (SDbMaterialRequestEntry entry : materialRequest.getChildEntries()) {
+                    if (SLibUtilities.compareKeys(entry.getPrimaryKey(), updateEntryKey)) {
+                        if (rowDpsEdit.getOriginalQuantityNew() != 0) {
+                            entry.setQuantity(rowDpsEdit.getOriginalQuantityNew());
+                            entry.setRegistryEdited(true);
+                        }
+
+                        if (rowDpsEdit.getItemRefNew() != null) {
+                            entry.setFkItemReferenceId_n(rowDpsEdit.getItemRefNew().getPkItemId());
+                            entry.setRegistryEdited(true);
+                        }
+
+                        if (rowDpsEdit.getCostCenterNew() != null) {
+                            entry.setFkCostCenterId_n(rowDpsEdit.getCostCenterNew().getPkCostCenterId());
+                            System.out.println("Nuevo CC: " + entry.getFkCostCenterId_n());
+                            entry.setRegistryEdited(true);
+                        }
+                        
+                        if (entry.isRegistryEdited()) {
+                            materialRequest.setRegistryEdited(true);
+                        }
+                        
+                        break;
+                    }
                 }
             }
         });
@@ -798,6 +1154,21 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
         }
     }
+    
+    private void getUpdateMatRequestEntryKeys(int[] entryKey){
+        ArrayList<int[]> assocKeys = new ArrayList<>();
+        try {
+            String sql = "SELECT fid_mat_req AS mat_req, fid_mat_req_ety AS ety "
+                    + "FROM trn_dps_mat_req " + "WHERE fid_dps_year = " + entryKey[0] + " AND fid_dps_doc = " + entryKey[1] + " AND fid_dps_ety = " + entryKey[2] + "";
+
+            moUpdateMaterialRequestEntryKeys  = getMaterialRequests(sql, assocKeys, true);
+            
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+    
+    }
        
     private void actionOk() {
         SFormValidation validation = formValidate();
@@ -805,9 +1176,93 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             miClient.showMsgBoxWarning(validation.getMessage());
         }
         else {
+            if (!aceptDocumentsParentsChanges()) {
+                return;
+            }
+            if (!acceptStockValuationChanges()) {
+                return;
+            }
+
             mnFormResult = SLibConstants.FORM_RESULT_OK;
             setVisible(false);
         }
+    }
+    
+    private boolean aceptDocumentsParentsChanges(){
+        String affectedEntries = getModifiedEntriesWithParents();
+        
+        if (!affectedEntries.isEmpty()) {
+            int option = JOptionPane.showConfirmDialog(
+                    this,
+                    "Las siguientes partidas tienen documentos vinculados:\n\n"
+                        + affectedEntries
+                        + "\n ¿Desea continuar con los cambios?",
+                        "Confirmar cambios",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+            
+            return option == JOptionPane.OK_OPTION;
+        }
+        
+        return true;
+    }
+    
+    private boolean acceptStockValuationChanges() {
+        StringBuilder warnings = new StringBuilder();
+
+        try {
+            for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
+
+                SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
+
+                boolean change = row.getOriginalQuantityNew() != 0 || row.getItemRefNew() != null || row.getCostCenterNew() != null;
+                
+                if (!change) {
+                    continue;
+                }
+
+                int[] dpsEntryKey = (int[]) row.getDpsEntryPK();
+
+                SDataDpsEntry entry = moDps.getDbmsDpsEntry(dpsEntryKey);
+
+                int count = SStockValuationUtils.countStockValuationsForDpsEntry(
+                        miClient.getSession(),
+                        dpsEntryKey,
+                        moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR
+                );
+
+                if (count > 0) {
+
+                    warnings.append("• Partida ")
+                            .append(entry.getConceptKey())
+                            .append(" - ")
+                            .append(entry.getConcept())
+                            .append(": ")
+                            .append(count)
+                            .append(" valuación(es) de inventario.\n");
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+            return false;
+        }
+
+        if (warnings.length() > 0) {
+
+            int option = JOptionPane.showConfirmDialog(
+                    this,
+                    "Las siguientes partidas tienen valuaciones de inventario asociadas:\n\n"
+                            + warnings.toString()
+                            + "\n¿Desea continuar con los cambios?",
+                    "Confirmar cambios con valuaciones",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            return option == JOptionPane.OK_OPTION;
+        }
+
+        return true;
     }
 
     private void actionCancel() {
@@ -818,13 +1273,17 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         releaseDpsUserRedisLock();
         */
         releaseDpsUserSLock();
+        releaseMaterialRequestLocks();
+        //releaseMaterialRequestUserSlock();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jbAddNote;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDeleteReferenceItem;
+    private javax.swing.JButton jbEditNote;
     private javax.swing.JButton jbEditQty;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbSelectCostCenter;
@@ -863,16 +1322,17 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
             SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i); 
             
-            if (row.getOriginalQuantityNew() != 0 || row.getItemRefNew() != null || row.getCostCenterNew() != null) {
+            if (row.getOriginalQuantityNew() != 0 || row.getItemRefNew() != null || row.getCostCenterNew() != null || (row.getNewNote() != null && !row.getNewNote().trim().isEmpty())) {
                 isAnyEntryChanged = true;
             }
         }
         if (!isAnyEntryChanged) {
-            validation.setMessage("Ninguna entrada tiene una cantidad nueva o item de referencia o un centro de costo nuevo seleccionado.");
+            validation.setMessage("No se realizaron cambios en cantidad, ítem de referencia, centro de costo o nota.");
         }
-        if (!validation.getIsError()) {
-            SDataDps dps = comprobateRegistry();
-            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE);
+        
+        if (!validation.getIsError()) { 
+            SDataDps dps = comprobateRegistry(); // inyecta los datos del form a las partidas del objeto en memoria (moDps)
+            SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE); // simula un guardado para ver si el server no truena 
             SServerResponse response;
 
             request.setPacket(dps);
@@ -886,6 +1346,117 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         return validation;
     }
     
+    private String getModifiedEntriesWithParents() {
+        StringBuilder message = new StringBuilder();
+
+        try {
+            for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
+                SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
+
+                if (row.getOriginalQuantityNew() != 0 || row.getItemRefNew() != null || row.getCostCenterNew() != null) {
+                    int[] entryKey = (int[]) row.getDpsEntryPK();
+
+                    String sql = "SELECT "
+                            + "d.fid_ct_dps AS rel_ct_dps, "
+                            + "d.fid_cl_dps AS rel_cl_dps, "
+                            + "d.fid_tp_dps AS rel_tp_dps, "
+                            + "CONCAT(d.num_ser, '-', d.num) AS rel_folio, "
+                            + "s.id_src_ety AS rel_ety, "
+                            + "0 AS is_mat_req "
+                            + "FROM trn_dps_dps_supply AS s "
+                            + "INNER JOIN trn_dps AS d ON "
+                            + "s.id_src_year = d.id_year "
+                            + "AND s.id_src_doc = d.id_doc "
+                            + "WHERE s.id_des_year = " + entryKey[0] + " "
+                            + "AND s.id_des_doc = " + entryKey[1] + " "
+                            + "AND s.id_des_ety = " + entryKey[2] + " "
+
+                            + "UNION ALL "
+
+                            + "SELECT "
+                            + "0 AS rel_ct_dps, "
+                            + "0 AS rel_cl_dps, "
+                            + "0 AS rel_tp_dps, "
+                            + "mr.num AS rel_folio, "
+                            + "mrq.fid_mat_req_ety AS rel_ety, "
+                            + "1 AS is_mat_req "
+                            + "FROM trn_dps_mat_req AS mrq "
+                            + "INNER JOIN trn_mat_req AS mr ON "
+                            + "mrq.fid_mat_req = mr.id_mat_req "
+                            + "WHERE mrq.fid_dps_year = " + entryKey[0] + " "
+                            + "AND mrq.fid_dps_doc = " + entryKey[1] + " "
+                            + "AND mrq.fid_dps_ety = " + entryKey[2];
+
+                    ResultSet rs = miClient.getSession().getStatement().executeQuery(sql);
+
+                    while (rs.next()) {
+                        String docType;
+
+                        if (rs.getBoolean("is_mat_req")) {
+                            docType = "Requisición";
+                        }
+                        else{
+                            switch (rs.getInt("rel_cl_dps")) {
+                                case SDataConstantsSys.TRNS_CL_DPS_EST:
+                                    docType = "Cotización";
+                                    break;
+
+                                case SDataConstantsSys.TRNS_CL_DPS_ORD:
+                                    docType = "Pedido";
+                                    break;
+
+                                case SDataConstantsSys.TRNS_CL_DPS_DOC:
+                                    int tpDps = rs.getInt("rel_tp_dps");
+                                    
+                                    if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) {
+                                        docType = "Factura";
+                                    } 
+                                    else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REM[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REM[2]) {
+                                        docType = "Remisión";
+                                    } 
+                                    else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REC[2]) {
+                                        docType = "Nota Venta";
+                                    } 
+                                    else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_TIC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_TIC[2]) {
+                                        docType = "Ticket";
+                                    } 
+                                    else {
+                                        docType = "Documento"; // Fallback por si acaso
+                                    }
+                                    break;
+                                
+                                case SDataConstantsSys.TRNS_CL_DPS_ADJ:
+                                    docType = "Ajuste";
+                                    break;
+
+                                default:
+                                    docType = "Documento";
+                            }
+                        }
+                        
+                        message.append("Partida #")
+                                .append(entryKey[2])
+                                .append(" ← ")
+                                .append(docType)
+                                .append(" ")
+                                .append(rs.getString("rel_folio"))
+                                .append(" (partida #")
+                                .append(rs.getInt("rel_ety"))
+                                .append(")")
+                                .append("\n");
+                    }
+
+                    rs.close();
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+
+        return message.toString();
+    } 
+
     private SDataDps comprobateRegistry(){
         for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
             SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
@@ -902,6 +1473,9 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                 entry.setFkCostCenterId_n(row.getCostCenterNew().getPkCostCenterIdXXX());
                 entry.setDbmsCostCenterCode(row.getCostCenterNew().getCode());
                 entry.setDbmsCostCenter_n(row.getCostCenterNew().getCostCenter());
+                entry.setIsRegistryEdited(true);
+            }
+            if (row.getNewNote() != null && !row.getNewNote().trim().isEmpty()) {
                 entry.setIsRegistryEdited(true);
             }
         }
@@ -922,10 +1496,13 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         
         moDps = null;
         moDocuments = null;
+        moMaterialRequests = null;
         moUpdateDocumentEntryKeys = null;
         moDocEntriesTablePane.clearTableRows();
         
         mdTotalDpsOld = 0;
+        
+        mvMatReqLocks = null;
     }
 
     @Override
@@ -952,9 +1529,13 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
         moDps = (SDataDps) registry;
         
         moDocuments = new ArrayList<>();
+        moMaterialRequests = new ArrayList<>();
+        mvMatReqLocks = new java.util.Vector<>();
+                
         getAssociatedDocuments(moDps);
+        getAssociatedMaterialRequests(moDps);
         
-        mbDocumentsLockedError = lockDocuments();
+        mbDocumentsLockedError = lockDocuments() || lockMaterialRequests();
         
         moPanelDps.setDps(moDps, null);
         
@@ -971,22 +1552,86 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
 
     @Override
     public SDataRegistry getRegistry() {
+        ArrayList<SDataDpsEntryEdit.HistLog> histLogs = new ArrayList<>();
+        
         for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
             SRowDpsEdit row = (SRowDpsEdit) moDocEntriesTablePane.getTableRow(i);
             SDataDpsEntry entry = moDps.getDbmsDpsEntry((int[]) row.getDpsEntryPK());
-            if (row.getItemRefNew() != null || row.getCostCenterNew() != null) {
+            if (row.getItemRefNew() != null || row.getCostCenterNew() != null || row.getOriginalQuantityNew() != 0 
+                    || (row.getNewNote() != null && !row.getNewNote().trim().isEmpty())) {
+                
+                // Recopilacion de datos para la bitácora:
+                if (row.getItemRefNew() != null) { //por ahora solo guarda Item referencia
+                    SDataDpsEntryEdit.HistLog log = new SDataDpsEntryEdit.HistLog();
+                    log.entry = entry;
+                    log.itemRefNew = row.getItemRefNew().getPkItemId();
+                    log.allDocs = new ArrayList<>();
+                    
+                    // Agregar orden
+                    log.allDocs.add(new int[] { 
+                        moDps.getPkYearId(), moDps.getPkDocId(), entry.getPkEntryId(), 
+                        moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() 
+                    });
+                    
+                    // Agregar documentos vinculados a orden
+                    moUpdateDocumentEntryKeys = new ArrayList<>();
+                    getUpdateEntryKeys((int[]) entry.getPrimaryKey());
+                    
+                    for (int[] key : moUpdateDocumentEntryKeys) {
+                        if (key[0] == moDps.getPkYearId() && key[1] == moDps.getPkDocId() && key[2] == entry.getPkEntryId()) continue; //revisamos si ya está cargado
+                        
+                        for (SDataDps doc : moDocuments) {
+                            if (doc.getPkYearId() == key[0] && doc.getPkDocId() == key[1]) {
+                                log.allDocs.add(new int[] { 
+                                    key[0], key[1], key[2], doc.getFkDpsCategoryId(), doc.getFkDpsClassId(), doc.getFkDpsTypeId() 
+                                });
+                                break;
+                            }
+                        }
+                    }
+                    histLogs.add(log);
+                }    
+                
                 updateAssocDocuments(entry.getPrimaryKey(), row);
+                updateAssocMaterialRequestEntries(entry.getPrimaryKey(), row);
             }
         }
+
         moDpsEntryEdit = new SDataDpsEntryEdit();
-        
         moDpsEntryEdit.getDocuments().clear();
         moDocuments.forEach((document) -> {
             moDpsEntryEdit.getDocuments().add(document);
         });
         moDpsEntryEdit.setUserEditId(miClient.getSession().getUser().getPkUserId());
+
+        moDpsEntryEdit.setHistLogs(histLogs);
         
+        ArrayList<SDataDpsEntryEdit.MatReqEtyData> matReqsData = new ArrayList<>(); // objeto ligero DTO para mandar Material Request como Seriazable
+        
+        for (SDbMaterialRequest req : moMaterialRequests) {
+            
+            if (req.isRegistryEdited()) {
+                for (SDbMaterialRequestEntry reqEty : req.getChildEntries()) {
+                    if (reqEty.isRegistryEdited()) {
+                        SDataDpsEntryEdit.MatReqEtyData data = new SDataDpsEntryEdit.MatReqEtyData();
+                        data.idMatReq = reqEty.getPkMatRequestId();
+                        data.idEty = reqEty.getPkEntryId();
+                        data.qty = reqEty.getQuantity();
+                        data.fkItemRefId_n = reqEty.getFkItemReferenceId_n();
+                        data.fkCostCenterId_n = reqEty.getFkCostCenterId_n();
+
+                        matReqsData.add(data);
+                    }
+                }
+            }
+        }
+        
+        moDpsEntryEdit.setMatReqsData(matReqsData);
+        moDpsEntryEdit.setMatReqLocks(new java.util.Vector<>(mvMatReqLocks));
+        mvMatReqLocks.clear();
+
         return moDpsEntryEdit;
+
     }
 
     @Override
@@ -1026,6 +1671,12 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             }
             else if (button == jbDeleteReferenceItem) {
                 actionDeleteItemReference();
+            }
+            else if (button == jbAddNote) {
+                actionAddNote();
+            }
+            else if (button == jbEditNote) {
+                actionEditNote();
             }
         }
     }

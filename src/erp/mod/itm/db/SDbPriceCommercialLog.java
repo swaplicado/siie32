@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servin, Rodrigo Ayala
  */
 public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
 
@@ -47,6 +47,7 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
     protected Date mtAuxDateDps;
     protected String msAuxNumDps;
     protected String msAuxBpName;
+    protected String msAuxLocalCurrency;
     
     public SDbPriceCommercialLog() {
         super(SModConsts.ITMU_PRICE_COMM_LOG);
@@ -113,12 +114,14 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
     public void setAuxDateDps(Date t) { mtAuxDateDps = t; }
     public void setAuxNumDps(String s) { msAuxNumDps = s; }
     public void setAuxBpName(String s) { msAuxBpName = s; }
+    public void setAuxLocalCurrency(String s) { msAuxLocalCurrency = s; }
     
     public String getAuxItemName() { return msAuxItemName; }
     public String getAuxUnitSy() { return msAuxUnitSy; }
     public Date getAuxDateDps() { return mtAuxDateDps; }
     public String getAuxNumDps() { return msAuxNumDps; }
     public String getAuxBpName() { return msAuxBpName; }
+    public String getAuxLocalCurrency() { return msAuxLocalCurrency; }
     
     public void saveFromDps(Connection connection) throws SQLException, Exception {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
@@ -199,6 +202,7 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
         mtAuxDateDps = null;
         msAuxNumDps = "";
         msAuxBpName = "";
+        msAuxLocalCurrency = "";
     }
 
     @Override
@@ -322,6 +326,9 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
                         "NOW()" + " " + 
                         ")";
             }
+            else {
+                throw new Exception("El precio comercial ( $" + mdPrice + ") ya existe actualmente para este ítem y unidad.");
+            }
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
@@ -373,6 +380,7 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
         registry.setAuxDateDps(this.getAuxDateDps());
         registry.setAuxNumDps(this.getAuxNumDps());
         registry.setAuxBpName(this.getAuxBpName());
+        registry.setAuxLocalCurrency(this.getAuxLocalCurrency());
         
         registry.setRegistryNew(this.isRegistryNew());
 
@@ -423,11 +431,12 @@ public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
             case 1: value = msAuxItemName; break;
             case 2: value = msAuxUnitSy; break;
             case 3: value = mdPrice; break;
-            case 4: value = mtAuxDateDps; break;
-            case 5: value = msAuxNumDps; break;
-            case 6: value = msAuxBpName; break;
-            case 7: value = mbSystem; break;
-            case 8: value = mbDeleted; break;
+            case 4: value = msAuxLocalCurrency; break;
+            case 5: value = mtAuxDateDps; break;
+            case 6: value = msAuxNumDps; break;
+            case 7: value = msAuxBpName; break;
+            case 8: value = mbSystem; break;
+            case 9: value = mbDeleted; break;
         }
         
         return value;

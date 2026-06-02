@@ -94,7 +94,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -141,6 +141,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersLinkedEntry;
     private javax.swing.JMenuItem jmiOrdersLinksSource;
     private javax.swing.JMenuItem jmiOrdersLinksDestiny;
+    private javax.swing.JMenuItem jmiOrdersChangeItemHistory;
     private javax.swing.JMenuItem jmiOrdersAutPending;
     private javax.swing.JMenuItem jmiOrdersAutAutorized;
     private javax.swing.JMenuItem jmiOrdersAutRejected;
@@ -152,6 +153,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiDpsEntryRef;
     private javax.swing.JMenuItem jmiDpsLinksDestiny;
     private javax.swing.JMenuItem jmiDpsLinksTrace;
+    private javax.swing.JMenuItem jmiDpsDocChangeItem;
+    private javax.swing.JMenuItem jmiDpsDpsItemAll;
     private javax.swing.JMenuItem jmiDpsAutPending;
     private javax.swing.JMenuItem jmiDpsAutAutorized;
     private javax.swing.JMenuItem jmiDpsAutReject;
@@ -440,6 +443,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry = new JMenuItem("Pedidos procesados a detalle");
         jmiOrdersLinksSource = new JMenuItem("Vínculos de pedidos como origen");
         jmiOrdersLinksDestiny = new JMenuItem("Vínculos de pedidos como destino");
+        jmiOrdersChangeItemHistory = new JMenuItem("Historial de cambios en partidas de pedidos");
         jmiOrdersAutPending = new JMenuItem("Pedidos por autorizar");
         jmiOrdersAutAutorized = new JMenuItem("Pedidos autorizados");
         jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
@@ -456,6 +460,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.add(jmiOrdersLinksSource);
         jmOrd.add(jmiOrdersLinksDestiny);
         jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersChangeItemHistory);
+        jmOrd.addSeparator();
         jmOrd.add(jmiOrdersAutPending);
         jmOrd.add(jmiOrdersAutAutorized);
         jmOrd.add(jmiOrdersAutRejected);
@@ -469,6 +475,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsEntryRef = new JMenuItem("Referencias de partidas de facturas");
         jmiDpsLinksDestiny = new JMenuItem("Vínculos de facturas como destino");
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
+        jmiDpsDocChangeItem = new JMenuItem("Historial de cambios en partidas de facturas");
+        jmiDpsDpsItemAll = new JMenuItem("Historial de cambios en documentos relacionados a facturas");
         jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
         jmiDpsAutAutorized = new JMenuItem("Facturas autorizadas");
         jmiDpsAutReject = new JMenuItem("Facturas rechazadas");
@@ -499,6 +507,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.addSeparator();
         jmDps.add(jmiDpsLinksDestiny);
         jmDps.add(jmiDpsLinksTrace);
+        jmDps.addSeparator();
+        jmDps.add(jmiDpsDocChangeItem);
+        jmDps.add(jmiDpsDpsItemAll);
         jmDps.addSeparator();
         jmDps.add(jmiDpsAutPending);
         jmDps.add(jmiDpsAutAutorized);
@@ -825,6 +836,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry.addActionListener(this);
         jmiOrdersLinksSource.addActionListener(this);
         jmiOrdersLinksDestiny.addActionListener(this);
+        jmiOrdersChangeItemHistory.addActionListener(this);
         jmiOrdersAutPending.addActionListener(this);
         jmiOrdersAutAutorized.addActionListener(this);
         jmiOrdersAutRejected.addActionListener(this);
@@ -835,6 +847,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsEntryRef.addActionListener(this);
         jmiDpsLinksDestiny.addActionListener(this);
         jmiDpsLinksTrace.addActionListener(this);
+        jmiDpsDocChangeItem.addActionListener(this);
+        jmiDpsDpsItemAll.addActionListener(this);
         jmiDpsAutPending.addActionListener(this);
         jmiDpsAutAutorized.addActionListener(this);
         jmiDpsAutReject.addActionListener(this);
@@ -1019,6 +1033,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsEntryRef.setEnabled(hasRightDocTransaction);
         jmiDpsLinksDestiny.setEnabled(hasRightDocTransaction);
         jmiDpsLinksTrace.setEnabled(hasRightDocTransaction);
+        jmiDpsDocChangeItem.setEnabled(hasRightDocTransaction);
+        jmiDpsDpsItemAll.setEnabled(hasRightDocTransaction);
         jmiDpsAudPending.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsAudAudited.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
         jmiDpsEntryAnulled.setEnabled(hasRightDocTransaction && levelRightDocTransaction == SUtilConsts.LEV_MANAGER);
@@ -1761,11 +1777,27 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 sViewTitle += "Notas crédito (detalle)";
                             }
                             break;
-                       case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_SAL:
+                        case SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_N_BP_SAL:
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemBizPartnerLocality.class;
                             if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
                                 sViewTitle += "Reporte ventas facturas";
                             }
+                            break;
+                        case SDataConstantsSys.TRNX_SAL_DPS_BY_CHANGE_ITEM_CONCEPT: //aux01
+                            oViewClass = erp.mtrn.view.SViewQueryDpsByItemHistory.class;
+                            
+                            sViewTitle = "VTA - ";
+                            
+                            if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+                                sViewTitle += "Historial cambios partidas facturas";
+                            }
+                            else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ADJ) {
+                                sViewTitle += "Historial cambios docs. relacionados facturas";
+                            }
+                            else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+                                sViewTitle += "Historial cambios partidas pedidos";
+                            }
+                            
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -2122,6 +2154,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiOrdersLinksDestiny) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_LINK_ORD_DES);
             }
+            else if (item == jmiOrdersChangeItemHistory) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_ORD);
+            }
             else if (item == jmiOrdersAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_ORD_AUT_PEND);
             }
@@ -2145,6 +2180,12 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsLinksTrace) {
                 showView(SDataConstants.TRNX_DPS_LINKS_TRACE, SDataConstantsSys.TRNS_CT_DPS_SAL);
+            }
+            else if (item == jmiDpsDocChangeItem) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_DOC);
+            }
+            else if (item == jmiDpsDpsItemAll) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_SAL_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_ADJ);
             }
             else if (item == jmiDpsAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_SAL_DOC_AUT_PEND);

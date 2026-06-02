@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiSession;
  * Contiene métodos estáticos para obtener configuraciones, crear, consumir y eliminar movimientos de valuación,
  * así como validar y actualizar información relacionada con la valuación de inventario.
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Rodrigo Ayala
  */
 public class SStockValuationUtils {
     
@@ -1171,5 +1171,81 @@ public class SStockValuationUtils {
 
             return groupedEntries;
         }
+    }
+    
+    /**
+     * Regresa el número de valuaciones de invetario de la partida del documento (Pedido [y sus facturas vinculadas] o Factura).
+     * 
+     * @param session Sesión de usuario.
+     * @param dpsEntryKey Id paritda del documento.
+     * @param isOrder Boleano si es pedido.
+     * @throws SQLException
+    */
+    public static int countStockValuationsForDpsEntry(SGuiSession session, int[] dpsEntryKey, boolean isOrder) throws Exception{
+        int valuationCount = 0;
+        
+        int yearId = dpsEntryKey[0];
+        int docId = dpsEntryKey[1];
+        int etyId = dpsEntryKey[2];
+
+        String sql;
+
+        if (!isOrder) {
+            // Factura:
+
+            sql = "SELECT COUNT(*) " +
+                    "FROM trn_stk_val_mvt AS mvt " +
+                    "INNER JOIN trn_stk_val AS val ON mvt.fk_stk_val = val.id_stk_val " +
+                    "WHERE NOT mvt.b_del " +
+                    "AND NOT mvt.b_rev " +
+                    "AND NOT val.b_del " +
+                    "AND mvt.fk_dps_year_in_n = " + yearId + " " +
+                    "AND mvt.fk_dps_doc_in_n = " + docId + " " +
+                    "AND mvt.fk_dps_ety_in_n = " + etyId;
+
+            ResultSet rs = session.getStatement().executeQuery(sql);
+
+            if (rs.next()) {
+                valuationCount = rs.getInt(1);
+            }
+        }
+        else {
+            // Orden:
+
+            sql = "SELECT COUNT(*) " +
+                    "FROM trn_stk_val_mvt AS mvt " +
+                    "INNER JOIN trn_stk_val AS val ON mvt.fk_stk_val = val.id_stk_val " +
+                    "WHERE NOT mvt.b_del " +
+                    "AND NOT mvt.b_rev " +
+                    "AND NOT val.b_del " +
+                    "AND ( " +
+
+                    "(mvt.fk_dps_year_in_n = " + yearId + " " +
+                    "AND mvt.fk_dps_doc_in_n = " + docId + " " +
+                    "AND mvt.fk_dps_ety_in_n = " + etyId + ") " +
+
+                    "OR " +
+
+                    // Facturas asociadas a la orden:
+                    "(mvt.fk_dps_year_in_n, mvt.fk_dps_doc_in_n, mvt.fk_dps_ety_in_n) IN ( " +
+                        "SELECT s.id_des_year, s.id_des_doc, s.id_des_ety " +
+                        "FROM trn_dps_dps_supply AS s " +
+                        "INNER JOIN trn_dps AS d ON " +
+                        "s.id_des_year = d.id_year AND " +
+                        "s.id_des_doc = d.id_doc " +
+                        "WHERE s.id_src_year = " + yearId + " " +
+                        "AND s.id_src_doc = " + docId + " " +
+                        "AND s.id_src_ety = " + etyId + " " +
+                        "AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_DOC + " " + // solo facturas
+                        ") " +
+                    ")";
+
+            ResultSet rs = session.getStatement().executeQuery(sql);
+
+            if (rs.next()) {
+                valuationCount = rs.getInt(1);
+            }
+        }
+        return valuationCount;
     }
 }

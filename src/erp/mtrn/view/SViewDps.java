@@ -139,7 +139,7 @@ import sa.lib.gui.SGuiUtils;
  * Nombre de la variable: GOOGLE_APPLICATION_CREDENTIALS
  * Valor de la variable: ruta accesible al archivo JSON.
  * 
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
@@ -344,7 +344,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbChangeDpsEntryItem = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
         jbChangeDpsEntryItem.setPreferredSize(new Dimension(23, 23));
         jbChangeDpsEntryItem.addActionListener(this);
-        jbChangeDpsEntryItem.setToolTipText("Cambiar cantidad o ítem de referencia o CC de paridas del documento");
+        jbChangeDpsEntryItem.setToolTipText("Cambiar cantidad, ítem de referencia, CC o nota de partidas del documento");
 
         jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));

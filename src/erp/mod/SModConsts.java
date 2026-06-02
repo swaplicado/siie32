@@ -251,9 +251,12 @@ public abstract class SModConsts {
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
     public static final int ITMU_PRICE_COMM_LOG = 1052122;
+            
     public static final int ITMU_ITEM_COMP = 1052141;
     
     public static final int ITMX_IGEN_INV = 1053001;
+    public static final int ITMX_PRICE_COMM_LOG_CURR = 1053006;
+    public static final int ITMX_PRICE_COMM_LOG_ALL = 1053011;
 
     /*
      * Finance

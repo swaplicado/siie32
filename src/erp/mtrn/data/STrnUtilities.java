@@ -4543,45 +4543,60 @@ public abstract class STrnUtilities {
         
     }
     
-    public static void insertDpsEtyHist(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
-        Statement statement = null;
-        String sql = "";
-        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
-        statement = miClient.getSession().getStatement().getConnection().createStatement();
+    // Método de compatibilidad para Facturas
+    public static void insertDpsEtyHist(SClientInterface miClient, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
+            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
         
-        int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+        Connection connection = miClient.getSession().getStatement().getConnection();
+        int usrId = miClient.getSession().getUser().getPkUserId();
         
-        sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
-                    + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
-                    + "VALUES (" + pkYearId + ", "
-                    + "" + pkDocId + ", "
-                    + "" + moDpsEntry.getPkEntryId() + ", " 
-                    + "" + histEty + ", "
-                    + "'" + moDpsEntry.getConceptKey() + "', "
-                    + "'" + conceptKeyNew + "', "
-                    + "'" + moDpsEntry.getConcept() + "', "
-                    + "'" + conceptNew + "', "
-                    + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
-                    + "'" + itemRef + "', "
-
-                    + "'" + moDpsEntry.getFkItemId()+ "', "
-                    + "'" + moDpsEntry.getFkItemId() + "', "
-                    + "'" + moDpsDoc[0][0] + "', "
-                    + "'" + moDpsDoc[0][1] + "', "
-                    + "'" + moDpsDoc[0][2] + "', "
-
-                    + "" + miClient.getSession().getUser().getPkUserId() + ", "
-                    + " NOW()); ");
-           
-        statement.executeUpdate(sql);
+        insertDpsEtyHist(connection, usrId, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allRelatedDocs);
+    }
+    
+    // Método Core y transaccional para Pedidos
+    public static void insertDpsEtyHist(Connection connection, int usrId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
+            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
         
-        
+        try (Statement statement = connection.createStatement()) {
+            
+            String valItemRefOld = (moDpsEntry.getDbmsFkItemGenericId() > 0) ? String.valueOf(moDpsEntry.getDbmsFkItemGenericId()) : "NULL";
+            String valItemRefNew = (itemRef > 0) ? String.valueOf(itemRef) : "NULL";
+            
+            String finalConceptKey = conceptKeyNew.isEmpty() ? moDpsEntry.getConceptKey() : conceptKeyNew;
+            String finalConcept = conceptNew.isEmpty() ? moDpsEntry.getConcept() : conceptNew;
+            
+            for (int[] docKey : allRelatedDocs) {
+                int pkYearId = docKey[0];
+                int pkDocId = docKey[1];
+                int pkEtyId = docKey[2];
+                int ctDps = docKey[3];
+                int clDps = docKey[4];
+                int tpDps = docKey[5];
+                
+                int histEty = 1;
+                try (ResultSet rs = statement.executeQuery("SELECT COALESCE(MAX(id_hist), 0) + 1 FROM trn_dps_ety_hist WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + pkEtyId)) {
+                    if (rs.next()) histEty = rs.getInt(1);
+                }
+                
+                String sql = "INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
+                        + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+                        + "VALUES (" + pkYearId + ", " + pkDocId + ", " + pkEtyId + ", " + histEty + ", "
+                        + "'" + moDpsEntry.getConceptKey() + "', '" + finalConceptKey + "', "
+                        + "'" + moDpsEntry.getConcept() + "', '" + finalConcept + "', "
+                        + valItemRefOld + ", " + valItemRefNew + ", "
+                        + "'" + moDpsEntry.getFkItemId() + "', '" + moDpsEntry.getFkItemId() + "', "
+                        + ctDps + ", " + clDps + ", " + tpDps + ", "
+                        + usrId + ", NOW());";
+                        
+                statement.executeUpdate(sql);
+            }
+        }
     }
     
     public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {
         Statement statement = null;
         String sql = "";
-        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
+        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId()); //Truena porque se usa este mismo para todos los docs relacionados
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
@@ -4614,40 +4629,151 @@ public abstract class STrnUtilities {
     }
 
     public static void updateItemRefInvoice(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
-        Statement statement = null;
-        String sql = "";
+        
         String mySql = "";
-        insertDpsEtyHist(miClient, pkYearId, pkDocId, moDpsEntry, conceptKeyNew, conceptNew, itemRef );
         
-        statement = miClient.getSession().getStatement().getConnection().createStatement();
-        
-        if(!conceptKeyNew.isEmpty()) {
-            mySql = "concept_key = '" + conceptKeyNew + "' "; 
+        if (!conceptKeyNew.isEmpty()) {
+            mySql += "concept_key = '" + conceptKeyNew + "' ";
         }
-        if(!conceptNew.isEmpty()) {
-            if (mySql.isEmpty()) {
-                mySql += "concept = '" + conceptNew + "' ";
-            }
-            else {
-                mySql += ", concept = '" + conceptNew + "' ";
-            }
+        if (!conceptNew.isEmpty()) {
+            mySql += (mySql.isEmpty() ? "" : ", ") + "concept = '" + conceptNew + "' ";
         }        
-        if(itemRef > 0) {
-            if (mySql.isEmpty()) {
-                mySql += "fid_item_ref_n = '" + itemRef + "' ";
+        if (itemRef > 0) {
+            mySql += (mySql.isEmpty() ? "" : ", ") + "fid_item_ref_n = " + itemRef + " ";
+        }
+        
+        if (mySql.isEmpty()) {
+            return; 
+        }
+        
+        java.util.List<int[]> sourceDoc = new java.util.ArrayList<>();
+        java.util.List<int[]> sourceReq = new java.util.ArrayList<>();
+        java.util.List<int[]> adjDocs = new java.util.ArrayList<>();
+        java.util.List<int[]> allDocsToLog = new java.util.ArrayList<>(); // Lista de documentos para la bitácora
+        int itemRefOld = moDpsEntry.getFkItemRefId_n();
+
+        try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement()) {
+            
+            int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+            allDocsToLog.add(new int[] { pkYearId, pkDocId, moDpsEntry.getPkEntryId(), moDpsDoc[0][0], moDpsDoc[0][1], moDpsDoc[0][2] });
+            
+            // Factura:
+            
+            String sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
+            statement.executeUpdate(sql);
+
+            // Orden de C/V padres:
+            
+            sql = "SELECT DISTINCT id_src_year, id_src_doc, id_src_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " + //DISTINCT para entregas fraccionadas (Dos DPS mismas Facturas)
+                  "FROM trn_dps_dps_supply AS s " +
+                  "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc " +
+                  "WHERE s.id_des_year = " + pkYearId + " AND s.id_des_doc = " + pkDocId + " AND s.id_des_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                if (resultSet.next()) {
+                    int[] srcData = new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety") };
+                    sourceDoc.add(srcData);
+                    allDocsToLog.add(new int[] { srcData[0], srcData[1], srcData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
+                }
             }
-            else {
-                 mySql += ",fid_item_ref_n = '" + itemRef + "' ";
+            
+            // Requisiciones:
+            
+            sql = "SELECT fid_mat_req, fid_mat_req_ety FROM trn_dps_mat_req " + 
+                  "WHERE fid_dps_year = " + pkYearId + " AND fid_dps_doc = " + pkDocId + " AND fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                if (resultSet.next()) {
+                    sourceReq.add(new int[] { resultSet.getInt("fid_mat_req"), resultSet.getInt("fid_mat_req_ety") });
+                }
+            }
+            
+            // Notas de credito hijos (todos los asociados):
+            
+            sql = "SELECT DISTINCT a.id_adj_year, a.id_adj_doc, a.id_adj_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " +
+                  "FROM trn_dps_dps_adj AS a " +
+                  "INNER JOIN trn_dps AS d ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
+                  "WHERE a.id_dps_year = " + pkYearId + " AND a.id_dps_doc = " + pkDocId + " AND a.id_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    int[] adjData = new int[] { resultSet.getInt("id_adj_year"), resultSet.getInt("id_adj_doc"), resultSet.getInt("id_adj_ety") };
+                    adjDocs.add(adjData);
+                    allDocsToLog.add(new int[] { adjData[0], adjData[1], adjData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
+                }
+            }
+            
+            // Procesamos ordenes:
+            
+            if (!sourceDoc.isEmpty()) {
+                for (int[] srcKey : sourceDoc) {
+                    sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + srcKey[0] + " AND id_doc = " + srcKey[1] + " AND id_ety = " + srcKey[2] + ";";
+                    statement.executeUpdate(sql);
+                    
+                    // Si se modificó referencia de ítem se actualiza en requisicion abuelo:
+                    if (itemRef > 0) {
+                        sql = "UPDATE trn_mat_req_ety AS mre " +
+                              "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
+                              "SET mre.fk_item_ref_n = " + itemRef + " " +
+                              "WHERE mr.fid_dps_year = " + srcKey[0] + " AND mr.fid_dps_doc = " + srcKey[1] + " AND mr.fid_dps_ety = " + srcKey[2] + ";";
+                        statement.executeUpdate(sql);
+                    }
+                }
+            }
+            else if (!sourceReq.isEmpty()) {
+                
+                // Actualizar Requisición directa de la Factura:
+                if (itemRef > 0) { 
+                    sql = "UPDATE trn_mat_req_ety AS mre " +
+                          "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
+                          "SET mre.fk_item_ref_n = " + itemRef + " " +
+                          "WHERE mr.fid_dps_year = " + pkYearId + " AND mr.fid_dps_doc = " + pkDocId + " AND mr.fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+                    statement.executeUpdate(sql);
+                }
+            }
+            
+            // Procesamos notas de credito:
+            
+            for (int[] adjKey : adjDocs) {
+                sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + adjKey[0] + " AND id_doc = " + adjKey[1] + " AND id_ety = " + adjKey[2] + ";";
+                statement.executeUpdate(sql);
             }
         }
-            
-        sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " " + 
-                "AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
         
-        statement.executeUpdate(sql);
+        insertDpsEtyHist(miClient, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allDocsToLog); //registro en bitácora
         
-    }
-    
+        // Actualización de contabilización de Factura y NC:
+        
+        if (itemRefOld > 0 && itemRef > 0) {
+            try (Statement statement = connection.createStatement()){
+                int userId = miClient.getSession().getUser().getPkUserId();
+                
+                String sqlRecEty = "UPDATE fin_rec_ety " +
+                                   "SET fid_item_n = " + itemRef + ", " + 
+                                   "fid_usr_edit = " + userId + ", " +
+                                   "ts_edit = NOW() " +
+                                   "WHERE fid_dps_year_n = " + pkYearId + " " +
+                                   "AND fid_dps_doc_n = " + pkDocId + " " +
+                                   "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
+                                   "AND b_del = 0;";
+                
+                statement.executeUpdate(sqlRecEty);
+
+                for (int[] adjKey : adjDocs) {
+                    sqlRecEty = "UPDATE fin_rec_ety " +
+                                "SET fid_item_n = " + itemRef + ", " +
+                                "fid_usr_edit = " + userId + ", " +
+                                "ts_edit = NOW() " +
+                                "WHERE fid_dps_year_n = " + adjKey[0] + " " +
+                                "AND fid_dps_doc_n = " + adjKey[1] + " " +
+                                "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
+                                "AND b_del = 0;";
+                    statement.executeUpdate(sqlRecEty);
+                }
+            }
+        }
+    }    
+
     public static void updateDpsItemAll(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew) throws SQLException {
         Statement statement = null;
         String sql = "";

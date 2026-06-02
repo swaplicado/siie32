@@ -28,7 +28,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Rodrigo Ayala
  */
 public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -450,6 +450,16 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
                         "WHERE de.fid_dps_adj_year_n = " + moParamDpsEntry.getPkYearId() + " AND de.fid_dps_adj_doc_n = " + moParamDpsEntry.getPkDocId() + " AND de.fid_dps_adj_ety_n = " + moParamDpsEntry.getPkEntryId() + " " +
                         "UNION " +
+                        "SELECT DISTINCT 22 AS f_id_type, 'REQUISICIÓN DE MATERIALES' AS f_type, mr.dt, 'REQ' AS f_code, mr.num AS f_num, " +
+                        "0.0 AS f_tot, 0.0 AS f_tot_cur, 'N/A' AS f_cur, '' AS f_cob, 0 AS f_sp, i.item_key AS f_cpt_key, i.item AS f_cpt, " +
+                        "mre.qty AS f_qty, u.symbol AS f_us, 0.0 AS f_tot_de, 0.0 AS f_tot_cur_de, 'N/A' AS f_cur_de " +
+                        "FROM trn_dps_mat_req AS mrq " +
+                        "INNER JOIN trn_mat_req AS mr ON mrq.fid_mat_req = mr.id_mat_req AND mr.b_del = 0 " +
+                        "INNER JOIN trn_mat_req_ety AS mre ON mrq.fid_mat_req = mre.id_mat_req AND mrq.fid_mat_req_ety = mre.id_ety AND mre.b_del = 0 " +
+                        "INNER JOIN erp.itmu_item AS i ON mre.fk_item = i.id_item " +
+                        "INNER JOIN erp.itmu_unit AS u ON mre.fk_unit = u.id_unit " +
+                        "WHERE mrq.fid_dps_year = " + moParamDpsEntry.getPkYearId() + " AND mrq.fid_dps_doc = " + moParamDpsEntry.getPkDocId() + " AND mrq.fid_dps_ety = " + moParamDpsEntry.getPkEntryId() + " " +
+                        "UNION " +
                         "SELECT DISTINCT 10 AS f_id_type, 'PARTIDAS DE COMISIONES' AS f_type, e.dt, '' AS f_code, '' AS f_num, " +
                         "e.comms AS f_tot, 0 AS f_tot_cur, 'N/A' AS f_cur, '' AS f_cob, 0 AS f_sp, '' AS f_cpt_key, '' AS f_cpt, " +
                         "0 AS f_qty, '' AS f_us, e.comms AS f_tot_de, 0 AS f_tot_cur_de, 'N/A' AS f_cur_de  " +
@@ -663,6 +673,12 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         "INNER JOIN fin_pay_ety AS pe ON pe.id_pay = p.id_pay " +
                         "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = p.fk_cur " +
                         "WHERE NOT p.b_del AND pe.fk_doc_year_n = " + moParamDps.getPkYearId() + " AND pe.fk_doc_doc_n = " + moParamDps.getPkDocId() + " " +
+                        "UNION " +
+                        "SELECT DISTINCT 22 AS f_id_type, 'REQUISICIÓN DE MATERIALES' AS f_type, mr.dt, 'REQ' AS f_code, mr.num AS f_num, " +
+                        "0.0 AS f_tot, 0.0 AS f_tot_cur, 'N/A' AS f_cur, '' AS f_cob " +
+                        "FROM trn_dps_mat_req AS mrq " +
+                        "INNER JOIN trn_mat_req AS mr ON mrq.fid_mat_req = mr.id_mat_req AND mr.b_del = 0 " +
+                        "WHERE mrq.fid_dps_year = " + moParamDps.getPkYearId() + " AND mrq.fid_dps_doc = " + moParamDps.getPkDocId() + " " +
                         "ORDER BY f_id_type, f_code, f_num ";
 
                 oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);

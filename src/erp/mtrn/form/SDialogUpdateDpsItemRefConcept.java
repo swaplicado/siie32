@@ -13,9 +13,10 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
-import erp.mtrn.data.STrnUtilities;
+import erp.mod.trn.utils.SStockValuationUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.STrnUtilities;
 import static erp.mtrn.data.STrnUtilities.isServiceOrder;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -29,7 +30,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Rodrigo Ayala
  */
 public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
     
@@ -171,11 +172,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfConceptfKeyOld.setText("CLAVE ACTUAL");
         jtfConceptfKeyOld.setFocusable(false);
         jtfConceptfKeyOld.setPreferredSize(new java.awt.Dimension(277, 23));
-        jtfConceptfKeyOld.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfConceptfKeyOldActionPerformed(evt);
-            }
-        });
         jPanel49.add(jtfConceptfKeyOld);
 
         jlDummy3.setPreferredSize(new java.awt.Dimension(5, 23));
@@ -188,11 +184,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfConceptKeyNew.setEditable(false);
         jtfConceptKeyNew.setFocusable(false);
         jtfConceptKeyNew.setPreferredSize(new java.awt.Dimension(260, 23));
-        jtfConceptKeyNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfConceptKeyNewActionPerformed(evt);
-            }
-        });
         jPanel49.add(jtfConceptKeyNew);
 
         jPanel1.add(jPanel49);
@@ -208,11 +199,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfItemConceptOld.setText("CONCEPTO ACTUAL");
         jtfItemConceptOld.setFocusable(false);
         jtfItemConceptOld.setPreferredSize(new java.awt.Dimension(277, 23));
-        jtfItemConceptOld.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfItemConceptOldActionPerformed(evt);
-            }
-        });
         jPanel50.add(jtfItemConceptOld);
 
         jlDummy2.setPreferredSize(new java.awt.Dimension(5, 23));
@@ -225,11 +211,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfItemConceptNew.setEditable(false);
         jtfItemConceptNew.setFocusable(false);
         jtfItemConceptNew.setPreferredSize(new java.awt.Dimension(260, 23));
-        jtfItemConceptNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfItemConceptNewActionPerformed(evt);
-            }
-        });
         jPanel50.add(jtfItemConceptNew);
 
         jPanel1.add(jPanel50);
@@ -245,11 +226,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfItemRefOld.setText("ITEM REFERENCIA ACTUAL");
         jtfItemRefOld.setFocusable(false);
         jtfItemRefOld.setPreferredSize(new java.awt.Dimension(277, 23));
-        jtfItemRefOld.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfItemRefOldActionPerformed(evt);
-            }
-        });
         jPanel51.add(jtfItemRefOld);
 
         jlDummy1.setPreferredSize(new java.awt.Dimension(5, 23));
@@ -302,28 +278,8 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jtfItemRefOldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfItemRefOldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfItemRefOldActionPerformed
-
-    private void jtfItemConceptOldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfItemConceptOldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfItemConceptOldActionPerformed
-
-    private void jtfItemConceptNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfItemConceptNewActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfItemConceptNewActionPerformed
-
-    private void jtfConceptfKeyOldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfConceptfKeyOldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfConceptfKeyOldActionPerformed
-
-    private void jtfConceptKeyNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfConceptKeyNewActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfConceptKeyNewActionPerformed
-
     private void initComponentsExtra() {
-        mvFields = new java.util.Vector<erp.lib.form.SFormField>();
+        mvFields = new java.util.Vector<>();
         
         moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlItemRefNew);
         moFieldPkItemId.setPickerButton(jbFkItemId);
@@ -332,8 +288,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItemConceptNew, jlItemConceptNew);
         moFieldConcept.setLengthMax(CONCEPT_LENGTH_MAX);
          
-     
-        
         try {
             moPanelDps = new SPanelDps(miClient, "");
         }
@@ -380,6 +334,7 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     
     private void renderItem() {
         jtfItem.setText(moDpsEntry.getDbmsItem());
+        jtfItem.setCaretPosition(0);
         jtfOriginalQuantity.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(moDpsEntry.getOriginalQuantity()));
         jtfOriginalUnitSymbolRo.setText(moDpsEntry.getDbmsOriginalUnitSymbol());
         
@@ -402,7 +357,11 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         }
         else {
             try {
-                if (miClient.showMsgBoxConfirm("¿Esta seguro que desea modificar los valores actuales de la partida? \n Esta función es solo para ordenes de compra almacén") == JOptionPane.OK_OPTION) {
+                if (miClient.showMsgBoxConfirm("¿Esta seguro que desea modificar los valores actuales de la partida? \n Esta función es solo para órdenes de compra.") == JOptionPane.OK_OPTION) {
+                    if (!aceptDocumentsParentsChanges() || !acceptStockValuationChanges()) {
+                        return;
+                    }
+                    
                     if(!isServiceOrder(miClient, moDps.getFkSourceYearId_n(), moDps.getFkSourceDocId_n())) {
                         if (((!jtfConceptKeyNew.getText().isEmpty()) || (!jtfItemConceptNew.getText().isEmpty()) || jcbFkItemId.getSelectedIndex() > 0)) {
                             String conceptKeyNew = moFieldConceptKey.getString();
@@ -410,19 +369,21 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
                             int itemRef = (Integer) (moFieldPkItemId.getKeyAsIntArray())[0];
                                     
                             if ((STrnUtilities.requieredItemGen(miClient, moDpsEntry.getFkItemId()) && itemRef <= 0 )) {
-                                miClient.showMsgBoxWarning("El ítem '" + moDpsEntry.getDbmsItem() + "' requiere un ítem de refencia" );
-                            } 
+                                miClient.showMsgBoxWarning("El ítem '" + moDpsEntry.getDbmsItem() + "' requiere un ítem de refencia." );
+                                return;
+                            }
                             else {
                                 STrnUtilities.updateItemRefInvoice(miClient.getSession().getStatement().getConnection(), miClient, moDps.getPkYearId(), moDps.getPkDocId(), moDpsEntry ,conceptKeyNew, conceptNew, itemRef);
                             }  
                         }
                         else {
-                            miClient.showMsgBoxInformation("No se editó ningún campo para el reglón" );
+                            miClient.showMsgBoxInformation("No se modificó ningún campo para el reglón." );
+                            return;
                         }
                         mnFormResult = SLibConstants.FORM_RESULT_OK;
                     }
                     else {
-                        miClient.showMsgBoxInformation("Esta factura corresponde a una orden de servicio");
+                        miClient.showMsgBoxInformation("Esta factura corresponde a una orden de servicios.");
                         this.setVisible(false);
                         }
                     miClient.showMsgBoxInformation("El proceso ha terminado.");
@@ -441,6 +402,179 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         setVisible(false);
     }
 
+    private boolean acceptStockValuationChanges() {
+        try {
+            int count = SStockValuationUtils.countStockValuationsForDpsEntry(
+                    miClient.getSession(),
+                    new int[] {
+                        moDpsEntry.getPkYearId(),
+                        moDpsEntry.getPkDocId(),
+                        moDpsEntry.getPkEntryId()
+                    },
+                    false // factura
+            );
+
+            if (count > 0) {
+                int option = JOptionPane.showConfirmDialog(
+                        this,
+                        "La partida tiene " + count + " valuación(es) de inventario asociada(s).\n\n"
+                        + "¿Desea continuar con los cambios?",
+                        "Confirmar cambios con valuaciones",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return option == JOptionPane.OK_OPTION;
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+            return false;
+        }
+
+        return true;
+    }
+    
+    private boolean aceptDocumentsParentsChanges(){
+        String affectedEntries = getModifiedEntriesWithParents();
+        
+        if (!affectedEntries.isEmpty()) {
+            int option = JOptionPane.showConfirmDialog(
+                    this,
+                    "La partida tiene documentos vinculados que también se verán afectados:\n\n"
+                        + affectedEntries
+                        + "\n ¿Desea continuar con los cambios?",
+                    "Confirmar cambios",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            
+            return option == JOptionPane.OK_OPTION;
+        }
+        
+        return true;
+    }
+
+    private String getModifiedEntriesWithParents() {
+        StringBuilder message = new StringBuilder();
+
+        try {
+            int[] entryKey = (int[]) moDpsEntry.getPrimaryKey();
+
+            String sql = "SELECT "
+                    + "d.fid_ct_dps AS rel_ct_dps, "
+                    + "d.fid_cl_dps AS rel_cl_dps, "
+                    + "d.fid_tp_dps AS rel_tp_dps, "
+                    + "CONCAT(d.num_ser, '-', d.num) AS rel_folio, "
+                    + "s.id_src_ety AS rel_ety, "
+                    + "0 AS is_mat_req "
+                    + "FROM trn_dps_dps_supply AS s "
+                    + "INNER JOIN trn_dps AS d ON "
+                    + "s.id_src_year = d.id_year "
+                    + "AND s.id_src_doc = d.id_doc "
+                    + "WHERE s.id_des_year = " + entryKey[0] + " "
+                    + "AND s.id_des_doc = " + entryKey[1] + " "
+                    + "AND s.id_des_ety = " + entryKey[2] + " "
+
+                    + "UNION ALL "
+
+                    + "SELECT "
+                    + "0 AS rel_ct_dps, "
+                    + "0 AS rel_cl_dps, "
+                    + "0 AS rel_tp_dps, " 
+                    + "mr.num AS rel_folio, "
+                    + "mrq.fid_mat_req_ety AS rel_ety, "
+                    + "1 AS is_mat_req "
+                    + "FROM trn_dps_mat_req AS mrq "
+                    + "INNER JOIN trn_mat_req AS mr ON "
+                    + "mrq.fid_mat_req = mr.id_mat_req "
+                    + "WHERE mrq.fid_dps_year = " + entryKey[0] + " "
+                    + "AND mrq.fid_dps_doc = " + entryKey[1] + " "
+                    + "AND mrq.fid_dps_ety = " + entryKey[2] + " "
+            
+                    + "UNION ALL "
+                    
+                    + "SELECT "
+                    + "d.fid_ct_dps AS rel_ct_dps, "
+                    + "d.fid_cl_dps AS rel_cl_dps, "
+                    + "d.fid_tp_dps AS rel_tp_dps, "
+                    + "CONCAT(d.num_ser, '-', d.num) AS rel_folio, "
+                    + "a.id_adj_ety AS rel_ety, "
+                    + "0 AS is_mat_req "
+                    + "FROM trn_dps_dps_adj AS a "
+                    + "INNER JOIN trn_dps AS d ON "
+                    + "a.id_adj_year = d.id_year "
+                    + "AND a.id_adj_doc = d.id_doc "
+                    + "WHERE a.id_dps_year = " + entryKey[0] + " "
+                    + "AND a.id_dps_doc = " + entryKey[1] + " "
+                    + "AND a.id_dps_ety = " + entryKey[2];
+                    
+            java.sql.ResultSet rs = miClient.getSession().getStatement().executeQuery(sql);
+
+            while (rs.next()) {
+                String docType;
+
+                if (rs.getBoolean("is_mat_req")) {
+                    docType = "Requisición";
+                }
+                else {
+                    switch (rs.getInt("rel_cl_dps")) {
+                        case SDataConstantsSys.TRNS_CL_DPS_EST:
+                            docType = "Cotización";
+                            break;
+
+                        case SDataConstantsSys.TRNS_CL_DPS_ORD:
+                            docType = "Pedido";
+                            break;
+
+                        case SDataConstantsSys.TRNS_CL_DPS_DOC:
+                            int tpDps = rs.getInt("rel_tp_dps");
+                            
+                            if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) {
+                                docType = "Factura";
+                            } 
+                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REM[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REM[2]) {
+                                docType = "Remisión";
+                            } 
+                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REC[2]) {
+                                docType = "Nota Venta";
+                            } 
+                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_TIC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_TIC[2]) {
+                                docType = "Ticket";
+                            } 
+                            else {
+                                docType = "Documento"; // Fallback por si acaso
+                            }
+                            break;
+                        
+                        case SDataConstantsSys.TRNS_CL_DPS_ADJ:
+                            docType = "Ajuste / NC";
+                            break;
+
+                        default:
+                            docType = "Documento";
+                    }
+                }
+                
+                message.append("Partida #")
+                        .append(entryKey[2])
+                        .append(" ← ")
+                        .append(docType)
+                        .append(" ")
+                        .append(rs.getString("rel_folio"))
+                        .append(" (partida #")
+                        .append(rs.getInt("rel_ety"))
+                        .append(")\n");
+            }
+
+            rs.close();
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return message.toString();
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel48;
@@ -513,7 +647,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
-        String message = "";
 
         for (SFormField field : mvFields) {
             if (!field.validateField()) {
@@ -521,24 +654,17 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
                 validation.setComponent(field.getComponent());
             }
         }
-            
-
 
         if (!validation.getIsError()) {
-            // Validate account:
-
-
-            if (message.length() > 0) {
-                validation.setMessage(message);
+            if (jcbFkItemId.getSelectedIndex() > 0) {
+                if ((int) moFieldPkItemId.getKeyAsIntArray()[0] == moDpsEntry.getFkItemRefId_n()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlItemRefNew.getText() + "'.");
+                    validation.setComponent(jcbFkItemId);
+                    validation.setIsError(true);
+                }
             }
-            
         }
         
-        if (!validation.getIsError()) {
-            // Validate cost center:
-
-        }
-
         return validation;
     }
 
@@ -632,8 +758,7 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
-                JComboBox comboBox = (JComboBox)  e.getSource();
-            }
-        }    
-
+            JComboBox comboBox = (JComboBox)  e.getSource();
+        }
+    }    
 }

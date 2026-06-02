@@ -1,4 +1,29 @@
 ================================================================================
+SIIE 3.2 302.1/ 2026-06-02
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de botones para agregar y modificar notas de partidas al formulario de modificación de datos complementarios de pedidos de compras (OC).
+2) Propagación de las modificaciones realizadas en las partidas de las OC hacia sus respectivas requisiciones vinculadas.
+3) Incorporación de validación que impide la modificación del centro de costo (CeCo) si la requisición asociada carece de un subcentro de consumo seleccionado, o si el CeCo elegido no está autorizado para el mismo.
+4) Adición de validación para la confirmación sobre los documentos vinculados a la OC que serán afectados en cascada.
+5) Inserción de una nueva columna para visualizar las notas en el formulario de modificación de datos complementarios de OC.
+6) Incorporación de funcionalidad y validación de conteo de valuaciones de inventario asociadas a la OC y a la factura vinculada a dicha OC.
+7) Implementación de validación de confirmación al usuario sobre los documentos asociados a la factura (pedidos, justes y ahora requisiciones) que se verán afectados por los cambios.
+8) Adición de restricción en el formulario de modificación de facturas que impide el guardado si el ítem de referencia nuevo seleccionado es idéntico al ítem de referencia actual.
+9) Integración de la actualización automática de datos hacia las requisiciones y todas las notas de crédito (NC) vinculadas a la partida de la factura modificada.
+10) Actualización de la contabilización en las pólizas contables de la factura y sus NC.
+11) Refactorización del método de generación de historial de cambios a partidas de facturas para permitir el registro adecuado de los cambios provenientes de las partidas de OC.
+12) Segmentación de la vista historial de cambios en 6 subvistas especializadas, estructuradas de acuerdo con el módulo operativo (Compras o Ventas) y la categoría del documento (Órdenes, Facturas o NC).
+13) Parametrización dinámica de la interfaz de la tabla, ajustando automáticamente el tipo de filtro de período, la cantidad de columnas y los títulos de los encabezados en función de la subvista instanciada.
+14) Incorporación de botones en la vista de historial de cambios a partidas de documentos para la visualización directa del documento, las notas adjuntas y vínculos del registro seleccionado.
+15) Ampliación de la funcionalidad de rastreo de documentos vinculados, añadiendo la capacidad de buscar y mostrar las requisiciones asociadas al documento.
+16) Segmentación de la vista de precios comerciales en una vista para "precios vigentes" (edición y eliminación inhabilitados) y otra para "todos los precios" que facilita el rastreo del historial.
+17) Incorporación de columna de moneda local en ambas vistas de precios comerciales.
+18) Se deshabilitó en el formulario de modificación de precios los campos "ítem" y "unidad" en registros existentes, previniendo así la alteración accidental de precios de sistema.
+19) Adición de restricción que impide la creación de un nuevo precio comercial si ya existe un registro para el mismo ítem y unidad en la fecha especificada.
+20) Implementación de validación en caso de seleccionar una unidad de medida en el precio comercial que difiera de la unidad base configurada en el catálogo del ítem.
+
+================================================================================
 SIIE 3.2 302.0/ 2026-06-01
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

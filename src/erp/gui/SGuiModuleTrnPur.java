@@ -78,7 +78,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores, Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -91,7 +91,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiCatCfgCostCenterItem;
     private javax.swing.JMenuItem jmiCatSendingDpsLog;
     private javax.swing.JMenuItem jmiCatFunctionalAreaBudgets;
-    private javax.swing.JMenuItem jmiCatPriceCommercialLog;
+    private javax.swing.JMenuItem jmiCatPriceCommercialLogCurr;
+    private javax.swing.JMenuItem jmiCatPriceCommercialLogAll;
     private javax.swing.JMenuItem jmiCatBizPartherUpdate;
     private javax.swing.JMenuItem jmiCatBizPartherUpdateLog;
     private javax.swing.JMenuItem jmiCatItemBizParther;
@@ -129,6 +130,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiOrdersLinkedEntry;
     private javax.swing.JMenuItem jmiOrdersLinksSource;
     private javax.swing.JMenuItem jmiOrdersLinksDestiny;
+    private javax.swing.JMenuItem jmiOrdersChangeItemHistory;
     private javax.swing.JMenuItem jmiOrdersAutPending;
     private javax.swing.JMenuItem jmiOrdersAutAutorized;
     private javax.swing.JMenuItem jmiOrdersAutRejected;
@@ -349,7 +351,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfgCostCenterItem = new JMenuItem("Configuración de centros de costo vs. ítems");
         jmiCatSendingDpsLog = new JMenuItem("Bitácora de envío de documentos por correo-e");
         jmiCatFunctionalAreaBudgets = new JMenuItem("Presupuestos mensuales de gastos");
-        jmiCatPriceCommercialLog = new JMenuItem("Precios comerciales de ítems");
+        jmiCatPriceCommercialLogCurr = new JMenuItem("Precios comerciales vigentes de ítems");
+        jmiCatPriceCommercialLogAll = new JMenuItem("Todos los precios comerciales de ítems");
         jmiCatBizPartherUpdate = new JMenuItem("Datos de proveedores");
         jmiCatBizPartherUpdateLog = new JMenuItem("Actualizaciones de datos de proveedores");
         jmiCatItemBizParther = new JMenuItem("Configuración de proveedores vs. insumos");
@@ -373,7 +376,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCat.addSeparator();
         jmCat.add(jmiCatFunctionalAreaBudgets);
         jmCat.addSeparator();
-        jmCat.add(jmiCatPriceCommercialLog);
+        jmCat.add(jmiCatPriceCommercialLogCurr);
+        jmCat.add(jmiCatPriceCommercialLogAll);
         jmCat.addSeparator();
         jmCat.add(jmiCatBizPartherUpdate);
         jmCat.add(jmiCatBizPartherUpdateLog);
@@ -445,6 +449,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry = new JMenuItem("Pedidos procesados a detalle");
         jmiOrdersLinksSource = new JMenuItem("Vínculos de pedidos como origen");
         jmiOrdersLinksDestiny = new JMenuItem("Vínculos de pedidos como destino");
+        jmiOrdersChangeItemHistory = new JMenuItem("Historial de cambios en partidas de pedidos");
         jmiOrdersAutPending = new JMenuItem("Pedidos por autorizar");
         jmiOrdersAutAutorized = new JMenuItem("Pedidos autorizados");
         jmiOrdersAutRejected = new JMenuItem("Pedidos rechazados");
@@ -467,6 +472,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersLinksSource);
         jmOrd.add(jmiOrdersLinksDestiny);
+        jmOrd.addSeparator();
+        jmOrd.add(jmiOrdersChangeItemHistory);
         jmOrd.addSeparator();
         jmOrd.add(jmiOrdersAutPending);
         jmOrd.add(jmiOrdersAutAutorized);
@@ -492,8 +499,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsEntryRef = new JMenuItem("Referencias de partidas de facturas");
         jmiDpsLinksDestiny = new JMenuItem("Vínculos de facturas como destino");
         jmiDpsLinksTrace = new JMenuItem("Rastreo de vínculos de facturas");
-        jmiDpsDocChangeItem = new JMenuItem("Historial modificación facturas ítem/concepto");
-        jmiDpsDpsItemAll = new JMenuItem("Historial modificación documentos");
+        jmiDpsDocChangeItem = new JMenuItem("Historial de cambios en partidas de facturas");
+        jmiDpsDpsItemAll = new JMenuItem("Historial de cambios en documentos relacionados a facturas");
         jmiDpsCfdPay = new JMenuItem("Facturas de compras con CFDI de pagos por anexar");
         jmiDpsCfdPayDone = new JMenuItem("Facturas de compras con CFDI de pagos anexados");
         jmiDpsAutPending = new JMenuItem("Facturas por autorizar");
@@ -812,7 +819,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiCatCfgCostCenterItem.addActionListener(this);
         jmiCatSendingDpsLog.addActionListener(this);
         jmiCatFunctionalAreaBudgets.addActionListener(this);
-        jmiCatPriceCommercialLog.addActionListener(this);
+        jmiCatPriceCommercialLogCurr.addActionListener(this);
+        jmiCatPriceCommercialLogAll.addActionListener(this);
         jmiCatBizPartherUpdate.addActionListener(this);
         jmiCatBizPartherUpdateLog.addActionListener(this);
         jmiCatItemBizParther.addActionListener(this);
@@ -846,6 +854,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiOrdersLinkedEntry.addActionListener(this);
         jmiOrdersLinksSource.addActionListener(this);
         jmiOrdersLinksDestiny.addActionListener(this);
+        jmiOrdersChangeItemHistory.addActionListener(this);
         jmiOrdersAutPending.addActionListener(this);
         jmiOrdersAutAutorized.addActionListener(this);
         jmiOrdersAutRejected.addActionListener(this);
@@ -1724,18 +1733,19 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                        case SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT:
                             oViewClass = erp.mtrn.view.SViewQueryDpsByItemHistory.class;
                             
-                            if (auxType01 == SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_N_BP_ALL) {
-                                sViewTitle = "CPA - ";
-                            }
-                            else {
-                                sViewTitle = getViewTitle(auxType01);
-                            }
+                            //Eliminado porque era copia del caso SViewQueryDpsByItemBizPartner y nunca entraría aquí.
+                            sViewTitle = "CPA - ";
+                            
                             if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_DOC) {
-                                sViewTitle += "Historial facturas cambios";
+                                sViewTitle += "Historial cambios partidas facturas";
                             }
                             else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ADJ) {
-                                sViewTitle += "Historial documentos relacionados";
+                                sViewTitle += "Historial cambios docs. relacionados facturas";
                             }
+                            else if (auxType02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+                                sViewTitle += "Historial cambios partidas pedidos";
+                            }
+                            
                             break;
                         default:
                                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1882,8 +1892,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiCatFunctionalAreaBudgets) {
                 miClient.getSession().showView(SModConsts.TRNX_FUNC_BUDGETS, 0, null);
             }
-            else if (item == jmiCatPriceCommercialLog) {
-                miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SLibConstants.UNDEFINED, null);
+            else if (item == jmiCatPriceCommercialLogCurr) {
+                miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SModConsts.ITMX_PRICE_COMM_LOG_CURR, null);
+            }
+            else if (item == jmiCatPriceCommercialLogAll) {
+                miClient.getSession().showView(SModConsts.ITMU_PRICE_COMM_LOG, SModConsts.ITMX_PRICE_COMM_LOG_ALL, null);
             }
             else if (item == jmiCatBizPartherUpdate) {         
                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_UPD, SDataConstantsSys.BPSS_CT_BP_SUP);
@@ -1983,6 +1996,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiOrdersLinksDestiny) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_LINK_ORD_DES);
+            }
+            else if (item == jmiOrdersChangeItemHistory) {
+                showView(SDataConstants.TRNX_DPS_QRY, SDataConstantsSys.TRNX_PUR_DPS_BY_CHANGE_ITEM_CONCEPT, SDataConstantsSys.TRNX_TP_DPS_ORD);
             }
             else if (item == jmiOrdersAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_ORD_AUT_PEND);

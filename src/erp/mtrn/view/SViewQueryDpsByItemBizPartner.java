@@ -100,13 +100,13 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         jbChangeItemConcept = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")));
         jbChangeItemConcept.setPreferredSize(new Dimension(23, 23));
         jbChangeItemConcept.addActionListener(this);
-        jbChangeItemConcept.setToolTipText("Modificar ítem/concepto(Ordenes compra)");
+        jbChangeItemConcept.setToolTipText("Modificar ítem o concepto");
         
         //falta solo para ordenes de servicio
         jbChangeItemDocAll = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_dps.gif")));
         jbChangeItemDocAll.setPreferredSize(new Dimension(23, 23));
         jbChangeItemDocAll.addActionListener(this);
-        jbChangeItemDocAll.setToolTipText("Modificar ítem en todos los documentos(Ordenes servicio)");
+        jbChangeItemDocAll.setToolTipText("Modificar ítem en todos los documentos (órdenes de servicios)");
         
         if (isViewForPurchase()) {
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
