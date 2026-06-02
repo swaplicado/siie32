@@ -219,7 +219,6 @@ public abstract class SAuthorizationUtils {
                             "        ORDER BY step2.lev ASC " +
                             "        LIMIT 1);";
                 
-                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
                 ResultSet res = statement.executeQuery(sql);
                 while(res.next()) {
                     lUsers.add(res.getInt("step1.fk_usr_step"));
@@ -249,7 +248,6 @@ public abstract class SAuthorizationUtils {
                             "        ORDER BY step2.lev ASC " +
                             "        LIMIT 1);";
                
-                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
                 ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
                 while(res.next()) {
                     lUsers.addAll(SAuthorizationUtils.getUsersOfAutorizationNode(statement.getConnection(), res.getInt("step1.fk_node_step_n"), toNotification));
