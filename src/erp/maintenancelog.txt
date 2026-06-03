@@ -22,6 +22,7 @@ Rodrigo Abel AYALA VÁZQUEZ
 18) Se deshabilitó en el formulario de modificación de precios los campos "ítem" y "unidad" en registros existentes, previniendo así la alteración accidental de precios de sistema.
 19) Adición de restricción que impide la creación de un nuevo precio comercial si ya existe un registro para el mismo ítem y unidad en la fecha especificada.
 20) Implementación de validación en caso de seleccionar una unidad de medida en el precio comercial que difiera de la unidad base configurada en el catálogo del ítem.
+21) Implementación de funcionalidad para la actualización y validación de nuevo precio comercial al modificar requisiciones.
 
 ================================================================================
 SIIE 3.2 302.0/ 2026-06-01
