@@ -945,14 +945,26 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
 
             stmt.executeUpdate(sqlEntradaNo);
 
-            // Si existe registro en trn_stk marcar "Si"
-            String sqlEntradaSi =               
-                    "UPDATE tmp_reporte_compras t " +
-                    "INNER JOIN trn_diog d " +
-                    "ON d.fid_dps_year_n = t.id_year_oc " +
-                    "AND d.fid_dps_doc_n = t.id_doc_oc " +
-                    "AND d.b_del = 0 " +
-                    "SET t.entrada_almacen = '1'";
+            // Marcar como surtido si existe DIOG ligado a la OC o si existe DIOG ligado a la factura
+            String sqlEntradaSi =
+                "UPDATE tmp_reporte_compras t " +
+                "SET t.entrada_almacen = '1' " +
+                "WHERE EXISTS ( " +
+                "    SELECT 1 " +
+                "    FROM trn_diog d " +
+                "    WHERE d.b_del = 0 " +
+                "    AND ( " +
+                "        ( " +
+                "            d.fid_dps_year_n = t.id_year_oc " +
+                "            AND d.fid_dps_doc_n = t.id_doc_oc " +
+                "        ) " +
+                "        OR " +
+                "        ( " +
+                "            d.fid_dps_year_n = t.id_year_fac " +
+                "            AND d.fid_dps_doc_n = t.id_doc_fac " +
+                "        ) " +
+                "    ) " +
+                ")";
 
             int rowsEntrada = stmt.executeUpdate(sqlEntradaSi);
             // System.out.println("Entradas a almacén detectadas: " + rowsEntrada);
@@ -1238,80 +1250,42 @@ public class SViewPurchasingProcess extends SGridPaneView implements ActionListe
         return columns;
     }
 
-//    private void actionViewRm() {
-//        if (getSelectedGridRow() == null) {
-//            miClient.showMsgBoxWarning("Debe seleccionar un registro.");
-//            return;
-//        }
-//        try {
-//            String folioRm = getSelectedGridRow().getRowValueAt(0).toString();
-//
-//            int idRm = -1;
-//            try (Statement stmt = miClient.getSession().getStatement()) {
-//                ResultSet rs = stmt.executeQuery("SELECT id_rm FROM tmp_reporte_compras WHERE folio_rm = '" + folioRm + "' LIMIT 1");
-//                if (rs.next()) {
-//                    idRm = rs.getInt("id_rm");
-//                }
-//            }
-//            if (idRm <= 0) {
-//                miClient.showMsgBoxWarning("No se pudo obtener el ID de la requisición.");
-//                return;
-//            }
-//            SDbMaterialRequest registry = new SDbMaterialRequest();
-//            registry.read(miClient.getSession(), new int[]{idRm});
-//            SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición (visualización)", SModConsts.TRNX_MAT_REQ_EST);
-//            form.setRegistry(registry);
-//            form.setVisible(true);
-//
-//        }
-//        catch (Exception e) {
-//            miClient.showMsgBoxError(e.getMessage());
-//        }
-//    }
     private void actionViewRm() {
-    if (getSelectedGridRow() == null) {
-        miClient.showMsgBoxWarning("Debe seleccionar un registro.");
-        return;
-    }
-
-    try {
-        String folioRm = getSelectedGridRow().getRowValueAt(0).toString();
-
-        int idRm = -1;
-
-        try (Statement stmt = miClient.getSession().getStatement()) {
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT id_rm FROM tmp_reporte_compras WHERE folio_rm = '" + folioRm + "' LIMIT 1");
-
-            if (rs.next()) {
-                idRm = rs.getInt("id_rm");
-            }
-        }
-
-        if (idRm <= 0) {
-            miClient.showMsgBoxWarning("No se pudo obtener el ID de la requisición.");
+        if (getSelectedGridRow() == null) {
+            miClient.showMsgBoxWarning("Debe seleccionar un registro.");
             return;
         }
+        try {
+            String folioRm = getSelectedGridRow().getRowValueAt(0).toString();
+            int idRm = -1;
+            try (Statement stmt = miClient.getSession().getStatement()) {
+                ResultSet rs = stmt.executeQuery(
+                        "SELECT id_rm FROM tmp_reporte_compras WHERE folio_rm = '" + folioRm + "' LIMIT 1");
+                if (rs.next()) {
+                    idRm = rs.getInt("id_rm");
+                }
+            }
 
-        SDbMaterialRequest registry = new SDbMaterialRequest();
-        registry.read(miClient.getSession(), new int[] { idRm });
+            if (idRm <= 0) {
+                miClient.showMsgBoxWarning("No se pudo obtener el ID de la requisición.");
+                return;
+            }
 
-        SFormMaterialRequest form = new SFormMaterialRequest(
-                miClient,
-                "Requisición (visualización)",
-                SModConsts.TRNX_MAT_REQ_EST);
+            SDbMaterialRequest registry = new SDbMaterialRequest();
+            registry.read(miClient.getSession(), new int[] { idRm });
+            SFormMaterialRequest form = new SFormMaterialRequest(miClient, "Requisición (visualización)", SModConsts.TRNX_MAT_REQ_EST);
 
-        form.setRegistry(registry);
-        java.lang.reflect.Field field = SFormMaterialRequest.class.getDeclaredField("moDateDelivery");
-        field.setAccessible(true);
-        sa.lib.gui.bean.SBeanFieldDate dateField = (sa.lib.gui.bean.SBeanFieldDate) field.get(form);
-        dateField.setEnabled(false);
-        form.setVisible(true);
+            form.setRegistry(registry);
+            java.lang.reflect.Field field = SFormMaterialRequest.class.getDeclaredField("moDateDelivery");
+            field.setAccessible(true);
+            sa.lib.gui.bean.SBeanFieldDate dateField = (sa.lib.gui.bean.SBeanFieldDate) field.get(form);
+            dateField.setEnabled(false);
+            form.setVisible(true);
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
     }
-    catch (Exception e) {
-        miClient.showMsgBoxError(e.getMessage());
-    }
-}
     
     private void actionAuthWebViewAuthLog() {
         int[] pkOc = getSelectedPurchaseOrderPk();

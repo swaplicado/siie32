@@ -1,3 +1,8 @@
+SIIE 3.2 302.2/ 2026-06-04
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección en el seguimiento de compras cuando el surtido con almacén fue realizado por factura
+
 ================================================================================
 SIIE 3.2 302.1/ 2026-06-02
 Rodrigo Abel AYALA VÁZQUEZ
