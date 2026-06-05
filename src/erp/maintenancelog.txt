@@ -1,7 +1,13 @@
-SIIE 3.2 302.2/ 2026-06-04
+================================================================================
+SIIE 3.2 302.2/ 2026-06-05
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Corrección en el seguimiento de compras cuando el surtido con almacén fue realizado por factura
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ajuste provisional a la inicialización de Google Cloud Storage Manager, para realizarse solamente si los parámetros de configuración correspondientes no están vacíos.
+   NOTA: La inicialización de Google Cloud Storage Manager se invoque hasta el momento justo en que sea requerido.
 
 ================================================================================
 SIIE 3.2 302.1/ 2026-06-02

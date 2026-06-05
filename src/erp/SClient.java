@@ -121,13 +121,13 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores, Edwin Carmona, Rodrigo Ayala
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Edwin Carmona, Rodrigo Ayala, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 302.2"; // release date: 2026-06-04
+    public static final String APP_RELEASE = "3.2 302.2"; // release date: 2026-06-05
 
     public static final String APP_COPYRIGHT = "2007-2026";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
@@ -1864,15 +1864,20 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         }
     }
 
+    /*
+    XXX 2026-06-05, Sergio Flores: Este método debe cambiarse de lugar y, seguramente, de clase,
+    de modo que la inicialización de Google Cloud Storage Manager se invoque hasta el momento justo en que sea requerido.
+    */
     private void initCloudStorageManager() {
         try {
-            String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CONFIG);
-            String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_CLOUD_STORAGE_CREDENTIALS);
-            if (config != null && !config.isEmpty() && credentials != null && !credentials.isEmpty()) {
-                CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
-            }
-            else {
-                Logger.getLogger(getClass().getName()).log(Level.WARNING, "Cloud Storage Manager no está configurado.");
+            String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CONFIG);
+            
+            if (!config.isEmpty()) {
+                String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CREDENTIALS);
+                
+                if (!credentials.isEmpty()) {
+                    CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+                }
             }
         }
         catch (Exception e) {
