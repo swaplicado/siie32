@@ -30,6 +30,9 @@ import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.mod.hrs.form.SDialogEmployerSubstitution;
+import erp.mod.hrs.human.SHumanAction;
+import erp.mod.hrs.human.SHumanIntegrationService;
+import erp.mod.hrs.human.SHumanService;
 import erp.table.SFilterConstants;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -90,6 +93,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     private int mnFilterPaymentTypeId;
     private int mnFilterDepartamentId;
     private int mnFilterStatusEmployee;
+    
 
     public SViewBizPartner(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType) {
         super(client, tabTitle, auxType);
@@ -102,6 +106,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         int rightLevelBpCatCreate = 0;
         int rightLevelBpCatEdit = 0;
         boolean employeesCrudEnabled = false;
+        
         
         mbIsViewEmployees = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.BPSX_BP_EMP, SDataConstants.BPSX_BP_EMP_CON_EXP });
         mbIsViewBizPartnersSimple = mbIsViewEmployees || SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.BPSU_BP, SDataConstants.BPSX_BP_ATT_SAL_AGT, SDataConstants.BPSX_BP_ATT_BANK, SDataConstants.BPSX_BP_ATT_CARR });
@@ -751,6 +756,16 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbNew.isEnabled()) {
             if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showForm(mnTabTypeAux01, null) == SLibConstants.DB_ACTION_SAVE_OK) {
                 miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                // último registro que se modifico o creo
+                int[] pk = (int[]) miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).getLastSavedPrimaryKey();
+                
+                if (pk != null && pk.length > 0) {
+                    SHumanIntegrationService.syncEmployee(
+                            miClient.getSession(),
+                            pk[0],
+                            SHumanAction.CREATE
+                    );
+                }
             }
         }
     }
@@ -759,8 +774,16 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     public void actionEdit() {
         if (jbEdit.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
+                int[] pk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                 if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showForm(mnTabTypeAux01, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                     miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                    if (pk != null && pk.length > 0) {
+                        SHumanIntegrationService.syncEmployee(
+                                miClient.getSession(),
+                                pk[0],
+                                SHumanAction.UPDATE
+                        );
+                    }
                 }
             }
         }
@@ -824,6 +847,14 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     try {
                         SDbEmployee employee = (SDbEmployee) dialog.getValue(SModConsts.HRSU_EMP);
                         employee.save(miClient.getSession());
+                        
+                        SHumanIntegrationService.syncEmployee(
+                                miClient.getSession(),
+                                employee.getPkEmployeeId(),
+                                employee.isActive()
+                                        ? SHumanAction.CREATE
+                                        : SHumanAction.DELETE
+                        );
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -869,6 +900,21 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                     if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última " + (employee.isActive() ? "ALTA" : "BAJA") + " del empleado '" + employee.getXtaEmployeeName() + "'?\n"
                             + "IMPORTANTE: ¡Esta acción no se puede deshacer!") == JOptionPane.YES_OPTION) {
                         if (SHrsUtils.revertLastHireLogEntry(miClient.getSession(), employee)) {
+                            
+                            employee = (SDbEmployee)
+                                miClient.getSession().readRegistry(
+                                        SModConsts.HRSU_EMP,
+                                        employee.getPrimaryKey()
+                                );
+                            
+                            SHumanIntegrationService.syncEmployee(
+                                    miClient.getSession(),
+                                    employee.getPkEmployeeId(),
+                                    employee.isActive()
+                                            ? SHumanAction.CREATE
+                                            : SHumanAction.DELETE
+                            );
+                            
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
                             miClient.getSession().notifySuscriptors(mnTabTypeAux01);
                         }
