@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 302.3/ 2026-06-08
+Cesar Iván OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Funcionalidad para dar de alta en Human a los empleados que se den de alta en
+siie, tambien si se modifican se envian cambios a Human, si se da de baja, se 
+borra en Human, la reactivación realmente generá una alta nueva.
+
+================================================================================
 SIIE 3.2 302.2/ 2026-06-05
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
