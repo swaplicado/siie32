@@ -105,7 +105,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jbZoomOut = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jtfDocument = new javax.swing.JTextField();
-        jtfFile = new javax.swing.JTextField();
+        jtfFileName = new javax.swing.JTextField();
         jbFileSave = new javax.swing.JButton();
         jbFileInfo = new javax.swing.JButton();
         jbFileDeleteToUpdate = new javax.swing.JButton();
@@ -182,15 +182,15 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jtfDocument.setText("folio");
         jtfDocument.setToolTipText("Folio documento");
         jtfDocument.setFocusable(false);
-        jtfDocument.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfDocument.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel1.add(jtfDocument);
 
-        jtfFile.setEditable(false);
-        jtfFile.setText("file.pdf");
-        jtfFile.setToolTipText("Archivo PDF");
-        jtfFile.setFocusable(false);
-        jtfFile.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel1.add(jtfFile);
+        jtfFileName.setEditable(false);
+        jtfFileName.setText("file.pdf");
+        jtfFileName.setToolTipText("Archivo PDF");
+        jtfFileName.setFocusable(false);
+        jtfFileName.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel1.add(jtfFileName);
 
         jbFileSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif"))); // NOI18N
         jbFileSave.setToolTipText("Guardar PDF...");
@@ -205,12 +205,12 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
         jPanel1.add(jbFileInfo);
 
         jbFileDeleteToUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif"))); // NOI18N
-        jbFileDeleteToUpdate.setToolTipText("Descartar para actualizar PDF...");
+        jbFileDeleteToUpdate.setToolTipText("Desechar para actualizar PDF...");
         jbFileDeleteToUpdate.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbFileDeleteToUpdate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel1.add(jbFileDeleteToUpdate);
 
-        jchkDeleteOnClose.setText("Descartar al cerrar");
+        jchkDeleteOnClose.setText("Desechar al cerrar");
         jchkDeleteOnClose.setEnabled(false);
         jchkDeleteOnClose.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel1.add(jchkDeleteOnClose);
@@ -242,7 +242,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     private javax.swing.JTextField jtfCurrentPage;
     private javax.swing.JTextField jtfCurrentZoom;
     private javax.swing.JTextField jtfDocument;
-    private javax.swing.JTextField jtfFile;
+    private javax.swing.JTextField jtfFileName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -281,17 +281,17 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             jtfDocument.setText("");
             jtfDocument.setToolTipText(TOOL_TIP_DOCUMENT);
             
-            jtfFile.setText("");
-            jtfFile.setToolTipText(TOOL_TIP_FILE);
+            jtfFileName.setText("");
+            jtfFileName.setToolTipText(TOOL_TIP_FILE);
         }
         else {
             jtfDocument.setText(miDocument.getFolio());
             jtfDocument.setCaretPosition(0);
             jtfDocument.setToolTipText(TOOL_TIP_DOCUMENT + ": " + jtfDocument.getText());
             
-            jtfFile.setText(moPdf.getName());
-            jtfFile.setCaretPosition(0);
-            jtfFile.setToolTipText(TOOL_TIP_FILE + ": " + jtfFile.getText());
+            jtfFileName.setText(!miDocument.getFileName().isEmpty() ? miDocument.getFileName() : moPdf.getName());
+            jtfFileName.setCaretPosition(0);
+            jtfFileName.setToolTipText(TOOL_TIP_FILE + ": " + jtfFileName.getText());
         }
     }
     
@@ -385,8 +385,9 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
             fileChooser.setAcceptAllFileFilterUsed(false);
             fileChooser.setFileFilter(filter);
 
-            String safeFileName = miDocument.getFolio().replaceAll("[\\\\/:*?\"<>|]", "");
-            fileChooser.setSelectedFile(new File(safeFileName + "." + SFileUtilities.pdf));
+            String fileName = !miDocument.getFileName().isEmpty() ? miDocument.getFileName() : miDocument.getFolio();
+            String safeFileName = fileName.replaceAll("[\\\\/:*?\"<>|]", "");
+            fileChooser.setSelectedFile(new File(safeFileName + (safeFileName.toLowerCase().endsWith("." + SFileUtilities.pdf) ? "" : "." + SFileUtilities.pdf)));
 
             if (fileChooser.showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 File newFile = fileChooser.getSelectedFile();
@@ -402,7 +403,7 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
                     StandardCopyOption.REPLACE_EXISTING
                 );
                 
-                miClient.showMsgBoxInformation("El siguiente archivo ha sido guardado:\n" + newFile.getAbsolutePath());
+                miClient.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' ha sido guardado como:\n" + newFile.getAbsolutePath());
             }
         }
         catch (IOException ioe) {
@@ -436,20 +437,20 @@ public class SDialogPdfViewer extends SBeanFormDialog implements ActionListener 
     
     private void actionPerformedFileDeleteToUpdate() {
         if (!jchkDeleteOnClose.isSelected()) {
-            String confirmDeletion = "¡El presente archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' será descartado!\n"
-                    + "La próxima vez que solicite visualizarlo se descargará nuevamente desde su origen.\n"
+            String confirmDeletion = "Este archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' será desechado al cerrarse esta ventana.\n"
+                    + "La próxima vez que solicite visualizarlo se obtendrá nuevamente desde su origen.\n"
                     + SGuiConsts.MSG_CNF_CONT;
             
             if (miClient.showMsgBoxConfirm(confirmDeletion) == JOptionPane.YES_OPTION) {
                 // set delete on close:
                 jchkDeleteOnClose.setSelected(true);
-                miClient.showMsgBoxWarning("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' será descartado al cerrarse este diálogo.");
+                miClient.showMsgBoxWarning("¡Este archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' será desechado al cerrarse esta ventana!");
             }
         }
         else {
             // revert delete on close:
             jchkDeleteOnClose.setSelected(false);
-            miClient.showMsgBoxInformation("El archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' ya no será descartado al cerrarse este diálogo.");
+            miClient.showMsgBoxInformation("Este archivo " + SFileUtilities.pdf.toUpperCase() + " del documento '" + miDocument.getFolio() + "' ya no será desechado al cerrarse esta ventana.");
         }
     }
 

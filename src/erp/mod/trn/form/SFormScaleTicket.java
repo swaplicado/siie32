@@ -38,7 +38,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SFormScaleTicket extends SBeanForm implements ActionListener, ItemListener, FocusListener {
 

@@ -143,12 +143,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
     }
 
-    private void parseCfdiAttributes(final Connection connection, final String xml) throws java.lang.Exception {
-        boolean isCfdi = false;
-        String sql = "";
-        String xmlSafe = SLibUtils.textToSql(xml);
-        ResultSet resultSet = null;
-        
+    private void parseCfdiAttributes(final Connection connection) throws java.lang.Exception {
         msDocXmlRfcEmi = "";
         msDocXmlRfcRec = "";
         mdDocXmlTot = 0;
@@ -157,53 +152,45 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mtDocXmlSign_n = null;
         msUuid = "";
         
-        // is CFDI:
-        
-        sql = "SELECT " +
-                "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', ' Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " + // without preceeding blank, attribute 'SubTotal' value is get!
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
-                "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', '" + xmlSafe + "', " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
-                "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_uuid ";
+        if (!msDocXml.isEmpty()) {
+            float version = DCfdUtils.getCfdiVersion(msDocXml);
 
-        resultSet = connection.createStatement().executeQuery(sql);
+            if (DCfdUtils.isCfdi(version)) {
+                DCfdUtils.CfdiEssentials ce = DCfdUtils.createCfdiEssentials(msDocXml);
                 
-        if (resultSet.next()) {
-            msDocXmlRfcEmi = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_emisor_rfc"));
-            msDocXmlRfcRec = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_receptor_rfc"));
-            mdDocXmlTot = resultSet.getDouble("_xml_total");
-            msDocXmlMon = resultSet.getString("_xml_moneda");
-            mdDocXmlTc = resultSet.getDouble("_xml_tc");
-            mtDocXmlSign_n = resultSet.getTimestamp("_xml_timbrado");
-            msUuid = resultSet.getString("_xml_uuid");
-            
-            isCfdi = !msDocXmlRfcEmi.isEmpty();
-        }
+                msDocXmlRfcEmi = ce.EmisorRfc;
+                msDocXmlRfcRec = ce.ReceptorRfc;
+                mdDocXmlTot = ce.Total;
+                msDocXmlMon = ce.Moneda;
+                mdDocXmlTc = ce.TipoCambio;
+                mtDocXmlSign_n = ce.FechaTimbrado;
+                msUuid = ce.Uuid;
+            }
+            else {
+                String sql = "";
+                String xmlSafe = SLibUtils.textToSql(msDocXml);
+                ResultSet resultSet = null;
 
-        // is CFD:
-        
-        if (!isCfdi) {
-            sql = "SELECT " +
-                "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('Comprobante', ' Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
-                "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
-                "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
-                "NULL AS _xml_timbrado, " +
-                "'' AS _xml_uuid ";
+                sql = "SELECT " +
+                    "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                    "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                    "erp.f_get_xml_atr('Comprobante', ' Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                    "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                    "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                    "NULL AS _xml_timbrado, " +
+                    "'' AS _xml_uuid ";
 
-            resultSet = connection.createStatement().executeQuery(sql);
-            
-            if (resultSet.next()) {
-                msDocXmlRfcEmi = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_emisor_rfc"));
-                msDocXmlRfcRec = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_receptor_rfc"));
-                mdDocXmlTot = resultSet.getDouble("_xml_total");
-                msDocXmlMon = resultSet.getString("_xml_moneda");
-                mdDocXmlTc = resultSet.getDouble("_xml_tc");
-                mtDocXmlSign_n = resultSet.getTimestamp("_xml_timbrado");
-                msUuid = resultSet.getString("_xml_uuid");
+                resultSet = connection.createStatement().executeQuery(sql);
+
+                if (resultSet.next()) {
+                    msDocXmlRfcEmi = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_emisor_rfc"));
+                    msDocXmlRfcRec = DCfdUtils.cleanXmlEntities(resultSet.getString("_xml_receptor_rfc"));
+                    mdDocXmlTot = resultSet.getDouble("_xml_total");
+                    msDocXmlMon = resultSet.getString("_xml_moneda");
+                    mdDocXmlTc = resultSet.getDouble("_xml_tc");
+                    mtDocXmlSign_n = resultSet.getTimestamp("_xml_timbrado");
+                    msUuid = resultSet.getString("_xml_uuid");
+                }
             }
         }
     }
@@ -423,7 +410,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public String getCfdNumber() {
         String cfdNumber = "";
         
-        if (mnNumber != SLibConstants.UNDEFINED) {
+        if (mnNumber != 0) {
             cfdNumber = STrnUtils.formatDocNumber(msSeries, "" + mnNumber);
         }
         else {
@@ -680,7 +667,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         try {
             statement = connection.createStatement();
             
-            if (mnPkCfdId == SLibConsts.UNDEFINED) {
+            if (mnPkCfdId == 0) {
                 // obtain new ID for CFD:
                 sql = "SELECT COALESCE(MAX(id_cfd), 0) + 1 FROM trn_cfd ";
                 resultSet = statement.executeQuery(sql);
@@ -770,7 +757,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "WHERE id_cfd = " + mnPkCfdId + " "; 
             }
             
-            parseCfdiAttributes(connection, msDocXml);
+            parseCfdiAttributes(connection);
             
             preparedStatement = connection.prepareStatement(sql);
             

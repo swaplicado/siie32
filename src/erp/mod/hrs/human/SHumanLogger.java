@@ -13,7 +13,7 @@ import java.util.Date;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanLogger {
 private static final String LOG_FOLDER =

@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDbAccountingCustomizableReportCostCenter extends SDbRegistryUser implements SGridRow, Serializable {
     

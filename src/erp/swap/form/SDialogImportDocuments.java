@@ -99,7 +99,7 @@ import sa.lib.xml.SXmlUtils;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  * 
- * @author Sergio Flores, Cesar Orozco, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, César Orozco, Claudio Peña, Sergio Flores
  */
 public class SDialogImportDocuments extends SBeanFormDialog implements ActionListener, ListSelectionListener, ItemListener {
     
@@ -2243,7 +2243,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                             else {
                                 // retrieve CFDI files:
 
-                                boolean filesOk = document.AuxFiles != null && document.AuxFiles.length == SImportUtils.CFDI_FILES && document.AuxFiles[SImportUtils.CFDI_XML_IDX] != null && document.AuxFiles[SImportUtils.CFDI_PDF_IDX] != null;
+                                boolean filesOk = document.getAuxFile(SImportUtils.CFDI_XML_IDX) != null && document.getAuxFile(SImportUtils.CFDI_PDF_IDX) != null;
 
                                 if (!filesOk) {
                                     File[] files = document.retrieveFiles(miClient.getSession(), msSyncUrlDownload);
@@ -3047,7 +3047,7 @@ public class SDialogImportDocuments extends SBeanFormDialog implements ActionLis
                         File xml = document.retrieveXml(miClient.getSession(), msSyncUrlDownload);
 
                         if (xml != null) {
-                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()));
+                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()), xml.getName());
                         }
                         else {
                             miClient.showMsgBoxWarning("No se pudo obtener el archivo " + SFileUtilities.xml.toUpperCase() + " de la " + msDocLcName + " autorizada.");

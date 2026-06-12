@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servin, Rodrigo Ayala
+ * @author Isabel Servín, Rodrigo Ayala
  */
 public class SDbPriceCommercialLog extends SDbRegistryUser implements SGridRow {
 

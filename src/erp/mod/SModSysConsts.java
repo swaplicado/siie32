@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín, Rodrigo Ayala, Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Rodrigo Ayala, Sergio Flores, César Orozco
  */
 public abstract class SModSysConsts {
 

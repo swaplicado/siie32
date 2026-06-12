@@ -1181,7 +1181,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             boolean enable = rowCfdiImport.getItem() != null;
             boolean isCreditNoteInvoicedAdvance = !isInvoice() && (rowCfdiImport.getItem() != null && rowCfdiImport.getItem().getIsPrepayment()) || (rowCfdiImport.getItem() == null && rowCfdiImport.isInvoicedAdvance());
             
-            jbSelectItem.setEnabled(enable && (!isWithDpsToLink() || isCreditNoteInvoicedAdvance));
+            jbSelectItem.setEnabled(!isWithDpsToLink() || isCreditNoteInvoicedAdvance);
             jbSelectUnit.setEnabled(enable && !isWithDpsToLink());
             jbSelectTaxRegion.setEnabled(enable && !isWithDpsToLink()); 
             jbSelectOperationsType.setEnabled(enable && (!isWithDpsToLink() || isCreditNoteInvoicedAdvance)); 
@@ -2210,7 +2210,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                             break;
                         }
                         else if (row.getUnit().getDbmsClaveUnidad().isEmpty()) {
-                            validation.setMessage(msgPrefix + "su unidad asignada carece de ClaveUnidad SAT.");
+                            validation.setMessage(msgPrefix + "su unidad asignada, '" + row.getUnit().getUnit() + "', carece de ClaveUnidad SAT.");
                             validation.setComponent(jbSelectUnit);
                             break;
                         }
@@ -2328,7 +2328,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         if (concepto.getAttClaveUnidad().getString().equals(row.getUnit().getDbmsClaveUnidad())) {
                             if (row.getConvFactor() != 1) {
                                 if (miClient.showMsgBoxConfirm(msgPrefix + "es diferente de 1.0,\n"
-                                        + "pero las Claves de Unidad SAT del concepto y del ítem seleccionado son iguales.\n"
+                                        + "pero las Claves de Unidad SAT del concepto y del ítem seleccionado son iguales ('" + concepto.getAttClaveUnidad().getString() + "').\n"
                                         + "¿Esta seguro de que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
                                     validation.setMessage("Cambiar el factor de conversión del concepto del CFDI #" + (i + 1) + " para que sea igual a 1.0.");
                                     break;
@@ -2338,7 +2338,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         else {
                             if (row.getConvFactor() == 1) {
                                 if (miClient.showMsgBoxConfirm(msgPrefix + "es igual a 1.0,\n"
-                                        + "pero las Claves de Unidad SAT del concepto y del ítem seleccionado son diferentes.\n"
+                                        + "pero las Claves de Unidad SAT del concepto y del ítem seleccionado son diferentes (respectivamente '" + concepto.getAttClaveUnidad().getString() + "' y '" + row.getUnit().getDbmsClaveUnidad() + "').\n"
                                         + "¿Esta seguro de que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
                                     validation.setMessage("Cambiar el factor de conversión del concepto del CFDI #" + (i + 1) + " para que sea diferente de 1.0.");
                                     break;
@@ -2394,6 +2394,9 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
             if (selectedRow == -1) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
             }
+            else if (!((SRowCfdiImport40) moCfdiConceptsPane.getSelectedTableRow()).isConfigured()) {
+                miClient.showMsgBoxWarning("El renglón seleccionado todavía no está configurado."); 
+            }
             else {
                 moRowCfdiCopy = (SRowCfdiImport40) moCfdiConceptsPane.getSelectedTableRow();
                 jbPasteRowSettings.setEnabled(true);
@@ -2404,32 +2407,37 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     private void actionPasteRow() {
-        if (jbPasteRowSettings.isEnabled() && moRowCfdiCopy != null) {
-            int selectedRow = moCfdiConceptsPane.getTable().getSelectedRow();
-            
-            if (selectedRow == -1) {
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+        if (jbPasteRowSettings.isEnabled()) {
+            if (moRowCfdiCopy == null) {
+                miClient.showMsgBoxWarning("No existen valores de algún renglón que hayan sido copiados.\nNo se puede proceder con el pegado.");
             }
             else {
-                SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moCfdiConceptsPane.getSelectedTableRow();
-                
-                rowCfdiImport.setItem(moRowCfdiCopy.getItem());
-                rowCfdiImport.setItemReference(moRowCfdiCopy.getItemReference());
-                rowCfdiImport.setUnit(moRowCfdiCopy.getUnit());
-                rowCfdiImport.setTaxRegion(moRowCfdiCopy.getTaxRegion()); 
-                rowCfdiImport.setCostCenter(moRowCfdiCopy.getCostCenter());
-                rowCfdiImport.setConvFactor(moRowCfdiCopy.getConvFactor());
-                rowCfdiImport.setOperationsType(moRowCfdiCopy.getOperationsType());
-                
-                rowCfdiImport.prepareTableRow();
-                moCfdiConceptsPane.renderTableRows();
-                moCfdiConceptsPane.setTableRowSelection(selectedRow);
-                
-                refreshRowEntriesAndTotalAndTaxes(rowCfdiImport);
-                
-                moRowCfdiCopy = null;
-                jbPasteRowSettings.setEnabled(false);
-                jtfCopyRowInfo.setText(""); 
+                int selectedRow = moCfdiConceptsPane.getTable().getSelectedRow();
+
+                if (selectedRow == -1) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_ROW_UNDEF); 
+                }
+                else {
+                    SRowCfdiImport40 rowCfdiImport = (SRowCfdiImport40) moCfdiConceptsPane.getSelectedTableRow();
+
+                    rowCfdiImport.setItem(moRowCfdiCopy.getItem());
+                    rowCfdiImport.setItemReference(moRowCfdiCopy.getItemReference());
+                    rowCfdiImport.setUnit(moRowCfdiCopy.getUnit());
+                    rowCfdiImport.setTaxRegion(moRowCfdiCopy.getTaxRegion()); 
+                    rowCfdiImport.setCostCenter(moRowCfdiCopy.getCostCenter());
+                    rowCfdiImport.setConvFactor(moRowCfdiCopy.getConvFactor());
+                    rowCfdiImport.setOperationsType(moRowCfdiCopy.getOperationsType());
+
+                    rowCfdiImport.prepareTableRow();
+                    moCfdiConceptsPane.renderTableRows();
+                    moCfdiConceptsPane.setTableRowSelection(selectedRow);
+
+                    refreshRowEntriesAndTotalAndTaxes(rowCfdiImport);
+
+                    moRowCfdiCopy = null;
+                    jbPasteRowSettings.setEnabled(false);
+                    jtfCopyRowInfo.setText(""); 
+                }
             }
         }
     }

@@ -16,7 +16,7 @@ import java.sql.Statement;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanService {
 

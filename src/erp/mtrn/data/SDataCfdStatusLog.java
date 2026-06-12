@@ -14,7 +14,7 @@ import java.util.Date;
 
 /**
  *
- * @author Adrian Aviles
+ * @author Adrián Aviles
  */
 public class SDataCfdStatusLog extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 

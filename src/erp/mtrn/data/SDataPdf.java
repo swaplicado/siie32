@@ -39,7 +39,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     /** Original name of PDF file. */
     protected java.lang.String msDocPdfName;
     
-    protected java.lang.String msPdfDirectory;
+    protected java.lang.String msPdfBaseDirectory;
     protected java.lang.String msPdfAsBase64;
     
     protected boolean mbAuxSkipSave;
@@ -59,7 +59,12 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDocPdfName() { return msDocPdfName; }
     
     public void setAuxSkipSave(boolean b) { mbAuxSkipSave = b; }
-    public void setAuxDeleted(boolean b) { mbAuxDelete = b; }
+    public void setAuxDeleted(boolean b) {
+        mbAuxDelete = b;
+        if (mbAuxDelete) {
+            mbAuxSkipSave = false; // assure update of PDF!
+        }
+    }
     
     public boolean getAuxSkipSave() { return mbAuxSkipSave; }
     public boolean getAuxDeleted() { return mbAuxDelete; }
@@ -87,7 +92,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         mnPkDocId = 0;
         msDocPdfName = "";
         
-        msPdfDirectory = "";
+        msPdfBaseDirectory = "";
         msPdfAsBase64 = "";
         
         mbAuxSkipSave = false;
@@ -122,7 +127,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                     throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + "\n(Configuración empresa.)");
                 }
                 else {
-                    msPdfDirectory = resultSet.getString("xml_base_dir");
+                    msPdfBaseDirectory = resultSet.getString("xml_base_dir");
                 }
                 
                 readPdfFile();
@@ -218,17 +223,6 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
      * PDF file management:
      */
     
-    private String composePdfDirectory() throws Exception {
-        if (msPdfDirectory.isEmpty()) {
-            throw new Exception("No se ha proporcionado el directorio " + SFileUtilities.pdf.toUpperCase() + ".");
-        }
-        else if (mnPkYearId == 0) {
-            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.pdf.toUpperCase() + ".");
-        }
-        
-        return msPdfDirectory + (msPdfDirectory.endsWith("/") ? "" : "/") + "ext/" + mnPkYearId;
-    }
-    
     private String composePdfFileNameStd() throws Exception {
         if (mnPkYearId == 0 || mnPkDocId == 0) {
             throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.pdf.toUpperCase() + ".");
@@ -237,8 +231,35 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         return mnPkYearId + "_" + DCfdUtils.CfdNumberFormat.format(mnPkDocId) + "." + SFileUtilities.pdf;
     }
     
+    /**
+     * Compose PDF base directory on the side of the SIIE Server.
+     * @return PDF base directory.
+     * @throws Exception 
+     */
+    private String composePdfBaseDirectory() throws Exception {
+        if (msPdfBaseDirectory.isEmpty()) {
+            throw new Exception("No se ha proporcionado el directorio base " + SFileUtilities.pdf.toUpperCase() + ".");
+        }
+        else if (mnPkYearId == 0) {
+            throw new Exception("No se ha proporcionado la clave primaria del registro " + SFileUtilities.pdf.toUpperCase() + ".");
+        }
+        
+        return msPdfBaseDirectory + (msPdfBaseDirectory.endsWith("/") ? "" : "/") + "ext/" + mnPkYearId;
+    }
+    
     private File createPdfFile() throws Exception {
-        return new File(composePdfDirectory() + "/" + composePdfFileNameStd());
+        return new File(composePdfBaseDirectory() + "/" + composePdfFileNameStd());
+    }
+    
+    /**
+     * Create PDF temporal file in SIIE client host.
+     * @param client
+     * @return PDF temporal file in SIIE client host.
+     * @throws Exception 
+     */
+    public File createPdfTempFile(final SClientInterface client) throws Exception {
+        File localTempDir = SImportUtils.createDocumentsLocalTempDir(SFileUtilities.pdf, client.getSession().getConfigCompany().getCompanyId());
+        return new File(localTempDir.getAbsolutePath() + (localTempDir.getAbsolutePath().endsWith("\\") ? "" : "\\") + composePdfFileNameStd());
     }
     
     /**
@@ -249,7 +270,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
      */
     public void uploadPdfFile(final File pdfFile, final String pdfDirectory) throws Exception {
         if (pdfFile.getName().toLowerCase().endsWith("." + SFileUtilities.pdf)) {
-            msPdfDirectory = pdfDirectory;
+            msPdfBaseDirectory = pdfDirectory;
             
             byte[] pdfBytes = Files.readAllBytes(pdfFile.toPath());
             msPdfAsBase64 = Base64.getEncoder().encodeToString(pdfBytes);
@@ -301,8 +322,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
                     break;
                     
                 case MODE_TEMP_DIR:
-                    File localTempDir = SImportUtils.createDocumentsLocalTempDir(SFileUtilities.pdf);
-                    pdfFile = new File(localTempDir.getAbsolutePath() + (localTempDir.getAbsolutePath().endsWith("\\") ? "" : "\\") + composePdfFileNameStd());
+                    pdfFile = createPdfTempFile(client);
                     break;
                     
                 default:
@@ -354,7 +374,7 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
             throw new Exception("No se ha codificado el archivo " + SFileUtilities.pdf.toUpperCase() + " en Base64.");
         }
         
-        File directory = new File(composePdfDirectory());
+        File directory = new File(composePdfBaseDirectory());
         
         if (!directory.exists()) {
             directory.mkdirs();
@@ -408,6 +428,9 @@ public final class SDataPdf extends erp.lib.data.SDataRegistry implements java.i
         
         if (originalPdf == null) {
             pdf.setPkYearId(year);
+        }
+        else {
+            pdf.setAuxSkipSave(false); // assure update of PDF!
         }
 
         pdf.uploadPdfFile(pdfFile, pdfDirectory);

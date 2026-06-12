@@ -73,7 +73,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  * Ejemplo de la URL de descarga de documentos:
  * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
  *
- * @author Cesar Orozco, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author César Orozco, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDialogImportProformas extends SBeanFormDialog implements ActionListener, ListSelectionListener {
 

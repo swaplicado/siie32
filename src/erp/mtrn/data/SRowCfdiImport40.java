@@ -183,6 +183,14 @@ public final class SRowCfdiImport40 extends erp.lib.table.STableRow {
     }
     
     /**
+     * Verifica si el renglón ya está configurado.
+     * @return 
+     */
+    public boolean isConfigured() {
+        return moItem != null && moUnit != null && moTaxRegion != null && moCostCenter != null;
+    }
+    
+    /**
      * Verifica si el renglón está vinculado como servicio.
      * @return 
      */

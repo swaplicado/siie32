@@ -74,7 +74,7 @@ import sa.lib.srv.SSrvConsts;
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
  * 
- * @author Sergio Flores, Cesar Orozco, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores
  */
 public abstract class SImportUtils {
     
@@ -1081,10 +1081,11 @@ public abstract class SImportUtils {
     /**
      * Create documents local temporal directory.
      * @param fileExtension Extension of temporal files to be stored in temporal directory.
-     * @return
+     * @param ownerCompanyId ID of owner company of temporal directory. When zero is provided, ID of owner company is excluded from path.
+     * @return Temporal directory in format: system_temp_dir\temp_dor_docs_for_file_extension\[owner_company_ID]
      * @throws IOException 
      */
-    public static File createDocumentsLocalTempDir(final String fileExtension) throws IOException {
+    public static File createDocumentsLocalTempDir(final String fileExtension, final int ownerCompanyId) throws IOException {
         String subdir = "";
         
         switch (fileExtension) {
@@ -1097,11 +1098,10 @@ public abstract class SImportUtils {
         }
         
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + subdir);
+        File localTempDir = new File(sysTempDir + (sysTempDir.endsWith("\\") ? "" : "\\") + subdir + (ownerCompanyId != 0 ? "\\" + ownerCompanyId : ""));
         
         if (!localTempDir.exists()) {
-            boolean ok = localTempDir.mkdirs();
-            if (!ok) {
+            if (!localTempDir.mkdirs()) {
                 throw new RuntimeException("Failed to create directory: " + localTempDir.getAbsolutePath());
             }
         }
@@ -1127,8 +1127,8 @@ public abstract class SImportUtils {
      * @throws IOException 
      */
     private static File createDocumentLocalTempFile(final int documentExternalId, final int bizPartnerId, final String fileExtension) throws IOException {
-        File localTempDir = createDocumentsLocalTempDir(fileExtension);
-        String absolutePath = localTempDir.getAbsolutePath() + "\\" + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(documentExternalId) + "." + fileExtension;
+        File localTempDir = createDocumentsLocalTempDir(fileExtension, 0);
+        String absolutePath = localTempDir.getAbsolutePath() + (localTempDir.getAbsolutePath().endsWith("\\") ? "" : "\\") + FormatBizPartnerId.format(bizPartnerId) + FormatExternalId.format(documentExternalId) + "." + fileExtension;
         
         System.out.println("DocumentTempFileAbsolutePath: " + absolutePath);
         

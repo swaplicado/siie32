@@ -89,7 +89,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores, Cesar Orozco
+ * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores, César Orozco
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 

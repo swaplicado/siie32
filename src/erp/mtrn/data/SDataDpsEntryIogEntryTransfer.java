@@ -16,7 +16,7 @@ import java.util.Date;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDataDpsEntryIogEntryTransfer extends SDataRegistry {
     

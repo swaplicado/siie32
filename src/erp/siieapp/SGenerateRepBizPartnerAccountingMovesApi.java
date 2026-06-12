@@ -38,7 +38,7 @@ import sa.lib.gui.SGuiSession;
  * Integra datos del ERP incluyendo información de crédito, moneda y parámetros
  * configurables del sistema.
  * 
- * @author Adrian Aviles
+ * @author Adrián Aviles
  * @version 1.0
  */
 public class SGenerateRepBizPartnerAccountingMovesApi {

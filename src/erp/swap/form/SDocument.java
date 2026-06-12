@@ -13,4 +13,5 @@ public interface SDocument {
     
     public String getFolio();
     public String getIssuer();
+    public String getFileName();
 }

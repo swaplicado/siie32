@@ -18,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanConfig {
 

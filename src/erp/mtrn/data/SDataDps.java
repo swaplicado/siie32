@@ -104,7 +104,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -3157,7 +3157,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 nSortingPosition = 0;
                 dAdminPriceAvg = 0;
                 
-                if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
+                if (SLibUtils.compareKeys(getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
                     int paramAdministrativeConceptType = SLibUtils.parseInt(
                             erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
                             SDataConstantsSys.CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT));
@@ -3963,8 +3963,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
                                             boolean hasMaterialRequest = false;
-                                            Date tAccDpsDate = this.getDateDoc();
-                                            if (this.isAdjustment()) {
+                                            Date tAccDpsDate = getDateDoc();
+                                            if (isAdjustment()) {
                                                 if (! dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
                                                     SDataDps dps = new SDataDps();
                                                     dps.read(dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), connection.createStatement());
@@ -4090,7 +4090,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, dpsEntry.getFkItemId());
                                                     if (aWh == null) {
                                                         // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
-                                                        aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                                        aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, getFkCompanyBranchId());
                                                         if (aWh == null) {
                                                             throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
                                                                     dpsEntry.getConcept());
@@ -4533,22 +4533,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oStatement.execute(sSql);
                 
                 if (moDbmsDataDpsCfd != null) {
-                    if (((this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
-                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
-                            || (this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
-                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))) {
-                        if (this.getComprobanteVersion().equals("" + DCfdConsts.CFDI_VER_40)) {
-                            // Cuando el documento sea factura de compras o nc de compras y
-                            // el objeto comprobante no sea nulo se actualizan los datos
-                            if (moDbmsDataDpsCfd.getAuxComprobante40() != null) {
-                                moDbmsDataDpsCfd.setPaymentMethod(moDbmsDataDpsCfd.getAuxComprobante40().getAttMetodoPago().getString());
-                                moDbmsDataDpsCfd.setPaymentWay(moDbmsDataDpsCfd.getAuxComprobante40().getAttFormaPago().getString());
-                                moDbmsDataDpsCfd.setTaxRegimeIssuing(moDbmsDataDpsCfd.getAuxComprobante40().getEltEmisor().getAttRegimenFiscal().getString());
-                                moDbmsDataDpsCfd.setTaxRegimeReceiver(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttRegimenFiscalReceptor().getString());
-                                moDbmsDataDpsCfd.setCfdiUsage(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttUsoCFDI().getString());
-                            }
-                        }
+                    if (isDocumentOrAdjustmentPur() && moDbmsDataDpsCfd.getAuxComprobante40() != null) {
+                        cfd.ver40.DElementComprobante comprobante = moDbmsDataDpsCfd.getAuxComprobante40();
+                        moDbmsDataDpsCfd.setPaymentMethod(comprobante.getAttMetodoPago().getString());
+                        moDbmsDataDpsCfd.setPaymentWay(comprobante.getAttFormaPago().getString());
+                        moDbmsDataDpsCfd.setTaxRegimeIssuing(comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+                        moDbmsDataDpsCfd.setTaxRegimeReceiver(comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString());
+                        moDbmsDataDpsCfd.setCfdiUsage(comprobante.getEltReceptor().getAttUsoCFDI().getString());
                     }
+                    
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
                     moDbmsDataDpsCfd.setVersion(getComprobanteVersion());
@@ -4671,8 +4664,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 
-                                Date tAccDpsDate = this.getDateDoc();
-                                if (this.isAdjustment()) {
+                                Date tAccDpsDate = getDateDoc();
+                                if (isAdjustment()) {
                                     if (! entry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
                                         SDataDps dps = new SDataDps();
                                         dps.read(entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), statement);
@@ -4747,7 +4740,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, entry.getFkItemId());
                                         if (aWh == null) {
                                             // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
-                                            aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                            aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, getFkCompanyBranchId());
                                             if (aWh == null) {
                                                 throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
                                                         entry.getConcept());
@@ -5270,11 +5263,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                                 mvDbmsDpsEntries,
-                                                                oSimpleDateFormat.format(this.getDate()),
-                                                                oSimpleDateFormat.format(this.getDateDoc()),
-                                                                this.getNumber(), 
-                                                                this.getNumberReference(), 
-                                                                this.getNumberSeries(), 
+                                                                oSimpleDateFormat.format(getDate()),
+                                                                oSimpleDateFormat.format(getDateDoc()),
+                                                                getNumber(), 
+                                                                getNumberReference(), 
+                                                                getNumberSeries(), 
                                                                 companyName, bpName);
 
                 if (qualityBody != null) {
@@ -5298,7 +5291,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Object images = null;
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
-                                        (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                        (getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
                                         toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }
@@ -5406,11 +5399,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                                 mvDbmsDpsEntries,
-                                                                oSimpleDateFormat.format(this.getDate()),
-                                                                oSimpleDateFormat.format(this.getDateDoc()),
-                                                                this.getNumber(), 
-                                                                this.getNumberReference(), 
-                                                                this.getNumberSeries(), 
+                                                                oSimpleDateFormat.format(getDate()),
+                                                                oSimpleDateFormat.format(getDateDoc()),
+                                                                getNumber(), 
+                                                                getNumberReference(), 
+                                                                getNumberSeries(), 
                                                                 companyName, bpName);
 
                 if (qualityBody != null) {
@@ -5434,7 +5427,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Object images = null;
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
-                                        (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                        (getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
                                         toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }

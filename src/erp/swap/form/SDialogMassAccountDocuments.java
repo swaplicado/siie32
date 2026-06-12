@@ -2085,7 +2085,7 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                         File xml = document.ImportedDocument.retrieveXml(miClient.getSession(), moSettings.SyncUrlDownload);
 
                         if (xml != null) {
-                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()));
+                            moDialogCfdRenderer.renderCfdXml(SXmlUtils.readXml(xml.getAbsolutePath()), xml.getName());
                         }
                         else {
                             miClient.showMsgBoxWarning("No se pudo obtener el archivo " + SFileUtilities.xml.toUpperCase() + " de la factura autorizada.");
@@ -2496,9 +2496,9 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                             miClient.showMsgBoxWarning("El boleto '" + document.ScaleTicketBol + "' no existe.");
                         }
                         else {
-                            File pdf = SExportDataSomUtils.createTicketPdf(miClient.getSession(), moSomDatabase.getConnection(), somTicketId, false, false);
+                            File file = SExportDataSomUtils.createTicketPdf(miClient.getSession(), moSomDatabase.getConnection(), somTicketId, false, false);
 
-                            if (pdf != null) {
+                            if (file != null && file.exists()) {
                                 if (moDialogPdfViewer == null) {
                                     moDialogPdfViewer = new SDialogPdfViewer(miClient);
                                 }
@@ -2514,9 +2514,14 @@ public class SDialogMassAccountDocuments extends SBeanFormDialog implements Acti
                                     public String getIssuer() {
                                         return msCompanyName;
                                     }
+
+                                    @Override
+                                    public String getFileName() {
+                                        return file.getName();
+                                    }
                                 };
 
-                                moDialogPdfViewer.setPdf(documentInfo, pdf);
+                                moDialogPdfViewer.setPdf(documentInfo, file);
                                 moDialogPdfViewer.setVisible(true);
                             }
                         }

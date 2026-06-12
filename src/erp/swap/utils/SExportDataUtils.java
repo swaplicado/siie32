@@ -61,7 +61,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, César Orozco
  */
 public abstract class SExportDataUtils {
 

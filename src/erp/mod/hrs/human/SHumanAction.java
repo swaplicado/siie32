@@ -7,7 +7,7 @@ package erp.mod.hrs.human;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public enum SHumanAction {
     CREATE,

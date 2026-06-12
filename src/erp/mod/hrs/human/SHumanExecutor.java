@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanExecutor {
     private static final ExecutorService executor =

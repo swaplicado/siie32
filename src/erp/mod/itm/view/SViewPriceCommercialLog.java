@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Isabel Servin, Sergio Flores, Edwin Carmona, Rodrigo Ayala
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona, Rodrigo Ayala
  */
 public class SViewPriceCommercialLog extends SGridPaneView implements ActionListener {
     //public static final int PRICES_CURRENT = 1;

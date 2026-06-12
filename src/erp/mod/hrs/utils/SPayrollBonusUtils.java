@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Edwin Carmona, Cesar Orozco
+ * @author Edwin Carmona, César Orozco
  */
 public class SPayrollBonusUtils {
     

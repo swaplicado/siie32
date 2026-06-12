@@ -7,7 +7,7 @@ package erp.mod.hrs.human;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanResponse {
 

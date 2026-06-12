@@ -33,7 +33,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Isabel Servin, Rodrigo Ayala
+ * @author Isabel Servín, Rodrigo Ayala
  */
 public class SDialogItemPicker extends SBeanOptionPicker implements KeyListener, ItemListener {
 

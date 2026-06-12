@@ -9,7 +9,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 public class SHumanIntegrationWorker implements Runnable {
 

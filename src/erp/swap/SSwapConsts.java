@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Cesar Orozco, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores
  */
 public abstract class SSwapConsts {
 

@@ -1471,6 +1471,32 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     }
     
     /**
+     * Get auxiliar file by index.
+     * @param fileIndex Either SImportUtils.CFDI_XML_IDX or SImportUtils.CFDI_PDF_IDX.
+     * @return If available, auxiliar file, otherwise <code>null</code>.
+     */
+    public File getAuxFile(final int fileIndex) {
+        File auxFile = null;
+        
+        if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES && fileIndex >= 0 && fileIndex < AuxFiles.length) {
+            auxFile = AuxFiles[fileIndex];
+        }
+        
+        return auxFile;
+    }
+    
+    /**
+     * Get auxiliar file name by index.
+     * @param fileIndex Either SImportUtils.CFDI_XML_IDX or SImportUtils.CFDI_PDF_IDX.
+     * @return If available, auxiliar file name, otherwise an empty <code>String</code>.
+     */
+    public String getAuxFileName(final int fileIndex) {
+        File auxFile = getAuxFile(fileIndex);
+        
+        return auxFile == null ? "" : auxFile.getName();
+    }
+    
+    /**
      * Retrieve XML and PDF files of document.
      * @param session GUI session.
      * @param filesDownloadServiceUrl URL of document files download service.
@@ -1525,8 +1551,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public File retrieveXml(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
         File xml = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.xml, BizPartnerId);
         
-        if (xml == null && AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
-            xml = AuxFiles[SImportUtils.CFDI_XML_IDX]; // re-use existing files, if available
+        if (xml == null) {
+            xml = getAuxFile(SImportUtils.CFDI_XML_IDX); // re-use existing file, if available
         }
         
         if (xml == null) {
@@ -1547,8 +1573,8 @@ public class SImportedDocument implements SGridRow, Serializable, Comparable<SIm
     public File retrievePdf(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
         File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
         
-        if (pdf == null && AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
-            pdf = AuxFiles[SImportUtils.CFDI_PDF_IDX]; // re-use existing files, if available
+        if (pdf == null) {
+            pdf = getAuxFile(SImportUtils.CFDI_PDF_IDX); // re-use existing file, if available
         }
         
         if (pdf == null) {

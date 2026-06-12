@@ -68,6 +68,7 @@ public final class SDialogCfdRenderer implements ActionListener {
     private final SClientInterface miClient;
     private int mnDocumentType;
     private String msCfdiXml;
+    private String msCfdiFileName;
     private File moCfdiFile;
     private File moPdfFile;
     private SDataDps moDpsToLink;
@@ -87,7 +88,7 @@ public final class SDialogCfdRenderer implements ActionListener {
     private SDataDps moDpsRendered;
     private JDialog moCfdiViewer;
     protected SDialogPdfViewer moDialogPdfViewer;
-    protected DCfdUtils.CfdEssentials moCfdEssentials;
+    protected DCfdUtils.CfdiEssentials moCfdiEssentials;
     
     /**
      * Clase que se encarga de mostrar el CFDI y hacer las validaciones previo 
@@ -201,11 +202,11 @@ public final class SDialogCfdRenderer implements ActionListener {
     }
     
     private SDocumentInfo createDocumentInfo() throws Exception {
-        if (moCfdEssentials == null) {
-            moCfdEssentials = DCfdUtils.getCfdi40Essentials(msCfdiXml);
+        if (moCfdiEssentials == null) {
+            moCfdiEssentials = DCfdUtils.createCfdiEssentials(msCfdiXml);
         }
         
-        return new SDocumentInfo(moCfdEssentials.Serie, moCfdEssentials.Folio, moCfdEssentials.Uuid, moCfdEssentials.Fecha, moCfdEssentials.Emisor);
+        return new SDocumentInfo(moCfdiEssentials.Serie, moCfdiEssentials.Folio, moCfdiEssentials.Uuid, moCfdiEssentials.Fecha, moCfdiEssentials.Emisor, moPdfFile != null ? moPdfFile.getName() : "");
     }
     
     private SFormValidation validateCfdi40() throws Exception {
@@ -721,19 +722,21 @@ public final class SDialogCfdRenderer implements ActionListener {
     }
     
     private void actionPerformedSaveCfd() throws Exception {
-        String name;
+        String name = !msCfdiFileName.isEmpty() ? msCfdiFileName : (moCfdiFile != null ? moCfdiFile.getName() : "");
         
-        if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
-            name = moComprobante40.getEltEmisor().getAttRfc().getString();
-            name += "_" + moComprobante40.getAttTipoDeComprobante().getString();
-            name += "_" + STrnUtils.formatDocNumber(moComprobante40.getAttSerie().getString(), moComprobante40.getAttFolio().getString());
-            name += "." + SFileUtilities.xml;
-        }
-        else {
-            name = moComprobante33.getEltEmisor().getAttRfc().getString();
-            name += "_" + moComprobante33.getAttTipoDeComprobante().getString();
-            name += "_" + STrnUtils.formatDocNumber(moComprobante33.getAttSerie().getString(), moComprobante33.getAttFolio().getString());
-            name += "." + SFileUtilities.xml;
+        if (name.isEmpty()) {
+            if (mfCfdiVersion == DCfdConsts.CFDI_VER_40) {
+                name = moComprobante40.getEltEmisor().getAttRfc().getString();
+                name += "_" + moComprobante40.getAttTipoDeComprobante().getString();
+                name += "_" + STrnUtils.formatDocNumber(moComprobante40.getAttSerie().getString(), moComprobante40.getAttFolio().getString());
+                name += "." + SFileUtilities.xml;
+            }
+            else {
+                name = moComprobante33.getEltEmisor().getAttRfc().getString();
+                name += "_" + moComprobante33.getAttTipoDeComprobante().getString();
+                name += "_" + STrnUtils.formatDocNumber(moComprobante33.getAttSerie().getString(), moComprobante33.getAttFolio().getString());
+                name += "." + SFileUtilities.xml;
+            }
         }
         
         miClient.getFileChooser().setSelectedFile(new File(name));
@@ -754,13 +757,15 @@ public final class SDialogCfdRenderer implements ActionListener {
     /**
      * Recibe el XML de un CFDI y lo muestra en pantalla en un diálogo "flotante", accesible todo el tiempo.
      * @param xml XML del CFDI.
+     * @param fileName Nombre de archivo del CFDI.
      * @throws Exception
      */
-    public void renderCfdXml(final String xml) throws Exception {
+    public void renderCfdXml(final String xml, final String fileName) throws Exception {
         mbCreateProcessingButtons = false;
         
         mnDocumentType = 0;
         msCfdiXml = xml;
+        msCfdiFileName = fileName;
         moCfdiFile = null;
         moPdfFile = null;
         moDpsToLink = null;
@@ -796,9 +801,11 @@ public final class SDialogCfdRenderer implements ActionListener {
         if (mnDocumentType != 0) {
             try {
                 msCfdiXml = SXmlUtils.readXml(cfdiFile.getAbsolutePath());
+                msCfdiFileName = cfdiFile.getName();
             } 
             catch (Exception e) {
                 msCfdiXml = "";
+                msCfdiFileName = "";
                 throw new Exception("El XML no es válido:\n" + e);
             }
 

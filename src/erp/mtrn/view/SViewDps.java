@@ -57,6 +57,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryIogEntryTransfer;
 import erp.mtrn.data.SDataMinorChangesDps;
+import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.SThinDps;
 import erp.mtrn.data.STrnUtilities;
@@ -139,7 +140,7 @@ import sa.lib.gui.SGuiUtils;
  * Nombre de la variable: GOOGLE_APPLICATION_CREDENTIALS
  * Valor de la variable: ruta accesible al archivo JSON.
  * 
- * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
+ * @author Sergio Flores, Alfredo Pérez, Isabel Servín, Edwin Carmona, Claudio Peña, Rodrigo Ayala, Sergio Flores
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
@@ -4174,7 +4175,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             throw new FileNotFoundException(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            renderer.renderCfdXml(cfd.getDocXml());
+            renderer.renderCfdXml(cfd.getDocXml(), cfd.getDocXmlName());
         }
     }
     
@@ -4197,14 +4198,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
      * @throws Exception 
      */
     public static void showDocPdf(final SClientInterface client, final int[] dpsKey, final SDialogPdfViewer viewer) throws Exception {
-        File pdf = SCfdUtils.getXmlPdfInTempFile(client, dpsKey);
+        SDataPdf pdf = (SDataPdf) SDataUtilities.readRegistry(client, SDataConstants.TRN_PDF, dpsKey, SLibConstants.EXEC_MODE_SILENT);
+        File file = pdf == null ? null : pdf.downloadPdfFile(client, SDataPdf.MODE_TEMP_DIR);
 
-        if (pdf != null) {
+        if (file != null && file.exists()) {
             String folio = SThinDps.readDpsNumber(dpsKey, client.getSession().getStatement());
             String issuer = SThinDps.readDpsBizPartner(dpsKey, client.getSession().getStatement());
 
             SDocument document = new SDocument() {
-
+                
                 @Override
                 public String getFolio() {
                     return folio;
@@ -4214,9 +4216,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 public String getIssuer() {
                     return issuer;
                 }
+
+                @Override
+                public String getFileName() {
+                    return pdf.getDocPdfName();
+                }
             };
 
-            viewer.setPdf(document, pdf);
+            viewer.setPdf(document, file);
             viewer.setVisible(true);
         }
         else {

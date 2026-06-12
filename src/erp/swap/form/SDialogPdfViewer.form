@@ -161,18 +161,18 @@
             <Property name="toolTipText" type="java.lang.String" value="Folio documento"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[150, 23]"/>
+              <Dimension value="[125, 23]"/>
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="jtfFile">
+        <Component class="javax.swing.JTextField" name="jtfFileName">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="text" type="java.lang.String" value="file.pdf"/>
             <Property name="toolTipText" type="java.lang.String" value="Archivo PDF"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[150, 23]"/>
+              <Dimension value="[225, 23]"/>
             </Property>
           </Properties>
         </Component>
@@ -209,7 +209,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/erp/img/icon_std_return.gif"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Descartar para actualizar PDF..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Desechar para actualizar PDF..."/>
             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
               <Insets value="[2, 2, 2, 2]"/>
             </Property>
@@ -220,7 +220,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="jchkDeleteOnClose">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Descartar al cerrar"/>
+            <Property name="text" type="java.lang.String" value="Desechar al cerrar"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[125, 23]"/>

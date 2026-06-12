@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * Clase para registrar la importación de datos de servicios externos.
  *
- * @author Sergio Flores, Cesar Orozco
+ * @author Sergio Flores, César Orozco
  */
 public class SDbComImportLog extends SDbRegistryUser {
     

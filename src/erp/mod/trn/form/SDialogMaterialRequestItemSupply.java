@@ -37,7 +37,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDialogMaterialRequestItemSupply extends SBeanFormDialog implements ActionListener, ItemListener {
     

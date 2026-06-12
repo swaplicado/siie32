@@ -59,7 +59,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Adrian Aviles, Claudio Peña
+ * @author Adrián Aviles, Claudio Peña
  */
 public class SViewPurchasingProcess extends SGridPaneView implements ActionListener, ItemListener {
     

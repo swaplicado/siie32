@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SViewReportMaterialConsuptionCC extends SGridPaneView {
     

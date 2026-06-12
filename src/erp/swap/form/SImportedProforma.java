@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * In-memory proforma received from SWAP Services.
  *
- * @author Cesar Orozco, Edwin Carmona, Sergio Flores
+ * @author César Orozco, Edwin Carmona, Sergio Flores
  */
 public class SImportedProforma implements SGridRow, Serializable, Comparable<SImportedProforma> {
 

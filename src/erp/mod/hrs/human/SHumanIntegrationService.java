@@ -7,7 +7,7 @@ package erp.mod.hrs.human;
 
 /**
  *
- * @author Cesar Orozco
+ * @author César Orozco
  */
 
 import sa.lib.gui.SGuiSession;

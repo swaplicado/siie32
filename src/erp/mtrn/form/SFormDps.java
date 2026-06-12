@@ -125,7 +125,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -372,11 +371,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private int mnCfdXmlType; // current XML type for CFD type invoice
     private double mdPrepayments;
     private double mdPrepaymentsCy;
+    private int mnOldCurrencyId;
     private int mnOldFunctionalSubAreaId;
     private double mdOldExchangeRate;
     private double mdOldDiscountDocPercentage;
     private boolean mbOldIsDiscountDocApplying;
-    private java.lang.String msFileXmlJustLoaded;
+    private java.io.File moFileXmlJustLoaded;
     private java.io.File moFilePdfJustLoaded;
     private SDialogCfdRenderer moDialogCfdRenderer;
     private erp.swap.form.SDialogPdfViewer moDialogPdfViewer;
@@ -4641,8 +4641,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 }
                             }
                             catch (Exception e) {
-                                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
                                 SLibUtilities.renderException(this, e);
+                                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, e);
                             }
                             finally {
                                 moParamDpsSource = null; // no longer needed
@@ -4729,15 +4729,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void enableCfdXmlFields(boolean enable) {
         boolean enableFields = enable && isCfdEmissionRequired();
         boolean enableXmlFields = enable && isCfdXmlFileAllowed();
+        boolean enableXmlFieldsForValidation = enableXmlFields && moDps != null && (moDps.getDbmsDataCfd() != null || moDps.getAuxFileXml() != null);
         boolean isCfdi33or40 = mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33 || mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_40;
         
         jlFileXml.setEnabled(enableXmlFields);
         jbLoadFileXml.setEnabled(enableXmlFields);
         jbDeleteFileXml.setEnabled(enableXmlFields);
-        jckValidateOnSaveFileXml.setEnabled(false);
         jlFilePdf.setEnabled(enableXmlFields);
         jbLoadFilePdf.setEnabled(enableXmlFields);
         jbDeleteFilePdf.setEnabled(enableXmlFields);
+        
+        jckValidateOnSaveFileXml.setEnabled(enableXmlFieldsForValidation);
+        jckValidateOnSaveFileXml.setSelected(enableXmlFieldsForValidation);
         
         jcbCfdiTaxRegimeIssuing.setEnabled(enableFields && isCfdi33or40);
         jcbCfdiTaxRegimeReceptor.setEnabled(enableFields && isCfdi33or40);
@@ -7840,10 +7843,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void setFilePdfJustLoaded(final File pdf) {
+    private void setFileXmlJustLoaded(final File xml) {
+        moFileXmlJustLoaded = xml;
+        moFieldCfdiXmlFile.setFieldValue(moFileXmlJustLoaded == null ? "" : moFileXmlJustLoaded.getName());
+        
+        jbViewDocumentXml.setEnabled(moFileXmlJustLoaded != null);
+        
+        jckValidateOnSaveFileXml.setEnabled(moFileXmlJustLoaded != null);
+        jckValidateOnSaveFileXml.setSelected(moFileXmlJustLoaded != null);
+    }
+    
+    private void setFilePdfJustLoaded(final File pdf, final boolean deleteObsoleteTempFile) {
         moFilePdfJustLoaded = pdf;
-        jbViewDocumentPdf.setEnabled(moDps.isDocumentOrAdjustmentPur() && 
-                                        pdf != null && pdf.exists());
+        moFieldCfdiPdfFile.setFieldValue(moFilePdfJustLoaded == null ? "" : moFilePdfJustLoaded.getName());
+        
+        jbViewDocumentPdf.setEnabled(moFilePdfJustLoaded != null);
+        
+        if (deleteObsoleteTempFile && moDps != null && moDps.getDbmsDataPdf() != null) {
+            try {
+                File file = moDps.getDbmsDataPdf().createPdfTempFile(miClient);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+        }
     }
 
     private void actionDate() {
@@ -7914,65 +7940,57 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void actionShowCfdiXml() {
+    private void actionViewDocumentXml() {
         if (jbViewDocumentXml.isEnabled()) {
             try {
                 if (moDialogCfdRenderer == null) {
                     moDialogCfdRenderer = new SDialogCfdRenderer(miClient);
                 }
 
-                if (msFileXmlJustLoaded != null && !msFileXmlJustLoaded.isEmpty()) {
-                    // extraer el texto del xml en la ruta:
-                    // validar que el archivo exista:
-                    if (!new File(msFileXmlJustLoaded).exists()) {
-                        miClient.showMsgBoxWarning("No existe el XML del documento que se acaba de descargar.");
-                    }
-                    else {
-                        String xmlContent = SXmlUtils.readXml(msFileXmlJustLoaded);
-                        moDialogCfdRenderer.renderCfdXml(xmlContent);
-                    }
+                if (moFileXmlJustLoaded != null && moFileXmlJustLoaded.exists()) {
+                    String xml = SXmlUtils.readXml(moFileXmlJustLoaded.getAbsolutePath());
+                    
+                    moDialogCfdRenderer.renderCfdXml(xml, moFileXmlJustLoaded.getName());
                 }
                 else {
                     SViewDps.showCfdiXml(miClient, (int[]) moDps.getPrimaryKey(), moDialogCfdRenderer);
                 }
             }
-            catch (FileNotFoundException fnfe) {
-                miClient.showMsgBoxWarning(fnfe.getMessage());
-                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, fnfe);
-            }
-            catch (Exception ex) {
-                miClient.showMsgBoxWarning("No se pudo mostrar el XML del documento. "
-                        + "" + ex.getMessage());
-                Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+                Logger.getLogger(SFormDps.class.getName()).log(Level.WARNING, null, e);
             }
         }
     }
 
     private void actionViewDocumentPdf() {
-        try {
-            if (moDialogPdfViewer == null) {
-                moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient);
-            }
-            if (moFilePdfJustLoaded != null) {
-                SDocumentInfo documentInfo;
+        if (jbViewDocumentPdf.isEnabled()) {
+            try {
+                if (moDialogPdfViewer == null) {
+                    moDialogPdfViewer = new SDialogPdfViewer((SGuiClient) miClient);
+                }
 
-                if (moImportedDocument != null) {
-                    documentInfo = new SDocumentInfo(moImportedDocument);
+                if (moFilePdfJustLoaded != null && moFilePdfJustLoaded.exists()) {
+                    SDocumentInfo documentInfo;
+
+                    if (moImportedDocument != null) {
+                        documentInfo = new SDocumentInfo(moImportedDocument, moFilePdfJustLoaded.getName());
+                    }
+                    else {
+                        documentInfo = new SDocumentInfo(moFieldNumberSeries.getString(), moFieldNumber.getString(), "", moFieldDateDoc.getDate(), moBizPartner.getBizPartner(), moFilePdfJustLoaded.getName());
+                    }
+
+                    moDialogPdfViewer.setPdf(documentInfo, moFilePdfJustLoaded);
+                    moDialogPdfViewer.setVisible(true);
                 }
                 else {
-                    documentInfo = new SDocumentInfo(moFieldNumberSeries.getString(), moFieldNumber.getString(), "", moFieldDateDoc.getDate(), moBizPartner.getBizPartner());
+                    SViewDps.showDocPdf(miClient, (int[]) moDps.getPrimaryKey(), moDialogPdfViewer);
                 }
-
-                moDialogPdfViewer.setPdf(documentInfo, moFilePdfJustLoaded);
-                moDialogPdfViewer.setVisible(true);
             }
-            else {
-                SViewDps.showDocPdf(miClient, (int[]) moDps.getPrimaryKey(), moDialogPdfViewer);
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+                Logger.getLogger(SFormDps.class.getName()).log(Level.WARNING, null, e);
             }
-        }
-        catch (Exception ex) {
-            miClient.showMsgBoxWarning("No se encontró el PDF del documento");
-            Logger.getLogger(SFormDps.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -9480,89 +9498,93 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     @SuppressWarnings("deprecation")
     private void actionLoadFileXml() {
-        FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
-        miClient.getFileChooser().repaint();
-        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
-        miClient.getFileChooser().setFileFilter(filter);
-       
-        try {
-            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
-                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.xml)) {
-                    String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
-                    
-                    if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, absolutePath)) {
-                        String cfdi = SXmlUtils.readXml(absolutePath);
-                        float version = DCfdUtils.getCfdiVersion(cfdi);
-                        if (version == DCfdConsts.CFDI_VER_40) {
-                            msXmlUuid = "";
-                            moComprobante40 = DCfdUtils.getCfdi40(cfdi);
-                            cfd.ver40.DElementTimbreFiscalDigital tfd = moComprobante40.getEltOpcComplementoTimbreFiscalDigital();
+        if (!mbIsCatSales && !moBizPartner.isDomestic(miClient)) {
+            miClient.showMsgBoxInformation("Los asociados de negocios extranjeros no emiten CFDI.");
+        }
+        else {
+            FileFilter filter = SFileUtilities.createFileNameExtensionFilter(SFileUtilities.xml);
+            miClient.getFileChooser().repaint();
+            miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+            miClient.getFileChooser().setFileFilter(filter);
 
-                            if (tfd != null) {
-                                msXmlUuid = tfd.getAttUUID().getString();
-                            }
+            try {
+                if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.xml)) {
+                        File fileXml = miClient.getFileChooser().getSelectedFile();
 
-                            if (jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
-                                if (!moComprobante40.getAttSerie().getString().isEmpty()) {
-                                    jcbNumberSeries.setSelectedItem(moComprobante40.getAttSerie().getString());
+                        if (SCfdUtils.checkCompanyAsCfdiReceptor(miClient, fileXml.getAbsolutePath())) {
+                            String cfdi = SXmlUtils.readXml(fileXml.getAbsolutePath());
+                            float version = DCfdUtils.getCfdiVersion(cfdi);
+                            
+                            if (version == DCfdConsts.CFDI_VER_40) {
+                                msXmlUuid = "";
+                                moComprobante40 = DCfdUtils.getCfdi40(cfdi);
+                                cfd.ver40.DElementTimbreFiscalDigital tfd = moComprobante40.getEltOpcComplementoTimbreFiscalDigital();
+
+                                if (tfd != null) {
+                                    msXmlUuid = tfd.getAttUUID().getString();
+                                }
+
+                                if (jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
+                                    if (!moComprobante40.getAttSerie().getString().isEmpty()) {
+                                        jcbNumberSeries.setSelectedItem(moComprobante40.getAttSerie().getString());
+                                    }
+                                }
+
+                                if (jtfNumber.getText().isEmpty()) {
+                                    if (!moComprobante40.getAttFolio().getString().isEmpty()) {
+                                        jtfNumber.setText(moComprobante40.getAttFolio().getString());
+                                    }
+                                    else {
+                                        jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+                                    }
                                 }
                             }
+                            else if (version == DCfdConsts.CFDI_VER_33) {
+                                msXmlUuid = "";
+                                moComprobante33 = DCfdUtils.getCfdi33(cfdi);
+                                cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante33.getEltOpcComplementoTimbreFiscalDigital();
 
-                            if (jtfNumber.getText().isEmpty()) {
-                                if (!moComprobante40.getAttFolio().getString().isEmpty()) {
-                                    jtfNumber.setText(moComprobante40.getAttFolio().getString());
+                                if (tfd != null) {
+                                    msXmlUuid = tfd.getAttUUID().getString();
                                 }
-                                else {
-                                    jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+
+                                if (jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
+                                    if (!moComprobante33.getAttSerie().getString().isEmpty()) {
+                                        jcbNumberSeries.setSelectedItem(moComprobante33.getAttSerie().getString());
+                                    }
+                                }
+
+                                if (jtfNumber.getText().isEmpty()) {
+                                    if (!moComprobante33.getAttFolio().getString().isEmpty()) {
+                                        jtfNumber.setText(moComprobante33.getAttFolio().getString());
+                                    }
+                                    else {
+                                        jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+                                    }
                                 }
                             }
-                        }
-                        else if (version == DCfdConsts.CFDI_VER_33) {
-                            msXmlUuid = "";
-                            moComprobante33 = DCfdUtils.getCfdi33(cfdi);
-                            cfd.ver33.DElementTimbreFiscalDigital tfd = moComprobante33.getEltOpcComplementoTimbreFiscalDigital();
-
-                            if (tfd != null) {
-                                msXmlUuid = tfd.getAttUUID().getString();
+                            else {
+                                miClient.showMsgBoxInformation("Solo se pueden leer los CFDI versión 3.3 y 4.0."); 
                             }
-
-                            if (jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
-                                if (!moComprobante33.getAttSerie().getString().isEmpty()) {
-                                    jcbNumberSeries.setSelectedItem(moComprobante33.getAttSerie().getString());
-                                }
+                            
+                            if (moComprobante33 != null || moComprobante40 != null) {
+                                setFileXmlJustLoaded(fileXml);
                             }
-
-                            if (jtfNumber.getText().isEmpty()) {
-                                if (!moComprobante33.getAttFolio().getString().isEmpty()) {
-                                    jtfNumber.setText(moComprobante33.getAttFolio().getString());
-                                }
-                                else {
-                                    jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
-                                }
-                            }
-                        }
-                        else {
-                            miClient.showMsgBoxInformation("Solo se pueden leer los CFDI versión 3.3 y 4.0."); 
-                        }
-                        if (moComprobante33 != null || moComprobante40 != null) {
-                            moFieldCfdiXmlFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                            msFileXmlJustLoaded = absolutePath;
-                            jckValidateOnSaveFileXml.setEnabled(true);
-                            jckValidateOnSaveFileXml.setSelected(true);
                         }
                     }
-                }
-                else {
-                    miClient.showMsgBoxInformation("El archivo sólo puede ser XML.");
+                    else {
+                        miClient.showMsgBoxInformation("El archivo sólo puede ser XML.");
+                    }
                 }
             }
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-        finally {
-            miClient.getFileChooser().resetChoosableFileFilters();
-            miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
+            finally {
+                miClient.getFileChooser().resetChoosableFileFilters();
+                miClient.getFileChooser().setAcceptAllFileFilterUsed(true);
+            }
         }
     }
     
@@ -9575,8 +9597,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains("." + SFileUtilities.pdf)) {
-                    setFilePdfJustLoaded(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
-                    moFieldCfdiPdfFile.setFieldValue(moFilePdfJustLoaded.getName());
+                    setFilePdfJustLoaded(new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath()), true);
                 }
                 else {
                     miClient.showMsgBoxInformation("El archivo sólo puede ser PDF.");
@@ -9595,10 +9616,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         msXmlUuid = "";
         moComprobante33 = null;
         moComprobante40 = null;
-        moFieldCfdiXmlFile.setFieldValue("");
-        msFileXmlJustLoaded = "";
-        jckValidateOnSaveFileXml.setEnabled(false);
-        jckValidateOnSaveFileXml.setSelected(false);
+        
+        setFileXmlJustLoaded(null);
     }
     
     private void actionDeleteBillOfLading() {
@@ -9607,8 +9626,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionDeleteFilePdf() {
-        setFilePdfJustLoaded(null);
-        moFieldCfdiPdfFile.setFieldValue("");
+        setFilePdfJustLoaded(null, true);
     }
     
     private void actionCfdiRelatedDocs() {
@@ -12040,8 +12058,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbHasRightOmitSourceDoc = mbIsCatSales ? 
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
-        msFileXmlJustLoaded = "";
-        setFilePdfJustLoaded(null);
+        setFileXmlJustLoaded(null);
+        setFilePdfJustLoaded(null, false);
         moAddendaAmc71Manager = null;
         moComprobante33 = null;
         moComprobante40 = null;
@@ -12148,6 +12166,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditHelp.setEnabled(false);
         jbOk.setEnabled(true);
 
+        mnOldCurrencyId = 0;
         mnOldFunctionalSubAreaId = 0;
         mdOldExchangeRate = 0;
         mdOldDiscountDocPercentage = 0;
@@ -12408,33 +12427,44 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
 
-                // validate exchange rate, if neccesary:
+                // validate change of currency, or, if necessary, exchange rate:
 
-                if (!validation.getIsError() && !isLocalCurrency()) {
-                    if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
-                            miClient.showMsgBoxConfirm("¡La moneda del documento es '" + moFieldFkCurrencyId.getString() + "'!\n"
-                                    + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(1d) + "?") != JOptionPane.YES_OPTION) {
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
-                        validation.setComponent(jtfExchangeRate);
+                if (!validation.getIsError()) {
+                    boolean currencyWasChanged = mnOldCurrencyId != 0 && mnOldCurrencyId != moFieldFkCurrencyId.getKeyAsIntArray()[0];
+                    
+                    if (currencyWasChanged && miClient.showMsgBoxConfirm("<html><b>IMPORTANTE: ¡CONFIRMAR CAMBIO DE MONEDA DEL DOCUMENTO!</b><br>"
+                            + "La moneda que tenía el documento originalmente, " + miClient.getSession().getSessionCustom().getCurrency(new int[] { mnOldCurrencyId }) + ", ha cambiado.<br>"
+                            + "La moneda seleccionada en este momento es " + miClient.getSession().getSessionCustom().getCurrency(new int[] { moFieldFkCurrencyId.getKeyAsIntArray()[0] }) + ".<br>"
+                            + SLibConstants.MSG_CNF_MSG_CONT + "</html>") != JOptionPane.YES_OPTION) {
+                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkCurrencyId.getText() + "'.");
+                        validation.setComponent(jcbFkCurrencyId);
                     }
-                    else {
-                        double xrt = 0;
-
-                        try {
-                            xrt = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                    else if (!isLocalCurrency()) {
+                        if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
+                                miClient.showMsgBoxConfirm("¡La moneda del documento es '" + moFieldFkCurrencyId.getString() + "'!\n"
+                                        + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(1d) + "?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                            validation.setComponent(jtfExchangeRate);
                         }
-                        catch (Exception e) {
-                            SLibUtilities.renderException(this, e);
-                        }
+                        else {
+                            double xrt = 0;
 
-                        if (xrt != 0d) {
-                            int decs = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+                            try {
+                                xrt = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.renderException(this, e);
+                            }
 
-                            if (SLibUtils.round(Math.abs(SLibUtils.round(xrt, decs) - SLibUtils.round(moFieldExchangeRate.getDouble(), decs)), decs) >= 0.0001 &&
-                                    miClient.showMsgBoxConfirm("¡El tipo de cambio del día " + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + " para '" + moFieldFkCurrencyId.getString() + "' es " + SLibUtils.getDecimalFormatExchangeRate().format(xrt) + "!\n"
-                                            + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(moFieldExchangeRate.getDouble()) + "?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
-                                validation.setComponent(jtfExchangeRate);
+                            if (xrt != 0d) {
+                                int decs = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+
+                                if (SLibUtils.round(Math.abs(SLibUtils.round(xrt, decs) - SLibUtils.round(moFieldExchangeRate.getDouble(), decs)), decs) >= 0.0001 &&
+                                        miClient.showMsgBoxConfirm("¡El tipo de cambio del día " + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + " para '" + moFieldFkCurrencyId.getString() + "' es " + SLibUtils.getDecimalFormatExchangeRate().format(xrt) + "!\n"
+                                                + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(moFieldExchangeRate.getDouble()) + "?") != JOptionPane.YES_OPTION) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                                    validation.setComponent(jtfExchangeRate);
+                                }
                             }
                         }
                     }
@@ -12886,6 +12916,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                             }
                         }
                         
+                        // validate PDF removal:
+                        
+                        if (!validation.getIsError() && !mbIsCatSales) {
+                            if (moDps.getDbmsDataCfd() != null && moFieldCfdiXmlFile.getString().isEmpty() &&
+                                    miClient.showMsgBoxConfirm("El documento ya tenía archivo XML, pero ha sido eliminado.\n"
+                                            + "¿Está seguro que desea dejar al documento sin archivo XML?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Favor de agregar un archivo XML para el documento.");
+                                validation.setComponent(jbLoadFileXml);
+                                validation.setTabbedPaneIndex(TAB_CFD_XML);
+                            }
+                            else if (moDps.getDbmsDataPdf() != null && moFieldCfdiPdfFile.getString().isEmpty() &&
+                                    miClient.showMsgBoxConfirm("El documento ya tenía archivo PDF, pero ha sido eliminado.\n"
+                                            + "¿Está seguro que desea dejar al documento sin archivo PDF?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Favor de agregar un archivo PDF para el documento.");
+                                validation.setComponent(jbLoadFilePdf);
+                                validation.setTabbedPaneIndex(TAB_CFD_XML);
+                            }
+                        }
+                        
                         // validate CFD emission:
 
                         if (!validation.getIsError() && isCfdEmissionRequired) {
@@ -13269,16 +13318,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkFunctionalSubAreaId.setFieldValue(new int[] { moDps.getFkFunctionalSubAreaId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
         
-        moImportedDocument = moDps.getXtaImportedDocument();
-        jbViewImportedDocument.setEnabled(moImportedDocument != null);
-        if (moDps.isDocumentOrAdjustmentPur() && (moDps.getDbmsDataCfd() != null 
-            || (msFileXmlJustLoaded != null && !msFileXmlJustLoaded.isEmpty()))) {
-            jbViewDocumentXml.setEnabled(true);
-        }
-        else {
-            jbViewDocumentXml.setEnabled(false);
-        }
-        
         // set business partner, set aswell business partner default preferences when document is new:
 
         if (!mbMatRequestImport || moDps.getFkBizPartnerId_r() > 0) {
@@ -13536,23 +13575,35 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         if (isCfdXmlFileAllowed()) {
+            moImportedDocument = moDps.getXtaImportedDocument();
+            
+            setFileXmlJustLoaded(null);
+            
             if (moDps.getDbmsDataCfd() != null) { // cuando se modifica un DPS existente desde la vista de facturas
                 moFieldCfdiXmlFile.setFieldValue(moDps.getDbmsDataCfd().getDocXmlName());
-                msFileXmlJustLoaded = "";
             }
             else if (moDps.getAuxFileXml() != null) { // cuando se crea un DPS a partir de un archivo XML
-                moFieldCfdiXmlFile.setFieldValue(moDps.getAuxFileXml().getName());
-                msFileXmlJustLoaded = moDps.getAuxFileXml().getAbsolutePath();
+                setFileXmlJustLoaded(moDps.getAuxFileXml());
             }
             
-            if (moDps.getDbmsDataPdf() != null) { // Cuando el DPS posee un archivo PDF asociado.
-                setFilePdfJustLoaded(null);
+            setFilePdfJustLoaded(null, false);
+            
+            if (moDps.getDbmsDataPdf() != null) { // cuando el DPS posee un archivo PDF previamente asociado
                 moFieldCfdiPdfFile.setFieldValue(moDps.getDbmsDataPdf().getDocPdfName());
             }
-            else if (moDps.getAuxFilePdf() != null) {
-                setFilePdfJustLoaded(moDps.getAuxFilePdf());
-                moFieldCfdiPdfFile.setFieldValue(moFilePdfJustLoaded.getName());
+            else if (moDps.getAuxFilePdf() != null) { // cuando el DPS posee un archivo PDF recién asociado
+                setFilePdfJustLoaded(moDps.getAuxFilePdf(), false);
             }
+            
+            boolean enableUtilsFofXml = moDps.getDbmsDataCfd() != null || moDps.getAuxFileXml() != null;
+            boolean enableUtilsForPdf = moDps.getDbmsDataPdf() != null || moDps.getAuxFilePdf() != null;
+            
+            jbViewImportedDocument.setEnabled(moImportedDocument != null);
+            jbViewDocumentXml.setEnabled(enableUtilsFofXml);
+            jbViewDocumentPdf.setEnabled(enableUtilsForPdf);
+            
+            jckValidateOnSaveFileXml.setEnabled(enableUtilsFofXml);
+            jckValidateOnSaveFileXml.setSelected(enableUtilsFofXml);
         }
         
         if (isApplingInitiatives()) {
@@ -13588,6 +13639,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEditLogistics.setEnabled(enableMinor);
         jbEditNotes.setEnabled(enableMinor);
 
+        mnOldCurrencyId = moDps.getFkCurrencyId();
         mnOldFunctionalSubAreaId = moDps.getFkFunctionalSubAreaId();
         mdOldExchangeRate = moFieldExchangeRate.getDouble();
         mdOldDiscountDocPercentage = moFieldDiscountDocPercentage.getDouble();
@@ -13959,24 +14011,22 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             // process added XML file of CFDI:
 
-            if (!msFileXmlJustLoaded.isEmpty()) {
+            if (moFileXmlJustLoaded != null && moFileXmlJustLoaded.exists()) {
                 // an XML has just been provided to be attached to current registry:
                 
                 try {
                     SDataCfd cfd = SDataCfd.prepareCfd(
                             moDps.getDbmsDataCfd(), 
-                            new File(msFileXmlJustLoaded), 
+                            moFileXmlJustLoaded, 
                             miClient.getSession().getUser().getPkUserId());
                     
                     moDps.setDbmsDataCfd(cfd);
                     
-                    if (((moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
-                            || (moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0] && moDps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))
-                            && moComprobante40 != null) {
+                    if (moDps.isDocumentOrAdjustmentPur() && moComprobante40 != null) {
                         if (moDps.getDbmsDataDpsCfd() == null) {
-                            SDataDpsCfd oDpsCfdAux = new SDataDpsCfd();
-                            oDpsCfdAux.setAuxComprobante40(moComprobante40);
-                            moDps.setDbmsDataDpsCfd(oDpsCfdAux);
+                            SDataDpsCfd dpsCfd = new SDataDpsCfd();
+                            dpsCfd.setAuxComprobante40(moComprobante40);
+                            moDps.setDbmsDataDpsCfd(dpsCfd);
                         }
                         else {
                             moDps.getDbmsDataDpsCfd().setAuxComprobante40(moComprobante40);
@@ -13988,16 +14038,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             else if (moFieldCfdiXmlFile.getString().isEmpty() && moDps.getDbmsDataCfd() != null) {
-                // XXX NOTE: 2018-05-24, Sergio Flores: Check if this code is correct. It seems it does not, because when XML file is deleted, it is preserved... why?!
+                // Note that CFD registry will not be deleted, but only reseted:
                 
-                SDataCfd cfd = moDps.getDbmsDataCfd();
-
+                SDataCfd cfd = moDps.getDbmsDataCfd(); // convenience variable
                 cfd.setDocXml(""); // resets CFD
                 cfd.setDocXmlName(""); // resets CFD
                 cfd.setIsConsistent(true);
                 cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
-
-                moDps.setDbmsDataCfd(cfd);
             }
 
             if (moFilePdfJustLoaded != null) {
@@ -14021,7 +14068,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moDps.getDbmsDataPdf().setAuxDeleted(true); // PDF was removed!
                 }
                 else {
-                    moDps.getDbmsDataPdf().setAuxSkipSave(true); // PDF remains the same
+                    moDps.getDbmsDataPdf().setAuxSkipSave(true); // no need to change PDF at all, it remains the same!
                 }
             }
             
@@ -14123,7 +14170,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     actionViewImportedDocument();
                 }
                 else if (button == jbViewDocumentXml) {
-                    actionShowCfdiXml();
+                    actionViewDocumentXml();
                 }
                 else if (button == jbViewDocumentPdf) {
                     actionViewDocumentPdf();
