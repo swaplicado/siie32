@@ -1883,76 +1883,82 @@ public class SDbBankLayout extends SDbRegistryUser {
      */
     private void assignFilesToNewPayments(SGuiSession session) throws Exception {
         // Validación rápida: si no hay pagos nuevos o antiguos, nada que hacer.
-        if (maAuxNewPayments == null || maAuxNewPayments.isEmpty() || maAuxOldPaymentsIds == null || maAuxOldPaymentsIds.isEmpty()) {
+        if (maAuxNewPayments == null || maAuxNewPayments.isEmpty()) {
             return;
         }
+        try {
+            String sDeleteFilesSql = "UPDATE fin_pay_file SET b_del = 1 WHERE id_pay IN ("
+                    + "SELECT DISTINCT pl.id_pay "
+                    + "FROM fin_pay_lay_bank pl "
+                    + "INNER JOIN fin_pay AS p ON pl.id_pay = p.id_pay "
+                    + "WHERE pl.id_lay_bank = " + mnPkBankLayoutId + " AND "
+                    + "p.pay_tp = 'P')";
 
-        String sDeleteFilesSql = "UPDATE fin_pay_file SET b_del = 1 WHERE id_pay IN ("
-                + "SELECT DISTINCT pl.id_pay "
-                + "FROM fin_pay_lay_bank pl "
-                + "INNER JOIN fin_pay AS p ON pl.id_pay = p.id_pay "
-                + "WHERE pl.id_lay_bank = " + mnPkBankLayoutId + " AND "
-                + "p.pay_tp = 'P')";
+            session.getDatabase().getConnection().createStatement().executeUpdate(sDeleteFilesSql);
 
-        session.getDatabase().getConnection().createStatement().executeUpdate(sDeleteFilesSql);
-
-        StringBuilder sql = new StringBuilder("SELECT id_pay, id_file FROM fin_pay_file WHERE id_pay IN (");
-        for (int i = 0; i < maAuxOldPaymentsIds.size(); i++) {
-            if (i > 0) {
-                sql.append(',');
-            }
-            sql.append('?');
-        }
-        sql.append(") AND NOT b_del;");
-        java.sql.Connection conn = session.getDatabase().getConnection();
-        try (java.sql.PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            // Rellenar parámetros con los ids de pagos antiguos
-            for (int i = 0; i < maAuxOldPaymentsIds.size(); i++) {
-                ps.setInt(i + 1, maAuxOldPaymentsIds.get(i));
-            }
-            
-            // Leer todos los archivos asociados a los pagos antiguos (una sola vez)
-            ArrayList<SDbPaymentFile> files = new ArrayList<>();
-            try (ResultSet resultSet = ps.executeQuery()) {
-                while (resultSet.next()) {
-                    SDbPaymentFile oPaymentFile = new SDbPaymentFile();
-                    // Leer por clave compuesta (id_pay, id_file)
-                    oPaymentFile.read(session, new int[] { resultSet.getInt("id_pay"), resultSet.getInt("id_file") });
-                    files.add(oPaymentFile);
-                }
-            } catch (Exception ex) {
-                Logger.getLogger(SDbBankLayout.class.getName()).log(Level.SEVERE, null, ex);
-                throw ex;
-            }
-            
-            if (!files.isEmpty()) {
-                // Para cada pago nuevo, clonar las entradas leídas y asignar el nuevo id de pago
-                for (SDbPayment payment : maAuxNewPayments) {
-                    ArrayList<SDbPaymentFile> lFiles = new ArrayList<>();
-                    int sortPos = 1;
-                    for (SDbPaymentFile pf : files) {
-                        try {
-                            SDbPaymentFile cloned = pf.clone();
-                            // Actualizar clave de pago al pago nuevo
-                            cloned.setPkPaymentId(payment.getPkPaymentId());
-                            cloned.setRegistryNew(true);
-                            cloned.setSortingPos(sortPos);
-                            lFiles.add(cloned);
-                            sortPos++;
-                        }
-                        catch (CloneNotSupportedException e) {
-                            // Si la clonación falla, mostrar excepción y continuar con los demás
-                            SLibUtils.showException(this, e);
+            String sFilesOfPaymentsTypeP = "SELECT p.id_pay "
+                    + "FROM fin_pay_lay_bank pl "
+                    + "INNER JOIN fin_pay AS p ON pl.id_pay = p.id_pay "
+                    + "WHERE pl.id_lay_bank = " + mnPkBankLayoutId + " AND "
+                    + "p.pay_tp = 'P' AND p.b_del = 0";
+            ResultSet paymentsP = session.getDatabase().getConnection().createStatement().executeQuery(sFilesOfPaymentsTypeP);
+            while (paymentsP.next()) {
+                int idPaymentP = paymentsP.getInt("id_pay");
+                StringBuilder sql = new StringBuilder("SELECT id_pay, id_file FROM fin_pay_file WHERE b_del = 0 AND id_pay IN ("
+                        + "SELECT pe.fk_pay_req_n FROM fin_pay_ety AS pe WHERE pe.id_pay = " + idPaymentP + ");");
+                java.sql.Connection conn = session.getDatabase().getConnection();
+                try (java.sql.PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                    // Leer todos los archivos asociados a los pagos antiguos (una sola vez)
+                    ArrayList<SDbPaymentFile> files = new ArrayList<>();
+                    try (ResultSet resultSet = ps.executeQuery()) {
+                        while (resultSet.next()) {
+                            SDbPaymentFile oPaymentFile = new SDbPaymentFile();
+                            // Leer por clave compuesta (id_pay, id_file)
+                            oPaymentFile.read(session, new int[]{resultSet.getInt("id_pay"), resultSet.getInt("id_file")});
+                            files.add(oPaymentFile);
                         }
                     }
-                    // Añadir todos los archivos clonados al pago actual
-                    payment.getFiles().addAll(lFiles);
+                    catch (Exception ex) {
+                        Logger.getLogger(SDbBankLayout.class.getName()).log(Level.SEVERE, null, ex);
+                        throw ex;
+                    }
+
+                    if (!files.isEmpty()) {
+                        // Para cada pago nuevo, clonar las entradas leídas y asignar el nuevo id de pago
+                        for (SDbPayment payment : maAuxNewPayments) {
+                            if (payment.getPkPaymentId() != idPaymentP) {
+                                continue;
+                            }
+                            ArrayList<SDbPaymentFile> lFiles = new ArrayList<>();
+                            int sortPos = 1;
+                            for (SDbPaymentFile pf : files) {
+                                try {
+                                    SDbPaymentFile cloned = pf.clone();
+                                    // Actualizar clave de pago al pago nuevo
+                                    cloned.setPkPaymentId(payment.getPkPaymentId());
+                                    cloned.setRegistryNew(true);
+                                    cloned.setSortingPos(sortPos);
+                                    lFiles.add(cloned);
+                                    sortPos++;
+                                }
+                                catch (CloneNotSupportedException e) {
+                                    // Si la clonación falla, mostrar excepción y continuar con los demás
+                                    SLibUtils.showException(this, e);
+                                }
+                            }
+                            // Añadir todos los archivos clonados al pago actual
+                            payment.getFiles().addAll(lFiles);
+                        }
+                    }
+                }
+                catch (SQLException ex) {
+                    Logger.getLogger(SDbBankLayout.class.getName()).log(Level.SEVERE, null, ex);
+                    throw ex;
                 }
             }
         }
-        catch (SQLException ex) {
+        catch (Exception ex) {
             Logger.getLogger(SDbBankLayout.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
         }
     }
     
@@ -2476,7 +2482,6 @@ public class SDbBankLayout extends SDbRegistryUser {
             }
         }
         else {
-            assignFilesToNewPayments(session);
             for (SDbPayment pay : maAuxNewPayments) {
                 pay.save(session);
                 try {
@@ -2492,6 +2497,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 }
                 catch (Exception e) {}
             }
+            assignFilesToNewPayments(session);
         }
         
         mbRegistryNew = false;
@@ -2611,7 +2617,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         msSql = "SELECT p.id_pay "
                 + "FROM fin_pay AS p "
                 + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS + ";";
+                + "WHERE p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_IN_TREAS + " AND p.pay_tp = 'P';";
         try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             while (resultSet.next()) {
                 SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { resultSet.getInt(1) });
@@ -2622,7 +2628,8 @@ public class SDbBankLayout extends SDbRegistryUser {
         msSql = "SELECT p.id_pay "
                 + "FROM fin_pay AS p "
                 + "INNER JOIN fin_pay_lay_bank AS b ON p.id_pay = b.id_pay AND b.id_lay_bank = " + mnPkBankLayoutId + " "
-                + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ");";
+                + "WHERE p.fk_st_pay IN (" + SModSysConsts.FINS_ST_PAY_SUBR + ", " + SModSysConsts.FINS_ST_PAY_SUBR_P + ") "
+                + "AND p.pay_tp = 'R';";
         try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             while (resultSet.next()) {
                 SDbPayment payment = (SDbPayment) session.readRegistry(SModConsts.FIN_PAY, new int[] { resultSet.getInt(1) });
