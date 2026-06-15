@@ -6,10 +6,11 @@
 package erp.swap.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SExportDataPaymentEntry implements SExportData {
     
@@ -32,6 +33,10 @@ public class SExportDataPaymentEntry implements SExportData {
     public String entry_amount_exec;
     
     public int installment;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("payment_class")
+    public int paymentClass;
     
     public String document_bal_prev_app;
     
@@ -58,4 +63,12 @@ public class SExportDataPaymentEntry implements SExportData {
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String document_amount;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("fiscal_use")
+    public String documentFiscalUse;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("reference_item")
+    public String documentReferenceItem;
 }
