@@ -1445,8 +1445,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_USR_CO);
                             break;
                         case SLibConstants.LOGIN_OK:
-                            // login concedido
-                            // IMPORTANTE: ¡Favor de no cambiar el orden de las instrucciones de esta sección!
+                            // IMPORTANTE: ¡No cambiar el orden de las instrucciones de esta sección!
                             
                             markDevControlPoint("Creating session...");
                     
@@ -1457,8 +1456,8 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             prepareGui();
                             createSession();
                             retrieveSwapServicesSettings();
-                            SCfdUtils.resetDataSetForPayroll();
                             initCloudStorageManager(); 
+                            SCfdUtils.resetDataSetForPayroll();
 
                             boolean actionOk = actionFileSession(true);
                             
@@ -1864,24 +1863,26 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         }
     }
 
-    /*
-    XXX 2026-06-05, Sergio Flores: Este método debe cambiarse de lugar y, seguramente, de clase,
-    de modo que la inicialización de Google Cloud Storage Manager se invoque hasta el momento justo en que sea requerido.
-    */
+    /**
+     * Initialize Google Cloud Storage Manager.
+     * NOTICE: SWAP Services Settings must have been already retrieved!
+     */
     private void initCloudStorageManager() {
-        try {
-            String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CONFIG);
-            
-            if (!config.isEmpty()) {
-                String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CREDENTIALS);
-                
-                if (!credentials.isEmpty()) {
-                    CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+        if (mbSwapServicesLinkUp) {
+            try {
+                String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CONFIG);
+
+                if (!config.isEmpty()) {
+                    String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CREDENTIALS);
+
+                    if (!credentials.isEmpty()) {
+                        CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+                    }
                 }
             }
-        }
-        catch (Exception e) {
-            Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+            catch (Exception e) {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+            }
         }
     }
     
