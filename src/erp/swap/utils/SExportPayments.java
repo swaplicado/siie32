@@ -12,6 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mtrn.data.SThinDps;
 import erp.swap.SSwapConsts;
 import java.sql.ResultSet;
@@ -23,7 +24,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Isabel Servín. Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Edwin Carmona
  */
 public class SExportPayments extends Thread {
     
@@ -178,11 +179,21 @@ public class SExportPayments extends Thread {
                     entry.document_uuid = dps.getThinCfd() == null ? "" : dps.getThinCfd().getUuid();
                     entry.document_folio = dps.getDpsNumber();
                     entry.document_date = SLibUtils.DbmsDateFormatDate.format(dps.getDate());
-
+                    
                     entry.document_currency = dps.getDbmsCurrencyCode();
                     entry.document_amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(dps.getTotalCy_r()));
+                    
+                    if (dps.getThinDpsCfd() != null) {
+                        entry.documentFiscalUse = dps.getThinDpsCfd().getCfdUse();
+                    }
+                    entry.documentReferenceItem = dps.getRefItems();    
                 }
+                
             }
+            
+            entry.paymentClass = SPaymentUtils.mapPaymentClass(entry.documentFiscalUse,
+                                                                entry.documentReferenceItem,
+                                                                paymentEty.getFkDocDocId_n() > 0);
             entries.add(entry);
         }
         return entries.toArray(new SExportDataPaymentEntry[0]);

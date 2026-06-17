@@ -530,6 +530,12 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
     
+    public static final int FINS_CL_PAY_ND = 0;
+    public static final int FINS_CL_PAY_ASSET = 1;
+    public static final int FINS_CL_PAY_PURCHASE = 2;
+    public static final int FINS_CL_PAY_EXPENSE = 3;
+    public static final int FINS_CL_PAY_ADVANCE = 4;
+    
     public static final int FINS_ST_PAY_NEW = 1; // nuevo
     public static final int FINS_ST_PAY_IN_AUTH = 2; // en autorización
     public static final int FINS_ST_PAY_REJC = 3; // rechazado

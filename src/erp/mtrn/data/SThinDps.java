@@ -14,7 +14,7 @@ import sa.lib.SLibUtils;
  * Versión "delgada" del registro SDataDps (tabla trn_dps).
  * Se usa para agilizar la lectura de datos de DPS,
  * p. ej., en el procesamiento de CFDI de recepción de pagos o la importación de documentos desde SWAP Services.
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SThinDps implements Serializable, SThinData {
 
@@ -27,6 +27,7 @@ public class SThinDps implements Serializable, SThinData {
     protected int mnDaysOfCredit;
     protected double mdTotalCy_r;
     protected double mdTotal_r;
+    protected String msRefItems;
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
     protected int mnFkDpsTypeId;
@@ -87,6 +88,10 @@ public class SThinDps implements Serializable, SThinData {
 
     public double getTotal_r() {
         return mdTotal_r;
+    }
+
+    public String getRefItems() {
+        return msRefItems;
     }
     
     public int getFkDpsCategoryId() {
@@ -188,6 +193,7 @@ public class SThinDps implements Serializable, SThinData {
         mnDaysOfCredit = 0;
         mdTotalCy_r = 0;
         mdTotal_r = 0;
+        msRefItems = "";
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
         mnFkDpsTypeId = 0;
@@ -220,10 +226,22 @@ public class SThinDps implements Serializable, SThinData {
                 + "d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.fid_tp_pay, "
                 + "d.fid_bp_r, d.fid_bpb, d.fid_func, d.fid_func_sub, d.fid_cur, c.cur, c.cur_key, un.id_usr, un.usr, "
                 + "dr.fid_rec_year, dr.fid_rec_per, dr.fid_rec_bkc, dr.fid_rec_tp_rec, dr.fid_rec_num, "
-                + "dcfd.id_year, dcfd.id_doc, cfd.id_cfd, pdf.doc_pdf_name "
+                + "dcfd.id_year, dcfd.id_doc, cfd.id_cfd, pdf.doc_pdf_name, c_info.ref_items "
                 + "FROM trn_dps AS d "
                 + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
                 + "INNER JOIN erp.usru_usr AS un ON un.id_usr = d.fid_usr_new "
+                + "INNER JOIN "
+                        + "    (SELECT "
+                        + "            GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
+                        + "                SEPARATOR '/ ') AS ref_items, "
+                        + "            de.id_year, "
+                        + "            de.id_doc "
+                        + "    FROM trn_dps_ety de "
+                        + "    LEFT JOIN erp.itmu_item AS r_itm ON de.fid_item_ref_n = r_itm.id_item "
+                        + "    LEFT JOIN fin_cc AS fcc ON de.fid_cc_n = fcc.id_cc "
+                        + "    WHERE "
+                        + "        NOT de.b_del "
+                        + "    GROUP BY de.id_year , de.id_doc) AS c_info ON d.id_year = c_info.id_year AND d.id_doc = c_info.id_doc "
                 + "LEFT OUTER JOIN trn_dps_rec AS dr ON dr.id_dps_year = d.id_year AND dr.id_dps_doc = d.id_doc "
                 + "LEFT OUTER JOIN trn_dps_cfd AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
                 + "LEFT OUTER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc "
@@ -244,6 +262,7 @@ public class SThinDps implements Serializable, SThinData {
                 mnDaysOfCredit = resultSet.getInt("d.days_cred");
                 mdTotalCy_r = resultSet.getDouble("d.tot_cur_r");
                 mdTotal_r = resultSet.getDouble("d.tot_r");
+                msRefItems = resultSet.getString("c_info.ref_items");
                 mnFkDpsCategoryId = resultSet.getInt("d.fid_ct_dps");
                 mnFkDpsClassId = resultSet.getInt("d.fid_cl_dps");
                 mnFkDpsTypeId = resultSet.getInt("d.fid_tp_dps");

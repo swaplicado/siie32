@@ -588,4 +588,144 @@ public class SPaymentUtils {
                 return SSwapConsts.FILE_TYPE_PAY_SUPP;
         }
     }
+    
+    
+    /**
+     * Verifica si el código de referencia del ítem indica un activo fijo.
+     * Códigos válidos: ADI, AET, AMC, AME, AMM, AMU
+     *
+     * @param refItem código de referencia del ítem
+     * @return true si el ítem indica activo fijo, false en caso contrario
+     */
+    private static boolean isFixedAssetItem(String refItem) {
+        if (refItem == null || refItem.isEmpty()) {
+            return false;
+        }
+        return refItem.startsWith("ADI") || refItem.startsWith("AET") || 
+               refItem.startsWith("AMC") || refItem.startsWith("AME") || 
+               refItem.startsWith("AMM") || refItem.startsWith("AMU");
+    }
+    
+    /**
+     * Verifica si el código de referencia del ítem indica un gasto.
+     * Códigos válidos: GA, GC, GF, GO, GP, GV, HA, OA, OP, OV
+     *
+     * @param refItem código de referencia del ítem
+     * @return true si el ítem indica gasto, false en caso contrario
+     */
+    private static boolean isExpenseItem(String refItem) {
+        if (refItem == null || refItem.isEmpty()) {
+            return false;
+        }
+        return refItem.startsWith("GA") || refItem.startsWith("GC") || 
+               refItem.startsWith("GF") || refItem.startsWith("GO") || 
+               refItem.startsWith("GP") || refItem.startsWith("GV") || 
+               refItem.startsWith("HA") || refItem.startsWith("OA") || 
+               refItem.startsWith("OP") || refItem.startsWith("OV");
+    }
+    
+    /**
+     * Clasifica los pagos según su tipo basado en el uso fiscal del CFDI y el código de referencia del ítem.
+     * 
+     * <p>Esta función implementa la lógica de clasificación de pagos en cuatro categorías:</p>
+     * 
+     * <h3>1. Activo Fijo (paymentClass = 1)</h3>
+     * <p>Aplica a proveedores nacionales y extranjeros, cuando:</p>
+     * <ul>
+     *   <li>El Uso del CFDI de la factura o de la OC relacionada es "I01" - "I08"
+     *       <br/><em>Nota: Los extranjeros no emiten CFDI, pero sus facturas tienen OC relacionada.</em></li>
+     *   <li>O bien, la clave del ítem del concepto inicia con: ADI, AET, AMC, AME, AMM, AMU</li>
+     * </ul>
+     * 
+     * <h3>2. Compra (paymentClass = 2)</h3>
+     * <p>Aplica a proveedores nacionales y extranjeros, cuando:</p>
+     * <ul>
+     *   <li>El Uso del CFDI de la factura o de la OC relacionada es "G01" - "G03"
+     *       <br/><em>Nota: Los extranjeros no emiten CFDI, pero sus facturas tienen OC relacionada.</em></li>
+     *   <li>Y la clave del ítem NO inicia con: GA[09], GC[09], GF[09], GO[09], GP[09], GV[09], HA[09], OA[0-9], OP[0-9], OV[0-9]
+     *       <br/><em>Nota: Distíngase entre las expresiones regulares [09] (dos caracteres) y [0-9] (un dígito).</em></li>
+     * </ul>
+     * 
+     * <h3>3. Gasto (paymentClass = 3)</h3>
+     * <p>Aplica a proveedores nacionales y extranjeros, cuando:</p>
+     * <ul>
+     *   <li>El Uso del CFDI de la factura o de la OC relacionada es "G01" - "G03"
+     *       <br/><em>Nota: Los extranjeros no emiten CFDI, pero sus facturas tienen OC relacionada.</em></li>
+     *   <li>Y la clave del ítem INICIA con: GA[09], GC[09], GF[09], GO[09], GP[09], GV[09], HA[09], OA[0-9], OP[0-9], OV[0-9]
+     *       <br/><em>Nota: Distíngase entre las expresiones regulares [09] (dos caracteres) y [0-9] (un dígito).</em></li>
+     * </ul>
+     * 
+     * <h3>4. Anticipo (paymentClass = 4)</h3>
+     * <p>Aplica a proveedores nacionales y extranjeros, cuando:</p>
+     * <ul>
+     *   <li>El pago no tiene factura relacionada</li>
+     * </ul>
+     * 
+     * @param documentFiscalUse  Uso del CFDI de la factura (ej: "G01", "I01", etc.), o {@code null}
+     * @param refItem            Código de referencia del ítem del concepto, o {@code null}
+     * @param hasDocument        Indica si el pago tiene documento relacionado
+     * @return código de clasificación: 0 (sin clasificación/anticipo), 1 (activo fijo), 2 (compra), 3 (gasto), 4 (anticipo)
+     */
+    public static int mapPaymentClass(String documentFiscalUse, String refItem, boolean hasDocument) {
+        int paymentClass;
+        if (!hasDocument) {
+            return SModSysConsts.FINS_CL_PAY_ADVANCE; // anticipo
+        }
+        
+        // Si el uso fiscal no está disponible, verificar solo el refItem
+        if (documentFiscalUse == null || documentFiscalUse.isEmpty()) {
+            if (isFixedAssetItem(refItem)) {
+                paymentClass = SModSysConsts.FINS_CL_PAY_ASSET; // Activo fijo
+            }
+            else if (isExpenseItem(refItem)) {
+                paymentClass = SModSysConsts.FINS_CL_PAY_EXPENSE; // Gasto
+            }
+            else {
+                paymentClass = 0; // Sin clasificación
+            }
+            return paymentClass;
+        }
+        
+        // Si el uso fiscal está disponible, evaluar según la tabla de códigos
+        switch (documentFiscalUse) {
+            case "G01":
+            case "G02":
+            case "G03":
+                // Compra o Gasto depende del refItem
+                paymentClass = isExpenseItem(refItem) ? SModSysConsts.FINS_CL_PAY_EXPENSE : SModSysConsts.FINS_CL_PAY_PURCHASE;
+                break;
+
+            case "I01":
+            case "I02":
+            case "I03":
+            case "I04":
+            case "I05":
+            case "I06":
+            case "I07":
+            case "I08":
+                paymentClass = SModSysConsts.FINS_CL_PAY_ASSET; // Activo fijo
+                break;
+
+            case "D01":
+            case "D02":
+            case "D03":
+            case "D04":
+            case "D05":
+            case "D06":
+            case "D07":
+            case "D08":
+            case "D09":
+            case "D10":
+            case "S01":
+            case "CP01":
+            case "CN01":
+            case "P01":
+            default:
+                // Para otros códigos, verificar el refItem
+                paymentClass = isFixedAssetItem(refItem) ? SModSysConsts.FINS_CL_PAY_ASSET : SModSysConsts.FINS_CL_PAY_ND;
+                break;
+        }
+        
+        return paymentClass;
+    }
 }

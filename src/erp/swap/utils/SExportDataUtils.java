@@ -2174,6 +2174,7 @@ public abstract class SExportDataUtils {
                         // DPS:
                         + "d.id_year, d.id_doc, d.num_ser AS _dps_ser, d.num AS _dps_num, CONCAT(d.num_ser, IF(d.num_ser = '', '', '-'), d.num) AS _dps_folio, d.dt AS _dps_dt, "
                         + "d.tot_cur_r, d.fid_cur AS _dps_cur_id, cd.cur_key AS _dps_cur_key, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, c_info.ref_items, "
                         // CFD:
                         + "cfd.uuid AS _cfd_uuid, cfd.fid_tp_cfd, cfd.fid_tp_xml, cfd.fid_st_xml "
                         + "FROM "
@@ -2188,6 +2189,19 @@ public abstract class SExportDataUtils {
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ba_ben_b ON ba_ben_b.id_bp = ba_ben.fid_bank "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " AS sdp ON sdp.fk_dps_year_n = pe.fk_doc_year_n AND sdp.fk_dps_doc_n = pe.fk_doc_doc_n AND NOT sdp.b_del "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON d.id_year = pe.fk_doc_year_n AND d.id_doc = pe.fk_doc_doc_n AND NOT d.b_del "
+                        + "LEFT OUTER JOIN "
+                        + "    (SELECT "
+                        + "            GROUP_CONCAT(DISTINCT CONCAT(r_itm.item_key, ' - ', r_itm.item) "
+                        + "                SEPARATOR '/ ') AS ref_items, "
+                        + "            de.id_year, "
+                        + "            de.id_doc "
+                        + "    FROM " + database + ".trn_dps_ety de "
+                        + "    LEFT JOIN erp.itmu_item AS r_itm ON de.fid_item_ref_n = r_itm.id_item "
+                        + "    LEFT JOIN " + database + ".fin_cc AS fcc ON de.fid_cc_n = fcc.id_cc "
+                        + "    WHERE "
+                        + "        NOT de.b_del "
+                        + "    GROUP BY de.id_year , de.id_doc) AS c_info ON d.id_year = c_info.id_year AND d.id_doc = c_info.id_doc "
+                        + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_CFD) + " AS dcfd ON dcfd.id_year = d.id_year AND dcfd.id_doc = d.id_doc "
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cd ON cd.id_cur = d.fid_cur "
                         + "LEFT OUTER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = pe.fk_doc_year_n AND cfd.fid_dps_doc_n = pe.fk_doc_doc_n "
                         + "WHERE ("
@@ -2302,6 +2316,8 @@ public abstract class SExportDataUtils {
                         paymentEntry.document_date = null;
                         paymentEntry.document_currency = null;
                         paymentEntry.document_amount = null;
+                        
+                        paymentEntry.paymentClass = SPaymentUtils.mapPaymentClass(null, null, false);
                     }
                     else {
                         String uuid = resultSet.getString("_cfd_uuid");
@@ -2320,6 +2336,13 @@ public abstract class SExportDataUtils {
                         paymentEntry.document_date = SLibUtils.DbmsDateFormatDate.format(resultSet.getDate("_dps_dt"));
                         paymentEntry.document_currency = resultSet.getString("_dps_cur_key");
                         paymentEntry.document_amount = SExportUtils.FormatStdAmount.format(resultSet.getDouble("d.tot_cur_r"));
+                        
+                        paymentEntry.documentFiscalUse = resultSet.getString("_cfd_use");
+                        paymentEntry.documentReferenceItem = resultSet.getString("ref_items");
+                        
+                        paymentEntry.paymentClass = SPaymentUtils.mapPaymentClass(paymentEntry.documentFiscalUse, 
+                                                paymentEntry.documentReferenceItem, 
+                                                true);
                     }
 
                     ArrayList<SExportDataPaymentEntry> entries = paymentEntriesMap.get(currentPayment);

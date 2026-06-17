@@ -10,13 +10,14 @@ import java.sql.Statement;
  * Versión "delgada" del registro SDataDpsCfd (tabla trn_dps_cfd).
  * Se usa para agilizar la lectura de datos de DPS,
  * p. ej., en el procesamiento de CFDI de recepción de pagos o la importación de documentos desde SWAP Services.
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona
  */
 public class SThinDpsCfd implements Serializable, SThinData {
     
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected String msPaymentMethod;
+    protected String msCfdUse;
     
     public SThinDpsCfd() {
         reset();
@@ -34,11 +35,16 @@ public class SThinDpsCfd implements Serializable, SThinData {
         return msPaymentMethod;
     }
 
+    public String getCfdUse() {
+        return msCfdUse;
+    }
+
     @Override
     public void reset() {
         mnPkYearId = 0;
         mnPkDocId = 0;
         msPaymentMethod = "";
+        msCfdUse = "";
     }
 
     @Override
@@ -46,7 +52,7 @@ public class SThinDpsCfd implements Serializable, SThinData {
         reset();
         
         int[] key = (int[]) primaryKey;
-        String sql = "SELECT pay_met "
+        String sql = "SELECT pay_met, COALESCE(dcfd.cfd_use, '') AS _cfd_use "
                 + "FROM trn_dps_cfd "
                 + "WHERE id_year = " + key[0] + " AND id_doc = " + key[1] + ";";
         
@@ -58,6 +64,7 @@ public class SThinDpsCfd implements Serializable, SThinData {
                 mnPkYearId = key[0];
                 mnPkDocId = key[1];
                 msPaymentMethod = resultSet.getString("pay_met");
+                msCfdUse = resultSet.getString("_cfd_use");
             }
         }
     }
