@@ -1933,12 +1933,13 @@ public class SDbBankLayout extends SDbRegistryUser {
                             int sortPos = 1;
                             for (SDbPaymentFile pf : files) {
                                 try {
-                                    SDbPaymentFile cloned = pf.clone();
+                                    SDbPaymentFile oPaymentFileCloned = pf.clone();
                                     // Actualizar clave de pago al pago nuevo
-                                    cloned.setPkPaymentId(payment.getPkPaymentId());
-                                    cloned.setRegistryNew(true);
-                                    cloned.setSortingPos(sortPos);
-                                    lFiles.add(cloned);
+                                    oPaymentFileCloned.setPkPaymentId(payment.getPkPaymentId());
+                                    oPaymentFileCloned.setRegistryNew(true);
+                                    oPaymentFileCloned.setSortingPos(sortPos);
+                                    oPaymentFileCloned.save(session);
+                                    lFiles.add(oPaymentFileCloned);
                                     sortPos++;
                                 }
                                 catch (CloneNotSupportedException e) {

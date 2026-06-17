@@ -2319,7 +2319,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
     
     private ArrayList<SDbPayment> createAuxNewPayments() {
-        ArrayList<SDbPayment> newPays = new ArrayList<>();
+        ArrayList<SDbPayment> lNewPayments = new ArrayList<>();
         HashMap<Integer, Boolean> lBps = new HashMap<>();
         
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
@@ -2336,7 +2336,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     isDomestic = oBp.isDomestic((SClientInterface) miClient);
                     lBps.put(row.getBizPartnerId(), isDomestic);
                 }
-                for (SDbPayment pay : newPays) {
+                for (SDbPayment pay : lNewPayments) {
                     if (row.getBizPartnerId() == pay.getFkBeneficiaryId() &&
                             row.getBankAccPk()[0] == pay.getFkBeneficiaryBankBizParterBranchId_n() &&
                             row.getBankAccPk()[1] == pay.getFkBeneficiaryBankAccountCashId_n()) {
@@ -2350,8 +2350,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             pay.setReceiptPaymentRequired(false);
                         }
                         else {
-                            if (!pay.isReceiptPaymentRequired()) {
-                                pay.setReceiptPaymentRequired(row.getReceptionPayReq());
+                            if (! pay.isReceiptPaymentRequired() && row.getDpsDocId() > 0) {
+                                SDataDps oDps = new SDataDps();
+                                oDps.read(new int[]{row.getDpsYearId(), row.getDpsDocId()}, miClient.getSession().getStatement());
+                                if (oDps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                                    pay.setReceiptPaymentRequired(oDps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CASH);
+                                }
                             }
                         }
                         for (SRowPayments oRowPay : row.getPayments()) {
@@ -2361,7 +2365,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                             }
                         }
                         
-                        pay.getChildEntries().add(createAuxNewPaymentEntry(row));
+                        SDbPaymentEntry oPayEntry = createAuxNewPaymentEntry(row);
+                        pay.getChildEntries().add(oPayEntry);
                         break;
                     }
                 }
@@ -2406,14 +2411,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     //payment.setTsUserInsert(...);
                     //payment.setTsUserUpdate(...);
                     
-                    payment.getChildEntries().add(createAuxNewPaymentEntry(row));
+                    SDbPaymentEntry oPayEntry = createAuxNewPaymentEntry(row);
+                    payment.getChildEntries().add(oPayEntry);
                     
-                    newPays.add(payment);
+                    lNewPayments.add(payment);
                 }
             }
         }
         
-        return newPays;
+        return lNewPayments;
     }
     
     private SDbPaymentEntry createAuxNewPaymentEntry(SLayoutBankRow row) {
