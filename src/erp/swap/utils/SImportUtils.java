@@ -769,7 +769,7 @@ public abstract class SImportUtils {
     private static File[] downloadDocumentsFiles(final SGuiSession session, final String filesDownloadServiceUrl, final int downloadMode, final int downloadFilesType, final ArrayList<Integer> documentExternalIds, final int documentType, final File desiredZipFile, final int zipBatch) throws Exception {
         File[] files = null;
         File zipFile = null;
-        Path tempDir = null;
+        Path tempPath = null;
         Path tempFile = null;
         Exception exception = null;
         HttpURLConnection conn = null;
@@ -854,11 +854,15 @@ public abstract class SImportUtils {
                     
                     String prefix = getFileNamePrefix(documentType);
                     String companyCode = SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.CFGU_CO, new int[] { session.getConfigCompany().getCompanyId() }, SLibConstants.DESCRIPTION_CODE);
+                    String tempDir = SSwapConsts.SIIE + "_" + companyCode;
                     
-                    tempDir = Files.createTempDirectory(SSwapConsts.SIIE + "_" + companyCode);
-                    System.out.println("Temporary directory created at: " + tempDir);
+                    System.out.println("Deleting obsolete temporary directories created previously...");
+                    SFileUtils.deleteObsoleteDirectories(System.getProperty("java.io.tmpdir"), tempDir + "*");
                     
-                    tempFile = Files.createFile(tempDir.resolve((prefix + " " + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
+                    tempPath = Files.createTempDirectory(tempDir);
+                    System.out.println("Temporary directory created at: " + tempPath);
+                    
+                    tempFile = Files.createFile(tempPath.resolve((prefix + " " + FormatDatetime.format(new Date())).replaceAll(" ", "_") + "." + SFileUtilities.zip));
                     
                     zipFile = tempFile.toFile();
                     break;
@@ -913,7 +917,7 @@ public abstract class SImportUtils {
 
                                     while ((entry = zis.getNextEntry()) != null) {
 
-                                        File currentFile = new File(tempDir.toString(), entry.getName());
+                                        File currentFile = new File(tempPath.toString(), entry.getName());
                                         currentFile.getParentFile().mkdirs();
 
                                         try (FileOutputStream fos = new FileOutputStream(currentFile)) {
@@ -950,7 +954,7 @@ public abstract class SImportUtils {
                                     while ((entry = zis.getNextEntry()) != null) {
                                         System.out.println("Extracting: " + entry.getName());
 
-                                        File currentFile = new File(tempDir.toString() + "\\output", entry.getName());
+                                        File currentFile = new File(tempPath.toString() + "\\output", entry.getName());
                                         currentFile.getParentFile().mkdirs(); // decompress files in temporal directory
 
                                         try (FileOutputStream fos = new FileOutputStream(currentFile)) {
