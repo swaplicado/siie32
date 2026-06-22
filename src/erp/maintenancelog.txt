@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 303.0/ 2026-06-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Eliminación de carpetas temporales obsoletas de descarga de archivos de facturas desde SWAP Services, estas son, las creadas el día anterior o antes.
+
+================================================================================
 SIIE 3.2 302.6/ 2026-06-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -10,7 +16,7 @@ SIIE 3.2 302.5/ 2026-06-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Clasificación de pagos 1. Activo Fijo, 2. Compra, 3. Gasto, 4. Anticipo.
-2) Se agrega clase de pago e ítem de referencia a exportación de pagos
+2) Se agrega clase de pago e ítem de referencia a exportación de pagos.
 
 --------------------------------------------------------------------------------
 Sergio Abraham FLORES GUTIÉRREZ
