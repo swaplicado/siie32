@@ -3,6 +3,7 @@ SIIE 3.2 303.0/ 2026-06-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Eliminación de carpetas temporales obsoletas de descarga de archivos de facturas desde SWAP Services, estas son, las creadas el día anterior o antes.
+2) Extensión de longitud de columna "símbolo", a 15 carácteres, en el catálogo de unidades de medida.
 
 ================================================================================
 SIIE 3.2 302.6/ 2026-06-17

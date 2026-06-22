@@ -306,7 +306,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfUnit, jlUnit);
         moFieldUnit.setLengthMax(50);
         moFieldSymbol = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSymbol, jlSymbol);
-        moFieldSymbol.setLengthMax(10);
+        moFieldSymbol.setLengthMax(15);
         moFieldSymbol.setAutoCaseType(SLibConstants.UNDEFINED);
         moFieldFkCfdUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, moKeyCfdUnitId.getComponent(), jlFkCfdUnitId);
         moKeyCfdUnitId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdUnitId.getText()), true);
