@@ -3,7 +3,7 @@ SIIE 3.2 303.1/ 2026-06-23
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Adición de subtotales a reportes de cobros o pagos por período.
-2) Corrección al importar facturas en SThinDpsCfd, al leer los datos de CFDI de recepción de pagos o la importación de documentos desde SWAP Services (Alias incorrecto)
+2) Corrección al importar facturas en SThinDpsCfd, al leer los datos de CFDI de recepción de pagos o la importación de documentos desde SWAP Services (alias incorrecto).
 
 ================================================================================
 SIIE 3.2 303.0/ 2026-06-22
