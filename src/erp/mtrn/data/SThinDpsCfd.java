@@ -52,7 +52,7 @@ public class SThinDpsCfd implements Serializable, SThinData {
         reset();
         
         int[] key = (int[]) primaryKey;
-        String sql = "SELECT pay_met, COALESCE(dcfd.cfd_use, '') AS _cfd_use "
+        String sql = "SELECT pay_met, COALESCE(cfd_use, '') AS _cfd_use "
                 + "FROM trn_dps_cfd "
                 + "WHERE id_year = " + key[0] + " AND id_doc = " + key[1] + ";";
         

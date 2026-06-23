@@ -21,7 +21,7 @@ import sa.lib.SLibUtils;
 /**
  * Consulta de pagos y cobros por período, en resumen y a detalle.
  * 2026-05-27, Sergio Flores: Se usa actualmente para resumen y detalle de ventas y resumen de comrpas. Para detalle de compras se usa la clase erp.mod.fin.view.SViewDpsPayment.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewDpsPayment extends erp.lib.table.STableTab {
     
@@ -52,7 +52,7 @@ public class SViewDpsPayment extends erp.lib.table.STableTab {
         updateCurrencyToolTip();
         addTaskBarUpperComponent(mjCurrency);
 
-        int cols = isSummary() ? 7 : 24;
+        int cols = isSummary() ? 11 : 24;
         
         if (!isPurchases()) {
             // columns for sales only:
@@ -97,6 +97,20 @@ public class SViewDpsPayment extends erp.lib.table.STableTab {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "re.sort_pos", "# partida póliza", STableConstants.WIDTH_NUM_TINYINT); // as String to prevent NaN to be displayed in totals row
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "re.concept", "Concepto partida póliza", 200);
+        }
+        
+        if (isSummary()) {
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stot", "Subtotal $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true);
+
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_charged", "Imp tras $", STableConstants.WIDTH_VALUE);
+            aoTableColumns[i++].setSumApplying(true);
+
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tax_retained", "Imp ret $", STableConstants.WIDTH_VALUE);
+            aoTableColumns[i++].setSumApplying(true);
+
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_tot", "Total $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setSumApplying(true);
         }
         
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_debit", "Cargos $", STableConstants.WIDTH_VALUE_2X);
@@ -166,11 +180,23 @@ public class SViewDpsPayment extends erp.lib.table.STableTab {
         }
         
         if (isLocalCurrency) {
-            msSql += "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, "
-                    + SModSysConsts.CFGU_CUR_MXN + " AS f_id_cur, '" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur ";
+            msSql += "SUM(d.stot_r) AS f_stot, "
+                    + "SUM(d.tax_charged_r) AS f_tax_charged, "
+                    + "SUM(d.tax_retained_r) AS f_tax_retained, "
+                    + "SUM(d.tot_r) AS f_tot, "
+                    + "SUM(re.debit) AS f_debit, "
+                    + "SUM(re.credit) AS f_credit, "
+                    + SModSysConsts.CFGU_CUR_MXN + " AS f_id_cur, '"
+                    + miClient.getSession().getSessionCustom().getLocalCurrencyCode()
+                    + "' AS f_cur ";
         }
         else {
-            msSql += "SUM(re.debit_cur) AS f_debit, SUM(re.credit_cur) AS f_credit, "
+            msSql += "SUM(d.stot_cur_r) AS f_stot, "
+                    + "SUM(d.tax_charged_cur_r) AS f_tax_charged, "
+                    + "SUM(d.tax_retained_cur_r) AS f_tax_retained, "
+                    + "SUM(d.tot_cur_r) AS f_tot, "
+                    + "SUM(re.debit_cur) AS f_debit, "
+                    + "SUM(re.credit_cur) AS f_credit, "
                     + "re.fid_cur AS f_id_cur, c.cur_key AS f_cur ";
         }
                 
