@@ -10,10 +10,13 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbPayroll;
 import erp.mtrn.data.SCfdPrint;
 import erp.mtrn.data.SDataCfd;
 import erp.print.SDataConstantsPrint;
-import java.awt.Cursor;
+import erp.swap.form.SProgressCallback;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -21,40 +24,56 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
+import sa.lib.gui.bean.SBeanFieldRadio;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
-public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, ChangeListener, ItemListener {
+public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener {
     
-    private int emitedCfdi;
+    public static final int BY_PERIOD = 1;
+    public static final int BY_PAYROLL = 2;
+    
+    protected int mnMode;
+    protected int mnPayrollId;
+    protected int mnCfdiFound;
+    protected ArrayList<JComponent> maByPeriodFields;
+    protected ArrayList<JComponent> maByPayrollFields;
 
     /**
      * Creates new form SDialogSaveCfdi
-     * @param client
-     * @param title
+     * @param client GUI Client.
+     * @param title Title.
+     * @param mode Saving mode: BY_PERIOD or BY_PAYROLL.
      * @throws java.lang.Exception
      */
-    public SDialogSaveCfdi(SGuiClient client, final String title) throws Exception {
-        this.setTitle(title);
-        miClient = client;
+    public SDialogSaveCfdi(SGuiClient client, final String title, final int mode) throws Exception {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, 0, 0, title);
+        mnMode = mode;
         initComponents();
         initComponentsCustom();
     }
@@ -68,6 +87,8 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgPaymentType = new javax.swing.ButtonGroup();
+        bgSheetType = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -76,10 +97,24 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
         jPanel4 = new javax.swing.JPanel();
         jlPeriod = new javax.swing.JLabel();
         moCalPeriod = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
+        jPanel11 = new javax.swing.JPanel();
+        jlPaymentType = new javax.swing.JLabel();
+        moRadPaymentWeek = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadPaymentFortnight = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadPaymentAll = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel13 = new javax.swing.JPanel();
+        jlSheetType = new javax.swing.JLabel();
+        moRadSheetNormal = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadSheetSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadSheetExtra = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadSheetAll = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel5 = new javax.swing.JPanel();
         jlEmployee = new javax.swing.JLabel();
         moKeyEmployee = new sa.lib.gui.bean.SBeanFieldKey();
         jtbEmployeeActive = new javax.swing.JToggleButton();
+        jPanel10 = new javax.swing.JPanel();
+        jlPayroll = new javax.swing.JLabel();
+        jtfPayroll = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jlCfdiFound = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
@@ -87,17 +122,20 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
         jPanel8 = new javax.swing.JPanel();
         moTextSaveFolder = new sa.lib.gui.bean.SBeanFieldText();
         jPanel9 = new javax.swing.JPanel();
-        jbSaveFolder = new javax.swing.JButton();
-        jPanel10 = new javax.swing.JPanel();
+        jbChooseFolder = new javax.swing.JButton();
+        moBoolCreateSubfolders = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel12 = new javax.swing.JPanel();
+        jlProgress = new javax.swing.JLabel();
+        jProgressBar = new javax.swing.JProgressBar();
 
-        setTitle("Descarga de CFDIs de nóminas");
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Generación de archivos"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Obtención de archivos:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(8, 0));
+        jPanel2.setLayout(new java.awt.GridLayout(10, 0, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlYear.setText("Ejercicio:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -106,7 +144,7 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
 
         jPanel2.add(jPanel3);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPeriod.setText("Periodo:*");
         jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -115,7 +153,52 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPaymentType.setText("Período pago:*");
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jlPaymentType);
+
+        bgPaymentType.add(moRadPaymentWeek);
+        moRadPaymentWeek.setText("Semanal");
+        jPanel11.add(moRadPaymentWeek);
+
+        bgPaymentType.add(moRadPaymentFortnight);
+        moRadPaymentFortnight.setText("Quincenal");
+        jPanel11.add(moRadPaymentFortnight);
+
+        bgPaymentType.add(moRadPaymentAll);
+        moRadPaymentAll.setText("Todos");
+        jPanel11.add(moRadPaymentAll);
+
+        jPanel2.add(jPanel11);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSheetType.setText("Tipo nómina:*");
+        jlSheetType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlSheetType);
+
+        bgSheetType.add(moRadSheetNormal);
+        moRadSheetNormal.setText("Normal");
+        jPanel13.add(moRadSheetNormal);
+
+        bgSheetType.add(moRadSheetSpecial);
+        moRadSheetSpecial.setText("Especial");
+        jPanel13.add(moRadSheetSpecial);
+
+        bgSheetType.add(moRadSheetExtra);
+        moRadSheetExtra.setText("Extraordinaria");
+        moRadSheetExtra.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel13.add(moRadSheetExtra);
+
+        bgSheetType.add(moRadSheetAll);
+        moRadSheetAll.setText("Todos");
+        jPanel13.add(moRadSheetAll);
+
+        jPanel2.add(jPanel13);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEmployee.setText("Empleado:");
         jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -133,24 +216,37 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
 
         jPanel2.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayroll.setText("Nómina:");
+        jlPayroll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlPayroll);
+
+        jtfPayroll.setEditable(false);
+        jtfPayroll.setFocusable(false);
+        jtfPayroll.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel10.add(jtfPayroll);
+
+        jPanel2.add(jPanel10);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCfdiFound.setForeground(java.awt.SystemColor.textInactiveText);
-        jlCfdiFound.setText("Se encontraron 0 CFDIs emitidos");
+        jlCfdiFound.setText("Se encontraron 0 CFDI emitidos.");
         jlCfdiFound.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel6.add(jlCfdiFound);
 
         jPanel2.add(jPanel6);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSaveFolder.setText("Ruta descarga:*");
-        jlSaveFolder.setPreferredSize(new java.awt.Dimension(120, 23));
+        jlSaveFolder.setText("Carpeta de descarga:*");
+        jlSaveFolder.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlSaveFolder);
 
         jPanel2.add(jPanel7);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moTextSaveFolder.setEditable(false);
         moTextSaveFolder.setPreferredSize(new java.awt.Dimension(600, 23));
@@ -158,25 +254,44 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
 
         jPanel2.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbSaveFolder.setText("Seleccionar carpeta");
-        jbSaveFolder.setPreferredSize(new java.awt.Dimension(145, 23));
-        jPanel9.add(jbSaveFolder);
+        jbChooseFolder.setText("Seleccionar carpeta");
+        jbChooseFolder.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel9.add(jbChooseFolder);
+
+        moBoolCreateSubfolders.setText("Guardar los CFDI en subcarpetas individuales para cada nómina");
+        moBoolCreateSubfolders.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel9.add(moBoolCreateSubfolders);
 
         jPanel2.add(jPanel9);
 
-        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jPanel2.add(jPanel10);
-
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel12.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jlProgress.setBackground(java.awt.SystemColor.controlHighlight);
+        jlProgress.setText("Progress...");
+        jlProgress.setOpaque(true);
+        jlProgress.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlProgress);
+
+        jProgressBar.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jProgressBar);
+
+        jPanel1.add(jPanel12, java.awt.BorderLayout.PAGE_END);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgPaymentType;
+    private javax.swing.ButtonGroup bgSheetType;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -185,45 +300,367 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbSaveFolder;
+    private javax.swing.JProgressBar jProgressBar;
+    private javax.swing.JButton jbChooseFolder;
     private javax.swing.JLabel jlCfdiFound;
     private javax.swing.JLabel jlEmployee;
+    private javax.swing.JLabel jlPaymentType;
+    private javax.swing.JLabel jlPayroll;
     private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlProgress;
     private javax.swing.JLabel jlSaveFolder;
+    private javax.swing.JLabel jlSheetType;
     private javax.swing.JLabel jlYear;
     private javax.swing.JToggleButton jtbEmployeeActive;
+    private javax.swing.JTextField jtfPayroll;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolCreateSubfolders;
     private sa.lib.gui.bean.SBeanFieldCalendarMonth moCalPeriod;
     private sa.lib.gui.bean.SBeanFieldCalendarYear moCalYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadPaymentAll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadPaymentFortnight;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadPaymentWeek;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSheetAll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSheetExtra;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSheetNormal;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadSheetSpecial;
     private sa.lib.gui.bean.SBeanFieldText moTextSaveFolder;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
-
-        jbSave.setText("Guardar");
-        jbCancel.setText("Cerrar");
+        SGuiUtils.setWindowBounds(this, 720, 450);
         
         moCalYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear));
         moCalPeriod.setCalendarSettings(SGuiUtils.getLabelName(jlYear));
+        moRadPaymentWeek.setBooleanSettings(moRadPaymentWeek.getText(), false);
+        moRadPaymentFortnight.setBooleanSettings(moRadPaymentFortnight.getText(), false);
+        moRadPaymentAll.setBooleanSettings(moRadPaymentAll.getText(), true);
+        moRadSheetNormal.setBooleanSettings(moRadSheetNormal.getText(), false);
+        moRadSheetSpecial.setBooleanSettings(moRadSheetSpecial.getText(), false);
+        moRadSheetExtra.setBooleanSettings(moRadSheetExtra.getText(), false);
+        moRadSheetAll.setBooleanSettings(moRadSheetAll.getText(), true);
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
-        moTextSaveFolder.setTextSettings(SGuiUtils.getLabelName(jlSaveFolder), 500);
+        moTextSaveFolder.setTextSettings(SGuiUtils.getLabelName(jlSaveFolder), 500, 1);
+        moBoolCreateSubfolders.setBooleanSettings(moBoolCreateSubfolders.getText(), false);
         
         moFields.addField(moCalYear);
         moFields.addField(moCalPeriod);
+        moFields.addField(moRadPaymentWeek);
+        moFields.addField(moRadPaymentFortnight);
+        moFields.addField(moRadPaymentAll);
+        moFields.addField(moRadSheetNormal);
+        moFields.addField(moRadSheetSpecial);
+        moFields.addField(moRadSheetExtra);
+        moFields.addField(moRadSheetAll);
         moFields.addField(moKeyEmployee);
         moFields.addField(moTextSaveFolder);
+        moFields.addField(moBoolCreateSubfolders);
         moFields.setFormButton(jbSave);
+        
+        maByPeriodFields = new ArrayList<>();
+        maByPeriodFields.add(jlYear);
+        maByPeriodFields.add(jlPeriod);
+        maByPeriodFields.add(jlPaymentType);
+        maByPeriodFields.add(jlSheetType);
+        maByPeriodFields.add(jlEmployee);
+        maByPeriodFields.add(moCalYear);
+        maByPeriodFields.add(moCalPeriod);
+        maByPeriodFields.add(moRadPaymentWeek);
+        maByPeriodFields.add(moRadPaymentFortnight);
+        maByPeriodFields.add(moRadPaymentAll);
+        maByPeriodFields.add(moRadSheetNormal);
+        maByPeriodFields.add(moRadSheetSpecial);
+        maByPeriodFields.add(moRadSheetExtra);
+        maByPeriodFields.add(moRadSheetAll);
+        maByPeriodFields.add(moKeyEmployee);
+        maByPeriodFields.add(jtbEmployeeActive);
+        
+        maByPayrollFields = new ArrayList<>();
+        maByPayrollFields.add(jlPayroll);
+        
+        switch (mnMode) {
+            case BY_PERIOD:
+                for (JComponent component : maByPeriodFields) {
+                    component.setEnabled(true);
+                }
+                for (JComponent component : maByPayrollFields) {
+                    component.setEnabled(true);
+                }
+                break;
+                
+            case BY_PAYROLL:
+                for (JComponent component : maByPeriodFields) {
+                    component.setEnabled(false);
+                }
+                for (JComponent component : maByPayrollFields) {
+                    component.setEnabled(true);
+                }
+                break;
+                
+            default:
+                // nothing
+        }
+        
+        moRadPaymentAll.setSelected(true);
+        moRadSheetAll.setSelected(true);
+        moBoolCreateSubfolders.setSelected(true);
+        
+        jbCancel.setText(SUtilConsts.TXT_CLOSE);
         
         reloadCatalogues();
         addAllListeners();
-        getCfdiEmited();
+        
+        clearProgress();
+        countCfdiFound();
+    }
+    
+    @Override
+    protected void windowActivated() {
+        if (mnMode == BY_PAYROLL) {
+            jbChooseFolder.requestFocusInWindow();
+        }
+        else {
+            super.windowActivated();
+        }
     }
 
+    private void initProgress(final String message) {
+        jlProgress.setText(message);
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(true);
+    }
+    
+    private void startProgress(final String message) {
+        jlProgress.setText(message);
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(true);
+        jProgressBar.setIndeterminate(false);
+    }
+    
+    private void clearProgress() {
+        jlProgress.setText("");
+        
+        jProgressBar.setValue(0);
+        jProgressBar.setStringPainted(false);
+        jProgressBar.setIndeterminate(false);
+    }
+    
     private void populateEmployee() {
         miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 
                 new SGuiParams(jtbEmployeeActive.isSelected() ? SGuiConsts.PARAM_REGS_ACT : SGuiConsts.PARAM_REGS_ALL));
     }
+    
+    private void actionPerformedChooseFolder() {
+        try {
+            miClient.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (miClient.getFileChooser().showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                moTextSaveFolder.setValue(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            miClient.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
+        }
+    }
+    
+    private String composeFromAndWhere() {
+        String fromAndWhere = "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " as pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " as c on pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n "
+                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND pri.fk_st_rcp = " + SModSysConsts.TRNS_ST_DPS_EMITED + " ";
+        
+        switch (mnMode) {
+            case BY_PERIOD:
+                fromAndWhere += "AND p.per_year = " + moCalYear.getValue() + " AND p.per = " + moCalPeriod.getValue() + " ";
+
+                if (moRadPaymentWeek.isSelected()) {
+                    fromAndWhere += "AND p.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + " ";
+                }
+                else if (moRadPaymentFortnight.isSelected()) {
+                    fromAndWhere += "AND p.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_FOR + " ";
+                }
+                
+                if (moRadSheetNormal.isSelected()) {
+                    fromAndWhere += "AND p.fk_tp_pay_sht = " + SModSysConsts.HRSS_TP_PAY_SHT_NOR + " ";
+                }
+                else if (moRadSheetSpecial.isSelected()) {
+                    fromAndWhere += "AND p.fk_tp_pay_sht = " + SModSysConsts.HRSS_TP_PAY_SHT_SPE + " ";
+                }
+                else if (moRadSheetExtra.isSelected()) {
+                    fromAndWhere += "AND p.fk_tp_pay_sht = " + SModSysConsts.HRSS_TP_PAY_SHT_EXT + " ";
+                }
+
+                if (moKeyEmployee.getSelectedIndex() > 0) {
+                    fromAndWhere += "AND pr.id_emp = " + moKeyEmployee.getValue()[0] + " ";
+                }
+                break;
+
+            case BY_PAYROLL:
+                fromAndWhere += "AND p.id_pay = " + mnPayrollId + " ";
+                break;
+
+            default:
+                // nothing
+        }
+        
+        return fromAndWhere;
+    }
+    
+    private String composePayrollFolder(final Statement statement, final int payrollId) throws Exception {
+        String folder = "";
+        String sql = "SELECT per_year, per, num, nts, fk_tp_pay "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                + "WHERE id_pay = " + payrollId + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                String notes = resultSet.getString("nts");
+                
+                folder = SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("per_year")) + "-" +
+                        SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("per")) + " " +
+                        SDbPayroll.getPaymentTypeAbbr(resultSet.getInt("fk_tp_pay")) + " " +
+                        SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("num")) +
+                        (notes.isEmpty() ? "" : " " + SLibUtils.textToPathSafe(notes));
+            }
+        }
+
+        return folder;
+    }
+    
+    private void countCfdiFound() {
+        mnCfdiFound = 0;
+        
+        try {
+            String sql = "SELECT COUNT(*) "
+                    + composeFromAndWhere()
+                    + ";";
+            
+            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    mnCfdiFound = resultSet.getInt(1);
+                }
+            }
+        }
+        catch (Exception e) {
+            miClient.showMsgBoxError(e.getMessage());
+        }
+        finally {
+            jlCfdiFound.setText("Se " + (mnCfdiFound == 1 ? "encontró un CFDI emitido" : "encontraron " + SLibUtils.DecimalFormatInteger.format(mnCfdiFound) + " CFDI emitidos") + ".");
+        }
+    }
+
+    public void setPayroll(final int payrollId) {
+        mnPayrollId = payrollId;
+        
+        String description = "";
+        
+        try {
+            description = SDbPayroll.getPayrollDescription(miClient.getSession(), mnPayrollId);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        
+        jtfPayroll.setText(description);
+        jtfPayroll.setCaretPosition(0);
+        
+        countCfdiFound();
+    }
+    
+    @SuppressWarnings("deprecation")
+    private void backgroundProcess(final SProgressCallback callback) throws Exception {
+        Exception exception = null;
+        
+        try {
+            startProgress("Procesando " + (mnCfdiFound == 1 ? "un " : SLibUtils.DecimalFormatInteger.format(mnCfdiFound)) + " CFDI...");
+
+            int cfdiProcessed = 0;
+            int currentPayrollId = -1;
+            String currentSubfolder = "";
+
+            String sql = "SELECT p.id_pay, c.id_cfd "
+                    + composeFromAndWhere()
+                    + "ORDER BY p.id_pay, c.id_cfd;";
+
+            try (Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+                    Statement statementSubfolder = miClient.getSession().getDatabase().getConnection().createStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
+
+                while (resultSet.next()) {
+                    callback.onProgress((int) ((++cfdiProcessed / (double) mnCfdiFound) * 100));
+                    
+                    // set path to save files of current CFDI:
+
+                    String path = moTextSaveFolder.getValue();
+
+                    if (moBoolCreateSubfolders.isSelected()) {
+                        if (currentPayrollId != resultSet.getInt("p.id_pay")) {
+                            currentPayrollId = resultSet.getInt("p.id_pay");
+                            currentSubfolder = composePayrollFolder(statementSubfolder, currentPayrollId);
+                        }
+
+                        String newPath = path + "\\" + currentSubfolder;
+
+                        File newDir = new File(newPath);
+                        if (!newDir.exists()) {
+                            if (!newDir.mkdirs()) {
+                                miClient.showMsgBoxError("Error al crear el subdirectorio:\n" + newDir.getAbsolutePath() + "\n"
+                                        + "Los archivos de la nómina '" + currentSubfolder + "' se guardarán directamente en la carpeta seleccionada.");
+                            }
+                        }
+                        
+                        if (newDir.exists()) {
+                            path += "\\" + currentSubfolder;
+                        }
+                    }
+                    
+                    // save PDF:
+                    
+                    SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("c.id_cfd") }, SLibConstants.EXEC_MODE_SILENT);
+
+                    SCfdPrint cfdPrint = new SCfdPrint((SClientInterface) miClient);
+                    if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                        cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH, SLibConsts.UNDEFINED,
+                                path, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                    }
+                    else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
+                        cfdPrint.printPayrollReceipt40_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH, SLibConsts.UNDEFINED,
+                                path, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                    }
+                    
+                    // save XML:
+
+                    File xmlFile = new File(path + "\\" + cfd.getDocXmlName());
+                    xmlFile.createNewFile();
+                    try (FileWriter fw = new FileWriter(xmlFile)) {
+                        fw.write(cfd.getDocXml());
+                    }
+                }
+            }
+
+            callback.onProgress(100); // assure to show 100%
+            miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
+        }
+        catch (Exception e) {
+            exception = e;
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            if (exception != null) {
+                throw exception;
+            }
+        }
+    }
+    
+    /*
+     * Overrideh methods 
+     */
     
     @Override
     public void reloadCatalogues() {
@@ -232,59 +669,62 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
         populateEmployee();
     }
     
-    private void actionSaveFolder() {
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int result = fc.showSaveDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            moTextSaveFolder.setValue(fc.getSelectedFile().getAbsolutePath());
-        }
-    }
-    
-    private void getCfdiEmited() {
-        try {
-            String sql = "SELECT COUNT(*) FROM hrs_pay AS p " +
-                    "INNER JOIN hrs_pay_rcp AS pr ON p.id_pay = pr.id_pay " +
-                    "INNER JOIN hrs_pay_rcp_iss as pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp " +
-                    "INNER JOIN trn_cfd as c on pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n " +
-                    "WHERE p.per_year = " + moCalYear.getValue() + " " +
-                    "AND p.per = " + moCalPeriod.getValue() + " " +
-                    (moKeyEmployee.getSelectedIndex() != 0 ? "AND pr.id_emp = " + moKeyEmployee.getValue()[0] + " " : "") +
-                    "AND pri.fk_st_rcp = 2 " +
-                    "AND NOT p.b_del " +
-                    "AND NOT pr.b_del " +
-                    "AND NOT pri.b_del;";
-            try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
-                if (resultSet.next()) {
-                    emitedCfdi = resultSet.getInt(1);
-                    jlCfdiFound.setText("Se encontraron " + emitedCfdi + " CFDIs emitidos");
-                }
-            }
-        } catch (Exception e) {
-            miClient.showMsgBoxError(e.getMessage());
-        }
-    }
-
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            if (mnCfdiFound == 0) {
+                validation.setMessage("¡No hay CFDI para guardar!");
+            }
+            else if (moTextSaveFolder.getValue().isEmpty()) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moTextSaveFolder.getFieldName() + "'.");
+                validation.setComponent(jbChooseFolder);
+            }
+            else {
+                File dir = new File(moTextSaveFolder.getValue());
+                
+                if (!dir.exists()) {
+                    validation.setMessage("¡La carpeta '" + dir.getAbsolutePath() + "' no existe!\nFavor de seleccionar una carpeta válida.");
+                    validation.setComponent(jbChooseFolder);
+                }
+            }
+        }
         
         return validation;
     }
 
     @Override
     public void addAllListeners() {
-        jbSaveFolder.addActionListener(this);
+        jbChooseFolder.addActionListener(this);
+        
         moCalYear.addChangeListener(this);
         moCalPeriod.addChangeListener(this);
+        
+        moRadPaymentWeek.addItemListener(this);
+        moRadPaymentFortnight.addItemListener(this);
+        moRadPaymentAll.addItemListener(this);
+        moRadSheetNormal.addItemListener(this);
+        moRadSheetSpecial.addItemListener(this);
+        moRadSheetExtra.addItemListener(this);
+        moRadSheetAll.addItemListener(this);
         moKeyEmployee.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        jbSaveFolder.removeActionListener(this);
+        jbChooseFolder.removeActionListener(this);
+        
         moCalYear.removeChangeListener(this);
         moCalPeriod.removeChangeListener(this);
+        
+        moRadPaymentWeek.removeItemListener(this);
+        moRadPaymentFortnight.removeItemListener(this);
+        moRadPaymentAll.removeItemListener(this);
+        moRadSheetNormal.removeItemListener(this);
+        moRadSheetSpecial.removeItemListener(this);
+        moRadSheetExtra.removeItemListener(this);
+        moRadSheetAll.removeItemListener(this);
         moKeyEmployee.removeItemListener(this);
     }
 
@@ -308,51 +748,53 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
     }
     
     @Override
-    @SuppressWarnings("deprecation")
     public void actionSave()  {
-        try {
-            if (miClient.showMsgBoxConfirm("El proceso puede durar varios minutos. ¿Desea continuar?") == JOptionPane.OK_OPTION) {
-                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                SGuiValidation validation = validateForm();
-                if (validation.isValid()) {
-                    String sql = "SELECT c.id_cfd FROM hrs_pay AS p " +
-                            "INNER JOIN hrs_pay_rcp AS pr ON p.id_pay = pr.id_pay " +
-                            "INNER JOIN hrs_pay_rcp_iss as pri ON pr.id_pay = pri.id_pay AND pr.id_emp = pri.id_emp " +
-                            "INNER JOIN trn_cfd as c on pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n " +
-                            "WHERE p.per_year = " + moCalYear.getValue() + " " +
-                            "AND p.per = " + moCalPeriod.getValue() + " " + 
-                            (moKeyEmployee.getSelectedIndex() != 0 ? "AND pr.id_emp = " + moKeyEmployee.getValue()[0] + " " : "") +
-                            "AND pri.fk_st_rcp = 2 " +
-                            "AND NOT p.b_del " +
-                            "AND NOT pr.b_del " +
-                            "AND NOT pri.b_del;";
-                    try (ResultSet resultSet = miClient.getSession().getDatabase().getConnection().createStatement().executeQuery(sql)) {
-                        while (resultSet.next()) {
+        SGuiValidation validation = validateForm();
 
-                            SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, new int[] { resultSet.getInt(1) }, SLibConstants.EXEC_MODE_SILENT);
+        if (SGuiUtils.computeValidation(miClient, validation)) {
+            if (miClient.showMsgBoxConfirm("El proceso puede durar varios minutos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.OK_OPTION) {
+                try {
+                    // prepare to background processing:
 
-                            SCfdPrint cfdPrint = new SCfdPrint((SClientInterface) miClient);
-                            if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-                                cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH, SLibConsts.UNDEFINED,
-                                        moTextSaveFolder.getValue(), SCfdConsts.CFDI_PAYROLL_VER_CUR);
-                            }
-                            else if (cfd.getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_40) {
-                                cfdPrint.printPayrollReceipt40_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE_PATH, SLibConsts.UNDEFINED,
-                                        moTextSaveFolder.getValue(), SCfdConsts.CFDI_PAYROLL_VER_CUR);
-                            }
+                    initProgress("Preparando la solicitud...");
 
-                            File xmlFile = new File(moTextSaveFolder.getValue() + "/" + cfd.getDocXmlName());
-                            xmlFile.createNewFile();
-                            try (FileWriter fw = new FileWriter(xmlFile)) {
-                                fw.write(cfd.getDocXml());
+                    // start of background processing...
+
+                    SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            backgroundProcess(progress -> {
+                                publish(progress);
+                            });
+                            return null;
+                        }
+
+                        @Override
+                        protected void process(List<Integer> chunks) {
+                            int latest = chunks.get(chunks.size() - 1);
+                            jProgressBar.setValue(latest); // runs on EDT
+                        }
+
+                        @Override
+                        protected void done() {
+                            clearProgress();
+                            
+                            if (mnMode == BY_PAYROLL) {
+                                setVisible(false);
                             }
-                        } 
-                    }
-                    miClient.showMsgBoxInformation("El proceso ha finalizado");
-                    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        }
+                    };
+
+                    worker.execute();
+
+                    // ... end of background processing
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
                 }
             }
-        } catch (Exception e) {}
+        }
     }
 
     @Override
@@ -360,8 +802,27 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
             
-            if (button == jbSaveFolder) {
-                actionSaveFolder();
+            if (button == jbChooseFolder) {
+                actionPerformedChooseFolder();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
+            
+            if (field == moRadPaymentWeek || field == moRadPaymentFortnight || field == moRadPaymentAll ||
+                    field == moRadSheetNormal || field == moRadSheetSpecial || field == moRadSheetExtra || field == moRadSheetAll) {
+                countCfdiFound();
+            }
+        }
+        else if (e.getSource() instanceof SBeanFieldKey) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyEmployee) {
+                countCfdiFound();
             }
         }
     }
@@ -371,22 +832,8 @@ public class SDialogSaveCfdi extends SBeanFormDialog implements ActionListener, 
         if (e.getSource() instanceof JSpinner) {
             JSpinner spinner = (JSpinner) e.getSource();
             
-            if (spinner == moCalYear) {
-                getCfdiEmited();
-            }
-            else if (spinner == moCalPeriod) {
-                getCfdiEmited();
-            }
-        }
-    }
-
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof JComboBox) {
-            JComboBox comboBox = (JComboBox) e.getSource();
-            
-            if (comboBox == moKeyEmployee) {
-                getCfdiEmited();
+            if (spinner == moCalYear || spinner == moCalPeriod) {
+                countCfdiFound();
             }
         }
     }

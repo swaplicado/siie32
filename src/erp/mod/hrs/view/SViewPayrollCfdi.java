@@ -82,7 +82,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
     private JButton jbRestoreCfdiCancelAck;
     private JButton jbDeactivateControlFlags;
     private JButton jbGetCfdiStatus;
-    private JButton jbSaveAllCfdi;
+    private JButton jbSaveCfdiByPayroll;
+    private JButton jbSaveCfdiByPeriod;
 
     private SDialogAnnulCfdi moDialogAnnulCfdi;
     private SDialogFormerPayrollDate moDialogFormerPayrollDate;
@@ -137,7 +138,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         jbRestoreCfdiCancelAck = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")), "Insertar PDF del acuse de cancelación del CFDI de nómina", this);
         jbDeactivateControlFlags = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias de timbrado o cancelación del CFDI de nómina", this);
         jbGetCfdiStatus = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query.gif")), "Consultar estatus SAT del CFDI", this);
-        jbSaveAllCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Descargar CFDIs de nóminas", this);
+        jbSaveCfdiByPayroll = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save_alt.png")), "Guardar CFDI de nóminas de la nómina", this);
+        jbSaveCfdiByPeriod = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Guardar CFDI de nóminas por período", this);
 
         switch (mnGridSubtype) {
             case SModConsts.VIEW_SC_SUM:
@@ -154,7 +156,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 jbRestoreCfdiCancelAck.setEnabled(false);
                 jbDeactivateControlFlags.setEnabled(false);
                 jbGetCfdiStatus.setEnabled(false);
-                jbSaveAllCfdi.setEnabled(true);
+                jbSaveCfdiByPayroll.setEnabled(true);
+                jbSaveCfdiByPeriod.setEnabled(true);
                 break;
                 
             case SModConsts.VIEW_SC_DET:
@@ -171,7 +174,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 jbRestoreCfdiCancelAck.setEnabled(true);
                 jbDeactivateControlFlags.setEnabled(true);
                 jbGetCfdiStatus.setEnabled(true);
-                jbSaveAllCfdi.setEnabled(false);
+                jbSaveCfdiByPayroll.setEnabled(false);
+                jbSaveCfdiByPeriod.setEnabled(false);
                 break;
                 
             default:
@@ -192,7 +196,8 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbRestoreCfdiCancelAck);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateControlFlags);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetCfdiStatus);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSaveAllCfdi);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSaveCfdiByPayroll);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSaveCfdiByPeriod);
 
         if (isViewReceipts) {
             moFilterEmployee = new SGridFilterPanelEmployee(miClient, this);
@@ -858,13 +863,50 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionSaveAllCfdi() {
-        if (jbSaveAllCfdi.isEnabled()) {
-            try {
-                SDialogSaveCfdi save = new SDialogSaveCfdi(miClient, "Descargar CFDIs de nóminas");
-                save.setVisible(true);
-            } catch (Exception e) {
-                miClient.showMsgBoxError(e.getMessage());
+    private void actionSaveAllCfdi(final int mode) {
+        if (jbSaveCfdiByPeriod.isEnabled()) {
+            boolean save = false;
+            int payrollId = 0;
+            
+            switch (mode) {
+                case SDialogSaveCfdi.BY_PERIOD:
+                    save = true;
+                    break;
+                    
+                case SDialogSaveCfdi.BY_PAYROLL:
+                    if (jtTable.getSelectedRowCount() != 1) {
+                        miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+                    }
+                    else {
+                        SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                        if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                            miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                        }
+                        else {
+                            save = true;
+                            payrollId = gridRow.getRowPrimaryKey()[0];
+                        }
+                    }
+                    break;
+                    
+                default:
+                    // nothing
+            }
+            
+            if (save) {
+                try {
+                    SDialogSaveCfdi dialog = new SDialogSaveCfdi(miClient, "Guardar CFDI de nóminas", mode);
+                    
+                    if (mode == SDialogSaveCfdi.BY_PAYROLL) {
+                        dialog.setPayroll(payrollId);
+                    }
+                    
+                    dialog.setVisible(true);
+                }
+                catch (Exception e) {
+                    miClient.showMsgBoxError(e.getMessage());
+                }
             }
         }
     }
@@ -1377,8 +1419,11 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             else if (button == jbGetCfdiStatus) {
                 actionGetCfdiStatus();
             }
-            else if (button == jbSaveAllCfdi) {
-                actionSaveAllCfdi();
+            else if (button == jbSaveCfdiByPayroll) {
+                actionSaveAllCfdi(SDialogSaveCfdi.BY_PAYROLL);
+            }
+            else if (button == jbSaveCfdiByPeriod) {
+                actionSaveAllCfdi(SDialogSaveCfdi.BY_PERIOD);
             }
         }
     }

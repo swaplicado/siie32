@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 303.2/ 2026-06-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de más opciones de filtrado en el guardado masivod de CFDI de nóminas, con opción a hacerlo para una sola nómina, y también con opción a guardar por separado los CFDI de cada nómina en subcarpetas individuales.
+
+================================================================================
 SIIE 3.2 303.1/ 2026-06-23
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
