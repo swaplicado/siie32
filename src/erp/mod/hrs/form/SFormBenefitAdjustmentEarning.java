@@ -142,21 +142,21 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAdjustmentDays.setText("Días ajuste:*");
+        jlAdjustmentDays.setText("Días del ajuste:*");
         jlAdjustmentDays.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlAdjustmentDays);
         jPanel15.add(moDecAdjustmentDays);
 
-        jlAdjustmentDays1.setForeground(java.awt.Color.gray);
-        jlAdjustmentDays1.setText("(Para aumentar: valor positivo. Para disminuir: valor negativo.)");
-        jlAdjustmentDays1.setPreferredSize(new java.awt.Dimension(325, 23));
+        jlAdjustmentDays1.setForeground(java.awt.SystemColor.textInactiveText);
+        jlAdjustmentDays1.setText("<html>(días <b>consumidos</b>: aumentar con valor positivo; disminuir con valor negativo)</html>");
+        jlAdjustmentDays1.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel15.add(jlAdjustmentDays1);
 
         jPanel2.add(jPanel15);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFactorAmount.setText("Factor monto:*");
+        jlFactorAmount.setText("Factor del monto:*");
         jlFactorAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlFactorAmount);
         jPanel16.add(moDecFactorAmount);
@@ -165,7 +165,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAdjustmentAmount.setText("Monto ajuste:");
+        jlAdjustmentAmount.setText("Monto del ajuste:");
         jlAdjustmentAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlAdjustmentAmount);
         jPanel8.add(moCurAdjustmentAmount);
@@ -174,7 +174,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotes.setText("Notas ajuste:");
+        jlNotes.setText("Notas del ajuste:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlNotes);
 
@@ -221,7 +221,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 640, 450);
 
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), true);
         moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);
