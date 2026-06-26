@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 303.3/ 2026-06-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Ajuste en valuación de consumos de inventarios para determinar si las partidas son de activo fijo.
+2) Se agrega columna en vista de consumos de valuación de inventarios.
+
+================================================================================
 SIIE 3.2 303.2/ 2026-06-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

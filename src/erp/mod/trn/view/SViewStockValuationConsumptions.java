@@ -193,7 +193,10 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                         + "bp.bp LIKE '%" + text + "%' OR "
                         + "CONCAT(r.id_tp_rec, "
                         + " '-', "
-                        + " erp.lib_fix_int(r.id_num, 6))  LIKE '%" + text + "%' ";
+                        + " erp.lib_fix_int(r.id_num, 6))  LIKE '%" + text + "%' OR "
+                        + "(IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "         'ACTIVO FIJO', "
+                + "         'PREDETERMINADO') LIKE '%" + text + "%' )";
                 
                 msSeekQueryText += ") ";
             }
@@ -408,6 +411,9 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "    IF(LENGTH(dps.num_ser) = 0, '', '-'), "
                 + "    dps.num) AS f_num, "
                 + "dps.dt_doc, "
+                + "IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "         'ACTIVO FIJO', "
+                + "         'PREDETERMINADO') AS dps_nat, "
                 + "bp.bp, "
                 + "di_in.fid_dps_year_n, "
                 + "di_in.fid_dps_doc_n, "
@@ -545,6 +551,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "dps_type", "Tipo doc compra"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_num", "Folio doc compra"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc", "Fecha doc compra"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "dps_nat", "Nat. doc compra"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "bp", "Proveedor"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_cc_n", "No. centro costo"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cc", "Centro costo"));

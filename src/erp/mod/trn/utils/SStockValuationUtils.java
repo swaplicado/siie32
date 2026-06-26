@@ -81,7 +81,7 @@ public class SStockValuationUtils {
         try (Statement st = statement.getConnection().createStatement()) {
             oCfg = SStockValuationUtils.getStockValuationConfig(st);
         }
-        String sql = "SELECT  "
+        String sql = "SELECT DISTINCT "
                 + "    stk.*,"
                 + "    d.num, "
                 + "    mre.fk_item_ref_n AS ref_ety, "
@@ -92,6 +92,7 @@ public class SStockValuationUtils {
                 + "    i.item AS item_name,"
                 + "    dps.num AS dps_num, "
                 + "    dps.dt AS dps_date, "
+                + "    dps.fid_dps_nat, "
                 + "    dps.fid_ct_dps, "
                 + "    dps.fid_cl_dps, "
                 + "    dps.fid_tp_dps, "
@@ -178,7 +179,9 @@ public class SStockValuationUtils {
 
                 for (Integer tpIog : tpIogs) {
                     // Verifica si es el caso especial
-                    boolean isSpecial = (diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0] && fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1] && tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2]);
+                    boolean isSpecial = (diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0] && 
+                                        fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1] && 
+                                        tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2]);
                     if (!firstGroup) {
                         sql += " OR ";
                     }
@@ -237,42 +240,90 @@ public class SStockValuationUtils {
                 oEntry.setFkCompanyBranchId(res.getInt("id_cob"));
                 oEntry.setFkWarehouseId(res.getInt("id_wh"));
                 oEntry.setFkUserInsertId(session.getUser().getPkUserId());
-                oEntry.setAuxTypeDpsIn(new int[] { res.getInt("fid_ct_dps"), 
-                                                    res.getInt("fid_cl_dps"), 
-                                                    res.getInt("fid_tp_dps") });
+                oEntry.setAuxTypeDpsIn(new int[]{res.getInt("fid_ct_dps"),
+                    res.getInt("fid_cl_dps"),
+                    res.getInt("fid_tp_dps")});
 
-                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] && 
-                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] && 
-                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                        if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
-                            oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
-                            oEntry.setTemporalPrice(true);
-                            String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
-                                    + "con número de documento " + res.getInt("d.num") + " y "
-                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
-                                    + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", " 
-                                    + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
-                            SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
-                        }
-                        else if (oEntry.getCostUnitary() != res.getDouble("ety_des_price_real")) {
-                                oEntry.setCostUnitary(res.getDouble("ety_des_price_real"));
-                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-                                oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
-                                oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
-                                oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
-                            }
-                }
-                else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0] && 
-                    oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1] && 
-                    oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
-                        if (oEntry.getCostUnitary() != res.getDouble("dps_ety.price_u_real_r")) {
-                            oEntry.setCostUnitary(res.getDouble("dps_ety.price_u_real_r"));
+                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0]
+                        && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1]
+                        && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                    if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                        oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                        oEntry.setTemporalPrice(true);
+                        String sLog = "No se puede crear la valuación. El movimiento de entrada al almacén "
+                                + "con número de documento " + res.getInt("d.num") + " y "
+                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", "
+                                + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                        SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
+                    }
+                    else {
+                        double newCostUnitary = (res.getInt("fid_dps_nat") == SDataConstantsSys.TRNU_DPS_NAT_ASSET)
+                                ? 0d
+                                : res.getDouble("ety_des_price_real");
+
+                        if (oEntry.getCostUnitary() != newCostUnitary) {
+                            oEntry.setCostUnitary(newCostUnitary);
                             oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
                         }
+
+                        oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
+                        oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
+                        oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                    }
+                }
+                else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0]
+                        && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1]
+                        && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
+                    double newCostUnitary = (res.getInt("fid_dps_nat") == SDataConstantsSys.TRNU_DPS_NAT_ASSET)
+                            ? 0d
+                            : res.getDouble("ety_des_price_real");
+
+                    if (oEntry.getCostUnitary() != newCostUnitary) {
+                        oEntry.setCostUnitary(newCostUnitary);
+                        oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
+                    }
                 }
 
-                oEntry.save(session);
+                // ── Verificar duplicado antes de insertar ──
+                if (!existsValuationEntry(session, oEntry.getFkDiogYearInId_n(),
+                        oEntry.getFkDiogDocInId_n(),
+                        oEntry.getFkDiogEntryInId_n())) {
+                    oEntry.save(session);
+                }
+                else {
+                    String sLog = "Movimiento duplicado omitido: valuación=" + idValuation
+                            + ", año=" + oEntry.getFkDiogYearInId_n()
+                            + ", doc=" + oEntry.getFkDiogDocInId_n()
+                            + ", entrada=" + oEntry.getFkDiogEntryInId_n();
+                    SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
+                }
             }
+        }
+    }
+    
+    /**
+     * Verifica si ya existe un movimiento de valuación insertado previamente
+     * para evitar duplicados en la tabla trn_stk_val_mvt.
+     *
+     * @param session Sesión de usuario para ejecutar consultas.
+     * @param diogYear Año del documento de almacén (fk_diog_year_in_n).
+     * @param diogDoc Número del documento de almacén (fk_diog_doc_in_n).
+     * @param diogEty Entrada del documento de almacén (fk_diog_ety_in_n).
+     * @return true si ya existe, false si no existe.
+     * @throws Exception
+     */
+    private static boolean existsValuationEntry(SGuiSession session, int diogYear, int diogDoc, int diogEty) throws Exception {
+        String sql = "SELECT COUNT(*) FROM trn_stk_val_mvt "
+                + "WHERE fk_diog_year_in_n = " + diogYear
+                + " AND fk_diog_doc_in_n = " + diogDoc
+                + " AND fk_diog_ety_in_n = " + diogEty
+                + " AND fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN
+                + " AND NOT b_del ";
+
+        try (Statement st = session.getStatement().getConnection().createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
+            return rs.next() && rs.getInt(1) > 0;
         }
     }
 
@@ -429,8 +480,14 @@ public class SStockValuationUtils {
 
                         oConsumption.setDateMove(res.getDate("dt"));
                         oConsumption.setQuantityMovement(consumeQuantity);
-                        oConsumption.setCostUnitary(entry.getCostUnitary());
-                        oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+                        if (entry.getAuxInDpsNature() != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                            oConsumption.setCostUnitary(entry.getCostUnitary());
+                            oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+                        }
+                        else {
+                            oConsumption.setCostUnitary(0d);
+                            oConsumption.setCost_r(0d);
+                        }
 
                         if (entry.isTemporalPrice()) {
                             oConsumption.setTemporalPrice(true);
@@ -1103,6 +1160,7 @@ public class SStockValuationUtils {
                 + "dps.fid_ct_dps, "
                 + "dps.fid_cl_dps, "
                 + "dps.fid_tp_dps, "
+                + "dps.fid_dps_nat, "
                 + "supp.id_des_year, "
                 + "supp.id_des_doc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
@@ -1158,6 +1216,7 @@ public class SStockValuationUtils {
                                                 res.getInt("dps.fid_cl_dps"), 
                                                 res.getInt("dps.fid_tp_dps") 
                                             });
+                    oEntry.setAuxInDpsNature(res.getInt("dps.fid_dps_nat"));
                     if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
                         oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
                         oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {

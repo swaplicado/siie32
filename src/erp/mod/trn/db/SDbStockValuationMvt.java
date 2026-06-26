@@ -73,6 +73,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected int[] maAuxTypeDpsIn;
     protected int[] maAuxTypeDpsOut;
     protected boolean mbAuxIsAdjust;
+    protected int mnAuxInDpsNature;
 
     public SDbStockValuationMvt() {
         super(SModConsts.TRN_STK_VAL_MVT);
@@ -125,6 +126,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public void setAuxTypeDpsIn(int[] typeDpsIn) { maAuxTypeDpsIn = typeDpsIn; }
     public void setAuxTypeDpsOut(int[] typeDpsOut) { maAuxTypeDpsOut = typeDpsOut; }
     public void setAuxIsAdjust(boolean b) { mbAuxIsAdjust = b; }
+    public void setAuxInDpsNature(int n) { mnAuxInDpsNature = n; }
     
     public int getPkStockValuationMvtId() { return mnPkStockValuationMvtId; }
     public Date getDateMove() { return mtDate; }
@@ -173,6 +175,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public int[] getAuxTypeDpsIn() { return maAuxTypeDpsIn; }
     public int[] getAuxTypeDpsOut() { return maAuxTypeDpsOut; }
     public boolean isAuxAdjust() { return mbAuxIsAdjust; }
+    public int getAuxInDpsNature() { return mnAuxInDpsNature; }
 
     public int[] getAuxWarehousePk() {
         if (mnFkWarehouseId > 0) {
