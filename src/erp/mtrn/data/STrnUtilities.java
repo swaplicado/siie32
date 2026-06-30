@@ -52,6 +52,7 @@ import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import erp.server.SSessionServer;
+import erp.swap.SSwapConsts;
 import java.awt.Cursor;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -2063,72 +2064,83 @@ public abstract class STrnUtilities {
     private static File sendMailOrder(final SClientInterface client, SDataDps oDps, boolean bReturnFile) throws IOException {
         String addressee = "";
         String msg = "";
-        String userMail = "";
         int nUserId = 0;
         String bizPartnerMail = "";
         boolean canSend = true;
-        SMailSender sender;
-        SMail mail;
-        ArrayList<String> toRecipients;
-        ArrayList<String> toRecipientsCc = new ArrayList<>();
         File pdf = null;
         SDbMms mms;     
         SDataBizPartner bizPartnerUserSend;
-        String series = oDps.getNumberSeries() == null ? "" : oDps.getNumberSeries();
-        String fNum = series + (series.isEmpty() ? "" : "-") + oDps.getNumber();    
+        String folio = oDps.getDpsNumber();
         
         try {
             int dpsCategory = oDps.getFkDpsCategoryId();
+            
             if (client.isGui()) {
                 client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             }
+            
             mms = getMms(client, dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
             
             bizPartnerMail = getMailToSendForOrder(client, oDps);
+            
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-                client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
+                String warning = "No existe ningún correo-e configurado para envío de pedidos.";
+                if (client.isGui()) {
+                    client.showMsgBoxWarning(warning);
+                }
+                else {
+                    System.err.println(warning);
+                }
             }
             else {
-                //Si es un pedido 
-                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] 
-                    && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] 
-                        && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
-                    //Si viene de la interfaz, se valida si hay correo del usuario de la sesion
+                String replyTo = "";
+                
+                // Si es un pedido de compras:
+                if (oDps.isOrderPur()) {
+                    // Si viene de la interfaz, se valida si hay correo del usuario de la sesión:
                     if (client.isGui()) {
-                        userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        replyTo = ((SDataUser) client.getSession().getUser()).getEmail();
                         nUserId = client.getSession().getUser().getPkUserId();
                     }
-                    //Si no hay correo entonces se busca el del creador de la OC
-                    if (userMail.isEmpty()) {
+                    
+                    // Si no hay correo entonces se busca el del creador de la OC:
+                    if (replyTo.isEmpty()) {
                         SDataUser user = new SDataUser();
                         user.read(new int[] { oDps.getFkUserNewId() }, client.getSession().getStatement());
                         nUserId = oDps.getFkUserNewId();
-                        userMail = user.getEmail();
+                        replyTo = user.getEmail();
                     }
-                    //Si no hay correo se usa el institucional
-                    if (userMail.isEmpty()) {
-                        userMail = mms.getUser();
+                    
+                    // Si no hay correo se usa el del servicio de mensajería mail (MMS):
+                    if (replyTo.isEmpty()) {
+                        replyTo = mms.getUser();
                     }
                 }
                 else {
                     if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                         bizPartnerUserSend = new SDataBizPartner();
                         bizPartnerUserSend.read(new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, client.getSession().getStatement());
-                        userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                        replyTo = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
                     }
                 }
                 
-                sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
-                if (mms.getMmsCase() == 5) {
-                    sender.setMailReplyTo(userMail);
+                SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), ! replyTo.isEmpty() ? replyTo : mms.getUser());
+                ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
+                ArrayList<String> toRecipientsCc = new ArrayList<>();
+                
+                if (mms.getMmsCase() == SDbMms.CASE_5_SWAP_SERVICES_PUR_ORD) {
+                    sender.setMailReplyTo(replyTo);
                     
                     String sCfg = SCfgUtils.getParamValue(client.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+                    
                     if (! sCfg.isEmpty() && nUserId > 0) {
                         ObjectMapper mapper = new ObjectMapper();
                         JsonNode rootNode = mapper.readTree(sCfg);
                         List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", nUserId);
+                        
                         if (toUsers.isEmpty()) {
                             toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", nUserId);
+                            
                             if (toUsers.isEmpty()) {
                                 toUsers.add(nUserId);
                             }
@@ -2142,34 +2154,44 @@ public abstract class STrnUtilities {
                 else {
                     sender.setMailReplyTo(mms.getXtaMailReplyTo());
                 }
-                toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
-
+                
                 if (toRecipients.isEmpty()) {
-                    client.showMsgBoxWarning("No existe ningún correo-e destinatario configurado.");
+                    String waring = "No existe ningún correo-e destinatario configurado (documento: " + folio + ").";
+                    if (client.isGui()) {
+                        client.showMsgBoxWarning(waring);
+                    }
+                    else {
+                        System.err.println(waring);
+                    }
+                    
                     canSend = false;
                 }
                 else {
-                      if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {                                                 
-                            String body = "Le informamos que la orden de compra " + fNum + " adjunta ha sido " 
-                             + (oDps.getIsAuthorized() ? "AUTORIZADA." : "RECHAZADA.");
-                            body += "<p><b>Favor de registrarse en nuestro nuevo portal de proveedores</b><br>"
-                                 + "En el siguiente enlace: "
-                                 + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a></p>";
-                            body += "<p>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, "
-                                 + "facturas, pagos y comprobantes de pago.</p>";
-                            body += "<p>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, "
-                                 + "fuera de esta fecha no se pueden recibir.</p>";
-                            body += "<br><br>Atentamente,<br>"
-                            + client.getSessionXXX().getCurrentCompanyName() + "."
-                            + "<br><br>" + composeMailFooter("", mms.getMmsCase());
+                      if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                            String body = "Le informamos que la orden de compra " + folio + " adjunta ha sido "
+                             + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + ".";
+                            
+                            if ((boolean) client.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP)) {
+                                body += "<p><b>Favor de registrarse en nuestro " + SSwapConsts.PURCHASE_PORTAL + ".</b><br>"
+                                     + "Ingrese al siguiente enlace: "
+                                     + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a></p>";
+                                body += "<p>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, "
+                                     + "facturas, pagos y comprobantes de pago.</p>";
+                                body += "<p>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, "
+                                     + "fuera de esta fecha no se pueden recibir.</p>";
+                            }
+                                                        
+                            body += "<br>Atentamente,<br>"
+                            + client.getSessionXXX().getCurrentCompanyName() + "<br><br>"
+                            + "<hr>" + composeMailFooter("", mms.getMmsCase());
 
                         mms.setTextBody(body);
                     }
                 }
-                String subjectOriginal = mms.getTextSubject(); // "Orden de compra Aceites Especiales TH"
-                String subjectConcatenado = subjectOriginal.replaceFirst("Orden de compra", "Orden de compra " + fNum);
-                mail = new SMail(sender, subjectConcatenado, mms.getTextBody(), toRecipients, toRecipientsCc);
+                
+                String subject = mms.getTextSubject().replaceAll(SDbMms.TAG_NUM, folio); // replacee tag "<num>" wigh the folio of the order!
 
+                SMail mail = new SMail(sender, subject, mms.getTextBody(), toRecipients, toRecipientsCc);
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {
@@ -2186,7 +2208,7 @@ public abstract class STrnUtilities {
                         addressee += (addressee.isEmpty() ? "" : ";") + recipient;
                     }
 
-                    if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, true)) {
+                    if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, true)) { // XXX 2026-06-30, Sergio Flores: ¿Qué ocurre con este bloque de código que no hace nada?
                     }
                     
                     if (! bReturnFile) {
@@ -2195,10 +2217,22 @@ public abstract class STrnUtilities {
                     }
                     
                     if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                        client.showMsgBoxInformation("La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e");
+                        String information = "La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e.";
+                        if (client.isGui()) {
+                            client.showMsgBoxWarning(information);
+                        }
+                        else {
+                            System.out.println(information);
+                        }
                     }
                     else {
-                        client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
+                        String information = "El correo-e ha sido enviado.\n" + msg;
+                        if (client.isGui()) {
+                            client.showMsgBoxWarning(information);
+                        }
+                        else {
+                            System.out.println(information);
+                        }
                     }
                 }
             }
@@ -3774,10 +3808,10 @@ public abstract class STrnUtilities {
                 + "</html>";
     }
     
-    public static String composeMailFooter(final String htmlClass, final int caseMms) {
+    public static String composeMailFooter(final String htmlClass, final int mmsCase) {
         return "<p" + (htmlClass.isEmpty() ? "" : " class=\"" +  htmlClass+ "\"") + ">"
-                + (caseMms != 5 ? "<b>Favor de no responder a este correo-e.</b><br>" : "")
-                + "Generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
+                + (mmsCase != SDbMms.CASE_5_SWAP_SERVICES_PUR_ORD ? "<b>Favor de no responder a este correo-e.</b><br>" : "")
+                + "Generado de forma autom&aacute;tica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
                 + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE + "<br>"
                 + SClient.APP_RELEASE
                 + "</p>";
