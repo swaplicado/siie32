@@ -675,7 +675,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             }
         }
         
-        if (moDpsBalance != null && moDpsBalance.getBalanceNetCy() <= 0) {
+        if (moDpsBalance != null && (moDpsBalance.getBalanceCy() - moDpsBalance.getPaymentsPendCy()) <= 0) {
             miClient.showMsgBoxWarning(composeDpsBalanceNetWarning());
         }
     }
@@ -689,7 +689,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         else {
             warning = "El saldo neto del documento es $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceNetCy()) + ".\n"
                     + "Aunque el documento tiene saldo de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceCy()) 
-                    + ", también tiene pagos pendientes por $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getPaymentsPendCy()) + ".";
+                    + ", también tiene pagos por un total de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getPaymentsPendCy()) + ".\n"
+                    + "Pago actual: $" + moCurPaymentCy.getField().getValue() + ".";
         }
         
         return warning;
@@ -723,6 +724,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                                                 moDps.getPkDocId(),
                                                 isDocAdvance,
                                                 finYear,
+                                                0,
                                                 0);
                     
                     showDps();
@@ -762,6 +764,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                                                     moDps.getPkDocId(),
                                                     isDocAdvance,
                                                     finYear,
+                                                    0,
                                                     0);
                     
                     showDps();
@@ -1019,6 +1022,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                                                                 moDps.getPkYearId(),
                                                                 moDps.getPkDocId(),
                                                                 isDocAdvance,
+                                                                0,
                                                                 0); // note that all fields must be already set with proper values!
         }
         if (moDps != null) {
@@ -1176,6 +1180,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                     moDps.getPkYearId(),
                     moDps.getPkDocId(),
                     isDocAdvance,
+                    moRegistry.getPkPaymentId(),
                     0); // note that all fields must be already set with proper values!
         }
         catch (Exception ex) {
@@ -1187,9 +1192,14 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moTextDps.getFieldName() + "'.");
                 validation.setComponent(moTextDps);
             }
-            else if (moDps != null && moDpsBalance != null && moCurPaymentCy.getField().getValue() > moDpsBalance.getBalanceNetCy()) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moCurPaymentCy.getField().getFieldName() + "':\n" + composeDpsBalanceNetWarning());
-                validation.setComponent(moCurPaymentCy.getField().getComponent());
+            else if (moDps != null && moDpsBalance != null) {
+                double netBalanceCur = moDpsBalance.getBalanceCy() - moDpsBalance.getPaymentsPendCyWithoutCurrent();
+                if (moCurPaymentCy.getField().getValue() > netBalanceCur) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" +
+                            moCurPaymentCy.getField().getFieldName() + "':\n" + 
+                            composeDpsBalanceNetWarning());
+                    validation.setComponent(moCurPaymentCy.getField().getComponent());
+                }
             }
             else {
                 int paymentYear = SLibTimeUtils.digestYear(moDateRequired.getValue())[0];

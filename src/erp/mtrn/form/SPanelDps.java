@@ -627,6 +627,7 @@ public class SPanelDps extends javax.swing.JPanel {
                                                         moDps.getPkDocId(),
                                                         mbIsDpsAdvance,
                                                         miClient.getSession().getCurrentYear(),
+                                                        0,
                                                         0);
 
                         madDpsBalance = new double[] { oBalance.getBalanceNet(), oBalance.getBalanceNetCy() };

@@ -66,6 +66,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1203,6 +1204,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         return true;
     }
 
+    /**
+     * Valida los pagos seleccionados.
+     *
+     * @throws Exception si ocurre un error durante la validación.
+     */
     private void validatePayments() throws Exception {
         int payments = 0;
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
@@ -1227,48 +1233,102 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
         }
         else {
-            String sPaymentDates = "";
-            String sPaymentDocs = "";
-            int paymentDateCount = 0;
-            HashSet<Integer> processedIds = new HashSet<>();
-            for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
-                SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
-                if (layoutBankPaymentRow.isForPayment()) {
+            validateBalancesAndDates(true, true);
+        }
+    }
+    
+    /**
+     * Valida que los montos de pago por documento no superen el saldo disponible.
+     * Retorna un string con los errores encontrados, vacío si no hay problemas.
+     */
+    private String buildPaymentDocErrors(List<int[]> docPayments) throws Exception {
+        HashMap<String, Double> paymentAmountByDoc = new HashMap<>();
+        HashMap<String, Double> paymentAmountInOtherLayouts = new HashMap<>();
+        for (int[] entry : docPayments) {
+            String docKey = SLibUtils.textKey(new int[]{entry[0], entry[1]});
+            paymentAmountByDoc.put(docKey, paymentAmountByDoc.getOrDefault(docKey, 0.0) + entry[2]);
+        }
+        for (Map.Entry<String, Double> entrySet : paymentAmountByDoc.entrySet()) {
+            String key = entrySet.getKey();
+            Double value = entrySet.getValue();
+            int idYear = Integer.parseInt(SLibUtils.textExplode(key, "-")[0]);
+            int idDoc = Integer.parseInt(SLibUtils.textExplode(key, "-")[1]);
 
-                    // Validar el monto de los pagos contra el saldo del documento:
-                    if (layoutBankPaymentRow.getLayoutBankPayment().getLayoutBankDpss().size() > 0) {
-                        // agrupar por documento y sumar los montos de pago para comparar contra el saldo del documento:
-                        HashMap<String, Double> paymentAmountByDoc = new HashMap<>();
-                        for (SLayoutBankDps layoutBankDps : layoutBankPaymentRow.getLayoutBankPayment().getLayoutBankDpss()) {
-                            String docKey = SLibUtils.textKey(new int[]{layoutBankDps.getDps().getPkYearId(), layoutBankDps.getDps().getPkDocId()});
-                            paymentAmountByDoc.put(docKey, paymentAmountByDoc.getOrDefault(docKey, 0.0) + layoutBankDps.getPayment());
-                        }
-                        for (String docKey : paymentAmountByDoc.keySet()) {
-                            String[] docKeyParts = SLibUtils.textExplode(docKey, "-");
-                            int docYearId = Integer.parseInt(docKeyParts[0]);
-                            int docDocId = Integer.parseInt(docKeyParts[1]);
-                            Calendar cal = Calendar.getInstance();
-                            cal.setTime(moDateDateLayout.getValue());
-                            int finYear = cal.get(Calendar.YEAR);
-                            PurchaseDpsBalance oDpsBalance = SPaymentUtils.getDpsBalance(miClient.getSession().getStatement(), 
-                                                                                docYearId, 
-                                                                                docDocId, 
-                                                                                moRadAdvanceDocuments.isSelected(),
-                                                                                finYear,
-                                                                                moRegistry.getPkBankLayoutId());
-                            double paymentAmount = paymentAmountByDoc.get(docKey);
-                            if (paymentAmount > oDpsBalance.getBalance()) {
-                                SDataDps oDps = new SDataDps();
-                                oDps.read(new int[]{docYearId, docDocId}, miClient.getSession().getStatement());
-                                if (oDps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
-                                    sPaymentDocs += "Folio: " + oDps.getNumber() + ", "
-                                            + "Monto pago: " + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ", "
-                                            + "Saldo doc: " + SLibUtils.getDecimalFormatAmount().format(oDpsBalance.getBalance()) + "\n";
-                                }
-                            }
-                        }
+            HashMap<Integer, double[]> otherPayments = SPaymentUtils.getPaymentsInOtherLayoutsByDoc(miClient.getSession().getStatement(),
+                    idYear, idDoc,
+                    moRegistry.getPkBankLayoutId());
+
+            // actualizar el valor del monto de los pagos sumando el index 0 de los pagos en otros layouts
+            if (otherPayments.size() > 0) {
+                double dOtherPayments = 0d;
+                for (Map.Entry<Integer, double[]> otherPaymentEntry : otherPayments.entrySet()) {
+                    double[] otherPaymentValues = otherPaymentEntry.getValue();
+                    value += otherPaymentValues[1]; // sumar el monto de pago en otros layouts
+                    dOtherPayments += otherPaymentValues[1];
+                }
+                paymentAmountByDoc.put(key, value);
+                paymentAmountInOtherLayouts.put(key, dOtherPayments);
+            }
+        }
+
+        String sPaymentDocs = "";
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(moDateDateLayout.getValue());
+        int finYear = cal.get(Calendar.YEAR);
+
+        for (String docKey : paymentAmountByDoc.keySet()) {
+            String[] parts = SLibUtils.textExplode(docKey, "-");
+            int docYearId = Integer.parseInt(parts[0]);
+            int docDocId = Integer.parseInt(parts[1]);
+            PurchaseDpsBalance oDpsBalance = SPaymentUtils.getDpsBalance(
+                    miClient.getSession().getStatement(),
+                    docYearId, docDocId,
+                    moRadAdvanceDocuments.isSelected(),
+                    finYear, 0,
+                    moRegistry.getPkBankLayoutId());
+            double paymentAmount = paymentAmountByDoc.get(docKey);
+            if (paymentAmount > oDpsBalance.getBalance()) {
+                SDataDps oDps = new SDataDps();
+                oDps.read(new int[]{docYearId, docDocId}, miClient.getSession().getStatement());
+                if (oDps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
+                    sPaymentDocs += "Folio documento : " + oDps.getDpsNumber() + ", "
+                            + "Monto pago: " + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + ", "
+                            + (paymentAmountInOtherLayouts.containsKey(docKey) ? "Monto pago en otros layouts: " + SLibUtils.getDecimalFormatAmount().format(paymentAmountInOtherLayouts.get(docKey)) + ", " : "")
+                            + "Saldo doc: " + SLibUtils.getDecimalFormatAmount().format(oDpsBalance.getBalance()) + "\n";
+                }
+            }
+        }
+
+        return sPaymentDocs;
+    }
+
+    /** 
+     * Valida que los pagos seleccionados tengan el mismo saldo que el documento al que están asociados y que tengan la misma fecha programada que la póliza seleccionada.
+     * 
+     * @param validateBalances true para validar los saldos de los pagos contra el saldo del documento, false para no validar los saldos de los pagos contra el saldo del documento.
+     * @param validateDates true para validar que los pagos tengan la misma fecha programada que la póliza seleccionada, false para no validar la fecha programada de los pagos contra la fecha de la póliza seleccionada.
+     * @throws Exception si ocurre un error durante la validación.
+     */
+    private void validateBalancesAndDates(boolean validateBalances, boolean validateDates) throws Exception {
+        String sPaymentDates = "";
+        String sPaymentDocs = "";
+        int paymentDateCount = 0;
+        HashSet<Integer> processedIds = new HashSet<>();
+        for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
+            SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
+            if (layoutBankPaymentRow.isForPayment()) {
+                if (validateBalances && layoutBankPaymentRow.getLayoutBankPayment().getLayoutBankDpss().size() > 0) {
+                    List<int[]> docPayments = new ArrayList<>();
+                    for (SLayoutBankDps layoutBankDps : layoutBankPaymentRow.getLayoutBankPayment().getLayoutBankDpss()) {
+                        docPayments.add(new int[]{
+                            layoutBankDps.getDps().getPkYearId(),
+                            layoutBankDps.getDps().getPkDocId(),
+                            (int) layoutBankDps.getPayment()
+                        });
                     }
-
+                    sPaymentDocs += buildPaymentDocErrors(docPayments);
+                }
+                if (validateDates) {
                     for (Integer iPayment : layoutBankPaymentRow.getPaymentIds()) {
                         if (!processedIds.add(iPayment)) {
                             continue;
@@ -1287,22 +1347,45 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     }
                 }
             }
+        }
 
-            if (!sPaymentDocs.isEmpty()) {
-                throw new Exception("Los pagos\n"
-                        + " " + sPaymentDocs + " "
-                        + "Tienen un monto de pago mayor al saldo del documento al que están asociados.");
+        if (validateBalances && !sPaymentDocs.isEmpty()) {
+            throw new Exception("Los pagos\n"
+                    + " " + sPaymentDocs + " "
+                    + "Tienen un monto de pago mayor al saldo del documento al que están asociados.");
+        }
+
+        if (validateDates && !sPaymentDates.isEmpty()) {
+            sPaymentDates = sPaymentDates.substring(0, sPaymentDates.length() - 2) + ".";
+            if (miClient.showMsgBoxConfirm("Los siguientes pagos no tienen la misma fecha programada que la póliza seleccionada (" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + "):\n"
+                    + " " + sPaymentDates + " \n"
+                    + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
+                throw new Exception("Revise la fecha de la póliza contra la fecha de los pagos: \n " + sPaymentDates);
             }
-
-            if (!sPaymentDates.isEmpty()) {
-                // Quitar la coma y espacio al final de la cadena:
-                sPaymentDates = sPaymentDates.substring(0, sPaymentDates.length() - 2) + ".";
-                if (miClient.showMsgBoxConfirm("Los siguientes pagos no tienen la misma fecha programada que la póliza seleccionada (" + SLibUtils.DateFormatDate.format(moCurrentRecord.getDate()) + "):\n"
-                        + " " + sPaymentDates + " \n"
-                        + "¿Está seguro que desea continuar?") != JOptionPane.YES_OPTION) {
-                    throw new Exception("Revise la fecha de la póliza contra la fecha de los pagos: \n " + sPaymentDates);
+        }
+    }
+    
+    private void validateBalancesAndDatesTransfer() throws Exception {
+        String sPaymentDocs = "";
+        for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
+            SLayoutBankRow layoutBankRowInGrid = (SLayoutBankRow) gridRow;
+            if (layoutBankRowInGrid.isForPayment() && layoutBankRowInGrid.getPayments().size() > 0) {
+                List<int[]> docPayments = new ArrayList<>();
+                for (SRowPayments layoutBankDps : layoutBankRowInGrid.getPayments()) {
+                    docPayments.add(new int[]{
+                        layoutBankDps.getIdYear(),
+                        layoutBankDps.getIdDoc(),
+                        (int) layoutBankDps.getAmount()
+                    });
                 }
+                sPaymentDocs += buildPaymentDocErrors(docPayments);
             }
+        }
+
+        if (!sPaymentDocs.isEmpty()) {
+            throw new Exception("Los pagos\n"
+                    + " " + sPaymentDocs + " "
+                    + "Tienen un monto de pago mayor al saldo del documento al que están asociados.");
         }
     }
 
@@ -3634,6 +3717,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                 if (!cfdiSatStatus.isEmpty()) {
                                     validation.setMessage(cfdiSatStatus);
                                 }
+                            }
+                        }
+                        
+                        if (validation.isValid()) {
+                            try {
+                                validateBalancesAndDatesTransfer();
+                            }
+                            catch (Exception e) {
+                                validation.setMessage(e.getMessage());
                             }
                         }
                     }

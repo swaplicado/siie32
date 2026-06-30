@@ -104,12 +104,13 @@ public abstract class SStockValuationAdjustsUtils {
 
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
                     oMvtAdjust.setQuantityMovement(0d);
-                    oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                     if (resultSet.getInt("fac.fid_dps_nat") != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                        oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                         oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
                                                             - resultSet.getDouble("mvt.cost_r"), 8));
                     }
                     else {
+                        oMvtAdjust.setCostUnitary(0d);
                         oMvtAdjust.setCost_r(0d);
                     }
                     oMvtAdjust.setFkStockValuationId(idValuation);
