@@ -1,10 +1,18 @@
 ================================================================================
-SIIE 3.2 303.4/ 2026-06-26
+SIIE 3.2 303.4/ 2026-06-30
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Validación del saldo de los documentos al crear las solicitudes de pago.
 2) Validación del saldo de los documentos al guardar y contabilizar los layouts.
 3) Validación de pagos en otros layouts para los documentos de los pagos en dicho layout.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Exclusión de adición de información alusiva al Portal de Compras (PC) en el cuerpo de las notificaciones de correo sobre la autorización de pedidos de compras (OC),
+    porque erróneamente se dejó habilitada para todas las empresas, sin considerar si tenían o no PC.
+2) Formalización, mediante constantes, de los casos de servicio mensajería de correo (MMS) para la determinación del remitente de los mensajes de correo,
+    incluyendo además un caso nuevo no documentado para pedidos de compras (OC) y su autorización en empresas con PC,
+    y habilitación de tag reemplazable para insertar el folio del pedido de compras (OC) en el asunto del mensaje de correos de notificación.
 
 ================================================================================
 SIIE 3.2 303.3/ 2026-06-26
@@ -17,7 +25,8 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 303.2/ 2026-06-25
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Habilitación de más opciones de filtrado en el guardado masivod de CFDI de nóminas, con opción a hacerlo para una sola nómina, y también con opción a guardar por separado los CFDI de cada nómina en subcarpetas individuales.
+1) Habilitación de más opciones de filtrado en el guardado masivod de CFDI de nóminas, con opción a hacerlo para una sola nómina,
+    y también con opción a guardar por separado los CFDI de cada nómina en subcarpetas individuales.
 
 ================================================================================
 SIIE 3.2 303.1/ 2026-06-23
