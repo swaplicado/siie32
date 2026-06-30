@@ -2,6 +2,14 @@
 SIIE 3.2 303.3/ 2026-06-26
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
+1) Validación del saldo de los documentos al crear las solicitudes de pago.
+2) Validación del saldo de los documentos al guardar y contabilizar los layouts.
+3) Validación de pagos en otros layouts para los documentos de los pagos en dicho layout.
+
+================================================================================
+SIIE 3.2 303.3/ 2026-06-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
 1) Ajuste en valuación de consumos de inventarios para determinar si las partidas son de activo fijo.
 2) Se agrega columna en vista de consumos de valuación de inventarios.
 

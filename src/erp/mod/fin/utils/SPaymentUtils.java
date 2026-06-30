@@ -14,9 +14,11 @@ import erp.swap.SSwapConsts;
 import erp.swap.form.SDocumentUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
@@ -124,6 +126,7 @@ public class SPaymentUtils {
         double dPaymentsPendCy;
         double dBalanceNet;
         double dBalanceNetCy;
+        double dPaymentsPendCyWithoutCurrent;
         
         public PurchaseDpsBalance(final double balance, 
                                     final double balanceCy, 
@@ -192,6 +195,14 @@ public class SPaymentUtils {
         public void setBalanceNetCy(double BalanceNetCy) {
             this.dBalanceNetCy = BalanceNetCy;
         }
+
+        public double getPaymentsPendCyWithoutCurrent() {
+            return dPaymentsPendCyWithoutCurrent;
+        }
+
+        public void setPaymentsPendCyWithoutCurrent(double d) {
+            this.dPaymentsPendCyWithoutCurrent = d;
+        }
     }
     
     
@@ -249,8 +260,9 @@ public class SPaymentUtils {
                                             final int idDoc,
                                             final boolean isDocAdvance,
                                             final int finYear,
+                                            final int idPayment,
                                             final int idLayout) throws Exception {
-        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, 0d, finYear, idLayout);
+        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, 0d, finYear, idPayment, idLayout);
     }
 
     public static PurchaseDpsBalance getDpsBalance(Statement oStatement,
@@ -263,13 +275,14 @@ public class SPaymentUtils {
                                             final int idYear,
                                             final int idDoc,
                                             final boolean isDocAdvance,
+                                            final int idPayment,
                                             final int idLayout) throws Exception {
         double paymentCy = calculatePaymentCy(miClient, fkCurrencyId, fkEntryCurrencyId, paymentAmountCy, paymentAmountApplication, date);
         // obtener el año del objeto Date recibido:
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int finYear = cal.get(Calendar.YEAR);
-        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, paymentCy, finYear, idLayout);
+        return getDpsBalance(oStatement, idYear, idDoc, isDocAdvance, paymentCy, finYear, idPayment, idLayout);
     }
 
     private static PurchaseDpsBalance getDpsBalance(Statement oStatement,
@@ -278,6 +291,7 @@ public class SPaymentUtils {
                                             final boolean isDocAdvance,
                                             final double paymentCy,
                                             final int finYear,
+                                            final int idPayment,
                                             final int idLayout) throws Exception {
         PurchaseDpsBalance dpsBalance = null;
         String sql = "";
@@ -302,17 +316,13 @@ public class SPaymentUtils {
                 "  FROM fin_pay AS p " +
                 "  INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay " +
                 "  WHERE NOT p.b_del " +
-                "    AND p.fk_st_pay IN (" +
-                "   " + SModSysConsts.FINS_ST_PAY_NEW + ", " +
-                "   " + SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
-                "   " + SModSysConsts.FINS_ST_PAY_SCHED + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
-                /*
-                "   " + SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " +
-                */
-                "   " + SModSysConsts.FINS_ST_PAY_BLOC + ", " + 
-                "   " + SModSysConsts.FINS_ST_PAY_BLOC_P + ") " +
+                "    AND p.pay_tp = 'R' ";
+            if (idPayment > 0) {
+                sql += " AND p.id_pay <> " + idPayment + " ";
+            }
+            sql += " AND p.fk_st_pay NOT IN (" +
+                "   " + SModSysConsts.FINS_ST_PAY_CANC_P + ", " +
+                "   " + SModSysConsts.FINS_ST_PAY_CANC + ") " +
                 "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
                 ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc ";
             sql += "WHERE re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND "
@@ -386,15 +396,101 @@ public class SPaymentUtils {
             if (resultSet.next()) {
                 double balance = resultSet.getDouble("f_bal");
                 double balanceCy = resultSet.getDouble("f_bal_cur");
-                double paymentsPendCy = SLibUtils.roundAmount(resultSet.getDouble("f_pay_pend_cur") - paymentCy);
                 double balanceNet = resultSet.getDouble("f_bal_net");
-                double balanceNetCy = SLibUtils.roundAmount(resultSet.getDouble("f_bal_net_cur") - paymentCy);
+                double paymentsPendCy;
+                double paymentsPendCyWithoutCurrent;
+                double balanceNetCy;
+                if (idPayment == 0) {
+                    paymentsPendCy = SLibUtils.roundAmount(resultSet.getDouble("f_pay_pend_cur") - paymentCy);
+                    balanceNetCy = SLibUtils.roundAmount(resultSet.getDouble("f_bal_net_cur") - paymentCy);
+                }
+                else {
+                    paymentsPendCy = SLibUtils.roundAmount(resultSet.getDouble("f_pay_pend_cur"));
+                    balanceNetCy = SLibUtils.roundAmount(resultSet.getDouble("f_bal_net_cur"));
+                }
+                paymentsPendCyWithoutCurrent = SLibUtils.roundAmount(resultSet.getDouble("f_pay_pend_cur"));
                 
                 dpsBalance = new PurchaseDpsBalance(balance, balanceCy, paymentsPendCy, balanceNet, balanceNetCy);
+                dpsBalance.setPaymentsPendCyWithoutCurrent(paymentsPendCyWithoutCurrent);
             }
         }
         
         return dpsBalance;
+    }
+    
+
+    /**
+     * Obtiene los pagos asociados a un documento en layouts distintos al especificado.
+     * 
+     * <p>Esta función realiza una consulta SQL para recuperar los pagos relacionados con un documento
+     * específico, excluyendo aquellos que pertenecen al layout proporcionado. Los resultados se almacenan
+     * en un HashMap donde la clave es el ID del pago y el valor es un arreglo de dos elementos:
+     * [0] = ety_pay_app
+     * [1] = des_pay_app_ety_cur</p>
+     * 
+     * @param oStatement conexión activa a la base de datos para ejecutar la consulta
+     * @param idYear año fiscal del documento
+     * @param idDoc ID del documento
+     * @param idLayout ID del layout a excluir
+     * 
+     * @return HashMap con los pagos encontrados, donde la clave es el ID del pago y el valor es un arreglo de dos elementos
+     */
+    public static HashMap<Integer, double[]> getPaymentsInOtherLayoutsByDoc(Statement oStatement,
+                                            final int idYear,
+                                            final int idDoc,
+                                            final int idLayout) {
+        String sql = "select " +
+                    "	l.id_lay_bank, " +
+                    "	l.dt_lay, " +
+                    "	l.dt_due, " +
+                    "	l.cpt, " +
+                    "	l.con, " +
+                    "	l.amt, " +
+                    "	l.amt_pay, " +
+                    "	(l.amt - l.amt_pay) as f_amt_x_pay, " +
+                    "	l.tra, " +
+                    "	l.tra_pay, " +
+                    "	(l.tra - l.tra_pay) as f_tra_x_pay, " +
+                    "	l.b_clo_pay, " +
+                    "   fp.id_pay, " +
+                    "	fpe.des_pay_app_ety_cur, " +
+                    "   fpe.ety_pay_app " +
+                    "from " +
+                    "	fin_lay_bank as l " +
+                    "	inner join fin_pay_lay_bank fplb on l.id_lay_bank = fplb.id_lay_bank  " +
+                    "	inner join fin_pay fp on fplb.id_pay = fp.id_pay  " +
+                    "	inner join fin_pay_ety fpe on fp.id_pay = fpe.id_pay " +
+                    "where " +
+                    "	l.trn_tp = 2 " +
+                    "	and l.b_del = 0 " +
+                    "	and fp.b_del = 0 " +
+                    "	and fp.pay_tp = 'R' " +
+                    "	and fpe.fk_doc_year_n = " + idYear + " " +
+                    "	and fpe.fk_doc_doc_n = " + idDoc + " " +
+                    "	and l.id_lay_bank <> " + idLayout + " " +
+                    "having " +
+                    "	f_tra_x_pay <> 0 " +
+                    "	and l.b_clo_pay = 0 " +
+                    "order by " +
+                    "	l.dt_lay, " +
+                    "	l.dt_due, " +
+                    "	l.id_lay_bank;";
+
+        HashMap<Integer, double[]> paymentsInOtherLayouts = new HashMap<>();
+        try (ResultSet resultSet = oStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                double[] values = new double[2];
+                values[0] = resultSet.getDouble("ety_pay_app");
+                values[1] = resultSet.getDouble("des_pay_app_ety_cur");
+                paymentsInOtherLayouts.put(resultSet.getInt("id_pay"), values);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return paymentsInOtherLayouts;
     }
 
     /**
