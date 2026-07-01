@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona
+ * @author Isabel Servín, Edwin Carmona, Claudio Peña
  */
 public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
@@ -885,9 +885,18 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "ur.usr AS usr_req, "
                 + "bmu.bp AS contractor, "
                 + "iref.item_key, "
-                + "cob.ent, "
-                + select
-                + "CASE "
+                + "cob.ent, ";
+                if (mnGridMode == SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
+                    msSql += "CASE auth.auth_st "
+                    + "WHEN 4 THEN 'AUTORIZADO' "
+                    + "WHEN 5 THEN 'RECHAZADO' "
+                    + "WHEN 2 THEN 'PENDIENTE' "
+                    + "WHEN 3 THEN 'EN PROCESO' "
+                    + "ELSE '(NO APLICA)' "
+                    + "END AS auth_status, ";
+                }
+                else {
+                msSql += "CASE "
                     + "WHEN cfg_get_st_authorn(" + SAuthorizationUtils.AUTH_TYPE_MAT_REQUEST + ", "
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
                     + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_AUTHORIZED + " THEN 'AUTORIZADO' "
@@ -901,28 +910,29 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                     + "'" + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + "', v.id_mat_req, "
                     + "NULL, NULL, NULL, NULL) = " + SAuthorizationUtils.AUTH_STATUS_IN_PROCESS + " THEN 'EN PROCESO' "
                     + "ELSE '(NO APLICA)' "
-                + "END AS auth_status, "
-                + "(SELECT  " +
-                    "COUNT(*) > 0 " +
-                    "FROM " +
-                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dmr " +
-                    "INNER JOIN " +
-                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " ety ON dmr.fid_dps_year = ety.id_year " +
-                    "AND dmr.fid_dps_doc = ety.id_doc " +
-                    "AND dmr.fid_dps_ety = ety.id_ety " +
-                    "INNER JOIN " +
-                    "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON ety.id_year = dps.id_year " +
-                    "AND ety.id_doc = dps.id_doc " +
-                    "WHERE " +
-                    "NOT ety.b_del AND NOT dps.b_del " +
-                    "AND dmr.fid_mat_req = v.id_mat_req " +
-                    "AND ((dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " " +
-                    "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " " +
-                    "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ") " +
-                    "OR (dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " " +
-                    "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " " +
-                    "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + "))) AS comp_doc, "
-                + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                    + "END AS auth_status, ";
+                }
+               msSql += "(SELECT  "
+                    + "COUNT(*) > 0 "
+                    + "FROM "
+                    + "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_MAT_REQ) + " dmr "
+                    + "INNER JOIN "
+                    + "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " ety ON dmr.fid_dps_year = ety.id_year "
+                    + "AND dmr.fid_dps_doc = ety.id_doc "
+                    + "AND dmr.fid_dps_ety = ety.id_ety "
+                    + "INNER JOIN "
+                    + "" + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON ety.id_year = dps.id_year "
+                    + "AND ety.id_doc = dps.id_doc "
+                    + "WHERE "
+                    + "NOT ety.b_del AND NOT dps.b_del "
+                    + "AND dmr.fid_mat_req = v.id_mat_req "
+                    + "AND ((dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                    + "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                    + "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + ") "
+                    + "OR (dps.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                    + "AND dps.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                    + "AND dps.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + "))) AS comp_doc, "
+                + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "                
                 + "(SELECT "
                 +   "item FROM " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " "
                 +   "WHERE id_item = "
@@ -966,8 +976,27 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS iref ON "
                 + "v.fk_item_ref_n = iref.id_item "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
-                + "mu.id_maint_user = bmu.id_bp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
+                + "mu.id_maint_user = bmu.id_bp ";
+                if (mnGridMode == SModSysConsts.TRNX_DIOG_CST_ASIG_NA) {
+                   msSql += "LEFT JOIN ( "
+                    + "SELECT "
+                    + "res_pk_n1_n AS id_mat_req, "
+                    + "CASE "
+                    + "WHEN SUM(b_reject) > 0 THEN 5 "
+                    + "WHEN COUNT(*) = SUM(b_authorn) THEN 4 "
+                    + "WHEN SUM(b_authorn) > 0 THEN 3 "
+                    + "ELSE 2 "
+                    + "END AS auth_st "
+                    + "FROM cfgu_authorn_step "
+                    + "WHERE NOT b_del "
+                    + "AND b_req "
+                    + "AND res_tab_name_n = 'trn_mat_req' "
+                    + "AND fk_tp_authorn = 1 "
+                    + "GROUP BY res_pk_n1_n "
+                    + ") auth ON auth.id_mat_req = v.id_mat_req ";
+                }
+
+                msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "v.fk_usr_clo_prov = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ucp ON "
                 + "v.fk_usr_clo_pur = ucp.id_usr "
