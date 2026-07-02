@@ -1924,7 +1924,7 @@ public abstract class STrnUtilities {
         mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
         
         if (mailToSend.isEmpty()) {
-            throw new Exception("El receptor del documento no tiene buzones de correo-e.");
+            throw new Exception("El receptor del documento, " + bizPartner.getBizPartner() + " (ID " + bizPartner.getPkBizPartnerId() + "), no tiene buzones de correo-e.");
         }
         
         return mailToSend;
