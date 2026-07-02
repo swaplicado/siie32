@@ -1,7 +1,14 @@
+================================================================================
 SIIE 3.2 303.5/ 2026-07-01
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Optimización de la vista de todas mis RM (52 a 37 segundos)
+
+SIIE 3.2 303.5/ 2026-07-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al envío automático de correos de OC autorizadas mediante la implementación del método de obtención del estatus de SWAP Services disponibles en erp.SClientApi.
+2) Adición de método de impresión bonita de una cadena JSON en erp.swap.utils.SJsonUtils.
 
 ================================================================================
 SIIE 3.2 303.4/ 2026-06-30
