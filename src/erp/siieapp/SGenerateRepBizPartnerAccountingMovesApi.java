@@ -89,12 +89,12 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
             java.lang.String msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
             java.lang.String msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_PLR);
 
-            String host = "192.168.1.233";
-            String port = "3306";
+            String host = "192.168.1.233"; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
+            String port = "3306"; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
             String db = sBd;
-            int idDefaultCompany = 2852;
+            int idDefaultCompany = 2852; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
             SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN, idDefaultCompany);
-            SClientApi apiClient = new SClientApi(client.getSession(), client.getSession().getUser().getPkUserId());
+            SClientApi apiClient = new SClientApi(client.getSession(), client.getSession().getUser().getPkUserId(), true);
 
             SDataBizPartner oBizPartner = new SDataBizPartner();
             int result = oBizPartner.read((Object) moFieldBizPartner, client.getSession().getStatement());
@@ -121,6 +121,7 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
                     bizPartnerCategory = oBizPartner.getDbmsCategorySettingsCus();
                     break;
                 default:
+                    // nothing
             }
 
             String sql = SDataReadDescriptions.createQueryForCatalogue(SDataConstants.BPSS_TP_CRED, new int[]{bizPartnerCategory.getEffectiveCreditTypeId()}, 0);
@@ -145,7 +146,8 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
             }
 
             return JasperExportManager.exportReportToPdf(jasperPrint);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println(e);
             throw e;
         }

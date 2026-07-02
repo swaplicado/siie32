@@ -12,7 +12,7 @@ import sa.lib.db.SDbDatabase;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Sergio Floers
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public abstract class SClientUtils {
     

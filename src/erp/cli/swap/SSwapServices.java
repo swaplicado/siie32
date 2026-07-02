@@ -72,7 +72,7 @@ public class SSwapServices {
             user.read(new int[]{1}, session.getStatement());
             session.setUser(user);
             SResponses responses;
-            SClientApi client = SCliSendAuthMails.createClientApi(session, 1);
+            SClientApi client = SCliSendAuthMails.createClientApi(session, 1, true);
             session.setClient(client);
 
             responses = SExportUtils.exportData(client.getSession(), SSyncType.PUR_ORDER, true, SExportUtils.EXPORT_MODE_SILENT);

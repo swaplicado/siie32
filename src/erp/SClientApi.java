@@ -18,6 +18,7 @@ import erp.mcfg.data.SDataCompany;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.musr.data.SDataUser;
 import erp.server.SSessionXXX;
+import erp.swap.SSwapConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,14 +45,20 @@ public class SClientApi implements SClientInterface, SGuiClient {
     
     protected final SGuiSession moSession;
     protected final int mnUserId;
+    protected boolean mbSwapServicesLinkUp;
     protected SSessionXXX moSessionXXX;
     
-    public SClientApi(SGuiSession session, int userId) {
+    public SClientApi(SGuiSession session, int userId, boolean swapServicesLinkUp) {
         moSession = session; 
         moSession.setSessionCustom(new SSessionCustomApi(session));
         mnUserId = userId;
+        mbSwapServicesLinkUp = swapServicesLinkUp;
         createSessionXXX();
     }
+    
+    /*
+     * Private methods
+     */
     
     private void createSessionXXX() {
         moSessionXXX = new SSessionXXX();
@@ -96,6 +103,10 @@ public class SClientApi implements SClientInterface, SGuiClient {
         params.read(new int[] { moSessionXXX.getCompany().getPkCompanyId() }, moSession.getStatement());
         return params;
     }
+    
+    /*
+     * Overriden methods
+     */
     
     @Override
     public boolean isGui() {
@@ -179,7 +190,17 @@ public class SClientApi implements SClientInterface, SGuiClient {
 
     @Override
     public Object getSwapServicesSetting(String setting) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Object object = null;
+        
+        switch (setting) {
+            case SSwapConsts.CFG_NVP_LINK_UP:
+                object = mbSwapServicesLinkUp;
+                break;
+            default:
+                // nothing
+        }
+        
+        return object;
     }
 
     @Override

@@ -2044,6 +2044,7 @@ public abstract class STrnUtilities {
             if (confirmSending && client.isGui()) {
                 send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
             }
+            
             if (send) {
                 oPdf = sendMailOrder(client, dps, bReturnFile);
                 if (! bReturnFile) {

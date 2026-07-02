@@ -5,12 +5,35 @@
  */
 package erp.swap.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import sa.lib.SLibUtils;
+
 /**
  * Utilerías JSON para SWAP Services.
  * 
  * @author Sergio Flores
  */
 public abstract class SJsonUtils {
+    
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /**
+     * JSON pretty print.
+     * @param json
+     * @return 
+     */
+    public static String prettyPrint(String json) {
+        try {
+            Object object = MAPPER.readValue(json, Object.class);
+            return MAPPER.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(object);
+        }
+        catch (Exception e) {
+            // Return the original string if it is not valid JSON
+            SLibUtils.printException(SJsonUtils.class.getName(), e);
+            return json;
+        }
+    }
 
     /**
      * Sanitiza una cadena JSON para evitar caracteres problemáticos.
