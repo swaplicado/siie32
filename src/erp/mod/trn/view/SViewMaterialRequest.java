@@ -977,7 +977,7 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
                 + "v.fk_item_ref_n = iref.id_item "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bmu ON "
                 + "mu.id_maint_user = bmu.id_bp ";
-                if (mnGridMode == SModSysConsts.TRNX_DIOG_CST_ASIG_NA) {
+                if (mnGridMode == SModSysConsts.TRNX_DIOG_CST_ASIG_NA ||  mnGridMode == SModSysConsts.TRNS_ST_MAT_REQ_NEW) {
                    msSql += "LEFT JOIN ( "
                     + "SELECT "
                     + "res_pk_n1_n AS id_mat_req, "
