@@ -2437,7 +2437,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                 SDataDps oDps = new SDataDps();
                                 oDps.read(new int[]{row.getDpsYearId(), row.getDpsDocId()}, miClient.getSession().getStatement());
                                 if (oDps.getLastDbActionResult() == SLibConstants.DB_ACTION_READ_OK) {
-                                    pay.setReceiptPaymentRequired(oDps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CASH);
+                                    if (oDps.getDbmsDataDpsCfd() != null) {
+                                        pay.setReceiptPaymentRequired(oDps.getDbmsDataDpsCfd().getPaymentMethod().equals("PPD"));
+                                    }
+                                    else {
+                                        pay.setReceiptPaymentRequired(oDps.getFkPaymentTypeId() != SDataConstantsSys.TRNS_TP_PAY_CASH);
+                                    }
                                 }
                             }
                         }
