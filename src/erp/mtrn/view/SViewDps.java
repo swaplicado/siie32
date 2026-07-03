@@ -3989,7 +3989,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             msSql += "bp.id_bp, bpb.bpb, bpb.id_bpb ";
         }
         
-        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
+        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD && mbSwapServicesLinkUp) {
             erp.lib.gui.SGuiDate oGuiDate = (erp.lib.gui.SGuiDate) moTabFilterDatePeriod.getDate();
             boolean isByYear = oGuiDate.getDataType() == SLibConstants.GUI_DATE_AS_YEAR;
             SAuthDBUtils.refreshAuthMsAuthData(miClient.getSession(), msSql, isByYear);
