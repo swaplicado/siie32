@@ -16,8 +16,7 @@ import java.util.Date;
  * @author César Orozco
  */
 public class SHumanLogger {
-private static final String LOG_FOLDER =
-            "C:/HumandLogs/";
+private static final String LOG_FOLDER = "./HumandLogs";
 
     public static synchronized void log(
             final SHumanAction action,
