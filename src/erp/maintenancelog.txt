@@ -2,7 +2,7 @@
 SIIE 3.2 303.7/ 2026-07-03
 Cesar Iván OROZCO NATIVIDAD
 --------------------------------------------------------------------------------
-1) Se modifica la ruta del log de Humand estaba hacia C y no funcionaba
+1) Se modifica la ruta del log de Humand estaba hacia C y no funcionaba.
 
 ================================================================================
 SIIE 3.2 303.7/ 2026-07-03
@@ -14,13 +14,14 @@ Jhonatan Claudio PEÑA HERNANDEZ
 SIIE 3.2 303.6/ 2026-07-02
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Corrección de la vista de todas mis RM, constante incorrecta
+1) Corrección de la vista de todas mis RM, constante incorrecta.
 
 ================================================================================
 SIIE 3.2 303.5/ 2026-07-01
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
-1) Optimización de la vista de todas mis RM (52 a 37 segundos)
+1) Optimización de la vista de todas mis RM (52 a 37 segundos).
+
 ================================================================================
 SIIE 3.2 303.5/ 2026-07-02
 Sergio Abraham FLORES GUTIÉRREZ
