@@ -1,8 +1,14 @@
 ================================================================================
-SIIE 3.2 303.6/ 2026-07-03
+SIIE 3.2 303.7/ 2026-07-03
 Cesar Iván OROZCO NATIVIDAD
 --------------------------------------------------------------------------------
 1) Se modifica la ruta del log de Humand estaba hacia C y no funcionaba
+
+================================================================================
+SIIE 3.2 303.7/ 2026-07-03
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección vista pedidos, para que no intente leer los estatus de google en caso de que no este habilitado en esa empresa.
 
 ================================================================================
 SIIE 3.2 303.6/ 2026-07-02
