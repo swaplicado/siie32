@@ -277,7 +277,7 @@ public class SStockValuationUtils {
                         && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
                     double newCostUnitary = (res.getInt("fid_dps_nat") == SDataConstantsSys.TRNU_DPS_NAT_ASSET)
                             ? 0d
-                            : res.getDouble("ety_des_price_real");
+                            : res.getDouble("price_u_real_r");
 
                     if (oEntry.getCostUnitary() != newCostUnitary) {
                         oEntry.setCostUnitary(newCostUnitary);
@@ -1062,28 +1062,29 @@ public class SStockValuationUtils {
      * @param idCob ID de la sucursal.
      * @param idWh ID del almacén.
      * @param idMov ID del movimiento.
-     * @param dCost Costo a actualizar.
+     * @param dCostU Costo a actualizar.
      * @param opType Tipo de operación (DEBIT/CREDIT).
      * @throws SQLException 
      */
-    private static void updateTrnStockRowCost(SGuiSession session, final int idYear,
+    public static void updateTrnStockRowCost(SGuiSession session, final int idYear,
                                                                 final int idItem, 
                                                                 final int idUnit, 
                                                                 final int idLot, 
                                                                 final int idCob, 
                                                                 final int idWh, 
                                                                 final int idMov, 
-                                                                final double dCost,
+                                                                final double dCostU,
                                                                 final int opType) throws SQLException {
+        double roundedAmount = SLibUtils.roundAmount(dCostU);
         String sql = "UPDATE "
                 + "" + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " SET "
-                + "cost_u = " + SLibUtils.roundAmount(dCost) + ", ";
+                + "cost_u = " + roundedAmount + ", ";
         
         if (DEBIT == opType) {
-            sql += "debit = ROUND((" + SLibUtils.roundAmount(dCost) + " * mov_in), 2) ";
+            sql += "debit = ROUND((" + roundedAmount + " * mov_in), 2) ";
         }
         else {
-            sql += "credit = ROUND((" + SLibUtils.roundAmount(dCost) + " * mov_out), 2) ";
+            sql += "credit = ROUND((" + roundedAmount + " * mov_out), 2) ";
         }
 
         sql += "WHERE (id_year = " + idYear + ") and "
