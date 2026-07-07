@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 303.8/ 2026-07-07
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Eliminación de la sincronización de cantidad hacia las requisiciones asociadas.
+2) Auditoría en requisición asociada a una OC al modificarla.
+3) Agregado de una nota aclaratoria que la cantidad de la requisición no será modificada.
+
+================================================================================
 SIIE 3.2 303.7/ 2026-07-03
 Cesar Iván OROZCO NATIVIDAD
 --------------------------------------------------------------------------------

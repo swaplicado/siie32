@@ -1085,10 +1085,10 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
             for (SDbMaterialRequest materialRequest : moMaterialRequests) {
                 for (SDbMaterialRequestEntry entry : materialRequest.getChildEntries()) {
                     if (SLibUtilities.compareKeys(entry.getPrimaryKey(), updateEntryKey)) {
-                        if (rowDpsEdit.getOriginalQuantityNew() != 0) {
+                        /*if (rowDpsEdit.getOriginalQuantityNew() != 0) {
                             entry.setQuantity(rowDpsEdit.getOriginalQuantityNew());
                             entry.setRegistryEdited(true);
-                        }
+                        }*/
 
                         if (rowDpsEdit.getItemRefNew() != null) {
                             entry.setFkItemReferenceId_n(rowDpsEdit.getItemRefNew().getPkItemId());
@@ -1348,6 +1348,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
     
     private String getModifiedEntriesWithParents() {
         StringBuilder message = new StringBuilder();
+        boolean isQtyChanged = false;
 
         try {
             for (int i = 0; i < moDocEntriesTablePane.getTableGuiRowCount(); i++) {
@@ -1393,7 +1394,15 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                         String docType;
 
                         if (rs.getBoolean("is_mat_req")) {
-                            docType = "Requisición";
+                            if (row.getItemRefNew() != null || row.getCostCenterNew() != null) { // solo mostrar mensaje de cambio cuando se modifique Item Ref y/o CC
+                                docType = "Requisición";                                
+                                if (row.getOriginalQuantityNew() != 0) { //si también cambió la cantidad, mostrar una nota al final del mensaje
+                                    isQtyChanged = true;
+                                }
+                            }
+                            else {
+                                continue;
+                            }
                         }
                         else{
                             switch (rs.getInt("rel_cl_dps")) {
@@ -1445,13 +1454,17 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                                 .append(")")
                                 .append("\n");
                     }
-
+                    
                     rs.close();
                 }
             }
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
+        }
+
+        if (isQtyChanged) {
+            message.append("\nNota: La cantidad de la requisición asociada no será modificada\n");
         }
 
         return message.toString();
@@ -1616,7 +1629,7 @@ public class SFormDpsEdit extends javax.swing.JDialog implements erp.lib.form.SF
                         SDataDpsEntryEdit.MatReqEtyData data = new SDataDpsEntryEdit.MatReqEtyData();
                         data.idMatReq = reqEty.getPkMatRequestId();
                         data.idEty = reqEty.getPkEntryId();
-                        data.qty = reqEty.getQuantity();
+                        //data.qty = reqEty.getQuantity();
                         data.fkItemRefId_n = reqEty.getFkItemReferenceId_n();
                         data.fkCostCenterId_n = reqEty.getFkCostCenterId_n();
 
