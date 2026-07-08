@@ -690,7 +690,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             warning = "El saldo neto del documento es $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceNetCy()) + ".\n"
                     + "Aunque el documento tiene saldo de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getBalanceCy()) 
                     + ", también tiene pagos por un total de $" + SLibUtils.DecimalFormatValue2D.format(moDpsBalance.getPaymentsPendCy()) + ".\n"
-                    + "Pago actual: $" + moCurPaymentCy.getField().getValue() + ".";
+                    + "Pago actual: $" + SLibUtils.DecimalFormatValue2D.format(moCurPaymentCy.getField().getValue()) + ".";
         }
         
         return warning;

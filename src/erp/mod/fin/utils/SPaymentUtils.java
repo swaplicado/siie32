@@ -299,7 +299,7 @@ public class SPaymentUtils {
             sql += "SELECT " +
                 "SUM(re.debit - re.credit) AS f_bal," +
                 "SUM(IF(re.fid_cur <> d.fid_cur, 0.0, re.debit_cur - re.credit_cur)) AS f_bal_cur, " +
-                "COALESCE(ps.sum_pay_cur, 0.0) AS f_pay_pend_cur, " +
+                "COALESCE(ps.sum_pay_cur, 0.0) - COALESCE(pacc.sum_pay_cur, 0.0) AS f_pay_pend_cur, " + // TODOS los pagos tipo 'R' al documento - (menos) pagos cotabilizados tipo 'P'
                 "SUM(re.debit - re.credit) + COALESCE(ps.sum_pay, 0.0) AS f_bal_net, " +
                 "SUM(IF(re.fid_cur <> d.fid_cur, 0.0, re.debit_cur - re.credit_cur)) + COALESCE(ps.sum_pay_cur, 0.0) AS f_bal_net_cur " +
                 "FROM fin_rec AS r " +
@@ -320,11 +320,31 @@ public class SPaymentUtils {
             if (idPayment > 0) {
                 sql += " AND p.id_pay <> " + idPayment + " ";
             }
-            sql += " AND p.fk_st_pay NOT IN (" +
-                "   " + SModSysConsts.FINS_ST_PAY_CANC_P + ", " +
-                "   " + SModSysConsts.FINS_ST_PAY_CANC + ") " +
-                "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n " +
-                ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc ";
+            sql += " AND p.fk_st_pay NOT IN ("
+                    + "   " + SModSysConsts.FINS_ST_PAY_CANC_P + ", "
+                    + "   " + SModSysConsts.FINS_ST_PAY_CANC + ") "
+                    + "  GROUP BY pe.fk_doc_year_n, pe.fk_doc_doc_n "
+                    + ") AS ps ON ps.id_year = d.id_year AND ps.id_doc = d.id_doc "
+                    + "LEFT JOIN "
+                    + "    (SELECT  "
+                    + "        pe.fk_doc_year_n AS id_year, "
+                    + "        pe.fk_doc_doc_n AS id_doc, "
+                    + "        SUM(pe.ety_pay) AS sum_pay, "
+                    + "        SUM(pe.des_pay_app_ety_cur) AS sum_pay_cur "
+                    + "    FROM "
+                    + "        fin_pay AS p "
+                    + "    INNER JOIN fin_pay_ety AS pe ON p.id_pay = pe.id_pay "
+                    + "    INNER JOIN fin_pay_lay_bank AS pl ON p.id_pay = pl.id_pay "
+                    + "    INNER JOIN fin_lay_bank AS l ON pl.id_lay_bank = l.id_lay_bank "
+                    + "    WHERE "
+                    + "        p.b_del = 0 AND p.pay_tp = 'P' "
+                    + "            AND p.fk_st_pay NOT IN ("
+                    + "   " + SModSysConsts.FINS_ST_PAY_CANC_P + ", "
+                    + "   " + SModSysConsts.FINS_ST_PAY_CANC + ") "
+                    + "            AND l.b_del = 0 "
+                    + "            AND l.tra_pay > 0 "
+                    + "    GROUP BY pe.fk_doc_year_n , pe.fk_doc_doc_n) AS pacc ON pacc.id_year = d.id_year "
+                    + "        AND pacc.id_doc = d.id_doc ";
             sql += "WHERE re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND "
                     + "re.fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] + " ";
         }
