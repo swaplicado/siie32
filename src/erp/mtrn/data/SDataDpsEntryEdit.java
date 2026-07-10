@@ -23,7 +23,7 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     public static class MatReqEtyData implements java.io.Serializable {
         public int idMatReq;
         public int idEty;
-        public double qty;
+        //public double qty;
         public int fkItemRefId_n;
         public int fkCostCenterId_n;
     }
@@ -139,10 +139,17 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
             if (moMatReqsData != null) {
                 for (MatReqEtyData data : moMatReqsData) {
                     String sql = "UPDATE trn_mat_req_ety SET "
-                            + "qty = " + data.qty + ", "
+                            //+ "user_qty = " + data.qty + ", " 
                             + "fk_item_ref_n = " + (data.fkItemRefId_n == 0 ? "NULL" : data.fkItemRefId_n) + ", "
-                            + "fk_cc_n = " + (data.fkCostCenterId_n == 0 ? "NULL" : data.fkCostCenterId_n) + " "
-                            + "WHERE id_mat_req = " + data.idMatReq + " AND id_ety = " + data.idEty;
+                            + "fk_cc_n = " + (data.fkCostCenterId_n == 0 ? "NULL" : data.fkCostCenterId_n) + " " 
+                            + "WHERE id_mat_req = " + data.idMatReq + " AND id_ety = " + data.idEty;                        
+                    connection.createStatement().execute(sql);
+                
+                    sql = "UPDATE trn_mat_req SET "
+                            + "fk_usr_upd = " + mnUserEditId + ", "
+                            + "ts_usr_upd = NOW() "
+                            + "WHERE id_mat_req = " + data.idMatReq;
+
                     connection.createStatement().execute(sql);
                 }
             }
