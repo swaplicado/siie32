@@ -7,6 +7,12 @@ Rodrigo Abel AYALA VÁZQUEZ
 3) Agregado de una nota aclaratoria que la cantidad de la requisición no será modificada.
 
 ================================================================================
+SIIE 3.2 303.8/ 2026-07-08
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación del saldo de los documentos al crear las solicitudes de pago: Se toma en cuenta el monto de los pagos contabilizados y se resta a los pagos existentes.
+
+================================================================================
 SIIE 3.2 303.7/ 2026-07-03
 Cesar Iván OROZCO NATIVIDAD
 --------------------------------------------------------------------------------
