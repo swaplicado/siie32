@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 303.8/ 2026-07-07
+SIIE 3.2 303.8/ 2026-07-10
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Eliminación de la sincronización de cantidad hacia las requisiciones asociadas.
