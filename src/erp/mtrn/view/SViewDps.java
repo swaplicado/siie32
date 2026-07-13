@@ -67,6 +67,7 @@ import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.mtrn.form.SDialogDpsMaterialRequestLink;
 import erp.mtrn.form.SDialogPrintCfdiMasive;
+import erp.mtrn.form.SDialogUpdateDpsData;
 import erp.mtrn.form.SDialogUpdateDpsDate;
 import erp.mtrn.form.SDialogUpdateDpsDeliveryAddress;
 import erp.mtrn.form.SDialogUpdateDpsLogistics;
@@ -193,6 +194,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbAuthWebForceCheckStatus;
     private javax.swing.JButton jbAuthWebViewAuthComments;
     private javax.swing.JButton jbAuthWebDnldAllFiles;
+    private javax.swing.JButton jbAuthWebUpdateData;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -204,6 +206,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private erp.mtrn.form.SDialogUpdateDpsDeliveryAddress moDialogUpdateDpsDeliveryAddress;
     private erp.mtrn.form.SDialogUpdateDpsSalesAgentComms moDialogUpdateDpsSalesAgentComms;
     private erp.mtrn.form.SDialogUpdateDpsLogistics moDialogUpdateDpsLogistics;
+    private erp.mtrn.form.SDialogUpdateDpsData moDialogUpdateDpsData;
     private erp.mtrn.form.SDialogUpdateDpsDate moDialogUpdateDpsDate;
     private erp.mtrn.form.SDialogUpdateDpsReferenceComms moDialogUpdateDpsRefCommissions;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
@@ -581,6 +584,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 jbAuthWebDnldAllFiles.setPreferredSize(new Dimension(23, 23));
                 jbAuthWebDnldAllFiles.addActionListener(this);
                 jbAuthWebDnldAllFiles.setToolTipText("Descargar todos los archivos vinculados a la orden");
+                
+                jbAuthWebUpdateData = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif")));
+                jbAuthWebUpdateData.setPreferredSize(new Dimension(23, 23));
+                jbAuthWebUpdateData.addActionListener(this);
+                jbAuthWebUpdateData.setToolTipText("Editar fecha / uso CFDI de la orden");
             }
             
             if (mbIsDocInvoices) {
@@ -661,6 +669,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 addTaskBarUpperComponent(jbAuthWebForceCheckStatus);
                 addTaskBarUpperComponent(jbAuthWebViewAuthComments);
                 addTaskBarUpperComponent(jbAuthWebDnldAllFiles);
+                addTaskBarUpperComponent(jbAuthWebUpdateData);
             }
             
             if (mbIsDocInvoices) {
@@ -765,6 +774,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 jbAuthWebForceCheckStatus.setEnabled(true);
                 jbAuthWebViewAuthComments.setEnabled(true);
                 jbAuthWebDnldAllFiles.setEnabled(true);
+                jbAuthWebUpdateData.setEnabled(true);
             }
             
             if (mbIsDocInvoices) {
@@ -3458,6 +3468,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionAuthWebUpdateData () {
+        if (jbAuthWebUpdateData.isEnabled()) {
+            if (isRowSelected()) {
+                if (moDialogUpdateDpsData == null) {
+                    moDialogUpdateDpsData = new SDialogUpdateDpsData(miClient);
+                }
+                
+                moDialogUpdateDpsData.formReset();
+                moDialogUpdateDpsData.setValue(SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey());
+                moDialogUpdateDpsData.setFormVisible(true);
+
+                if (moDialogUpdateDpsData.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    miClient.getGuiModule(mnModule).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+    
     private void initProgressDialog() {
         progressDialog = new JDialog(miClient.getFrame(), "Descargando...", true);
         progressDialog.setSize(300, 100);
@@ -4150,6 +4178,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbAuthWebDnldAllFiles) {
                     actionAuthWebDnldAllFiles();
+                }
+                else if (button == jbAuthWebUpdateData) {
+                    actionAuthWebUpdateData();
                 }
             }
         }

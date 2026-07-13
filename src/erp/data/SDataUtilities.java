@@ -204,6 +204,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -3795,5 +3797,44 @@ public abstract class SDataUtilities {
             pk = resultSet.getInt(1);
         }
         return pk;
+    }
+    
+    public static int updateDpsDateAndCfdUse(erp.client.SClientInterface client, int nPkYearId, int nPkDocId, java.util.Date dpsDate, String dpsCfdUse) throws java.lang.Exception {
+        Statement oStatement;
+        int mnLastDbActionResult;
+        
+        try {
+            oStatement = client.getSession().getStatement();
+            // Iniciar transacción
+            oStatement.execute("START TRANSACTION");
+
+            // Primer UPDATE
+            String sql1 = "UPDATE trn_dps\n" +
+                "SET dt = '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dpsDate) + "',\n" +
+                "    dt_doc = '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dpsDate) + "',\n" +
+                "    ts_edit = NOW(),\n" +
+                "    fid_usr_new = " + client.getSession().getUser().getPkUserId() + "\n" +
+                "WHERE id_year = " + nPkYearId + "\n" +
+                "  AND id_doc = " + nPkDocId;
+
+            oStatement.executeUpdate(sql1);
+
+            // Segundo UPDATE
+            String sql2 = "UPDATE trn_dps_cfd\n" +
+                "SET cfd_use = '" + dpsCfdUse + "'\n" +
+                "WHERE id_year = " + nPkYearId + "\n" +
+                "  AND id_doc = " + nPkDocId;
+
+            oStatement.executeUpdate(sql2);
+
+            // Commit
+            oStatement.execute("COMMIT");
+            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
+        }
+        catch (SQLException e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+        }
+        
+        return mnLastDbActionResult;
     }
 }
