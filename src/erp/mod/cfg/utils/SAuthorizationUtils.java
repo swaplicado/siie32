@@ -90,6 +90,8 @@ public abstract class SAuthorizationUtils {
     public static final int AUTH_STATUS_IN_PROCESS = 3;
     public static final int AUTH_STATUS_AUTHORIZED = 4;
     public static final int AUTH_STATUS_REJECTED = 5;
+    public static final int AUTH_STATUS_SENDING = 11;
+    public static final int AUTH_STATUS_SENT_FAIL = 12;
     
     public static final HashMap<Integer, String> AUTH_STATUS_DESC = new HashMap<>();
     

@@ -1195,7 +1195,9 @@ public abstract class SExportDataUtils {
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, nat.dps_nat, "
                         + "COALESCE(d.acc_tag, '') AS _acc_tag, "
-                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
+                        + "COALESCE(dcfd.pay_met, '') AS _pay_met, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
+                        + "d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
                         + "IF(d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
@@ -1273,7 +1275,13 @@ public abstract class SExportDataUtils {
                     oDpsExport.notes = resultSet.getString("_notes");
                     oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
                     oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
-                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    String paymentMethod = resultSet.getString("_pay_met");
+                    if (paymentMethod != null && !paymentMethod.isEmpty()) {
+                        oDpsExport.payment_method = paymentMethod;
+                    }
+                    else {
+                        oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    }
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
                     oDpsExport.account_tag = resultSet.getString("_acc_tag");

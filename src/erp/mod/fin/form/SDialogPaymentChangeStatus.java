@@ -39,6 +39,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public static final int CASE_CHANGE_CURRENCY = 3; // payment must be scheduled
     public static final int CASE_MARK_AS_PAID = 4; // payment must be scheduled
     public static final int CASE_CHANGE_BANK_ACCOUNT = 5; // payment must be operated
+    public static final int CASE_CHANGE_EXEC_DATE = 6; // only change execution date
     
     public final static int VALUE_PAYMENT = 1;
     public final static int VALUE_DATE = 2;
@@ -465,6 +466,12 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
                 break;
                 
+            case CASE_CHANGE_EXEC_DATE: // payment is operated
+                setTitle("Cambio de fecha de ejecución");
+                jlPaymentCy.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha ejecución:*"); // to get a new date
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -534,6 +541,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         boolean changingCurrency = false;
         boolean markingAsPaid = false;
         boolean changingAccountBank = false;
+        boolean changingExecDate = false;
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
@@ -564,6 +572,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
                 break;
                 
+            case CASE_CHANGE_EXEC_DATE:
+                changingExecDate = true;
+                moDateNewDate.setValue(moRegistry.getDateExecution_n());
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Caso: " + mnFormCase + ")");
         }
@@ -590,12 +603,12 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
         moCurPaymentCy.setEditable(markingAsPaid);
-        moDateNewDate.setEditable(!changingCurrency && !changingAccountBank);
+        moDateNewDate.setEditable((!changingCurrency && !changingAccountBank) || changingExecDate);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
         moKeyPaymentBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyBeneffBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyPriority.setEditable(reactivating);
-        moTextNotes.setEditable(reactivating || rescheduling);
+        moTextNotes.setEditable(reactivating || rescheduling || changingExecDate);
         moTextNotesAuthorization.setEditable(reactivating);
         
         addAllListeners();
@@ -685,6 +698,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                             }
                         }
                         
+                        break;
+
+                    case CASE_CHANGE_EXEC_DATE:
+                        if (moDateNewDate.getValue() == null) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moDateNewDate.getFieldName() + "'.");
+                            validation.setComponent(moDateNewDate.getComponent());
+                        }
                         break;
 
                     default:
