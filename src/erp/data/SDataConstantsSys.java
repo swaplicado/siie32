@@ -150,6 +150,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE = "SIIE_CFG_USR_GRP_DPS_NAT_CFD_USE";
     public static final String CFG_PARAM_SIIE_CFG_MASS_ACC = "SIIE_CFG_MASS_ACC";
     public static final String CFG_PARAM_SWAP_SERVICES_CONFIG = "SWAP_SERVICES_CONFIG";
+    public static final String CFG_PARAM_SWAP_SERVICES_AME_CONFIG = "SWAP_SERVICES_AME_CONFIG";
     public static final String CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG = "SWAP_SERVICES_AUTH_CONFIG";
     public static final String CFG_PARAM_SWAP_SOM = "SWAP_SOM";
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";

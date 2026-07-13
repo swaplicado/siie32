@@ -74,6 +74,14 @@ public abstract class SSwapConsts {
     public static final String QRY_END_DATE = "end_date";
     public static final String QRY_DOCUMENT_TYPE = "document_type";
     
+    /*
+     * JSON object for request attributes of ame service.
+     */
+    
+    public static final String CFG_OBJ_AME_SRV = "ame-srv";
+    public static final String CFG_OBJ_AME_SRV_LOGIN = "login";
+    public static final String CFG_OBJ_AME_SRV_SEASON_EXPORT = "season-export";
+    
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";
