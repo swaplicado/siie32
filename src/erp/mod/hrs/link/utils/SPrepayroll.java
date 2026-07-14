@@ -5,6 +5,7 @@
  */
 package erp.mod.hrs.link.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class SPrepayroll {
     private String start_date;
     private String end_date;
     private List<SPrepayrollRow> rows;
+    private ArrayList<SPrepayrollError> processing_errors;
 
     public String getStart_date() {
         return start_date;
@@ -39,6 +41,14 @@ public class SPrepayroll {
 
     public void setRows(List<SPrepayrollRow> rows) {
         this.rows = rows;
+    }
+    
+    public ArrayList<SPrepayrollError> getProcessing_errors(){
+        return processing_errors;
+    }
+    
+    public void setProcessing_errors(ArrayList<SPrepayrollError> processing_errors) {
+        this.processing_errors = processing_errors;
     }
  
     
