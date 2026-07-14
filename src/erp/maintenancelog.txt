@@ -2,6 +2,10 @@
 SIIE 3.2 303.10/ 2026-07-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
+1) Mejorar visibilidad de envío a autorización de OC en SIIE. PDC-677
+2) Excluir solicitudes de pago eliminadas y canceladas de consulta de pagos existentes de un documento en SIIE. PDC-890
+3) Permitir cambiar fecha de pago (de operación) de solicitudes y pagos que ya están pagados (operados) en SIIE. PDC-888
+4) Cambio en la manera de obtención de el método de pago al exportar OC.
 
 ================================================================================
 SIIE 3.2 303.9/ 2026-07-13
