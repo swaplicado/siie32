@@ -12801,26 +12801,32 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     
                     if (!validation.getIsError() && !mbIsCatSales && mbIsDocOrder) {
                         if (isApplingFiscalData()) {
-                            if (moBizPartnerCategory.getTaxRegime().isEmpty() && jcbFisDataTaxRegimeIssuing.getSelectedIndex() > 0) {
-                                if(miClient.showMsgBoxConfirm("El campo '" + jlFisDataTaxRegimeIssuing.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString() + "',\n"
-                                        + "pero el proveedor en el catálogo no tiene asignado un regimén fiscal, por lo que hay que asegurarse de que este valor es correcto.\n"
-                                        + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
-                                    validation.setComponent(jcbFisDataTaxRegimeIssuing);
-                                    validation.setTabbedPaneIndex(TAB_FIS_DATA);
-                                }
+                            if (moBizPartnerCategory.getTaxRegime().isEmpty() && jcbFisDataTaxRegimeIssuing.getSelectedIndex() > 0 &&
+                                    miClient.showMsgBoxConfirm("El proveedor en el catálogo no tiene régimen fiscal, pero el campo '" + jlFisDataTaxRegimeIssuing.getText() + "',\n"
+                                            + "de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString() + "'.\n"
+                                            + "¿Está seguro de que este valor es el correcto?") != JOptionPane.OK_OPTION) {
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
+                                validation.setComponent(jcbFisDataTaxRegimeIssuing);
+                                validation.setTabbedPaneIndex(TAB_FIS_DATA);
                             }
-
-                            if (!validation.getIsError()) {
-                                if (moCfgPurposeDpsNature.getfixAsset().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0]) &&
-                                        !moCfgPurposeCfdUse.getfixAsset().contains(moFieldFisDataCfdiUsage.getFieldValue().toString())) {
-                                    if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFisDataCfdiUsage.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) +"', '" + moFieldFisDataCfdiUsage.getFieldValue().toString() + "',\n"
+                            else if (!moBizPartnerCategory.getTaxRegime().isEmpty() && !moBizPartnerCategory.getTaxRegime().equals(jcbFisDataTaxRegimeIssuing.getSelectedItem().toString()) &&
+                                    miClient.showMsgBoxConfirm("el proveedor en el catálogo tiene el régimen fiscal '" + moBizPartnerCategory.getTaxRegime() + "', pero el campo '" + jlFisDataTaxRegimeIssuing.getText() + "',\n"
+                                            + "de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString() + "'.\n"
+                                            + "¿Está seguro de que este valor es el correcto?") != JOptionPane.OK_OPTION) {
+                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
+                                validation.setComponent(jcbFisDataTaxRegimeIssuing);
+                                validation.setTabbedPaneIndex(TAB_FIS_DATA);
+                            }
+                            else {
+                                boolean isDpsNatureFixedAsset = moCfgPurposeDpsNature.getfixAsset().contains(moFieldFkDpsNatureId.getKeyAsIntArray()[0]);
+                                
+                                if (isDpsNatureFixedAsset && !moCfgPurposeCfdUse.getfixAsset().contains(moFieldFisDataCfdiUsage.getFieldValue().toString()) ||
+                                        !isDpsNatureFixedAsset && moCfgPurposeCfdUse.getfixAsset().contains(moFieldFisDataCfdiUsage.getFieldValue().toString())) {
+                                    validation.setMessage("El valor del campo '" + jlFisDataCfdiUsage.getText() + "', de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) +"', '" + moFieldFisDataCfdiUsage.getFieldValue().toString() + "',\n"
                                             + "no concuerda con el valor del campo '" + jlFkDpsNatureId.getText() + "', '" + jcbFkDpsNatureId.getSelectedItem().toString() + "'.\n"
-                                            + "¿Desea continuar de todas formas?") != JOptionPane.OK_OPTION) {
-                                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFisDataCfdiUsage.getText() + "'");
-                                        validation.setComponent(jcbFisDataCfdiUsage);
-                                        validation.setTabbedPaneIndex(TAB_FIS_DATA);
-                                    }
+                                            + "Si la naturaleza del documento le da carácter de " + (isDpsNatureFixedAsset ? "'activo fijo'" : "'gasto'") + ", el Uso del CFDI debe estar alineado a ello.");
+                                    validation.setComponent(jcbFisDataCfdiUsage);
+                                    validation.setTabbedPaneIndex(TAB_FIS_DATA);
                                 }
                             }
                         }
