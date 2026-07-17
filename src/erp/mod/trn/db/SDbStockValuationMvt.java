@@ -9,7 +9,9 @@ import erp.mod.SModConsts;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -31,9 +33,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected double mdCost_r;
     protected boolean mbTemporalPrice;
     protected boolean mbRevised;
-    //protected boolean mbDeleted;
+    // protected boolean mbSystem;
+    // protected boolean mbDeleted;
     protected int mnFkStockValuationId;
     protected int mnFkStockValuationMvtId_n;
+    protected int mnFkStockTypeValuationMvtId;
     protected int mnFkDiogCategoryId;
     protected int mnFkDiogYearInId_n;
     protected int mnFkDiogDocInId_n;
@@ -60,6 +64,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     //protected Date mtTsUserInsert;
     //protected Date mtTsUserUpdate;
 
+    protected List<SDbStockValuationMvtNote> mlNotes;
+
     protected boolean mbAuxConsumed;
     protected double mdAuxConsumption;
     protected int[] maAuxWarehousePk;
@@ -74,6 +80,12 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected int[] maAuxTypeDpsOut;
     protected boolean mbAuxIsAdjust;
     protected int mnAuxInDpsNature;
+    
+    public static final int TYPE_VAL_MVT_NA = 1;
+    public static final int TYPE_VAL_MVT_IN = 2;
+    public static final int TYPE_VAL_MVT_CONSUMP = 3;
+    public static final int TYPE_VAL_MVT_PRICE_ADJ = 4;
+    public static final int TYPE_VAL_MVT_ASSET_ADJ = 5;
 
     public SDbStockValuationMvt() {
         super(SModConsts.TRN_STK_VAL_MVT);
@@ -86,9 +98,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public void setCost_r(double d) { mdCost_r = d; }
     public void setTemporalPrice(boolean b) { mbTemporalPrice = b; }
     public void setRevised(boolean b) { mbRevised = b; }
+    public void setSystem(boolean b) { mbSystem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkStockValuationId(int n) { mnFkStockValuationId = n; }
     public void setFkStockValuationMvtId_n(int n) { mnFkStockValuationMvtId_n = n; }
+    public void setFkStockTypeValuationMvtId(int n) { mnFkStockTypeValuationMvtId = n; }
     public void setFkDiogCategoryId(int n) { mnFkDiogCategoryId = n; }
     public void setFkDiogYearInId_n(int n) { mnFkDiogYearInId_n = n; }
     public void setFkDiogDocInId_n(int n) { mnFkDiogDocInId_n = n; }
@@ -115,6 +129,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
+    public void setNotes(List<SDbStockValuationMvtNote> notes) { this.mlNotes = notes; }
+
     public void setAuxConsumed(boolean b) { mbAuxConsumed = b; }
     public void setAuxConsumption(double d) { mdAuxConsumption = d; }
     public void setAuxFkCostCenterId(int n) { mnAuxFkCostCenterId = n; }
@@ -135,9 +151,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public double getCost_r() { return mdCost_r; }
     public boolean isTemporalPrice() { return mbTemporalPrice; }
     public boolean isRevised() { return mbRevised; }
+    public boolean isSystem() { return mbSystem; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkStockValuationId() { return mnFkStockValuationId; }
     public int getFkStockValuationMvtId_n() { return mnFkStockValuationMvtId_n; }
+    public int getFkStockTypeValuationMvtId() { return mnFkStockTypeValuationMvtId; }
     public int getFkDiogCategoryId() { return mnFkDiogCategoryId; }
     public int getFkDiogYearInId_n() { return mnFkDiogYearInId_n; }
     public int getFkDiogDocInId_n() { return mnFkDiogDocInId_n; }
@@ -163,6 +181,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+
+    public List<SDbStockValuationMvtNote> getNotes() { return mlNotes; }
 
     public boolean isAuxConsumed() { return mbAuxConsumed; }
     public double getAuxConsumption() { return mdAuxConsumption; }
@@ -215,9 +235,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         mdCost_r = 0d;
         mbTemporalPrice = false;
         mbRevised = false;
+        mbSystem = false;
         mbDeleted = false;
         mnFkStockValuationId = 0;
         mnFkStockValuationMvtId_n = 0;
+        mnFkStockTypeValuationMvtId = 1;
         mnFkDiogCategoryId = 0;
         mnFkDiogYearInId_n = 0;
         mnFkDiogDocInId_n = 0;
@@ -253,6 +275,8 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         maAuxTypeDpsIn = new int[] { 0, 0, 0 };
         maAuxTypeDpsOut = new int[] { 0, 0, 0 };
         mbAuxIsAdjust = false;
+
+        mlNotes = new ArrayList<>();
     }
 
     @Override
@@ -303,9 +327,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
             mdCost_r = resultSet.getDouble("cost_r");
             mbTemporalPrice = resultSet.getBoolean("b_temp_price");
             mbRevised = resultSet.getBoolean("b_rev");
+            mbSystem = resultSet.getBoolean("b_sys");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkStockValuationId = resultSet.getInt("fk_stk_val");
             mnFkStockValuationMvtId_n = resultSet.getInt("fk_stk_val_mvt_n");
+            mnFkStockTypeValuationMvtId = resultSet.getInt("fk_tp_stk_val_mvt");
             mnFkDiogCategoryId = resultSet.getInt("fk_ct_iog");
             mnFkDiogYearInId_n = resultSet.getInt("fk_diog_year_in_n");
             mnFkDiogDocInId_n = resultSet.getInt("fk_diog_doc_in_n");
@@ -357,9 +383,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
                     mdCost_r + ", " +
                     (mbTemporalPrice ? 1 : 0) + ", " +
                     (mbRevised ? 1 : 0) + ", " +
+                    (mbSystem ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkStockValuationId + ", " +
                     (mnFkStockValuationMvtId_n > 0 ? mnFkStockValuationMvtId_n : "null") + ", " +
+                    (mnFkStockTypeValuationMvtId > 0 ? mnFkStockTypeValuationMvtId : 1) + ", " +
                     mnFkDiogCategoryId + ", " +
                     (mnFkDiogYearInId_n > 0 ? mnFkDiogYearInId_n : "null") + ", " +
                     (mnFkDiogDocInId_n > 0 ? mnFkDiogDocInId_n : "null") + ", " +
@@ -398,9 +426,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
                     "cost_r = " + mdCost_r + ", " +
                     "b_temp_price = " + (mbTemporalPrice ? 1 : 0) + ", " +
                     "b_rev = " + (mbRevised ? 1 : 0) + ", " +
+                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_stk_val = " + mnFkStockValuationId + ", " +
                     "fk_stk_val_mvt_n = " + (mnFkStockValuationMvtId_n > 0 ? mnFkStockValuationMvtId_n : "null") + ", " +
+                    "fk_tp_stk_val_mvt = " + mnFkStockTypeValuationMvtId + ", " +
                     "fk_ct_iog = " + mnFkDiogCategoryId + ", " +
                     "fk_diog_year_in_n = " + (mnFkDiogYearInId_n > 0 ? mnFkDiogYearInId_n : "null") + ", " +
                     "fk_diog_doc_in_n = " + (mnFkDiogDocInId_n > 0 ? mnFkDiogDocInId_n : "null") + ", " +
@@ -430,6 +460,15 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         }
         
         session.getStatement().getConnection().createStatement().execute(msSql);
+
+        if (! mbRegistryNew) {
+            SDbStockValuationMvtNote.deleteAllNotesFromMvt(session, mnPkStockValuationMvtId);
+        }
+        
+        for (SDbStockValuationMvtNote note : mlNotes) {
+            note.setFkStockValuationMvtId(mnPkStockValuationMvtId);
+            note.save(session);
+        }
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -446,9 +485,11 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         registry.setCost_r(this.getCost_r());
         registry.setTemporalPrice(this.isTemporalPrice());
         registry.setRevised(this.isRevised());
+        registry.setSystem(this.isSystem());
         registry.setDeleted(this.isDeleted());
         registry.setFkStockValuationId(this.getFkStockValuationId());
         registry.setFkStockValuationMvtId_n(this.getFkStockValuationMvtId_n());
+        registry.setFkStockTypeValuationMvtId(this.getFkStockTypeValuationMvtId());
         registry.setFkDiogCategoryId(this.getFkDiogCategoryId());
         registry.setFkDiogYearInId_n(this.getFkDiogYearInId_n());
         registry.setFkDiogDocInId_n(this.getFkDiogDocInId_n());

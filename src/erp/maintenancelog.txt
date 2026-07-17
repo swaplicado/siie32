@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 304.0/ 2026-07-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales. Validación de entradas y salidas de activo fijo con costo así como de naturaleza predeterminada sin costo.
+2) Se agregan comentarios a la valuación cuando ocurran casos especiales.
+3) Se agrega tipo de movimiento a movimientos de valuación.
+
+================================================================================
 SIIE 3.2 303.10/ 2026-07-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
