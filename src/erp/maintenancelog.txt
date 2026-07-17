@@ -7,6 +7,12 @@ Edwin Omar CARMONA FIGUEROA
 3) Se agrega tipo de movimiento a movimientos de valuación.
 
 ================================================================================
+SIIE 3.2 303.11/ 2026-07-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Reforzamiento de la validación de captura de pedidos de compra para hacer concordar la naturaleza del documento con el Uso del CFDI.
+
+================================================================================
 SIIE 3.2 303.10/ 2026-07-13
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
