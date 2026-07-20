@@ -46,15 +46,15 @@ public class SStockValNotesUtils {
 
     public static List<SDbStockValuationMvtNote> getStockValuationMvtNotes(SGuiSession session, int stockValuationMvtId) throws Exception {
         List<SDbStockValuationMvtNote> notes = new ArrayList<>();
-        String sql = "SELECT id_stk_val_mvt_note FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " "
+        String sql = "SELECT id_stk_val_mvt_nts FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " "
                 + "WHERE fk_stk_val_mvt = " + stockValuationMvtId + " "
                 + "AND b_del = 0 "
-                + "ORDER BY id_stk_val_mvt_note ";
+                + "ORDER BY id_stk_val_mvt_nts ";
         
         ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
         while (resultSet.next()) {
             SDbStockValuationMvtNote note = new SDbStockValuationMvtNote();
-            note.read(session, new int[] { resultSet.getInt("id_stk_val_mvt_note") });
+            note.read(session, new int[] { resultSet.getInt("id_stk_val_mvt_nts") });
             notes.add(note);
         }
         

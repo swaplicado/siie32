@@ -201,7 +201,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                         + "(IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
                         + "         'ACTIVO FIJO', "
                         + "         'PREDETERMINADO') LIKE '%" + text + "%' ) OR "
-                        + "(SELECT GROUP_CONCAT(COALESCE(mvtn.notes, '') SEPARATOR ';') "
+                        + "(SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
                         + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
                         + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
                         + "  GROUP BY mvtn.fk_stk_val_mvt) LIKE '%" + text + "%' ";
@@ -443,7 +443,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "facc.acc, "
                 + "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, "
                 + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as fin_num, "
-                + " (SELECT GROUP_CONCAT(COALESCE(mvtn.notes, '') SEPARATOR ';') "
+                + " (SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
                 + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
                 + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
                 + "  GROUP BY mvtn.fk_stk_val_mvt) AS _notes, "

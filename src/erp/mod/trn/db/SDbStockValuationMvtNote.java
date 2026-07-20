@@ -27,7 +27,9 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
 //    protected boolean mbDeleted;
     protected int mnFkStockValuationMvtId;
 //    protected int mnFkUserInsertId;
+//    protected int mnFkUserUpdateId;
 //    protected Date mtTsUserInsert;
+//    protected Date mtTsUserUpdate;
 
     public SDbStockValuationMvtNote() {
         super(SModConsts.TRN_STK_VAL_MVT_NOTE);
@@ -39,15 +41,19 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
 //    public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkStockValuationMvtId(int n) { mnFkStockValuationMvtId = n; }
 //    public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
+//    public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
 //    public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
-    
+//    public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
+
     public int getPkStockValMvtNoteId() { return mnPkStockValMvtNoteId; }
     public String getNotes() { return msNotes; }
 //    public boolean isSystem() { return mbSystem; }
 //    public boolean isDeleted() { return mbDeleted; }
     public int getFkStockValuationMvtId() { return mnFkStockValuationMvtId; }
 //    public int getFkUserInsertId() { return mnFkUserInsertId; }
+//    public int getFkUserUpdateId() { return mnFkUserUpdateId; }
 //    public Date getTsUserInsert() { return mtTsUserInsert; }
+//    public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     public static void deleteAllNotesFromMvt(SGuiSession session, int fkStockValuationMvtId) throws SQLException, Exception {
         String sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " WHERE fk_stk_val_mvt = " + fkStockValuationMvtId;
@@ -75,6 +81,8 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
         mnFkStockValuationMvtId = 0;
         mnFkUserInsertId = 0;
         mtTsUserInsert = null;
+        mnFkUserUpdateId = 0;
+        mtTsUserUpdate = null;
     }
 
     @Override
@@ -84,12 +92,12 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_stk_val_mvt_note = " + mnPkStockValMvtNoteId;
+        return "WHERE id_stk_val_mvt_nts = " + mnPkStockValMvtNoteId;
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_stk_val_mvt_note = " + pk[0];
+        return "WHERE id_stk_val_mvt_nts = " + pk[0];
     }
 
     @Override
@@ -98,7 +106,7 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
 
         mnPkStockValMvtNoteId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_stk_val_mvt_note), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_stk_val_mvt_nts), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
             mnPkStockValMvtNoteId = resultSet.getInt(1);
@@ -118,15 +126,16 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkStockValMvtNoteId = resultSet.getInt("id_stk_val_mvt_note");
-            msNotes = resultSet.getString("notes");
+            mnPkStockValMvtNoteId = resultSet.getInt("id_stk_val_mvt_nts");
+            msNotes = resultSet.getString("nts");
             mbSystem = resultSet.getBoolean("b_sys");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkStockValuationMvtId = resultSet.getInt("fk_stk_val_mvt");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
+            mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
+            mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
-            
             mbRegistryNew = false;
         }
         
@@ -151,6 +160,8 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkStockValuationMvtId + ", " + 
                     mnFkUserInsertId + ", " + 
+                    mnFkUserUpdateId + ", " +
+                    "NOW()" + ", " +
                     "NOW()" + " " +
                     ")" ;
         }
@@ -158,13 +169,15 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    "id_stk_val_mvt_note = " + mnPkStockValMvtNoteId + ", " +
-                    "notes = '" + (msNotes != null ? msNotes.substring(0, Math.min(msNotes.length(), 512)) : "") + "', " +
+                    "id_stk_val_mvt_nts = " + mnPkStockValMvtNoteId + ", " +
+                    "nts = '" + (msNotes != null ? msNotes.substring(0, Math.min(msNotes.length(), 512)) : "") + "', " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_stk_val_mvt = " + mnFkStockValuationMvtId + ", " +
-                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    "ts_usr_ins = " + "NOW()" + " " +
+                    // "fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    "ts_usr_ins = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
         
@@ -184,7 +197,9 @@ public class SDbStockValuationMvtNote extends SDbRegistryUser implements Seriali
         registry.setDeleted(this.isDeleted());
         registry.setFkStockValuationMvtId(this.getFkStockValuationMvtId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
+        registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
+        registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setRegistryNew(this.isRegistryNew());
         
