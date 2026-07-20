@@ -5,6 +5,12 @@ Sergio Abraham FLORES GUTIÉRREZ
 1) Implementación del campo "Prioridad" para Documentos, haciéndolo modificable en la captura y en la solicitud de autorización de pedidos de compras.
 2) Reset a bandera "Es moneda local" en la forma de captura de Documentos, para evitar el cambio inesperado de moneda extranjera a moneda local al abrir documentos para modificarlos.
 3) Restricción de largo máximo de campos "Notas" de Pagos, para evitar errores en la inserción en la BD.
+SIIE 3.2 304.0/ 2026-07-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales. Validación de entradas y salidas de activo fijo con costo así como de naturaleza predeterminada sin costo.
+2) Se agregan comentarios a la valuación cuando ocurran casos especiales.
+3) Se agrega tipo de movimiento a movimientos de valuación.
 
 ================================================================================
 SIIE 3.2 303.11/ 2026-07-16
