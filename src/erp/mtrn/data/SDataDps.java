@@ -116,6 +116,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_USR = 6;
     public static final int LEN_SERIES = 25; // maximum length of number series
     public static final int LEN_NUMBER = SSwapConsts.LEN_UUID; // maximum length of number
+    public static final int PRIORITY_NORMAL = 0;
+    public static final int PRIORITY_URGENT = 1;
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
@@ -186,6 +188,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msPaymentMethod;
     protected java.lang.String msPaymentAccount;
     protected java.lang.String msAccountingTag;
+    protected int mnPriority;
     protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
@@ -1916,6 +1919,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
     public void setAccountingTag(java.lang.String s) { msAccountingTag = s; }
+    public void setPriority(int n) { mnPriority = n; }
     public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
@@ -2042,6 +2046,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getPaymentMethod() { return msPaymentMethod; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
     public java.lang.String getAccountingTag() { return msAccountingTag; }
+    public int getPriority() { return mnPriority; }
     public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
@@ -2398,6 +2403,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msPaymentMethod = "";
         msPaymentAccount = "";
         msAccountingTag = "";
+        mnPriority = 0;
         mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
@@ -2603,7 +2609,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
-                msAccountingTag = oResultSet.getString("acc_tag");
+                msAccountingTag = oResultSet.getString("d.acc_tag");
+                mnPriority = oResultSet.getInt("d.priority");
                 mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
@@ -2631,7 +2638,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkDpsNatureId = oResultSet.getInt("d.fid_dps_nat");
                 mnFkCompanyBranchId = oResultSet.getInt("d.fid_cob");
                 mnFkFunctionalAreaId = oResultSet.getInt("d.fid_func");
-                mnFkFunctionalSubAreaId = oResultSet.getInt("fid_func_sub");
+                mnFkFunctionalSubAreaId = oResultSet.getInt("d.fid_func_sub");
                 mnFkBizPartnerId_r = oResultSet.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = oResultSet.getInt("d.fid_bpb");
                 mnFkBizPartnerBranchAddressId = oResultSet.getInt("d.fid_add");
@@ -3012,7 +3019,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -3057,6 +3064,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setString(nParam++, msPaymentMethod);
             oCallableStatement.setString(nParam++, msPaymentAccount);
             oCallableStatement.setString(nParam++, msAccountingTag);
+            oCallableStatement.setInt(nParam++, mnPriority);
             oCallableStatement.setInt(nParam++, mnAutomaticAuthorizationRejection);
             oCallableStatement.setBoolean(nParam++, mbIsPublic);
             oCallableStatement.setBoolean(nParam++, mbIsLinked);

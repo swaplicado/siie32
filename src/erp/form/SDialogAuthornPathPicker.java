@@ -11,10 +11,12 @@ import erp.data.SDataConstantsSys;
 import erp.data.SRowAuthornPathPicker;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
+import erp.mod.cfg.utils.SAuthJsonUtils;
+import erp.mod.trn.db.STrnConsts;
+import erp.mtrn.data.SDataDps;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.utils.SExportUtils;
-import erp.mod.cfg.utils.SAuthJsonUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +39,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogAuthornPathPicker extends JDialog implements ActionListener {
 
@@ -215,11 +217,9 @@ public class SDialogAuthornPathPicker extends JDialog implements ActionListener 
         moGridPaths.getPanelCommandsSys(SGuiConsts.PANEL_LEFT).removeAll();
         jpGrid.add(moGridPaths, BorderLayout.CENTER);
         
-        SGuiItem standard = new SGuiItem(new int[] {0}, "NORMAL");
-        SGuiItem urgent = new SGuiItem(new int[] {1}, "URGENTE");
         moKeyPriority.removeAllItems();
-        moKeyPriority.addItem(standard);
-        moKeyPriority.addItem(urgent);
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDataDps.PRIORITY_NORMAL }, STrnConsts.PRIORITY_NORMAL));
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDataDps.PRIORITY_URGENT }, STrnConsts.PRIORITY_URGENT));
         moKeyPriority.setSelectedIndex(0);
         
         SGuiUtils.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE);
