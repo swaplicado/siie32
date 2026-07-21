@@ -23,6 +23,7 @@ import erp.mod.fin.db.SDbPaymentFile;
 import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.db.STrnUtils;
 import erp.mod.trn.form.SDialogSelectOrderAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
@@ -1749,20 +1750,29 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static boolean sendAuthornPurchaseOrderAppWeb(SClientInterface client, int[] pk) {
+    public static boolean sendAuthornPurchaseOrderAppWeb(SClientInterface client, int[] dpsKey) {
         try {
             SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
-            fileProcess.read(client.getSession(), pk);
+            fileProcess.read(client.getSession(), dpsKey);
+            
             if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
                     fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
                 if (canSendAuthornOrderAppWeb(client, fileProcess)) {
+                    int oldPriority = fileProcess.getDps().getPriority();
                     SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SSwapConsts.RESOURCE_TYPE_PUR_ORDER);
                     picker.setNotes("");
-                    picker.setPriority(0);
+                    picker.setPriority(oldPriority);
+                    
                     if (picker.hasAuthornPaths()) {
                         picker.setVisible(true);
+                        
                         if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            new SProcDpsSendAuthornWeb(client, fileProcess, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                            int newPriority = picker.getSelectedPriority();
+                            if (newPriority != oldPriority) {
+                                STrnUtils.updateDpsPriority((SGuiClient) client, dpsKey, newPriority);
+                            }
+                            
+                            new SProcDpsSendAuthornWeb(client, fileProcess, picker.getSelectedAuthPath(), newPriority, picker.getAuthornNotes()).start();
                         }
                         else {
                             return false;
@@ -1779,7 +1789,7 @@ public abstract class SAuthorizationUtils {
                 }
             }
             else {
-                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es '" + fileProcess.getDpsStatus() + "'.");
                 return false;
             }
             return true;

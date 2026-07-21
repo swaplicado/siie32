@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 305.0/ 2026-07-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación del campo "Prioridad" para Documentos, haciéndolo modificable en la captura y en la solicitud de autorización de pedidos de compras.
+2) Reset a bandera "Es moneda local" en la forma de captura de Documentos, para evitar el cambio inesperado de moneda extranjera a moneda local al abrir documentos para modificarlos.
+3) Restricción de largo máximo de campos "Notas" de Pagos, para evitar errores en la inserción en la BD.
+
+================================================================================
 SIIE 3.2 304.0/ 2026-07-17
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

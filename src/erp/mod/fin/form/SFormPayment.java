@@ -20,6 +20,7 @@ import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.fin.utils.SPaymentUtils.PurchaseDpsBalance;
+import erp.mod.trn.db.STrnConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogPickerDps;
 import erp.mtrn.form.SPanelDps;
@@ -911,8 +912,8 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         
         moKeyPriority.removeAllItems();
         moKeyPriority.addItem(new SGuiItem(new int[] { }, "- Prioridad -"));
-        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_NORMAL }, "NORMAL"));
-        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_URGENT }, "URGENTE"));
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_NORMAL }, STrnConsts.PRIORITY_NORMAL));
+        moKeyPriority.addItem(new SGuiItem(new int[] { SDbPayment.PRIORITY_URGENT }, STrnConsts.PRIORITY_URGENT));
     }
 
     @Override
