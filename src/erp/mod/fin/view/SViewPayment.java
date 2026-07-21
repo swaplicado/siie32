@@ -1118,7 +1118,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ve.fk_ety_cur = ce.id_cur "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
-                + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
+                + "LEFT JOIN erp.trnu_dps_nat AS nat ON d.fid_dps_nat = nat.id_dps_nat "
                 + "LEFT JOIN ("
                 + "SELECT fk_dps_year_n, fk_dps_doc_n, MAX(prc_type) AS _prc_type "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " " 
