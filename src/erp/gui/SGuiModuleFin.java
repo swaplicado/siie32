@@ -126,6 +126,7 @@ import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
 import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormCtr;
 import erp.swap.SSwapConsts;
+import erp.swap.form.SDialogImportProcurementFacility;
 import erp.swap.form.SDialogImportProformas;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -224,6 +225,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecDpsBizPartnerCus;
     private javax.swing.JMenuItem jmiRecDpsBizPartnerSup;
     private javax.swing.JMenuItem jmiRecAccCus;
+    private javax.swing.JMenuItem jmiRecImportProcurementFacility;
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
@@ -392,6 +394,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private erp.mfin.form.SFormCheckAnnuled moFormCheckAnnuled;
     private erp.swap.form.SDialogImportProformas moDialogImportProformas;
     private erp.swap.form.SDialogImportProformas moDialogImportCrps;
+    private erp.swap.form.SDialogImportProcurementFacility moDialogImportProcurementFacility;
+    
     private erp.mtrn.form.SFormCtr moFormCtr;
     private erp.mtrn.form.SDialogRepAccountTag moDialogRepAccTag;
 
@@ -585,6 +589,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerCus = new JMenuItem("Consulta pólizas contables de docs. de clientes");
         jmiRecDpsBizPartnerSup = new JMenuItem("Consulta pólizas contables de docs. de proveedores");
         jmiRecAccCus = new JMenuItem("Consulta personalizada de aux. contables...");
+        jmiRecImportProcurementFacility = new JMenuItem("Importación de gastos de bodegas");
 
         jmRec.add(jmiRecRec);
         jmRec.add(jmiRecRecCash);
@@ -624,6 +629,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec.add(jmiRecDpsBizPartnerSup);
         jmRec.addSeparator();
         jmRec.add(jmiRecAccCus);
+        jmRec.addSeparator();
+        jmRec.add(jmiRecImportProcurementFacility);
 
         jmFin = new JMenu("Finanzas");
 
@@ -1030,6 +1037,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerCus.addActionListener(this);
         jmiRecDpsBizPartnerSup.addActionListener(this);
         jmiRecAccCus.addActionListener(this);
+        jmiRecImportProcurementFacility.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
         jmiFinBankNbDay.addActionListener(this);
@@ -1294,6 +1302,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerCus.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecDpsBizPartnerSup.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecAccCus.setEnabled(hasRightAuxCustom);
+        jmiRecImportProcurementFacility.setEnabled(true);
 
         jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt || hasRightCfdPayment);
         jmiFinExchangeRate.setEnabled(hasRightExcRate);
@@ -2338,6 +2347,14 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     params.getParamsMap().put(subType, ((String) picker.getValue(SPickerAccountingCustomReport.PARAM_REP_NAME)).toLowerCase());
                     miClient.getSession().showView(SModConsts.FINX_REP_CUS_ACC, subType, params);
                 }
+            }
+            else if (item == jmiRecImportProcurementFacility) {
+                if (moDialogImportProcurementFacility == null) {
+                    String title = "Importación de gastos de bodegas";
+                    moDialogImportProcurementFacility = new SDialogImportProcurementFacility((SGuiClient) miClient, SSwapConsts.TXN_DOC_TYPE_AVO_WEEKS, title);
+                }
+                moDialogImportProcurementFacility.resetForm();
+                moDialogImportProcurementFacility.setVisible(true);
             }
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
