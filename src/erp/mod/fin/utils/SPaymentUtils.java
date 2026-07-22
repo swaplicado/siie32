@@ -356,7 +356,7 @@ public class SPaymentUtils {
                     + "   " + SModSysConsts.FINS_ST_PAY_CANC + ") "
                     + "                    AND l.b_del = 0 "
                     + "                    AND l.tra_pay = l.tra "
-                    + "                    AND l.tra_pay > 1) "
+                    + "                    AND l.tra_pay > 0) "
                     + "    GROUP BY pe.fk_doc_year_n , pe.fk_doc_doc_n) AS ps ON ps.id_year = d.id_year "
                     + "        AND ps.id_doc = d.id_doc "
                     + "LEFT JOIN "
