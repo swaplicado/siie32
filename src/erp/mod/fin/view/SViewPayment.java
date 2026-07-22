@@ -19,6 +19,7 @@ import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.view.SViewFilter;
 import erp.mtrn.data.cfd.SDialogCfdRenderer;
@@ -1066,7 +1067,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + " WHERE v.id_pay = f.id_pay) = 0, " + SGridConsts.ICON_NULL + ", " + SGridConsts.ICON_FOLDER + ") AS _ico_files, "
                 + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJC_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ") AS _ico_proc, "
                 + "IF(ve.ety_tp = '" + SDbPaymentEntry.TYPE_ADVANCE + "' , '" + SDbPaymentEntry.DESC_ENTRY_TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_PAYMENT + "') AS _ety_tp, "
-                + "IF(v.priority = 1 , '" + SDbPayment.DESC_PRIORITY_URGENT + "', '" + SDbPayment.DESC_PRIORITY_NORMAL + "') AS _priority, "
+                + "IF(v.priority = " + SDbPayment.PRIORITY_URGENT + ", '" + STrnConsts.PRIORITY_URGENT + "', '" + STrnConsts.PRIORITY_NORMAL + "') AS _priority, "
                 + "ve.ety_pay_app_cur, "
                 + "ve.ety_pay_app, "
                 + "ve.conv_rate_app, "

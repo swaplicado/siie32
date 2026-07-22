@@ -36,9 +36,6 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
-    public static final String DESC_PRIORITY_NORMAL = "Normal";
-    public static final String DESC_PRIORITY_URGENT = "Urgente";
-    
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
