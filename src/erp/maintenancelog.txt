@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 305.1/ 2026-07-23
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Saporis tiene un formato especial JasperReports para la impresión de ordenes de compra. El archivo se llama trn_dps_order - SAPORIS.jasper, y al igual que todos los demás formatos JasperReports, está en la carpeta /reps.
+Cada vez que se actualicen reportes en SAPORIS, hay que renombrar el formato original trn_dps_order.jasper como trn_dps_order - ORIGINAL.jasper, y al archivo del formato propio de SAPORIS hay que quitar la parte " - SAPORIS", para que quede como trn_dps_order.jasper.
+2) Eliminación de botones de marcar y desmarcar como urgentes y cancelar autorización WEB desde la vista de pedidos por autorizar desde APP WEB
+
+================================================================================
 SIIE 3.2 305.0/ 2026-07-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
