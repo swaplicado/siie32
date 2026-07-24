@@ -166,7 +166,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  * Forma principal de captura de documents de compras y ventas (DPS).
- * @author Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Adrián Avilés, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener, javax.swing.event.ListSelectionListener, erp.lib.form.SFormExtendedInterface {
     
@@ -12845,8 +12845,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 validation.setComponent(jcbFisDataTaxRegimeIssuing);
                                 validation.setTabbedPaneIndex(TAB_FIS_DATA);
                             }
-                            else if (!moBizPartnerCategory.getTaxRegime().isEmpty() && !moBizPartnerCategory.getTaxRegime().equals(jcbFisDataTaxRegimeIssuing.getSelectedItem().toString()) &&
-                                    miClient.showMsgBoxConfirm("el proveedor en el catálogo tiene el régimen fiscal '" + moBizPartnerCategory.getTaxRegime() + "', pero el campo '" + jlFisDataTaxRegimeIssuing.getText() + "',\n"
+                            else if (!moBizPartnerCategory.getTaxRegime().isEmpty() && !jcbFisDataTaxRegimeIssuing.getSelectedItem().toString().startsWith(moBizPartnerCategory.getTaxRegime()) &&
+                                    miClient.showMsgBoxConfirm("El proveedor en el catálogo tiene el régimen fiscal '" + moBizPartnerCategory.getTaxRegime() + "', pero el campo '" + jlFisDataTaxRegimeIssuing.getText() + "',\n"
                                             + "de la pestaña '" + jTabbedPane.getTitleAt(TAB_FIS_DATA) + "', tiene el valor '" + jcbFisDataTaxRegimeIssuing.getSelectedItem().toString() + "'.\n"
                                             + "¿Está seguro de que este valor es el correcto?") != JOptionPane.OK_OPTION) {
                                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + " " + jlFisDataTaxRegimeIssuing.getText());
