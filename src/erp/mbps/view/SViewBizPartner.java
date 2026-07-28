@@ -19,11 +19,6 @@ import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mbps.form.SDialogImportBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.SSwapUtils;
-import erp.swap.SSyncType;
-import erp.swap.utils.SExportUtils;
-import erp.swap.utils.SResponses;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsConsts;
@@ -32,7 +27,11 @@ import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.mod.hrs.form.SDialogEmployerSubstitution;
 import erp.mod.hrs.human.SHumanAction;
 import erp.mod.hrs.human.SHumanIntegrationService;
-import erp.mod.hrs.human.SHumanService;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
 import erp.table.SFilterConstants;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -60,7 +59,7 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Claudio Peña
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -659,6 +658,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Enviando datos a servicios SWAP...", () -> {
                     SResponses responses;
+                    SResponses responsesAvoSup;
+                    SResponses responsesAvoEmp;
                     try {
                         SwingUtilities.invokeLater(() ->
                             miClient.getFrame().getRootPane().setCursor(
@@ -666,10 +667,30 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                             )
                         );
 
-                        responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
+/*                        responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                         SwingUtilities.invokeLater(() -> {
                             try {
                                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                            } catch (Exception ex) {
+                                Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        });
+*/                   
+                        // Avocado: Proveedores 
+                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_SILENT);
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                SExportUtils.processResponses(miClient.getSession(), responsesAvoSup, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                            } catch (Exception ex) {
+                                Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        });
+
+                        // Avocado: Empleados
+                        responsesAvoEmp = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_EMPLOYEE, false, SExportUtils.EXPORT_MODE_SILENT);
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                SExportUtils.processResponses(miClient.getSession(), responsesAvoEmp, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
                             } catch (Exception ex) {
                                 Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
                             }

@@ -8,6 +8,7 @@ package erp.swap.utils;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
@@ -61,7 +62,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores, César Orozco
+ * @author Sergio Flores, César Orozco, Rodrigo Ayala
  */
 public abstract class SExportDataUtils {
 
@@ -86,6 +87,8 @@ public abstract class SExportDataUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
+            case AVO_PARTNER_SUPPLIER:
+            case AVO_PARTNER_EMPLOYEE:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
 
@@ -152,8 +155,10 @@ public abstract class SExportDataUtils {
                 || syncType == SSyncType.PARTNER_SUPPLIER
                 || syncType == SSyncType.PARTNER_CUSTOMER
                 || syncType == SSyncType.AUTH_JOB_TITLE
-                || syncType == SSyncType.FUNCTIONAL_AREA;
-
+                || syncType == SSyncType.FUNCTIONAL_AREA
+                || syncType == SSyncType.AVO_PARTNER_SUPPLIER
+                || syncType == SSyncType.AVO_PARTNER_EMPLOYEE;
+        
         return "SELECT "
                 + "DISTINCT sle.reference_id "
                 + "FROM "
@@ -164,6 +169,149 @@ public abstract class SExportDataUtils {
                 + "AND (sle.response_code = '" + SHttpConsts.RSC_SUCC_OK + "' OR sle.response_code = '" + SHttpConsts.RSC_SUCC_CREATED + "') "
                 + "ORDER BY "
                 + (sortAsUnsigned ? "CONVERT(sle.reference_id, UNSIGNED)" : "sle.reference_id");
+    }
+    
+    /**
+     * Obtiene la consulta SQL base unificada para extraer asociados de negocios
+     * (proveedores y/o empleados) que se exportarán a Avocado.
+     *
+     * @param supBizAreas Cadena con los IDs de las áreas de negocio permitidas para proveedores, separados por comas.
+     * @param empDepartments Cadena con los IDs de los departamentos permitidos para empleados, separados por comas.
+     * @return Cadena con la sentencia SQL base unificada.
+     */
+    private static String getSqlQueryBaseAvo(String supBizAreas, String empDepartments) {
+        String sqlSupArea = supBizAreas.isEmpty() ? "1 = 0" : "b.fid_ba IN (" + supBizAreas + ")";
+        String sqlEmpDep = empDepartments.isEmpty() ? "1 = 0" : "emp.fk_dep IN (" + empDepartments + ")";
+        
+        return "SELECT "
+                + "b.id_bp, b.bp, b.bp_comm, b.fiscal_id, "
+                + "(" + sqlSupArea + " AND b.b_sup = 1 AND b.b_del = 0) AS is_avo_sup, " 
+                + "(emp.id_emp IS NOT NULL AND " + sqlEmpDep + " AND b.b_att_emp = 1 AND emp.b_del = 0 AND b.b_del = 0) AS is_avo_emp " 
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = b.id_bp " 
+                /*Bitácora de actualizaciones*/
+                + "LEFT OUTER JOIN ("
+                + "SELECT bul.id_bp, bul.ts_usr_upd "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bul "
+                + "INNER JOIN ("
+                + "SELECT bulx.id_bp, MAX(bulx.id_log) AS id_log "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bulx "
+                + "GROUP BY bulx.id_bp "
+                + ") AS t ON t.id_bp = bul.id_bp AND t.id_log = bul.id_log "
+                + ") AS tbul ON tbul.id_bp = b.id_bp ";
+    }
+    
+    /**
+     * Otiene los parámetros de configuracion del Json de la DB para AVO.
+     * 
+     * @param session Sesión de usuario.
+     * @throws Exception Si ocurre un error.
+     * @return Las dos cadenas en un arreglo: [0] = Áreas Proveedor, [1] = Deptos Empleado 
+    */
+    private static String[] getSwapAvoConfig(SGuiSession session) throws Exception {
+        String jsonAvo = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_AVO); 
+        JsonNode configAvo = new ObjectMapper().readTree(jsonAvo);
+
+        if (configAvo.path("link-up").asInt(0) == 0) {
+            return null; // Retorna null si está apagado
+        }
+
+        String empDep = "", supArea = "";
+        if (configAvo.path("emp_departments").isArray()) {
+            for (JsonNode dep : configAvo.path("emp_departments")) empDep += (empDep.isEmpty() ? "" : ", ") + dep.asInt();
+        }
+        if (configAvo.path("sup_biz_areas").isArray()) {
+            for (JsonNode ba : configAvo.path("sup_biz_areas")) supArea += (supArea.isEmpty() ? "" : ", ") + ba.asInt();
+        }
+
+        return new String[] { supArea, empDep };
+    }
+    
+    /**
+     * Consulta los proveedores de Avocado (filtrados por áreas de negocios definidas en la configuración) listos para enviar.
+     * 
+     * @param session Sesión de usuario.
+     * @throws SQLException Si ocurre un error en la consulta.
+     * @throws Exception Si ocurre un error.
+     */
+    private static ArrayList<SExportData> getListOfAvoSuppliersToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> suppliers = new ArrayList<>();
+        
+        String[] avoConfig = getSwapAvoConfig(session);
+        if (avoConfig == null) return suppliers; // Si devuelve null, está apagado
+
+        String supBizAreas = avoConfig[0];
+        String empDepartments = avoConfig[1];
+        String sqlSupArea = supBizAreas.isEmpty() ? "1 = 0" : "b.fid_ba IN (" + supBizAreas + ")";
+
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String referenceId = "CONVERT(b.id_bp, CHAR)";
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_SUPPLIER, "");
+
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments)
+                    + "WHERE " + sqlSupArea + " AND b.b_sup AND " 
+                    + "( "
+                    + "  ((NOT b.b_del AND (bc.b_del IS NULL OR NOT bc.b_del)) AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "") + ")) "
+                    + (lastSyncDatetime == null ? "" : "  OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) ")  
+                    + ") "
+                    + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
+                    + "ORDER BY b.id_bp;";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SExportDataAvoBp supplier = createAvoBp(resultSet); 
+                if (supplier != null) {
+                    suppliers.add(supplier);
+                }
+            }
+        }
+        return suppliers;
+    }
+    
+    /**
+     * Consulta los empleados de Avocado (filtrados por departamentos laborales definidas en la configuración), y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @throws SQLException Si ocurre un error en la consulta.
+     * @throws Exception Si ocurre un error.
+     */
+    private static ArrayList<SExportData> getListOfAvoEmployeesToExport(final SGuiSession session) throws SQLException, Exception {
+        ArrayList<SExportData> employees = new ArrayList<>();
+        
+        String[] avoConfig = getSwapAvoConfig(session);
+        if (avoConfig == null) return employees; // Si devuelve null, está apagado
+
+        String supBizAreas = avoConfig[0];
+        String empDepartments = avoConfig[1];
+        String sqlEmpDep = empDepartments.isEmpty() ? "1 = 0" : "emp.fk_dep IN (" + empDepartments + ")";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()){
+            String referenceId = "CONVERT(b.id_bp, CHAR)";
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_EMPLOYEE, "");
+            
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments)
+                    + "WHERE " + sqlEmpDep + " AND b.b_att_emp AND " 
+                    + "( "
+                    + "  (NOT b.b_del AND NOT emp.b_del AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "") + ")) "
+                    + (lastSyncDatetime == null ? "" : "  OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                    + "OR emp.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                    + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) ")
+                    + ") "
+                    + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
+                    + "ORDER BY b.id_bp;";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SExportDataAvoBp employee = createAvoBp(resultSet); 
+                if (employee != null) {
+                    employees.add(employee);
+                }
+            }
+        }
+        return employees;
     }
 
     /**
@@ -186,7 +334,7 @@ public abstract class SExportDataUtils {
                 + "FROM "
                 + table + " "
                 + "WHERE "
-                + "response_code = '" + SHttpConsts.RSC_SUCC_OK + "' "
+                + "response_code IN ('" + SHttpConsts.RSC_SUCC_OK + "', '" + SHttpConsts.RSC_SUCC_CREATED + "') " //se agregó Http(201)
                 + "AND sync_type = '" + syncType + "' "
                 + "ORDER BY "
                 + "id_sync_log DESC " // primero el registro más nuevo
@@ -627,6 +775,49 @@ public abstract class SExportDataUtils {
         user.groups = new int[]{SSwapConsts.ROL_SUPPLIER};
 
         return user;
+    }
+    
+    /**
+     * Crea el objeto DTO para socio de negocios (proveedor/empleado) hacia Avocado 
+     * a partir de un conjunto de datos previamente abierto.
+     *
+     * @param resultSet Conjunto de datos previamente abierto.
+     * @return DTO del asociado de negocios para Avocado, o null si el registro no tiene un tipo válido.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static SExportDataAvoBp createAvoBp(final ResultSet resultSet) throws SQLException {
+        int partnerId = resultSet.getInt("id_bp");
+        String name = SJsonUtils.sanitizeJson(resultSet.getString("bp"));
+        String tradeName = SJsonUtils.sanitizeJson(resultSet.getString("bp_comm"));
+        String fiscalId = SJsonUtils.sanitizeJson(resultSet.getString("fiscal_id"));
+        
+        SExportDataAvoBp avoBp = new SExportDataAvoBp();
+        avoBp.erp_id = partnerId;
+        avoBp.name = name;
+        avoBp.trade_name = (tradeName == null || tradeName.isEmpty()) ? null : tradeName;
+        avoBp.fiscal_id = fiscalId;
+        
+        // Sacamos el tipo de persona que devolvió la consulta:
+        
+        boolean isSup = resultSet.getBoolean("is_avo_sup");
+        boolean isEmp = resultSet.getBoolean("is_avo_emp");
+
+        // Asignamos el arreglo dinámicamente:
+        
+        if (isSup && isEmp) {
+            avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_SUPPLIER, SAvoConsts.SWAP_AVO_BP_EMPLOYEE };
+        }
+        else if (isSup) {
+            avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_SUPPLIER };
+        }
+        else if (isEmp) {
+            avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_EMPLOYEE };
+        }
+        else {
+            return null; //si no es ninguno, no se manda
+        }
+        
+        return avoBp;
     }
 
     /**
@@ -2620,6 +2811,14 @@ public abstract class SExportDataUtils {
 
             case PUR_PAYMENT_UPD:
                 data = getListOfPurchasePaymentUpdatesToExport(session);
+                break;
+                
+            case AVO_PARTNER_SUPPLIER:
+                data = getListOfAvoSuppliersToExport(session);
+                break;
+                
+            case AVO_PARTNER_EMPLOYEE:
+                data = getListOfAvoEmployeesToExport(session);
                 break;
 
             default:

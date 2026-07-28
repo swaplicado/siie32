@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SSwapConsts {
 
@@ -75,18 +75,21 @@ public abstract class SSwapConsts {
     public static final String QRY_DOCUMENT_TYPE = "document_type";
     
     /*
-     * JSON object for request attributes of ame service.
+     * JSON object for request attributes of avo service.
      */
     
-    public static final String CFG_OBJ_AME_SRV = "ame-srv";
-    public static final String CFG_OBJ_AME_SRV_LOGIN = "login";
-    public static final String CFG_OBJ_AME_SRV_SEASON_EXPORT = "season-export";
+    public static final String CFG_OBJ_AVO_SRV = "avo-srv";
+    public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
+    public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
+    public static final String CFG_OBJ_AVO_SRV_BUSINESS_PARTNERS = "business-partners";
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";
     public static final String CFG_ATT_API_KEY = "api-key";
     public static final String CFG_ATT_LIMIT = "limit";
+    public static final String CFG_ATT_USER = "user";
+    public static final String CFG_ATT_PSWD = "pswd";
 
     // SWAP Services transaction constants:
     public static final int TXN_CAT_PURCHASE = 1;

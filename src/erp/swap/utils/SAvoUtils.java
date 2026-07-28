@@ -18,15 +18,16 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Adrian Aviles
  */
-public class SAmeUtils {
-    public static String loginToAmeOperationControl (SGuiSession session) throws Exception {
+public abstract class SAvoUtils {
+    
+    public static String loginToAvoOperationControl(SGuiSession session) throws Exception {
         String token = "";
-        String username = "cesar.orozco";
-        String password = "123456";
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AME_CONFIG));
-        String baseUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AME_SRV, SSwapConsts.CFG_ATT_URL);
-        String url = baseUrl + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AME_SRV_LOGIN, SSwapConsts.CFG_ATT_URL);
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG));
+        String baseUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV, SSwapConsts.CFG_ATT_URL);
+        String url = baseUrl + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_LOGIN, SSwapConsts.CFG_ATT_URL);
+        String username = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_LOGIN, SSwapConsts.CFG_ATT_USER);
+        String password = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_LOGIN, SSwapConsts.CFG_ATT_PSWD);
         String jsonBody = "{"
                 + "\"username\":\"" + username + "\", "
                 + "\"password\":\"" + password 
@@ -42,5 +43,4 @@ public class SAmeUtils {
         
         return token;
     }
-    
 }

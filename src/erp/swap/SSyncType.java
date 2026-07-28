@@ -7,7 +7,7 @@ package erp.swap;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Rodrigo Ayala
  */
 public enum SSyncType {
     // For ERP database:
@@ -18,6 +18,8 @@ public enum SSyncType {
     AUTH_JOB_TITLE,
     AUTH_DEPARTMENT,
     AUTH_FUNCTIONAL_AREA,
+    AVO_PARTNER_SUPPLIER,
+    AVO_PARTNER_EMPLOYEE,
     // For company database:
     FUNCTIONAL_AREA,
     REQUISITION,
