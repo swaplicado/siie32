@@ -6,6 +6,8 @@
 package erp.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataCostCenter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,7 +25,8 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
     public String Reference;
     public double Debe;
     public double Haber;
-    public String Currency;
+//    public String Currency;
+    public Currency oCurrency;
     public CostCenter Cost_center;
     public AccountingAccount Accounting_account;
     public String Fiscal_id;
@@ -36,6 +39,9 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
     public Item Item;
     public boolean Is_adjustment;
     public boolean Is_invoiced;
+    public SDataAccount oDataAccount;
+    public SDataAccount oDataAccountMajor;
+    public SDataCostCenter oDataCostCenter;
     
     public SImportWeekProcurementFacility() {
         Id = 0;
@@ -44,7 +50,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         Reference = "";
         Debe = 0;
         Haber = 0;
-        Currency = "";
+        oCurrency = null;
         Cost_center = null;
         Accounting_account = null;
         Fiscal_id = "";
@@ -57,6 +63,9 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         Item = null;
         Is_adjustment = false;
         Is_invoiced = false;
+        oDataAccount = null;
+        oDataCostCenter = null;
+        oDataAccountMajor = null;
     }
     
     public SImportWeekProcurementFacility(final JsonNode docNode) throws ParseException {
@@ -69,29 +78,33 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         Reference = docNode.get("reference").isNull() ? "" : docNode.get("reference").asText();
         Debe = docNode.get("debe").asDouble();
         Haber = docNode.get("haber").asDouble();
-        Currency = docNode.get("currency").isNull() ? "" : docNode.get("currency").asText();
+//        oCurrency = docNode.get("currency").isNull() ? "" : docNode.get("currency").asText();
+
+        oCurrency = new Currency();
         
-        JsonNode costCenterNode = docNode.path("cost_center");
-        if (!costCenterNode.isEmpty()) {
-            Cost_center = new CostCenter(
-                costCenterNode.get("id").asInt(),
-                costCenterNode.get("code").isNull() ? "" : costCenterNode.get("code").asText(), 
-                costCenterNode.get("name").isNull() ? "" : costCenterNode.get("name").asText()
-            );
-        } else {
-            Cost_center = new CostCenter();
-        }
-        
-        JsonNode accountingAccountNode = docNode.path("accounting_account");
-        if (!accountingAccountNode.isEmpty()) {
-            Accounting_account = new AccountingAccount(
-                accountingAccountNode.get("id").asInt(),
-                accountingAccountNode.get("code").isNull() ? "" : accountingAccountNode.get("code").asText(), 
-                accountingAccountNode.get("name").isNull() ? "" : accountingAccountNode.get("name").asText()
-            );
-        } else {
-            Accounting_account = new AccountingAccount();
-        }
+//        JsonNode costCenterNode = docNode.path("cost_center");
+//        if (!costCenterNode.isEmpty()) {
+//            Cost_center = new CostCenter(
+//                costCenterNode.get("id").asInt(),
+//                costCenterNode.get("code").isNull() ? "" : costCenterNode.get("code").asText(), 
+//                costCenterNode.get("name").isNull() ? "" : costCenterNode.get("name").asText()
+//            );
+//        } else {
+//            Cost_center = new CostCenter();
+//        }
+//        
+//        JsonNode accountingAccountNode = docNode.path("accounting_account");
+//        if (!accountingAccountNode.isEmpty()) {
+////            Accounting_account = new AccountingAccount(
+////                accountingAccountNode.get("id").asInt(),
+////                accountingAccountNode.get("code").isNull() ? "" : accountingAccountNode.get("code").asText(), 
+////                accountingAccountNode.get("name").isNull() ? "" : accountingAccountNode.get("name").asText()
+////            );
+//
+////            SDataAccount oAccount = new SDataAccount();
+//        } else {
+////            Accounting_account = new AccountingAccount();
+//        }
         
         Fiscal_id = docNode.get("fiscal_id").isNull() ? "" : docNode.get("fiscal_id").asText();
         Erp_user = docNode.get("erp_user").isNull() ? "" : docNode.get("erp_user").asText();
@@ -124,7 +137,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         JsonNode itemNode = docNode.path("item");
         if (!itemNode.isEmpty()) {
             Item = new Item(
-                itemNode.get("id").asInt(),
+                itemNode.get("erp_id").asInt(),
                 itemNode.get("code").isNull() ? "" : itemNode.get("code").asText(), 
                 itemNode.get("name").isNull() ? "" : itemNode.get("name").asText()
             );
@@ -184,12 +197,12 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         this.Haber = Haber;
     }
 
-    public String getCurrency() {
-        return Currency;
+    public Currency getCurrency() {
+        return oCurrency;
     }
 
-    public void setCurrency(String Currency) {
-        this.Currency = Currency;
+    public void setCurrency(int id, String code, String name) {
+        this.oCurrency = new Currency(id, code, name);
     }
 
     public CostCenter getCost_center() {
@@ -288,7 +301,29 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         this.Is_invoiced = Is_invoiced;
     }
 
+    public void setDataAccount(SDataAccount dataAccount) {
+        this.oDataAccount = dataAccount;
+    }
     
+    public SDataAccount getDataAccount(){
+        return oDataAccount;
+    }
+    
+    public void setDataAccountMajor(SDataAccount dataAccountMajor) {
+        this.oDataAccountMajor = dataAccountMajor;
+    }
+    
+    public SDataAccount getDataAccountMajor(){
+        return oDataAccountMajor;
+    }
+    
+    public void setDataCostCenter(SDataCostCenter dataCostCenter) {
+        this.oDataCostCenter = dataCostCenter;
+    }
+    
+    public SDataCostCenter getDataCostCenter(){
+        return oDataCostCenter;
+    }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -346,7 +381,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
                 value = Haber;
                 break;
             case 5:
-                value = Currency;
+                value = oCurrency.Name;
                 break;
             case 6:
                 value = Cost_center.Code;
@@ -393,6 +428,24 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
     @Override
     public void setRowValueAt(Object value, int col) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public static class Currency implements Serializable{
+        public int Id;
+        public String Code;
+        public String Name;
+        
+        public Currency() {
+            Id = 1;
+            Code = "";
+            Name = "PESOS MEXICANOS";
+        }
+        
+        public Currency(final int id, final String code, final String name) {
+            Id = id;
+            Code = code;
+            Name = name;
+        }
     }
     
     /**

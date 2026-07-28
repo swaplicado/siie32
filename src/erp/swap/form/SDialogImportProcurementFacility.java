@@ -11,15 +11,23 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mcfg.data.SCfgUtils;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataCostCenter;
+import erp.mfin.data.SDataRecord;
+import erp.mfin.data.SDataRecordEntry;
+import erp.mfin.form.SDialogRecordPicker;
+import erp.mfin.form.SFinRecordEntry;
+import erp.mfin.form.SFinRecordUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mtrn.form.SDialogDpsFinder;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.utils.SAmeUtils;
-import erp.swap.utils.SImportUtils;
+import erp.swap.utils.SExportUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -28,12 +36,18 @@ import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -57,11 +71,7 @@ import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
- * Importación de proformas de compras desde el Portal de Compras.
- * Ejemplo de la URL de consulta de documentos:
- * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=41"
- * Ejemplo de la URL de descarga de documentos:
- * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
+ * Importación de semanas de bodegas aguacate
  *
  * @author Adrián Avilés
  */
@@ -79,9 +89,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     protected String msSyncUrlGetLAccountingAccount;
     protected String msSyncUrlGetLCostCenter;
     protected String msSyncUrlGetLItems;
-    protected String msSyncUrlRetrieveByWeek;
-    protected String msSyncUrlDownload;
-    protected int mnSyncLimit;
+    protected String msSyncUrlGetMovements;
     protected PreparedStatement moPrepStatToCountImports;
     protected PreparedStatement moPrepStatToGetProcessedProformaByExternalId;
     protected PreparedStatement moPrepStatToGetDpsKeyByDocData;
@@ -92,6 +100,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     protected boolean mbExportPaymentRequests;
     protected String sAmeToken;
     private erp.swap.form.SDialogImportWeekProcurementFacility moDialogImportWeekProcurementFacility;
+    private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
+    private SDataRecord moCurrentRecord;
+    protected ArrayList<SImportWeekProcurementFacility> maWeekProcurementFacility;
+    
+    private SFinRecordEntry moFinRecordEntry;
 
     /**
      * Creates new form SDialogImportDocuments
@@ -134,16 +147,17 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jbOpenProcurementFacility = new javax.swing.JButton();
+        jbRecord = new javax.swing.JButton();
         jpDownloadE2 = new javax.swing.JPanel();
         jbClearWeeksProcurements = new javax.swing.JButton();
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
-        jLabel2b3 = new javax.swing.JLabel();
+        jbSelectAll = new javax.swing.JButton();
+        jbToAccount = new javax.swing.JButton();
         jpDownloadE3 = new javax.swing.JPanel();
-        jLabel3b1 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
-        jLabel3b3 = new javax.swing.JLabel();
+        jbUnselectAll = new javax.swing.JButton();
+        jtfRecordSelected = new javax.swing.JTextField();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsGrid = new javax.swing.JPanel();
         jpDocumentsGrid1 = new javax.swing.JPanel();
@@ -273,6 +287,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbOpenProcurementFacility.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbOpenProcurementFacility);
 
+        jbRecord.setText("Pólizas");
+        jbRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRecord.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE1.add(jbRecord);
+
         jpDownloadE.add(jpDownloadE1);
 
         jpDownloadE2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
@@ -288,24 +307,35 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jLabel22.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel22);
 
-        jLabel2b3.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jLabel2b3);
+        jbSelectAll.setText("Seleccionar todas");
+        jbSelectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSelectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbSelectAll);
+
+        jbToAccount.setText("Contabilizar");
+        jbToAccount.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbToAccount.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbToAccount);
 
         jpDownloadE.add(jpDownloadE2);
 
         jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        jLabel3b1.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(jLabel3b1);
-
-        jLabel31.setPreferredSize(new java.awt.Dimension(5, 23));
-        jpDownloadE3.add(jLabel31);
-
         jLabel32.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel32);
 
-        jLabel3b3.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(jLabel3b3);
+        jbUnselectAll.setText("Deleccionar todas");
+        jbUnselectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbUnselectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jbUnselectAll);
+
+        jtfRecordSelected.setEditable(false);
+        jtfRecordSelected.setToolTipText("");
+        jtfRecordSelected.setFocusable(false);
+        jtfRecordSelected.setMaximumSize(new java.awt.Dimension(150, 23));
+        jtfRecordSelected.setMinimumSize(new java.awt.Dimension(150, 23));
+        jtfRecordSelected.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jtfRecordSelected);
 
         jpDownloadE.add(jpDownloadE3);
 
@@ -574,19 +604,19 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel2b3;
-    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel3b1;
-    private javax.swing.JLabel jLabel3b3;
     private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbChangePaymentRequiredDate;
     private javax.swing.JButton jbChangePaymentScheduledDate;
     private javax.swing.JButton jbChangeRequiredPaymentDate;
     private javax.swing.JButton jbClearWeeksProcurements;
     private javax.swing.JButton jbOpenProcurementFacility;
+    private javax.swing.JButton jbRecord;
     private javax.swing.JButton jbRequestPayment;
+    private javax.swing.JButton jbSelectAll;
     private javax.swing.JButton jbShowWeeks;
+    private javax.swing.JButton jbToAccount;
+    private javax.swing.JButton jbUnselectAll;
     private javax.swing.JComboBox<String> jcbMonths;
     private javax.swing.JLabel jlPay;
     private javax.swing.JLabel jlPayExec;
@@ -643,6 +673,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JTextField jtfPaySchedDate;
     private javax.swing.JTextField jtfPayStatus;
     private javax.swing.JTextField jtfProforma;
+    private javax.swing.JTextField jtfRecordSelected;
     private javax.swing.JTextField jtfReqPayAmount;
     private javax.swing.JTextField jtfReqPayAmountPct;
     private javax.swing.JTextField jtfReqPayReqDate;
@@ -658,22 +689,28 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         SGuiUtils.setWindowBounds(this, 1024, 670);
 
         String[] months = SLibTimeUtils.createMonthsOfYear(Locale.getDefault(), Calendar.LONG);
-        jcbMonths.addItem(months[0]);
-        jcbMonths.addItem(months[1]);
-        jcbMonths.addItem(months[2]);
-        jcbMonths.addItem(months[3]);
-        jcbMonths.addItem(months[4]);
-        jcbMonths.addItem(months[5]);
-        jcbMonths.addItem(months[6]);
-        jcbMonths.addItem(months[7]);
-        jcbMonths.addItem(months[8]);
-        jcbMonths.addItem(months[9]);
-        jcbMonths.addItem(months[10]);
-        jcbMonths.addItem(months[11]);
+        for (String month : months) {
+            jcbMonths.addItem(month);
+        }
+        
+//        jcbMonths.addItem(months[0]);
+//        jcbMonths.addItem(months[1]);
+//        jcbMonths.addItem(months[2]);
+//        jcbMonths.addItem(months[3]);
+//        jcbMonths.addItem(months[4]);
+//        jcbMonths.addItem(months[5]);
+//        jcbMonths.addItem(months[6]);
+//        jcbMonths.addItem(months[7]);
+//        jcbMonths.addItem(months[8]);
+//        jcbMonths.addItem(months[9]);
+//        jcbMonths.addItem(months[10]);
+//        jcbMonths.addItem(months[11]);
         
         jcbMonths.setSelectedIndex(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1] - 1);
         moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
 
+        moDialogRecordPicker = new SDialogRecordPicker((SClientInterface) miClient, SDataConstants.FINX_REC_USER);
+        
         moFields.setFormButton(jbShowWeeks);
 
         jbSave.setEnabled(false);
@@ -690,13 +727,17 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
+                SGridColumnForm column;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Semana #"));  // col 0
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Semana #", 50));  // col 0
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicio"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha fin"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Bodega"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Estatus"));
+                column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizar", moImportationsGrid.getTable().getDefaultEditor(Boolean.class));
+                column.setEditable(true);
+                gridColumnsForm.add(column);
                 
                 return gridColumnsForm;
             }
@@ -727,28 +768,30 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             maImportedAccountingaccount = new ArrayList<>();
             maImportedCostCenter = new ArrayList<>();
             maImportedItems = new ArrayList<>();
+            maWeekProcurementFacility = new ArrayList<>();
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG));
 
             msSyncUrlGetProcurementFacilities = "";
-            msSyncUrlRetrieveByWeek = "";
-            mnSyncLimit = 0;
+//            msSyncUrlRetrieveByWeek = "";
+//            mnSyncLimit = 0;
 
             // Recuperar la configuración base:
             String syncHost;
             syncHost = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV, SSwapConsts.CFG_ATT_URL);
 
             msSyncUrlGetProcurementFacilities = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_SEASON_EXPORT, SSwapConsts.CFG_ATT_URL);
-            msSyncUrlRetrieveByWeek = msSyncUrlGetProcurementFacilities.substring(0, msSyncUrlGetProcurementFacilities.indexOf("?") + 1);
+//            msSyncUrlRetrieveByWeek = msSyncUrlGetProcurementFacilities.substring(0, msSyncUrlGetProcurementFacilities.indexOf("?") + 1);
             msSyncUrlGetLAccountingAccount = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_ACCOUNTING_ACCOUNTS, SSwapConsts.CFG_ATT_URL);
             msSyncUrlGetLCostCenter = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_COST_CENTERS, SSwapConsts.CFG_ATT_URL);
             msSyncUrlGetLItems = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_ITEMS, SSwapConsts.CFG_ATT_URL);
-            mnSyncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_LIMIT));
+            msSyncUrlGetMovements = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_BATCH_MOVEMENTS, SSwapConsts.CFG_ATT_URL);
+//            mnSyncLimit = SLibUtils.parseInt(SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_PUR_DOC, SSwapConsts.CFG_ATT_LIMIT));
 
             // Instanciar prepared statements:
-            moPrepStatToCountImports = SImportUtils.createPrepStatementToCountImports(miClient.getSession().getStatement());
-            moPrepStatToGetProcessedProformaByExternalId = SImportedProforma.createPrepStatementToGetProcessedProformaByExternalId(miClient.getSession().getStatement());
+//            moPrepStatToCountImports = SImportUtils.createPrepStatementToCountImports(miClient.getSession().getStatement());
+//            moPrepStatToGetProcessedProformaByExternalId = SImportedProforma.createPrepStatementToGetProcessedProformaByExternalId(miClient.getSession().getStatement());
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -767,10 +810,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbShowWeeks.setEnabled(false);
     }
 
-    private void enableFieldsForShowingProforms(final boolean setShowingProformsModeOn) {
-        jbShowWeeks.setEnabled(!setShowingProformsModeOn);
-        jbClearWeeksProcurements.setEnabled(setShowingProformsModeOn);
-        jbOpenProcurementFacility.setEnabled(setShowingProformsModeOn);
+    private void enableFieldsForShowingProcurementFacilities(final boolean setShowingProcurementFacilitiesModeOn) {
+        jbShowWeeks.setEnabled(!setShowingProcurementFacilitiesModeOn);
+        jbClearWeeksProcurements.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbOpenProcurementFacility.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbRecord.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbSelectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbUnselectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
     }
     
     private void initProgress() {
@@ -780,7 +826,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jProgressBar.setIndeterminate(true);
     }
 
-    private void startProgress(final int docs) {
+    private void startProgress() {
         jProgressBar.setValue(0);
         jProgressBar.setStringPainted(true);
         jProgressBar.setIndeterminate(false);
@@ -802,19 +848,21 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             try (InputStream is = connection.getInputStream()) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(is);
+                JsonNode weeks = root.path("weeks");
 
-                if (root.isArray()) {
-                    startProgress(root.size());
-
-                    for (JsonNode docNode : root) {
+                if (weeks.isArray()) {
+                    startProgress();
+                    for (JsonNode docNode : weeks) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * percentaje));
                         JsonNode lProcurements = docNode.path("procurement_facilities");
                         for (JsonNode oProcurement : lProcurements) {
                             SImportProcurementFacility oProcurementFacilityWeek = new SImportProcurementFacility(
-                                    docNode.get("week_month_number").asInt(),
-                                    docNode.get("start_date").asText(),
-                                    docNode.get("end_date").asText(),
-                                    oProcurement
+                                root.get("season_year").asInt(),
+                                root.get("month_number").asInt(),
+                                docNode.get("week_month_number").asInt(),
+                                docNode.get("start_date").asText(),
+                                docNode.get("end_date").asText(),
+                                oProcurement
                             );
                             maImportedDocuments.add(oProcurementFacilityWeek);
                             ++countProcurement;
@@ -823,7 +871,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 }
 
                 callback.onProgress(initPercentaje + percentaje);
-                enableFieldsForShowingProforms(true);
+                enableFieldsForShowingProcurementFacilities(true);
                 
                 String message = "Resumen de la búsqueda de semanas por bodega para " + jcbMonths.getSelectedItem().toString() + ":\n\n"
                         + "Semanas de " + jcbMonths.getSelectedItem().toString() + " por bodega: " + countRetreived + "\n\n"
@@ -859,7 +907,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 JsonNode root = mapper.readTree(is);
 
                 if (root.isArray()) {
-                    startProgress(root.size());
+                    startProgress();
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * percentaje));
@@ -892,7 +940,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 JsonNode root = mapper.readTree(is);
 
                 if (root.isArray()) {
-                    startProgress(root.size());
+                    startProgress();
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * percentaje));
@@ -925,7 +973,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 JsonNode root = mapper.readTree(is);
 
                 if (root.isArray()) {
-                    startProgress(root.size());
+                    startProgress();
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * percentaje));
@@ -1076,7 +1124,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(true);
             renderCurrentProforma();
 
-            enableFieldsForShowingProforms(false);
+            enableFieldsForShowingProcurementFacilities(false);
 
             jlStatus.setText("");
             clearProgress();
@@ -1171,6 +1219,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
 
         mbExportPaymentRequests = false;
         moBoolExportPaymentRequestsOnClose.setSelected(mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
+        
+        jbToAccount.setEnabled(false);
+        jtfRecordSelected.setText("");
+        moCurrentRecord = null;
 
         jcbMonths.setSelectedIndex(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1] - 1);
         moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
@@ -1185,6 +1237,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbShowWeeks.addActionListener(this);
         jbClearWeeksProcurements.addActionListener(this);
         jbOpenProcurementFacility.addActionListener(this);
+        jbRecord.addActionListener(this);
+        jbSelectAll.addActionListener(this);
+        jbUnselectAll.addActionListener(this);
+        jbToAccount.addActionListener(this);
 
         jbChangeRequiredPaymentDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
@@ -1197,6 +1253,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbShowWeeks.removeActionListener(this);
         jbClearWeeksProcurements.removeActionListener(this);
         jbOpenProcurementFacility.removeActionListener(this);
+        jbRecord.removeActionListener(this);
+        jbSelectAll.removeActionListener(this);
+        jbUnselectAll.removeActionListener(this);
+        jbToAccount.removeActionListener(this);
 
         jbChangeRequiredPaymentDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
@@ -1243,6 +1303,18 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             else if (button == jbOpenProcurementFacility) {
                 actionOpenSelectedProcurementFacility();
             }
+            else if (button == jbRecord) {
+                actionPerformedPickRecord();
+            }
+            else if (button == jbSelectAll) {
+                actionPerformedSelectAllDocs();
+            }
+            else if (button == jbUnselectAll) {
+                actionPerformedDeselectAllDocs();
+            }
+            else if (button == jbToAccount) {
+                actionToAccount();
+            }
         }
     }
 
@@ -1251,5 +1323,266 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         if (!e.getValueIsAdjusting()) {
             renderCurrentProforma();
         }
+    }
+
+    private void actionPerformedPickRecord() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M");
+        try {
+            Date dMovementDate = sdf.parse(moCalYear.getValue().toString() + "-" + (jcbMonths.getSelectedIndex() + 1));
+            moDialogRecordPicker.formReset();
+            moDialogRecordPicker.setFilterKey(dMovementDate);
+            moDialogRecordPicker.formRefreshOptionPane();
+            moDialogRecordPicker.setFormVisible(true);
+            
+            if (moDialogRecordPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                moCurrentRecord = (SDataRecord) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_REC, moDialogRecordPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                jtfRecordSelected.setText(
+                    moCurrentRecord.getRecordPeriod() + " "
+                    + moCurrentRecord.getDbmsBookkeepingCenterCode() + " "
+                    + moCurrentRecord.getDbmsCompanyBranchCode() + " "
+                    + moCurrentRecord.getRecordNumber()
+                );
+                
+                jbToAccount.setEnabled(true);
+            }
+            
+        } catch (ParseException ex) {
+            Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void refreshDocumentsGrid() {
+        int index = moImportationsGrid.getTable().getSelectedRow();
+        moImportationsGrid.renderGridRows();
+        moImportationsGrid.setSelectedGridRow(index);
+    }
+    
+    private void actionPerformedSelectAllDocs() {
+        for (SGridRow row : moImportationsGrid.getModel().getGridRows()) {
+            ((SImportProcurementFacility) row).ToAccount = true;
+        }
+        refreshDocumentsGrid();
+    }
+    
+    private void actionPerformedDeselectAllDocs() {
+        for (SGridRow row : moImportationsGrid.getModel().getGridRows()) {
+            ((SImportProcurementFacility) row).ToAccount = false;
+        }
+        refreshDocumentsGrid();
+    }
+    
+    private void processGetMovements(final SProgressCallback callback, int percentaje, int initPercentaje, List<Integer> facilities_ids) throws Exception {
+        int countUpdated = 0;
+        int total = facilities_ids.size();
+        
+        int company_id = miClient.getSession().getConfigCompany().getCompanyId();
+        
+        Statement statement = miClient.getSession().getStatement();
+
+        try {
+            // Iniciar el progreso
+            startProgress();
+
+            // Construir el JSON de manera más eficiente
+            StringBuilder jsonBody = new StringBuilder("");
+            jsonBody.append("[");
+            
+            for (int i = 0; i < facilities_ids.size(); i++) {
+                int facilityWeekId = facilities_ids.get(i);
+
+                // Actualizar progreso
+                int progress = (int) ((++countUpdated / (double) total) * 100);
+                callback.onProgress(progress);
+
+                // Construir el objeto JSON
+                jsonBody
+                .append("{")
+                    .append("\"facility_season_week_id\": ").append(facilityWeekId).append(",")
+//                    .append("\"facility_season_week_id\": ").append(977).append(",")
+                    .append("\"company_id\": ").append(company_id)
+//                    .append("\"company_id\": ").append(2935)
+                .append("}");
+
+                if (i < (facilities_ids.size() - 1)) {
+                    jsonBody.append(",");
+                }
+            }
+            jsonBody.append("]");
+
+            // Enviar la petición (aquí no hay progreso, pero se puede reportar)
+            callback.onProgress(95); // 95% = proceso casi completo
+
+            // Hacer la petición HTTP
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String cleanToken = sAmeToken.trim().replaceAll("^\"|\"$", "");
+                String responseBody = SExportUtils.requestSwapService(
+                    "", 
+                    msSyncUrlGetMovements,
+                    SHttpConsts.METHOD_POST, 
+                    jsonBody.toString(), 
+                    "Bearer " + cleanToken, 
+                    "", 
+                    SSwapConsts.TIME_30_SEC
+                );
+
+                JsonNode responseJson = mapper.readTree(responseBody);
+
+                if (responseJson.has("error")) {
+                    throw new Exception("Portal compras respondió: " + responseBody);
+                }
+                JsonNode data = responseJson.get(0).get("data");
+                
+                if (data.isArray()) {
+                    for (JsonNode docNode : data) {
+                        SImportWeekProcurementFacility oWeekProcurementFacility = new SImportWeekProcurementFacility(docNode);
+                        
+                        SDataAccount oAccount = new SDataAccount();
+                        SDataAccount oAccountLedger = new SDataAccount();
+                        
+                        JsonNode accountingAccountNode = docNode.path("accounting_account");
+                        if (!accountingAccountNode.isEmpty()) {                    
+                            oAccount.read(new String[] { accountingAccountNode.get("code").asText() }, statement);
+                            oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
+                        } else {
+//                            oAccount.read( new String[] { "6000-0001-0000" }, statement);
+//                            oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
+                        }
+                        oWeekProcurementFacility.setDataAccount(oAccount);
+                        oWeekProcurementFacility.setDataAccountMajor(oAccountLedger);
+                        
+                        SDataCostCenter costCenter = new SDataCostCenter();
+                        JsonNode costCenterNode = docNode.path("cost_center");
+                        if (!costCenterNode.isEmpty()) {                    
+                            costCenter.read( new String[] { costCenterNode.get("code").asText() }, statement);
+                        } else {
+//                            costCenter.read( new String[] { "100-01-01-001" }, statement);
+                        }
+                        
+                        oWeekProcurementFacility.setDataCostCenter(costCenter);
+                            
+                        maWeekProcurementFacility.add(oWeekProcurementFacility);
+                    }
+                }
+                
+                callback.onProgress(100);
+
+            } catch (Exception ex) {
+                throw new Exception(ex.getMessage() + ". Queda pendiente la sincronización con el portal compras.");
+            }
+
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            
+        }
+    }
+    
+    private void actionToAccount() {
+        try {
+            List<Integer> facilities_ids = new ArrayList<>();
+        
+            for (SGridRow row : moImportationsGrid.getModel().getGridRows()) {
+                if(((SImportProcurementFacility) row).ToAccount){
+                    System.out.println( "facilitySeasonWeekId: " + ((SImportProcurementFacility) row).FacilitySeasonWeekId + " Semana: " + ((SImportProcurementFacility) row).WeekMonthNumber + " Bodega: " + ((SImportProcurementFacility) row).ProcurementFacilityName);
+                    facilities_ids.add(((SImportProcurementFacility) row).FacilitySeasonWeekId);
+//                    facilities_ids.add(975);
+                }
+            }
+            
+            initProgress();
+
+            SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    processGetMovements(progress -> {
+                        publish(progress);
+                    }, 100, 0, facilities_ids);
+                    return null;
+                }
+
+                @Override
+                protected void process(List<Integer> chunks) {
+                    int latest = chunks.get(chunks.size() - 1);
+                    jProgressBar.setValue(latest);
+                }
+
+                @Override
+                protected void done() {
+                    clearProgress();
+                }
+            };
+
+            worker.execute();
+            
+            try {
+                worker.get(); // BLOQUEA hasta que termine el worker
+            } catch (InterruptedException | ExecutionException e) {
+                handleShowException(e);
+            }
+
+            for (SImportWeekProcurementFacility sImportWeekProcurementFacility : maWeekProcurementFacility) {
+                moFinRecordEntry = new SFinRecordEntry();
+
+                moFinRecordEntry.AccountId = sImportWeekProcurementFacility.oDataAccount.getPkAccountIdXXX();
+                moFinRecordEntry.Account = sImportWeekProcurementFacility.getDataAccount();
+                moFinRecordEntry.AccountMajor = sImportWeekProcurementFacility.getDataAccountMajor();
+                moFinRecordEntry.Concept = sImportWeekProcurementFacility.Concept;
+                moFinRecordEntry.Debit = sImportWeekProcurementFacility.Debe;
+                moFinRecordEntry.Credit = sImportWeekProcurementFacility.Haber;
+                moFinRecordEntry.ExchangeRate = 1;
+                moFinRecordEntry.ExchangeRateSystem = 1;
+                moFinRecordEntry.DebitCy = sImportWeekProcurementFacility.Debe;
+                moFinRecordEntry.CreditCy = sImportWeekProcurementFacility.Haber;
+                moFinRecordEntry.CurId = sImportWeekProcurementFacility.oCurrency.Id;
+                moFinRecordEntry.IsExchangeDifference = false;
+                moFinRecordEntry.IsSystem = true;
+                moFinRecordEntry.IsDeleted = false;
+                moFinRecordEntry.OccasionalFiscalId = sImportWeekProcurementFacility.Fiscal_id;
+                moFinRecordEntry.Reference = sImportWeekProcurementFacility.Reference;
+                moFinRecordEntry.IsReferenceTax = false;
+                moFinRecordEntry.ItemKey = sImportWeekProcurementFacility.Item.Id;
+                moFinRecordEntry.Quantity = sImportWeekProcurementFacility.Stock_in;
+                moFinRecordEntry.Year = moCalYear.getValue();
+                moFinRecordEntry.Account = sImportWeekProcurementFacility.oDataAccount;
+                moFinRecordEntry.AccountMajor = sImportWeekProcurementFacility.oDataAccountMajor;
+                moFinRecordEntry.CostCenter = sImportWeekProcurementFacility.oDataCostCenter.getPkCostCenterIdXXX();
+                
+                SDataRecordEntry moRecordEntry = SFinRecordUtils.composeRecordEntry((SClientInterface) miClient, null, moFinRecordEntry);
+                
+                moRecordEntry.setPkYearId(moCurrentRecord.getPkYearId());
+                moRecordEntry.setPkPeriodId(moCurrentRecord.getPkPeriodId());
+                moRecordEntry.setPkBookkeepingCenterId(moCurrentRecord.getPkBookkeepingCenterId());
+                moRecordEntry.setPkRecordTypeId(moCurrentRecord.getPkRecordTypeId());
+                moRecordEntry.setPkNumberId(moCurrentRecord.getPkNumberId());
+                
+                moCurrentRecord.getDbmsRecordEntries().add(moRecordEntry);
+                
+//                moFinRecordEntry.DpsKey = moCurrentRecord.
+//                moFinRecordEntry.DpsKeyAdj = (int[]) moEntryDpsAdj.getPrimaryKey();
+//                moFinRecordEntry.IsTaxCash = jrbTaxCash.isSelected();
+//                moFinRecordEntry.IsCheckAppliying = jckIsCheckApplying.isSelected();
+//                if (jckIsCheckApplying.isSelected()) {
+//                    moFinRecordEntry.CheckIndex = (Integer) jcbFkCheckId_n.getSelectedIndex();
+//                }
+//                moFinRecordEntry.IsBizPartnerRequired = mbIsBizPartnerRequired;
+//                moFinRecordEntry.IsCurrentAccountDiogAccount = mbIsCurrentAccountDiogAccount;
+//                moFinRecordEntry.IsTaxRequired = mbIsTaxRequired;
+//                moFinRecordEntry.IsRequiredEntity = jtfEntityCurrencyKey.isEnabled();
+//                moFinRecordEntry.IsRequiredYear = jtfFkYearId_n.isEnabled();
+//                moFinRecordEntry.MissingFieldsBizPartnerAndOccasionalFiscalId = jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty();
+//                moFinRecordEntry.MissingFieldItem = mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ });
+//                moFinRecordEntry.FilledFieldItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0;
+//                moFinRecordEntry.FilledFieldUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d; 
+            }
+            
+            Connection con = miClient.getSession().getStatement().getConnection();
+            moCurrentRecord.save(con);
+            
+        } catch (Exception e) {
+            handleShowException(e);
+        }
+        
     }
 }

@@ -17,6 +17,7 @@ import sa.lib.grid.SGridRow;
  * @author Adrian Aviles
  */
 public class SImportProcurementFacility implements SGridRow, Serializable {
+    private final int COL_TO_ACCOUNT = 5;
     
     public int WeekMonthNumber;
     public Date StartDate;
@@ -24,6 +25,9 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
     public int FacilitySeasonWeekId;
     public String ProcurementFacilityName;
     public int StatusId;
+    public int Year;
+    public int MonthNumber;
+    public boolean ToAccount;
     
     public SImportProcurementFacility() {
         WeekMonthNumber = 0;
@@ -32,10 +36,13 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
         FacilitySeasonWeekId = 0;
         ProcurementFacilityName = "";
         StatusId = 0;
+        ToAccount = false;
     }
     
-    public SImportProcurementFacility(final int weekMonthNumber, final String startDate, final String endDate, final JsonNode docNode) throws ParseException {
+    public SImportProcurementFacility(final int year, final int monthNumber, final int weekMonthNumber, final String startDate, final String endDate, final JsonNode docNode) throws ParseException {
         WeekMonthNumber = weekMonthNumber;
+        Year = year;
+        MonthNumber = monthNumber;
         
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         
@@ -105,6 +112,9 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
             case 4:
                 value = StatusId == 1 ? "Nueva" : "";
                 break;
+            case COL_TO_ACCOUNT:
+                value = ToAccount;
+                break;
             default:
             // nothing
         }
@@ -114,7 +124,13 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        switch (col) {
+            case COL_TO_ACCOUNT:
+                ToAccount = (boolean) value;
+                break;
+            default:
+                // nothing
+        }
     }
     
 }

@@ -979,10 +979,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 String urlQuery;
                 urlQuery = msSyncUrlRetrieveByMonth;
                 
-//                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + oProcurementFacility.FacilitySeasonWeekId);
-//                urlQuery = urlQuery.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
-                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + 36);
-                urlQuery = urlQuery.replace("<company_id>", "" + 2935);
+                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + oProcurementFacility.FacilitySeasonWeekId);
+                urlQuery = urlQuery.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
+//                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + 975);
+//                urlQuery = urlQuery.replace("<company_id>", "" + 2935);
 
                 URL url = new URL(urlQuery);
 
@@ -1079,10 +1079,15 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     maImportedDocument.setReference(weekProcurementFacility.Reference);
                     maImportedDocument.setDebe(weekProcurementFacility.Debe);
                     maImportedDocument.setHaber(weekProcurementFacility.Haber);
-                    maImportedDocument.setCurrency(weekProcurementFacility.Currency);
                     maImportedDocument.setFiscal_id(weekProcurementFacility.Fiscal_id);
                     maImportedDocument.setUnit_cost(weekProcurementFacility.Unit_cost);
                     maImportedDocument.setStock_in(weekProcurementFacility.Stock_in);
+
+                    maImportedDocument.setCurrency(
+                        weekProcurementFacility.oCurrency.Id,
+                        weekProcurementFacility.oCurrency.Code,
+                        weekProcurementFacility.oCurrency.Name
+                    );
 
                     maImportedDocument.setAccounting_account(
                         weekProcurementFacility.Accounting_account.Id,
@@ -1101,6 +1106,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                         weekProcurementFacility.Item.Code,
                         weekProcurementFacility.Item.Name
                     );
+                    
+                    maImportedDocument.setDataAccount(weekProcurementFacility.oDataAccount);
+                    maImportedDocument.setDataAccountMajor(weekProcurementFacility.oDataAccountMajor);
+                    maImportedDocument.setDataCostCenter(weekProcurementFacility.oDataCostCenter);
 
                     if (!smaEdited.contains(i)) {
                         smaEdited.add(i);
@@ -1242,8 +1251,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     @Override
     public void windowClosed() {
         super.windowClosed();
-
-//        exportPaymentRequestsIfNeeded();
     }
 
     @Override
