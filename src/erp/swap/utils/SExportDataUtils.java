@@ -1194,6 +1194,7 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, nat.dps_nat, "
+                        + "d.priority, "
                         + "COALESCE(d.acc_tag, '') AS _acc_tag, "
                         + "COALESCE(dcfd.pay_met, '') AS _pay_met, "
                         + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
@@ -1285,6 +1286,7 @@ public abstract class SExportDataUtils {
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
                     oDpsExport.account_tag = resultSet.getString("_acc_tag");
+                    oDpsExport.priority = resultSet.getInt("d.priority");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     rms = resultSet.getString("_rms");
 

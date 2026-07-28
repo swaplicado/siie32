@@ -19,6 +19,7 @@ import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SDbStockValuationMvtNote;
 import erp.mod.trn.db.SStockValuationConfiguration;
 import erp.mtrn.data.SDataDiog;
+import erp.mtrn.data.SDataDps;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -681,16 +682,18 @@ public class SStockValuationUtils {
 
                     oConsumption.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
                     oConsumption.setAuxDiogTypeDescription(res.getString("tp.tp_iog"));
-                    String log = "ADVERTENCIA: Movimiento de consumo en $0. "
-                            + "No hay suficiente stock para consumir. Fecha mov: " + (res.getString("dt"))
+                    String log = "ERROR: Movimiento de consumo en $0. Contacte a soporte técnico.\n"
+                            + "No hay suficiente stock para consumir (" + qtyToConsume + ").\n "
+                            + "Item: " + res.getString("item_key") + " - " + res.getString("item_name")
+                            + ", Fecha mov: " + (res.getString("dt"))
                             + ", num: " + res.getString("d.num")
                             + ", Tipo: " + res.getString("tp.tp_iog")
-                            + " / ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
+                            + " \n ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
                             + "ID_DOC = " + (res.getInt("fid_diog_doc"))
-                            + ", ID_ETY = " + res.getInt("fid_diog_ety") + ".";
-                    oConsumption.setLogMessage(log);
+                            + ", ID_ETY = " + res.getInt("fid_diog_ety") + ". "
+                            + "ID_ITEM = " + res.getInt("id_item") + ".";
 
-                    lTempConsumptions.add(oConsumption);
+                    throw new Exception(log);
                 }
 
                 lConsumptions.addAll(lTempConsumptions);
@@ -1034,6 +1037,7 @@ public class SStockValuationUtils {
             ResultSet res = st.executeQuery(sql);
             ArrayList<SDataDiog> lDiogs = null;
             ArrayList<SDbMaterialRequest> lMatReqs = null;
+            ArrayList<SDataDps> lDps = null;
             String sResult = "";
             while (res.next()) {
                 lDiogs = isValuationDiogsValidById(session, res.getInt("id_stk_val"));
@@ -1054,6 +1058,16 @@ public class SStockValuationUtils {
                     for (SDbMaterialRequest oMatReq : lMatReqs) {
                         sResult += "La requisición con folio: " + oMatReq.getNumber() + ", "
                                 + "Fecha: '" + SLibUtils.DateFormatDate.format(oMatReq.getDate()) + "' "
+                                + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
+                                + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
+                    }
+                }
+
+                lDps = isValuationDpsValidById(session, res.getInt("id_stk_val"));
+                if (!lDps.isEmpty()) {
+                    for (SDataDps oDps : lDps) {
+                        sResult += "El documento de compra con folio: " + oDps.getNumberSeries() + "-" + oDps.getNumber() + ", "
+                                + "Fecha: '" + SLibUtils.DateFormatDate.format(oDps.getDate()) + "' "
                                 + "invalida la valuación de las fechas del '" + SLibUtils.DateFormatDate.format(res.getDate("dt_sta")) + "' "
                                 + "al '" + SLibUtils.DateFormatDate.format(res.getDate("dt_end")) + "' \n";
                     }
@@ -1137,6 +1151,43 @@ public class SStockValuationUtils {
             }
         }
         return lMatReqs;
+    }
+
+    /**
+     * Determina si la valuación con el ID recibido es válida. Consulta si hay
+     * un documento de venta actualizado después del timestamp de la última
+     * actualización de la valuación. Si hay documentos que cumplen el
+     * criterio, los devuelve en la lista; si la lista está vacía, la valuación
+     * es válida.
+     *
+     * @param session Sesión de usuario.
+     * @param idValuation ID de la valuación.
+     * @return Lista de documentos de venta que invalidan la valuación.
+     * @throws Exception
+     */
+    public static ArrayList<SDataDps> isValuationDpsValidById(SGuiSession session, final int idValuation) throws Exception {
+        String sql = "SELECT DISTINCT "
+                + " dps.id_year, dps.id_doc "
+                + "FROM "
+                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS vm ON v.id_stk_val = vm.fk_stk_val "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps ON vm.fk_dps_year_in_n = dps.id_year AND vm.fk_dps_doc_in_n = dps.id_doc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dpse ON dps.id_year = dpse.id_year AND dps.id_doc = dpse.id_doc AND vm.fk_dps_ety_in_n = dpse.id_ety "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON dpse.fid_item = i.id_item AND i.b_inv = 1 "
+                + "WHERE "
+                + "    NOT v.b_del AND NOT vm.b_del "
+                + "    AND v.id_stk_val = " + idValuation + " "
+                + "    AND (dps.ts_edit > v.ts_usr_upd OR dps.ts_edit > v.ts_usr_upd);";
+        ArrayList<SDataDps> lDps = new ArrayList<>();
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            ResultSet res = st.executeQuery(sql);
+            while (res.next()) {
+                SDataDps oDps = new SDataDps();
+                oDps.read(new int[]{res.getInt("id_year"), res.getInt("id_doc")}, session.getStatement().getConnection().createStatement());
+                lDps.add(oDps);
+            }
+        }
+        return lDps;
     }
 
     /**

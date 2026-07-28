@@ -1,9 +1,14 @@
 ================================================================================
 SIIE 3.2 305.3/ 2026-07-28
 Jhonatan Claudio PEÑA HERNÁNDEZ
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Reforzamiento de validaciones en la clave del ítem al crear un ítem (si es modificación, no se valida; si es nuevo, advierte, pero deja guardar; si es copia, valida y no deja repetir la clave).
 2) Funcionalidad para bajar el monto autorizado para pago en las solicitudes de pago autorizadas.
+--------------------------------------------------------------------------------
+1) Sincronización del campo prioridad en exportación de OC.
+2) Validación en Valuación de consumos de materiales para reportar déficit en un consumo.
+3) Validación de Documentos de compra actualizados después de la valuación.
 
 ================================================================================
 SIIE 3.2 305.2/ 2026-07-24

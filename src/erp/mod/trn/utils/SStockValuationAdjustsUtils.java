@@ -95,7 +95,7 @@ public abstract class SStockValuationAdjustsUtils {
                 + "        AND NOT fac.b_del ";
         
         try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
-             ResultSet resultSet = st.executeQuery(sql)) {
+            ResultSet resultSet = st.executeQuery(sql)) {
             SDbStockValuationMvt oMvtAdjust = null;
             SDbStockValuationMvt oMvtRevised = null;
             SDbStockValuationMvtNote oMvtNote = null;
