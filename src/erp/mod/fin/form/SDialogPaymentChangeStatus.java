@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -39,6 +39,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public static final int CASE_CHANGE_CURRENCY = 3; // payment must be scheduled
     public static final int CASE_MARK_AS_PAID = 4; // payment must be scheduled
     public static final int CASE_CHANGE_BANK_ACCOUNT = 5; // payment must be operated
+    public static final int CASE_CHANGE_EXEC_DATE = 6; // only change execution date
     
     public final static int VALUE_PAYMENT = 1;
     public final static int VALUE_DATE = 2;
@@ -54,6 +55,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private SPanelDps moPanelDps;
     private int mnFormCase;
     private HashMap<Integer, Date> moLastPaymentDaysMap;
+    private double mdOriginalPaymentCy;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -465,6 +467,12 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
                 break;
                 
+            case CASE_CHANGE_EXEC_DATE: // payment is operated
+                setTitle("Cambio de fecha de ejecución");
+                jlPaymentCy.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha ejecución:*"); // to get a new date
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -514,6 +522,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         reloadCatalogues();
         
         SDbPaymentEntry singleEntry = moRegistry.getSingleEntry();
+        mdOriginalPaymentCy = singleEntry.getDestinyPaymentApplicationEntryCy();
         
         jtfFolio.setText(moRegistry.getFolio());
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
@@ -534,6 +543,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         boolean changingCurrency = false;
         boolean markingAsPaid = false;
         boolean changingAccountBank = false;
+        boolean changingExecDate = false;
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
@@ -564,6 +574,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
                 break;
                 
+            case CASE_CHANGE_EXEC_DATE:
+                changingExecDate = true;
+                moDateNewDate.setValue(moRegistry.getDateExecution_n());
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "(Caso: " + mnFormCase + ")");
         }
@@ -589,13 +604,14 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDps = moRegistry.getChildEntries().get(0).getDpsRelated();
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
-        moCurPaymentCy.setEditable(markingAsPaid);
-        moDateNewDate.setEditable(!changingCurrency && !changingAccountBank);
+//        moCurPaymentCy.setEditable(markingAsPaid);
+        moCurPaymentCy.setEditable(markingAsPaid || rescheduling);
+        moDateNewDate.setEditable((!changingCurrency && !changingAccountBank) || changingExecDate);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
         moKeyPaymentBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyBeneffBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyPriority.setEditable(reactivating);
-        moTextNotes.setEditable(reactivating || rescheduling);
+        moTextNotes.setEditable(reactivating || rescheduling || changingExecDate);
         moTextNotesAuthorization.setEditable(reactivating);
         
         addAllListeners();
@@ -633,11 +649,41 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             
             if (validation.isValid()) {
                 switch (mnFormCase) {
-                    case CASE_REACTIVATE:
-                    case CASE_RESCHEDULE:
-                    case CASE_CHANGE_CURRENCY:
+                      case CASE_REACTIVATE:
                         int paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
                         Date lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+                        
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_RESCHEDULE:
+                        if (moCurPaymentCy.getField().getValue() > mdOriginalPaymentCy) {
+                            validation.setMessage("El monto a pagar no puede ser mayor al monto original.");
+                            validation.setComponent(moCurPaymentCy.getField().getComponent());
+                            break;
+                        }
+
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_CHANGE_CURRENCY:
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
 
                         if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
                             String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " " + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", "
@@ -685,6 +731,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                             }
                         }
                         
+                        break;
+
+                    case CASE_CHANGE_EXEC_DATE:
+                        if (moDateNewDate.getValue() == null) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moDateNewDate.getFieldName() + "'.");
+                            validation.setComponent(moDateNewDate.getComponent());
+                        }
                         break;
 
                     default:

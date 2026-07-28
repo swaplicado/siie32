@@ -35,7 +35,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Claudio Peña
  */
 public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
     
@@ -108,7 +108,7 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
         
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         
-        addTaskBarUpperComponent(jbAuthWebAnullAuth);
+//        addTaskBarUpperComponent(jbAuthWebAnullAuth);
         if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_AUTH) {
             addTaskBarUpperComponent(jbAddFileSupp);
         }
@@ -125,10 +125,10 @@ public class SViewDpsAppAuthorn extends STableTab implements ActionListener {
             addTaskBarUpperComponent(jbAuth);
             addTaskBarUpperComponent(jbRej); 
         }
-        if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_PROC) {
-            addTaskBarUpperComponent(jbPriorityAdd);
-            addTaskBarUpperComponent(jbPriorityQuit);
-        }
+//        if (mnTabTypeAux01 == SModSysConsts.CFGS_ST_AUTHORN_PROC) {
+//            addTaskBarUpperComponent(jbPriorityAdd);
+//            addTaskBarUpperComponent(jbPriorityQuit);
+//        }
         
         mnShow = SDataConstantsSys.CFGS_ST_AUTHORN_NA;
         

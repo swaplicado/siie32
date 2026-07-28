@@ -19,6 +19,7 @@ import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSwapDataProcessing;
+import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.form.SDialogDocumentAuthornComments;
 import erp.mod.view.SViewFilter;
 import erp.mtrn.data.cfd.SDialogCfdRenderer;
@@ -311,7 +312,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_SCHED:
-                jbPaymentReschedule.setToolTipText("Cambiar fecha programada");
+                jbPaymentReschedule.setToolTipText("Cambiar fecha programada o bajar el monto solicitado");
 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
@@ -1066,7 +1067,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + " WHERE v.id_pay = f.id_pay) = 0, " + SGridConsts.ICON_NULL + ", " + SGridConsts.ICON_FOLDER + ") AS _ico_files, "
                 + "IF(fk_st_pay >= " + SModSysConsts.FINS_ST_PAY_REJC_P + ", " + SGridConsts.ICON_WAIT + ", " + SGridConsts.ICON_NULL + ") AS _ico_proc, "
                 + "IF(ve.ety_tp = '" + SDbPaymentEntry.TYPE_ADVANCE + "' , '" + SDbPaymentEntry.DESC_ENTRY_TYPE_ADVANCE + "', '" + SDbPaymentEntry.DESC_ENTRY_TYPE_PAYMENT + "') AS _ety_tp, "
-                + "IF(v.priority = 1 , '" + SDbPayment.DESC_PRIORITY_URGENT + "', '" + SDbPayment.DESC_PRIORITY_NORMAL + "') AS _priority, "
+                + "IF(v.priority = " + SDbPayment.PRIORITY_URGENT + ", '" + STrnConsts.PRIORITY_URGENT + "', '" + STrnConsts.PRIORITY_NORMAL + "') AS _priority, "
                 + "ve.ety_pay_app_cur, "
                 + "ve.ety_pay_app, "
                 + "ve.conv_rate_app, "
@@ -1118,7 +1119,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 + "ve.fk_ety_cur = ce.id_cur "
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON "
                 + "ve.fk_doc_year_n = d.id_year AND ve.fk_doc_doc_n = d.id_doc "
-                + "LEFT JOIN erp.TRNU_DPS_NAT AS nat ON d.fid_dps_nat = nat.id_dps_nat "
+                + "LEFT JOIN erp.trnu_dps_nat AS nat ON d.fid_dps_nat = nat.id_dps_nat "
                 + "LEFT JOIN ("
                 + "SELECT fk_dps_year_n, fk_dps_doc_n, MAX(prc_type) AS _prc_type "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " " 

@@ -9,6 +9,7 @@ import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.db.SDbStockValuationMvtNote;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnStockMove;
@@ -49,6 +50,9 @@ public abstract class SStockValuationAdjustsUtils {
 
         String sql = "SELECT  "
                 + "    mvt.*, "
+                + "    oc_e.id_year, "
+                + "    oc_e.id_doc, "
+                + "    oc_e.id_ety, "
                 + "    oc_e.price_u_real_r, "
                 + "    oc.fid_ct_dps, "
                 + "    oc.fid_cl_dps, "
@@ -91,9 +95,11 @@ public abstract class SStockValuationAdjustsUtils {
                 + "        AND NOT fac.b_del ";
         
         try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
-             ResultSet resultSet = st.executeQuery(sql)) {
+            ResultSet resultSet = st.executeQuery(sql)) {
             SDbStockValuationMvt oMvtAdjust = null;
             SDbStockValuationMvt oMvtRevised = null;
+            SDbStockValuationMvtNote oMvtNote = null;
+            String sComment;
             while (resultSet.next()) {
                 oMvtRevised = new SDbStockValuationMvt();
                 oMvtRevised.setPkStockValuationMvtId(resultSet.getInt("id_stk_val_mvt"));
@@ -101,18 +107,46 @@ public abstract class SStockValuationAdjustsUtils {
 
                 if (resultSet.getDouble("fac_e.price_u_real_r") != resultSet.getDouble("mvt.cost_u")) {
                     oMvtAdjust = new SDbStockValuationMvt();
-
+                    sComment = "";
+                    
+                    oMvtAdjust.setSystem(true);
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
                     oMvtAdjust.setQuantityMovement(0d);
-                    if (resultSet.getInt("fac.fid_dps_nat") != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                    int documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
+                    if (documentNature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                         oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                         oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
                                                             - resultSet.getDouble("mvt.cost_r"), 8));
+                        oMvtAdjust.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_PRICE_ADJ);
+                        // Crear comentario para el movimiento de ajuste:
+                        sComment = "Ajuste de costo unitario por diferencia de la factura de proveedor. "
+                                + "De OC: " + resultSet.getDouble("oc_e.price_u_real_r") + ", "
+                                + "FACT: " + resultSet.getDouble("fac_e.price_u_real_r") + ", "
+                                + "MVT: " + resultSet.getDouble("mvt.cost_r") + " - "
+                                + "OC [" + resultSet.getInt("oc_e.id_year") + ", "
+                                + resultSet.getInt("oc_e.id_doc") + ", "
+                                + resultSet.getInt("oc_e.id_ety")
+                                + "] - FACT [ " + resultSet.getInt("fact_e_id_year") + ", "
+                                + resultSet.getInt("fact_e_id_doc") + ", "
+                                + resultSet.getInt("fact_e_id_ety") + " ]";
                     }
                     else {
+                        oMvtAdjust.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_ASSET_ADJ);
+                        // Crear comentario para el movimiento de ajuste:
+                        sComment = "Ajuste de valor de activo. "
+                                + "De OC: " + resultSet.getDouble("oc_e.price_u_real_r") + ", "
+                                + "FACT: " + resultSet.getDouble("fac_e.price_u_real_r") + ", "
+                                + "MVT: " + resultSet.getDouble("mvt.cost_r") + " - "
+                                + "OC [" + resultSet.getInt("oc_e.id_year") + ", "
+                                + resultSet.getInt("oc_e.id_doc") + ", "
+                                + resultSet.getInt("oc_e.id_ety")
+                                + "] - FACT [ " + resultSet.getInt("fact_e_id_year") + ", "
+                                + resultSet.getInt("fact_e_id_doc") + ", "
+                                + resultSet.getInt("fact_e_id_ety") + " ]";
                         oMvtAdjust.setCostUnitary(0d);
                         oMvtAdjust.setCost_r(0d);
                     }
+
                     oMvtAdjust.setFkStockValuationId(idValuation);
                     oMvtAdjust.setFkStockValuationMvtId_n(resultSet.getInt("fk_stk_val_mvt_n"));
                     oMvtAdjust.setFkDiogCategoryId(resultSet.getInt("fk_ct_iog"));
@@ -135,6 +169,12 @@ public abstract class SStockValuationAdjustsUtils {
                     oMvtAdjust.setFkWarehouseId(resultSet.getInt("fk_wh"));
                     
                     oMvtAdjust.setAuxIsAdjust(true);
+                    
+                    if (! sComment.isEmpty()) {
+                        oMvtNote = new SDbStockValuationMvtNote();
+                        oMvtNote.setNotes(sComment);
+                        oMvtAdjust.getNotes().add(oMvtNote);
+                    }
 
                     oMvtAdjust.save(session);
 
@@ -300,5 +340,20 @@ public abstract class SStockValuationAdjustsUtils {
         }
         
         return lDiogs;
+    }
+
+    public static double getDpsEtyCostUnitary(SGuiSession session, final int idDpsYear, final int idDpsDoc, final int idDpsEty) throws Exception {
+        String sql = "SELECT price_u_real_r "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " "
+                + "WHERE id_year = " + idDpsYear + " AND id_doc = " + idDpsDoc + " AND id_ety = " + idDpsEty;
+        try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
+             ResultSet resultSet = st.executeQuery(sql)) {
+            if (resultSet.next()) {
+                return resultSet.getDouble("price_u_real_r");
+            }
+            else {
+                throw new Exception("No se encontró el registro de la entrada del documento de compra.");
+            }
+        }
     }
 }

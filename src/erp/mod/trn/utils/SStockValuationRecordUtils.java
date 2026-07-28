@@ -16,12 +16,14 @@ import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbStockValuationAccounting;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SStockValuationConfiguration;
+import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -598,6 +600,55 @@ public class SStockValuationRecordUtils {
         }
         
         return oRecordEntry; 
+    }
+
+    /**
+     * Obtiene la naturaleza del documento de compra a partir de su PK.
+     * Si el documento es una orden de compra, se obtiene la naturaleza directamente del documento.
+     * Si el documento es una factura de compra, se obtiene la contabilidad.
+     * 
+     * @param session
+     * @param idDpsYear
+     * @param idDpsDoc
+     * @return
+     * @throws Exception
+     */
+    public static int getDocumentNature(SGuiSession session, final int idDpsYear, final int idDpsDoc) throws Exception {
+        String sqlDoc = "SELECT td.fid_ct_dps, td.fid_cl_dps, td.fid_tp_dps, td.fid_dps_nat "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " td "
+                + "WHERE td.id_year = " + idDpsYear + " AND td.id_doc = " + idDpsDoc;
+
+        ResultSet resultSetDoc = session.getStatement().executeQuery(sqlDoc);
+        if (resultSetDoc.next()) {
+            if (resultSetDoc.getInt("fid_ct_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                resultSetDoc.getInt("fid_cl_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                resultSetDoc.getInt("fid_tp_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                return resultSetDoc.getInt("fid_dps_nat");
+            }
+        }
+
+        String sql = "SELECT DISTINCT "
+                + "fre.fid_acc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " fr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " fre ON fr.id_year = fre.id_year "
+                + "AND fr.id_per = fre.id_per "
+                + "AND fr.id_bkc = fre.id_bkc "
+                + "AND fr.id_tp_rec = fre.id_tp_rec "
+                + "AND fr.id_num = fre.id_num "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " td ON fre.fid_dps_year_n = td.id_year "
+                + "AND fre.fid_dps_doc_n = td.id_doc "
+                + "WHERE "
+                + "fr.b_del = 0 AND fre.b_del = 0 "
+                + "AND td.b_del = 0 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "AND fre.fid_acc LIKE '12%' "
+                + "AND td.id_year = " + idDpsYear + " "
+                + "AND td.id_doc = " + idDpsDoc + " ";
+
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        return resultSet.next() ? SDataConstantsSys.TRNU_DPS_NAT_ASSET : SDataConstantsSys.TRNU_DPS_NAT_DEF;
     }
 
     /**

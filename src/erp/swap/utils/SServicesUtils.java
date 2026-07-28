@@ -13,10 +13,11 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbComImportLog;
 import erp.mod.cfg.db.SDbComImportLogEntry;
-import erp.swap.SHttpConsts;
-import erp.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
+import erp.mod.trn.db.STrnConsts;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -536,7 +537,7 @@ public abstract class SServicesUtils {
             if (FlowId != 0) {
                 string += "FLUJO DE AUTORIZACIÓN:\n"
                         + "- Estatus: " + FlowStatusName + "\n"
-                        + "- Prioridad: " + (FlowPriority == SDbPayment.PRIORITY_URGENT ? SDbPayment.DESC_PRIORITY_URGENT : SDbPayment.DESC_PRIORITY_NORMAL) + "\n"
+                        + "- Prioridad: " + (FlowPriority == SDbPayment.PRIORITY_URGENT ? STrnConsts.PRIORITY_URGENT : STrnConsts.PRIORITY_NORMAL) + "\n"
                         + "- Notas: \"" + FlowNotes + "\"\n"
                         + "ACCIÓN ACTUAL:\n"
                         + "- No. secuencia: " + CurrActionSequence + "\n"

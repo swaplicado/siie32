@@ -1,14 +1,71 @@
 ================================================================================
-SIIE 3.2 303.10/ 2026-07-29
+SIIE 3.2 305.4/ 2026-07-28
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de funcionalidad para la exportación de proveedores y empleados a la aplicación de compras y gastos de aguacate.
 
 ================================================================================
+SIIE 3.2 305.3/ 2026-07-28
+Jhonatan Claudio PEÑA HERNÁNDEZ
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Reforzamiento de validaciones en la clave del ítem al crear un ítem (si es modificación, no se valida; si es nuevo, advierte, pero deja guardar; si es copia, valida y no deja repetir la clave).
+2) Funcionalidad para bajar el monto autorizado para pago en las solicitudes de pago autorizadas.
+--------------------------------------------------------------------------------
+1) Sincronización del campo prioridad en exportación de OC.
+2) Validación en Valuación de consumos de materiales para reportar déficit en un consumo.
+3) Validación de Documentos de compra actualizados después de la valuación.
+
+================================================================================
+SIIE 3.2 305.2/ 2026-07-24
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección de validaciones de régimen fiscal al crear una orden de compra
+
+================================================================================
+SIIE 3.2 305.1/ 2026-07-23
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Saporis tiene un formato especial JasperReports para la impresión de ordenes de compra. El archivo se llama trn_dps_order - SAPORIS.jasper, y al igual que todos los demás formatos JasperReports, está en la carpeta /reps.
+Cada vez que se actualicen reportes en SAPORIS, hay que renombrar el formato original trn_dps_order.jasper como trn_dps_order - ORIGINAL.jasper, y al archivo del formato propio de SAPORIS hay que quitar la parte " - SAPORIS", para que quede como trn_dps_order.jasper.
+2) Eliminación de botones de marcar y desmarcar como urgentes y cancelar autorización WEB desde la vista de pedidos por autorizar desde APP WEB
+
+================================================================================
+SIIE 3.2 305.0/ 2026-07-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación del campo "Prioridad" para Documentos, haciéndolo modificable en la captura y en la solicitud de autorización de pedidos de compras.
+2) Reset a bandera "Es moneda local" en la forma de captura de Documentos, para evitar el cambio inesperado de moneda extranjera a moneda local al abrir documentos para modificarlos.
+3) Restricción de largo máximo de campos "Notas" de Pagos, para evitar errores en la inserción en la BD.
+
+================================================================================
+SIIE 3.2 304.0/ 2026-07-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales. Validación de entradas y salidas de activo fijo con costo así como de naturaleza predeterminada sin costo.
+2) Se agregan comentarios a la valuación cuando ocurran casos especiales.
+3) Se agrega tipo de movimiento a movimientos de valuación.
+
+================================================================================
+SIIE 3.2 303.11/ 2026-07-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Reforzamiento de la validación de captura de pedidos de compra para hacer concordar la naturaleza del documento con el Uso del CFDI.
+
+================================================================================
+SIIE 3.2 303.10/ 2026-07-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Mejorar visibilidad de envío a autorización de OC en SIIE. PDC-677
+2) Excluir solicitudes de pago eliminadas y canceladas de consulta de pagos existentes de un documento en SIIE. PDC-890
+3) Permitir cambiar fecha de pago (de operación) de solicitudes y pagos que ya están pagados (operados) en SIIE. PDC-888
+4) Cambio en la manera de obtención de el método de pago al exportar OC.
+
+================================================================================
 SIIE 3.2 303.9/ 2026-07-13
 Adrián Alejandro AVILÉS GÓMEZ
 --------------------------------------------------------------------------------
-1) Se añadio funcionalidad para editar la fecha y el uso de cfd de un pedido de compra en la pantalla de pedidos de compras.
+1) Se añadio funcionalidad para modificar la fecha y el uso de CFDI de un pedido de compras en la pantalla de pedidos de compras.
 
 ================================================================================
 SIIE 3.2 303.8/ 2026-07-10
@@ -23,6 +80,12 @@ SIIE 3.2 303.8/ 2026-07-08
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Validación del saldo de los documentos al crear las solicitudes de pago: Se toma en cuenta el monto de los pagos contabilizados y se resta a los pagos existentes.
+
+================================================================================
+SIIE 3.2 303.7/ 2026-07-07
+Cesar Iván OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Se agrega en la funcionalidad que importa las prenóminas a siie, un mensaje que indica si algún colaborador tuvo un error al generar la prenómina en CAP.
 
 ================================================================================
 SIIE 3.2 303.7/ 2026-07-03

@@ -10,6 +10,7 @@ import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.model.FlowResponse;
+import erp.swap.utils.SAuthzUtils;
 import erp.swap.utils.SExportUtils;
 import erp.swap.utils.SServicesUtils;
 import java.sql.ResultSet;
@@ -108,13 +109,22 @@ public class SAuthDBUtils {
      */
     public static void refreshAuthMsAuthData(SGuiSession session, final String query, final boolean isYear) {
         try {
-            List<String> resourceIds = extractResourceIds(session, query);
-            if (resourceIds.isEmpty()) {
+            List<DocPkStatus> lResources = extractResourceIds(session, query);
+            if (lResources.isEmpty()) {
                 return;
             }
 
-            String cacheKey = session.getConfigCompany().getCompanyId() + "_auth_" 
-                    + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + "_" + String.join(",", resourceIds).hashCode();
+            List<String> resourceIdStrings = new ArrayList<>();
+            List<DocPkStatus> pendingResources = new ArrayList<>();
+            for (DocPkStatus oResource : lResources) {
+                resourceIdStrings.add(oResource.getStringPk());
+                if (oResource.trnAuthStatus == SAuthorizationUtils.AUTH_STATUS_SENDING) {
+                    pendingResources.add(oResource);
+                }
+            }
+
+            String cacheKey = session.getConfigCompany().getCompanyId() + "_auth_"
+                    + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + "_" + String.join(",", resourceIdStrings).hashCode();
             CacheEntry cached = CACHE.get(cacheKey);
             
             if (cached != null && !cached.isExpired()) {
@@ -125,15 +135,20 @@ public class SAuthDBUtils {
                 return;
             }
 
-            JsonNode flowDetails = fetchFlowDetailsFromMsAuth(session, SSwapConsts.RESOURCE_TYPE_PUR_ORDER, resourceIds);
+            JsonNode flowDetails = fetchFlowDetailsFromMsAuth(session, SSwapConsts.RESOURCE_TYPE_PUR_ORDER, resourceIdStrings);
             if (flowDetails == null) {
                 return;
             }
 
             loadValidUserIds(session);
-            deleteAuthStepsByResources(session, resourceIds);
+            deleteAuthStepsByResources(session, resourceIdStrings);
             List<SDbAuthorizationStep> authSteps = parseAuthorizationSteps(flowDetails);
             insertAuthorizationSteps(session, authSteps);
+            for (DocPkStatus oResource : pendingResources) {
+                SAuthzUtils.forceCheckAuthStatus(session,
+                        SSwapConsts.RESOURCE_TYPE_PUR_ORDER,
+                        oResource.getArrayPk());
+            }
             CACHE.put(cacheKey, new CacheEntry(flowDetails));
         }
         catch (Exception ex) {
@@ -170,14 +185,14 @@ public class SAuthDBUtils {
      * @param query Consulta SQL que contiene los documentos
      * @return Lista de IDs de recursos en formato "año_documento"
      */
-    private static List<String> extractResourceIds(SGuiSession session, String query) {
-        List<String> resourceIds = new ArrayList<>();
-        String sql = "SELECT d.id_year, d.id_doc " + query.substring(query.toLowerCase().indexOf("from trn_dps as d"));
+    private static List<DocPkStatus> extractResourceIds(SGuiSession session, String query) {
+        List<DocPkStatus> resourceIds = new ArrayList<>();
+        String sql = "SELECT d.id_year, d.id_doc, ah.fid_st_authorn " + query.substring(query.toLowerCase().indexOf("from trn_dps as d"));
 
         try (Statement stmt = session.getStatement().getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                resourceIds.add(rs.getInt("id_year") + "_" + rs.getInt("id_doc"));
+                resourceIds.add(new DocPkStatus(rs.getInt("id_year"), rs.getInt("id_doc"), rs.getInt("fid_st_authorn")));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al extraer IDs de recursos", e);
@@ -397,6 +412,26 @@ public class SAuthDBUtils {
         
         for (SDbAuthorizationStep authStep : authSteps) {
             authStep.save(session);
+        }
+    }
+    
+    private static class DocPkStatus {
+        int idYear;
+        int idDoc;
+        int trnAuthStatus;
+
+        public DocPkStatus(int idYear, int idDoc, int trnAuthStatus) {
+            this.idYear = idYear;
+            this.idDoc = idDoc;
+            this.trnAuthStatus = trnAuthStatus;
+        }
+        
+        public String getStringPk() {
+            return this.idYear + "_" + this.idDoc;
+        }
+        
+        public int[] getArrayPk() {
+            return new int[] {this.idYear, this.idDoc};
         }
     }
 }

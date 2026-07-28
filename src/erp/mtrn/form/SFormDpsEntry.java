@@ -832,7 +832,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDiscountUnitaryPercentage.setText("Descto. unitario en pct.:");
+        jckIsDiscountUnitaryPercentage.setText("% descto. unitario:");
         jckIsDiscountUnitaryPercentage.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsDiscountUnitaryPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel19.add(jckIsDiscountUnitaryPercentage);
@@ -864,7 +864,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDiscountEntryPercentage.setText("Descto. partida en pct.:");
+        jckIsDiscountEntryPercentage.setText("% descto. partida:");
         jckIsDiscountEntryPercentage.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsDiscountEntryPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jckIsDiscountEntryPercentage);

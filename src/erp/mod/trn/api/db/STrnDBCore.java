@@ -750,12 +750,12 @@ public class STrnDBCore {
      *
      * @param dateDoc Fecha del documento.
      * @param idItem ID del ítem.
-     * @param currentPrice Precio actual del ítem.
-     * @param currentPriceCurrency Precio actual del ítem en la moneda del documento.
+     * @param currentPriceLocalCurrency Precio actual del ítem.
+     * @param currentPriceDocCurrency Precio actual del ítem en la moneda del documento.
      * @param queryLimit Límite de resultados de la consulta.
      * @return Lista de objetos {@code SWebItemHistory} con el historial del ítem.
      */
-    public ArrayList<SWebItemHistory> getDpsItemHistory(String dateDoc, int idItem, double currentPrice, double currentPriceCurrency, int queryLimit) {
+    public ArrayList<SWebItemHistory> getDpsItemHistory(String dateDoc, int idItem, double currentPriceLocalCurrency, double currentPriceDocCurrency, int queryLimit) {
         try {
             Connection conn = this.getConnection();
 
@@ -808,7 +808,6 @@ public class STrnDBCore {
                                 + "LIMIT " + queryLimit + ";";
             
             Statement st = conn.createStatement();
-//            Logger.getLogger(STrnDBCore.class.getName()).log(Level.INFO, query);
             ResultSet res = st.executeQuery(query);
             ArrayList<SWebItemHistory> lHistory = new ArrayList<>();
             while (res.next()) {
@@ -827,10 +826,10 @@ public class STrnDBCore {
                 oHistory.setUnitSymbol(res.getString("u.symbol"));
                 oHistory.setCurrencyName(res.getString("cur.cur"));
                 oHistory.setCurrencySymbol(res.getString("cur.cur_key"));
-                oHistory.setCurrentPriceUnitary(currentPrice);
-                oHistory.setCurrentPriceUnitaryCur(currentPriceCurrency);
+                oHistory.setCurrentPriceUnitary(currentPriceLocalCurrency);
+                oHistory.setCurrentPriceUnitaryCur(currentPriceDocCurrency);
                 if (oHistory.getPriceUnitary() > 0) {
-                    oHistory.setPercentage(SLibUtils.round(((currentPrice - oHistory.getPriceUnitary()) * 100) / currentPrice, 4));
+                    oHistory.setPercentage(SLibUtils.round(((currentPriceLocalCurrency - oHistory.getPriceUnitary()) * 100) / currentPriceLocalCurrency, 4));
                 }
 
                 lHistory.add(oHistory);

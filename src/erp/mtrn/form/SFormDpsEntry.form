@@ -317,7 +317,7 @@
                           <SubComponents>
                             <Component class="javax.swing.JCheckBox" name="jckIsDiscountUnitaryPercentage">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Descto. unitario en pct.:"/>
+                                <Property name="text" type="java.lang.String" value="% descto. unitario:"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[2, 0, 2, 2]"/>
                                 </Property>
@@ -380,7 +380,7 @@
                           <SubComponents>
                             <Component class="javax.swing.JCheckBox" name="jckIsDiscountEntryPercentage">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Descto. partida en pct.:"/>
+                                <Property name="text" type="java.lang.String" value="% descto. partida:"/>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[2, 0, 2, 2]"/>
                                 </Property>
