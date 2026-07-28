@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -55,6 +55,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private SPanelDps moPanelDps;
     private int mnFormCase;
     private HashMap<Integer, Date> moLastPaymentDaysMap;
+    private double mdOriginalPaymentCy;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -521,6 +522,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         reloadCatalogues();
         
         SDbPaymentEntry singleEntry = moRegistry.getSingleEntry();
+        mdOriginalPaymentCy = singleEntry.getDestinyPaymentApplicationEntryCy();
         
         jtfFolio.setText(moRegistry.getFolio());
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
@@ -602,7 +604,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDps = moRegistry.getChildEntries().get(0).getDpsRelated();
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
-        moCurPaymentCy.setEditable(markingAsPaid);
+//        moCurPaymentCy.setEditable(markingAsPaid);
+        moCurPaymentCy.setEditable(markingAsPaid || rescheduling);
         moDateNewDate.setEditable((!changingCurrency && !changingAccountBank) || changingExecDate);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
         moKeyPaymentBank.setEditable(markingAsPaid || changingAccountBank);
@@ -646,11 +649,41 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             
             if (validation.isValid()) {
                 switch (mnFormCase) {
-                    case CASE_REACTIVATE:
-                    case CASE_RESCHEDULE:
-                    case CASE_CHANGE_CURRENCY:
+                      case CASE_REACTIVATE:
                         int paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
                         Date lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+                        
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_RESCHEDULE:
+                        if (moCurPaymentCy.getField().getValue() > mdOriginalPaymentCy) {
+                            validation.setMessage("El monto a pagar no puede ser mayor al monto original.");
+                            validation.setComponent(moCurPaymentCy.getField().getComponent());
+                            break;
+                        }
+
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_CHANGE_CURRENCY:
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
 
                         if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
                             String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " " + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", "

@@ -312,7 +312,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 break;
                 
             case SModSysConsts.FINS_ST_PAY_SCHED:
-                jbPaymentReschedule.setToolTipText("Cambiar fecha programada");
+                jbPaymentReschedule.setToolTipText("Cambiar fecha programada o bajar el monto solicitado");
 
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthLog);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAuthWebViewAuthComments);
