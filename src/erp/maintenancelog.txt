@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 305.4/ 2026-07-31
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de columna "área de negocios" en vista de clientes y proveedores.
+
+================================================================================
 SIIE 3.2 305.3/ 2026-07-28
 Jhonatan Claudio PEÑA HERNÁNDEZ
 Edwin Omar CARMONA FIGUEROA

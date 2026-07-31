@@ -19,11 +19,6 @@ import erp.mbps.form.SDialogBizPartnerExport;
 import erp.mbps.form.SDialogImportBizPartner;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
-import erp.swap.SSwapConsts;
-import erp.swap.SSwapUtils;
-import erp.swap.SSyncType;
-import erp.swap.utils.SExportUtils;
-import erp.swap.utils.SResponses;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsConsts;
@@ -32,7 +27,11 @@ import erp.mod.hrs.form.SDialogEmployeeHireLog;
 import erp.mod.hrs.form.SDialogEmployerSubstitution;
 import erp.mod.hrs.human.SHumanAction;
 import erp.mod.hrs.human.SHumanIntegrationService;
-import erp.mod.hrs.human.SHumanService;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
 import erp.table.SFilterConstants;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -214,11 +213,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 break;
                 
             case SDataConstants.BPSX_BP_SUP:
-                aoTableColumns = new STableColumn[39];
+                aoTableColumns = new STableColumn[40];
                 break;
                 
             case SDataConstants.BPSX_BP_CUS:
-                aoTableColumns = new STableColumn[40];
+                aoTableColumns = new STableColumn[41];
                 break;
                 
             case SDataConstants.BPSX_BP_CDR:
@@ -500,6 +499,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         // for suppliers and customers:
 
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_SUP || mnTabTypeAux01 == SDataConstants.BPSX_BP_CUS) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ba.ba", "Área negocios", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_last_trans", "Últ. trans.", STableConstants.WIDTH_DATE);
         }
 
@@ -602,6 +602,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         mvSuscriptors.add(mnTabTypeAux01);
         mvSuscriptors.add(SDataConstants.USRU_USR);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
+        mvSuscriptors.add(SDataConstants.BPSU_BA);
         mvSuscriptors.add(SDataConstants.BPSX_BP_CO);
         mvSuscriptors.add(SDataConstants.BPSX_BP_CUS);
         mvSuscriptors.add(SDataConstants.BPSX_BP_SUP);
@@ -987,7 +988,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
         
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.fiscal_frg_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
-                "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
+                "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, ba.ba, " +
                 (mbIsViewBizPartnersSimple ? "" : "bp_ct.b_del, bp_ct.bp_key, bp_ct.co_key, bp_ct.num_exporter, bp_ct.diot_oper, bp_ct.cfdi_pay_way, bp_ct.cfdi_cfd_use, bp_ct.tax_regime, bp_ct.dt_start, bp_ct.dt_end_n, " +
                 "ct.ct_bp, tp.tp_bp, c.cur_key, l.lan_key, us.usr, tpy.tp_pay_sys, bp_ct.pay_account, tca.tp_cfd_add, ") +
                 "(SELECT MAX(dt) FROM trn_dps WHERE b_del = 0 AND fid_bp_r = bp.id_bp AND fid_ct_dps IN(" + SDataConstantsSys.TRNS_CT_DPS_PUR + ", " + SDataConstantsSys.TRNS_CT_DPS_SAL + ") AND " +
@@ -1005,6 +1006,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "FROM erp.bpsu_bp AS bp " +
                 (!mbIsViewEmployees ? "" : "INNER JOIN hrs_emp_member AS em ON bp.id_bp = em.id_emp ") +
                 "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON bp.fid_tp_bp_idy = tp_bp.id_tp_bp_idy " +
+                "INNER JOIN erp.bpsu_ba AS ba ON bp.fid_ba = ba.id_ba " +
                 "INNER JOIN erp.finu_tax_idy AS tax_tp ON bp.fid_tax_idy = tax_tp.id_tax_idy " +
                 "INNER JOIN erp.usru_usr AS un ON bp.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON bp.fid_usr_edit = ue.id_usr " +
