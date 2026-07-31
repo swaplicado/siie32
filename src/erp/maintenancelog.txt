@@ -1,9 +1,9 @@
 ================================================================================
-SIIE 3.2 305.4/ 2026-07-28
+SIIE 3.2 305.4/ 2026-07-31
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de funcionalidad para la exportación de proveedores y empleados a la aplicación de compras y gastos de aguacate.
-SIIE 3.2 305.4/ 2026-07-31
+
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Adición de columna "área de negocios" en vista de clientes y proveedores.
