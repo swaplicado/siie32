@@ -667,7 +667,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                             )
                         );
 
-/*                        responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                        responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                         SwingUtilities.invokeLater(() -> {
                             try {
                                 SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
@@ -675,7 +675,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                                 Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         });
-*/                   
+                   
                         // Avocado: Proveedores 
                         responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_SILENT);
                         SwingUtilities.invokeLater(() -> {

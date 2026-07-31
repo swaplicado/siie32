@@ -888,7 +888,7 @@ public abstract class SExportUtils {
         String testHost = "";
         String testApyKey = "";
         
-        if (session.getClient() != null && ((SClientInterface) session.getClient()).isDev() || true) {
+        if (session.getClient() != null && ((SClientInterface) session.getClient()).isDev()) {
             // hosts para pruebas:
             
             System.out.println("*** Running in dev mode! ***");
