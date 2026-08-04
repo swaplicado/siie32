@@ -672,7 +672,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                         // Exportación SWAP Services:
                         responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                         // Exportación Avocado proveedores:
-                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_CONFIRM);
+                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_SILENT);
                         // Exportación Avocado empleados:
                         responsesAvoEmp = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_EMPLOYEE, false, SExportUtils.EXPORT_MODE_SILENT);
                         
