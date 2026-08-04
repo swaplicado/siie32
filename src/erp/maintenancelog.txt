@@ -1,8 +1,9 @@
 ================================================================================
-SIIE 3.2 305.4/ 2026-07-31
+SIIE 3.2 305.4/ 2026-08-04
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Implementación de funcionalidad para la exportación de proveedores y empleados a la aplicación de compras y gastos de aguacate.
+2) Arreglo de exportación de empleados activos.
 
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

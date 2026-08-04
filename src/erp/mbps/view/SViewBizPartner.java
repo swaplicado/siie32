@@ -668,31 +668,19 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                                 new Cursor(Cursor.WAIT_CURSOR)
                             )
                         );
-
+                        
+                        // Exportación SWAP Services:
                         responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                        SwingUtilities.invokeLater(() -> {
-                            try {
-                                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-                            } catch (Exception ex) {
-                                Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        });
-                   
-                        // Avocado: Proveedores 
-                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_SILENT);
-                        SwingUtilities.invokeLater(() -> {
-                            try {
-                                SExportUtils.processResponses(miClient.getSession(), responsesAvoSup, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-                            } catch (Exception ex) {
-                                Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        });
-
-                        // Avocado: Empleados
+                        // Exportación Avocado proveedores:
+                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_CONFIRM);
+                        // Exportación Avocado empleados:
                         responsesAvoEmp = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_EMPLOYEE, false, SExportUtils.EXPORT_MODE_SILENT);
+                        
                         SwingUtilities.invokeLater(() -> {
                             try {
-                                SExportUtils.processResponses(miClient.getSession(), responsesAvoEmp, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                                if (responses != null) SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                                if (responsesAvoSup != null) SExportUtils.processResponses(miClient.getSession(), responsesAvoSup, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                                if (responsesAvoEmp != null) SExportUtils.processResponses(miClient.getSession(), responsesAvoEmp, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
                             } catch (Exception ex) {
                                 Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
                             }
