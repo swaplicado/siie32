@@ -47,6 +47,7 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         super(client.getFrame(), true);
         miClient = client;
         manDpsTypeKey = dpsTypeKey;
+        
         initComponents();
         initComponentsExtra();
     }
@@ -181,13 +182,14 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        moTablePane = new STablePane(miClient);
-        jpOptions.add(moTablePane, BorderLayout.CENTER);
-
+        
         STableColumnForm[] tableColumns = new STableColumnForm[2];
         tableColumns[0] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre", 300);
         tableColumns[1] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionado", 100);
         tableColumns[1].setEditable(true);
+
+        moTablePane = new STablePane(miClient);
+        jpOptions.add(moTablePane, BorderLayout.CENTER);
 
         for (int i = 0; i < tableColumns.length; i++) {
             moTablePane.addTableColumn(tableColumns[i]);
