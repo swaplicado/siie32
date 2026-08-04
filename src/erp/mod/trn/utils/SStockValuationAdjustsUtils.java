@@ -10,6 +10,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SDbStockValuationMvtNote;
+import erp.mod.trn.utils.SStockValuationRecordUtils.DocNature;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnStockMove;
@@ -112,8 +113,8 @@ public abstract class SStockValuationAdjustsUtils {
                     oMvtAdjust.setSystem(true);
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
                     oMvtAdjust.setQuantityMovement(0d);
-                    int documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
-                    if (documentNature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                    DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
+                    if (documentNature.nature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                         oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                         oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov")) 
                                                             - resultSet.getDouble("mvt.cost_r"), 8));

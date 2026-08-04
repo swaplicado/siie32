@@ -205,6 +205,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
             return null;
         }
     }
+    
     public int[] getAuxMaterialRequestEntryPk() {
         if (mnFkMaterialRequestId_n > 0) {
             return new int [] { mnFkMaterialRequestId_n, mnFkMaterialRequestEntryId_n }; 
@@ -212,6 +213,10 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
         else {
             return null;
         }
+    }
+    
+    public boolean hasInDps() {
+        return mnFkDpsYearInId_n > 0 && mnFkDpsDocInId_n > 0 && mnFkDpsEntryInId_n > 0;
     }
 
     @Override

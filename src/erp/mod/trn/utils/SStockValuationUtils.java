@@ -18,6 +18,7 @@ import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SDbStockValuationMvtNote;
 import erp.mod.trn.db.SStockValuationConfiguration;
+import erp.mod.trn.utils.SStockValuationRecordUtils.DocNature;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDps;
 import java.sql.Connection;
@@ -255,78 +256,101 @@ public class SStockValuationUtils {
                 oEntry.setAuxTypeDpsIn(new int[]{res.getInt("fid_ct_dps"),
                     res.getInt("fid_cl_dps"),
                     res.getInt("fid_tp_dps")});
+                if (oEntry.hasInDps()) {
+                    if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0]
+                            && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1]
+                            && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                        // Si es OC y no tiene factura asociada
+                        if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                            oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
+                            oEntry.setTemporalPrice(true);
+                            String sLog = "El movimiento de entrada al almacén "
+                                    + "con número de documento " + res.getInt("d.num") + " y "
+                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                    + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", "
+                                    + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                            SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
+                            SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
+                            oMvtNote.setNotes(sLog);
+                            oEntry.getNotes().add(oMvtNote);
 
-                if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0]
-                        && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1]
-                        && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                    if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
-                        oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
-                        oEntry.setTemporalPrice(true);
-                        String sLog = "El movimiento de entrada al almacén "
-                                + "con número de documento " + res.getInt("d.num") + " y "
-                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
-                                + "no tiene una factura asociada.\nPedido folio: " + res.getString("dps_num") + ", "
-                                + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
-                        SStockValuationLogUtils.logConsume(startDate, cutDate, oEntry, sLog);
-                        SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
-                        oMvtNote.setNotes(sLog);
-                        oEntry.getNotes().add(oMvtNote);
+                            DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session,
+                                                                                    oEntry.getFkDpsYearInId_n(),
+                                                                                    oEntry.getFkDpsDocInId_n());
+                            double newCostUnitary = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
+                                    ? 0d
+                                    : res.getDouble("price_u_real_r");
+                            if (oEntry.getCostUnitary() != newCostUnitary) {
+                                oEntry.setCostUnitary(newCostUnitary);
+                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
+
+                                String sLogCost = "";
+                                if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                                    sLogCost += "La OC tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
+                                    SDbStockValuationMvtNote oCostNote = new SDbStockValuationMvtNote();
+                                    oCostNote.setNotes(sLogCost);
+                                    oEntry.getNotes().add(oCostNote);
+                                }
+                            }
+                        }
+                        // Si es OC y sí tiene factura asociada
+                        else {
+                            DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
+                                                                                    res.getInt("supp.id_des_year"), 
+                                                                                    res.getInt("supp.id_des_doc"));
+                            double newCostUnitary = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
+                                    ? 0d
+                                    : res.getDouble("ety_des_price_real");
+
+                            if (oEntry.getCostUnitary() != newCostUnitary) {
+                                oEntry.setCostUnitary(newCostUnitary);
+                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
+
+                                String sLog = "";
+                                if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                                    sLog += "La factura tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
+                                }
+                                sLog += "Entrada almacén número: " + res.getInt("d.num") + " y "
+                                        + "fecha: " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                        + "tiene un costo unitario diferente a la factura: " + res.getString("des_num")
+                                        + ". Pedido folio: " + res.getString("dps_num") + ", "
+                                        + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                                SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
+                                oMvtNote.setNotes(sLog);
+                                oEntry.getNotes().add(oMvtNote);
+                            }
+
+                            oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
+                            oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
+                            oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                        }
                     }
-                    else {
-                        int documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
-                                                                                res.getInt("supp.id_des_year"), 
-                                                                                res.getInt("supp.id_des_doc"));
-                        double newCostUnitary = documentNature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
+                    // Si es factura
+                    else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0]
+                            && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1]
+                            && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
+                        DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
+                                                                            oEntry.getFkDpsYearInId_n(),
+                                                                            oEntry.getFkDpsDocInId_n());
+                        double newCostUnitary = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
                                 ? 0d
-                                : res.getDouble("ety_des_price_real");
+                                : res.getDouble("price_u_real_r");
 
                         if (oEntry.getCostUnitary() != newCostUnitary) {
                             oEntry.setCostUnitary(newCostUnitary);
                             oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
 
-                            String sLog = "";
-                            if (documentNature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
-                                sLog += "La factura tiene contabilidad de activo, por lo que el costo unitario se establece en 0.";
+                            String sLog = "La entrada al almacén y la factura tienen un costo unitario distinto. ";
+                            if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                                sLog += "La factura tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
                             }
                             sLog += "Entrada almacén número: " + res.getInt("d.num") + " y "
-                                    + "fecha: " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
-                                    + "tiene un costo unitario diferente a la factura: " + res.getString("des_num")
-                                    + ". Pedido folio: " + res.getString("dps_num") + ", "
-                                    + "fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
+                                    + "tiene un costo unitario diferente a la factura: " + res.getString("dps_num") + ". ";
                             SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
                             oMvtNote.setNotes(sLog);
                             oEntry.getNotes().add(oMvtNote);
                         }
-
-                        oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
-                        oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
-                        oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
-                    }
-                }
-                else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0]
-                        && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1]
-                        && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
-                    int documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
-                                                                        oEntry.getFkDpsYearInId_n(),
-                                                                        oEntry.getFkDpsDocInId_n());
-                    double newCostUnitary = documentNature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
-                            ? 0d
-                            : res.getDouble("price_u_real_r");
-
-                    if (oEntry.getCostUnitary() != newCostUnitary) {
-                        oEntry.setCostUnitary(newCostUnitary);
-                        oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-
-                        String sLog = "La entrada al almacén y la factura tienen un costo unitario distinto. ";
-                        if (documentNature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
-                            sLog += "La factura tiene contabilidad de activo, por lo que el costo unitario se establece en 0.";
-                        }
-                        sLog += "Entrada almacén número: " + res.getInt("d.num") + " y "
-                                + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
-                                + "tiene un costo unitario diferente a la factura: " + res.getString("des_num") + ". ";
-                        SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
-                        oMvtNote.setNotes(sLog);
-                        oEntry.getNotes().add(oMvtNote);
                     }
                 }
 
@@ -517,9 +541,9 @@ public class SStockValuationUtils {
                         if (entry.getFkDpsDocInId_n() > 0) {
                             String docKey = entry.getFkDpsYearInId_n() + "-" + entry.getFkDpsDocInId_n();
                             if (!mapDocsAccountingNatures.containsKey(docKey)) {
-                                int documentNature = SStockValuationRecordUtils.getDocumentNature(session, entry.getFkDpsYearInId_n(), entry.getFkDpsDocInId_n());
-                                mapDocsAccountingNatures.put(docKey, documentNature);
-                                rowAccountingNature = documentNature;
+                                DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, entry.getFkDpsYearInId_n(), entry.getFkDpsDocInId_n());
+                                mapDocsAccountingNatures.put(docKey, documentNature.nature);
+                                rowAccountingNature = documentNature.nature;
                             }
                             else {
                                 rowAccountingNature = mapDocsAccountingNatures.get(docKey);
@@ -691,7 +715,7 @@ public class SStockValuationUtils {
                             + " \n ID_YEAR = " + (res.getInt("fid_diog_year")) + ", "
                             + "ID_DOC = " + (res.getInt("fid_diog_doc"))
                             + ", ID_ETY = " + res.getInt("fid_diog_ety") + ". "
-                            + "ID_ITEM = " + res.getInt("id_item") + ".";
+                            + "ID_ITEM = " + res.getInt("id_item") + ", ID_UNIT = " + res.getInt("id_unit") + ".";
 
                     throw new Exception(log);
                 }
