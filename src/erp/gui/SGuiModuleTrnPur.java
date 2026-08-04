@@ -1566,6 +1566,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "CPA - Rastreo vínculos " + SDataConstantsSys.getDpsTypeNamePlr(auxType01).toLowerCase();
                     break;
 
+                case SDataConstants.TRNX_CON_LINK_ETY:
+                    oViewClass = erp.mtrn.view.SViewContractLinkEntry.class;
+                    sViewTitle = "CPA - Vínculos " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON).toLowerCase() + " x procesar (detalle)";
+                    break;
+
                 case SDataConstants.TRNX_DPS_AUTHORIZE_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsPendAuthorized.class;
                     sViewTitle = getViewTitle(auxType01);
@@ -1581,10 +1586,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
                     break;
                     
+                /* XXX 2026-08-04, Sergio Flores: ¡No es claro por qué este código se encuentra comentado!
                 //case SDataConstants.TRNX_DPS_SUPPLY:
                 //    oViewClass = erp.mtrn.view.SViewDpsPendAuthorizedSupply.class;
                 //    sViewTitle = getViewTitle(auxType01);
                 //    break;
+                */
                 
                 case SDataConstants.TRNU_TP_DPS_ANN:
                     oViewClass = erp.mtrn.view.SViewDpsAnnulled.class;

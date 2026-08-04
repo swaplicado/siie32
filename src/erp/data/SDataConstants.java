@@ -584,6 +584,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_LINKS_TRACE = 207537;
     public static final int TRNX_DPS_SUPPLY = 207538;
     public static final int TRNX_DPS_MAT_REQ_LINKS = 207539;
+    public static final int TRNX_CON_LINK_ETY = 207540;
 
     public static final int TRNX_DPS_SUPPLY_PEND = 207541;
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
