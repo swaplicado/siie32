@@ -40,8 +40,21 @@ public class SExportDataAvoBp implements SExportData {
     public String fiscal_id;
 
     /**
+     * Bandera que indica si el asociado de negocios (Proveedor o Empleado) 
+     * se encuentra activo (true) o inactivo (false) en el ERP.
+     */
+    public boolean is_active;
+    
+    /**
+     * Bandera que indica si el registro base del asociado de negocios fue eliminado 
+     * o si perdió el rol asignado (dejó de ser proveedor/empleado) en el ERP.
+     */
+    public boolean is_deleted;
+    
+    /**
      * Arreglo numérico que indica los roles del asociado de negocios en el sistema de destino
      * (por ejemplo: [1] para Proveedor, [2] para Empleado, o [1, 2] para ambos).
      */
     public int[] types;
+    
 }

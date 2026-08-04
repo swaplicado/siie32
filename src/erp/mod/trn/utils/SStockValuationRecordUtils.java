@@ -613,17 +613,22 @@ public class SStockValuationRecordUtils {
      * @return
      * @throws Exception
      */
-    public static int getDocumentNature(SGuiSession session, final int idDpsYear, final int idDpsDoc) throws Exception {
+    public static DocNature getDocumentNature(SGuiSession session, final int idDpsYear, final int idDpsDoc) throws Exception {
         String sqlDoc = "SELECT td.fid_ct_dps, td.fid_cl_dps, td.fid_tp_dps, td.fid_dps_nat "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " td "
                 + "WHERE td.id_year = " + idDpsYear + " AND td.id_doc = " + idDpsDoc;
-
+        
+        DocNature natureDocAcc = new DocNature();
         ResultSet resultSetDoc = session.getStatement().executeQuery(sqlDoc);
         if (resultSetDoc.next()) {
+            natureDocAcc.nature = resultSetDoc.getInt("fid_dps_nat");
+            natureDocAcc.dpsNature = resultSetDoc.getInt("fid_dps_nat");
+            
             if (resultSetDoc.getInt("fid_ct_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
                 resultSetDoc.getInt("fid_cl_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
                 resultSetDoc.getInt("fid_tp_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
-                return resultSetDoc.getInt("fid_dps_nat");
+                natureDocAcc.accNature = 0;
+                return natureDocAcc;
             }
         }
 
@@ -648,7 +653,22 @@ public class SStockValuationRecordUtils {
                 + "AND td.id_doc = " + idDpsDoc + " ";
 
         ResultSet resultSet = session.getStatement().executeQuery(sql);
-        return resultSet.next() ? SDataConstantsSys.TRNU_DPS_NAT_ASSET : SDataConstantsSys.TRNU_DPS_NAT_DEF;
+        natureDocAcc.accNature = resultSet.next() ? SDataConstantsSys.TRNU_DPS_NAT_ASSET : SDataConstantsSys.TRNU_DPS_NAT_DEF;
+        natureDocAcc.nature = natureDocAcc.accNature;
+        
+        return natureDocAcc;
+    }
+    
+    public static class DocNature {
+        public int nature;
+        public int dpsNature;
+        public int accNature;
+
+        public DocNature() {
+            this.nature = 0;
+            this.dpsNature = 0;
+            this.accNature = 0;
+        }
     }
 
     /**

@@ -6,7 +6,9 @@ package erp.mod.trn.view;
 
 import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelValMovType;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.trn.form.SDialogStockValuationNotes;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +28,7 @@ import sa.lib.grid.SGridFilterDateRange;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -38,8 +41,10 @@ import sa.lib.gui.SGuiDate;
 public class SViewStockValuationDetail extends SGridPaneView implements ActionListener {
 
     private SGridFilterDateRange moFilterDateRange;
+    private SDialogStockValuationNotes moMvtNotesDialog;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
+    private JButton mjbViewNotes;
     private String msSeekQueryText;
     private JTextField moTextToSearch;
     private SGridFilterPanelValMovType moFilterMatReqStatus;
@@ -67,9 +72,12 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
             new SGuiDate(SGuiConsts.GUI_DATE_DATE, SViewStockValuationDetail.getEndDateOfMonth(month[0], month[1]).getTime())}
         );
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
+
+        moMvtNotesDialog = new SDialogStockValuationNotes(miClient, "Notas del movimiento");
         
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
+        mjbViewNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_notes.gif")), "Ver notas", this);
         
         moFilterMatReqStatus = new SGridFilterPanelValMovType(miClient, this);
         moFilterMatReqStatus.initFilter(mnGridMode);
@@ -80,12 +88,31 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moTextToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbToSearch);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbCleanSearch);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterMatReqStatus);
         
         mjbToSearch.setEnabled(true);
         mjbCleanSearch.setEnabled(true);
+        mjbViewNotes.setEnabled(true);
         
         msSeekQueryText = "";
+    }
+
+    private void actionViewNotes() {
+        if (jtTable.getSelectedRowCount() != 1) {
+            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+        }
+        else {
+            SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+            if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+            }
+            else {
+                moMvtNotesDialog.setValue(0, gridRow.getRowPrimaryKey()[0]);
+                moMvtNotesDialog.setVisible(true);
+            }
+        }
     }
     
     private void actionSearch() {
@@ -119,7 +146,14 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
                         + "bp.bp LIKE '%" + text + "%' OR "
                         + "CONCAT(r.id_tp_rec, "
                         + " '-', "
-                        + " erp.lib_fix_int(r.id_num, 6))  LIKE '%" + text + "%' ";
+                        + " erp.lib_fix_int(r.id_num, 6))  LIKE '%" + text + "%' OR"
+                        + "(IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                        + "         'ACTIVO FIJO', "
+                        + "         'PREDETERMINADO') LIKE '%" + text + "%' ) OR "
+                        + "(SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
+                        + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
+                        + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
+                        + "  GROUP BY mvtn.fk_stk_val_mvt) LIKE '%" + text + "%' ";
                 
                 msSeekQueryText += ") ";
             }
@@ -195,7 +229,7 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
             where += (where.isEmpty() ? "" : "AND ") + msSeekQueryText;
         }
         
-        msSql = "SELECT val.id_stk_val AS " + SDbConsts.FIELD_ID + "1, "
+        msSql = "SELECT mvt.id_stk_val_mvt AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "'' AS " + SDbConsts.FIELD_NAME + ", "
                 + "val.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
@@ -222,6 +256,9 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
                 + "    IF(LENGTH(dps.num_ser) = 0, '', '-'), "
                 + "    dps.num) AS f_num, "
                 + "dps.dt_doc, "
+                + "IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "         'ACTIVO FIJO', "
+                + "         'PREDETERMINADO') AS dps_nat, "
                 + "bp.bp, "
                 + "di_in.fid_dps_year_n, "
                 + "di_in.fid_dps_doc_n, "
@@ -241,6 +278,10 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
                 + "facc.acc, "
                 + "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, "
                 + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as fin_num, "
+                + " (SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
+                + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
+                + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
+                + "  GROUP BY mvtn.fk_stk_val_mvt) AS _notes, "
                 + "r.id_year, "
                 + "r.id_per, "
                 + "r.id_bkc, "
@@ -334,6 +375,7 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "dps_type", "Doc. compra"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_num", "Num. Doc."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_doc", "Fecha Doc."));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "dps_nat", "Nat. doc compra"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "bp", "Asoc. negocios"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "dout_num", "Fol. Mvto. Sal."));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp_diog_out", "Tipo Mvto. Sal."));
@@ -348,6 +390,7 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_acc", "Cta. contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "acc", "Cuenta contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "fin_num", "Póliza contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "_notes", "Notas valuación"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -373,6 +416,9 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
             }
             else if (button == mjbCleanSearch) {
                 actionCleanSearch();
+            }
+            else if (button == mjbViewNotes) {
+               actionViewNotes();
             }
         }
     }

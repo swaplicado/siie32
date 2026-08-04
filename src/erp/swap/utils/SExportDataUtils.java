@@ -179,17 +179,30 @@ public abstract class SExportDataUtils {
      * @param empDepartments Cadena con los IDs de los departamentos permitidos para empleados, separados por comas.
      * @return Cadena con la sentencia SQL base unificada.
      */
-    private static String getSqlQueryBaseAvo(String supBizAreas, String empDepartments) {
+    private static String getSqlQueryBaseAvo(String supBizAreas, String empDepartments, String sqlSyncedSup, String sqlSyncedEmp) {
         String sqlSupArea = supBizAreas.isEmpty() ? "1 = 0" : "b.fid_ba IN (" + supBizAreas + ")";
         String sqlEmpDep = empDepartments.isEmpty() ? "1 = 0" : "emp.fk_dep IN (" + empDepartments + ")";
+        String referenceId = "CONVERT(b.id_bp, CHAR)";
         
         return "SELECT "
                 + "b.id_bp, b.bp, b.bp_comm, b.fiscal_id, "
-                + "(" + sqlSupArea + " AND b.b_sup = 1 AND b.b_del = 0) AS is_avo_sup, " 
-                + "(emp.id_emp IS NOT NULL AND " + sqlEmpDep + " AND b.b_att_emp = 1 AND emp.b_del = 0 AND b.b_del = 0) AS is_avo_emp " 
+                
+                //Identificación de rol: Pertenece a Avo si cumple el filtro hoy, o si ya se había exportado antes.
+                + "(bc.id_bp IS NOT NULL AND (" + sqlSupArea + " OR " + referenceId + " IN (" + sqlSyncedSup + "))) AS is_avo_sup, "
+                + "(emp.id_emp IS NOT NULL AND (" + sqlEmpDep + " OR " + referenceId + " IN (" + sqlSyncedEmp + "))) AS is_avo_emp, "
+                
+                // Banderas para Proveedores:
+                + "(IFNULL(bc.b_del, 1) = 0) AS sup_is_active, " // si en categoria está eliminada/null se exporta como no activo, activo en caso contrario
+                + "(b.b_del = 1 OR b.b_sup = 0 OR NOT (" + sqlSupArea + ")) AS sup_is_deleted, " // si está eliminado, dejó de ser proveedor o ya no cumple el área: se exporta eliminado
+                
+                // Banderas para Empleados:
+                + "(emp.b_act = 1 AND emp.b_del = 0) AS emp_is_active, " // si está inactivo o eliminado en HRSU se exporta inactivo, activo en caso contrario
+                + "(b.b_del = 1 OR b.b_att_emp = 0 OR NOT (" + sqlEmpDep + ")) AS emp_is_deleted " // si está eliminado, dejó de ser empleado o ya no cumple el departamento: se exporta eliminado
+                
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = b.id_bp " 
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = b.id_bp "
+                
                 /*Bitácora de actualizaciones*/
                 + "LEFT OUTER JOIN ("
                 + "SELECT bul.id_bp, bul.ts_usr_upd "
@@ -247,22 +260,26 @@ public abstract class SExportDataUtils {
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             String referenceId = "CONVERT(b.id_bp, CHAR)";
+            String sqlSyncedSup = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "");
+            String sqlSyncedEmp = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "");
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_SUPPLIER, "");
 
-            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments)
-                    + "WHERE " + sqlSupArea + " AND b.b_sup AND " 
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments, sqlSyncedSup, sqlSyncedEmp)
+                    + "WHERE bc.id_bp IS NOT NULL AND "
                     + "( "
-                    + "  ((NOT b.b_del AND (bc.b_del IS NULL OR NOT bc.b_del)) AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "") + ")) "
-                    + (lastSyncDatetime == null ? "" : "  OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                    // Condición para nuevos: Vivos, activos, son proveedores y cumplen el filtro de área de negocio.
+                    + "  ((b.b_sup = 1 AND b.b_del = 0 AND IFNULL(bc.b_del, 1) = 0 AND " + sqlSupArea + ") AND " + referenceId + " NOT IN (" + sqlSyncedSup + ")) "
+                    
+                    // Condición para modificados: Si se modificó la tabla principal bpsu_bp, la configuración o hay cambios en la bitacora de actualizaciones.
+                    + (lastSyncDatetime == null ? "" : "  OR ((" + referenceId + " IN (" + sqlSyncedSup + ")) AND (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
                             + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) ")  
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))) ")  
                     + ") "
-                    + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
                     + "ORDER BY b.id_bp;";
 
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                SExportDataAvoBp supplier = createAvoBp(resultSet); 
+                SExportDataAvoBp supplier = createAvoBp(resultSet);
                 if (supplier != null) {
                     suppliers.add(supplier);
                 }
@@ -290,17 +307,21 @@ public abstract class SExportDataUtils {
         
         try (Statement statement = session.getStatement().getConnection().createStatement()){
             String referenceId = "CONVERT(b.id_bp, CHAR)";
+            String sqlSyncedSup = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "");
+            String sqlSyncedEmp = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "");
             Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_EMPLOYEE, "");
             
-            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments)
-                    + "WHERE " + sqlEmpDep + " AND b.b_att_emp AND " 
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments, sqlSyncedSup, sqlSyncedEmp)
+                    + "WHERE emp.id_emp IS NOT NULL AND " 
                     + "( "
-                    + "  (NOT b.b_del AND NOT emp.b_del AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "") + ")) "
-                    + (lastSyncDatetime == null ? "" : "  OR (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                    + "OR emp.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                    + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')) ")
+                    // Condición para nuevos: Vivos, activos, son empleados y cumplen el filtro de departamento.
+                    + "  ((b.b_att_emp = 1 AND b.b_del = 0 AND emp.b_act = 1 AND emp.b_del = 0 AND " + sqlEmpDep + ") AND " + referenceId + " NOT IN (" + sqlSyncedEmp + ")) "
+                    
+                    // Condición para modificados: Si se modificó la tabla principal bpsu_bp, la de empleados o hay cambios en la bitacora de actualizaciones.
+                    + (lastSyncDatetime == null ? "" : "  OR ((" + referenceId + " IN (" + sqlSyncedEmp + ")) AND (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR emp.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))) ")  
                     + ") "
-                    + "AND NOT (b.fiscal_id = '' OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '')) "
                     + "ORDER BY b.id_bp;";
 
             ResultSet resultSet = statement.executeQuery(sql);
@@ -313,7 +334,6 @@ public abstract class SExportDataUtils {
         }
         return employees;
     }
-
     /**
      * Obtiene la fecha de la última sincronización exitosa para el tipo de
      * sincronización indicado.
@@ -801,17 +821,32 @@ public abstract class SExportDataUtils {
         
         boolean isSup = resultSet.getBoolean("is_avo_sup");
         boolean isEmp = resultSet.getBoolean("is_avo_emp");
+        
+        // Lectura de estatus del asociado:
+        
+        boolean supIsActive = resultSet.getBoolean("sup_is_active");
+        boolean supIsDeleted = resultSet.getBoolean("sup_is_deleted");
+        
+        boolean empIsActive = resultSet.getBoolean("emp_is_active");
+        boolean empIsDeleted = resultSet.getBoolean("emp_is_deleted");
 
         // Asignamos el arreglo dinámicamente:
         
         if (isSup && isEmp) {
             avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_SUPPLIER, SAvoConsts.SWAP_AVO_BP_EMPLOYEE };
+            avoBp.is_active = supIsActive && empIsActive;
+            avoBp.is_deleted = supIsDeleted && empIsDeleted;
         }
         else if (isSup) {
             avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_SUPPLIER };
+            avoBp.is_active = supIsActive;
+            avoBp.is_deleted = supIsDeleted;
+            
         }
         else if (isEmp) {
             avoBp.types = new int[] { SAvoConsts.SWAP_AVO_BP_EMPLOYEE };
+            avoBp.is_active = empIsActive;
+            avoBp.is_deleted = empIsDeleted;
         }
         else {
             return null; //si no es ninguno, no se manda
