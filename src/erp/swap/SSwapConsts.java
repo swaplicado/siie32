@@ -87,6 +87,7 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_AVO_SRV_ITEMS = "items";
     public static final String CFG_OBJ_AVO_SRV_UPDATE_WEEK = "update-week-procurement-facility";
     public static final String CFG_OBJ_AVO_SRV_BATCH_MOVEMENTS = "batch-movements";
+    public static final String CFG_OBJ_AVO_SRV_TOGGLE_ACCOUNTING = "toggle-accounting";
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";

@@ -6,9 +6,12 @@
 package erp.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import erp.lib.SLibConstants;
+import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataCostCenter;
 import java.io.Serializable;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +45,10 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
     public SDataAccount oDataAccount;
     public SDataAccount oDataAccountMajor;
     public SDataCostCenter oDataCostCenter;
-    
+    public SDataBizPartner oDataBizPartner;
+    public int mnSortingPosition;
+    public int mnFacilitySeasonWeekId;
+
     public SImportWeekProcurementFacility() {
         Id = 0;
         Movement_date = null;
@@ -66,9 +72,10 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         oDataAccount = null;
         oDataCostCenter = null;
         oDataAccountMajor = null;
+        oDataBizPartner = null;
     }
     
-    public SImportWeekProcurementFacility(final JsonNode docNode) throws ParseException {
+    public SImportWeekProcurementFacility(final JsonNode docNode, final Statement statement) throws ParseException {
         Id = docNode.get("id").asInt();
         String movement_date = docNode.get("movement_date").asText();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -105,6 +112,31 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
 //        } else {
 ////            Accounting_account = new AccountingAccount();
 //        }
+
+        SDataAccount oAccount = new SDataAccount();
+        SDataAccount oAccountLedger = new SDataAccount();
+
+        JsonNode accountingAccountNode = docNode.path("accounting_account");
+        if (!accountingAccountNode.isEmpty()) {                    
+            oAccount.read(new String[] { accountingAccountNode.get("code").asText() }, statement);
+            oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
+        } else {
+            oAccount.read( new String[] { "6000-0001-0000" }, statement);
+            oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
+        }
+        
+        oDataAccount = oAccount;
+        oDataAccountMajor = oAccountLedger;
+
+        SDataCostCenter costCenter = new SDataCostCenter();
+        JsonNode costCenterNode = docNode.path("cost_center");
+        if (!costCenterNode.isEmpty()) {                    
+            costCenter.read( new String[] { costCenterNode.get("code").asText() }, statement);
+        } else {
+            costCenter.read( new String[] { "100-01-01-001" }, statement);
+        }
+        
+        oDataCostCenter = costCenter;
         
         Fiscal_id = docNode.get("fiscal_id").isNull() ? "" : docNode.get("fiscal_id").asText();
         Erp_user = docNode.get("erp_user").isNull() ? "" : docNode.get("erp_user").asText();
@@ -137,7 +169,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         JsonNode itemNode = docNode.path("item");
         if (!itemNode.isEmpty()) {
             Item = new Item(
-                itemNode.get("erp_id").asInt(),
+                itemNode.get("id").asInt(),
                 itemNode.get("code").isNull() ? "" : itemNode.get("code").asText(), 
                 itemNode.get("name").isNull() ? "" : itemNode.get("name").asText()
             );
@@ -147,183 +179,65 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         
         Is_adjustment = docNode.get("is_adjustment").asBoolean();
         Is_invoiced = docNode.get("is_invoiced").asBoolean();
+        
+        int pkBp = docNode.get("erp_user").asInt();
+        SDataBizPartner bp = new SDataBizPartner();
+        int res = bp.read(new int[] {pkBp}, statement);
+        if (res == SLibConstants.DB_ACTION_READ_OK) {
+            oDataBizPartner = bp;
+        }
     }
 
-    public int getId() {
-        return Id;
-    }
-
-    public void setId(int Id) {
-        this.Id = Id;
-    }
-
-    public Date getMovement_date() {
-        return Movement_date;
-    }
-
-    public void setMovement_date(Date Movement_date) {
-        this.Movement_date = Movement_date;
-    }
-
-    public String getConcept() {
-        return Concept;
-    }
-
-    public void setConcept(String Concept) {
-        this.Concept = Concept;
-    }
-
-    public String getReference() {
-        return Reference;
-    }
-
-    public void setReference(String Reference) {
-        this.Reference = Reference;
-    }
-
-    public double getDebe() {
-        return Debe;
-    }
-
-    public void setDebe(double Debe) {
-        this.Debe = Debe;
-    }
-
-    public double getHaber() {
-        return Haber;
-    }
-
-    public void setHaber(double Haber) {
-        this.Haber = Haber;
-    }
-
-    public Currency getCurrency() {
-        return oCurrency;
-    }
-
-    public void setCurrency(int id, String code, String name) {
-        this.oCurrency = new Currency(id, code, name);
-    }
-
-    public CostCenter getCost_center() {
-        return Cost_center;
-    }
-
-    public void setCost_center(int id, String code, String name) {
-        this.Cost_center = new CostCenter(id, code, name);
-    }
-
-    public AccountingAccount getAccounting_account() {
-        return Accounting_account;
-    }
-
-    public void setAccounting_account(int id, String code, String name) {
-        this.Accounting_account = new AccountingAccount(id, code, name);
-    }
-
-    public String getFiscal_id() {
-        return Fiscal_id;
-    }
-
-    public void setFiscal_id(String Fiscal_id) {
-        this.Fiscal_id = Fiscal_id;
-    }
-
-    public String getErp_user() {
-        return Erp_user;
-    }
-
-    public void setErp_user(String Erp_user) {
-        this.Erp_user = Erp_user;
-    }
-
-    public double getUnit_cost() {
-        return Unit_cost;
-    }
-
-    public void setUnit_cost(double Unit_cost) {
-        this.Unit_cost = Unit_cost;
-    }
-
-    public double getStock_in() {
-        return Stock_in;
-    }
-
-    public void setStock_in(double Stock_in) {
-        this.Stock_in = Stock_in;
-    }
-
-    public int getCrates() {
-        return Crates;
-    }
-
-    public void setCrates(int Crates) {
-        this.Crates = Crates;
-    }
-
-    public ProcurementFacility getFacility() {
-        return Facility;
-    }
-
-    public void setFacility(ProcurementFacility Facility) {
-        this.Facility = Facility;
-    }
-
-    public MovementType getMovement_type() {
-        return Movement_type;
-    }
-
-    public void setMovement_type(MovementType Movement_type) {
-        this.Movement_type = Movement_type;
-    }
-
-    public Item getItem() {
-        return Item;
-    }
-
-    public void setItem(int id, String code, String name) {
-        this.Item = new Item(id, code, name);
-    }
-
-    public boolean isIs_adjustment() {
-        return Is_adjustment;
-    }
-
-    public void setIs_adjustment(boolean Is_adjustment) {
-        this.Is_adjustment = Is_adjustment;
-    }
-
-    public boolean isIs_invoiced() {
-        return Is_invoiced;
-    }
-
-    public void setIs_invoiced(boolean Is_invoiced) {
-        this.Is_invoiced = Is_invoiced;
-    }
-
-    public void setDataAccount(SDataAccount dataAccount) {
-        this.oDataAccount = dataAccount;
-    }
-    
-    public SDataAccount getDataAccount(){
-        return oDataAccount;
-    }
-    
-    public void setDataAccountMajor(SDataAccount dataAccountMajor) {
-        this.oDataAccountMajor = dataAccountMajor;
-    }
-    
-    public SDataAccount getDataAccountMajor(){
-        return oDataAccountMajor;
-    }
-    
-    public void setDataCostCenter(SDataCostCenter dataCostCenter) {
-        this.oDataCostCenter = dataCostCenter;
-    }
-    
-    public SDataCostCenter getDataCostCenter(){
-        return oDataCostCenter;
-    }
+    public int getId() { return Id; }
+    public void setId(int Id) { this.Id = Id; }
+    public Date getMovement_date() { return Movement_date; }
+    public void setMovement_date(Date Movement_date) { this.Movement_date = Movement_date; }
+    public String getConcept() { return Concept; }
+    public void setConcept(String Concept) { this.Concept = Concept; }
+    public String getReference() { return Reference; }
+    public void setReference(String Reference) { this.Reference = Reference; }
+    public double getDebe() { return Debe; }
+    public void setDebe(double Debe) { this.Debe = Debe; }
+    public double getHaber() { return Haber; }
+    public void setHaber(double Haber) { this.Haber = Haber; }
+    public Currency getCurrency() { return oCurrency; }
+    public void setCurrency(int id, String code, String name) { this.oCurrency = new Currency(id, code, name); }
+    public CostCenter getCost_center() { return Cost_center; }
+    public void setCost_center(int id, String code, String name) { this.Cost_center = new CostCenter(id, code, name); }
+    public AccountingAccount getAccounting_account() { return Accounting_account;    }
+    public void setAccounting_account(int id, String code, String name) { this.Accounting_account = new AccountingAccount(id, code, name); }
+    public String getFiscal_id() { return Fiscal_id; }
+    public void setFiscal_id(String Fiscal_id) { this.Fiscal_id = Fiscal_id; }
+    public String getErp_user() { return Erp_user; }
+    public void setErp_user(String Erp_user) { this.Erp_user = Erp_user; }
+    public double getUnit_cost() { return Unit_cost; }
+    public void setUnit_cost(double Unit_cost) { this.Unit_cost = Unit_cost; }
+    public double getStock_in() { return Stock_in; }
+    public void setStock_in(double Stock_in) { this.Stock_in = Stock_in; }
+    public int getCrates() { return Crates; }
+    public void setCrates(int Crates) { this.Crates = Crates; }
+    public ProcurementFacility getFacility() { return Facility; }
+    public void setFacility(ProcurementFacility Facility) { this.Facility = Facility; }
+    public MovementType getMovement_type() { return Movement_type; }
+    public void setMovement_type(MovementType Movement_type) { this.Movement_type = Movement_type; }
+    public Item getItem() { return Item; }
+    public void setItem(int id, String code, String name) { this.Item = new Item(id, code, name); }
+    public boolean isIs_adjustment() { return Is_adjustment; }
+    public void setIs_adjustment(boolean Is_adjustment) { this.Is_adjustment = Is_adjustment; }
+    public boolean isIs_invoiced() { return Is_invoiced; }
+    public void setIs_invoiced(boolean Is_invoiced) { this.Is_invoiced = Is_invoiced; }
+    public void setDataAccount(SDataAccount dataAccount) { this.oDataAccount = dataAccount; }
+    public SDataAccount getDataAccount(){ return oDataAccount; }
+    public void setDataAccountMajor(SDataAccount dataAccountMajor) { this.oDataAccountMajor = dataAccountMajor; }
+    public SDataAccount getDataAccountMajor(){ return oDataAccountMajor; }
+    public void setDataCostCenter(SDataCostCenter dataCostCenter) { this.oDataCostCenter = dataCostCenter; }
+    public SDataCostCenter getDataCostCenter(){ return oDataCostCenter; }
+    public void setDataBizPartner(SDataBizPartner bp) { this.oDataBizPartner = bp; }
+    public SDataBizPartner getDataBizPartner(){ return oDataBizPartner; }
+    public int getMnSortingPosition() { return mnSortingPosition; }
+    public void setMnSortingPosition(int mnSortingPosition) { this.mnSortingPosition = mnSortingPosition; }
+    public int getMnFacilitySeasonWeekId() { return mnFacilitySeasonWeekId; }
+    public void setMnFacilitySeasonWeekId(int mnFacilitySeasonWeekId) { this.mnFacilitySeasonWeekId = mnFacilitySeasonWeekId; }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -384,16 +298,16 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
                 value = oCurrency.Name;
                 break;
             case 6:
-                value = Cost_center.Code;
+                value = oDataCostCenter.getCode();
                 break;
             case 7:
-                value = Cost_center.Name;
+                value = oDataCostCenter.getCostCenter();
                 break;
             case 8:
-                value = Accounting_account.Code;
+                value = oDataAccount.getCode();
                 break;
             case 9:
-                value = Accounting_account.Name;
+                value = oDataAccount.getAccount();
                 break;
             case 10:
                 value = Fiscal_id;

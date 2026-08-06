@@ -354,6 +354,7 @@ public abstract class SDataConstants {
     public static final int FINU_TP_LAY_BANK = 206041;
     public static final int FINU_BANK_NB_DAY = 206116;
     public static final int FINU_COST_GIC = 206042;
+    public static final int FINU_EXT_FACILITY = 206151;
     public static final int FIN_YEAR = 206043;
     public static final int FIN_YEAR_PER = 206044;
     public static final int FIN_EXC_RATE = 206045;
@@ -388,6 +389,7 @@ public abstract class SDataConstants {
     public static final int FIN_LAY_BANK = 206075;
     public static final int FIN_LAY_BANK_dep = 206076;
     public static final int FIN_LAY_BANK_dep_ana = 206077;
+    public static final int FIN_EXT_FACILITY_REC = 206351;
     
     public static final int FINX_REC_CASH = 206101;
     public static final int FINX_MOVES_ACC = 206501;

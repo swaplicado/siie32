@@ -6,16 +6,28 @@ package erp.swap.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
+import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
+import erp.gui.account.SBeanPanelAccountOwner;
+import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import erp.mbps.data.SDataBizPartner;
+import erp.mcfg.data.SDataParamsCompany;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.diot.SDiotUtils;
 import erp.mod.SModConsts;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.Statement;
 import java.util.ArrayList;
+import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
@@ -32,8 +44,9 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Adrián Avilés
  */
-public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener, FocusListener {
+public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener, FocusListener, SBeanPanelAccountOwner {
     public static final int FORM_TYPE_WEEK_PROCUREMENT_FACILITY = 1;
+    private static final String LABEL_BIZ_PARTNER = "Asociado negocios";
     
     private SImportWeekProcurementFacility oWeekProcurementFacility;
     protected ArrayList<SImportAccountingAccount> maImportedAccountingaccount;
@@ -41,6 +54,17 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     protected ArrayList<SImportItems> maImportedItems;
     
     private SGuiFieldKeyGroup moFieldKeyEntityGroup;
+    private int mnOptionsBizPartnerType;
+    private int mnAccountSystemTypeId;
+    private boolean mbIsCurrentAccountDiogAccount;
+    private boolean mbIsBizPartnerRequired;
+    private SFormField moFieldFkBizPartnerId_nr;
+    private SFormField moFieldFkItemId_n;
+    
+    private int mnOptionsItemType;
+    private boolean mbIsItemRequired;
+    
+    private boolean isResetForm = true;
     
     /**
      * Creates new form SDialogPayrollBenefit
@@ -89,9 +113,6 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moDebe = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlHaber = new javax.swing.JLabel();
         moHaber = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jPanel8 = new javax.swing.JPanel();
-        jlFiscalId = new javax.swing.JLabel();
-        moFiscalId = new sa.lib.gui.bean.SBeanFieldText();
         jPanel16 = new javax.swing.JPanel();
         jlUnitCost = new javax.swing.JLabel();
         moUnitCost = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -103,6 +124,10 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jPanel5 = new javax.swing.JPanel();
         jlCurrencyId = new javax.swing.JLabel();
         moCurrencyId = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel10 = new javax.swing.JPanel();
+        jlFkBizPartnerId_nr = new javax.swing.JLabel();
+        jcbFkBizPartnerId_nr = new javax.swing.JComboBox<>();
+        jbFkBizPartnerId_nr = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         moAccountPanel = new erp.gui.account.SBeanPanelAccount();
         jPanel7 = new javax.swing.JPanel();
@@ -117,7 +142,6 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlConcept.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlConcept.setText("Concepto:");
         jlConcept.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel13.add(jlConcept);
@@ -154,19 +178,6 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jPanel6.add(moHaber);
 
         jPanel2.add(jPanel6);
-
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFiscalId.setText("RFC:");
-        jlFiscalId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jlFiscalId);
-
-        moFiscalId.setEditable(false);
-        moFiscalId.setText("TEXT");
-        moFiscalId.setPreferredSize(new java.awt.Dimension(315, 23));
-        jPanel8.add(moFiscalId);
-
-        jPanel2.add(jPanel8);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -219,6 +230,28 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 
         jPanel2.add(jPanel5);
 
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFkBizPartnerId_nr.setText("Asociado negocios: *");
+        jlFkBizPartnerId_nr.setMaximumSize(new java.awt.Dimension(150, 23));
+        jlFkBizPartnerId_nr.setMinimumSize(new java.awt.Dimension(150, 23));
+        jlFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel10.add(jlFkBizPartnerId_nr);
+
+        jcbFkBizPartnerId_nr.setMaximumRowCount(16);
+        jcbFkBizPartnerId_nr.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbFkBizPartnerId_nr.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(315, 23));
+        jPanel10.add(jcbFkBizPartnerId_nr);
+
+        jbFkBizPartnerId_nr.setText("...");
+        jbFkBizPartnerId_nr.setToolTipText("Seleccionar asociado de negocios");
+        jbFkBizPartnerId_nr.setFocusable(false);
+        jbFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbFkBizPartnerId_nr);
+
+        jPanel2.add(jPanel10);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel3.setAutoscrolls(true);
@@ -248,6 +281,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel16;
@@ -257,11 +291,12 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
+    private javax.swing.JButton jbFkBizPartnerId_nr;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerId_nr;
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlCurrencyId;
     private javax.swing.JLabel jlDebe;
-    private javax.swing.JLabel jlFiscalId;
+    private javax.swing.JLabel jlFkBizPartnerId_nr;
     private javax.swing.JLabel jlHaber;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlReference;
@@ -272,7 +307,6 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private erp.gui.account.SBeanPanelAccount moCostCenterPanel;
     private sa.lib.gui.bean.SBeanFieldKey moCurrencyId;
     private sa.lib.gui.bean.SBeanFieldDecimal moDebe;
-    private sa.lib.gui.bean.SBeanFieldText moFiscalId;
     private sa.lib.gui.bean.SBeanFieldDecimal moHaber;
     private sa.lib.gui.bean.SBeanFieldKey moItem;
     private sa.lib.gui.bean.SBeanFieldText moReference;
@@ -289,19 +323,12 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moReference.setTextSettings(SGuiUtils.getLabelName(jlReference.getText()), 250, 0);
         moDebe.setDecimalSettings(SGuiUtils.getLabelName(jlDebe), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moHaber.setDecimalSettings(SGuiUtils.getLabelName(jlHaber), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-//        moCurrency.setTextSettings(SGuiUtils.getLabelName(jlCurrency.getText()), 250, 0);
-        moFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId.getText()), 250, 0);
+//        moFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId.getText()), 250, 0);
         moUnitCost.setDecimalSettings(SGuiUtils.getLabelName(jlUnitCost), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moStockIn.setDecimalSettings(SGuiUtils.getLabelName(jlStockIn), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        
+        moStockIn.setDecimalSettings(SGuiUtils.getLabelName(jlStockIn), SGuiConsts.GUI_TYPE_DEC_AMT, true);        
         moItem.setKeySettings(miClient, SGuiUtils.getLabelName(jlItem.getText()), true);
-//        moCostCenter.setKeySettings(miClient, SGuiUtils.getLabelName(jlCostCenter.getText()), true);
-//        moAccountingAccount.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingAccount.getText()), true);
-        
         moCurrencyId.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrencyId.getText()), false);
-//        moCostCenterId.setKeySettings(miClient, SGuiUtils.getLabelName(jlCostCenterId.getText()), false);
-//        moAccountingAccountId.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingAccountId.getText()), false);
-        
+
         moFieldKeyEntityGroup = new SGuiFieldKeyGroup(miClient);
         
         moAccountPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, false);
@@ -309,21 +336,21 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         
         moAccountPanel.setComponentNext(moConcept);
         
+        moFieldFkBizPartnerId_nr = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkBizPartnerId_nr, jlFkBizPartnerId_nr);
+        moFieldFkBizPartnerId_nr.setPickerButton(jbFkBizPartnerId_nr);
+        
+//        moFieldFkItemId_n = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkItemId_n, jlFkItemId_n);
+//        moFieldFkItemId_n.setPickerButton(jbFkItemId_n);
+        
         moFields.addField(moConcept);
         moFields.addField(moReference);
         moFields.addField(moDebe);
         moFields.addField(moHaber);
-//        moFields.addField(moCurrency);
-        moFields.addField(moFiscalId);
+//        moFields.addField(moFiscalId);
         moFields.addField(moUnitCost);
         moFields.addField(moStockIn);
-        
         moFields.addField(moItem);
-//        moFields.addField(moCostCenter);
-//        moFields.addField(moAccountingAccount);
         moFields.addField(moCurrencyId);
-//        moFields.addField(moCostCenterId);
-//        moFields.addField(moAccountingAccountId);
         
         moFields.setFormButton(jbSave);
         
@@ -331,26 +358,17 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moReference.setEditable(true);
         moDebe.setEditable(true);
         moHaber.setEditable(true);
-//        moCurrency.setEditable(false);
-        moFiscalId.setEditable(false);
+//        moFiscalId.setEditable(false);
         moUnitCost.setEditable(true);
         moStockIn.setEditable(true);
         
-        moItem.setEditable(true);
-        moItem.setEnabled(true);
-//        moCostCenter.setEditable(true);
-//        moCostCenter.setEnabled(true);
-//        moAccountingAccount.setEditable(true);
-//        moAccountingAccount.setEnabled(true);
-        moCurrencyId.setEditable(true);
-        moCurrencyId.setEnabled(true);
-//        moCostCenterId.setEditable(true);
-//        moCostCenterId.setEnabled(true);
-//        moAccountingAccountId.setEditable(true);
-//        moAccountingAccountId.setEnabled(true);
+//        moItem.setEditable(true);
+//        moItem.setEnabled(true);
+        moCurrencyId.setEditable(false);
+        moCurrencyId.setEnabled(false);
         
         moAccountPanel.setRetrieveDataAccounts(true);
-//        moAccountPanel.setPanelAccountOwner((SBeanPanelAccountOwner) this);
+        moAccountPanel.setPanelAccountOwner(this);
         
         moCostCenterPanel.setRetrieveDataCostCenters(true);
         
@@ -371,15 +389,13 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     @Override
     public void reloadCatalogues() {
         moItem.removeAllItems();
-//        moCostCenter.removeAllItems();
-//        moAccountingAccount.removeAllItems();
         moCurrencyId.removeAllItems();
-//        moCostCenterId.removeAllItems();
-//        moAccountingAccountId.removeAllItems();
         
         moAccountPanel.initPanel();
         moCostCenterPanel.initPanel();
         
+        SGuiItem item0 = new SGuiItem(new int[] {0}, "(Seleccionar item)");
+        moItem.addItem(item0);
         maImportedItems.forEach((oitem) -> {
             int[] pk = {oitem.getId()};
             SGuiItem item = new SGuiItem(pk, oitem.getName());
@@ -389,39 +405,55 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         maImportedCostCenter.forEach((oitem) -> {
             int[] pk = {oitem.getId()};
             SGuiItem item = new SGuiItem(pk, oitem.getName());
-//            moCostCenter.addItem(item);
         });
         
         maImportedAccountingaccount.forEach((oitem) -> {
             int[] pk = {oitem.getId()};
             SGuiItem item = new SGuiItem(pk, oitem.getName());
-//            moAccountingAccount.addItem(item);
         });
         
         SFormUtilities.populateComboBox((SClientInterface) miClient, moCurrencyId, SDataConstants.CFGU_CUR);
-//        SFormUtilities.populateComboBox((SClientInterface) miClient, moCostCenterId, SDataConstants.FIN_CC);
-//        SFormUtilities.populateComboBox((SClientInterface) miClient, moAccountingAccountId, SDataConstants.FIN_ACC_CASH);
         moFieldKeyEntityGroup.initGroup();
             moFieldKeyEntityGroup.addFieldKey(moCurrencyId, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
         moFieldKeyEntityGroup.populateCatalogues();
         
-//        moFieldKeyEntityGroup.initGroup();
-//            moFieldKeyEntityGroup.addFieldKey(moCostCenterId, SModConsts.FIN_CC, SLibConsts.UNDEFINED, null);
-//        moFieldKeyEntityGroup.populateCatalogues();
-//        
-//        moFieldKeyEntityGroup.initGroup();
-//            moFieldKeyEntityGroup.addFieldKey(moAccountingAccountId, SModConsts.FIN_ACC_CASH, SLibConsts.UNDEFINED, null);
-//        moFieldKeyEntityGroup.populateCatalogues();
+//        mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
+
+        mnOptionsBizPartnerType = SDataConstantsSys.UNDEFINED;
+        mnAccountSystemTypeId = SDataConstantsSys.UNDEFINED;
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
         
+        mnOptionsItemType = SDataConstants.UNDEFINED;
+        mbIsBizPartnerRequired = false;
+        mbIsItemRequired = false;
     }
 
     @Override
     public SGuiValidation validateForm() {
+        System.out.println(moAccountPanel.getSelectedDataAccount());
+        
         SGuiValidation validation = moFields.validateFields();
         if (validation.isValid()) {
             if (moDebe.getValue() != 0d && moHaber.getValue() != 0d) {
                 validation.setComponent(moDebe);
                 validation.setMessage("No es posible ingresar valor en el campo Debe y el campo Haber para el mismo movimiento");
+            }
+            
+            if (validation.isValid()) {
+                if (moAccountPanel.getSelectedDataAccount() == null) {
+                    validation.setComponent(moAccountPanel);
+                    validation.setMessage("Ingrese una cuenta contable");
+                }
+            }
+            
+            if (validation.isValid()) {
+                boolean existe = maImportedAccountingaccount.stream()
+                    .anyMatch(account -> account.code.equals(moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX()));
+
+                if (!existe) {
+                    validation.setComponent(moAccountPanel);
+                    validation.setMessage("La cuenta contable ingresada no es valida");
+                }
             }
         }
         return validation;
@@ -433,17 +465,14 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moReference.addActionListener(this);
         moDebe.addActionListener(this);
         moHaber.addActionListener(this);
-//        moCurrency.addActionListener(this);
-//        moFiscalId.addActionListener(this);
         moUnitCost.addActionListener(this);
         moStockIn.addActionListener(this);
         
         moItem.addItemListener(this);
-//        moCostCenter.addItemListener(this);
-//        moAccountingAccount.addItemListener(this);
         moCurrencyId.addItemListener(this);
-//        moCostCenterId.addItemListener(this);
-//        moAccountingAccountId.addItemListener(this);
+        
+        jbFkBizPartnerId_nr.addActionListener(this);
+//        jcbFkItemId_n.addItemListener(this);
     }
 
     @Override
@@ -452,17 +481,10 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moReference.removeActionListener(this);
         moDebe.removeActionListener(this);
         moHaber.removeActionListener(this);
-//        moCurrency.removeActionListener(this);
-//        moFiscalId.removeActionListener(this);
         moUnitCost.removeActionListener(this);
         moStockIn.removeActionListener(this);
-        
         moItem.removeItemListener(this);
-//        moCostCenter.removeItemListener(this);
-//        moAccountingAccount.removeItemListener(this);
         moCurrencyId.removeItemListener(this);
-//        moCostCenterId.removeItemListener(this);
-//        moAccountingAccountId.removeItemListener(this);
     }
     
     private void setData(SImportWeekProcurementFacility weekProcurementFacility) {
@@ -471,14 +493,15 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moReference.setValue(oWeekProcurementFacility.Reference);
         moDebe.setValue(oWeekProcurementFacility.Debe);
         moHaber.setValue(oWeekProcurementFacility.Haber);
-//        moCurrency.setValue(oWeekProcurementFacility.Currency);
-        moFiscalId.setValue(oWeekProcurementFacility.Fiscal_id);
+//        moFiscalId.setValue(oWeekProcurementFacility.Fiscal_id);
         moUnitCost.setValue(oWeekProcurementFacility.Unit_cost);
         moStockIn.setValue(oWeekProcurementFacility.Stock_in);
-        
         moItem.setValue(new int[] {oWeekProcurementFacility.Item.Id});
-//        moCostCenter.setValue(new int[] {oWeekProcurementFacility.Cost_center.Id});
-//        moAccountingAccount.setValue(new int[] {oWeekProcurementFacility.Accounting_account.Id});
+        moAccountPanel.setSelectedAccount(new SAccount(weekProcurementFacility.getDataAccount(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount()));
+        moCostCenterPanel.setSelectedAccount(new SAccount(weekProcurementFacility.getDataCostCenter(), ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+        moCurrencyId.setSelectedIndex(1);
+        
+        isResetForm = true;
     }
     
     private SImportWeekProcurementFacility createWeekProcurementFacility() {
@@ -488,21 +511,24 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         weekProcurementFacility.setReference(moReference.getValue());
         weekProcurementFacility.setDebe(moDebe.getValue());
         weekProcurementFacility.setHaber(moHaber.getValue());
-        weekProcurementFacility.setFiscal_id(moFiscalId.getValue());
+//        weekProcurementFacility.setFiscal_id(moFiscalId.getValue());
         weekProcurementFacility.setUnit_cost(moUnitCost.getValue());
         weekProcurementFacility.setStock_in(moStockIn.getValue());
-        
-//        weekProcurementFacility.setAccounting_account(moAccountingAccount.getValue()[0], "", moAccountingAccount.getSelectedItem().toString());
-//        weekProcurementFacility.setCost_center(moCostCenter.getValue()[0], "", moCostCenter.getSelectedItem().toString());
         weekProcurementFacility.setItem(moItem.getValue()[0], "", moItem.getSelectedItem().toString());
         weekProcurementFacility.setCurrency(moCurrencyId.getValue()[0], "", moCurrencyId.getSelectedItem().toString());
-//        weekProcurementFacility.setAccounting_account(moAccountingAccountId.getValue()[0], "", moAccountingAccountId.getSelectedItem().toString());
-//        weekProcurementFacility.setCost_center(moCostCenterId.getValue()[0], "", moCostCenterId.getSelectedItem().toString());
-//        weekProcurementFacility.setItem(moCurrencyId.getValue()[0], "", moCurrencyId.getSelectedItem().toString());
         weekProcurementFacility.setDataAccount(moAccountPanel.getSelectedDataAccount());
         weekProcurementFacility.setDataCostCenter(moCostCenterPanel.getSelectedDataCostCenter());
         weekProcurementFacility.setDataAccountMajor(moAccountPanel.getSelectedDataAccountLedger());
 
+        int[] pk = moFieldFkBizPartnerId_nr.getKeyAsIntArray();
+//        int[] res2 = (int[])moFieldFkBizPartnerId_nr.getKey();
+        Statement statement = miClient.getSession().getStatement();
+        SDataBizPartner bp = new SDataBizPartner();
+        int res = bp.read(pk, statement);
+        if (res == SLibConstants.DB_ACTION_READ_OK) {
+            weekProcurementFacility.setDataBizPartner(bp);
+        }
+        
         return weekProcurementFacility;
     }
 
@@ -543,8 +569,11 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     }
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
-        
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        JButton button = (JButton) e.getSource();
+        if (button == jbFkBizPartnerId_nr) {
+            actionjbFkBizPartnerId_nr();
+        }
     }
 
     @Override
@@ -565,5 +594,136 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     @Override
     public void itemStateChanged(ItemEvent e) {
         
+    }
+    
+    private void actionjbFkBizPartnerId_nr() {
+        SClientInterface client = (SClientInterface) miClient;
+        client.pickOption(mnOptionsBizPartnerType, moFieldFkBizPartnerId_nr, null);
+    }
+    
+    private void renderAccountSettings() {
+        mnAccountSystemTypeId = SDataConstantsSys.UNDEFINED;
+        mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
+        jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ":");
+        
+        mbIsCurrentAccountDiogAccount = false;
+        mbIsBizPartnerRequired = false;
+
+        SDataAccount oAccountMajor;
+        oAccountMajor = moAccountPanel.getSelectedDataAccountLedger();
+
+        if (oAccountMajor == null) {
+            jlFkBizPartnerId_nr.setEnabled(false);
+            jcbFkBizPartnerId_nr.setEnabled(false);
+            jbFkBizPartnerId_nr.setEnabled(false);
+//            jlReference.setEnabled(false);
+//            jcbFkBizPartnerId_nr.setSelectedIndex(0);
+            
+            moItem.setEditable(false);
+            moItem.setEnabled(false);
+//            moItem.setSelectedIndex(0);
+        }
+        else {
+            SDataAccount selectedDataAccount = null;
+            mnAccountSystemTypeId = oAccountMajor.getFkAccountSystemTypeId();
+            int[] anAccountSubclass = new int[] { oAccountMajor.getFkAccountTypeId_r(), oAccountMajor.getFkAccountClassId_r(), oAccountMajor.getFkAccountSubclassId_r() };
+            
+            boolean isAccShortTermDoc = oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY || oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC;
+            boolean isAccSysBizPartnerAll = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR });
+            boolean isAccSysBizPartnerSupCus = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS });
+            boolean isAccSysPurchases = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ });
+            boolean isAccClsPurchases = SLibUtilities.belongsTo(anAccountSubclass, new int[][] {SDataConstantsSys.FINS_CLS_ACC_PUR, SDataConstantsSys.FINS_CLS_ACC_PUR_ADJ });
+            boolean isAccSysSales = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ });
+            boolean isAccClsSales = SLibUtilities.belongsTo(anAccountSubclass, new int[][] {SDataConstantsSys.FINS_CLS_ACC_SAL, SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ });
+            boolean isAccSysTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT });
+            
+            try {
+                selectedDataAccount = moAccountPanel.getSelectedDataAccount();
+                mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), oAccountMajor) || 
+                        SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), selectedDataAccount);
+            }
+            catch (Exception e) { }
+
+            // Check if it is necesary to enable business partner fields:
+
+            if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || mbIsCurrentAccountDiogAccount) {
+                if (isAccSysBizPartnerAll || (isAccSysPurchases && isAccClsPurchases) || (isAccSysSales && isAccClsSales)) {
+                    mbIsBizPartnerRequired = true;
+                    jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ": *");
+                }
+
+                jlFkBizPartnerId_nr.setEnabled(true);
+                jcbFkBizPartnerId_nr.setEnabled(true);
+                jbFkBizPartnerId_nr.setEnabled(true);
+
+                if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || mbIsCurrentAccountDiogAccount) {
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
+                }
+                else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CUS || isAccSysSales) {
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                }
+                else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CDR) {
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CDR;
+                }
+                else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_DBR) {
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_DBR;
+                }
+                else if (isAccSysTax) {
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CUS; // suppliers and customers!
+                }
+                else {
+                    switch (oAccountMajor.getFkAccountLedgerTypeId()) {
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CUS:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_DBR:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_CUS_DBR;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_SUP:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CDR:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CDR;
+                            break;
+                        default:
+                            mnOptionsBizPartnerType = SDataConstants.BPSU_BP; // all business partners!
+                    }
+                }
+
+                SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
+//                SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, SDataConstants.BPSU_BP);
+                moFieldFkBizPartnerId_nr.setFieldValue(new int[] { oWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId() });
+                
+//                if (isResetForm) {
+//                    moFiscalId.setValue(oWeekProcurementFacility.getDataBizPartner().getFiscalId());
+//                }
+//                else {
+//                    moFiscalId.setValue(null);
+//                }
+            }
+            else {
+                jlFkBizPartnerId_nr.setEnabled(false);
+                jcbFkBizPartnerId_nr.setEnabled(false);
+                jbFkBizPartnerId_nr.setEnabled(false);
+                jcbFkBizPartnerId_nr.setSelectedIndex(0);
+            }
+
+            // Check if it is necesary to enable item fields:
+
+            if (oAccountMajor.getIsRequiredItem() || isAccSysBizPartnerSupCus || isAccSysPurchases || isAccSysSales || isAccSysTax) {
+                moItem.setEditable(true);
+                moItem.setEnabled(true);
+            }
+            else {
+                moItem.setEditable(false);
+                moItem.setEnabled(false);
+                moItem.setSelectedIndex(0);
+            }
+        }
+    }
+
+    @Override
+    public void notifyAccountChanged() {
+        renderAccountSettings();
     }
 }

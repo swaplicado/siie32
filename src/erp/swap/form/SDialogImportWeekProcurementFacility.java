@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -765,7 +766,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             StringBuilder jsonMovements = new StringBuilder("");
             jsonBody
                 .append("{")
-                    .append("\"user_name\": ").append("\"").append(miClient.getSession().getUser().getName()).append("\",")
+//                    .append("\"user_name\": ").append("\"").append(miClient.getSession().getUser().getName()).append("\",")
+                    .append("\"user_name\": ").append("\"").append("swapst").append("\",")
                     .append("\"movements\": ").append("[");
             
             for (int i = 0; i < smaEdited.size(); i++) {
@@ -784,7 +786,12 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .append("\"reference\": \"").append(escapeJson(row.Reference)).append("\",")
                     .append("\"unit_cost\": ").append(row.Unit_cost).append(",")
                     .append("\"stock_in\": ").append(row.Stock_in).append(",")
-                    .append("\"cash\": ").append( row.Debe != 0 ? row.Debe : row.Haber )
+                    .append("\"cash\": ").append( row.Debe != 0 ? row.Debe : row.Haber ).append(",")
+                    .append("\"cost_center_code\": \"").append( row.getDataCostCenter().getPkCostCenterIdXXX() ).append("\",")
+                    .append("\"accounting_account_code\": \"").append( row.oDataAccount.getPkAccountIdXXX() ).append("\",")
+                    .append("\"business_partners\": ").append( row.oDataBizPartner != null ? "[{ "
+                            + "\"business_partner_erp_id\":" + row.oDataBizPartner.getPkBizPartnerId()
+                            + " }]" : "[]" )
                 .append("}");
                         
                 if (i < (smaEdited.size() - 1)) {
@@ -832,11 +839,11 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 callback.onProgress(100);
 
                 if (responseJson.has("error")) {
-                    throw new Exception("Portal compras respondió: " + responseBody);
+                    throw new Exception("Portal ame respondió: " + responseBody);
                 }
 
             } catch (Exception ex) {
-                throw new Exception(ex.getMessage() + ". Queda pendiente la sincronización con el portal compras.");
+                throw new Exception(ex.getMessage());
             }
 
         } catch (Exception e) {
@@ -913,7 +920,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private void processShowWeekProcurementFacility(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
         int countRetreived = 0;
         Exception exception = null;
-
+        Statement statement = miClient.getSession().getStatement();
         try {
             try (InputStream is = connection.getInputStream()) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -924,8 +931,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
-                           
-                        SImportWeekProcurementFacility oWeekProcurementFacility = new SImportWeekProcurementFacility(docNode);
+                        SImportWeekProcurementFacility oWeekProcurementFacility = new SImportWeekProcurementFacility(docNode, statement);
                         maImportedDocuments.add(oWeekProcurementFacility);
                     }
                 }
@@ -979,10 +985,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 String urlQuery;
                 urlQuery = msSyncUrlRetrieveByMonth;
                 
-                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + oProcurementFacility.FacilitySeasonWeekId);
-                urlQuery = urlQuery.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
-//                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + 975);
-//                urlQuery = urlQuery.replace("<company_id>", "" + 2935);
+//                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + oProcurementFacility.FacilitySeasonWeekId);
+//                urlQuery = urlQuery.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
+                urlQuery = urlQuery.replace("<facility_season_week_id>", "" + 36);
+                urlQuery = urlQuery.replace("<company_id>", "" + 2935);
 
                 URL url = new URL(urlQuery);
 
@@ -1044,7 +1050,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             maCRPs.clear();
 
             moImportationsGrid.populateGrid(new Vector<>());
-            moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(true);
+            moImportationsGrid.getTable().setRowSorter(null);
+            moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(false);
             renderCurrentProforma();
 
             enableFieldsForShowingProforms(false);
@@ -1089,18 +1096,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                         weekProcurementFacility.oCurrency.Name
                     );
 
-                    maImportedDocument.setAccounting_account(
-                        weekProcurementFacility.Accounting_account.Id,
-                        weekProcurementFacility.Accounting_account.Code,
-                        weekProcurementFacility.Accounting_account.Name
-                    );
-
-                    maImportedDocument.setCost_center(
-                        weekProcurementFacility.Cost_center.Id,
-                        weekProcurementFacility.Cost_center.Code,
-                        weekProcurementFacility.Cost_center.Name
-                    );
-
                     maImportedDocument.setItem(
                         weekProcurementFacility.Item.Id,
                         weekProcurementFacility.Item.Code,
@@ -1110,6 +1105,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     maImportedDocument.setDataAccount(weekProcurementFacility.oDataAccount);
                     maImportedDocument.setDataAccountMajor(weekProcurementFacility.oDataAccountMajor);
                     maImportedDocument.setDataCostCenter(weekProcurementFacility.oDataCostCenter);
+                    maImportedDocument.setDataBizPartner(weekProcurementFacility.oDataBizPartner);
 
                     if (!smaEdited.contains(i)) {
                         smaEdited.add(i);
@@ -1156,7 +1152,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private void populateWeekProcurementFacilityGrid(final ArrayList<SImportWeekProcurementFacility> proformas,
             final boolean focusProformasGridTable) {
         moImportationsGrid.populateGrid(new Vector<>(proformas), this);
-        moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(true);
+        moImportationsGrid.getTable().setRowSorter(null);
+        moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(false);
         moImportationsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         moImportationsGrid.setSelectedGridRow(0);
 
