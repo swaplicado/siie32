@@ -8,9 +8,13 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationVerify;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -33,6 +37,8 @@ import sa.lib.gui.SGuiDate;
 public class SViewStockValuation extends SGridPaneView implements ActionListener {
 
     private int mnRightValMatConsLevel;
+
+    private javax.swing.JButton jbVerifyValuation;
     
     private SGridFilterDatePeriod moFilterDatePeriod;
     
@@ -53,6 +59,9 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
         jbRowDelete.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_MANAGER);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
+
+        jbVerifyValuation = SGridUtils.createButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_ok_green.png")), "Verificar valuación", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbVerifyValuation);
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
@@ -62,6 +71,25 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+    }
+
+    private void actionVerifyValuation() {
+        if (jbVerifyValuation.isEnabled()) {
+            try {
+                String sErrors = SStockValuationVerify.verifyStockValuation(miClient.getSession());
+                if (!sErrors.isEmpty()) {
+                    miClient.showMsgBoxError(sErrors);
+                }
+                else {
+                    miClient.showMsgBoxInformation("La valuación de inventarios se verificó correctamente.\n"
+                            + "No se encontraron errores.");
+                }
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+                miClient.showMsgBoxError(ex.getMessage());
+            }
+        }
     }
     
     @Override
@@ -148,6 +176,10 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
+
+            if (button == jbVerifyValuation) {
+                actionVerifyValuation();
+            }
         }
     }
 }
