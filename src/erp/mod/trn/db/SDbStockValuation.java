@@ -11,6 +11,7 @@ import erp.mod.trn.utils.SStockValuationLogUtils;
 import erp.mod.trn.utils.SStockValuationRecordUtils;
 import erp.mod.trn.utils.SStockValuationUpdateStkUtils;
 import erp.mod.trn.utils.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationVerify;
 import erp.mtrn.data.SDataDiog;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -76,8 +77,6 @@ public class SDbStockValuation extends SDbRegistryUser {
      * @throws java.lang.Exception 
      */
     public static Date computeStartDate(SGuiSession session, Date cutoffDate) throws SQLException, Exception {
-        ResultSet resultSet;
-
         Date tDateStart = null;
 
         String msSql = "SELECT DATE_ADD(dt_end, INTERVAL 1 DAY) "
@@ -352,6 +351,14 @@ public class SDbStockValuation extends SDbRegistryUser {
                 
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
+                
+                System.out.println("Validando...");
+                String sErrors = SStockValuationVerify.verifyStockValuation(session);
+                if (!sErrors.isEmpty()) {
+                    throw new Exception("No se pudo completar el proceso.\n"
+                            + "Se encontraron errores en la valuación de inventarios:\n" + sErrors);
+                }
+                
                 System.out.println("Terminado.");
             }
             else {
