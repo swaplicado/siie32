@@ -13,33 +13,45 @@ package erp.mtrn.form;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
+import erp.lib.table.STableRow;
+import erp.mtrn.view.SViewContractLinkEntry;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
-import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * Filtrar contratos a mostrar en vista de detalle de vínculos de partidas de contratos.
  * @author Sergio Flores
  */
 public class SDialogContractFilter extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
-
+    
+    public static final int VALUE_SELECTED_OPTIONS = 1;
+    
+    private static final int SELECT_ALL = 1;
+    private static final int SELECT_NOTHING = 2;
+    private static final int SELECT_REVERSE = 3;
+    
     private erp.client.SClientInterface miClient;
     private int[] manDpsTypeKey;
+    private int mnBizPartnerCategory;
 
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
+    private SelectedOptions moSelectedOptions;
     private erp.lib.table.STablePane moTablePane;
 
-    /** Creates new form SDialogContractFilter.
+    /**
+     * Creates new form SDialogContractFilter.
      * @param client GUI client.
      * @param dpsTypeKey DPS type (In SDataConstantsSys: TRNU_TP_DPS_PUR_EST, TRNU_TP_DPS_PUR_CON, TRNU_TP_DPS_SAL_EST, TRNU_TP_DPS_SAL_CON).
      */
@@ -81,7 +93,7 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         jbClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Seguimiento del contrato");
+        setTitle("Filtrado de contratos");
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -92,7 +104,7 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
 
         joPanel.setLayout(new java.awt.BorderLayout());
 
-        jpFilter.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo de filtro:"));
+        jpFilter.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtrado:"));
         jpFilter.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel6.setMinimumSize(new java.awt.Dimension(50, 27));
@@ -137,7 +149,7 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         joPanel.add(jpFilter, java.awt.BorderLayout.NORTH);
 
         jpOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones elegibles:"));
-        jpOptions.setLayout(new java.awt.BorderLayout());
+        jpOptions.setLayout(new java.awt.BorderLayout(0, 5));
 
         jpOptionsControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
@@ -166,9 +178,9 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
         jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jbClose.setText("Cerrar");
+        jbClose.setText("Mostrar");
         jbClose.setToolTipText("[Escape]");
-        jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
+        jbClose.setPreferredSize(new java.awt.Dimension(100, 23));
         jpControls.add(jbClose);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
@@ -182,12 +194,29 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
+        jtfDocType.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, manDpsTypeKey));
+        jtfDocType.setCaretPosition(0);
         
-        STableColumnForm[] tableColumns = new STableColumnForm[2];
-        tableColumns[0] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre", 300);
-        tableColumns[1] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionado", 100);
-        tableColumns[1].setEditable(true);
+        bgFilter.setSelected(jrbFilterByBizPartner.getModel(), true);
+        
+        if (isPurchase()) {
+            jrbFilterByBizPartner.setText("Por proveedor");
+            mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_SUP;
+        }
+        else {
+            jrbFilterByBizPartner.setText("Por cliente");
+            mnBizPartnerCategory = SDataConstantsSys.BPSS_CT_BP_CUS;
+        }
+        
+        int col = 0;
+        STableColumnForm[] tableColumns = new STableColumnForm[3];
+        tableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre", 300);
+        tableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Contratos x procesar", 100);
+        tableColumns[col] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Seleccionado", 100);
+        tableColumns[col++].setEditable(true);
 
+        moSelectedOptions = null;
+        
         moTablePane = new STablePane(miClient);
         jpOptions.add(moTablePane, BorderLayout.CENTER);
 
@@ -195,10 +224,13 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
             moTablePane.addTableColumn(tableColumns[i]);
         }
 
-        jbClose.addActionListener(this);
         jbSelectAll.addActionListener(this);
         jbSelectNothing.addActionListener(this);
         jbSelectReverse.addActionListener(this);
+        jbClose.addActionListener(this);
+        
+        jrbFilterByBizPartner.addItemListener(this);
+        jrbFilterByAnalyst.addItemListener(this);
 
         SFormUtilities.createActionMap(this.getRootPane(), this, "actionClose", "close", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
@@ -218,166 +250,188 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
             jrbFilterByBizPartner.requestFocus();
         }
     }
+    
+    private boolean isAlreadySelected(final String option) {
+        return moSelectedOptions != null && moSelectedOptions.Options.contains(option);
+    }
 
-     @SuppressWarnings("unchecked")
-    private void renderTableColumns() {
-        /*
-        String sql = "";
-        ResultSet resulSet = null;
-        SDataDpsEntry entry = null;
-
-        mnPkYearId = ((int[]) ((SFormComponentItem) jltEntries.getSelectedValue()).getPrimaryKey())[0];
-        mnPkDocId = ((int[]) ((SFormComponentItem) jltEntries.getSelectedValue()).getPrimaryKey())[1];
-        mnPkEntryId = ((int[]) ((SFormComponentItem) jltEntries.getSelectedValue()).getPrimaryKey())[2];
-
-        entry = (SDataDpsEntry) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS_ETY, ((SFormComponentItem) jltEntries.getSelectedValue()).getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
-
-        mdSurplusPer = entry.getSurplusPercentage();
-        mdOrigQty = entry.getOriginalQuantity();
-        mdOrigPriceUnitary = entry.getOriginalPriceUnitaryCy();
-
+    private void renderOptions() throws Exception {
+        String sql = "SELECT "
+                + "b.bp AS _biz_partner, b.id_bp AS _biz_partner_id, COALESCE(a.usr, '" + SViewContractLinkEntry.NO_ANALYST + "') AS _analyst, a.id_usr AS _analyst_id, "
+                + "ig.igen, ig.id_igen, i.item_key, i.item, i.id_item, "
+                + "de.id_year, de.id_doc, de.id_ety, IF(d.num_ser <> '', CONCAT(d.num_ser, '-', d.num), d.num) AS _num, d.num_ref, d.dt, "
+                + "d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.fid_func, d.fid_func_sub, "
+                + "de.qty AS _ety_qty, COALESCE(SUM(dds.qty), 0.0) AS _dds_qty, u.symbol AS _symbol, "
+                + "de.orig_qty AS _ety_orig_qty, COALESCE(SUM(dds.orig_qty), 0.0) AS _dds_orig_qty, uo.symbol AS _orig_symbol, "
+                + "de.orig_price_u_cur, c.cur_key "
+                + "FROM trn_dps AS d "
+                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_bp_r "
+                + "INNER JOIN erp.bpsu_bp_ct AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + mnBizPartnerCategory + " "
+                + "INNER JOIN erp.cfgu_cur AS c ON c.id_cur = d.fid_cur "
+                + "INNER JOIN trn_dps_ety AS de ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
+                + "INNER JOIN erp.itmu_item AS i ON i.id_item = de.fid_item "
+                + "INNER JOIN erp.itmu_unit AS u ON u.id_unit = de.fid_unit "
+                + "INNER JOIN erp.itmu_unit AS uo ON uo.id_unit = de.fid_orig_unit "
+                + "INNER JOIN erp.itmu_igen AS ig ON ig.id_igen = i.fid_igen "
+                + "LEFT OUTER JOIN erp.usru_usr AS a ON a.id_usr = bc.fid_usr_ana_n "
+                + "LEFT OUTER JOIN trn_dps_dps_supply AS dds ON dds.id_src_year = de.id_year AND dds.id_src_doc = de.id_doc AND dds.id_src_ety = de.id_ety "
+                + "WHERE "
+                + "NOT d.b_del AND NOT de.b_del "
+                + "AND d.fid_ct_dps = " + manDpsTypeKey[0] + " AND d.fid_cl_dps = " + manDpsTypeKey[1] + " AND d.fid_tp_dps = " + manDpsTypeKey[2] + " "
+                + "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
+                + "AND NOT d.b_link "
+                + "GROUP BY "
+                + "de.id_year, de.id_doc, de.id_ety "
+                + "HAVING "
+                + "COALESCE(SUM(dds.qty), 0.0) < de.qty "
+                + "ORDER BY "
+                + (isFilterByBizPartner() ? "b.bp, b.id_bp" : "a.usr, a.id_usr, b.bp, b.id_bp") + ", "
+                + "ig.igen, ig.id_igen, i.item_key, i.item, i.id_item, "
+                + "d.num_ser, LPAD(d.num, 6, '0'), de.id_year, de.id_doc, de.sort_pos;";
+        
         moTablePane.createTable();
         moTablePane.clearTableRows();
-
-        try {
-            sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS _ord, " +
-                    "dep.sort_pos, cobp.code, " +
-                    "(dep.orig_qty * " +
-                    "IF((dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_CN[2] + ") OR " +
-                    "(dp.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[0] + " AND dp.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[1] + " AND dp.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_CN[2] + ") " +
-                    ", -1.0, 1.0)) AS _orig_qty_proc, " +
-                    "u.symbol, un.symbol " +
-                    "FROM trn_dps AS d " +
-                    "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
-                    "INNER JOIN erp.itmu_unit as un ON de.fid_orig_unit = un.id_unit " +
-                    "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND " +
-                    "d.fid_tp_dps = dt.id_tp_dps " +
-                    "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
-                    "INNER JOIN trn_dps_dps_supply AS sp ON de.id_year = sp.id_src_year AND " +
-                    "de.id_doc = sp.id_src_doc AND de.id_ety = sp.id_src_ety " +
-                    "INNER JOIN trn_dps_ety AS dep ON dep.id_year = sp.id_des_year AND dep.id_doc = sp.id_des_doc AND " +
-                    "dep.id_ety = sp.id_des_ety AND dep.b_del = 0 " +
-                    "INNER JOIN erp.itmu_unit as u ON dep.fid_orig_unit = u.id_unit " +
-                    "INNER JOIN trn_dps AS dp ON dp.id_year = dep.id_year AND " +
-                    "dp.id_doc = dep.id_doc AND dp.b_del = 0 " +
-                    "INNER JOIN erp.trnu_tp_dps AS dtp ON dp.fid_ct_dps = dtp.id_ct_dps AND dp.fid_cl_dps = dtp.id_cl_dps AND " +
-                    "dp.fid_tp_dps = dtp.id_tp_dps " +
-                    "INNER JOIN erp.bpsu_bpb AS cobp ON dp.fid_cob = cobp.id_bpb " +
-                    "WHERE d.b_del = 0 AND de.b_del = 0 AND de.id_year = " + mnPkYearId + " AND de.id_doc = " + mnPkDocId + " AND de.id_ety = " + mnPkEntryId + " ";
-
-            resulSet = miClient.getSession().getStatement().executeQuery(sql);
-            while (resulSet.next()) {
-                mbIsAdd = true;
-                oRow = new SDataContractAnalysisRow(miClient);
-                oRow.setDateOrd(resulSet.getDate("dp.dt"));
-                oRow.setTypeOrd(resulSet.getString("dtp.code"));
-                oRow.setNumberOrd(resulSet.getString("_ord"));
-                oRow.setBranchOrd(resulSet.getString("cobp.code"));
-                oRow.setSortPosOrd(resulSet.getInt("dep.sort_pos"));
-                oRow.setQtyOrd(resulSet.getDouble("_orig_qty_proc"));
-
-                mdQtyOrd += resulSet.getDouble("_orig_qty_proc");
-                msOrigUnit = resulSet.getString("un.symbol");
-                msUnitOrd = resulSet.getString("u.symbol");
-
-                renderDps(resulSet.getInt("dp.id_year"), resulSet.getInt("dp.id_doc"), resulSet.getInt("dep.id_ety"));
+        
+        jbSelectAll.setEnabled(false);
+        jbSelectNothing.setEnabled(false);
+        jbSelectReverse.setEnabled(false);
+        
+        try (ResultSet resultSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql)) {
+            int currentId = -1;
+            String currentName = "";
+            ArrayList<int[]> contractKeys = null;
+            
+            while (resultSet.next()) {
+                int id = resultSet.getInt(isFilterByBizPartner() ? "_biz_partner_id" : "_analyst_id");
+                
+                if (id != currentId) {
+                    if (currentId != -1) {
+                        // create new option:
+                        Option option = new Option(currentId, currentName, contractKeys, isAlreadySelected(currentName));
+                        option.prepareTableRow();
+                        moTablePane.addTableRow(option);
+                    }
+                    
+                    currentId = id;
+                    currentName = resultSet.getString(isFilterByBizPartner() ? "_biz_partner" : "_analyst");
+                    contractKeys = new ArrayList<>();
+                }
+                
+                boolean add = true;
+                int[] contractKey = new int[] { resultSet.getInt("de.id_year"), resultSet.getInt("de.id_doc") };
+                
+                for (int[] key : contractKeys) {
+                    if (SLibUtilities.compareKeys(key, contractKey)) {
+                        add = false;
+                        break;
+                    }
+                }
+                
+                if (add) {
+                    contractKeys.add(contractKey);
+                }
             }
 
+            if (currentId != -1) {
+                // create the last option:
+                Option option = new Option(currentId, currentName, contractKeys, isAlreadySelected(currentName));
+                option.prepareTableRow();
+                moTablePane.addTableRow(option);
+            }
+            
             if (moTablePane.getTableGuiRowCount() > 0) {
                 moTablePane.renderTableRows();
                 moTablePane.setTableRowSelection(0);
-
-                renderInformationAditional();
-                jtfSeek.setEnabled(true);
-                jbSeek.setEnabled(true);
-                jbExportCsv.setEnabled(true);
+                
+                jbSelectAll.setEnabled(true);
+                jbSelectNothing.setEnabled(true);
+                jbSelectReverse.setEnabled(true);
             }
         }
-        catch (Exception e) {
-           SLibUtilities.renderException(this, e);
+    }
+    
+    private void preserveSelections() {
+        for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+            ((Option) row).preserveValues();
         }
-        */
-   }
-
-    @SuppressWarnings("unchecked")
-    private void renderDps(int nPkYearId, int nPkDocId, int nPkEntryId) {
-        String sql = "";
-        ResultSet resulSet = null;
-        Statement statementAux = null;
-        int nCount = 0;
-
-        try {
-            sql = "SELECT dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, CONCAT(dp.num_ser, IF(length(dp.num_ser) = 0, '', '-'), dp.num) AS f_ped, " +
-                    "dep.sort_pos, cobp.code, dep.orig_qty, u.symbol, dp.tot_cur_r, COALESCE(SUM(re.debit_cur - re.credit_cur), 0) AS f_bal, dp.comms_ref, dep.cont_tank " +
-                    "FROM trn_dps_dps_supply AS sp " +
-                    "INNER JOIN trn_dps_ety AS dep ON dep.id_year = sp.id_des_year AND dep.id_doc = sp.id_des_doc AND " +
-                    "dep.id_ety = sp.id_des_ety AND dep.b_del = 0 " +
-                    "INNER JOIN erp.itmu_item AS i ON dep.fid_item = i.id_item " +
-                    "INNER JOIN erp.itmu_unit as u ON dep.fid_orig_unit = u.id_unit " +
-                    "INNER JOIN trn_dps AS dp ON dp.id_year = dep.id_year AND " +
-                    "dp.id_doc = dep.id_doc AND dp.b_del = 0 AND dp.fid_ct_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0]) + " AND " +
-                    "dp.fid_cl_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1]) + " AND dp.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
-                    "INNER JOIN erp.trnu_tp_dps AS dtp ON dp.fid_ct_dps = dtp.id_ct_dps AND dp.fid_cl_dps = dtp.id_cl_dps AND " +
-                    "dp.fid_tp_dps = dtp.id_tp_dps " +
-                    "INNER JOIN erp.bpsu_bpb AS cobp ON dp.fid_cob = cobp.id_bpb " +
-                    "LEFT OUTER JOIN fin_rec_ety AS re ON dp.id_year = re.fid_dps_year_n AND dp.id_doc = re.fid_dps_doc_n AND " +
-                    "re.fid_ct_sys_mov_xxx = " + (isPurchase() ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]) + " AND " +
-                    "re.fid_tp_sys_mov_xxx = " + (isPurchase() ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " " +
-                    "INNER JOIN fin_rec AS r ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND " +
-//                    "r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND r.b_del = 0 AND re.b_del = 0 AND r.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateCut.getDate()) + "' " +
-                    "WHERE dp.b_del = 0 AND dep.b_del = 0 AND sp.id_src_year = " + nPkYearId + " AND sp.id_src_doc = " + nPkDocId + " AND sp.id_src_ety = " + nPkEntryId + " " +
-                    "GROUP BY dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, f_ped, dp.num_ref, cobp.code, dep.orig_qty, u.symbol, dp.tot_cur_r " +
-                    "ORDER BY dp.id_year, dp.id_doc, dep.id_ety, dp.dt, dtp.code, f_ped, dp.num_ref, cobp.code, dep.orig_qty, u.symbol, dp.tot_cur_r ";
-
-            statementAux = miClient.getSession().getStatement().getConnection().createStatement();
-
-            resulSet = statementAux.executeQuery(sql);
-/*            
-            while (resulSet.next()) {
-                if (!mbIsAdd) {
-                   oRow = new  SDataContractAnalysisRow(miClient);
+    }
+    
+    private void actionSelect(final int selectCase) {
+        preserveSelections();
+        
+        int index = moTablePane.getTable().getSelectedRow();
+        
+        switch (selectCase) {
+            case SELECT_ALL:
+                for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+                    ((Option) row).Selected = true;
+                    row.prepareTableRow();
                 }
-                oRow.setDateDoc(resulSet.getDate(4));
-                oRow.setTypeDoc(resulSet.getString(5));
-                oRow.setNumberDoc(resulSet.getString(6));
-                oRow.setCommissionsReference(resulSet.getString(13));
-                oRow.setBranchDoc(resulSet.getString(8));
-                oRow.setSortPosDoc(resulSet.getInt(7));
-                oRow.setQtyDoc(resulSet.getDouble(9));
-                oRow.setTotalDoc(resulSet.getDouble(11));
-                oRow.setBalance(resulSet.getDouble(12));
-                oRow.setContTank(resulSet.getString(14));
-
-                mdQtyDoc += (resulSet.getDouble(9));
-                msUnitDoc = (resulSet.getString(10));
-
-                nCount++;
-
-                renderDpsAdj(resulSet.getInt(1), resulSet.getInt(2), resulSet.getInt(3));
-            }
-            if (nCount == 0) {
-                oRow.prepareTableRow();
-                moTablePane.addTableRow(oRow);
-            }
-*/
+                break;
+            case SELECT_NOTHING:
+                for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+                    ((Option) row).Selected = false;
+                    row.prepareTableRow();
+                }
+                break;
+            case SELECT_REVERSE:
+                for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+                    ((Option) row).Selected = !((Option) row).Selected;
+                    row.prepareTableRow();
+                }
+                break;
+            default:
+                // nothing
         }
-        catch (Exception e) {
-           SLibUtilities.renderException(this, e);
-       }
+        
+        moTablePane.renderTableRows();
+        moTablePane.setTableRowSelection(index);
     }
 
     public void actionClose() {
-        setVisible(false);
+        SFormValidation validation = formValidate();
+
+        if (validation.getIsError()) {
+            if (!validation.getMessage().isEmpty()) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
+        }
     }
 
-    private void actiongetLinks() {
-        formRefreshCatalogues();
-        renderTableColumns();
+    private void itemStateChangedFilter() {
+        try {
+            renderOptions();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
-     private boolean isPurchase() {
+    private boolean isPurchase() {
         return manDpsTypeKey[0] == SDataConstantsSys.TRNS_CT_DPS_PUR;
-     }
+    }
+    
+    private boolean isFilterByBizPartner() {
+        return jrbFilterByBizPartner.isSelected();
+    }
+    
+    private SelectedOptions createSelectedOptions() {
+        ArrayList<String> options = new ArrayList<>();
+        ArrayList<int[]> contractKeys = new ArrayList<>();
+        
+        for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+            if (((Option) row).Selected) {
+                options.add(((Option) row).Option);
+                contractKeys.addAll(((Option) row).ContractKeys);
+            }
+        }
+        
+        return moSelectedOptions = new SelectedOptions(isFilterByBizPartner() ? SDataConstants.BPSU_BP : SDataConstants.USRU_USR, options, contractKeys);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFilter;
@@ -411,10 +465,9 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-
-        jtfDocType.setText("");
-
         formRefreshCatalogues();
+        
+        itemStateChangedFilter();
     }
 
     @Override
@@ -425,6 +478,25 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
+        
+        if (moTablePane.getTableModelRowCount() > 0) {
+            preserveSelections();
+            
+            boolean selected = false;
+            
+            for (STableRow row : moTablePane.getTableModel().getTableRows()) {
+                if (((Option) row).Selected) {
+                    selected = true;
+                    break;
+                }
+            }
+            
+            if (!selected) {
+                validation.setMessage("Se debe seleccionar al menos una opción.");
+                validation.setComponent(moTablePane.getTable());
+            }
+        }
+        
         return validation;
     }
 
@@ -460,19 +532,20 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        switch (type) {
-            case SDataConstants.TRN_DPS:
-//                moParamDpsSource = (SDataDps) value;
-//                renderDpsSource();
-//                renderDpsSourceEntries();
-                break;
-            default:
-        }
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public java.lang.Object getValue(int type) {
         Object value = null;
+        
+        switch (type) {
+            case VALUE_SELECTED_OPTIONS:
+                value = createSelectedOptions();
+                break;
+            default:
+        }
+        
         return value;
     }
 
@@ -486,7 +559,16 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbClose) {
+            if (button == jbSelectAll) {
+                actionSelect(SELECT_ALL);
+            }
+            else if (button == jbSelectNothing) {
+                actionSelect(SELECT_NOTHING);
+            }
+            else if (button == jbSelectReverse) {
+                actionSelect(SELECT_REVERSE);
+            }
+            else if (button == jbClose) {
                 actionClose();
             }
         }
@@ -494,26 +576,94 @@ public class SDialogContractFilter extends javax.swing.JDialog implements erp.li
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (e.getSource() instanceof javax.swing.JRadioButton && e.getStateChange() == ItemEvent.SELECTED) {
+            javax.swing.JRadioButton radioButton = (javax.swing.JRadioButton) e.getSource();
+            
+            if (radioButton == jrbFilterByBizPartner || radioButton == jrbFilterByAnalyst) {
+                itemStateChangedFilter();
+            }
+        }
     }
-    
+
     public static class Option extends erp.lib.table.STableRow {
         
         public int OptionId;
-        public String OptionName;
+        public String Option;
+        public ArrayList<int[]> ContractKeys;
         public boolean Selected;
         
-        public Option(final int id, final String name) {
-            OptionId = id;
-            OptionName = name;
-            Selected = false;
+        public Option(final int optionId, final String option, final ArrayList<int[]> contractKeys, final boolean selected) {
+            OptionId = optionId;
+            Option = option;
+            ContractKeys = new ArrayList<>(contractKeys);
+            Selected = selected;
+        }
+        
+        public void preserveValues() {
+            if (mvValues.size() == 3) {
+                Selected = (Boolean) mvValues.get(2);
+            }
         }
 
         @Override
         public void prepareTableRow() {
             mvValues.clear();
-            mvValues.add(OptionName);
+            mvValues.add(Option);
+            mvValues.add(ContractKeys.size());
             mvValues.add(Selected);
+        }
+    }
+    
+    public static class SelectedOptions {
+        
+        /** Business partner or user. */
+        public int OptionsType;
+        public ArrayList<String> Options;
+        public ArrayList<int[]> ContractKeys;
+        
+        public SelectedOptions(final int optionsType) {
+            this(optionsType, new ArrayList<>(), new ArrayList<>());
+        }
+        
+        public SelectedOptions(final int optionsType, final ArrayList<String> options, final ArrayList<int[]> contractKeys) {
+            OptionsType = optionsType;
+            Options = new ArrayList<>(options);
+            ContractKeys = new ArrayList<>(contractKeys);
+        }
+        
+        public String getOptionsTypeDescrip() {
+            String descrip = "";
+            
+            switch (OptionsType) {
+                case SDataConstants.BPSU_BP:
+                    descrip = "asociado de negocios";
+                    break;
+                case SDataConstants.USRU_USR:
+                    descrip = "analista";
+                    break;
+                default:
+                    descrip = "¡Desconocido!";
+            }
+            
+            return descrip;
+        }
+        
+        public String composeSqlFilter(final String alias) {
+            String sqlFilter = "";
+            String aliasPrefix = alias.isEmpty() ? "" : alias + ".";
+            
+            for (int[] key : ContractKeys) {
+                if (key != null && key.length == 2) {
+                    sqlFilter += (sqlFilter.isEmpty() ? "" : " OR ");
+                    sqlFilter += "(" + aliasPrefix + "id_year = " + key[0] + " AND " + aliasPrefix + "id_doc = " + key[1] + ")";
+                }
+            }
+            
+            if (!sqlFilter.isEmpty()) {
+                sqlFilter = "(" + sqlFilter + ")";
+            }
+            
+            return sqlFilter;
         }
     }
 }

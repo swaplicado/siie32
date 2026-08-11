@@ -5,150 +5,112 @@
 
 package erp.mtrn.view;
 
+import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
-import erp.lib.data.SDataSqlUtilities;
-import erp.lib.table.STabFilterDateCutOff;
-import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mitm.form.SPanelFilterItemGeneric;
 import erp.mtrn.data.SDataDps;
-import erp.mtrn.data.SDataUserDnsDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
+import erp.mtrn.form.SDialogContractFilter;
 import erp.table.SFilterConstants;
-import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
-import erp.table.STabFilterDnsDps;
-import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibRpnArgument;
-import sa.lib.SLibRpnArgumentType;
-import sa.lib.SLibRpnOperator;
 
 /**
- *
- * @author Sergio Flores, Daniel López, Sergio Flores
+ * Vista de detalle de vínculos de partidas de cotizaciones contratos por procesar.
+ * Aunque la vista está diseñada para estos dos tipos de documento, sólo estará disponible para contratos.
+ * @author Sergio Flores
  */
 public class SViewContractLinkEntry extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+    
+    public static final String NO_ANALYST = "(SIN ANALISTA)";
+    
+    private static final int MAX_OPTIONS = 10;
 
-    private javax.swing.JButton mjbClose;
-    private javax.swing.JButton mjbOpen;
+    private javax.swing.JButton mjbSelectOptions;
+    private javax.swing.JButton mjbViewSelectedOptions;
     private javax.swing.JButton mjbViewDps;
     private javax.swing.JButton mjbViewNotes;
     private javax.swing.JButton mjbViewLinks;
     private javax.swing.JButton mjbViewContractAnalysis;
     private javax.swing.JButton mjbPrintContractMoves;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
-    private erp.table.STabFilterBizPartner moTabFilterBizPartner;
-    private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
-    private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
-    private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
+    private erp.mtrn.form.SDialogContractFilter moDialogContractFilter;
     private erp.table.STabFilterUsers moTabFilterUser;
-    private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
-    private erp.table.STabFilterDnsDps moTabFilterDnsDps;
-
+    private SDialogContractFilter.SelectedOptions moSelectedOptions;
     private boolean mbHasRightAuthor = false;
 
     /**
-     * View for documents linked or pending to be linked to other documents.
+     * Vista de detalle de vínculos de partidas de contratos.
      * @param client GUI client interface.
      * @param tabTitle View tab title.
-     * @param type Constants defined in SDataConstants (TRNX_DPS_LINK_PEND..., TRNX_DPS_LINKED...).
      * @param auxType01 Constants defined in SDataConstantsSys (TRNS_CT_DPS...).
-     * @param auxType02 Constants defined in SDataConstantsSys (TRNX_TP_DPS...).
+     * @param auxType02 Constants defined in SDataConstantsSys (TRNX_TP_DPS_EST_EST | TRNX_TP_DPS_EST_CON).
      */
-    public SViewContractLinkEntry(erp.client.SClientInterface client, java.lang.String tabTitle, int type, int auxType01, int auxType02) {
-        super(client, tabTitle, type, auxType01, auxType02);
+    public SViewContractLinkEntry(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
+        super(client, tabTitle, SDataConstants.TRNX_CON_LINK_ETY, auxType01, auxType02);
         initComponents();
     }
 
     private void initComponents() {
         int i;
         int levelDoc = SDataConstantsSys.UNDEFINED;
-        boolean hasRightToClose = false;
-        boolean hasRightToOpen = false;
-        STableField[] aoKeyFields = null;
-        STableColumn[] aoTableColumns = null;
 
         mbHasRightAuthor = false;
 
         if (isViewForCategoryPur()) {
             if (isViewForEstimate()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level >= SUtilConsts.LEV_EDITOR ||
-                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_DOC_EST_CLO);
-                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level;
-            }
-            else if (isViewForOrder()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR ||
-                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_DOC_ORD_CLO);
-                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
-                levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
             }
         }
         else {
             if (isViewForEstimate()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level >= SUtilConsts.LEV_EDITOR ||
-                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_SAL_DOC_EST_CLO);
-                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level;
-            }
-            else if (isViewForOrder()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR ||
-                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_SAL_DOC_ORD_CLO);
-                hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
-                levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level;
             }
         }
         
         mbHasRightAuthor = levelDoc == SUtilConsts.LEV_AUTHOR;
 
-        mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
-        mjbOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
+        mjbSelectOptions = new JButton(miClient.getImageIcon(SLibConstants.ICON_FILTER_DOC));
+        mjbViewSelectedOptions = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
         mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
         mjbViewContractAnalysis = new JButton(miClient.getImageIcon(SLibConstants.ICON_CONTRACT_ANALYSIS));
         mjbPrintContractMoves = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print_moves.gif")));
         
-        mjbClose.setPreferredSize(new Dimension(23, 23));
-        mjbOpen.setPreferredSize(new Dimension(23, 23));
+        mjbSelectOptions.setPreferredSize(new Dimension(23, 23));
+        mjbViewSelectedOptions.setPreferredSize(new Dimension(23, 23));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
         mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
         mjbViewContractAnalysis.setPreferredSize(new Dimension(23, 23));
         mjbPrintContractMoves.setPreferredSize(new Dimension(23, 23));
 
-        mjbClose.addActionListener(this);
-        mjbOpen.addActionListener(this);
+        mjbSelectOptions.addActionListener(this);
+        mjbViewSelectedOptions.addActionListener(this);
         mjbViewDps.addActionListener(this);
         mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
         mjbViewContractAnalysis.addActionListener(this);
         mjbPrintContractMoves.addActionListener(this);
 
-        mjbClose.setToolTipText("Cerrar documento");
-        mjbOpen.setToolTipText("Abrir documento");
+        mjbSelectOptions.setToolTipText("Filtrar opciones");
+        mjbViewSelectedOptions.setToolTipText("Ver opciones filtradas");
         mjbViewDps.setToolTipText("Ver documento");
         mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
@@ -156,39 +118,21 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
         mjbPrintContractMoves.setToolTipText("Imprimir movimientos de contrato");
 
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
-        moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moPanelFilterItemGeneric = new SPanelFilterItemGeneric(miClient, this);
         moDialogContractAnalysis = new SDialogContractAnalysis(miClient);
-
-        if (isViewForDocLinked()) {
-            moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, isViewForEstimateCon() ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-            moTabFilterDateCutOff = null;
-        }
-        else {
-            moTabFilterDatePeriod = null;
-            moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
-        }
 
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
-        moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
         moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
-        moTabFilterDnsDps = new STabFilterDnsDps(miClient, this);
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         
-        addTaskBarUpperComponent(mjbClose);
-        addTaskBarUpperComponent(mjbOpen);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(isViewForDocLinked() ? moTabFilterDatePeriod : moTabFilterDateCutOff);
+        addTaskBarUpperComponent(mjbSelectOptions);
+        addTaskBarUpperComponent(mjbViewSelectedOptions);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
-        addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterBizPartner);
-        addTaskBarUpperComponent(moPanelFilterItemGeneric);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
@@ -199,140 +143,140 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
         
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
-        addTaskBarLowerComponent(moTabFilterDocumentNature);
         addTaskBarLowerComponent(moTabFilterFunctionalArea);
-        addTaskBarLowerComponent(moTabFilterDnsDps);
 
-        mjbClose.setEnabled(hasRightToClose && !isViewForDocLinked());
-        mjbOpen.setEnabled(hasRightToOpen && isViewForDocLinked());
+        mjbSelectOptions.setEnabled(true);
+        mjbViewSelectedOptions.setEnabled(true);
         mjbViewNotes.setEnabled(true);
         mjbViewDps.setEnabled(true);
         mjbViewLinks.setEnabled(true);
         mjbViewContractAnalysis.setEnabled(isViewForEstimateCon());
         mjbPrintContractMoves.setEnabled(isViewForEstimateCon());
-        moTabFilterDnsDps.setVisible(mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD);
 
-        aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[isViewForDocEntries() ? 29 : 17];
+        STableField[] keyFields = new STableField[3];
 
         i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_doc");
-        for (i = 0; i < aoKeyFields.length; i++) {
-            moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
+        keyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "cone.id_year");
+        keyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "cone.id_doc");
+        keyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "cone.id_ety");
+        for (i = 0; i < keyFields.length; i++) {
+            moTablePane.getPrimaryKeyFields().add(keyFields[i]);
         }
+        
+        STableColumn[] tableColumns = new STableColumn[58];
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dt_code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc_delivery_n", "Entrega inicial", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt_doc_lapsing_n", "Entrega final", STableConstants.WIDTH_DATE);
         if (isViewForCategoryPur()) {
             if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave proveedor", 50);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Proveedor", 200);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave proveedor", 50);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Proveedor", 200);
             }
             else {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Proveedor", 200);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave proveedor", 50);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Proveedor", 200);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave proveedor", 50);
             }
         }
         else {
             if (miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave cliente", 50);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", 200);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave cliente", 50);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Cliente", 200);
             }
             else {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp", "Cliente", 200);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp_key", "Clave cliente", 50);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Cliente", 200);
+                tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bc.bp_key", "Clave cliente", 50);
             }
-        }
-
-        if (isViewForDocEntries()) {
-            if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
-            }
-            else {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 200);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
-            }
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "igen", "Ítem genérico", 200);
-        }
-
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_link_orig_qty", "Cant. procesada", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i++].setSumApplying(true);
-
-        if (isViewForDocEntries()) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_orig_unit", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-        }
-
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Avance %", STableConstants.WIDTH_PERCENTAGE);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.DIVISION, SLibRpnArgumentType.OPERATOR));
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Cant. pendiente", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
-        aoTableColumns[i].setSumApplying(true);
-        aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
-
-        if (isViewForDocEntries()) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_orig_unit", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "surplus_per", "Excedente %", STableConstants.WIDTH_PERCENTAGE);
-            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_price_u", "Precio u. mon $", STableConstants.WIDTH_VALUE_2X);
-            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto procesado $", STableConstants.WIDTH_VALUE_2X);
-            aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
-            aoTableColumns[i].setSumApplying(true);
-            aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto pendiente $", STableConstants.WIDTH_VALUE_2X);
-            aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
-            aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
-            aoTableColumns[i].setSumApplying(true);
-            aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sales_price_u_cur", "Precio u. (s/flete) mon $", STableConstants.WIDTH_VALUE_2X);
-            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sales_freight_u_cur", "Flete u. mon $", STableConstants.WIDTH_VALUE_2X);
-            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
-        }
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza doc.", STableConstants.WIDTH_CODE_DOC);
-
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "b_link", "Cerrado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "usr", "Usr. cierre", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "ts_link", "Cierre", STableConstants.WIDTH_DATE_TIME);
-
-        for (i = 0; i < aoTableColumns.length; i++) {
-            moTablePane.addTableColumn(aoTableColumns[i]);
         }
         
-        setIsSummaryApplying(true);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen", "Ítem genérico", 100);
+        
+        if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+            tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 50);
+            tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 200);
+        }
+        else {
+            tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 200);
+            tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", 50);
+        }
+        
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tcon.code", "Tipo contrato", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_con_num", "Folio contrato", STableConstants.WIDTH_DOC_NUM);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "con.num_ref", "Referencia contrato", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "con.dt", "Fecha contrato", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bcon.code", "Sucursal empresa contrato", STableConstants.WIDTH_CODE_COB);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "con.dt_doc_delivery_n", "Entrega inicial contrato", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "con.dt_doc_lapsing_n", "Entrega final contrato", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fcon.code", "Área funcional contrato", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fscon.code", "Subárea funcional contrato", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "cone.sort_pos", "Partida contrato", 50);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "cone.orig_qty", "Cantidad partida contrato", STableConstants.WIDTH_QUANTITY_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_orig_unit", "Unidad partida contrato", STableConstants.WIDTH_UNIT_SYMBOL);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_cone_orig_price_u_real_cur_r", "Precio u. contrato $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ccon.cur_key", "Moneda contrato", STableConstants.WIDTH_CURRENCY_KEY);
+        
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tdor.code", "Tipo pedido", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_dor_num", "Folio pedido", STableConstants.WIDTH_DOC_NUM);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dor.num_ref", "Referencia pedido", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dor.dt", "Fecha pedido", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bdor.code", "Sucursal empresa pedido", STableConstants.WIDTH_CODE_COB);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fdor.code", "Área funcional pedido", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fsdor.code", "Subárea funcional pedido", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "dore.sort_pos", "Partida pedido", 50);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "dore.orig_qty", "Cantidad partida pedido", STableConstants.WIDTH_QUANTITY_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_orig_unit", "Unidad partida pedido", STableConstants.WIDTH_UNIT_SYMBOL);
+        
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tinv.code", "Tipo factura", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_inv_num", "Folio factura", STableConstants.WIDTH_DOC_NUM);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "inv.num_ref", "Referencia factura", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "inv.comms_ref", "Referencia factura", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "inv.dt", "Fecha factura", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "binv.code", "Sucursal empresa factura", STableConstants.WIDTH_CODE_COB);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "finv.code", "Área funcional factura", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fsinv.code", "Subárea funcional factura", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "inv.tot_cur_r", "Total factura $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_inv_bal", "Saldo factura $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cinv.cur_key", "Moneda factura", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "inve.sort_pos", "Partida factura", 50);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "inve.orig_qty", "Cantidad partida factura", STableConstants.WIDTH_QUANTITY_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_orig_unit", "Unidad partida factura", STableConstants.WIDTH_UNIT_SYMBOL);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "inve.cont_tank", "Remolque, tanq./cont. partida factura", 100);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "inve.tank_car", "Carrotanque(s) partida factura", 100);
+        
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tcn.code", "Tipo nota crédito", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cn_num", "Folio nota crédito", STableConstants.WIDTH_DOC_NUM);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cn.num_ref", "Referencia nota crédito", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cn.comms_ref", "Referencia nota crédito", STableConstants.WIDTH_DOC_NUM_REF);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "cn.dt", "Fecha nota crédito", STableConstants.WIDTH_DATE);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bcn.code", "Sucursal empresa nota crédito", STableConstants.WIDTH_CODE_COB);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fcn.code", "Área funcional nota crédito", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fscn.code", "Subárea funcional nota crédito", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "cn.tot_cur_r", "Total nota crédito $", STableConstants.WIDTH_VALUE_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ccn.cur_key", "Moneda nota crédito", STableConstants.WIDTH_CODE_DOC);
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "cne.sort_pos", "Partida nota crédito", 50);
+        tableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "cne.orig_qty", "Cantidad partida nota crédito", STableConstants.WIDTH_QUANTITY_2X);
+        tableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        tableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_orig_unit", "Unidad partida nota crédito", STableConstants.WIDTH_UNIT_SYMBOL);
+
+        for (i = 0; i < tableColumns.length; i++) {
+            moTablePane.addTableColumn(tableColumns[i]);
+        }
+        
+        setIsSummaryApplying(false);
         
         mvSuscriptors.add(mnTabTypeAux01);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
         mvSuscriptors.add(SDataConstants.BPSU_BPB);
+        mvSuscriptors.add(SDataConstants.ITMU_IGEN);
+        mvSuscriptors.add(SDataConstants.ITMU_ITEM);
+        mvSuscriptors.add(SDataConstants.ITMU_UNIT);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
-        mvSuscriptors.add(SDataConstants.TRN_DVY);
-        mvSuscriptors.add(SDataConstants.TRNX_DPS_LINK_PEND);
-        mvSuscriptors.add(SDataConstants.TRNX_DPS_LINKED);
-        mvSuscriptors.add(SDataConstants.USRU_USR);
 
         getTablePane().setDoubleClickAction(this, "publicActionViewDps");
 
@@ -341,14 +285,6 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
 
     private boolean isViewForCategoryPur() {
         return mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
-    }
-
-    private boolean isViewForDocLinked() {
-        return mnTabType == SDataConstants.TRNX_DPS_LINKED || mnTabType == SDataConstants.TRNX_DPS_LINKED_ETY;
-    }
-
-    private boolean isViewForDocEntries() {
-        return mnTabType == SDataConstants.TRNX_DPS_LINK_PEND_ETY || mnTabType == SDataConstants.TRNX_DPS_LINKED_ETY;
     }
 
     private boolean isViewForEstimate() {
@@ -363,111 +299,117 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
         return mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_EST_CON;
     }
 
-    private boolean isViewForOrder() {
-        return mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD;
-    }
-
     private int[] getDpsTypeKey() {
-        int[] dpsTypeKey = null;
+        int[] typeKey = null;
 
         if (isViewForCategoryPur()) {
             if (isViewForEstimateEst()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_EST;
+                typeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_EST;
             }
             else if (isViewForEstimateCon()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_CON;
-            }
-            else if (isViewForOrder()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_ORD;
+                typeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_CON;
             }
         }
         else {
             if (isViewForEstimateEst()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_EST;
+                typeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_EST;
             }
             else if (isViewForEstimateCon()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_CON;
-            }
-            else if (isViewForOrder()) {
-                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_ORD;
+                typeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_CON;
             }
         }
 
-        return dpsTypeKey;
+        return typeKey;
     }
 
-    private void actionCloseDoc() {
-        if (mjbClose.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_CLOSE) == JOptionPane.YES_OPTION) {
-                    Vector<Object> params = new Vector<Object>();
+    private int[] getSysMovementTypeKey() {
+        int[] typeKey = null;
 
-                    params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
-                    params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                    params.add(SDataConstantsSys.UPD_DPS_FL_LINK);
-                    params.add(1);
-                    params.add(miClient.getSession().getUser().getPkUserId());
-                    params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
+        if (isViewForCategoryPur()) {
+            typeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP;
+        }
+        else {
+            typeKey = SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS;
+        }
 
-                    if (params.size() == 0) {
-                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
-                    }
-                    else {
-                        if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
-                            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
-                        }
-                        else {
-                            miClient.getGuiModule(isViewForCategoryPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabTypeAux01);
-                        }
-                    }
-                }
-            }
+        return typeKey;
+    }
+
+    private int getBizPartnerCategory() {
+        int category = 0;
+
+        if (isViewForCategoryPur()) {
+            category = SDataConstantsSys.BPSS_CT_BP_SUP;
+        }
+        else {
+            category = SDataConstantsSys.BPSS_CT_BP_CUS;
+        }
+
+        return category;
+    }
+
+    private void actionSelectOptions(final boolean reload) {
+        if (moDialogContractFilter == null) {
+            moDialogContractFilter = new SDialogContractFilter(miClient, getDpsTypeKey());
+        }
+
+        moDialogContractFilter.formReset();
+        moDialogContractFilter.setFormVisible(true);
+
+        if (moDialogContractFilter.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            moSelectedOptions = (SDialogContractFilter.SelectedOptions) moDialogContractFilter.getValue(SDialogContractFilter.VALUE_SELECTED_OPTIONS);
+        }
+        else {
+            moSelectedOptions = new SDialogContractFilter.SelectedOptions(SDataConstants.BPSU_BP);
+        }
+        
+        if (moSelectedOptions.Options.isEmpty()) {
+            miClient.showMsgBoxWarning("¡No hay ningún " + moSelectedOptions.getOptionsTypeDescrip() + " seleccionado!");
+        }
+        
+        if (reload) {
+            actionReload();
         }
     }
-
-    private void actionOpenDoc() {
-        if (mjbOpen.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient,
-                    SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                if (isViewForDocLinked() && !oDps.getIsLinked()) {
-                    miClient.showMsgBoxInformation("No se puede abrir un documento vinculado al 100%.");
-                }
-                else {
-                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_DOC_OPEN) == JOptionPane.YES_OPTION) {
-                        Vector<Object> params = new Vector<Object>();
-
-                        params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
-                        params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
-                        params.add(SDataConstantsSys.UPD_DPS_FL_LINK);
-                        params.add(0);
-                        params.add(miClient.getSession().getUser().getPkUserId());
-                        params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
-
-                        if (params.size() == 0) {
-                            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
-                        }
-                        else {
-                            if (SLibUtilities.parseInt((String) params.get(0)) != 0) {
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS + "\n" + params.get(1) + " (Error: " + params.get(0) + ")");
-                            }
-                            else {
-                                miClient.getGuiModule(isViewForCategoryPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL).refreshCatalogues(mnTabTypeAux01);
-                            }
-                        }
-                    }
+    
+    private void actionViewSelectedOptions() {
+        if (moSelectedOptions.Options.isEmpty()) {
+            miClient.showMsgBoxWarning("¡No hay ningún " + moSelectedOptions.getOptionsTypeDescrip() + " seleccionado!");
+        }
+        else {
+            int options = 0;
+            String message = "";
+            
+            for (String option : moSelectedOptions.Options) {
+                message += (message.isEmpty() ? "" : "\n") + ++options + ". " + option;
+                if (options == MAX_OPTIONS) {
+                    break;
                 }
             }
+            
+            message = (options == 1 ? "Opción seleccionada" : "Opciones seleccionadas") + " de " + moSelectedOptions.getOptionsTypeDescrip() + ":\n" + message;
+            if (options < moSelectedOptions.Options.size()) {
+                int remaining = moSelectedOptions.Options.size() - options;
+                message += "\n(Entre " + (remaining == 1 ? "otro" : "otros " + remaining) + " más.)";
+            }
+            
+            miClient.showMsgBoxInformation(message);
         }
     }
-
+    
     private void actionViewDps() {
-        int gui = isViewForCategoryPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
-        int[] dpsTypeKey = getDpsTypeKey();
+        if (mjbViewDps.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int gui = isViewForCategoryPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL; // GUI module
+                int[] dpsTypeKey = getDpsTypeKey();
 
-        miClient.getGuiModule(gui).setFormComplement(dpsTypeKey);
-        miClient.getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, moTablePane.getSelectedTableRow().getPrimaryKey());
+                miClient.getGuiModule(gui).setFormComplement(dpsTypeKey);
+                miClient.getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO, moTablePane.getSelectedTableRow().getPrimaryKey());
+            }
+        }
     }
 
     private void actionViewNotes() {
@@ -484,20 +426,30 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
 
     private void actionViewContractAnalysis() {
         if (mjbViewContractAnalysis.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null) {
-                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (moTablePane.getSelectedTableRow() != null) {
+                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
-                moDialogContractAnalysis.formReset();
-                moDialogContractAnalysis.setValue(SDataConstants.TRN_DPS, dps);
-                moDialogContractAnalysis.setFormVisible(true);
+                    moDialogContractAnalysis.formReset();
+                    moDialogContractAnalysis.setValue(SDataConstants.TRN_DPS, dps);
+                    moDialogContractAnalysis.setFormVisible(true);
+                }
             }
         }
     }
     
     private void actionPrintContractMoves() {
         if (mjbPrintContractMoves.isEnabled()) {
-            if (moTablePane.getSelectedTableRow() != null && moTablePane.getSelectedTableRow().getPrimaryKey() != null) {
-                STrnUtilities.createReportContractAnalysis(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+            if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                if (moTablePane.getSelectedTableRow() != null && moTablePane.getSelectedTableRow().getPrimaryKey() != null) {
+                    STrnUtilities.createReportContractAnalysis(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                }
             }
         }
     }
@@ -505,193 +457,138 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
     @Override
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
-        int[] dpsTypeKey = getDpsTypeKey();
-        String sqlDpsType = ""; 
-        String sqlDatePeriod = "";
-        String sqlCompanyBranch = "";
-        String sqlBizPartner = "";
-        String sqlItemGeneric = "";
+        if (moSelectedOptions == null) {
+            actionSelectOptions(false);
+        }
+        
+        int bizPartnerCategory = getBizPartnerCategory();
+        int[] sysMovementTypeKey = getSysMovementTypeKey();
         String sqlWhere = "";
-        STableSetting setting = null;
+        String sqlOrderByBizPartner = "";
+        String sqlOrderByItem = "";
+        
+        if (isViewForCategoryPur()) {
+            if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                sqlOrderByBizPartner = "bc.bp_key, b.bp,";
+            }
+            else {
+                sqlOrderByBizPartner = "b.bp, bc.bp_key,";
+            }
+        }
+        else {
+            if (miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+                sqlOrderByBizPartner = "bc.bp_key, b.bp,";
+            }
+            else {
+                sqlOrderByBizPartner = "b.bp, bc.bp_key,";
+            }
+        }
+        
+        if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
+            sqlOrderByItem = "i.item, i.item_key,";
+        }
+        else {
+            sqlOrderByItem = "i.item_key, i.item,";
+        }
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
-            setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
+            STableSetting setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
 
-            if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                if (isViewForDocLinked()) {
-                    sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
-                }
-                else {
-                    sqlDatePeriod = setting.getSetting() == null ? "" : "AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
-                }
-            }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
-                sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
-            }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
-                sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
-            }
-            else if (setting.getType() == STableConstants.SETTING_FILTER_ITM_ITEM_GENERIC) {
-                if (((int[]) setting.getSetting())[0] != SLibConstants.UNDEFINED) {
-                    sqlItemGeneric = "AND i.fid_igen = " + ((int[]) setting.getSetting())[0] + " ";
-                }
-            }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
-                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+            if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
+                if ((Integer) setting.getSetting() != SLibConstants.UNDEFINED) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "con.fid_cob = " + (Integer) setting.getSetting() + " ";
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "con.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
         
-        String sqlSeries = "";
-        boolean dnsRight = false; 
-        if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
-            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD_ALL_DNS).HasRight;
-            }
-            else if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                dnsRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD_ALL_DNS).HasRight;
-            }
-            if (!dnsRight) {
-                ArrayList<SDataUserDnsDps> usrDnsDpss = miClient.getSessionXXX().getUser().getDbmsConfigurationTransaction().getUserDnsDps();
-                if (!usrDnsDpss.isEmpty()) {
-                    for (SDataUserDnsDps usrDnsDps : usrDnsDpss) {
-                        sqlSeries += sqlSeries.isEmpty() ? "(" : "OR ";
-                        sqlSeries += "d.num_ser = '" + usrDnsDps.getDocumentNumberSeries().getDocNumberSeries() + "' ";
-                    }
-                    sqlSeries += ") ";
-                }
-            }
-        }
-
-        sqlDpsType = "AND d.fid_ct_dps = " + dpsTypeKey[0] + " AND d.fid_cl_dps = " + dpsTypeKey[1] + " AND d.fid_tp_dps = " + dpsTypeKey[2] + " ";
-
-        if (isViewForDocEntries()) {
-            msSql = "";
-        }
-        else {
-            msSql = "SELECT id_year, id_doc, dt, dt_doc_delivery_n, dt_doc_lapsing_n, " +
-                    "num_ref, b_link, ts_link, f_num, fid_cob, " +
-                    "fid_bpb, fid_bp_r, fid_usr_link, f_dt_code, f_dn_code, " +
-                    "f_cob_code, bpb, bp, bp_key, cur_key, usr, " +
-                    "SUM(f_qty) AS f_qty, SUM(f_orig_qty) AS f_orig_qty, " +
-                    "SUM(f_link_qty) AS f_link_qty, SUM(f_link_orig_qty) AS f_link_orig_qty, " +
-                    "COUNT(*) AS f_count, " +
-                    "COUNT(f_link_orig_qty >= f_orig_qty) AS f_count_link " +
-                    "FROM (";
-        }
-
-        msSql += "SELECT de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
-                "dt.code AS f_dt_code, dn.code AS f_dn_code, cob.code AS f_cob_code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, " +
-                "de.fid_item, de.fid_unit, de.fid_orig_unit, de.surplus_per, " +
-                "de.qty AS f_qty, de.orig_qty AS f_orig_qty, " +
-                "CASE WHEN de.qty = 0 THEN 0 ELSE de.stot_cur_r / de.qty END AS f_price_u, " +
-                "CASE WHEN de.orig_qty = 0 THEN 0 ELSE de.stot_cur_r / de.orig_qty END AS f_orig_price_u, " +
-                "de.sales_price_u_cur, de.sales_freight_u_cur, " +
-                "i.item_key, i.item, ig.igen, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
-                "COALESCE((SELECT SUM(ds.qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
-                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND " +
-                "ds.id_des_year = xde.id_year AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND " +
-                "xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND " +
-                "xde.b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_link_qty, " +
-                "COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
-                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND " +
-                "ds.id_des_year = xde.id_year AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND " +
-                "xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND " +
-                "xde.b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_link_orig_qty " +
-                "FROM trn_dps AS d " +
-                "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND " +
-                "d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
-                sqlDpsType + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
-                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
-                "INNER JOIN erp.trnu_dps_nat AS dn ON d.fid_dps_nat = dn.id_dps_nat " +
-                "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
-                "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
-                "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
-                "INNER JOIN erp.bpsu_bp_ct AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = " +
-                (isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +
-                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
-                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " + sqlItemGeneric +
-                "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
-                "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
-                "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                (sqlSeries.isEmpty() ? "" : (sqlWhere.isEmpty() ? "WHERE " : "AND ") + sqlSeries) + 
-                "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
-                "d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
-                "d.num_ser, d.num, " +
-                "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
-                "dt.code, dn.code, cob.code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, " +
-                "de.fid_item, de.fid_unit, de.fid_orig_unit, de.surplus_per, " +
-                "de.qty, de.orig_qty, " +
-                "de.stot_cur_r, " +
-                "i.item_key, i.item, ig.igen, u.symbol, uo.symbol ";
-
-        if (isViewForDocEntries()) {
-            if (isViewForDocLinked()) {
-                msSql += "HAVING f_link_orig_qty >= de.orig_qty OR d.b_link = 1 ";
-            }
-            else {
-                msSql += "HAVING f_link_orig_qty < de.orig_qty AND d.b_link = 0 ";
-            }
-
-            msSql += "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, de.id_year, de.id_doc, ";
-
-            if (isViewForCategoryPur()) {
-                msSql += miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                    "bc.bp_key, b.bp, " : "b.bp, bc.bp_key, ";
-            }
-            else {
-                msSql += miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                    "bc.bp_key, b.bp, " : "b.bp, bc.bp_key, ";
-            }
-
-            msSql += "d.fid_bp_r, bb.bpb, d.fid_bpb, ";
-
-            if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-                msSql += "i.item_key, i.item, ";
-            }
-            else {
-                msSql += "i.item, i.item_key, ";
-            }
-
-            msSql += "de.fid_item, uo.symbol, de.fid_orig_unit ";
-        }
-        else {
-            msSql += ") AS T " +
-                    "GROUP BY id_year, id_doc, dt, dt_doc_delivery_n, num_ref, b_link, ts_link, " +
-                    "f_num, fid_cob, fid_bpb, fid_bp_r, fid_usr_link, " +
-                    "f_dt_code, f_cob_code, bpb, bp, bp_key, usr ";
-
-            if (isViewForDocLinked()) {
-                msSql += "HAVING (f_link_orig_qty >= f_orig_qty OR b_link = 1) AND f_count = f_count_link ";
-            }
-            else {
-                msSql += "HAVING (f_link_orig_qty < f_orig_qty AND b_link = 0) OR f_count <> f_count_link ";
-            }
-
-            msSql += "ORDER BY f_dt_code, f_num, dt, id_year, id_doc, ";
-
-            if (isViewForCategoryPur()) {
-                msSql += miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                    "bp_key, bp, " : "bp, bp_key, ";
-            }
-            else {
-                msSql += miClient.getSessionXXX().getParamsErp().getFkSortingCustomerTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ?
-                    "bp_key, bp, " : "bp, bp_key, ";
-            }
-
-            msSql += "fid_bp_r, bpb, fid_bpb ";
-        }
+        String contracts = moSelectedOptions.composeSqlFilter("con");
+        sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + (contracts.isEmpty() ? "FALSE " : contracts);
+        
+        msSql = "SELECT STRAIGHT_JOIN "
+                // # contratos:
+                + "b.bp, b.id_bp, bc.bp_key, "
+                + "ig.igen, ig.id_igen, i.item_key, i.item, i.id_item, cone.id_year, cone.id_doc, cone.id_ety, "
+                + "tcon.code, IF(con.num_ser <> '', CONCAT(con.num_ser, '-', con.num), con.num) AS _con_num, con.dt, con.num_ref, bcon.code, "
+                + "fcon.id_func, fcon.code, fscon.id_func_sub, fscon.code, con.dt_doc_delivery_n, con.dt_doc_lapsing_n, "
+                + "cone.sort_pos, cone.qty, u.symbol AS _unit, cone.orig_qty, ou.symbol AS _orig_unit, "
+                + "cone.price_u_real_cur_r, ROUND(cone.stot_cur_r / cone.orig_qty, " + SErpConsts.VAL_QTY_MAX_DECS + ") AS _cone_orig_price_u_real_cur_r, ccon.cur_key, "
+                // # pedidos:
+                + "tdor.code, IF(dor.num_ser <> '', CONCAT(dor.num_ser, '-', dor.num), dor.num) AS _dor_num, dor.dt, dor.num_ref, bdor.code, "
+                + "fdor.id_func, fdor.code, fsdor.id_func_sub, fsdor.code, "
+                + "dore.sort_pos, dore.qty, u.symbol AS _unit, dore.orig_qty, ou.symbol AS _orig_unit, "
+                // # facturas:
+                + "tinv.code, IF(inv.num_ser <> '', CONCAT(inv.num_ser, '-', inv.num), inv.num) AS _inv_num, inv.dt, inv.num_ref, inv.comms_ref, binv.code, "
+                + "finv.id_func, finv.code, fsinv.id_func_sub, fsinv.code, "
+                + "inv.tot_cur_r, cinv.cur_key, "
+                + "COALESCE((SELECT SUM(re.debit_cur - re.credit_cur) "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_tp_rec <> '" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "' AND re.fid_ct_sys_mov_xxx = " + sysMovementTypeKey[0] + " AND re.fid_tp_sys_mov_xxx = " + sysMovementTypeKey[1] + " "
+                + "AND re.fid_dps_year_n = inv.id_year AND re.fid_dps_doc_n = inv.id_doc), 0.0) AS _inv_bal, "
+                + "inve.sort_pos, inve.qty, u.symbol AS _unit, inve.orig_qty, ou.symbol AS _orig_unit, inve.cont_tank, inve.tank_car, "
+                // # notas de crédito:
+                + "tcn.code, IF(cn.num_ser <> '', CONCAT(cn.num_ser, '-', cn.num), cn.num) AS _cn_num, cn.dt, cn.num_ref, cn.comms_ref, bcn.code, "
+                + "fcn.id_func, fcn.code, fscn.id_func_sub, fscn.code, "
+                + "cn.tot_cur_r, ccn.cur_key, "
+                + "cne.sort_pos, cne.qty, u.symbol AS _unit, cne.orig_qty, ou.symbol AS _orig_unit "
+                + ""
+                + "FROM "
+                // # contratos:
+                + "trn_dps AS con "
+                + "INNER JOIN erp.trnu_tp_dps AS tcon ON tcon.id_ct_dps = con.fid_ct_dps AND tcon.id_cl_dps = con.fid_cl_dps AND tcon.id_tp_dps = con.fid_tp_dps "
+                + "INNER JOIN erp.bpsu_bpb AS bcon ON bcon.id_bpb = con.fid_cob "
+                + "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = con.fid_bp_r "
+                + "INNER JOIN erp.bpsu_bp_ct AS bc ON bc.id_bp = con.fid_bp_r AND bc.id_ct_bp = " + bizPartnerCategory + " "
+                + "INNER JOIN cfgu_func AS fcon ON fcon.id_func = con.fid_func "
+                + "INNER JOIN cfgu_func_sub AS fscon ON fscon.id_func_sub = con.fid_func_sub "
+                + "INNER JOIN erp.cfgu_cur AS ccon ON ccon.id_cur = con.fid_cur "
+                + "INNER JOIN trn_dps_ety AS cone ON cone.id_year = con.id_year AND cone.id_doc = con.id_doc "
+                + "INNER JOIN erp.itmu_item AS i ON i.id_item = cone.fid_item "
+                + "INNER JOIN erp.itmu_unit AS u ON u.id_unit = cone.fid_unit "
+                + "INNER JOIN erp.itmu_unit AS ou ON ou.id_unit = cone.fid_orig_unit "
+                + "INNER JOIN erp.itmu_igen AS ig ON ig.id_igen = i.fid_igen "
+                + "LEFT OUTER JOIN trn_dps_dps_supply AS con_sup ON con_sup.id_src_year = cone.id_year AND con_sup.id_src_doc = cone.id_doc AND con_sup.id_src_ety = cone.id_ety "
+                // # pedidos:
+                + "LEFT OUTER JOIN trn_dps_ety AS dore ON dore.id_year = con_sup.id_des_year AND dore.id_doc = con_sup.id_des_doc AND dore.id_ety = con_sup.id_des_ety "
+                + "LEFT OUTER JOIN trn_dps AS dor ON dor.id_year = dore.id_year AND dor.id_doc = dore.id_doc "
+                + "LEFT OUTER JOIN erp.trnu_tp_dps AS tdor ON tdor.id_ct_dps = dor.fid_ct_dps AND tdor.id_cl_dps = dor.fid_cl_dps AND tdor.id_tp_dps = dor.fid_tp_dps "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bdor ON bdor.id_bpb = dor.fid_cob "
+                + "LEFT OUTER JOIN cfgu_func AS fdor ON fdor.id_func = dor.fid_func "
+                + "LEFT OUTER JOIN cfgu_func_sub AS fsdor ON fsdor.id_func_sub = dor.fid_func_sub "
+                + "LEFT OUTER JOIN trn_dps_dps_supply AS dor_sup ON dor_sup.id_src_year = dore.id_year AND dor_sup.id_src_doc = dore.id_doc AND dor_sup.id_src_ety = dore.id_ety "
+                // # facturas:
+                + "LEFT OUTER JOIN trn_dps_ety AS inve ON inve.id_year = dor_sup.id_des_year AND inve.id_doc = dor_sup.id_des_doc AND inve.id_ety = dor_sup.id_des_ety "
+                + "LEFT OUTER JOIN trn_dps AS inv ON inv.id_year = inve.id_year AND inv.id_doc = inve.id_doc AND inv.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
+                + "LEFT OUTER JOIN erp.trnu_tp_dps AS tinv ON tinv.id_ct_dps = inv.fid_ct_dps AND tinv.id_cl_dps = inv.fid_cl_dps AND tinv.id_tp_dps = inv.fid_tp_dps "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS binv ON binv.id_bpb = inv.fid_cob "
+                + "LEFT OUTER JOIN cfgu_func AS finv ON finv.id_func = inv.fid_func "
+                + "LEFT OUTER JOIN cfgu_func_sub AS fsinv ON fsinv.id_func_sub = inv.fid_func_sub "
+                + "LEFT OUTER JOIN erp.cfgu_cur AS cinv ON cinv.id_cur = inv.fid_cur "
+                + "LEFT OUTER JOIN trn_dps_dps_adj AS inv_adj ON inv_adj.id_dps_year = inve.id_year AND inv_adj.id_dps_doc = inve.id_doc AND inv_adj.id_dps_ety = inve.id_ety "
+                // # notas de crédito:
+                + "LEFT OUTER JOIN trn_dps_ety AS cne ON cne.id_year = inv_adj.id_adj_year AND cne.id_doc = inv_adj.id_adj_doc AND cne.id_ety = inv_adj.id_adj_ety "
+                + "LEFT OUTER JOIN trn_dps AS cn ON cn.id_year = cne.id_year AND cn.id_doc = cne.id_doc AND cn.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
+                + "LEFT OUTER JOIN erp.trnu_tp_dps AS tcn ON tcn.id_ct_dps = cn.fid_ct_dps AND tcn.id_cl_dps = cn.fid_cl_dps AND tcn.id_tp_dps = cn.fid_tp_dps "
+                + "LEFT OUTER JOIN erp.bpsu_bpb AS bcn ON bcn.id_bpb = cn.fid_cob "
+                + "LEFT OUTER JOIN cfgu_func AS fcn ON fcn.id_func = cn.fid_func "
+                + "LEFT OUTER JOIN cfgu_func_sub AS fscn ON fscn.id_func_sub = cn.fid_func_sub "
+                + "LEFT OUTER JOIN erp.cfgu_cur AS ccn ON ccn.id_cur = cn.fid_cur "
+                + ""
+                + (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere)
+                + ""
+                + "ORDER BY "
+                + sqlOrderByBizPartner + " b.id_bp, "
+                + "ig.igen, ig.id_igen, "
+                + sqlOrderByItem + " i.id_item, "
+                + "tcon.code, con.num_ser, LPAD(con.num, " + SDataConstantsSys.NUM_LEN_DPS + ", '0'), con.id_year, con.id_doc, cone.sort_pos, "
+                + "tdor.code, dor.num_ser, LPAD(dor.num, " + SDataConstantsSys.NUM_LEN_DPS + ", '0'), dor.id_year, dor.id_doc, "
+                + "tinv.code, inv.num_ser, LPAD(inv.num, " + SDataConstantsSys.NUM_LEN_DPS + ", '0'), inv.id_year, inv.id_doc, "
+                + "tcn.code, cn.num_ser, LPAD(cn.num, " + SDataConstantsSys.NUM_LEN_DPS + ", '0'), cn.id_year, cn.id_doc;";
     }
 
     @Override
@@ -726,11 +623,11 @@ public class SViewContractLinkEntry extends erp.lib.table.STableTab implements j
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == mjbClose) {
-                actionCloseDoc();
+            if (button == mjbSelectOptions) {
+                actionSelectOptions(true);
             }
-            else if (button == mjbOpen) {
-                actionOpenDoc();
+            else if (button == mjbViewSelectedOptions) {
+                actionViewSelectedOptions();
             }
             else if (button == mjbViewDps) {
                 actionViewDps();
