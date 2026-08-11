@@ -21,7 +21,7 @@ import sa.lib.grid.SGridRow;
  *
  * @author Adrian Aviles
  */
-public class SImportWeekProcurementFacility implements SGridRow, Serializable {
+public class SImportWeekMovProcurementFacility implements SGridRow, Serializable {
     public int Id;
     public Date Movement_date;
     public String Concept;
@@ -49,7 +49,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
     public int mnSortingPosition;
     public int mnFacilitySeasonWeekId;
 
-    public SImportWeekProcurementFacility() {
+    public SImportWeekMovProcurementFacility() {
         Id = 0;
         Movement_date = null;
         Concept =  "";
@@ -75,7 +75,7 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         oDataBizPartner = null;
     }
     
-    public SImportWeekProcurementFacility(final JsonNode docNode, final Statement statement) throws ParseException {
+    public SImportWeekMovProcurementFacility(final JsonNode docNode, final Statement statement) throws ParseException {
         Id = docNode.get("id").asInt();
         String movement_date = docNode.get("movement_date").asText();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -181,10 +181,12 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
         Is_invoiced = docNode.get("is_invoiced").asBoolean();
         
         int pkBp = docNode.get("erp_user").asInt();
-        SDataBizPartner bp = new SDataBizPartner();
-        int res = bp.read(new int[] {pkBp}, statement);
-        if (res == SLibConstants.DB_ACTION_READ_OK) {
-            oDataBizPartner = bp;
+        if (pkBp != 0) {
+            SDataBizPartner bp = new SDataBizPartner();
+            int res = bp.read(new int[] {pkBp}, statement);
+            if (res == SLibConstants.DB_ACTION_READ_OK) {
+                oDataBizPartner = bp;
+            }
         }
     }
 
@@ -298,10 +300,18 @@ public class SImportWeekProcurementFacility implements SGridRow, Serializable {
                 value = oCurrency.Name;
                 break;
             case 6:
-                value = oDataCostCenter.getCode();
+                if (oDataCostCenter != null) {
+                    value = oDataCostCenter.getCode();
+                } else {
+                    value = "";
+                }
                 break;
             case 7:
-                value = oDataCostCenter.getCostCenter();
+                if (oDataCostCenter != null) {
+                    value = oDataCostCenter.getCostCenter();
+                } else {
+                    value = "";
+                }
                 break;
             case 8:
                 value = oDataAccount.getCode();

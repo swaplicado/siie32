@@ -25,7 +25,7 @@ public class SValidateMovementWeekProcurementFacility {
     private final SGuiClient miClient;
     private final SDataAccount oAccount;
     private final SDataAccount oAccountMajor;
-    private final SImportWeekProcurementFacility oWeekProcurementFacility;
+    private final SImportWeekMovProcurementFacility oWeekProcurementFacility;
     private String Erros;
 
     public SValidateMovementWeekProcurementFacility() {
@@ -49,7 +49,7 @@ public class SValidateMovementWeekProcurementFacility {
         this.validateMovementWeekProcurementFacility();
     }
     
-    public SValidateMovementWeekProcurementFacility(SGuiClient miClient, SImportWeekProcurementFacility oWeekProcurementFacility) {
+    public SValidateMovementWeekProcurementFacility(SGuiClient miClient, SImportWeekMovProcurementFacility oWeekProcurementFacility) {
         this.miClient = miClient;
         this.oAccount = oWeekProcurementFacility.getDataAccount();
         this.oAccountMajor = oWeekProcurementFacility.getDataAccountMajor();

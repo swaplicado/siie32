@@ -234,11 +234,24 @@ public class SDataFacilityRec implements java.io.Serializable {
     public int findByExtDataId(int data_id, java.sql.Statement statement) {
         java.lang.String sql = "";
         java.sql.ResultSet resultSet = null;
+        boolean exist = false;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
+            sql = "SELECT COUNT(*) > 0 AS exist FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id;
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                // EXISTS devuelve 1 (true) o 0 (false)
+                exist = resultSet.getInt("exist") == 1;
+            }
+            
+            if (!exist) {
+                mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
+                return mnLastDbActionResult;
+            }
+            
             sql = "SELECT * FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id;
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {

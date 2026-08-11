@@ -48,7 +48,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     public static final int FORM_TYPE_WEEK_PROCUREMENT_FACILITY = 1;
     private static final String LABEL_BIZ_PARTNER = "Asociado negocios";
     
-    private SImportWeekProcurementFacility oWeekProcurementFacility;
+    private SImportWeekMovProcurementFacility oWeekProcurementFacility;
     protected ArrayList<SImportAccountingAccount> maImportedAccountingaccount;
     protected ArrayList<SImportCostCenter> maImportedCostCenter;
     protected ArrayList<SImportItems> maImportedItems;
@@ -386,6 +386,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
      * Overriden listeners:
      */
 
+    @SuppressWarnings("unchecked")
     @Override
     public void reloadCatalogues() {
         moItem.removeAllItems();
@@ -436,13 +437,13 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         if (validation.isValid()) {
             if (moDebe.getValue() != 0d && moHaber.getValue() != 0d) {
                 validation.setComponent(moDebe);
-                validation.setMessage("No es posible ingresar valor en el campo Debe y el campo Haber para el mismo movimiento");
+                validation.setMessage("No es posible ingresar valor en el campo Debe y el campo Haber para el mismo movimiento.");
             }
             
             if (validation.isValid()) {
                 if (moAccountPanel.getSelectedDataAccount() == null) {
                     validation.setComponent(moAccountPanel);
-                    validation.setMessage("Ingrese una cuenta contable");
+                    validation.setMessage("Ingrese una cuenta contable.");
                 }
             }
             
@@ -452,7 +453,21 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 
                 if (!existe) {
                     validation.setComponent(moAccountPanel);
-                    validation.setMessage("La cuenta contable ingresada no es valida");
+                    validation.setMessage("La cuenta contable ingresada no es valida.");
+                }
+            }
+            
+            if (validation.isValid()) {
+                SDataAccount accountMajor = moAccountPanel.getSelectedDataAccountLedger();
+                
+                if (accountMajor.getIsRequiredBizPartner()) {
+                    int[] pk = moFieldFkBizPartnerId_nr.getKeyAsIntArray();
+                    Statement statement = miClient.getSession().getStatement();
+                    SDataBizPartner bp = new SDataBizPartner();
+                    int res = bp.read(pk, statement);
+                    if (res != SLibConstants.DB_ACTION_READ_OK) {
+                        validation.setMessage("Ingrese un asociado de negocios.");
+                    }
                 }
             }
         }
@@ -487,7 +502,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moCurrencyId.removeItemListener(this);
     }
     
-    private void setData(SImportWeekProcurementFacility weekProcurementFacility) {
+    private void setData(SImportWeekMovProcurementFacility weekProcurementFacility) {
         oWeekProcurementFacility = weekProcurementFacility;
         moConcept.setValue(oWeekProcurementFacility.Concept);
         moReference.setValue(oWeekProcurementFacility.Reference);
@@ -504,8 +519,8 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         isResetForm = true;
     }
     
-    private SImportWeekProcurementFacility createWeekProcurementFacility() {
-        SImportWeekProcurementFacility weekProcurementFacility = new SImportWeekProcurementFacility();
+    private SImportWeekMovProcurementFacility createWeekProcurementFacility() {
+        SImportWeekMovProcurementFacility weekProcurementFacility = new SImportWeekMovProcurementFacility();
         weekProcurementFacility.setId(oWeekProcurementFacility.Id);
         weekProcurementFacility.setConcept(moConcept.getValue());
         weekProcurementFacility.setReference(moReference.getValue());
@@ -514,14 +529,23 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 //        weekProcurementFacility.setFiscal_id(moFiscalId.getValue());
         weekProcurementFacility.setUnit_cost(moUnitCost.getValue());
         weekProcurementFacility.setStock_in(moStockIn.getValue());
-        weekProcurementFacility.setItem(moItem.getValue()[0], "", moItem.getSelectedItem().toString());
+        
+        String code = "";
+        String name = "";
+        
+        if (!"".equals(moItem.getSelectedItem().toString()) && moItem.getValue()[0] != 0) {
+            String[] partes = moItem.getSelectedItem().toString().split(" - ");
+            code = partes[0];
+            name = partes[1];
+        }
+        
+        weekProcurementFacility.setItem(moItem.getValue()[0], code, name);
         weekProcurementFacility.setCurrency(moCurrencyId.getValue()[0], "", moCurrencyId.getSelectedItem().toString());
         weekProcurementFacility.setDataAccount(moAccountPanel.getSelectedDataAccount());
         weekProcurementFacility.setDataCostCenter(moCostCenterPanel.getSelectedDataCostCenter());
         weekProcurementFacility.setDataAccountMajor(moAccountPanel.getSelectedDataAccountLedger());
 
         int[] pk = moFieldFkBizPartnerId_nr.getKeyAsIntArray();
-//        int[] res2 = (int[])moFieldFkBizPartnerId_nr.getKey();
         Statement statement = miClient.getSession().getStatement();
         SDataBizPartner bp = new SDataBizPartner();
         int res = bp.read(pk, statement);
@@ -546,7 +570,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     public void setValue(final int type, final Object value) {
         switch(type) {
             case FORM_TYPE_WEEK_PROCUREMENT_FACILITY:
-                setData((SImportWeekProcurementFacility) value);
+                setData((SImportWeekMovProcurementFacility) value);
                 break;
             default:
                 miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -616,12 +640,12 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
             jlFkBizPartnerId_nr.setEnabled(false);
             jcbFkBizPartnerId_nr.setEnabled(false);
             jbFkBizPartnerId_nr.setEnabled(false);
-//            jlReference.setEnabled(false);
-//            jcbFkBizPartnerId_nr.setSelectedIndex(0);
             
             moItem.setEditable(false);
             moItem.setEnabled(false);
-//            moItem.setSelectedIndex(0);
+            
+//            moFieldFkBizPartnerId_nr.setFieldValue(null);
+//            moItem.setValue(null);
         }
         else {
             SDataAccount selectedDataAccount = null;
@@ -652,60 +676,65 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
                     jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ": *");
                 }
 
-                jlFkBizPartnerId_nr.setEnabled(true);
-                jcbFkBizPartnerId_nr.setEnabled(true);
-                jbFkBizPartnerId_nr.setEnabled(true);
-
                 if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || mbIsCurrentAccountDiogAccount) {
                     mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
                 }
-                else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CUS || isAccSysSales) {
-                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CUS || isAccSysSales) { //vacio
+                    mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                 }
                 else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_CDR) {
                     mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CDR;
                 }
                 else if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_DBR) {
-                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_DBR;
+                    mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                 }
                 else if (isAccSysTax) {
-                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CUS; // suppliers and customers!
+//                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CUS; // suppliers and customers!
+                    mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                 }
                 else {
                     switch (oAccountMajor.getFkAccountLedgerTypeId()) {
-                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CUS:
-                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CUS: //vacio
+                            mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                             break;
-                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_DBR:
-                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_CUS_DBR;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_DBR: //vacio
+                            mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                             break;
-                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_SUP:
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_SUP: //proveedores
                             mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
                             break;
-                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CDR:
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CDR: //empleados
                             mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CDR;
                             break;
                         default:
-                            mnOptionsBizPartnerType = SDataConstants.BPSU_BP; // all business partners!
+//                            mnOptionsBizPartnerType = SDataConstants.BPSU_BP; // all business partners!
+                            mnOptionsBizPartnerType = SDataConstants.UNDEFINED;
                     }
                 }
 
-                SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
-//                SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, SDataConstants.BPSU_BP);
-                moFieldFkBizPartnerId_nr.setFieldValue(new int[] { oWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId() });
-                
-//                if (isResetForm) {
-//                    moFiscalId.setValue(oWeekProcurementFacility.getDataBizPartner().getFiscalId());
-//                }
-//                else {
-//                    moFiscalId.setValue(null);
-//                }
+                if (oAccountMajor.getIsRequiredBizPartner()) {
+                    SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
+    //                SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, SDataConstants.BPSU_BP);
+                    SDataBizPartner bp = oWeekProcurementFacility.getDataBizPartner();
+                    if (bp != null) {
+                        moFieldFkBizPartnerId_nr.setFieldValue(new int[] { bp.getPkBizPartnerId() });
+                    }
+                    
+                    jlFkBizPartnerId_nr.setEnabled(true);
+                    jcbFkBizPartnerId_nr.setEnabled(true);
+                    jbFkBizPartnerId_nr.setEnabled(true);
+                } else {
+                    jlFkBizPartnerId_nr.setEnabled(false);
+                    jcbFkBizPartnerId_nr.setEnabled(false);
+                    jbFkBizPartnerId_nr.setEnabled(false);
+                    moFieldFkBizPartnerId_nr.setFieldValue(null);
+                }
             }
             else {
                 jlFkBizPartnerId_nr.setEnabled(false);
                 jcbFkBizPartnerId_nr.setEnabled(false);
                 jbFkBizPartnerId_nr.setEnabled(false);
-                jcbFkBizPartnerId_nr.setSelectedIndex(0);
+                moFieldFkBizPartnerId_nr.setFieldValue(null);
             }
 
             // Check if it is necesary to enable item fields:
