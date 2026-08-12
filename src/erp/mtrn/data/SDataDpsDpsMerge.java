@@ -264,8 +264,7 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
             sql = "SELECT COALESCE(MAX(ver), -1) + 1 AS f_ver "
                     + "FROM trn_dps_dps_merge " +
                     "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
-                    + "AND NOT b_del ";
+                    + "AND fk_dps_doc_des = " + idDoc + ";";
 
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
