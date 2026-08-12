@@ -1,4 +1,18 @@
 ================================================================================
+SIIE 3.2 306.1/ 2026-08-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Unión de partidas de facturas provenientes de distintas entregas mensuales en SIIE. DMS-92.
+
+================================================================================
+SIIE 3.2 306.0/ 2026-08-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan columnas de moneda extranjera a valuación.
+2) Validaciones extra al terminar el proceso.
+3) Configuración de porcentaje de diferencia de precio OC vs Factura.
+
+================================================================================
 SIIE 3.2 305.6/ 2026-08-11
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

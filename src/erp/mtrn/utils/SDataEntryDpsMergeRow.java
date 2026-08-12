@@ -3,16 +3,14 @@
  * and open the template in the editor.
  */
 
-package erp.mtrn.data;
+package erp.mtrn.utils;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Edwin Carmona
  */
-public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
-    
-    protected final boolean mbIsSelectionRequired;
-
+public class SDataEntryDpsMergeRow extends erp.lib.table.STableRow {
+   
     protected int mnPkYearId;
     protected int mnPkDocId;
     protected int mnPkEntryId;
@@ -20,26 +18,15 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     protected java.lang.String msConceptKey;
     protected java.lang.String msConcept;
     protected double mdQuantity;
-    protected double mdQuantityLinked;
-    protected double mdQuantityLinkedActual;
     protected boolean mbSelected;
-    protected double mdQuantityToLink;
     protected java.lang.String msUnitSymbol;
-    protected double mdSurplusPercentage;
     protected double mdPrice; // to be shown only in SDialogCfdiPurchaseOrder40
     protected java.lang.String msCurrencyCode; // to be shown only in SDialogCfdiPurchaseOrder40
     protected int mnItemId;
     protected int mnUnitId;
     
-    protected boolean mbAuxEntryPriceNeeded;
-    protected SGuiDpsEntryPrice moAuxSGuiDpsEntryPrice;
-    protected double mdAuxAmountToLink;
-    protected boolean mbAuxIsLinkedAsService;
-    
-    public SDataEntryDpsDpsLink(boolean selectionRequired) {
-        mbIsSelectionRequired = selectionRequired;
+    public SDataEntryDpsMergeRow() {
         reset();
-        prepareTableRow();
     }
 
     public void setPkYearId(int n) { mnPkYearId = n; }
@@ -49,12 +36,8 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public void setConceptKey(java.lang.String s) { msConceptKey = s; }
     public void setConcept(java.lang.String s) { msConcept = s; }
     public void setQuantity(double d) { mdQuantity = d; }
-    public void setQuantityLinked(double d) { mdQuantityLinked = d; }
-    public void setQuantityLinkedActual(double d) { mdQuantityLinkedActual = d; }
     public void setSelected(boolean b) { mbSelected = b; }
-    public void setQuantityToLink(double d) { mdQuantityToLink = d; }
     public void setUnitSymbol(java.lang.String s) { msUnitSymbol = s; }
-    public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
     public void setPrice(double d) { mdPrice = d; }
     public void setCurrencyCode(java.lang.String s) { msCurrencyCode = s; }
     public void setItemId(int n) { mnItemId = n; }
@@ -67,28 +50,12 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public java.lang.String getConceptKey() { return msConceptKey; }
     public java.lang.String getConcept() { return msConcept; }
     public double getQuantity() { return mdQuantity; }
-    public double getQuantityLinked() { return mdQuantityLinked; }
-    public double getQuantityLinkedActual() { return mdQuantityLinkedActual; }
-    public boolean getSelected() { return mbSelected; }
-    public double getQuantityToLink() { return mdQuantityToLink; }
+    public boolean isSelected() { return mbSelected; }
     public java.lang.String getUnitSymbol() { return msUnitSymbol; }
-    public double getSurplusPercentage() { return mdSurplusPercentage; }
     public double getPrice() { return mdPrice; }
     public java.lang.String getCurrencyCode() { return msCurrencyCode; }
     public int getItemId() { return mnItemId; }
     public int getUnitId() { return mnUnitId; }
-    
-    public void setAuxIsEntryPriceNeeded(boolean b) { mbAuxEntryPriceNeeded = b; }
-    public void setAuxSGuiDpsEntryPrice(SGuiDpsEntryPrice d) { moAuxSGuiDpsEntryPrice = d; }
-    public void setAuxAmountToLink(double d) { mdAuxAmountToLink = d; }
-    public void setAuxIsLinkedAsService(boolean b) { mbAuxIsLinkedAsService = b; }
-    
-    public boolean getAuxIsEntryPriceNeeded() { return mbAuxEntryPriceNeeded; }
-    public SGuiDpsEntryPrice getAuxSGuiDpsEntryPrice() { return moAuxSGuiDpsEntryPrice; }
-    public double getAuxAmountToLink() { return mdAuxAmountToLink; }
-    public boolean getAuxIsLinkedAsService() { return mbAuxIsLinkedAsService; }
-    
-    public double getQuantityToBeLinked() { return mdQuantity - mdQuantityLinked - mdQuantityLinkedActual; }
     
     public int[] getDpsEntryKey() { return new int[] { mnPkYearId, mnPkDocId, mnPkEntryId }; }
     
@@ -100,41 +67,23 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         msConceptKey = "";
         msConcept = "";
         mdQuantity = 0;
-        mdQuantityLinked = 0;
-        mdQuantityLinkedActual = 0;
         mbSelected = false;
-        mdQuantityToLink = 0;
         msUnitSymbol = "";
-        mdSurplusPercentage = 0;
         mdPrice = 0;
         msCurrencyCode = "";
         mnItemId = 0;
         mnUnitId = 0;
-        
-        mbAuxEntryPriceNeeded = false;
-        moAuxSGuiDpsEntryPrice = null;
-        mdAuxAmountToLink = 0;
-        mbAuxIsLinkedAsService = false;
     }
     
     @Override
     public void prepareTableRow() {
         mvValues.clear();
         mvValues.add(mnSortingPosition);
+        mvValues.add(mbSelected);
         mvValues.add(msConceptKey);
         mvValues.add(msConcept);
         mvValues.add(mdQuantity);
         mvValues.add(msUnitSymbol);
-        mvValues.add(mdQuantityLinked);
-        mvValues.add(mdQuantityLinkedActual);
-        mvValues.add(getQuantityToBeLinked());
-        if (mbIsSelectionRequired) {
-            mvValues.add(mbSelected);
-        }
-        mvValues.add(mdQuantityToLink);
-        mvValues.add(msUnitSymbol);
-        mvValues.add(mdSurplusPercentage);
-        // to be shown only in SDialogCfdiPurchaseOrder40:
         mvValues.add(mdPrice);
         mvValues.add(msCurrencyCode);
     }
