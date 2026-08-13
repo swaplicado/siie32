@@ -148,12 +148,6 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                         SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                         SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
                         
-                        // Exportación Avocado:
-                        
-                        SResponses responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_SILENT);
-                        SExportUtils.processResponses(miClient.getSession(), responsesAvoSup, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-                        SResponses responsesAvoEmp = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_EMPLOYEE, true, SExportUtils.EXPORT_MODE_SILENT);
-                        SExportUtils.processResponses(miClient.getSession(), responsesAvoEmp, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
                     }
                     catch (Exception e) {
                         SLibUtilities.printOutException(this, e);
