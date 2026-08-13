@@ -23,18 +23,18 @@ import java.util.logging.Logger;
 public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkDpsDpsMergeId;
-    protected int mnFkDpsOriginalYearId;
-    protected int mnFkDpsOriginalDocId;
-    protected int mnFkDpsOriginalEntryId;
-    protected int mnPkDpsDestinyYearId;
-    protected int mnPkDpsDestinyDocId;
-    protected int mnPkDpsDestinyEntryId;
     protected int mnVersion;
-    protected boolean mbIsDeleted;
-    protected double mdOriginalQuantity;
     protected double mdQuantity;
+    protected double mdOriginalQuantity;
     protected double mdUnitaryPrice;
     protected double mdUnitaryPriceCurrency;
+    protected boolean mbIsDeleted;
+    protected int mnFkDpsOldYearId;
+    protected int mnFkDpsOldDocId;
+    protected int mnFkDpsOldEntryId;
+    protected int mnPkDpsNewYearId;
+    protected int mnPkDpsNewDocId;
+    protected int mnPkDpsNewEntryId;
 
     protected java.util.Date mtAuxSourceTimestamp;
     protected java.util.Date mtAuxDestinyTimestamp;
@@ -57,37 +57,37 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
     }
 
     public void setPkDpsDpsMergeId(int n) { mnPkDpsDpsMergeId = n; }
-    public void setFkDpsOriginalYearId(int n) { mnFkDpsOriginalYearId = n; }
-    public void setFkDpsOriginalDocId(int n) { mnFkDpsOriginalDocId = n; }
-    public void setFkDpsOriginalEntryId(int n) { mnFkDpsOriginalEntryId = n; }
-    public void setFkDpsDestinyYearId(int n) { mnPkDpsDestinyYearId = n; }
-    public void setFkDpsDestinyDocId(int n) { mnPkDpsDestinyDocId = n; }
-    public void setFkDpsDestinyEntryId(int n) { mnPkDpsDestinyEntryId = n; }
     public void setVersion(int n) { mnVersion = n; }
-//    public void setIsDeleted(boolean b) { mbIsDeleted = b; }
-    public void setOriginalQuantity(double d) { mdOriginalQuantity = d; }
     public void setQuantity(double d) { mdQuantity = d; }
+    public void setOriginalQuantity(double d) { mdOriginalQuantity = d; }
     public void setUnitaryPrice(double d) { mdUnitaryPrice = d; }
     public void setUnitaryPriceCy(double d) { mdUnitaryPriceCurrency = d; }
+    //    public void setIsDeleted(boolean b) { mbIsDeleted = b; }
+    public void setFkDpsOldYearId(int n) { mnFkDpsOldYearId = n; }
+    public void setFkDpsOldDocId(int n) { mnFkDpsOldDocId = n; }
+    public void setFkDpsOldEntryId(int n) { mnFkDpsOldEntryId = n; }
+    public void setFkDpsNewYearId(int n) { mnPkDpsNewYearId = n; }
+    public void setFkDpsNewDocId(int n) { mnPkDpsNewDocId = n; }
+    public void setFkDpsNewEntryId(int n) { mnPkDpsNewEntryId = n; }
 
     public int getPkDpsDpsMergeId() { return mnPkDpsDpsMergeId; }
-    public int getFkDpsOriginalYearId() { return mnFkDpsOriginalYearId; }
-    public int getFkDpsOriginalDocId() { return mnFkDpsOriginalDocId; }
-    public int getFkDpsOriginalEntryId() { return mnFkDpsOriginalEntryId; }
-    public int getFkDpsDestinyYearId() { return mnPkDpsDestinyYearId; }
-    public int getFkDpsDestinyDocId() { return mnPkDpsDestinyDocId; }
-    public int getFkDpsDestinyEntryId() { return mnPkDpsDestinyEntryId; }
     public int getVersion() { return mnVersion; }
-//    public boolean getIsDeleted() { return mbIsDeleted; }
-    public double getOriginalQuantity() { return mdOriginalQuantity; }
     public double getQuantity() { return mdQuantity; }
+    public double getOriginalQuantity() { return mdOriginalQuantity; }
     public double getUnitaryPrice() { return mdUnitaryPrice; }
     public double getUnitaryPriceCurrency() { return mdUnitaryPriceCurrency; }
+    //    public boolean getIsDeleted() { return mbIsDeleted; }
+    public int getFkDpsOldYearId() { return mnFkDpsOldYearId; }
+    public int getFkDpsOldDocId() { return mnFkDpsOldDocId; }
+    public int getFkDpsOldEntryId() { return mnFkDpsOldEntryId; }
+    public int getFkDpsNewYearId() { return mnPkDpsNewYearId; }
+    public int getFkDpsNewDocId() { return mnPkDpsNewDocId; }
+    public int getFkDpsNewEntryId() { return mnPkDpsNewEntryId; }
     
-    public int[] getDbmsDpsKey() { return new int[] { mnPkDpsDpsMergeId, mnFkDpsOriginalYearId }; }
-    public int[] getDbmsSourceDpsEntryKey() { return new int[] { mnFkDpsOriginalYearId, mnFkDpsOriginalDocId, mnFkDpsOriginalEntryId }; }
-    public int[] getDbmsDestinyDpsKey() { return new int[] { mnPkDpsDestinyYearId, mnPkDpsDestinyDocId }; }
-    public int[] getDbmsDestinyDpsEntryKey() { return new int[] { mnPkDpsDestinyYearId, mnPkDpsDestinyDocId, mnPkDpsDestinyEntryId }; }
+    public int[] getDbmsDpsKey() { return new int[] { mnPkDpsDpsMergeId, mnFkDpsOldYearId }; }
+    public int[] getDbmsSourceDpsEntryKey() { return new int[] { mnFkDpsOldYearId, mnFkDpsOldDocId, mnFkDpsOldEntryId }; }
+    public int[] getDbmsDestinyDpsKey() { return new int[] { mnPkDpsNewYearId, mnPkDpsNewDocId }; }
+    public int[] getDbmsDestinyDpsEntryKey() { return new int[] { mnPkDpsNewYearId, mnPkDpsNewDocId, mnPkDpsNewEntryId }; }
 
     public void setAuxSourceTimestamp(java.util.Date t) { mtAuxSourceTimestamp = t; }
     public void setAuxDestinyTimestamp(java.util.Date t) { mtAuxDestinyTimestamp = t; }
@@ -138,18 +138,18 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
         super.resetRegistry();
 
         mnPkDpsDpsMergeId = 0;
-        mnFkDpsOriginalYearId = 0;
-        mnFkDpsOriginalDocId = 0;
-        mnFkDpsOriginalEntryId = 0;
-        mnPkDpsDestinyYearId = 0;
-        mnPkDpsDestinyDocId = 0;
-        mnPkDpsDestinyEntryId = 0;
         mnVersion = 0;
-        mbIsDeleted = false;
-        mdOriginalQuantity = 0; 
         mdQuantity = 0;
+        mdOriginalQuantity = 0; 
         mdUnitaryPrice = 0;
         mdUnitaryPriceCurrency = 0;
+        mbIsDeleted = false;
+        mnFkDpsOldYearId = 0;
+        mnFkDpsOldDocId = 0;
+        mnFkDpsOldEntryId = 0;
+        mnPkDpsNewYearId = 0;
+        mnPkDpsNewDocId = 0;
+        mnPkDpsNewEntryId = 0;
 
         mtAuxSourceTimestamp = null;
         mtAuxDestinyTimestamp = null;
@@ -171,8 +171,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
         try {
             sql = "SELECT COUNT(*) AS f_count "
                     + "FROM trn_dps_dps_merge " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + " "
                     + "AND NOT b_del "
                     + "AND ver <> 0 ";
 
@@ -201,8 +201,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
 
         try {
             sql = "SELECT id_dps_dps_merge FROM trn_dps_dps_merge " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + " "
                     + "AND NOT b_del "
                     + "AND ver <> 0 "
                     + "ORDER BY ver ";
@@ -232,8 +232,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
 
         try {
             sql = "SELECT id_dps_dps_merge FROM trn_dps_dps_merge " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + " "
                     + "AND NOT b_del "
                     + "AND ver = 0 ";
 
@@ -263,8 +263,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
         try {
             sql = "SELECT COALESCE(MAX(ver), -1) + 1 AS f_ver "
                     + "FROM trn_dps_dps_merge " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + ";";
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + ";";
 
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -291,8 +291,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
         try {
             sql = "UPDATE trn_dps_dps_merge " +
                     "SET b_del = 1 " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + " "
                     + "AND ver <> 0 "
                     + "AND ver < " + version + " AND NOT b_del";
 
@@ -315,8 +315,8 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
         try {
             sql = "UPDATE trn_dps_dps_merge " +
                     "SET b_del = 1 " +
-                    "WHERE fk_dps_year_des = " + idYear + " "
-                    + "AND fk_dps_doc_des = " + idDoc + " "
+                    "WHERE fid_dps_new_year = " + idYear + " "
+                    + "AND fid_dps_new_doc = " + idDoc + " "
                     + "AND ver <> 0 "
                     + "AND NOT b_del";
 
@@ -352,18 +352,18 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
             }
             else {
                 mnPkDpsDpsMergeId = pkDpsDpsMergeId;
-                mnFkDpsOriginalYearId = resultSet.getInt("fk_dps_year_orig");
-                mnFkDpsOriginalDocId = resultSet.getInt("fk_dps_doc_orig");
-                mnFkDpsOriginalEntryId = resultSet.getInt("fk_dps_ety_orig");
-                mnPkDpsDestinyYearId = resultSet.getInt("fk_dps_year_des");
-                mnPkDpsDestinyDocId = resultSet.getInt("fk_dps_doc_des");
-                mnPkDpsDestinyEntryId = resultSet.getInt("fk_dps_ety_des");
                 mnVersion = resultSet.getInt("ver");
-                mbIsDeleted = resultSet.getBoolean("b_del");
-                mdOriginalQuantity = resultSet.getDouble("orig_qty");
                 mdQuantity = resultSet.getDouble("qty");
                 mdUnitaryPrice = resultSet.getDouble("price_u");
                 mdUnitaryPriceCurrency = resultSet.getDouble("price_u_cur");
+                mdOriginalQuantity = resultSet.getDouble("orig_qty");
+                mbIsDeleted = resultSet.getBoolean("b_del");
+                mnFkDpsOldYearId = resultSet.getInt("fid_dps_old_year");
+                mnFkDpsOldDocId = resultSet.getInt("fid_dps_old_doc");
+                mnFkDpsOldEntryId = resultSet.getInt("fid_dps_old_ety");
+                mnPkDpsNewYearId = resultSet.getInt("fid_dps_new_year");
+                mnPkDpsNewDocId = resultSet.getInt("fid_dps_new_doc");
+                mnPkDpsNewEntryId = resultSet.getInt("fid_dps_new_ety");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -391,34 +391,34 @@ public class SDataDpsDpsMerge extends erp.lib.data.SDataRegistry implements java
                 mnPkDpsDpsMergeId = computePrimaryKey(connection.createStatement());
                 sql = "INSERT INTO trn_dps_dps_merge VALUES (" +
                         mnPkDpsDpsMergeId + ", " +
-                        mnFkDpsOriginalYearId + ", " +
-                        mnFkDpsOriginalDocId + ", " +
-                        mnFkDpsOriginalEntryId + ", " +
-                        mnPkDpsDestinyYearId + ", " +
-                        mnPkDpsDestinyDocId + ", " +
-                        mnPkDpsDestinyEntryId + ", " +
                         mnVersion + ", " +
-                        (mbIsDeleted ? 1 : 0) + ", " +
-                        mdOriginalQuantity + ", " +
                         mdQuantity + ", " +
+                        mdOriginalQuantity + ", " +
                         mdUnitaryPrice + ", " +
-                        mdUnitaryPriceCurrency + ")";
+                        mdUnitaryPriceCurrency + ", " +
+                        (mbIsDeleted ? 1 : 0) + ", " +
+                        mnFkDpsOldYearId + ", " +
+                        mnFkDpsOldDocId + ", " +
+                        mnFkDpsOldEntryId + ", " +
+                        mnPkDpsNewYearId + ", " +
+                        mnPkDpsNewDocId + ", " +
+                        mnPkDpsNewEntryId + ")";
             }
             else {
                 sql = "UPDATE trn_dps_dps_merge SET " +
                         //"id_dps_dps_merge = " + mnPkDpsDpsMergeId + ", " +
-                        "fk_dps_year_orig = " + mnFkDpsOriginalYearId + ", " +
-                        "fk_dps_doc_orig = " + mnFkDpsOriginalDocId + ", " +
-                        "fk_dps_ety_orig = " + mnFkDpsOriginalEntryId + ", " +
-                        "fk_dps_year_des = " + mnPkDpsDestinyYearId + ", " +
-                        "fk_dps_doc_des = " + mnPkDpsDestinyDocId + ", " +
-                        "fk_dps_ety_des = " + mnPkDpsDestinyEntryId + ", " +
                         "ver = " + mnVersion + ", " +
-                        "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
-                        "orig_qty = " + mdOriginalQuantity + ", " +
                         "qty = " + mdQuantity + ", " +
+                        "orig_qty = " + mdOriginalQuantity + ", " +
                         "price_u = " + mdUnitaryPrice + ", " +
-                        "price_u_cur = " + mdUnitaryPriceCurrency + 
+                        "price_u_cur = " + mdUnitaryPriceCurrency + ", " +
+                        "b_del = " + (mbIsDeleted ? 1 : 0) + ", " +
+                        "fid_dps_old_year = " + mnFkDpsOldYearId + ", " +
+                        "fid_dps_old_doc = " + mnFkDpsOldDocId + ", " +
+                        "fid_dps_old_ety = " + mnFkDpsOldEntryId + ", " +
+                        "fid_dps_new_year = " + mnPkDpsNewYearId + ", " +
+                        "fid_dps_new_doc = " + mnPkDpsNewDocId + ", " +
+                        "fid_dps_new_ety = " + mnPkDpsNewEntryId + " " +
                         " WHERE id_dps_dps_merge = " + mnPkDpsDpsMergeId;
             }
 

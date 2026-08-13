@@ -60,19 +60,19 @@ public class SMergeEntriesUtils {
             for (SDataDpsEntry oDpsEntry : lDpsEntries) {
                 boolean isOriginal = false;
                 for (SDataDpsDpsMerge oDpsOriginalEty : lOriginalEntries) {
-                    if (oDpsOriginalEty.getFkDpsDestinyYearId() == oDpsEntry.getPkYearId() &&
-                        oDpsOriginalEty.getFkDpsDestinyDocId() == oDpsEntry.getPkDocId() &&
-                        oDpsOriginalEty.getFkDpsDestinyEntryId() == oDpsEntry.getPkEntryId()) {
+                    if (oDpsOriginalEty.getFkDpsNewYearId() == oDpsEntry.getPkYearId() &&
+                        oDpsOriginalEty.getFkDpsNewDocId() == oDpsEntry.getPkDocId() &&
+                        oDpsOriginalEty.getFkDpsNewEntryId() == oDpsEntry.getPkEntryId()) {
                         oDpsEntry.setIsDeleted(false);
                         oDpsEntry.setAuxUndoMerged(true);
                         
                         SDataDpsDpsLink oOriginalDpsLink = new SDataDpsDpsLink();
-                        oOriginalDpsLink.setPkSourceYearId(oDpsOriginalEty.getFkDpsOriginalYearId());
-                        oOriginalDpsLink.setPkSourceDocId(oDpsOriginalEty.getFkDpsOriginalDocId());
-                        oOriginalDpsLink.setPkSourceEntryId(oDpsOriginalEty.getFkDpsOriginalEntryId());
-                        oOriginalDpsLink.setPkDestinyYearId(oDpsOriginalEty.getFkDpsDestinyYearId());
-                        oOriginalDpsLink.setPkDestinyDocId(oDpsOriginalEty.getFkDpsDestinyDocId());
-                        oOriginalDpsLink.setPkDestinyEntryId(oDpsOriginalEty.getFkDpsDestinyEntryId());
+                        oOriginalDpsLink.setPkSourceYearId(oDpsOriginalEty.getFkDpsOldYearId());
+                        oOriginalDpsLink.setPkSourceDocId(oDpsOriginalEty.getFkDpsOldDocId());
+                        oOriginalDpsLink.setPkSourceEntryId(oDpsOriginalEty.getFkDpsOldEntryId());
+                        oOriginalDpsLink.setPkDestinyYearId(oDpsOriginalEty.getFkDpsNewYearId());
+                        oOriginalDpsLink.setPkDestinyDocId(oDpsOriginalEty.getFkDpsNewDocId());
+                        oOriginalDpsLink.setPkDestinyEntryId(oDpsOriginalEty.getFkDpsNewEntryId());
                         oOriginalDpsLink.setQuantity(oDpsOriginalEty.getQuantity());
                         oOriginalDpsLink.setOriginalQuantity(oDpsOriginalEty.getOriginalQuantity());
                         
@@ -100,9 +100,9 @@ public class SMergeEntriesUtils {
                     // si no está borrada y está en la configuración de merge, se agrega a lista de borradas
                     boolean isInMergeConfig = false;
                     for (SDataDpsDpsMerge oDpsMerge : lMerged) {
-                        if (oDpsMerge.getFkDpsDestinyYearId() == oNotSelected.getPkYearId() &&
-                        oDpsMerge.getFkDpsDestinyDocId() == oNotSelected.getPkDocId() &&
-                        oDpsMerge.getFkDpsDestinyEntryId() == oNotSelected.getPkEntryId()) {
+                        if (oDpsMerge.getFkDpsNewYearId() == oNotSelected.getPkYearId() &&
+                        oDpsMerge.getFkDpsNewDocId() == oNotSelected.getPkDocId() &&
+                        oDpsMerge.getFkDpsNewEntryId() == oNotSelected.getPkEntryId()) {
                             isInMergeConfig = true;
                             break;
                         }
@@ -126,12 +126,12 @@ public class SMergeEntriesUtils {
                         
                         // crear partida de unificación en tabla de merge
                         oDpsMergeEty = new SDataDpsDpsMerge();
-                        oDpsMergeEty.setFkDpsOriginalYearId(oDpsEntry.getPkYearId());
-                        oDpsMergeEty.setFkDpsOriginalDocId(oDpsEntry.getPkDocId());
-                        oDpsMergeEty.setFkDpsOriginalEntryId(oDpsEntry.getPkEntryId());
-                        oDpsMergeEty.setFkDpsDestinyYearId(idYear);
-                        oDpsMergeEty.setFkDpsDestinyDocId(idDoc);
-                        oDpsMergeEty.setFkDpsDestinyEntryId(0);
+                        oDpsMergeEty.setFkDpsOldYearId(oDpsEntry.getPkYearId());
+                        oDpsMergeEty.setFkDpsOldDocId(oDpsEntry.getPkDocId());
+                        oDpsMergeEty.setFkDpsOldEntryId(oDpsEntry.getPkEntryId());
+                        oDpsMergeEty.setFkDpsNewYearId(idYear);
+                        oDpsMergeEty.setFkDpsNewDocId(idDoc);
+                        oDpsMergeEty.setFkDpsNewEntryId(0);
                         oDpsMergeEty.setVersion(mergeVersion == 0 ? 1 : mergeVersion);
                         oDpsMergeEty.setQuantity(oDpsEntry.getQuantity());
                         oDpsMergeEty.setOriginalQuantity(oDpsEntry.getOriginalQuantity());
@@ -170,12 +170,12 @@ public class SMergeEntriesUtils {
                                     // Si la versión es 0, se debe crear un registro en la tabla de merge para preservar el vínculo original
                                     oDpsOriginalLinkEty = new SDataDpsDpsMerge();
     
-                                    oDpsOriginalLinkEty.setFkDpsOriginalYearId(linkedEntry.getPkSourceYearId());
-                                    oDpsOriginalLinkEty.setFkDpsOriginalDocId(linkedEntry.getPkSourceDocId());
-                                    oDpsOriginalLinkEty.setFkDpsOriginalEntryId(linkedEntry.getPkSourceEntryId());
-                                    oDpsOriginalLinkEty.setFkDpsDestinyYearId(linkedEntry.getPkDestinyYearId());
-                                    oDpsOriginalLinkEty.setFkDpsDestinyDocId(linkedEntry.getPkDestinyDocId());
-                                    oDpsOriginalLinkEty.setFkDpsDestinyEntryId(linkedEntry.getPkDestinyEntryId());
+                                    oDpsOriginalLinkEty.setFkDpsOldYearId(linkedEntry.getPkSourceYearId());
+                                    oDpsOriginalLinkEty.setFkDpsOldDocId(linkedEntry.getPkSourceDocId());
+                                    oDpsOriginalLinkEty.setFkDpsOldEntryId(linkedEntry.getPkSourceEntryId());
+                                    oDpsOriginalLinkEty.setFkDpsNewYearId(linkedEntry.getPkDestinyYearId());
+                                    oDpsOriginalLinkEty.setFkDpsNewDocId(linkedEntry.getPkDestinyDocId());
+                                    oDpsOriginalLinkEty.setFkDpsNewEntryId(linkedEntry.getPkDestinyEntryId());
                                     oDpsOriginalLinkEty.setVersion(mergeVersion);
                                     oDpsOriginalLinkEty.setQuantity(linkedEntry.getQuantity());
                                     oDpsOriginalLinkEty.setOriginalQuantity(linkedEntry.getOriginalQuantity());

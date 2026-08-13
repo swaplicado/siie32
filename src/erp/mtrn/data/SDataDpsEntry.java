@@ -1552,8 +1552,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         else {
                             SDataDpsDpsMerge.deletePastVersions(connection.createStatement(), mnPkYearId, mnPkDocId, mlDbmsDpsMergeRows.get(mlDbmsDpsMergeRows.size()-1).getVersion());
                             for (SDataDpsDpsMerge oMerge : mlDbmsDpsMergeRows) {
-                                if (oMerge.getFkDpsDestinyEntryId() == 0) {
-                                    oMerge.setFkDpsDestinyEntryId(mnPkEntryId);
+                                if (oMerge.getFkDpsNewEntryId() == 0) {
+                                    oMerge.setFkDpsNewEntryId(mnPkEntryId);
                                 }
                                 if (oMerge.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
