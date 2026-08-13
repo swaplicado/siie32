@@ -234,7 +234,8 @@ public class SStockValuationRecordUtils {
                 }
                 
                 // Se asigna el centro de costo del movimiento de almacén de salida:
-                nIdDiogEtyCc = oConsumption.getAuxFkCostCenter();
+                // 2026-08-13 Se cambia CC a 0 para no usar el del diog, sino el de la RM o DPS
+                nIdDiogEtyCc = 0;
 
                 for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
@@ -249,6 +250,18 @@ public class SStockValuationRecordUtils {
                     if (nIdDiogEtyCc > 1) {
                         nIdCC = nIdDiogEtyCc;
                         sCc = SFinUtils.getCostCenterFormerIdXXX(session, nIdCC);
+                    }
+                    else if (lPurAccConfigs.size() == 1 
+                                && oConsumption.getAuxDpsCostCenterCode() != null 
+                                && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
+                        if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
+                            nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
+                            lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
+                        }
+                        sCc = oConsumption.getAuxDpsCostCenterCode();
                     }
                     else {
                         if (lCC.containsKey(oConfig.getCostCenterId())) {
@@ -355,6 +368,7 @@ public class SStockValuationRecordUtils {
                 if (Math.abs(quantityDifference) >= 0.001d && mainConfig != null) {
                     mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 3));
                 }
+                String sWhsCc;
                 for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
                         oAccount = lAccounts.get(oConfig.getAccountId());
@@ -365,13 +379,30 @@ public class SStockValuationRecordUtils {
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
 
-                    if (lCC.containsKey(oConfig.getCostCenterId())) {
-                        nIdCC = lCC.get(oConfig.getCostCenterId());
+                    if (lPurAccConfigs.size() == 1 
+                            && vWhsAccConfigs.size() == 1 
+                            && oConsumption.getAuxDpsCostCenterCode() != null 
+                            && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
+                        if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
+                            nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
+                            lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
+                        }
+                        sWhsCc = oConsumption.getAuxDpsCostCenterCode();
                     }
                     else {
-                        nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
-                        lCC.put(oConfig.getCostCenterId(), nIdCC);
+                        if (lCC.containsKey(oConfig.getCostCenterId())) {
+                            nIdCC = lCC.get(oConfig.getCostCenterId());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
+                            lCC.put(oConfig.getCostCenterId(), nIdCC);
+                        }
+                        sWhsCc = oConfig.getCostCenterId();
                     }
+
 
                     /**
                      * Partida de almacén (credit)
@@ -388,7 +419,7 @@ public class SStockValuationRecordUtils {
                             oCfg.getTextAssetEntries(),
                             oAccount,
                             nIdCC,
-                            oConfig.getCostCenterId(),
+                            sWhsCc,
                             sortPosition++,
                             new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
                             nItemReference,

@@ -14,6 +14,7 @@ import erp.lib.table.STablePane;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
 import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
@@ -26,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -544,7 +547,14 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 }
                 else {
                     if (moMaterialRequest.getChildCostCenters() != null && moMaterialRequest.getChildCostCenters().size() > 0) {
-                        idCc = moMaterialRequest.getChildCostCenters().get(0).getPkCostCenterId();
+                        SDbMaterialRequestCostCenter oMaxCC = Collections.max(moMaterialRequest.getChildCostCenters(), 
+                                                                Comparator.comparingDouble(SDbMaterialRequestCostCenter::getPercentage));
+                        if (oMaxCC != null) {
+                            idCc = oMaxCC.getPkCostCenterId();
+                        }
+                        else {
+                            idCc = moMaterialRequest.getChildCostCenters().get(0).getPkCostCenterId();
+                        }
                     }
                 }
                 if (idCc > 0) {

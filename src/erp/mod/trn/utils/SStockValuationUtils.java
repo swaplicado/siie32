@@ -108,11 +108,14 @@ public class SStockValuationUtils {
                 + "    dps.fid_tp_dps, "
                 + "    dps_ety.price_u_real_r, "
                 + "    dps_ety.stot_r, "
+                + "    dps_ety.fid_cc_n AS dps_ety_cc, "
                 + "    dps_des.num AS des_num, "
                 + "    supp.id_des_year, "
                 + "    supp.id_des_doc, "
                 + "    supp.id_des_ety, "
-                + "    dps_ety_des.price_u_real_r AS ety_des_price_real "
+                + "    dps_ety_des.fid_cc_n AS ety_des_cc, "
+                + "    dps_ety_des.price_u_real_r AS ety_des_price_real, "
+                + "    dps_ety_des.price_u_real_cur_r AS ety_des_price_real_cur "
                 + "FROM "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
                 + "        INNER JOIN "
@@ -264,6 +267,10 @@ public class SStockValuationUtils {
                         if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
                             oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
                             oEntry.setTemporalPrice(true);
+                            oEntry.setExchangeRate(res.getDouble("exc_rate"));
+                            oEntry.setFkDpsCurrencyInId_n(res.getInt("fid_cur"));
+                            oEntry.setAuxDpsCostCenterCode(res.getString("dps_ety_cc"));
+
                             String sLog = "El movimiento de entrada al almacén "
                                     + "con número de documento " + res.getInt("d.num") + " y "
                                     + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + " "
@@ -323,12 +330,19 @@ public class SStockValuationUtils {
                             oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
                             oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
                             oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+
+                            oEntry.setAuxDpsCostCenterCode(res.getString("ety_des_cc"));
                         }
                     }
                     // Si es factura
                     else if (oEntry.getAuxTypeDpsIn()[0] == SModSysConsts.TRNU_TP_DPS_PUR_INV[0]
                             && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_INV[1]
                             && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_INV[2]) {
+
+                        oEntry.setExchangeRate(res.getDouble("exc_rate"));
+                        oEntry.setFkDpsCurrencyInId_n(res.getInt("fid_cur"));
+                        oEntry.setAuxDpsCostCenterCode(res.getString("dps_ety_cc"));
+
                         DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
                                                                             oEntry.getFkDpsYearInId_n(),
                                                                             oEntry.getFkDpsDocInId_n());
@@ -652,6 +666,7 @@ public class SStockValuationUtils {
                         oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
                         oConsumption.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_CONSUMP);
                         oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+                        oConsumption.setAuxDpsCostCenterCode(entry.getAuxDpsCostCenterCode());
 
                         oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
                         oConsumption.setFkWarehouseId(res.getInt("id_wh"));
@@ -1378,6 +1393,7 @@ public class SStockValuationUtils {
                 + "    dps.fid_cl_dps AS fid_cl_dps, "
                 + "    dps.fid_tp_dps AS fid_tp_dps, "
                 + "    dps.fid_dps_nat AS fid_dps_nat, "
+                + "    COALESCE(dps_ety.fid_cc_n, '') AS dps_ety_cc, "
                 + "    supp.id_des_year AS id_des_year, "
                 + "    supp.id_des_doc AS id_des_doc "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS ve "
@@ -1390,6 +1406,11 @@ public class SStockValuationUtils {
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps "
                 + "        ON ve.fk_dps_year_in_n = dps.id_year "
                 + "        AND ve.fk_dps_doc_in_n = dps.id_doc "
+                + "        LEFT JOIN "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dps_ety "
+                + "        ON ve.fk_dps_year_in_n = dps_ety.id_year "
+                + "        AND ve.fk_dps_doc_in_n = dps_ety.id_doc "
+                + "        AND ve.fk_dps_ety_in_n = dps_ety.id_ety "
                 + "        LEFT JOIN "
                 + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON ve.fk_dps_year_in_n = supp.id_src_year "
                 + "        AND ve.fk_dps_doc_in_n = supp.id_src_doc "
@@ -1432,6 +1453,7 @@ public class SStockValuationUtils {
                 oEntry.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
                 oEntry.setFkCompanyBranchId(res.getInt("fk_cob"));
                 oEntry.setFkWarehouseId(res.getInt("fk_wh"));
+                oEntry.setAuxDpsCostCenterCode(res.getString("dps_ety_cc"));
 
                 if (res.getInt("fid_ct_dps") > 0 && res.getInt("fid_cl_dps") > 0
                         && res.getInt("fid_tp_dps") > 0) {
