@@ -481,9 +481,9 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
-    public static final int TRN_DPS_DPS_ADJ = 207055; 
-    public static final int TRN_DPS_DPS_MERGE = 207067; 
-    public static final int TRN_DPS_MAT_REQ = 207066;
+    public static final int TRN_DPS_DPS_ADJ = 207055;
+    public static final int TRN_DPS_DPS_MERGE = 207068;
+    public static final int TRN_DPS_MAT_REQ = 207067;
     public static final int TRN_DPS_IOG_CHG = 207056;
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;

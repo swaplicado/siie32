@@ -660,8 +660,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
             SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Enviando datos a servicios SWAP...", () -> {
                     SResponses responses;
-                    SResponses responsesAvoSup;
-                    SResponses responsesAvoEmp;
                     try {
                         SwingUtilities.invokeLater(() ->
                             miClient.getFrame().getRootPane().setCursor(
@@ -671,16 +669,11 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                         
                         // Exportación SWAP Services:
                         responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                        // Exportación Avocado proveedores:
-                        responsesAvoSup = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_SUPPLIER, false, SExportUtils.EXPORT_MODE_SILENT);
-                        // Exportación Avocado empleados:
-                        responsesAvoEmp = SExportUtils.exportData(miClient.getSession(), SSyncType.AVO_PARTNER_EMPLOYEE, false, SExportUtils.EXPORT_MODE_SILENT);
                         
                         SwingUtilities.invokeLater(() -> {
                             try {
                                 if (responses != null) SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-                                if (responsesAvoSup != null) SExportUtils.processResponses(miClient.getSession(), responsesAvoSup, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
-                                if (responsesAvoEmp != null) SExportUtils.processResponses(miClient.getSession(), responsesAvoEmp, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                                
                             } catch (Exception ex) {
                                 Logger.getLogger(SViewBizPartner.class.getName()).log(Level.SEVERE, null, ex);
                             }
