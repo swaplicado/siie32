@@ -117,6 +117,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiContractsLinked;
     private javax.swing.JMenuItem jmiContractsLinkedEntry;
     private javax.swing.JMenuItem jmiContractsLinks;
+    private javax.swing.JMenuItem jmiContractsLinksEntries;
     private javax.swing.JMenuItem jmiContractsAutPending;
     private javax.swing.JMenuItem jmiContractsAutAutorized;
     private javax.swing.JMenuItem jmiContractsAutRejected;
@@ -419,6 +420,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinked = new JMenuItem("Contratos procesados");
         jmiContractsLinkedEntry = new JMenuItem("Contratos procesados a detalle");
         jmiContractsLinks = new JMenuItem("Vínculos de contratos como origen");
+        jmiContractsLinksEntries = new JMenuItem("Detalle comercial de contratos por procesar");
         jmiContractsAutPending = new JMenuItem("Contratos por autorizar");
         jmiContractsAutAutorized = new JMenuItem("Contratos autorizados");
         jmiContractsAutRejected = new JMenuItem("Contratos rechazados");
@@ -433,6 +435,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmCon.add(jmiContractsLinkedEntry);
         jmCon.addSeparator();
         jmCon.add(jmiContractsLinks);
+        jmCon.add(jmiContractsLinksEntries);
         jmCon.addSeparator();
         jmCon.add(jmiContractsAutPending);
         jmCon.add(jmiContractsAutAutorized);
@@ -842,6 +845,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiContractsLinkPendEntry.addActionListener(this);
         jmiContractsLinkedEntry.addActionListener(this);
         jmiContractsLinks.addActionListener(this);
+        jmiContractsLinksEntries.addActionListener(this);
         jmiContractsAutPending.addActionListener(this);
         jmiContractsAutAutorized.addActionListener(this);
         jmiContractsAutRejected.addActionListener(this);
@@ -1566,6 +1570,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "CPA - Rastreo vínculos " + SDataConstantsSys.getDpsTypeNamePlr(auxType01).toLowerCase();
                     break;
 
+                case SDataConstants.TRNX_CON_LINK_ETY:
+                    oViewClass = erp.mtrn.view.SViewContractLinkEntry.class;
+                    sViewTitle = "CPA - Detalle comercial " + SDataConstantsSys.getDpsTypeNamePlr(SDataConstantsSys.TRNX_TP_DPS_EST_CON).toLowerCase() + " x procesar";
+                    break;
+
                 case SDataConstants.TRNX_DPS_AUTHORIZE_PEND:
                     oViewClass = erp.mtrn.view.SViewDpsPendAuthorized.class;
                     sViewTitle = getViewTitle(auxType01);
@@ -1581,10 +1590,12 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "CPA - " + SDataConstantsSys.getDpsTypeNamePlr(auxType02) + " auditad@s";
                     break;
                     
+                /* XXX 2026-08-04, Sergio Flores: ¡No es claro por qué este código se encuentra comentado!
                 //case SDataConstants.TRNX_DPS_SUPPLY:
                 //    oViewClass = erp.mtrn.view.SViewDpsPendAuthorizedSupply.class;
                 //    sViewTitle = getViewTitle(auxType01);
                 //    break;
+                */
                 
                 case SDataConstants.TRNU_TP_DPS_ANN:
                     oViewClass = erp.mtrn.view.SViewDpsAnnulled.class;
@@ -1761,7 +1772,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                             sViewTitle = "Pedidos concluidos aut. app web";
                             break;
                     }
-                break;
+                    break;
 
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
@@ -1960,6 +1971,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiContractsLinks) {
                 showView(SDataConstants.TRNX_DPS_LINKS, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_LINK_EST_CON_SRC);
+            }
+            else if (item == jmiContractsLinksEntries) {
+                showView(SDataConstants.TRNX_CON_LINK_ETY, SDataConstantsSys.TRNS_CT_DPS_PUR, SDataConstantsSys.TRNX_TP_DPS_EST_CON);
             }
             else if (item == jmiContractsAutPending) {
                 showView(SDataConstants.TRNX_DPS_AUTHORIZE_PEND, SDataConstantsSys.TRNX_DPS_PUR_CON_AUT_PEND);

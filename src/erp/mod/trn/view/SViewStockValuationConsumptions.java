@@ -402,7 +402,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "u.symbol, "
                 + "mvt.qty_mov, "
                 + "mvt.cost_u, "
-                + "mvt.qty_mov * mvt.cost_u AS mvt_total, "
+                + "IF(mvt.qty_mov = 0, mvt.cost_r, mvt.qty_mov * mvt.cost_u) AS mvt_total, "
                 + "mvt.fk_ct_iog, "
                 + "ctd.ct_iog, "
                 + "CONCAT(di_in.num_ser, IF(LENGTH(di_in.num_ser) = 0, '', '-'), "

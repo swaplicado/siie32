@@ -1030,7 +1030,8 @@ public class SStockValuationUtils {
             ResultSet res = st.executeQuery(sql);
             while (res.next()) {
                 if (!isValuationDiogsValidById(session, res.getInt("id_stk_val")).isEmpty()
-                        || !isValuationMatReqValidById(session, res.getInt("id_stk_val")).isEmpty()) {
+                        || !isValuationMatReqValidById(session, res.getInt("id_stk_val")).isEmpty()
+                        || !isValuationDpsValidById(session, res.getInt("id_stk_val")).isEmpty()) {
                     return res.getDate("dt_sta");
                 }
             }
