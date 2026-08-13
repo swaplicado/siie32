@@ -1,11 +1,13 @@
 ================================================================================
-SIIE 3.2 305.6/ 2026-08-13
+SIIE 3.2 305.7/ 2026-08-13
 Rodrigo Abel AYALA VÁZQUEZ
 --------------------------------------------------------------------------------
 1) Reforzamiento de validaciones de atributos activo y eliminado al exportar proveedores y empleados a la aplicación de compras y gastos de aguacate (Avocado).
 2) Optimización en la presentación de resultados al finalizar el proceso de exportación de Avocado.
 3) Blindaje del proceso de autenticación (Login dinámico) hacia servicios de Avocado.
 4) Exportación de acreedor y deudor comodín.
+
+================================================================================
 SIIE 3.2 305.6/ 2026-08-11
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
