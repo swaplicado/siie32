@@ -1046,10 +1046,23 @@ public abstract class SExportUtils {
             syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico del end point
         }
         
-        // Login dinámico:
+        // Login dinámico Avo:
         
         if (syncType == SSyncType.AVO_PARTNER_SUPPLIER || syncType == SSyncType.AVO_PARTNER_EMPLOYEE) {
-            String jwt = SAvoUtils.loginToAvoOperationControl(session);
+            String jwt = "";
+            try {
+                jwt = SAvoUtils.loginToAvoOperationControl(session);
+                
+                if (jwt == null || jwt.trim().isEmpty()) {
+                    throw new Exception("Falló la conexión con la API de " + SSwapConsts.AVOCADO + ".");
+                }
+            } 
+            catch (Exception ex) {
+                // Registramos el fallo solo en la carpeta de Logs del servidor:
+                SAvoLoginLogger.logFailure(ex.getMessage());
+                throw ex; 
+            }
+            
             syncToken = "Bearer " + jwt.replace("\"", "");
         }
         
@@ -1157,7 +1170,7 @@ public abstract class SExportUtils {
             Date requestDatetime = new Date();
             String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
             Date responseDatetime = new Date();
-
+            
             if (firstRequestDatetime == null) {
                 firstRequestDatetime = requestDatetime;
             }
@@ -1312,6 +1325,7 @@ public abstract class SExportUtils {
                     case PARTNER_SUPPLIER:
                     case PARTNER_CUSTOMER:
                         // exportar antes actores para autorización:
+                        
                         syncTypeInProgress = SSyncType.AUTH_ACTOR;
                         info = computeRequest(session, syncTypeInProgress);
                         responses.getInfos().add(info);
@@ -1319,6 +1333,17 @@ public abstract class SExportUtils {
                         if (info.isResponseOk()) {
                             // exportar los datos solicitados:
                             syncTypeInProgress = syncType;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                        }
+                        
+                        if (syncType == SSyncType.PARTNER_SUPPLIER) {
+                            // Exportar también proveedores y empleados aguacate:
+                            syncTypeInProgress = SSyncType.AVO_PARTNER_SUPPLIER;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                            
+                            syncTypeInProgress = SSyncType.AVO_PARTNER_EMPLOYEE;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }
@@ -1341,13 +1366,6 @@ public abstract class SExportUtils {
                         }
                         break;
                         
-                    case AVO_PARTNER_SUPPLIER:
-                    case AVO_PARTNER_EMPLOYEE:
-                        syncTypeInProgress = syncType;
-                        info = computeRequest(session, syncTypeInProgress);
-                        responses.getInfos().add(info);
-                        break;
-
                     default:
                         throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                 }

@@ -20,6 +20,7 @@ public abstract class SSwapConsts {
     public static final String SWAP_SERVICES = "SWAP Services";
     public static final String PURCHASE_PORTAL = "Portal de Compras";
     public static final String SOM = "Seeds, Oils and Meals, SOM 1.0";
+    public static final String AVOCADO = "Avocado";
     
     public static final int TIME_30_SEC = 60 * 1000; // 30 segundos en milisegundos
     public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
@@ -82,6 +83,10 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
     public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
     public static final String CFG_OBJ_AVO_SRV_BUSINESS_PARTNERS = "business-partners";
+    
+    // JSON names for Avo configuration:
+    public static final String CFG_ATT_AVO_CDR_IDS = "cdr_ids";
+    public static final String CFG_ATT_AVO_DBR_IDS = "dbr_ids";
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
