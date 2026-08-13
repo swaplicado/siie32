@@ -3609,7 +3609,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     }
                                 }
                                 else {
-                                    miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo");
+                                    miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo.");
                                     return;
                                 }
                             }
