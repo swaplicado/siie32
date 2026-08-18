@@ -74,7 +74,7 @@ import sa.lib.srv.SSrvConsts;
 /**
  * Utilerías para importar y controlar el procesamiento de registros desde SWAP Services.
  * 
- * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores, Claudfio Peña
  */
 public abstract class SImportUtils {
     
@@ -1023,6 +1023,11 @@ public abstract class SImportUtils {
             }
             
             if (downloadMode == DWNLD_MODE_DOCS_FILES_AS_ZIP) {
+                JFileChooser fileChooser = session.getClient().getFileChooser();
+                fileChooser.resetChoosableFileFilters();
+                fileChooser.setAcceptAllFileFilterUsed(true);
+            }
+            else if (downloadMode == DWNLD_MODE_DOC_FILES_IN_TEMP_DIR) {
                 JFileChooser fileChooser = session.getClient().getFileChooser();
                 fileChooser.resetChoosableFileFilters();
                 fileChooser.setAcceptAllFileFilterUsed(true);

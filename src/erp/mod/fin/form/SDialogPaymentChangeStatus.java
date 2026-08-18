@@ -56,6 +56,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private int mnFormCase;
     private HashMap<Integer, Date> moLastPaymentDaysMap;
     private double mdOriginalPaymentCy;
+    private Date moOriginalPaymentDate;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -523,6 +524,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         
         SDbPaymentEntry singleEntry = moRegistry.getSingleEntry();
         mdOriginalPaymentCy = singleEntry.getDestinyPaymentApplicationEntryCy();
+        moOriginalPaymentDate = moRegistry.getDateApplication();
         
         jtfFolio.setText(moRegistry.getFolio());
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
@@ -625,6 +627,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+                
+        if (validation.isValid() && moDateNewDate.getValue() != null) {
+            if (moDateNewDate.getValue().before(moOriginalPaymentDate)) {
+                validation.setMessage("La fecha programada no puede ser anterior a la fecha del pago: " + SLibUtils.DateFormatDate.format(moOriginalPaymentDate) + ".");
+                validation.setComponent(moDateNewDate.getComponent());
+            }
+        }
         
         if (validation.isValid()) {
             if (mnFormCase == CASE_CHANGE_CURRENCY && moRegistry.getOldFkCurrencyId() == moKeyCurrency.getValue()[0]) {

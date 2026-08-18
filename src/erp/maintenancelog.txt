@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 306.2/ 2026-08-18
+Jhonatan Claduio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Restricción de cambiar la fecha de pago programada a fechas posteriores a la fecha autorizada
+2) Reporte de embarques especial para saporis.  
+
+================================================================================
 SIIE 3.2 306.1/ 2026-08-12
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

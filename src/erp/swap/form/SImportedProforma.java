@@ -7,7 +7,10 @@ package erp.swap.form;
 
 import cfd.ver40.DCfdi40Catalogs;
 import com.fasterxml.jackson.databind.JsonNode;
+import erp.SFileUtilities;
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.mbps.data.SDataBizPartner;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbFunctionalSubArea;
@@ -40,7 +43,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * In-memory proforma received from SWAP Services.
  *
- * @author César Orozco, Edwin Carmona, Sergio Flores
+ * @author César Orozco, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SImportedProforma implements SGridRow, Serializable, Comparable<SImportedProforma> {
 
@@ -60,7 +63,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
     public static final int MATCH_PAY_TP_OMIT = 0; // coincidencia de tipo de pago: omitir
     public static final int MATCH_PAY_TP_REQUIRED = 1; // coincidencia de tipo de pago: requerida
     public static final int MATCH_PAY_TP_CONFIRM_ON_FAIL = 2; // coincidencia de tipo de pago: confirmar cuando no corresponda
-
+       
     /**
      * Document types.
      */
@@ -136,6 +139,8 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
     public SDbPayment Payment;
 
     public Reference[] References;
+    public File[] AuxFiles;
+    public Boolean IsBizPartnerDomestic;
 
     public SImportedProforma() {
         ExternalDocumentId = 0;
@@ -173,7 +178,7 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         ProcessedProforma = null;
         SwapDataProcessing = null;
         Payment = null;
-
+        
         References = null;
     }
 
@@ -693,7 +698,93 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
             }
         }
     }
+    
+    /**
+     * Retrieve PDF file of document.
+     * @param session GUI session.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @return PDF file, if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public File retrievePdf(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
+        File pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
+        
+        if (pdf == null) {
+            pdf = getAuxFile(SImportUtils.CFDI_PDF_IDX); // re-use existing file, if available
+        }
+        
+        if (pdf == null) {
+            retrieveFiles(session, filesDownloadServiceUrl);
+            pdf = SImportUtils.getDocumentFileFromTempDirIfExists(ExternalDocumentId, SFileUtilities.pdf, BizPartnerId);
+        }
+        
+        return pdf;
+    }
+    
+     /**
+     * Retrieve XML and PDF files of document.
+     * @param session GUI session.
+     * @param filesDownloadServiceUrl URL of document files download service.
+     * @return XML & PDF files, if found, otherwise <code>null</code>.
+     * @throws Exception 
+     */
+    public File[] retrieveFiles(final SGuiSession session, final String filesDownloadServiceUrl) throws Exception {
+        File[] files = null;
+        
+        if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES) {
+            files = AuxFiles; // re-use existing files, if available
+        }
+        
+        if (files == null) {            
+            files = SImportUtils.downloadDocumentFilesInTempDir(session, filesDownloadServiceUrl, SImportUtils.DWNLD_FILES_TYPE_CFDI, ExternalDocumentId, getSwapTxnDocType());
 
+            if (files == null || files.length != SImportUtils.CFDI_FILES) {
+                throw new Exception("No se pudo descargar o no existe el archivo PDF del CFDI de esta proforma autorizada.");
+            }
+            else if (files[SImportUtils.CFDI_PDF_IDX] == null) {
+                throw new Exception("No se pudo descargar o no existe el archivo PDF del CFDI de esta proforma autorizada.");
+            }
+
+            // copy files to local temporal directory:
+
+            SImportUtils.copyDocumentFileToTempDir(ExternalDocumentId, SFileUtilities.pdf, files[SImportUtils.CFDI_PDF_IDX], BizPartnerId);
+
+            // preserve files:
+
+            AuxFiles = files;
+        }
+        
+        return files;
+    }
+ 
+    /**
+     * Get auxiliar file by index.
+     * @param fileIndex Either SImportUtils.CFDI_XML_IDX or SImportUtils.CFDI_PDF_IDX.
+     * @return If available, auxiliar file, otherwise <code>null</code>.
+     */
+    public File getAuxFile(final int fileIndex) {
+        File auxFile = null;
+        
+        if (AuxFiles != null && AuxFiles.length == SImportUtils.CFDI_FILES && fileIndex >= 0 && fileIndex < AuxFiles.length) {
+            auxFile = AuxFiles[fileIndex];
+        }
+        
+        return auxFile;
+    }
+    
+    /**
+     * Check whether business partner is domestic.
+     * @param client GUI client.
+     * @return
+     * @throws Exception 
+     */
+    public boolean isBizPartnerDomestic(final SGuiClient client) throws Exception {
+        if (IsBizPartnerDomestic == null) {
+            IsBizPartnerDomestic = SDataBizPartner.checkIsDomestic(BizPartnerId, (SClientInterface) client);
+        }
+        return IsBizPartnerDomestic;
+    }
+    
     /**
      * Validate if a new payment request can be created.
      *
@@ -947,6 +1038,10 @@ public class SImportedProforma implements SGridRow, Serializable, Comparable<SIm
         info += "\n+ realizada el: " + (DocumentAuthorizedAt == null ? "ND" : SLibUtils.DateFormatDatetimeTimeZone.format(DocumentAuthorizedAt)) + ".";
         
         return info;
+    }
+    
+    private int getSwapTxnDocType() {
+        return SSwapUtils.getSwapTxnDocumentType(SImportUtils.DOC_TYPE_PROFORMA); 
     }
     
     /*
