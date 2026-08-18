@@ -82,6 +82,7 @@ import erp.mtrn.data.SDataDpsCustomAccEntry;
 import erp.mtrn.data.SDataDpsCustomAccEntryRow;
 import erp.mtrn.data.SDataDpsDpsAdjustment;
 import erp.mtrn.data.SDataDpsDpsLink;
+import erp.mtrn.data.SDataDpsDpsMerge;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsEntryCommissions;
 import erp.mtrn.data.SDataDpsEntryNotes;
@@ -111,6 +112,9 @@ import erp.mtrn.data.cfd.SAddendaAmc71Manager;
 import erp.mtrn.data.cfd.SAddendaAmc71Supplier;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SDialogCfdRenderer;
+import erp.mtrn.utils.SDataEntryDpsMergeRow;
+import erp.mtrn.utils.SMergeData;
+import erp.mtrn.utils.SMergeEntriesUtils;
 import erp.mtrn.view.SViewDps;
 import erp.musr.data.SUserUtils;
 import erp.redis.SLockUtils;
@@ -133,6 +137,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -405,6 +410,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mtrn.form.SDialogPickerDps moDialogPickerDpsForAdjustment;
     private erp.mtrn.form.SDialogPickerDps moDialogPickerBillOfLading;
     private erp.mtrn.form.SDialogDpsLink moDialogDpsLink;
+    private erp.mtrn.form.SDialogDpsJoinEntries moDialogDpsJoinEntries;
     private erp.mtrn.form.SDialogDpsAdjustment moDialogDpsAdjustment;
     private erp.mtrn.form.SDialogCfdRelatedDocs moDialogCfdRelatedDocs;
     private erp.mtrn.data.STrnCfdRelatedDocs moCfdRelatedDocs;
@@ -644,6 +650,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jsEntry03 = new javax.swing.JSeparator();
         jbEntryViewLinks = new javax.swing.JButton();
         jbItemDesc = new javax.swing.JButton();
+        jbItemJoinEntries = new javax.swing.JButton();
         jsEntry4 = new javax.swing.JSeparator();
         jbEntryImportFromMatRequest = new javax.swing.JButton();
         jbEntryViewMatReqLinks = new javax.swing.JButton();
@@ -1970,6 +1977,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbItemDesc.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbItemDesc);
 
+        jbItemJoinEntries.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_join.jpg"))); // NOI18N
+        jbItemJoinEntries.setToolTipText("Unificar partidas del documento");
+        jbItemJoinEntries.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpEntriesControlsWest.add(jbItemJoinEntries);
+
         jsEntry4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jsEntry4.setPreferredSize(new java.awt.Dimension(2, 23));
         jpEntriesControlsWest.add(jsEntry4);
@@ -1990,7 +2002,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jlAdjustmentSubtypeId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlAdjustmentSubtypeId.setText("Tipo ajuste: ");
-        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(60, 23));
         jpEntriesControlsEast.add(jlAdjustmentSubtypeId);
 
         jcbAdjustmentSubtypeId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -4317,6 +4329,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moDialogPickerDpsForLink = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PEND_LINK);
         moDialogPickerDpsForAdjustment = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PEND_ADJ);
         moDialogDpsLink = new SDialogDpsLink(miClient);
+        moDialogDpsJoinEntries = new SDialogDpsJoinEntries(miClient);
         moDialogDpsAdjustment = new SDialogDpsAdjustment(miClient);
         moDialogRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moDialogShowDocumentLinks = new SDialogShowDocumentLinks(miClient);
@@ -4374,6 +4387,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryWizard.addActionListener(this);
         jbEntryViewLinks.addActionListener(this);
         jbItemDesc.addActionListener(this);
+        jbItemJoinEntries.addActionListener(this);
         jbEntryImportFromMatRequest.addActionListener(this);
         jbEntryViewMatReqLinks.addActionListener(this);
         jbExportCsv.addActionListener(this);
@@ -6510,6 +6524,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryDiscountRetailChain.setEnabled(mbIsDocCreditNote);
         jbEntryImportFromDps.setEnabled(mbIsDocOrder || mbIsDocInvoice || mbIsDocCreditNote);
         jbEntryWizard.setEnabled(!mbIsDocCreditNote);
+        jbItemJoinEntries.setEnabled(mbIsDocInvoice && mbIsCatSales);
         jbEntryImportFromMatRequest.setEnabled((mbIsEstEstimate || mbIsDocOrder || mbIsDocInvoice) && ! mbIsCatSales);
 
         jlAdjustmentSubtypeId.setEnabled(mbIsDocCreditNote);
@@ -6613,6 +6628,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbEntryDiscountRetailChain.setEnabled(false);
             jbEntryImportFromDps.setEnabled(false);
             jbEntryWizard.setEnabled(false);
+            jbItemJoinEntries.setEnabled(false);
             jbEntryImportFromMatRequest.setEnabled(false);
 
             jbNotesNew.setEnabled(false);
@@ -9202,7 +9218,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void actionItemDescricption() {
+    private void actionItemDescription() {
         SDataDpsEntry entry = null;
         int index = moPaneGridEntries.getTable().getSelectedRow();
 
@@ -9239,6 +9255,62 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             catch (Exception e) {
                 SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void actionJoinEntries() {
+        if (jbItemJoinEntries.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT
+                // validar que el documento sea factura de venta
+                && mbIsDocInvoice && mbIsCatSales) {
+            SDataDps currentDps = moDps;
+
+            // 1. Pick source DPS:
+            if (currentDps != null) {
+                boolean bUndoMerge = SDataDpsDpsMerge.hasDpsMerged(miClient.getSession().getStatement(), 
+                                                            moDps.getPkYearId(), 
+                                                            moDps.getPkDocId());
+                // mostrar cuadro de diálogo para seleccionar renglones del documento a unificar
+                moDialogDpsJoinEntries.formReset();
+                moDialogDpsJoinEntries.setValue(SDataConstants.TRNX_DPS_SRC, currentDps);
+                moDialogDpsJoinEntries.setValue(SDialogDpsJoinEntries.CASE_UNDO_MERGE, bUndoMerge);
+                moDialogDpsJoinEntries.setFormVisible(true);
+                
+                // Complement addenda entries:
+                if (moDialogDpsJoinEntries.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                    SMergeData oData = SMergeEntriesUtils.mergeEntries(miClient, 
+                                                    moDps, 
+                                                    moDps.getDbmsDpsEntries(), 
+                                                    (List<SDataEntryDpsMergeRow>) moDialogDpsJoinEntries.getValue(SDialogDpsJoinEntries.MERGED_ENTRIES), 
+                                                    (Double) moDialogDpsJoinEntries.getValue(SDialogDpsJoinEntries.CASE_ETY_PRICE),
+                                                    mbIsLocalCurrency,
+                                                    moFieldIsDiscountDocPercentage.getBoolean(),
+                                                    moFieldDiscountDocPercentage.getDouble(),
+                                                    moFieldExchangeRate.getDouble(),
+                                                    bUndoMerge);
+                    
+                    moPaneGridEntries.clearTableRows();
+                    for (SDataDpsEntry oEntryToAdd : oData.getEntriesToAdd()) {
+                        moPaneGridEntries.addTableRow(new SDataDpsEntryRow(oEntryToAdd, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                    }
+                    
+                    for (SDataDpsEntry oEntryToDelete : oData.getEntriesToDelete()) {
+                        oEntryToDelete.setIsDeleted(true);
+                        oEntryToDelete.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                        oEntryToDelete.setIsRegistryEdited(true);
+                        oEntryToDelete.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                        moPaneGridEntries.addTableRow(new SDataDpsEntryRow(oEntryToDelete, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
+                    }
+                    
+                    updateDpsWithCurrentFormData();
+                    adequateDatesForOrderPrevious();
+
+                    renderEntries();
+                    calculateTotal();
+                    setLogisticsData();
+                    moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
+                }
             }
         }
     }
@@ -11589,6 +11661,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbFkProductionOrderId_n;
     private javax.swing.JButton jbFkVehicleId_n;
     private javax.swing.JButton jbItemDesc;
+    private javax.swing.JButton jbItemJoinEntries;
     private javax.swing.JButton jbLoadBillOfLading;
     private javax.swing.JButton jbLoadFilePdf;
     private javax.swing.JButton jbLoadFileXml;
@@ -14280,7 +14353,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     actionEntryViewLinks();
                 }
                 else if (button == jbItemDesc) {
-                    actionItemDescricption();
+                    actionItemDescription();
+                }
+                else if (button == jbItemJoinEntries) {
+                    actionJoinEntries();
                 }
                 else if (button == jbEntryImportFromMatRequest) {
                     actionImportEntryFromMatRequest();

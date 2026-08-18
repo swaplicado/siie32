@@ -594,6 +594,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SUPPLIED_ORDER = 207545; // order whit supplied movements
     public static final int TRNX_DPS_SUPPLIED_ORDER_INVOICE = 207546; // order whit supplied movements invoice
     public static final int TRNX_DPS_OUTPUTS_ORDER_INVOICE = 207547; // order whit supplied movements invoice outputs
+    public static final int TRNX_DPS_JOIN_ENTRIES = 207548; // order whit supplied movements invoice outputs
 
     public static final int TRNX_DPS_RETURN_PEND = 207551;
     public static final int TRNX_DPS_RETURN_PEND_ETY = 207552;
@@ -1064,6 +1065,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
         TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
+        TablesMap.put(TRN_DPS_DPS_MERGE, "trn_dps_dps_merge");
         TablesMap.put(TRN_DPS_MAT_REQ, "trn_dps_mat_req");
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
