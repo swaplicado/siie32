@@ -22,8 +22,9 @@ import sa.lib.grid.SGridRow;
  * @author Adrian Aviles
  */
 public class SImportProcurementFacility implements SGridRow, Serializable {
-    private final int COL_TO_ACCOUNT = 6;
+    private final int COL_TO_ACCOUNT = 8;
     private final int STATUS_APPROVAL = 22;
+    private final int STATUS_PARTIAL_ACCOUNT = 32;
     private static final Map<Integer, String> STATES = new HashMap<>();
     
     static {
@@ -57,6 +58,9 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
     public boolean isAccountedFor;
     public int mnSortingPosition;
     public SDataRecord moRecord;
+    public int accountingTypeId;
+    public String accountingTypeName;
+    public int movementsCount;
     
     public SImportProcurementFacility() {
         WeekMonthNumber = 0;
@@ -70,9 +74,21 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
         isAccountedFor = false;
         mnSortingPosition = 0;
         moRecord = null;
+        accountingTypeId = 0;
+        accountingTypeName = "";
+        movementsCount = 0;
     }
     
-    public SImportProcurementFacility(final int year, final int monthNumber, final int weekMonthNumber, final String startDate, final String endDate, final JsonNode docNode, Statement statement) throws ParseException {
+    public SImportProcurementFacility(
+            final int year,
+            final int monthNumber,
+            final int weekMonthNumber,
+            final String startDate,
+            final String endDate,
+            final JsonNode docNode,
+            Statement statement,
+            final JsonNode accountingType
+    ) throws ParseException {
         WeekMonthNumber = weekMonthNumber;
         Year = year;
         MonthNumber = monthNumber;
@@ -90,8 +106,12 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
         ProcurementFacilityId = docNode.get("id").asInt();
         StatusId = status.get("id").asInt();
         
+        accountingTypeId = accountingType.get("accounting_type_id").asInt();
+        accountingTypeName = accountingType.get("accounting_type_name").asText();
+        movementsCount = accountingType.get("movements_count").asInt();
+        
         SDataFacilityRec oDataFacilityRec = new SDataFacilityRec();
-        oDataFacilityRec.findByExtDataId(FacilitySeasonWeekId, statement);
+        oDataFacilityRec.findByExtDataId(FacilitySeasonWeekId, accountingTypeId, statement);
         
         SDataRecord record = new SDataRecord();
         record.read(new Object[] { 
@@ -161,39 +181,54 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
                 value = STATES.get(StatusId);
                 break;
             case 5:
+                value = accountingTypeName;
+                break;
+            case 6:
+                value = movementsCount;
+                break;
+            case 7:
                 value = isAccountedFor;
                 break;
             case COL_TO_ACCOUNT:
                 value = ToAccount;
                 break;
-            case 7:
-                if (moRecord != null) {
-                    value = moRecord.getRecordPeriod();
-                } else {
-                    value = "";
-                }
-                break;
-            case 8:
-                if (moRecord != null) {
-                    value = moRecord.getDbmsBookkeepingCenterCode();
-                } else {
-                    value = "";
-                }
-                break;
             case 9:
                 if (moRecord != null) {
-                    value = moRecord.getDbmsCompanyBranchCode();
+                    if (!"0000-00".equals(moRecord.getRecordPeriod())) {
+                        value = moRecord.getRecordPeriod();
+                    } else {
+                        value = "";
+                    }
                 } else {
                     value = "";
                 }
                 break;
             case 10:
                 if (moRecord != null) {
-                    value = moRecord.getRecordNumber();
+                    value = moRecord.getDbmsCompanyBranchCode();
                 } else {
                     value = "";
                 }
                 break;
+            case 11:
+                if (moRecord != null) {
+                    value = moRecord.getDbmsBookkeepingCenterCode();
+                } else {
+                    value = "";
+                }
+                break;
+            case 12:
+                if (moRecord != null) {
+                    if (!moRecord.getRecordNumber().equals("-000000")) {
+                        value = moRecord.getRecordNumber();
+                    } else {
+                        value = "";
+                    }
+                } else {
+                    value = "";
+                }
+                break;
+            
             default:
             // nothing
         }
@@ -239,4 +274,12 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
     public int getStatusApproval() { return STATUS_APPROVAL; }
     public void setMoRecord(SDataRecord moRecord) { this.moRecord = moRecord; }
     public SDataRecord getMoRecord() { return moRecord; }
+    public int getAccountingTypeId() { return accountingTypeId; }
+    public void setAccountingTypeId(int accountingTypeId) { this.accountingTypeId = accountingTypeId; }
+    public String getAccountingTypeName() { return accountingTypeName; }
+    public void setAccountingTypeName(String accountingTypeName) { this.accountingTypeName = accountingTypeName; }
+    public int getMovementsCount() { return movementsCount; }
+    public void setMovementsCount(int movementsCount) { this.movementsCount = movementsCount; }
+    public int getSTATUS_PARTIAL_ACCOUNT() { return STATUS_PARTIAL_ACCOUNT; }
+    
 }

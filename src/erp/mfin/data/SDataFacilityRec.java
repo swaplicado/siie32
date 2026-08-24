@@ -37,6 +37,7 @@ public class SDataFacilityRec implements java.io.Serializable {
     protected java.util.Date mtNewTs;
     protected java.util.Date mtEditTs;
     protected java.util.Date mtDeleteTs;
+    protected int mnAccountingTypeId;
     
     protected int mnLastDbActionResult;
     
@@ -65,6 +66,7 @@ public class SDataFacilityRec implements java.io.Serializable {
         mtNewTs = null;
         mtEditTs = null;
         mtDeleteTs = null;
+        mnAccountingTypeId = 0;
     }
 
     public int getMnRecYear() { return mnRecYear; }
@@ -108,6 +110,8 @@ public class SDataFacilityRec implements java.io.Serializable {
     public int getMnPkIdExtFacilityRec() { return mnPkIdExtFacilityRec; }
     public void setMnUserId(int mnUserId) { this.mnUserId = mnUserId; }
     public int getMnUserId() { return mnUserId; }
+    public int getMnAccountingTypeId() { return mnAccountingTypeId; }
+    public void setMnAccountingTypeId(int mnAccountingTypeId) { this.mnAccountingTypeId = mnAccountingTypeId; }    
     
     public int read(java.lang.Object pk, java.sql.Statement statement){
         Object[] key = (Object[]) pk;
@@ -145,6 +149,7 @@ public class SDataFacilityRec implements java.io.Serializable {
                 mtNewTs = resultSet.getDate("ts_new");
                 mtEditTs = resultSet.getDate("ts_edit");
                 mtDeleteTs = resultSet.getDate("ts_del");
+                mnAccountingTypeId = resultSet.getInt("accounting_type_id");
                 
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
@@ -179,14 +184,14 @@ public class SDataFacilityRec implements java.io.Serializable {
             }
 
             sql = "INSERT INTO fin_ext_facility_rec ("
-                    + "id_ext_facility_rec, rec_year, rec_month, rec_week, ext_data_id, usr_id, "
+                    + "id_ext_facility_rec, rec_year, rec_month, rec_week, ext_data_id, accounting_type_id, usr_id, "
                     + "b_can_edit, b_can_del, b_del, "
                     + "fid_ext_facility, fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, "
                     + "fid_usr_new, fid_usr_edit, fid_usr_del, "
                     + "ts_new, ts_edit, ts_del"
                     + ") " +
                     "VALUES ("
-                    + mnPkIdExtFacilityRec + ", " + mnRecYear + ", " + mnRecMonth + ", " + mnRecWeek + ", " + mnExtDataId + ", " + mnUserId + ", " 
+                    + mnPkIdExtFacilityRec + ", " + mnRecYear + ", " + mnRecMonth + ", " + mnRecWeek + ", " + mnExtDataId + ", " + mnAccountingTypeId + ", " + mnUserId + ", " 
                     + mbCanEdit + ", " + mbCanDel + ", " + mbIsDeleted + ", "
                     + mnFkExtFacility + ", " + mnFkRecYear + ", " + mnFkRecPer + ", " + mnFkRecBkc + ", \"" + msFkRecTpRec + "\", " + mnFkRecNum + ", "
                     + mnFkUserNewId + ", " + mnFkUserEditId + ", " + mnFkUserDeleteId + ", " 
@@ -217,7 +222,8 @@ public class SDataFacilityRec implements java.io.Serializable {
                     + "b_del = 1, "
                     + "fid_usr_del = " + mnFkUserDeleteId + ", "
                     + "ts_del = " + "NOW()" + " "
-                    + "WHERE id_ext_facility_rec = " + mnPkIdExtFacilityRec;
+                    + "WHERE id_ext_facility_rec = " + mnPkIdExtFacilityRec
+                    + " AND accounting_type_id = " + mnAccountingTypeId;
             
             statement.execute(sql);
             
@@ -231,7 +237,7 @@ public class SDataFacilityRec implements java.io.Serializable {
         return mnLastDbActionResult;
     }
     
-    public int findByExtDataId(int data_id, java.sql.Statement statement) {
+    public int findByExtDataId(int data_id, int accounting_type_id, java.sql.Statement statement) {
         java.lang.String sql = "";
         java.sql.ResultSet resultSet = null;
         boolean exist = false;
@@ -240,7 +246,7 @@ public class SDataFacilityRec implements java.io.Serializable {
         reset();
 
         try {
-            sql = "SELECT COUNT(*) > 0 AS exist FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id;
+            sql = "SELECT COUNT(*) > 0 AS exist FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id + " AND accounting_type_id = " + accounting_type_id;
             resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
                 // EXISTS devuelve 1 (true) o 0 (false)
@@ -252,7 +258,7 @@ public class SDataFacilityRec implements java.io.Serializable {
                 return mnLastDbActionResult;
             }
             
-            sql = "SELECT * FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id;
+            sql = "SELECT * FROM fin_ext_facility_rec where b_del = 0 AND ext_data_id = " + data_id + " AND accounting_type_id = " + accounting_type_id;
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -279,6 +285,7 @@ public class SDataFacilityRec implements java.io.Serializable {
                 mtNewTs = resultSet.getDate("ts_new");
                 mtEditTs = resultSet.getDate("ts_edit");
                 mtDeleteTs = resultSet.getDate("ts_del");
+                mnAccountingTypeId = resultSet.getInt("accounting_type_id");
                 
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }

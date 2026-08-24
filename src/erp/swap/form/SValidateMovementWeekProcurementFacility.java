@@ -104,7 +104,8 @@ public class SValidateMovementWeekProcurementFacility {
 
             // Check if it is necesary to enable business partner fields:
 
-            if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || mbIsCurrentAccountDiogAccount) {
+//            if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || mbIsCurrentAccountDiogAccount) {
+            if (oAccountMajor.getIsRequiredBizPartner()) {
                 this.BizPartnerRequired = true;
                 
                 if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || mbIsCurrentAccountDiogAccount) {

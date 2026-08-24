@@ -95,6 +95,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     protected ArrayList<SImportCostCenter> maImportedCostCenter;
     protected ArrayList<SImportItems> maImportedItems;
     protected List<Integer> smaEdited = new ArrayList<>();
+    protected int mnAccountingTypeId;
 
     /**
      * Creates new form SDialogImportDocuments
@@ -793,7 +794,9 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .append("\"business_partners\": ").append( row.oDataBizPartner != null ? "[{ "
                             + "\"business_partner_erp_id\":" + row.oDataBizPartner.getPkBizPartnerId()
                             + "\"business_partner_type\":" + (row.oDataBizPartner.getIsAttributeEmployee() ? 2 : 1)
-                            + " }]" : "[]" )
+                            + " }]" : "[]" ).append(",")
+                    .append("\"id_cob\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkCompanyBranchId() : "").append("\",")
+                    .append("\"id_ent\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkAccountCashId() : "").append("\"")
                 .append("}");
                         
                 if (i < (smaEdited.size() - 1)) {
@@ -899,7 +902,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             mbDocumentsBeingUpdated = true; // Evita eventos durante la actualización
 
             initProgress(); // Inicializa la barra de progreso
-
             SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
                 @Override
                 protected Void doInBackground() throws Exception {
@@ -957,7 +959,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
-                        SImportWeekMovProcurementFacility oWeekProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement);
+                        SImportWeekMovProcurementFacility oWeekProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement, (SClientInterface) miClient);
                         maImportedDocuments.add(oWeekProcurementFacility);
                     }
                 }
@@ -1013,6 +1015,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 
                 urlQuery = urlQuery.replace("<facility_season_week_id>", "" + oProcurementFacility.FacilitySeasonWeekId);
                 urlQuery = urlQuery.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
+                urlQuery = urlQuery.replace("<accounting_type_id>", "" + oProcurementFacility.accountingTypeId);
 
                 URL url = new URL(urlQuery);
 
@@ -1130,6 +1133,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     maImportedDocument.setDataAccountMajor(weekProcurementFacility.oDataAccountMajor);
                     maImportedDocument.setDataCostCenter(weekProcurementFacility.oDataCostCenter);
                     maImportedDocument.setDataBizPartner(weekProcurementFacility.oDataBizPartner);
+                    maImportedDocument.setDataAccountCash(weekProcurementFacility.moDataAccountCash);
 
                     if (!smaEdited.contains(i)) {
                         smaEdited.add(i);

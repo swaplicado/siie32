@@ -15,6 +15,7 @@ public class SImportItems {
     public int id;
     public String name;
     public String code;
+    public int erpId;
 //    public boolean is_vehicle_required;
 //    public boolean is_active;
     
@@ -22,6 +23,7 @@ public class SImportItems {
         id = 0;
         name = "";
         code = "";
+        erpId = 0;
 //        is_vehicle_required = false;
 //        is_active = false;
     }
@@ -30,6 +32,7 @@ public class SImportItems {
         id = docNode.get("id").asInt();
         name = docNode.get("name").asText();
         code = docNode.get("code").asText();
+        erpId = docNode.get("erp_id").asInt();
 //        is_vehicle_required = docNode.get("is_vehicle_required").asBoolean();
 //        is_active = docNode.get("is_active").asBoolean();
     }
@@ -42,4 +45,5 @@ public class SImportItems {
     public int getId() { return id; }
     public String getCode() { return code; }
     public String getName() { return name; }
+    public int getErpId() { return erpId; }
 }

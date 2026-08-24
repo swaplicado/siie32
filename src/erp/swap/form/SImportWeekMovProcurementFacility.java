@@ -6,14 +6,19 @@
 package erp.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataCostCenter;
 import java.io.Serializable;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.grid.SGridRow;
 
@@ -22,6 +27,24 @@ import sa.lib.grid.SGridRow;
  * @author Adrian Aviles
  */
 public class SImportWeekMovProcurementFacility implements SGridRow, Serializable {
+    private final int MOVEMENT_TYPE_INGRESO_ID = 1;
+    private final int MOVEMENT_TYPE_EGRESO_ID = 2;
+    
+    private final String REASIGNACIÓN_EFECTIVO_CODE = "DM004";
+    private final String ASIGNACIÓN_EFECTIVO_CODE = "DM003";
+    private final String ANTICIPO_PROVEEDOR_CODE = "DM002";
+    private final String ABONO_A_PRESTAMO_CODE = "DM001";
+    
+    private final int ACCOUNTING_TYPE_COMPRA_ID = 1;
+    private final int ACCOUNTING_TYPE_GASTO_ID = 2;
+    private final int ACCOUNTING_TYPE_EFECTIVO_ID = 4;
+    
+    private final int ACCOUNTING_SUBTYPE_COMPRA_ID = 4;
+    private final int ACCOUNTING_SUBTYPE_GASTO_ID = 5;
+    private final int ACCOUNTING_SUBTYPE_EFECTIVO_ID = 1;
+    private final int ACCOUNTING_SUBTYPE_DEUDORES_ID = 2;
+    private final int ACCOUNTING_SUBTYPE_ACREEDORES_ID = 3;
+    
     public int Id;
     public Date Movement_date;
     public String Concept;
@@ -48,6 +71,13 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public SDataBizPartner oDataBizPartner;
     public int mnSortingPosition;
     public int mnFacilitySeasonWeekId;
+    public SDataAccountCash moDataAccountCash;
+    public int AccountingTypeId;
+    public String AccountingTypeName;
+    public int AccountingSubTypeId;
+    public String AccountingSubTypeName;
+    public int MovementTypeId;
+    public String MovementTypeName;
 
     public SImportWeekMovProcurementFacility() {
         Id = 0;
@@ -73,9 +103,16 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         oDataCostCenter = null;
         oDataAccountMajor = null;
         oDataBizPartner = null;
+        moDataAccountCash = null;
+        AccountingTypeId = 0;
+        AccountingTypeName = "";
+        AccountingSubTypeId = 0;
+        AccountingSubTypeName = "";
+        MovementTypeId = 0;
+        MovementTypeName = "";
     }
     
-    public SImportWeekMovProcurementFacility(final JsonNode docNode, final Statement statement) throws ParseException {
+    public SImportWeekMovProcurementFacility(final JsonNode docNode, final Statement statement, SClientInterface miClient) throws ParseException {
         Id = docNode.get("id").asInt();
         String movement_date = docNode.get("movement_date").asText();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -83,35 +120,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         Movement_date = dMovementDate;
         Concept = docNode.get("concept").isNull() ? "" : docNode.get("concept").asText();
         Reference = docNode.get("reference").isNull() ? "" : docNode.get("reference").asText();
-        Debe = docNode.get("debe").asDouble();
-        Haber = docNode.get("haber").asDouble();
-//        oCurrency = docNode.get("currency").isNull() ? "" : docNode.get("currency").asText();
-
         oCurrency = new Currency();
-        
-//        JsonNode costCenterNode = docNode.path("cost_center");
-//        if (!costCenterNode.isEmpty()) {
-//            Cost_center = new CostCenter(
-//                costCenterNode.get("id").asInt(),
-//                costCenterNode.get("code").isNull() ? "" : costCenterNode.get("code").asText(), 
-//                costCenterNode.get("name").isNull() ? "" : costCenterNode.get("name").asText()
-//            );
-//        } else {
-//            Cost_center = new CostCenter();
-//        }
-//        
-//        JsonNode accountingAccountNode = docNode.path("accounting_account");
-//        if (!accountingAccountNode.isEmpty()) {
-////            Accounting_account = new AccountingAccount(
-////                accountingAccountNode.get("id").asInt(),
-////                accountingAccountNode.get("code").isNull() ? "" : accountingAccountNode.get("code").asText(), 
-////                accountingAccountNode.get("name").isNull() ? "" : accountingAccountNode.get("name").asText()
-////            );
-//
-////            SDataAccount oAccount = new SDataAccount();
-//        } else {
-////            Accounting_account = new AccountingAccount();
-//        }
 
         SDataAccount oAccount = new SDataAccount();
         SDataAccount oAccountLedger = new SDataAccount();
@@ -169,7 +178,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         JsonNode itemNode = docNode.path("item");
         if (!itemNode.isEmpty()) {
             Item = new Item(
-                itemNode.get("id").asInt(),
+                itemNode.get("erp_id").asInt(),
                 itemNode.get("code").isNull() ? "" : itemNode.get("code").asText(), 
                 itemNode.get("name").isNull() ? "" : itemNode.get("name").asText()
             );
@@ -186,6 +195,43 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
             int res = bp.read(new int[] {pkBp}, statement);
             if (res == SLibConstants.DB_ACTION_READ_OK) {
                 oDataBizPartner = bp;
+            }
+        }
+        
+        JsonNode accountCash = docNode.path("cash_holding");
+        if (!accountCash.isEmpty()) {
+            int[] pkAccountCash = new int[] { accountCash.get("id_cob_ext").asInt(), accountCash.get("id_ent_ext").asInt() };
+            moDataAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, pkAccountCash, SLibConstants.EXEC_MODE_SILENT);
+        }
+        
+        JsonNode accounting_type = docNode.path("accounting_type");
+        JsonNode accounting_subtype = docNode.path("accounting_subtype");
+        
+        AccountingTypeId = accounting_type.get("id").asInt();
+        AccountingTypeName = accounting_type.get("name").asText();
+        AccountingSubTypeId = accounting_subtype.get("id").asInt();
+        AccountingSubTypeName = accounting_subtype.get("name").asText();
+        
+        JsonNode movement_type = docNode.path("movement_type");
+        
+        MovementTypeId = movement_type.get("id").asInt();
+        MovementTypeName = movement_type.get("name").asText();
+        
+        ArrayList<String> checkAccountTypeResult = checkAccountType();
+        if ("debe".equals(checkAccountTypeResult.get(0))) {
+            if (docNode.get("outcome").asDouble() != 0) {
+                Debe = docNode.get("outcome").asDouble();
+            }
+            if (docNode.get("income").asDouble() != 0) {
+                Debe = docNode.get("income").asDouble();
+            }
+        }
+        if ("haber".equals(checkAccountTypeResult.get(0))) {
+            if (docNode.get("income").asDouble() != 0) {
+                Haber = docNode.get("income").asDouble();
+            }
+            if (docNode.get("outcome").asDouble() != 0) {
+                Haber = docNode.get("outcome").asDouble();
             }
         }
     }
@@ -240,6 +286,16 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public void setMnSortingPosition(int mnSortingPosition) { this.mnSortingPosition = mnSortingPosition; }
     public int getMnFacilitySeasonWeekId() { return mnFacilitySeasonWeekId; }
     public void setMnFacilitySeasonWeekId(int mnFacilitySeasonWeekId) { this.mnFacilitySeasonWeekId = mnFacilitySeasonWeekId; }
+    public SDataAccountCash getDataAccountCash() { return moDataAccountCash; }
+    public void setDataAccountCash(SDataAccountCash moDataAccountCash) { this.moDataAccountCash = moDataAccountCash; }
+    public int getAccountingTypeId() { return AccountingTypeId; }
+    public void setAccountingTypeId(int AccountingTypeId) { this.AccountingTypeId = AccountingTypeId; }
+    public int getAccountingSubTypeId() { return AccountingSubTypeId; }
+    public void setAccountingSubTypeId(int AccountingSubTypeId) { this.AccountingSubTypeId = AccountingSubTypeId; }
+    public String getAccountingTypeName() { return AccountingTypeName; }
+    public void setAccountingTypeName(String AccountingTypeName) { this.AccountingTypeName = AccountingTypeName; }
+    public String getAccountingSubTypeName() { return AccountingSubTypeName; }
+    public void setAccountingSubTypeName(String AccountingSubTypeName) { this.AccountingSubTypeName = AccountingSubTypeName; }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -480,5 +536,56 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
             Code = code;
             Name = name;
         }
+    }
+    
+    public ArrayList<String> checkAccountType() {
+        ArrayList<String> result = new ArrayList<>();
+        String type = "";
+        String counterpart = "";
+        
+        if (MOVEMENT_TYPE_EGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_COMPRA_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_COMPRA_ID == AccountingSubTypeId) {
+            type = "debe";
+            counterpart = "salida_caja_compras";
+        }
+        
+        if (MOVEMENT_TYPE_EGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_GASTO_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_GASTO_ID == AccountingSubTypeId) {
+            type = "debe";
+            counterpart = "salida_caja_gastos";
+        }
+        
+        if (MOVEMENT_TYPE_EGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_EFECTIVO_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_DEUDORES_ID == AccountingSubTypeId) {
+            type = "debe";
+            counterpart = "salida_caja_deudores";
+        }
+        
+        if (MOVEMENT_TYPE_EGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_EFECTIVO_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_ACREEDORES_ID == AccountingSubTypeId) {
+            type = "debe";
+            counterpart = "salida_caja_acreedores";
+        }
+        
+        if (MOVEMENT_TYPE_INGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_EFECTIVO_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_DEUDORES_ID == AccountingSubTypeId) {
+            type = "haber";
+            counterpart = "entrada_caja_deudores";
+        }
+        
+        if (MOVEMENT_TYPE_INGRESO_ID == MovementTypeId && ACCOUNTING_TYPE_EFECTIVO_ID == AccountingTypeId && ACCOUNTING_SUBTYPE_ACREEDORES_ID == AccountingSubTypeId) {
+            type = "haber";
+            counterpart = "entrada_caja_acreedor";
+        }
+        
+        if (ASIGNACIÓN_EFECTIVO_CODE.equals(Item.Code) && MovementTypeId == MOVEMENT_TYPE_INGRESO_ID) {
+            type = "debe";
+            counterpart = "caja_central";
+        }
+        
+        if (REASIGNACIÓN_EFECTIVO_CODE.equals(Item.Code) && MovementTypeId == MOVEMENT_TYPE_EGRESO_ID) {
+            type = "haber";
+            counterpart = "caja_x";
+        }
+        
+        result.add(type);
+        result.add(counterpart);
+        
+        return result;
     }
 }

@@ -15,6 +15,9 @@ import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mcfg.data.SCfgUtils;
+import erp.mcfg.data.SDataParamsCompany;
+import erp.mfin.data.SDataAccount;
+import erp.mfin.data.SDataAccountCash;
 import erp.mfin.data.SDataFacilityRec;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
@@ -29,6 +32,7 @@ import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
 import erp.swap.utils.SAmeUtils;
 import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SServicesUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -39,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -58,6 +63,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
@@ -168,7 +174,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jLabel21 = new javax.swing.JLabel();
         jbSelectAll = new javax.swing.JButton();
         jbToAccount = new javax.swing.JButton();
-        jLabel2b4 = new javax.swing.JLabel();
+        jbRejectWeek = new javax.swing.JButton();
         jpDownloadE3 = new javax.swing.JPanel();
         jLabel32 = new javax.swing.JLabel();
         jbUnselectAll = new javax.swing.JButton();
@@ -234,7 +240,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             }
         });
 
-        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de " + ((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "proformas" : "CRPs") + " autorizadas"));
+        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Semanas de bodegas"));
         jpDownload.setToolTipText("");
         jpDownload.setLayout(new java.awt.BorderLayout());
 
@@ -342,8 +348,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbToAccount.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbToAccount);
 
-        jLabel2b4.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jLabel2b4);
+        jbRejectWeek.setText("Rechazar semana");
+        jbRejectWeek.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbRejectWeek.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbRejectWeek);
 
         jpDownloadE.add(jpDownloadE2);
 
@@ -383,9 +391,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jpDownload.add(jpDownloadW4, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpDownload, java.awt.BorderLayout.NORTH);
-        jpDownload.getAccessibleContext().setAccessibleName("Búsqueda de  autorizadas:");
+        jpDownload.getAccessibleContext().setAccessibleName("");
 
-        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder(((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proformas autorizadas" : "CRPs autorizados")));
+        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder("Semanas de bodegas"));
         jpDocuments.setLayout(new java.awt.BorderLayout(5, 0));
 
         jpDocumentsGrid.setLayout(new java.awt.BorderLayout());
@@ -651,7 +659,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     private javax.swing.ButtonGroup bgSearchBy;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel2b4;
     private javax.swing.JLabel jLabel2b5;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JProgressBar jProgressBar;
@@ -661,6 +668,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JButton jbClearWeeksProcurements;
     private javax.swing.JButton jbOpenProcurementFacility;
     private javax.swing.JButton jbRecord;
+    private javax.swing.JButton jbRejectWeek;
     private javax.swing.JButton jbRequestPayment;
     private javax.swing.JButton jbReverseAccounting;
     private javax.swing.JButton jbSelectAll;
@@ -745,19 +753,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             jcbMonths.addItem(month);
         }
         
-//        jcbMonths.addItem(months[0]);
-//        jcbMonths.addItem(months[1]);
-//        jcbMonths.addItem(months[2]);
-//        jcbMonths.addItem(months[3]);
-//        jcbMonths.addItem(months[4]);
-//        jcbMonths.addItem(months[5]);
-//        jcbMonths.addItem(months[6]);
-//        jcbMonths.addItem(months[7]);
-//        jcbMonths.addItem(months[8]);
-//        jcbMonths.addItem(months[9]);
-//        jcbMonths.addItem(months[10]);
-//        jcbMonths.addItem(months[11]);
-        
         jcbMonths.setSelectedIndex(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1] - 1);
         moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
 
@@ -787,12 +782,18 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha fin"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Bodega"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Estatus"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Tipo movimiento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Movimientos"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Contabilizado", 90);
                 column.setEditable(false);
                 gridColumnsForm.add(column);
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionar", 70);
                 column.setEditable(true);
                 gridColumnsForm.add(column);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Período póliza"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Sucursal empresa"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Centro contable"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio póliza"));
                 
                 return gridColumnsForm;
             }
@@ -867,6 +868,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbSelectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
         jbUnselectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
         jbReverseAccounting.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbRejectWeek.setEnabled(setShowingProcurementFacilitiesModeOn);
     }
     
     private void initProgress() {
@@ -907,31 +909,35 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * percentaje));
                         JsonNode lProcurements = docNode.path("procurement_facilities");
                         for (JsonNode oProcurement : lProcurements) {
-                            SImportProcurementFacility oProcurementFacilityWeek = new SImportProcurementFacility(
-                                root.get("season_year").asInt(),
-                                root.get("month_number").asInt(),
-                                docNode.get("week_month_number").asInt(),
-                                docNode.get("start_date").asText(),
-                                docNode.get("end_date").asText(),
-                                oProcurement,
-                                miClient.getSession().getStatement()
-                            );
-                            SDataFacilityRec oFacilityRec = new SDataFacilityRec();
-                            
-                            if(oFacilityRec.findByExtDataId(oProcurementFacilityWeek.FacilitySeasonWeekId, statement) == SLibConstants.DB_ACTION_READ_OK){
-                                oProcurementFacilityWeek.setIsAccountedFor(true);
+                            JsonNode accountingTypes = oProcurement.path("accounting_types");
+                            for (JsonNode accountingType : accountingTypes) {
+                                SImportProcurementFacility oProcurementFacilityWeek = new SImportProcurementFacility(
+                                    root.get("season_year").asInt(),
+                                    root.get("month_number").asInt(),
+                                    docNode.get("week_month_number").asInt(),
+                                    docNode.get("start_date").asText(),
+                                    docNode.get("end_date").asText(),
+                                    oProcurement,
+                                    miClient.getSession().getStatement(),
+                                    accountingType
+                                );
+                                
+                                SDataFacilityRec oFacilityRec = new SDataFacilityRec();
+
+                                if(oFacilityRec.findByExtDataId(oProcurementFacilityWeek.FacilitySeasonWeekId, oProcurementFacilityWeek.accountingTypeId, statement) == SLibConstants.DB_ACTION_READ_OK){
+                                    oProcurementFacilityWeek.setIsAccountedFor(true);
+                                }
+
+                                if (jckOnlyWithOutAccountFor.isSelected() && !oProcurementFacilityWeek.isAccountedFor) {
+                                    ++countProcurement;
+                                    maImportedDocuments.add(oProcurementFacilityWeek);
+                                }
+
+                                if (!jckOnlyWithOutAccountFor.isSelected()) {
+                                    ++countProcurement;
+                                    maImportedDocuments.add(oProcurementFacilityWeek);
+                                }
                             }
-                            
-                            if (jckOnlyWithOutAccountFor.isSelected() && !oProcurementFacilityWeek.isAccountedFor) {
-                                ++countProcurement;
-                                maImportedDocuments.add(oProcurementFacilityWeek);
-                            }
-                            
-                            if (!jckOnlyWithOutAccountFor.isSelected()) {
-                                ++countProcurement;
-                                maImportedDocuments.add(oProcurementFacilityWeek);
-                            }
-                            
                         }
                     }
                 }
@@ -1116,6 +1122,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<season_year>", moCalYear.getValue().toString());
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<month_number>", "" + jcbMonths.getSelectedIndex());
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<only_accountable>", "" + true);
+                urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<group_by_accounting_type>", "" + true);
                 
                 HttpURLConnection connectionGetProcurementFacilities = createConnection(urlQueryGetProcurementFacilities, SHttpConsts.METHOD_GET);
                 
@@ -1212,10 +1219,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         int status = ((SImportProcurementFacility) row).getStatusId();
         int statusApproval = ((SImportProcurementFacility) row).getStatusApproval();
         
-        if (statusApproval != status) {
-            miClient.showMsgBoxWarning("La semana no ha sido aprovada, no se puede modificar.");
-            return;
-        }
+//        if (statusApproval != status) {
+//            miClient.showMsgBoxWarning("La semana no ha sido aprovada, no se puede modificar.");
+//            return;
+//        }
 
         if(((SImportProcurementFacility) row).isAccountedFor) {
             miClient.showMsgBoxWarning("La semana ya fue contabilizada, no se puede editar.");
@@ -1331,6 +1338,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbUnselectAll.addActionListener(this);
         jbToAccount.addActionListener(this);
         jbReverseAccounting.addActionListener(this);
+        jbRejectWeek.addActionListener(this);
 
         jbChangeRequiredPaymentDate.addActionListener(this);
         jbRequestPayment.addActionListener(this);
@@ -1348,6 +1356,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbUnselectAll.removeActionListener(this);
         jbToAccount.removeActionListener(this);
         jbReverseAccounting.removeActionListener(this);
+        jbRejectWeek.removeActionListener(this);
 
         jbChangeRequiredPaymentDate.removeActionListener(this);
         jbRequestPayment.removeActionListener(this);
@@ -1408,6 +1417,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             }
             else if (button == jbReverseAccounting) {
                 actionReverseAccounting();
+            }
+            else if (button == jbRejectWeek) {
+                actionRejectWeek();
             }
         }
     }
@@ -1494,6 +1506,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             
             for (int i = 0; i < arrfacilities.size(); i++) {
                 int facilityWeekId = arrfacilities.get(i).FacilitySeasonWeekId;
+                int accountingTypeId = arrfacilities.get(i).accountingTypeId;
 
                 // Actualizar progreso
                 int progress = (int) ((++countUpdated / (double) total) * percentaje);
@@ -1502,10 +1515,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 // Construir el objeto JSON
                 jsonBody
                     .append("{")
-                        .append("\"facility_season_week_id\": ").append(facilityWeekId).append(",")
+                        .append("\"facility_season_week_id\": ").append(facilityWeekId).append(", ")
 //                        .append("\"facility_season_week_id\": ").append(36).append(",")
-                        .append("\"company_id\": ").append(company_id)
+                        .append("\"company_id\": ").append(company_id).append(", ")
 //                        .append("\"company_id\": ").append(2935)
+                        .append("\"accounting_type_id\": ").append(accountingTypeId)
                     .append("}");
 
                 if (i < (arrfacilities.size() - 1)) {
@@ -1547,14 +1561,28 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     ));
                 
                 for (JsonNode jsonNode : responseJson) {
+                    maWeekMovProcurementFacility = new ArrayList<>();
                     JsonNode info = jsonNode.get("info");
                     JsonNode data = jsonNode.get("data");
                     
                     SImportedBatchWeekMovProcurementFacility oBatchWeekMovProcurementFacility = new SImportedBatchWeekMovProcurementFacility();
                     oBatchWeekMovProcurementFacility.setMnFacilitySeasonWeekId(info.get("facility_season_week_id").asInt());
+
+                    oBatchWeekMovProcurementFacility.setMnProcurementId(info.get("facility_id").asInt());
+                    oBatchWeekMovProcurementFacility.setMsProcurementName(info.get("facility_name").asText());
+                    oBatchWeekMovProcurementFacility.setMnWeekNumebr(info.get("week_number").asInt());
+                    
+                    JsonNode cashHolding = info.path("cash_holding");
+                    oBatchWeekMovProcurementFacility.setMnCashHoldingIdCob(cashHolding.get("id_cob").asInt());
+                    oBatchWeekMovProcurementFacility.setMnCashHoldingIdEnt(cashHolding.get("id_ent").asInt());
+                    
+//                    oBatchWeekMovProcurementFacility.setMnProcurementId(8);
+//                    oBatchWeekMovProcurementFacility.setMsProcurementName("ACN URUAPAN");
+//                    oBatchWeekMovProcurementFacility.setMnWeekNumebr(7);
+                    
                     if (data.isArray()) {
                         for (JsonNode docNode : data) {
-                            SImportWeekMovProcurementFacility oWeekMovProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement);
+                            SImportWeekMovProcurementFacility oWeekMovProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement, (SClientInterface) miClient);
                             oWeekMovProcurementFacility.setMnFacilitySeasonWeekId(info.get("facility_season_week_id").asInt());
                             SValidateMovementWeekProcurementFacility oValid = new SValidateMovementWeekProcurementFacility(miClient, oWeekMovProcurementFacility);
 
@@ -1571,6 +1599,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                             }
                         }
                     }
+                    
                     // Actualizar cada elemento de maWeekMovProcurementFacility
                     maWeekMovProcurementFacility.forEach(weekMov -> {
                         Integer sortingPosition = sortingPositionMap.get(weekMov.mnFacilitySeasonWeekId);
@@ -1578,9 +1607,14 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                             weekMov.mnSortingPosition = sortingPosition;
                         }
                     });
+                    
+                    ArrayList<SImportWeekMovProcurementFacility> counterpart = genereateCounterpart(oBatchWeekMovProcurementFacility, maWeekMovProcurementFacility);
+                    maWeekMovProcurementFacility.addAll(counterpart);
+                    
                     oBatchWeekMovProcurementFacility.setMaWeekMovProcurementFacility(maWeekMovProcurementFacility);
                     maBatchWeekMovProcurementFacility.add(oBatchWeekMovProcurementFacility);
                 }
+//                maBatchWeekMovProcurementFacility.add(counterpart);
                 
                 callback.onProgress(initPercentaje + percentaje);
 
@@ -1595,7 +1629,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         }
     }
     
-    private void processPostToggleAccounting(int facilityWeekId, boolean action) throws Exception {
+    private void processPostToggleAccounting(int facilityWeekId, int accounting_type_id, boolean action) throws Exception {
         int countUpdated = 0;
         int total = arrfacilities.size();
         int countErros = 0;
@@ -1621,9 +1655,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     .append("{")
                         .append("\"facility_season_week_id\": ").append(facilityWeekId).append(",")
 //                        .append("\"facility_season_week_id\": ").append(36).append(",")
-                        .append("\"company_erp_id\": ").append(company_id)
+                        .append("\"company_erp_id\": ").append(company_id).append(",")
 //                        .append("\"company_erp_id\": ").append(2935).append(",")
-                        .append("\"action\": ").append( action ? 1 : 0 )
+                        .append("\"action\": ").append( action ? 1 : 0 ).append(",")
+                        .append("\"accounting_type_id\": ").append(accounting_type_id)
                     .append("}");
 
 //                if (i < (arrfacilities.size() - 1)) {
@@ -1663,10 +1698,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     }
     
     private void processWeeksToAccount(final SProgressCallback callback, int percentaje, int initPercentaje) throws Exception {
-      if (!mbCanToAccount) {
-          miClient.showMsgBoxWarning(msErrorMessageToAccount);
-          return;
-      }
+        if (!mbCanToAccount) {
+            throw new Exception(msErrorMessageToAccount);
+        }
         int countUpdated = 0;
         int total = arrfacilities.size();
         Connection con = miClient.getSession().getStatement().getConnection();
@@ -1695,17 +1729,23 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 moFinRecordEntry.IsDeleted = false;
                 moFinRecordEntry.Reference = otWeekProcurementFacility.Reference;
                 moFinRecordEntry.IsReferenceTax = false;
-                moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item.Id;
+                moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item != null ? otWeekProcurementFacility.Item.Id : 0;
                 moFinRecordEntry.Quantity = otWeekProcurementFacility.Stock_in;
                 moFinRecordEntry.Year = moCalYear.getValue();
-                moFinRecordEntry.Account = otWeekProcurementFacility.oDataAccount;
-                moFinRecordEntry.AccountMajor = otWeekProcurementFacility.oDataAccountMajor;
-                moFinRecordEntry.CostCenter = otWeekProcurementFacility.oDataCostCenter.getPkCostCenterIdXXX();
+//                moFinRecordEntry.Account = otWeekProcurementFacility.oDataAccount;
+//                moFinRecordEntry.AccountMajor = otWeekProcurementFacility.oDataAccountMajor;
+                moFinRecordEntry.CostCenter =  otWeekProcurementFacility.oDataCostCenter != null ? otWeekProcurementFacility.oDataCostCenter.getPkCostCenterIdXXX() : "";
                 moFinRecordEntry.IsBizPartnerRequired = otWeekProcurementFacility.oDataAccountMajor.getIsRequiredBizPartner();
 
-                moFinRecordEntry.BizPartnerId = otWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId();
-                SDataBizPartner bp = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] {otWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId()}, SLibConstants.EXEC_MODE_VERBOSE);
-                moFinRecordEntry.IsForegn = !bp.getFiscalFrgId().isEmpty();
+                if (otWeekProcurementFacility.getDataBizPartner() != null) {
+                    moFinRecordEntry.BizPartnerId = otWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId();
+                    SDataBizPartner bp = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] {otWeekProcurementFacility.getDataBizPartner().getPkBizPartnerId()}, SLibConstants.EXEC_MODE_VERBOSE);
+                    moFinRecordEntry.IsForegn = !bp.getFiscalFrgId().isEmpty();
+                }
+                
+                if (otWeekProcurementFacility.getDataAccountCash() != null) {
+                    moFinRecordEntry.EntityKey = new int[] {otWeekProcurementFacility.getDataAccountCash().getPkCompanyBranchId(), otWeekProcurementFacility.getDataAccountCash().getPkAccountCashId()};
+                }
 
                 SDataRecordEntry moRecordEntry = SFinRecordUtils.composeRecordEntry((SClientInterface) miClient, null, moFinRecordEntry);
 
@@ -1745,9 +1785,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     oFacility.setIsAccountedFor(true);
                     oFacility.setMoRecord(moCurrentRecord);
                     oFacility.setToAccount(false);
+                    oFacilityRec.setMnAccountingTypeId(oFacility.accountingTypeId);
                     oFacilityRec.save(con);
                     
-                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, true);
+                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, oFacility.accountingTypeId, true);
                 }
             }
             
@@ -1779,9 +1820,10 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             if(ProcurementFacility.isAccountedFor){
                 ProcurementFacility.setToAccount(false);
                 ProcurementFacility.setIsAccountedFor(false);
+                ProcurementFacility.setMoRecord(null);
                 
                 SDataFacilityRec oDataFacilityRec = new SDataFacilityRec();
-                oDataFacilityRec.findByExtDataId(ProcurementFacility.FacilitySeasonWeekId, statement);
+                oDataFacilityRec.findByExtDataId(ProcurementFacility.FacilitySeasonWeekId, ProcurementFacility.accountingTypeId, statement);
                 
                 if (oDataFacilityRec.getMnExtDataId() == 0) {
                     continue;
@@ -1803,7 +1845,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     continue;
                 }
                 
-                if (SDataUtilities.isPeriodOpen((SClientInterface) miClient, record.getDate())) {
+                if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, record.getDate())) {
                     msErrorMessageToAccount = SLibConstants.MSG_ERR_GUI_PER_CLOSE + " (" + record.getDate().toString() + ")";
                     continue;
                 }
@@ -1821,7 +1863,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 oDataFacilityRec.delete(con);
                 
                 try {
-                    processPostToggleAccounting(ProcurementFacility.FacilitySeasonWeekId, false);
+                    processPostToggleAccounting(ProcurementFacility.FacilitySeasonWeekId, ProcurementFacility.accountingTypeId, false);
                 } catch (Exception ex) {
                     Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1909,8 +1951,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     
                     int status = ProcurementFacility.getStatusId();
                     int statusApproval = ProcurementFacility.getStatusApproval();
+                    int statuPartialAccount = ProcurementFacility.getSTATUS_PARTIAL_ACCOUNT();
 
-                    if (statusApproval != status) {
+                    if (statusApproval != status && statuPartialAccount != statuPartialAccount) {
                         miClient.showMsgBoxWarning("La semana " 
                                         + ProcurementFacility.getWeekMonthNumber() 
                                         + " de " 
@@ -2032,5 +2075,301 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         if (!exception.isEmpty()) {
             throw new Exception(exception);
         }
+    }
+    
+    private void actionRejectWeek() {
+        SServicesUtils.RejectData rejectData = SServicesUtils.askForRejectData(miClient.getSession());
+        String confirm;
+        if (rejectData != null) {
+            SGridRow row = moImportationsGrid.getModel().getGridRows().get(moImportationsGrid.getTable().getSelectedRow());
+            SImportProcurementFacility oProcurement = ((SImportProcurementFacility) row);
+            confirm = "Se rechazará la semana " + oProcurement.WeekMonthNumber + " \n"
+                    + "de la bodega: " + oProcurement.ProcurementFacilityName + ",\n"
+                    + "con los siguientes comentarios:\n"
+                    + "\"" + rejectData.Notes + "\"\n"
+                    + SGuiConsts.MSG_CNF_CONT;
+            
+            if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                //enviar a rechazar y recargar tabla
+            }
+        }
+    }
+    
+    private ArrayList<SImportWeekMovProcurementFacility> genereateCounterpart(
+            SImportedBatchWeekMovProcurementFacility oBatchWeekMovProcurementFacility, 
+            ArrayList<SImportWeekMovProcurementFacility> maWeekMovProcurementFacility 
+    ) {
+        double caja_central = 0;
+        double salida_caja_compras = 0;
+        double salida_caja_gastos = 0;
+        double salida_caja_deudores = 0;
+        double salida_caja_acreedores = 0;
+        double entrada_caja_deudores = 0;
+        double entrada_caja_acreedores = 0;
+        double caja_x = 0;
+        String concept = "";
+        ArrayList<SImportWeekMovProcurementFacility> maCounterpart = new ArrayList<>();
+        int sortingPosition = 0;
+        
+        for (SImportWeekMovProcurementFacility otWeekProcurementFacility : maWeekMovProcurementFacility) {
+            ArrayList<String> checkAccountTypeResult = otWeekProcurementFacility.checkAccountType();
+            sortingPosition = otWeekProcurementFacility.mnSortingPosition;
+            switch(checkAccountTypeResult.get(1)){
+                case "salida_caja_compras":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_compras += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_compras += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "salida_caja_gastos":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_gastos += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_gastos += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "salida_caja_deudores":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_deudores += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_deudores += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "salida_caja_acreedores":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_acreedores += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        salida_caja_acreedores += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "entrada_caja_deudores":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        entrada_caja_deudores += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        entrada_caja_deudores += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "entrada_caja_acreedor":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        entrada_caja_acreedores += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        entrada_caja_acreedores += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "caja_central":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        caja_central += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        caja_central += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                case "caja_x":
+                    if ("debe".equals(checkAccountTypeResult.get(0))) {
+                        caja_x += otWeekProcurementFacility.Debe;
+                    }
+                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+                        caja_x += otWeekProcurementFacility.Haber;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        SImportWeekMovProcurementFacility mov = getAccountByAccCash(oBatchWeekMovProcurementFacility.getMnCashHoldingIdCob(), oBatchWeekMovProcurementFacility.getMnCashHoldingIdEnt());
+        
+        if (caja_central != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "CAJA CENTRAL SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setHaber(caja_central);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (salida_caja_compras != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X COMPRAS SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setHaber(salida_caja_compras);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (salida_caja_gastos != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X GASTOS SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setHaber(salida_caja_gastos);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (salida_caja_deudores != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "SALIDA CAJA" + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X DEUDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setHaber(salida_caja_deudores);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (salida_caja_acreedores != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X ACREEDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setHaber(salida_caja_acreedores);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (entrada_caja_deudores != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "ENTRADA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X DEUDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setDebe(entrada_caja_deudores);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (entrada_caja_acreedores != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "ENTRADA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X ACREEDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setDebe(entrada_caja_acreedores);
+            
+            maCounterpart.add(counterpart);
+        }
+        if (caja_x != 0) {
+            SImportWeekMovProcurementFacility counterpart = new SImportWeekMovProcurementFacility();
+        
+            counterpart.setMnSortingPosition(sortingPosition);
+            counterpart.setDataAccount(mov.getDataAccount());
+            counterpart.setDataAccountMajor(mov.getDataAccountMajor());
+            counterpart.setCurrency(mov.getCurrency().Id, mov.getCurrency().Code, mov.getCurrency().Name);
+            counterpart.setMovement_date(new Date());
+            counterpart.setDataAccountCash(mov.getDataAccountCash());
+            
+            concept = "CAJA X SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
+            counterpart.setConcept(concept);
+            counterpart.setDebe(caja_x);
+            
+            maCounterpart.add(counterpart);
+        }
+        
+//        SImportedBatchWeekMovProcurementFacility oBatchWeekMovProcurementFacility = new SImportedBatchWeekMovProcurementFacility();
+//        oBatchWeekMovProcurementFacility.setMaWeekMovProcurementFacility(maCounterpart);
+        
+        return maCounterpart;
+    }
+    
+    public SImportWeekMovProcurementFacility getAccountByAccCash(int id_cob, int id_ent) {
+        try {
+            String sql;
+            SClientInterface client = (SClientInterface) miClient;
+            Statement statement = miClient.getSession().getStatement();
+            SDataAccount oAccount = new SDataAccount();
+            SDataAccount oAccountLedger = new SDataAccount();
+            
+            SImportWeekMovProcurementFacility weekMov = new SImportWeekMovProcurementFacility();
+            
+            sql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, e.b_act, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) \n" +
+                    "AS f_acc, cob.id_bpb, cob.bpb, a.acc, c.cur_key, c.id_cur, c.cur\n" +
+                    "FROM fin_acc_cash AS ac \n" +
+                    "INNER JOIN erp.cfgu_cob_ent AS e ON ac.id_cob = e.id_cob AND ac.id_acc_cash = e.id_ent \n" +
+                    "INNER JOIN erp.bpsu_bpb AS cob ON ac.id_cob = cob.id_bpb \n" +
+                    "INNER JOIN fin_acc AS a ON ac.fid_acc = a.id_acc \n" +
+                    "INNER JOIN erp.cfgu_cur AS c ON ac.fid_cur = c.id_cur \n" +
+                    "WHERE cob.fid_bp = " + client.getSessionXXX().getCurrentCompany().getPkCompanyId() +
+                    " AND ac.fid_ct_acc_cash = " + SDataConstantsSys.FINS_CT_ACC_CASH_CASH + " AND ac.b_del = FALSE" +
+                    " AND ac.id_acc_cash = " + id_ent +
+                    " AND cob.id_bpb = " + id_cob + ";";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
+            
+            if (!resultSet.next()) {
+                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+            }
+            
+            weekMov.setCurrency(resultSet.getInt("id_cur"), resultSet.getString("cur_key"), resultSet.getString("cur"));
+            
+            oAccount.read(new String[] {resultSet.getString("fid_acc")}, statement);
+            oAccount.getDbmsPkLedgerAccountIdXXX();
+            oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
+            
+            weekMov.setDataAccount(oAccount);
+            weekMov.setDataAccountMajor(oAccountLedger);
+
+            int[] pkAccountCash = new int[] { id_cob, id_ent };
+            SDataAccountCash moDataAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(client, SDataConstants.FIN_ACC_CASH, pkAccountCash, SLibConstants.EXEC_MODE_SILENT);
+            
+            weekMov.setDataAccountCash(moDataAccountCash);
+            
+            return weekMov;
+        } catch (SQLException ex) {
+            Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }
