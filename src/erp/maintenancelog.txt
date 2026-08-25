@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 307.0/ 2026-08-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de costo unitario cuando en valuación de consumos hay un surtido de factura, se busca la OC para determinar si la diferencia del costo no excede la configurada.
+
+================================================================================
 SIIE 3.2 306.2/ 2026-08-18
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------

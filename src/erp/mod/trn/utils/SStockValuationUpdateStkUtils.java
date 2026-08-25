@@ -101,9 +101,10 @@ public class SStockValuationUpdateStkUtils {
      *
      * @param oSession Sesión de base de datos.
      * @param idValuation ID de la valuación.
+     * @param sDate
      * @throws SQLException
      */
-    public static void updateStockInRows(SGuiSession oSession, final int idValuation) throws SQLException {
+    public static void updateStockInRows(SGuiSession oSession, final int idValuation, final String sDate) throws SQLException {
         String mainSql = "SELECT " +
             "	ts.* , " +
             "	tsvm.fk_diog_year_in_n, " +
@@ -124,7 +125,11 @@ public class SStockValuationUpdateStkUtils {
             "	AND ts.b_del = 0 " +
             "   AND tsv.b_del = 0 " +
             "	AND tsvm.fk_ct_iog = 1 " +
+            "   AND tsvm.fk_tp_stk_val_mvt <> 4 " +
             "	AND tsvm.b_del = 0 ";
+        if (sDate != null && !sDate.isEmpty()) {
+            mainSql += "AND tsvm.dt_mov >= '" + sDate + "' ";
+        }
 
         if (idValuation > 0) {
             mainSql += "AND tsvm.fk_stk_val = " + idValuation + " ";
@@ -136,7 +141,7 @@ public class SStockValuationUpdateStkUtils {
         mainSql += "AND ts.debit <> tsvm.cost_r " +
             "	AND ABS(ts.debit - tsvm.cost_r) > 1;";
 
-        ResultSet resultSet = oSession.getStatement().executeQuery(mainSql);
+        ResultSet resultSet = oSession.getStatement().getConnection().createStatement().executeQuery(mainSql);
         while (resultSet.next()) {
             System.out.println("Entrada: " + resultSet.getString("dt") + ". "
                     + "Diferencia de costo: " + (resultSet.getDouble("debit") - resultSet.getDouble("mvt_cost_r")) + ".");
@@ -152,5 +157,28 @@ public class SStockValuationUpdateStkUtils {
                     resultSet.getDouble("mvt_cost_u"),
                     SStockValuationUtils.DEBIT);
         }
+    }
+
+    public static void updateStockInRowsSinceDate(SGuiSession oSession, final String sDate) {
+        String sql = "SELECT " +
+                    "	v.id_stk_val " +
+                    "FROM " +
+                    "	trn_stk_val v " +
+                    "WHERE " +
+                    "	v.dt_sta >= '" + sDate + "' " +
+                    "	AND v.b_del = 0 " +
+                    "ORDER BY " +
+                    "	v.dt_sta ASC;";
+        
+        try {
+            ResultSet resultSet = oSession.getStatement().getConnection().createStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                System.out.println("Valuación: " + resultSet.getInt("id_stk_val"));
+                updateStockInRows(oSession, resultSet.getInt("id_stk_val"), sDate);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        }
+        System.out.println("¡Proceso terminado!");
     }
 }

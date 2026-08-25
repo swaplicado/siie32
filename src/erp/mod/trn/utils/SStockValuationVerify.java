@@ -7,12 +7,12 @@ package erp.mod.trn.utils;
 
 import erp.data.SDataConstantsSys;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SStockValuationConfiguration;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.velocity.runtime.log.Log;
-
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
@@ -49,6 +49,7 @@ public class SStockValuationVerify {
                 + verifyStockValuationCostConsumptions(oSession)
                 + verifyPurchaseInvoiceWithZero(oSession)
                 + verifyOrdersWithoutInvoiceWithZero(oSession);
+                // + verifyStockEntryValue(oSession);
     }
 
     /**
@@ -520,6 +521,101 @@ public class SStockValuationVerify {
                     + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
                     + rs.getInt("mvt.fk_diog_ety_in_n") + "] \n "
                     + "tiene un costo de consumos que rebasan el costo de entrada.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que los movimientos de entrada de almacén tengan un valor unitario
+     * consistente con el documento de origen (orden de compra o factura).
+     * <p>
+     * Para entradas con naturaleza de inventario (nat = 1), compara el costo
+     * unitario del movimiento ({@code trn_stk.cost_u}) contra el precio unitario
+     * real del renglón del documento ({@code trn_dps_ety.price_u_real_r}).
+     * Para entradas con naturaleza de activo fijo (nat = 2), detecta movimientos
+     * que tengan cargo o abono contable ({@code debit > 0} o {@code credit > 0}),
+     * lo cual indica que fueron incorrectamente valuados.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyStockEntryValue(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando valores de entradas de almacén...");
+        double priceDiffPercent = 0d;
+        try {
+            SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(oSession.getStatement().getConnection().createStatement());
+            // P.ej. para el 10% se configura 0.10
+            priceDiffPercent = oCfg.getDiffPricePercent();
+        }
+        catch (Exception e) {
+            Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, 
+                    "Error al obtener el porcentaje de diferencia de precio, definido en 0", 
+                    e);
+        }
+        SStockValuationUpdateStkUtils.updateStockInRowsSinceDate(oSession, SINCE_DATE);
+        String sErrors = "";
+        String sql = "SELECT "
+                + "  ie.id_year, "
+                + "  ie.id_doc, "
+                + "  ie.id_ety, "
+                + "  i.dt, "
+                + "  i.num, "
+                + "  trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 2 AS is_asset_nat, "
+                + "  de.id_year AS dps_year, "
+                + "  de.id_doc AS dps_doc, "
+                + "  de.id_ety AS dps_ety, "
+                + "  d.num_ser AS dps_num_ser, "
+                + "  d.num AS dps_num, "
+                + "  d.dt AS dps_dt, "
+                + "  d.fid_ct_dps, "
+                + "  d.fid_cl_dps, "
+                + "  d.fid_tp_dps, "
+                + "  ie.fid_item, "
+                + "  ie.fid_unit, "
+                + "  ie.val_u, "
+                + "  ie.qty, "
+                + "  ie.orig_qty, "
+                + "  ie.val, "
+                + "  s.cost_u, "
+                + "  de.fid_item, "
+                + "  de.fid_unit, "
+                + "  de.qty, "
+                + "  de.price_u_real_r "
+                + "FROM trn_diog i "
+                + "INNER JOIN trn_diog_ety ie ON i.id_year = ie.id_year AND i.id_doc = ie.id_doc "
+                + "INNER JOIN trn_stk s ON s.fid_diog_year = ie.id_year AND s.fid_diog_doc = ie.id_doc AND s.fid_diog_ety = ie.id_ety "
+                + "INNER JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_in_n = ie.id_year AND mvt.fk_diog_doc_in_n = ie.id_doc AND mvt.fk_diog_ety_in_n = ie.id_ety "
+                + " AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " AND mvt.b_del = 0 "
+                + "INNER JOIN trn_stk_val v ON v.id_stk_val = mvt.fk_stk_val AND v.b_del = 0 "
+                + "INNER JOIN trn_dps_ety de ON ie.fid_dps_year_n = de.id_year AND ie.fid_dps_doc_n = de.id_doc AND ie.fid_dps_ety_n = de.id_ety "
+                + "INNER JOIN trn_dps d ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
+                + "WHERE i.dt >= '" + SINCE_DATE + "' ";
+        
+        sql += "AND ( "
+                // Si la naturaleza del documento es predeterminada y la diferencia del costo excede el porcentaje configurado
+                + "  (trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 1 AND "
+                + "     ROUND(ABS(s.cost_u - de.price_u_real_r), 2) > ROUND((de.price_u_real_r * " + priceDiffPercent + "), 2)) "
+                // O si la naturaleza del documento es activo fijo y tiene cargo o abono contable
+                + "  OR (trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 2 AND (s.debit > 0 OR s.credit > 0)) "
+                + ") "
+                + "AND i.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND i.b_del = 0 AND ie.b_del = 0 AND s.b_del = 0;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("ie.id_year") + ", "
+                    + rs.getInt("ie.id_doc") + ", "
+                    + rs.getInt("ie.id_ety") + "] "
+                    + "precio unitario almacén ["+ rs.getDouble("s.cost_u") + "] vs "
+                    + "precio documento [" + rs.getDouble("de.price_u_real_r") + "].\n "
+                    + "Folio documento: " + rs.getString("dps_num_ser") + " " + rs.getString("dps_num") + ", "
+                    + "fecha: " + SLibUtils.DateFormatDate.format(rs.getDate("dps_dt")) + " " + ", "
+                    + "no tiene un valor de entrada consistente con su documento de origen.\n";
         }
         if (!sErrors.isEmpty()) {
             Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);

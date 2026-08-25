@@ -349,7 +349,7 @@ public class SStockValuationUtils {
                                 oEntry.setCostUnitaryCurrency(0d);
                                 oEntry.setCostCurrency_r(0d);
                             }
-                            
+
                             oEntry.setExchangeRate(res.getDouble("des_exc_rate"));
                             oEntry.setFkDpsCurrencyInId_n(res.getInt("des_fid_cur"));
 
@@ -411,6 +411,25 @@ public class SStockValuationUtils {
                             oEntry.setCostCurrency_r(0d);
                         }
                         else {
+                            String sqlOrder = SStockValuationDpsUtils.getOrderFromInvoice(oEntry.getFkDpsYearInId_n(), oEntry.getFkDpsDocInId_n(), oEntry.getFkDpsEntryInId_n());
+                            ResultSet resOrder = session.getStatement().getConnection().createStatement().executeQuery(sqlOrder);
+                            if (resOrder.next()) {
+                                double unitaryOrderPriceCur = resOrder.getDouble("price_u_real_cur_r");
+                                double unitaryInvoicePriceCur = res.getDouble("price_u_real_cur_r");
+                                double priceDiff = Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur);
+                                if (priceDiff > (unitaryOrderPriceCur * priceDiffPercent)) {
+                                    throw new Exception("No se puede continuar con la valuación.\n"
+                                                    + "El pedido y la factura asociados al movimiento de entrada al almacén "
+                                                    + "con número de documento " + res.getInt("d.num") + " y "
+                                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + "\n "
+                                                    + "tienen diferencia de costo unitario mayor a la configurada.\n "
+                                                    + "Factura: " + res.getString("dps_num") + " fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date"))
+                                                    + "Precio un: " + unitaryInvoicePriceCur + ". "
+                                                    + "Pedido folio: " + resOrder.getString("num_ser") + " " + resOrder.getString("num") + ", "
+                                                    + "fecha pedido: " + SLibUtils.DateFormatDate.format(resOrder.getDate("dt")) + " "
+                                                    + "Precio un: " + unitaryOrderPriceCur + ".");
+                                }
+                            }
                             oEntry.setCostUnitaryCurrency(res.getDouble("price_u_real_cur_r"));
                             oEntry.setCostCurrency_r(SLibUtils.roundAmount(res.getDouble("price_u_real_cur_r") * oEntry.getQuantityMovement()));
                         }
