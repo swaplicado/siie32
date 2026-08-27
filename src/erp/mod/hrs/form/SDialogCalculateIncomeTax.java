@@ -536,8 +536,9 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = pr.fk_tp_rec_sche "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " "
-                + "AND p.fis_year = 2025 "
-                + "AND p.dt_end BETWEEN '2025-12-01' AND '2025-12-31' "
+                + "AND p.fis_year = " + fiscalYear + " "
+                + (start_n == null ? "" : "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(start_n) + "' ")
+                + "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
                 + (earningTypeId == 0 ? "" : "AND pre.fk_tp_ear = " + earningTypeId + " ") + ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
@@ -561,8 +562,9 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = pr.fk_tp_rec_sche "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND pr.id_emp = " + employeeId + " AND trs.rec_sche_cat = " + recruitmentSchemaCat + " "
-                + "AND p.fis_year = 2025 "
-+ "AND p.dt_end BETWEEN '2025-12-01' AND '2025-12-31' "
+                + "AND p.fis_year = " + fiscalYear + " "
+                + (start_n == null ? "" : "AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(start_n) + "' ")
+                + "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(cutoff) + "' "
                 + (deductionTypeId == 0 ? "" : "AND prd.fk_tp_ded = " + deductionTypeId + " ") + ";";
         
         try (ResultSet resultSet = statement.executeQuery(sql)) {
@@ -634,9 +636,9 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
             Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
             Statement statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
             
-            int periodYear = 2025;
-            Date periodStart = SLibTimeUtils.createDate(2025, 12, 1);
-Date periodEnd = SLibTimeUtils.createDate(2025, 12, 31);
+            int periodYear = moCalYear.getValue();
+            Date periodStart = SLibTimeUtils.createDate(moCalYear.getValue(), 1, 1);
+            Date periodEnd = moDateCutoff.getValue();
             
             SDbTaxTable dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, moKeyTax.getValue());
             SDbTaxSubsidyTable dbTaxSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, moKeyTaxSubsidy.getValue());
@@ -664,10 +666,7 @@ Date periodEnd = SLibTimeUtils.createDate(2025, 12, 31);
                     + "SELECT DISTINCT pr.id_emp "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                    + "WHERE NOT p.b_del\n" +
-"AND NOT pr.b_del " +
-"AND p.fis_year = 2025 " +
-"AND p.dt_end BETWEEN '2025-12-01' AND '2025-12-31' "
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND p.fis_year = " + moCalYear.getValue() + " " + (moRadComputeCutoff.isSelected() ? "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateCutoff.getValue()) + "' " : "")
                     + "ORDER BY pr.id_emp) "
                     + "ORDER BY b.bp, b.id_bp;";
 

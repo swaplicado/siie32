@@ -6,8 +6,8 @@ package erp.mod.trn.view;
 
 import erp.data.SDataConstantsSys;
 import erp.gui.grid.SGridFilterPanelValMovType;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.form.SDialogStockValuationNotes;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -256,7 +256,7 @@ public class SViewStockValuationDetail extends SGridPaneView implements ActionLi
                 + "    IF(LENGTH(dps.num_ser) = 0, '', '-'), "
                 + "    dps.num) AS f_num, "
                 + "dps.dt_doc, "
-                + "IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "IF(trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", dps.id_year, dps.id_doc)=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
                 + "         'ACTIVO FIJO', "
                 + "         'PREDETERMINADO') AS dps_nat, "
                 + "bp.bp, "

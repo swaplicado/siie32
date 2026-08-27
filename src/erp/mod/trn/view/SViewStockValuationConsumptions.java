@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.form.SDialogStockValuationNotes;
 import erp.mod.trn.utils.SStockValuationConsumptionUtils;
@@ -95,17 +96,17 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbViewCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Filtrar ítem", this);
         
         mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
-        mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
-        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
+        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewDps.addActionListener(this);
-        mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
-        mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas del documento");
-        mjbViewLinks.setToolTipText("Ver vínculos del documento");
+        mjbViewNotes.addActionListener(this);
+        mjbViewDps.setToolTipText("Ver documento de entrada");
+        mjbViewLinks.setToolTipText("Ver vínculos del documento de entrada");
+        mjbViewNotes.setToolTipText("Ver notas del movimiento de valuación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
         moTextToSearch = new JTextField("");
@@ -415,7 +416,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "    IF(LENGTH(dps.num_ser) = 0, '', '-'), "
                 + "    dps.num) AS f_num, "
                 + "dps.dt_doc, "
-                + "IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "IF(trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", dps.id_year, dps.id_doc)=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
                 + "         'ACTIVO FIJO', "
                 + "         'PREDETERMINADO') AS dps_nat, "
                 + "bp.bp, "

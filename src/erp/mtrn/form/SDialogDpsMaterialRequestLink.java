@@ -545,7 +545,9 @@ public class SDialogDpsMaterialRequestLink extends javax.swing.JDialog implement
                 if (oTableRow.getMaterialRequestEntry().getCcConfigs().size() > 0) {
                     idCc = oTableRow.getMaterialRequestEntry().getCcConfigs().get(0).getFkCostCenterId();
                 }
-                else {
+                if (oTableRow.getMaterialRequestEntry().getCcConfigs() == null || 
+                    oTableRow.getMaterialRequestEntry().getCcConfigs().isEmpty() || 
+                    idCc == 0) {
                     if (moMaterialRequest.getChildCostCenters() != null && moMaterialRequest.getChildCostCenters().size() > 0) {
                         SDbMaterialRequestCostCenter oMaxCC = Collections.max(moMaterialRequest.getChildCostCenters(), 
                                                                 Comparator.comparingDouble(SDbMaterialRequestCostCenter::getPercentage));

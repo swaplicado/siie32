@@ -1,9 +1,16 @@
 ================================================================================
+SIIE 3.2 307.0/ 2026-08-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de costo unitario cuando en valuación de consumos hay un surtido de factura, se busca la OC para determinar si la diferencia del costo no excede la configurada.
+
+================================================================================
 SIIE 3.2 306.2/ 2026-08-18
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
 1) Restricción de cambiar la fecha de pago programada a fechas posteriores a la fecha autorizada.
 2) Reporte de embarques especial para Saporis.
+3) Corrección de clase subida por error con código de prueba  
 
 ================================================================================
 SIIE 3.2 306.1/ 2026-08-12

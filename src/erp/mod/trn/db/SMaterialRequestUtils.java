@@ -311,6 +311,7 @@ public abstract class SMaterialRequestUtils {
     public static String saveDiogs(Connection connection, ArrayList<SDataDiog> lDiogs) {
         String result;
         try {
+            connection.setAutoCommit(false);
             for (SDataDiog oDiog : lDiogs) {
                 if (! oDiog.getIsRegistryNew()) {
                     SMaterialRequestUtils.deleteMaintDiogSign(connection, oDiog.getPkYearId(), oDiog.getPkDocId());
@@ -328,18 +329,31 @@ public abstract class SMaterialRequestUtils {
                     oDiog.setIsDeleted(true);
                 }
                 
+                String sValidated = SMaterialRequestUtils.validateOutDiogEtys(oDiog, connection);
+
+                if (!sValidated.isEmpty()) {
+                   throw new SQLException(sValidated);
+                }
+                
                 oDiog.save(connection.createStatement().getConnection());
                 
                 if (oDiog.getLastDbActionResult() == SLibConstants.DB_ACTION_SAVE_ERROR) {
+                    connection.rollback();
+                    connection.setAutoCommit(true);
                     return "Error en el guardado del documento, no es posible acceder al código de error.";
                 }
             }
             
+            connection.commit();
+            connection.setAutoCommit(true);
             return "";
         }
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
             result = ex.getMessage();
+            try { 
+                connection.rollback(); connection.setAutoCommit(true); 
+            } catch (SQLException ignored) {}
         }
         
         return result;
@@ -355,6 +369,72 @@ public abstract class SMaterialRequestUtils {
         catch (SQLException ex) {
             Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private static String validateOutDiogEtys(SDataDiog oDiog, Connection oConn) {
+        for (SDataDiogEntry oDiogEty : oDiog.getDbmsEntries()) {
+            if (oDiogEty.getIsDeleted()) {
+                continue;
+            }
+            
+            String sResStock = SMaterialRequestUtils.hasStock(oConn, oDiogEty, 
+                                                        oDiog.getPkYearId(), oDiog.getFkCompanyBranchId(), 
+                                                        oDiog.getFkWarehouseId());
+            if (!sResStock.isEmpty()) {
+                return sResStock;
+            }
+        }
+
+        return "";
+    }
+
+    private static String hasStock(Connection oConn, SDataDiogEntry oDiogEty, final int idYear, final int idCob, final int idWh) {
+        String sql = "SELECT " +
+                    "	SUM(s.mov_in - s.mov_out) AS stock, " +
+                    "   i.item, " +
+                    "	u.unit " +
+                    "FROM " +
+                    "	trn_stk s " +
+                    "INNER JOIN " +
+                    "	erp.itmu_item i ON i.id_item = s.id_item " +
+                    "INNER JOIN " +
+                    "	erp.itmu_unit u ON u.id_unit = s.id_unit " +
+                    "WHERE " +
+                    "	s.b_del = 0 " +
+                    "	AND s.id_year = " + idYear + " " +
+                    "   AND s.id_item = " + oDiogEty.getFkItemId() + " " +
+                    "   AND s.id_unit = " + oDiogEty.getFkUnitId() + " " +
+                    "   AND s.id_cob = " + idCob + " " +
+                    "   AND s.id_wh = " + idWh + " " +
+                    "GROUP BY " +
+                    "	s.id_year, " +
+                    "	s.id_item, " +
+                    "	s.id_unit, " +
+                    "	s.id_lot, " +
+                    "	s.id_cob, " +
+                    "	s.id_wh;";
+
+        try {
+            ResultSet stkRes = oConn.createStatement().executeQuery(sql);
+            if (stkRes.next()) {
+                if (stkRes.getDouble("stock") < oDiogEty.getQuantity()) {
+                    return "No hay suficiente existencia del ítem '" + stkRes.getString("item") + 
+                    "' con unidad " + stkRes.getString("unit") + 
+                    " en el almacén, revise el movimiento.";
+                }
+            }
+            else {
+                return "No hay existencia del ítem '" + stkRes.getString("item") + 
+                    "' con unidad " + stkRes.getString("unit") + 
+                    " en el almacén, revise el movimiento.";
+            }
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SMaterialRequestUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return ex.getMessage();
+        }
+        
+        return "";
     }
     
     /**

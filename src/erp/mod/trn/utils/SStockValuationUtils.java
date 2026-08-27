@@ -84,7 +84,7 @@ public class SStockValuationUtils {
      * @return Consulta SQL como cadena.
      * @throws Exception
      */
-    private static String getStockMovementsQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
+    protected static String getStockMovementsQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
         SStockValuationConfiguration oCfg;
         try (Statement st = statement.getConnection().createStatement()) {
             oCfg = SStockValuationUtils.getStockValuationConfig(st);
@@ -303,31 +303,18 @@ public class SStockValuationUtils {
                             DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session,
                                                                                     oEntry.getFkDpsYearInId_n(),
                                                                                     oEntry.getFkDpsDocInId_n());
-                            if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
-                                oEntry.setCostUnitaryCurrency(0d);
-                                oEntry.setCostCurrency_r(0d);
-                            }
-                            else {
-                                oEntry.setCostUnitaryCurrency(res.getDouble("price_u_real_cur_r"));
-                                oEntry.setCostCurrency_r(SLibUtils.roundAmount(res.getDouble("price_u_real_cur_r") * oEntry.getQuantityMovement()));
-                            }
-                            double newCostUnitary = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
-                                    ? 0d
-                                    : res.getDouble("price_u_real_r");
-                            if (oEntry.getCostUnitary() != newCostUnitary) {
-                                oEntry.setCostUnitary(newCostUnitary);
-                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-
-                                String sLogCost = "";
-                                if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
-                                    oEntry.setCostUnitaryCurrency(0d);
-                                    oEntry.setCostCurrency_r(0d);
-
-                                    sLogCost += "La OC tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
-                                    SDbStockValuationMvtNote oCostNote = new SDbStockValuationMvtNote();
-                                    oCostNote.setNotes(sLogCost);
-                                    oEntry.getNotes().add(oCostNote);
-                                }
+                            boolean isAsset = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET;
+                            double newCostUnitary = isAsset ? 0d : res.getDouble("price_u_real_r");
+                            double newCostUnitaryCur = isAsset ? 0d : res.getDouble("price_u_real_cur_r");
+                            oEntry.setCostUnitary(newCostUnitary);
+                            oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * newCostUnitary));
+                            oEntry.setCostUnitaryCurrency(newCostUnitaryCur);
+                            oEntry.setCostCurrency_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * newCostUnitaryCur));
+                            if (isAsset) {
+                                String sLogCost = "La OC tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
+                                SDbStockValuationMvtNote oCostNote = new SDbStockValuationMvtNote();
+                                oCostNote.setNotes(sLogCost);
+                                oEntry.getNotes().add(oCostNote);
                             }
                         }
                         // Si es OC y sí tiene factura asociada
@@ -362,18 +349,30 @@ public class SStockValuationUtils {
                                 oEntry.setCostUnitaryCurrency(0d);
                                 oEntry.setCostCurrency_r(0d);
                             }
-                            
+
                             oEntry.setExchangeRate(res.getDouble("des_exc_rate"));
                             oEntry.setFkDpsCurrencyInId_n(res.getInt("des_fid_cur"));
+
+                            // Validar que ambas monedas sean iguales, si no, lanzar excepción
+                            if (res.getInt("fid_cur") != res.getInt("des_fid_cur")) {
+                                String sLog = "No se puede continuar con la valuación.\n"
+                                        + "El pedido y la factura asociados al movimiento de entrada al almacén "
+                                        + "con número de documento " + res.getInt("d.num") + " y "
+                                        + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + "\n "
+                                        + "tienen monedas diferentes.\n Factura: " + res.getString("des_num")
+                                        + ". Pedido folio: " + res.getString("dps_num") + ", "
+                                        + "fecha pedido: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + ".";
+                                throw new Exception(sLog);
+                            }
 
                             double newCostUnitary = documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET
                                     ? 0d
                                     : res.getDouble("ety_des_price_real");
+                            double prevCostUnitary = oEntry.getCostUnitary();
+                            oEntry.setCostUnitary(newCostUnitary);
+                            oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * newCostUnitary));
 
-                            if (oEntry.getCostUnitary() != newCostUnitary) {
-                                oEntry.setCostUnitary(newCostUnitary);
-                                oEntry.setCost_r(SLibUtils.roundAmount(oEntry.getQuantityMovement() * oEntry.getCostUnitary()));
-
+                            if (prevCostUnitary != newCostUnitary) {
                                 String sLog = "";
                                 if (documentNature.nature == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                                     sLog += "La factura tiene naturaleza de activo, por lo que el costo unitario se establece en 0.";
@@ -412,6 +411,25 @@ public class SStockValuationUtils {
                             oEntry.setCostCurrency_r(0d);
                         }
                         else {
+                            String sqlOrder = SStockValuationDpsUtils.getOrderFromInvoice(oEntry.getFkDpsYearInId_n(), oEntry.getFkDpsDocInId_n(), oEntry.getFkDpsEntryInId_n());
+                            ResultSet resOrder = session.getStatement().getConnection().createStatement().executeQuery(sqlOrder);
+                            if (resOrder.next()) {
+                                double unitaryOrderPriceCur = resOrder.getDouble("price_u_real_cur_r");
+                                double unitaryInvoicePriceCur = res.getDouble("price_u_real_cur_r");
+                                double priceDiff = Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur);
+                                if (priceDiff > (unitaryOrderPriceCur * priceDiffPercent)) {
+                                    throw new Exception("No se puede continuar con la valuación.\n"
+                                                    + "El pedido y la factura asociados al movimiento de entrada al almacén "
+                                                    + "con número de documento " + res.getInt("d.num") + " y "
+                                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + "\n "
+                                                    + "tienen diferencia de costo unitario mayor a la configurada.\n "
+                                                    + "Factura: " + res.getString("dps_num") + " fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date"))
+                                                    + "Precio un: " + unitaryInvoicePriceCur + ". "
+                                                    + "Pedido folio: " + resOrder.getString("num_ser") + " " + resOrder.getString("num") + ", "
+                                                    + "fecha pedido: " + SLibUtils.DateFormatDate.format(resOrder.getDate("dt")) + " "
+                                                    + "Precio un: " + unitaryOrderPriceCur + ".");
+                                }
+                            }
                             oEntry.setCostUnitaryCurrency(res.getDouble("price_u_real_cur_r"));
                             oEntry.setCostCurrency_r(SLibUtils.roundAmount(res.getDouble("price_u_real_cur_r") * oEntry.getQuantityMovement()));
                         }
@@ -586,14 +604,11 @@ public class SStockValuationUtils {
                             oConsumption.getNotes().add(oMvtNote);
                         }
                         if (rowAccountingNature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
-                            if (warningPrice) {
-                                oConsumption.setCostUnitary(etyPriceUnitary);
-                            }
-                            else {
-                                oConsumption.setCostUnitary(entry.getCostUnitary());
-                            }
-                            oConsumption.setCostUnitary(entry.getCostUnitary());
-                            oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * oConsumption.getCostUnitary()));
+                            double resolvedCost = warningPrice ? etyPriceUnitary : entry.getCostUnitary();
+                            oConsumption.setCostUnitary(resolvedCost);
+                            oConsumption.setCostUnitaryCurrency(resolvedCost);
+                            oConsumption.setCost_r(SLibUtils.roundAmount(consumeQuantity * resolvedCost));
+                            oConsumption.setCostCurrency_r(SLibUtils.roundAmount(consumeQuantity * resolvedCost));
                         }
                         else {
                             if (entry.getCostUnitary() > 0d) {
