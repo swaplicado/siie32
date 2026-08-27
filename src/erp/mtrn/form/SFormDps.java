@@ -12747,7 +12747,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         else if (!moImportedDocument.Number.isEmpty() && !moImportedDocument.Number.equals(moFieldNumber.getString())) {
                             validation.setMessage("El número del folio es distinto al del documento importado, '" + moImportedDocument.Number + "'.");
                         }
-                        else if (!moImportedDocument.NumberSeries.isEmpty() && !moImportedDocument.NumberSeries.equals(moFieldNumberSeries.getString())) {
+                        else if (!moImportedDocument.NumberSeries.isEmpty() && moImportedDocument.NumberSeries.compareToIgnoreCase(moFieldNumberSeries.getString()) != 0) {
                             validation.setMessage("La serie del folio es distinta a la del documento importado, '" + moImportedDocument.NumberSeries + "'.");
                         }
                     }
