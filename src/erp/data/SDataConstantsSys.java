@@ -1392,7 +1392,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DPS_SAL_DOC_AUT_AUT = 58;
     public static final int TRNX_DPS_SAL_DOC_AUT_PEND = 59;
     public static final int TRNX_DPS_SAL_DOC_AUT_REJ = 60;
-    
 
     public static final int TRNX_TP_IOG_IN_PUR_PUR = 101;
     public static final int TRNX_TP_IOG_IN_SAL_SAL = 102;
@@ -1930,6 +1929,15 @@ public abstract class SDataConstantsSys {
         "SET @FINS_CT_SYS_MOV_BPS_CUS = " + FINS_TP_SYS_MOV_BPS_CUS[0],
         "SET @FINS_TP_SYS_MOV_BPS_CUS = " + FINS_TP_SYS_MOV_BPS_CUS[1],
         "SET @FINS_ST_CHECK_NULL = " + TRNS_ST_DPS_ANNULED,
+        "SET @FINX_ACC_ASSET_CUR = '1000'",
+        "SET @FINX_ACC_ASSET_NON_CUR = '1200'",
+        "SET @FINX_ACC_LIABILITY_CUR = '2000'",
+        "SET @FINX_ACC_LIABILITY_NON_CUR = '2200'",
+        "SET @FINX_ACC_EQUITY = '3000'",
+        "SET @FINX_ACC_REVENUE = '4000'",
+        "SET @FINX_ACC_PURCHASES = '5000'",
+        "SET @FINX_ACC_COG = '5500'",
+        "SET @FINX_ACC_EXPENSES = '6000'",
         "SET @BPSS_CT_BP_CO = " + BPSS_CT_BP_CO,
         "SET @BPSS_CT_BP_SUP = " + BPSS_CT_BP_SUP,
         "SET @BPSS_CT_BP_CUS = " + BPSS_CT_BP_CUS,
@@ -1939,6 +1947,14 @@ public abstract class SDataConstantsSys {
         "SET @TRN_DIOG = " + SDataConstants.TRN_DIOG,
         "SET @TRNS_CT_DPS_PUR = " + TRNS_CT_DPS_PUR,
         "SET @TRNS_CT_DPS_SAL = " + TRNS_CT_DPS_SAL,
+        "SET @TRNX_DPS_ORD_CL = " + TRNU_TP_DPS_PUR_ORD[1],
+        "SET @TRNX_DPS_ORD_TP = " + TRNU_TP_DPS_PUR_ORD[2],
+        "SET @TRNX_DPS_INV_CL = " + TRNU_TP_DPS_PUR_INV[1],
+        "SET @TRNX_DPS_INV_TP = " + TRNU_TP_DPS_PUR_INV[2],
+        "SET @TRNX_DPS_CN_CL = " + TRNU_TP_DPS_PUR_CN[1],
+        "SET @TRNX_DPS_CN_TP = " + TRNU_TP_DPS_PUR_CN[2],
+        "SET @TRNU_DPS_NAT_DEF = " + TRNU_DPS_NAT_DEF,
+        "SET @TRNU_DPS_NAT_ASSET = " + TRNU_DPS_NAT_ASSET,
         "SET @ITMS_NAM_ORD_POS_QTY = " + ITMS_NAM_ORD_POS_QTY,
         "SET @ITMS_NAM_LINE_POS_QTY = " + ITMS_NAM_LINE_POS_QTY,
         "SET @ITMS_KEY_ORD_POS_QTY = " + ITMS_KEY_ORD_POS_QTY,
