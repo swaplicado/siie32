@@ -31,7 +31,6 @@ public class SImportWeekProcurementFacilityUtils {
         else {
             int mnAccountSystemTypeId = oAccountMajor.getFkAccountSystemTypeId();
             int[] anAccountSubclass = new int[] { oAccountMajor.getFkAccountTypeId_r(), oAccountMajor.getFkAccountClassId_r(), oAccountMajor.getFkAccountSubclassId_r() };
-            boolean isAccShortTermDoc = oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_PAY || oAccountMajor.getFkAccountSpecializedTypeId() == SDataConstantsSys.FINS_TP_ACC_SPE_DOC_REC;
             boolean isAccSysBizPartnerAll = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR });
             boolean isAccSysBizPartnerSupCus = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS });
             boolean isAccSysPurchases = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ });

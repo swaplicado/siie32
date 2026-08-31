@@ -2428,25 +2428,28 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionOk() {
-        SFormValidation validation = null;
+        //Aregado el if para deshabilitar el boton de "Aceptar" si es renglon de sistema
+        if (!moRecordEntry.isRowSystem()) {
+            SFormValidation validation = null;
 
-        triggerFocusLost();     // this forces all pending focus lost function to be called
+            triggerFocusLost();     // this forces all pending focus lost function to be called
 
-        composeFinRecordEntry();
-        
-        validation = formValidate();
+            composeFinRecordEntry();
 
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
+            validation = formValidate();
+
+            if (validation.getIsError()) {
+                if (validation.getComponent() != null) {
+                    validation.getComponent().requestFocus();
+                }
+                if (validation.getMessage().length() > 0) {
+                    miClient.showMsgBoxWarning(validation.getMessage());
+                }
             }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
+            else {
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
+                setVisible(false);
             }
-        }
-        else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
         }
     }
 
@@ -2976,7 +2979,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mbResetingForm = true;
 
         moRecordEntry = (SDataRecordEntry) registry;
-
+        
+        jbOk.setEnabled(!moRecordEntry.isRowSystem());
+        
         moFieldConcept.setFieldValue(moRecordEntry.getConcept());
         moFieldDebit.setFieldValue(moRecordEntry.getDebit());
         moFieldCredit.setFieldValue(moRecordEntry.getCredit());

@@ -13,20 +13,17 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class SImportAccountingAccount {
     public int id;
-//    public int company;
     public String code;
     public String name;
     
     public SImportAccountingAccount() {
         id = 0;
-//        company = 0;
         code = "";
         name = "";
     }
     
     public SImportAccountingAccount(final JsonNode docNode) {
         id = docNode.get("id").asInt();
-//        company = docNode.get("company").asInt();
         code = docNode.get("code").asText();
         name = docNode.get("name").asText();
     }
@@ -37,7 +34,6 @@ public class SImportAccountingAccount {
     }
     
     public int getId() { return id; }
-//    public int getCompany() { return company; }
     public String getCode() { return code; }
     public String getName() { return name; }
 }

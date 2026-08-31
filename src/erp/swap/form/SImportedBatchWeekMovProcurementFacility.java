@@ -18,6 +18,7 @@ public class SImportedBatchWeekMovProcurementFacility {
     private int mnWeekNumebr;
     private int mnCashHoldingIdCob;
     private int mnCashHoldingIdEnt;
+    private int mnAccountingTypeId;
     protected ArrayList<SImportWeekMovProcurementFacility> maWeekMovProcurementFacility;
     
     public SImportedBatchWeekMovProcurementFacility() {
@@ -28,6 +29,7 @@ public class SImportedBatchWeekMovProcurementFacility {
         this.maWeekMovProcurementFacility = new ArrayList<>();
         this.mnCashHoldingIdCob = 0;
         this.mnCashHoldingIdEnt = 0;
+        this.mnAccountingTypeId = 0;
     }
 
     public int getMnFacilitySeasonWeekId() { return mnFacilitySeasonWeekId; }
@@ -44,6 +46,8 @@ public class SImportedBatchWeekMovProcurementFacility {
     public void setMnCashHoldingIdCob(int mnCashHoldingIdCob) { this.mnCashHoldingIdCob = mnCashHoldingIdCob; }
     public int getMnCashHoldingIdEnt() { return mnCashHoldingIdEnt; }
     public void setMnCashHoldingIdEnt(int mnCashHoldingIdEnt) { this.mnCashHoldingIdEnt = mnCashHoldingIdEnt; }
+    public int getMnAccountingTypeId() { return mnAccountingTypeId; }
+    public void setMnAccountingTypeId(int mnAccountingTypeId) { this.mnAccountingTypeId = mnAccountingTypeId; }
     
     public void addToMaWeekMovProcurementFacility(SImportWeekMovProcurementFacility oWeekMovProcurementFacility) {
         this.maWeekMovProcurementFacility.add(oWeekMovProcurementFacility);

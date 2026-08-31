@@ -114,13 +114,15 @@ public class SImportProcurementFacility implements SGridRow, Serializable {
         oDataFacilityRec.findByExtDataId(FacilitySeasonWeekId, accountingTypeId, statement);
         
         SDataRecord record = new SDataRecord();
-        record.read(new Object[] { 
-            oDataFacilityRec.getMnFkRecYear(),
-            oDataFacilityRec.getMnFkRecPer(),
-            oDataFacilityRec.getMnFkRecBkc(),
-            oDataFacilityRec.getMsFkRecTpRec(),
-            oDataFacilityRec.getMnFkRecNum()
-        }, statement);
+        if (oDataFacilityRec.getMnFkRecYear() != 0) {
+            record.read(new Object[] { 
+                oDataFacilityRec.getMnFkRecYear(),
+                oDataFacilityRec.getMnFkRecPer(),
+                oDataFacilityRec.getMnFkRecBkc(),
+                oDataFacilityRec.getMsFkRecTpRec(),
+                oDataFacilityRec.getMnFkRecNum()
+            }, statement);
+        }
         
         moRecord = record;
     }

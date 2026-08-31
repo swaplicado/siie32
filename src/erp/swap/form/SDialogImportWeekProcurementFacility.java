@@ -52,15 +52,10 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
-import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
- * Importación de proformas de compras desde el Portal de Compras.
- * Ejemplo de la URL de consulta de documentos:
- * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/filter-by-date-and-type/?start_date=2025-08-01&end_date=2025-09-30&document_type=41"
- * Ejemplo de la URL de descarga de documentos:
- * "https://transaction-backend-368437194061.us-central1.run.app/api/documents/download-docs-zip/"
+ * Importación de movimientos de gastos de bodega.
  *
  * @author Adrián Avilés
  */
@@ -81,10 +76,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     protected String msSyncUrlDownload;
     protected int mnSyncLimit;
     protected PreparedStatement moPrepStatToCountImports;
-    protected PreparedStatement moPrepStatToGetProcessedProformaByExternalId;
     protected PreparedStatement moPrepStatToGetDpsKeyByDocData;
     protected JLabel jlStatus;
-    protected SBeanFieldBoolean moBoolExportPaymentRequestsOnClose;
     protected boolean mbAllowLinkGreaterInvoices;
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
@@ -174,38 +167,19 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
-        jlProforma = new javax.swing.JLabel();
         jpProcessingN2 = new javax.swing.JPanel();
-        jtfProforma = new javax.swing.JTextField();
         jpProcessingN4 = new javax.swing.JPanel();
-        jlReqPay = new javax.swing.JLabel();
         jpProcessingN5 = new javax.swing.JPanel();
-        jtfReqPayAmount = new javax.swing.JTextField();
-        jtfReqPayAmountPct = new javax.swing.JTextField();
         jpProcessingN6 = new javax.swing.JPanel();
-        jtfReqPayReqDate = new javax.swing.JTextField();
-        jbChangeRequiredPaymentDate = new javax.swing.JButton();
         jpProcessingN7 = new javax.swing.JPanel();
-        jbRequestPayment = new javax.swing.JButton();
         jpProcessingN8 = new javax.swing.JPanel();
-        jlPay = new javax.swing.JLabel();
         jpProcessingN9 = new javax.swing.JPanel();
-        jtfPayFolio = new javax.swing.JTextField();
-        jtfPayDate = new javax.swing.JTextField();
         jpProcessingN10 = new javax.swing.JPanel();
-        jtfPayReqDate = new javax.swing.JTextField();
-        jbChangePaymentRequiredDate = new javax.swing.JButton();
         jpProcessingN11 = new javax.swing.JPanel();
-        jtfPayStatus = new javax.swing.JTextField();
         jpProcessingN12 = new javax.swing.JPanel();
-        jlPaySched = new javax.swing.JLabel();
         jpProcessingN13 = new javax.swing.JPanel();
-        jtfPaySchedDate = new javax.swing.JTextField();
-        jbChangePaymentScheduledDate = new javax.swing.JButton();
         jpProcessingN14 = new javax.swing.JPanel();
-        jlPayExec = new javax.swing.JLabel();
         jpProcessingN15 = new javax.swing.JPanel();
-        jtfPayExecDate = new javax.swing.JTextField();
         jpProcessingN16 = new javax.swing.JPanel();
         jpProcessingN17 = new javax.swing.JPanel();
         jpProcessingN18 = new javax.swing.JPanel();
@@ -218,7 +192,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             }
         });
 
-        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda de " + ((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "proformas" : "CRPs") + " autorizadas"));
+        jpDownload.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimientos de bodega por semana"));
         jpDownload.setToolTipText("");
         jpDownload.setLayout(new java.awt.BorderLayout());
 
@@ -292,7 +266,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         getContentPane().add(jpDownload, java.awt.BorderLayout.NORTH);
         jpDownload.getAccessibleContext().setAccessibleName("Búsqueda de  autorizadas:");
 
-        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder(((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proformas autorizadas" : "CRPs autorizados")));
+        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder("Movimientos de la semana"));
         jpDocuments.setLayout(new java.awt.BorderLayout(5, 0));
 
         jpDocumentsGrid.setLayout(new java.awt.BorderLayout());
@@ -339,179 +313,45 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpProcessingN.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
 
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlProforma.setText("Gasto:");
-        jlProforma.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN1.add(jlProforma);
-
         jpProcessingN.add(jpProcessingN1);
 
         jpProcessingN2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfProforma.setEditable(false);
-        jtfProforma.setText("ABC-000000");
-        jtfProforma.setToolTipText("Proforma");
-        jtfProforma.setFocusable(false);
-        jtfProforma.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN2.add(jtfProforma);
-
         jpProcessingN.add(jpProcessingN2);
 
         jpProcessingN4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlReqPay.setText("Pago requerido:");
-        jlReqPay.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN4.add(jlReqPay);
-
         jpProcessingN.add(jpProcessingN4);
 
         jpProcessingN5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfReqPayAmount.setEditable(false);
-        jtfReqPayAmount.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfReqPayAmount.setText("000,000,000.00 MXN");
-        jtfReqPayAmount.setToolTipText("Pago requerido");
-        jtfReqPayAmount.setFocusable(false);
-        jtfReqPayAmount.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN5.add(jtfReqPayAmount);
-
-        jtfReqPayAmountPct.setEditable(false);
-        jtfReqPayAmountPct.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfReqPayAmountPct.setText("100%");
-        jtfReqPayAmountPct.setToolTipText("Porcentaje de pago requerido");
-        jtfReqPayAmountPct.setFocusable(false);
-        jtfReqPayAmountPct.setPreferredSize(new java.awt.Dimension(40, 23));
-        jpProcessingN5.add(jtfReqPayAmountPct);
-
         jpProcessingN.add(jpProcessingN5);
 
         jpProcessingN6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfReqPayReqDate.setEditable(false);
-        jtfReqPayReqDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfReqPayReqDate.setText("dow 01/mon/2001");
-        jtfReqPayReqDate.setToolTipText("Fecha requerida de pago");
-        jtfReqPayReqDate.setFocusable(false);
-        jtfReqPayReqDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN6.add(jtfReqPayReqDate);
-
-        jbChangeRequiredPaymentDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbChangeRequiredPaymentDate.setToolTipText("Cambiar fecha requerida de pago...");
-        jbChangeRequiredPaymentDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN6.add(jbChangeRequiredPaymentDate);
-
         jpProcessingN.add(jpProcessingN6);
 
         jpProcessingN7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jbRequestPayment.setForeground(java.awt.Color.blue);
-        jbRequestPayment.setText("Solicitar pago");
-        jbRequestPayment.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbRequestPayment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN7.add(jbRequestPayment);
-
         jpProcessingN.add(jpProcessingN7);
 
         jpProcessingN8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPay.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jlPay.setText("Solicitud de pago:");
-        jlPay.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN8.add(jlPay);
-
         jpProcessingN.add(jpProcessingN8);
 
         jpProcessingN9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfPayFolio.setEditable(false);
-        jtfPayFolio.setText("P-000000");
-        jtfPayFolio.setToolTipText("Folio de solicitud de pago");
-        jtfPayFolio.setFocusable(false);
-        jtfPayFolio.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpProcessingN9.add(jtfPayFolio);
-
-        jtfPayDate.setEditable(false);
-        jtfPayDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayDate.setText("01/01/2001");
-        jtfPayDate.setToolTipText("Fecha de solicitud de pago");
-        jtfPayDate.setFocusable(false);
-        jtfPayDate.setPreferredSize(new java.awt.Dimension(70, 23));
-        jpProcessingN9.add(jtfPayDate);
-
         jpProcessingN.add(jpProcessingN9);
 
         jpProcessingN10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfPayReqDate.setEditable(false);
-        jtfPayReqDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayReqDate.setText("dow 01/mon/2001");
-        jtfPayReqDate.setToolTipText("Fecha requerida de pago en solicitud de pago");
-        jtfPayReqDate.setFocusable(false);
-        jtfPayReqDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN10.add(jtfPayReqDate);
-
-        jbChangePaymentRequiredDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbChangePaymentRequiredDate.setToolTipText("Cambiar fecha requerida de pago en solicitud de pago...");
-        jbChangePaymentRequiredDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN10.add(jbChangePaymentRequiredDate);
-
         jpProcessingN.add(jpProcessingN10);
 
         jpProcessingN11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfPayStatus.setEditable(false);
-        jtfPayStatus.setText("STATUS");
-        jtfPayStatus.setToolTipText("Estatus de solicitud de pago");
-        jtfPayStatus.setFocusable(false);
-        jtfPayStatus.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN11.add(jtfPayStatus);
-
         jpProcessingN.add(jpProcessingN11);
 
         jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPaySched.setText("Programación del pago:");
-        jlPaySched.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN12.add(jlPaySched);
-
         jpProcessingN.add(jpProcessingN12);
 
         jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfPaySchedDate.setEditable(false);
-        jtfPaySchedDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPaySchedDate.setText("dow 01/mon/2001");
-        jtfPaySchedDate.setToolTipText("Fecha de programación del pago");
-        jtfPaySchedDate.setFocusable(false);
-        jtfPaySchedDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN13.add(jtfPaySchedDate);
-
-        jbChangePaymentScheduledDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbChangePaymentScheduledDate.setToolTipText("Cambiar fecha de programación del pago...");
-        jbChangePaymentScheduledDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpProcessingN13.add(jbChangePaymentScheduledDate);
-
         jpProcessingN.add(jpProcessingN13);
 
         jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPayExec.setText("Operación del pago:");
-        jlPayExec.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN14.add(jlPayExec);
-
         jpProcessingN.add(jpProcessingN14);
 
         jpProcessingN15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jtfPayExecDate.setEditable(false);
-        jtfPayExecDate.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPayExecDate.setText("dow 01/mon/2001");
-        jtfPayExecDate.setToolTipText("Fecha de operación del pago");
-        jtfPayExecDate.setFocusable(false);
-        jtfPayExecDate.setPreferredSize(new java.awt.Dimension(105, 23));
-        jpProcessingN15.add(jtfPayExecDate);
-
         jpProcessingN.add(jpProcessingN15);
 
         jpProcessingN16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -554,17 +394,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JLabel jLabel3b1;
     private javax.swing.JLabel jLabel3b3;
     private javax.swing.JProgressBar jProgressBar;
-    private javax.swing.JButton jbChangePaymentRequiredDate;
-    private javax.swing.JButton jbChangePaymentScheduledDate;
-    private javax.swing.JButton jbChangeRequiredPaymentDate;
     private javax.swing.JButton jbOpenProcurementFacility;
-    private javax.swing.JButton jbRequestPayment;
-    private javax.swing.JLabel jlPay;
-    private javax.swing.JLabel jlPayExec;
-    private javax.swing.JLabel jlPaySched;
-    private javax.swing.JLabel jlProforma;
     private javax.swing.JLabel jlProgress;
-    private javax.swing.JLabel jlReqPay;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid;
@@ -603,16 +434,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JPanel jpProcessingN7;
     private javax.swing.JPanel jpProcessingN8;
     private javax.swing.JPanel jpProcessingN9;
-    private javax.swing.JTextField jtfPayDate;
-    private javax.swing.JTextField jtfPayExecDate;
-    private javax.swing.JTextField jtfPayFolio;
-    private javax.swing.JTextField jtfPayReqDate;
-    private javax.swing.JTextField jtfPaySchedDate;
-    private javax.swing.JTextField jtfPayStatus;
-    private javax.swing.JTextField jtfProforma;
-    private javax.swing.JTextField jtfReqPayAmount;
-    private javax.swing.JTextField jtfReqPayAmountPct;
-    private javax.swing.JTextField jtfReqPayReqDate;
     private javax.swing.JTextField jtfUserName;
     // End of variables declaration//GEN-END:variables
 
@@ -629,7 +450,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[]{miClient.getSession().getConfigCompany().getCompanyId()}, SLibConstants.DESCRIPTION_NAME);
 
-        moImportationsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_IMP_PROFS, 1, "Proformas", null) {
+        moImportationsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_PROCUREMENT_WEEKS_MOV, 1, "Movimientos", null) {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -669,12 +490,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpCommandLeft.add(jlStatus);
         clearProgress();
 
-        moBoolExportPaymentRequestsOnClose = new SBeanFieldBoolean();
-        moBoolExportPaymentRequestsOnClose.setText("Exportar solicitudes de pago al cerrar");
-        moBoolExportPaymentRequestsOnClose.setPreferredSize(new Dimension(250, 23));
         ((FlowLayout) jpCommandCenter.getLayout()).setAlignment(FlowLayout.RIGHT);
-        jpCommandCenter.add(moBoolExportPaymentRequestsOnClose);
-        moBoolExportPaymentRequestsOnClose.setEnabled(mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
         mbAllowLinkGreaterInvoices = miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_LINK_INV_GREATER);
 
@@ -704,7 +520,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
             // Instanciar prepared statements:
             moPrepStatToCountImports = SImportUtils.createPrepStatementToCountImports(miClient.getSession().getStatement());
-            moPrepStatToGetProcessedProformaByExternalId = SImportedProforma.createPrepStatementToGetProcessedProformaByExternalId(miClient.getSession().getStatement());
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -715,7 +530,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         System.err.println(e);
         SLibUtils.showException(this, e);
 
-        actionPerformedClearProformas();
+        actionPerformedClearMov();
     }
 
     private void enableFieldsForShowingProforms(final boolean setShowingProformsModeOn) {
@@ -754,6 +569,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .replace("\t", "\\t");
     }
 
+    /**
+     * Metodo para actualizar masivamente los movemientos de una semana que hayan sido modificados
+     * @param callback
+     */
     private void processUpdateAllWeekProcurementFacility(final SProgressCallback callback) throws Exception {
         int countUpdated = 0;
         int total = smaEdited.size();
@@ -769,7 +588,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             jsonBody
                 .append("{")
                     .append("\"user_name\": ").append("\"").append(miClient.getSession().getUser().getName()).append("\",")
-//                    .append("\"user_name\": ").append("\"").append("swapst").append("\",")
                     .append("\"movements\": ").append("[");
             
             for (int i = 0; i < smaEdited.size(); i++) {
@@ -783,7 +601,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 jsonMovements
                 .append("{")
                     .append("\"id\": ").append(row.Id).append(",")
-                    .append("\"item\": ").append(row.Item.Id).append(",")
+                    .append("\"item_erp_id\": ").append(row.Item.Id).append(",")
                     .append("\"concept\": \"").append(escapeJson(row.Concept)).append("\",")
                     .append("\"reference\": \"").append(escapeJson(row.Reference)).append("\",")
                     .append("\"unit_cost\": ").append(row.Unit_cost).append(",")
@@ -792,7 +610,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .append("\"cost_center_code\": \"").append( row.getDataCostCenter() != null ? row.getDataCostCenter().getPkCostCenterIdXXX() : "" ).append("\",")
                     .append("\"accounting_account_code\": \"").append( row.oDataAccount.getPkAccountIdXXX() ).append("\",")
                     .append("\"business_partners\": ").append( row.oDataBizPartner != null ? "[{ "
-                            + "\"business_partner_erp_id\":" + row.oDataBizPartner.getPkBizPartnerId()
+                            + "\"business_partner_erp_id\":" + row.oDataBizPartner.getPkBizPartnerId() + ", "
                             + "\"business_partner_type\":" + (row.oDataBizPartner.getIsAttributeEmployee() ? 2 : 1)
                             + " }]" : "[]" ).append(",")
                     .append("\"id_cob\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkCompanyBranchId() : "").append("\",")
@@ -885,6 +703,9 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         }
     }
     
+    /**
+     * Metodo principal para actualizar los movimientos que hayan sido modificados
+     */
     public void actionUpdateWeek() {
         // Validar que haya elementos editados
         if (smaEdited == null || smaEdited.isEmpty()) {
@@ -927,9 +748,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                         // Verificar si hubo errores
                         get(); // Esto lanza excepción si ocurrió en doInBackground
                         miClient.showMsgBoxInformation("¡Actualización completada exitosamente!");
-                        // Refrescar la tabla después de actualizar
-//                        moImportationsGrid.renderGridRows();
-//                        smaEdited.clear(); // Limpiar la lista de editados
                     } catch (Exception e) {
                         miClient.showMsgBoxWarning("Error en la actualización: " + e.getMessage());
                     }
@@ -945,6 +763,9 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         }
     }
 
+    /**
+     * Metodo para obtener los movimientos de la semana del protal AME
+     */
     private void processShowWeekProcurementFacility(final HttpURLConnection connection, final SProgressCallback callback) throws Exception {
         int countRetreived = 0;
         Exception exception = null;
@@ -959,7 +780,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
                     for (JsonNode docNode : root) {
                         callback.onProgress((int) ((++countRetreived / (double) root.size()) * 100));
-                        SImportWeekMovProcurementFacility oWeekProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement, (SClientInterface) miClient);
+                        SImportWeekMovProcurementFacility oWeekProcurementFacility = new SImportWeekMovProcurementFacility(docNode, statement, (SClientInterface) miClient, oProcurementFacility);
                         maImportedDocuments.add(oWeekProcurementFacility);
                     }
                 }
@@ -1000,6 +821,9 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         return valid;
     }
 
+    /**
+     * Metodo principal para obtener los movimientos de la semana
+     */
     public void actionShowWeek() {
         boolean validation;
         validation = validateFields();
@@ -1070,7 +894,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         }
     }
 
-    private void actionPerformedClearProformas() {
+    /**
+     * Metodo para limpiar la tabla de movimientos
+     */
+    private void actionPerformedClearMov() {
         try {
             mbDocumentsBeingUpdated = true; // prevents item-state-change events from being handled!
             maImportedDocuments.clear();
@@ -1079,7 +906,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             moImportationsGrid.populateGrid(new Vector<>());
             moImportationsGrid.getTable().setRowSorter(null);
             moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(false);
-            renderCurrentProforma();
 
             enableFieldsForShowingProforms(false);
 
@@ -1095,6 +921,9 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         }
     }
 
+    /**
+     * Metodo para abrir un movimiento para poder editarlo
+     */
     private void actionOpenSelectedWeekProcurementFacility() {
         SGridRow row = moImportationsGrid.getModel().getGridRows().get(moImportationsGrid.getTable().getSelectedRow());
 
@@ -1146,44 +975,15 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         }
     }
 
-    private void renderCurrentProforma() {
-        SGridRow row = moImportationsGrid.getSelectedGridRow();
-
-        if (row == null) {
-            jbChangeRequiredPaymentDate.setEnabled(false);
-            jbRequestPayment.setEnabled(false);
-            jbChangePaymentRequiredDate.setEnabled(false);
-            jbChangePaymentScheduledDate.setEnabled(false);
-            jtfProforma.setText("");
-            jtfProforma.setToolTipText(null);
-            jtfReqPayAmount.setText("");
-            jtfReqPayAmountPct.setText("");
-            jtfReqPayReqDate.setText("");
-            jtfPayFolio.setText("");
-            jtfPayDate.setText("");
-            jtfPayReqDate.setText("");
-            jtfPayStatus.setText("");
-            jtfPaySchedDate.setText("");
-            jtfPayExecDate.setText("");
-        }
-        else if (mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) {
-
-            jbChangeRequiredPaymentDate.setEnabled(true);
-            jbRequestPayment.setEnabled(true);
-            jbChangePaymentRequiredDate.setEnabled(true);
-            jbChangePaymentScheduledDate.setEnabled(true);
-        }
-    }
-
-    private void populateWeekProcurementFacilityGrid(final ArrayList<SImportWeekMovProcurementFacility> proformas,
-            final boolean focusProformasGridTable) {
-        moImportationsGrid.populateGrid(new Vector<>(proformas), this);
+    private void populateWeekProcurementFacilityGrid(final ArrayList<SImportWeekMovProcurementFacility> movements,
+            final boolean focusMovementsGridTable) {
+        moImportationsGrid.populateGrid(new Vector<>(movements), this);
         moImportationsGrid.getTable().setRowSorter(null);
         moImportationsGrid.getTable().getTableHeader().setReorderingAllowed(false);
         moImportationsGrid.getTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         moImportationsGrid.setSelectedGridRow(0);
 
-        if (focusProformasGridTable) {
+        if (focusMovementsGridTable) {
             moImportationsGrid.getTable().requestFocusInWindow();
         }
         
@@ -1204,7 +1004,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
             if (((SClientInterface) miClient).getSessionXXX().getCurrentCompanyBranchId() == 0) {
                 // no branch selected in current user session:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH + "\n"
-                        + "No se podrá importar o capturar proformas, hasta que se seleccione una sucursal de la empresa.");
+                        + "No se podrá importar movimientos, hasta que se seleccione una sucursal de la empresa.");
             }
 
             super.windowActivated();
@@ -1220,9 +1020,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         smaEdited.clear();
 
         mbExportPaymentRequests = false;
-        moBoolExportPaymentRequestsOnClose.setSelected(mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA);
 
-        actionPerformedClearProformas();
+        actionPerformedClearMov();
 
         addAllListeners();
     }
@@ -1230,21 +1029,11 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     @Override
     public void addAllListeners() {
         jbOpenProcurementFacility.addActionListener(this);
-
-        jbChangeRequiredPaymentDate.addActionListener(this);
-        jbRequestPayment.addActionListener(this);
-        jbChangePaymentRequiredDate.addActionListener(this);
-        jbChangePaymentScheduledDate.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         jbOpenProcurementFacility.removeActionListener(this);
-
-        jbChangeRequiredPaymentDate.removeActionListener(this);
-        jbRequestPayment.removeActionListener(this);
-        jbChangePaymentRequiredDate.removeActionListener(this);
-        jbChangePaymentScheduledDate.removeActionListener(this);
     }
 
     @Override
@@ -1289,7 +1078,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            renderCurrentProforma();
+
         }
     }
     
