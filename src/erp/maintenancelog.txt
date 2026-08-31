@@ -1,3 +1,13 @@
+================================================================================
+SIIE 3.2 307.2/ 2026-08-31
+Adrian Alejandro AVILES GOMEZ
+--------------------------------------------------------------------------------
+1) Funcionalidad para importar gastos de bodegas por semana desde el portal AME.
+2) Edición de movimientos de gastos de bodegas y su actualización en el portal AME.
+3) Contabilización / descontabilización de semanas de bodegas.
+4) Habilitación para abrir partidas de sistema en pólizas pero no se pueden guardar.
+
+================================================================================
 SIIE 3.2 307.1/ 2026-08-31
 Jhonatan Claudio PEÑA HERNANDEZ
 --------------------------------------------------------------------------------
