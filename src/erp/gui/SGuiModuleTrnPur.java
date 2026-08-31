@@ -17,6 +17,7 @@ import erp.gui.mod.cfg.SCfgMenuSectionSeparator;
 import erp.gui.mod.cfg.SCfgModule;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.data.SDataRegistry;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.table.STableTabComponent;
 import erp.lib.table.STableTabInterface;
@@ -63,6 +64,9 @@ import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
 import erp.mtrn.form.SFormDpsEdit;
+import erp.server.SServerConstants;
+import erp.server.SServerRequest;
+import erp.server.SServerResponse;
 import erp.swap.SSwapConsts;
 import erp.swap.form.SDialogImportDocuments;
 import javax.swing.JComponent;
@@ -75,6 +79,7 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
+import sa.lib.srv.SSrvConsts;
 
 /**
  *
@@ -1362,15 +1367,19 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDps();
                     }
                     break;
-                case SDataConstants.TRNX_DPS_RO:
+                    case SDataConstants.TRNX_DPS_RO:
                     if (moFormDpsRo == null) {
-                        moFormDpsRo = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
+                        moFormDpsRo = new SFormDps(
+                            miClient,
+                            SDataConstantsSys.TRNS_CT_DPS_PUR,
+                            false
+                        );
                     }
                     miForm = moFormDpsRo;
-                    if (pk != null) {
-                        moRegistry = new SDataDps();
-                    }
-                    break;
+    if (pk != null) {
+        moRegistry = new SDataDps();
+    }
+    break;
                 case SDataConstants.TRNX_DPS_EDIT:
                     if (moFormDpsEdit == null) {
                         moFormDpsEdit = new SFormDpsEdit(miClient);
@@ -1449,6 +1458,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                     break;
 
                 case SDataConstants.TRNX_DPS_RO:
+                    mbIsFormReadOnly = true;
                     miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement); // int[] document type
                     miForm.setValue(SLibConstants.VALUE_READ_ONLY, true); // editable status
                     break;
@@ -1456,8 +1466,15 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 default:
             }
 
-            result = processForm(pk, isCopy);
-            clearFormComplement();
+            if (formType == SDataConstants.TRNX_DPS_RO) {
+                processFormReadOnly(pk);
+                result = SLibConstants.FORM_RESULT_CANCEL;
+            }
+            else {
+                result = processForm(pk, isCopy);
+            }
+
+        clearFormComplement();
         }
         catch (java.lang.Exception e) {
             SLibUtilities.renderException(this, e);
@@ -2506,5 +2523,36 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepAccTag.setFormVisible(true);
             }
         }
+    }
+    private void processFormReadOnly(java.lang.Object pk) throws java.lang.Exception {
+        SServerRequest request;
+        SServerResponse response;
+
+        miForm.formRefreshCatalogues();
+        miForm.formReset();
+
+        if (pk != null) {
+            request = new SServerRequest(SServerConstants.REQ_DB_ACTION_READ);
+            request.setPrimaryKey(pk);
+            request.setPacket(moRegistry);
+
+            response = miClient.getSessionXXX().request(request);
+
+            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                throw new Exception(response.getMessage());
+            }
+
+            if (response.getResultType() != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(
+                    SLibConstants.MSG_ERR_DB_REG_READ +
+                    (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage())
+                );
+            }
+
+            moRegistry = (SDataRegistry) response.getPacket();
+            miForm.setRegistry(moRegistry);
+        }
+
+        miForm.setFormVisible(true);
     }
 }

@@ -116,7 +116,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Isabel Servín, Claudio Peña, Sergio Flores
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -269,6 +269,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private boolean mbRightSalPriceChange;
     private boolean mbRightFinAccountant;
     private boolean mbRightTrnOmitSourceDoc;
+    private boolean mbRightFinAccountantPrice;
     private boolean mbAllowDiscount;
     private double mdQuantitySrcOrig;
     private double mdQuantityDesOrig;
@@ -2555,6 +2556,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mbRightPurPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_PRICE_CHG).HasRight;
         mbRightSalPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_PRICE_CHG).HasRight;
         mbRightFinAccountant = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REC).Level >= SUtilConsts.LEV_EDITOR;
+        mbRightFinAccountantPrice = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.ROL_FIN_ACCT).Level >= SUtilConsts.LEV_EDITOR;
 
         mvFields = new Vector<>();
         moFieldFkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
@@ -4073,9 +4075,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                         default:
                     }
                 }
-            }
+            }        
         }
-        
         return true; // otherwise price should be allways editable
     }
 
@@ -4113,7 +4114,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jbOriginalPriceUnitaryCyWizard.setEnabled(true);
                 jbPriceHistory.setEnabled(true);
             }
-
+                       
             boolean isSalesFreightAllowed = isSalesFreightAllowed();
             
             jckIsSalesFreightRequired.setEnabled(isSalesFreightAllowed);
@@ -4201,7 +4202,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             enableAccountFields(true);
             
             jckIsSurplusPercentageApplying.setEnabled(true);
-        }
+            if (moParamDps.isForPurchases() && !mbRightFinAccountantPrice) {
+                jtfOriginalPriceUnitaryCy.setEditable(false);
+                jtfOriginalPriceUnitaryCy.setEnabled(false);
+                jtfOriginalPriceUnitaryCy.setFocusable(false);
+                jtfOriginalDiscountUnitaryCy.setEditable(false);
+                jtfOriginalDiscountUnitaryCy.setFocusable(false);
+
+                jbOriginalPriceUnitaryCyWizard.setEnabled(false);
+                jbPriceHistory.setEnabled(false);
+            }
+        }        
     }
 
     private void enableAccountFields(boolean edit) {

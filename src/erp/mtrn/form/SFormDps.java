@@ -446,14 +446,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * @param formType Form type can be either erp.data.SDataConstantsSys.TRNS_CT_DPS_PUR or erp.data.SDataConstantsSys.TRNS_CT_DPS_SAL.
      */
     public SFormDps(erp.client.SClientInterface client, java.lang.Integer formType) {
-        super(client.getFrame(), true);
-        miClient = client;
-        mnFormType = formType;
-
-        initComponents();
-        initComponentsExtra();
+        this(client, formType, true);
     }
+    
+    public SFormDps(erp.client.SClientInterface client, java.lang.Integer formType, boolean modal) {
+    super(client.getFrame(), modal);
+    miClient = client;
+    mnFormType = formType;
 
+    initComponents();
+    initComponentsExtra();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -654,6 +658,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jsEntry4 = new javax.swing.JSeparator();
         jbEntryImportFromMatRequest = new javax.swing.JButton();
         jbEntryViewMatReqLinks = new javax.swing.JButton();
+        jbViewDps = new javax.swing.JButton();
         jpEntriesControlsEast = new javax.swing.JPanel();
         jlAdjustmentSubtypeId = new javax.swing.JLabel();
         jcbAdjustmentSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -1996,8 +2001,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEntryViewMatReqLinks.setPreferredSize(new java.awt.Dimension(23, 23));
         jpEntriesControlsWest.add(jbEntryViewMatReqLinks);
 
+        jbViewDps.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_query_doc.gif"))); // NOI18N
+        jbViewDps.setToolTipText("Ver movimientos documento");
+        jbViewDps.setFocusable(false);
+        jbViewDps.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbViewDps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbViewDpsActionPerformed(evt);
+            }
+        });
+        jpEntriesControlsWest.add(jbViewDps);
+
         jpEntriesControls.add(jpEntriesControlsWest, java.awt.BorderLayout.WEST);
 
+        jpEntriesControlsEast.setPreferredSize(new java.awt.Dimension(630, 23));
         jpEntriesControlsEast.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 2, 0));
 
         jlAdjustmentSubtypeId.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
@@ -3811,6 +3828,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         actionCancel();
     }//GEN-LAST:event_formWindowClosing
+
+    private void jbViewDpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbViewDpsActionPerformed
+            actionViewSourceDps();
+    }//GEN-LAST:event_jbViewDpsActionPerformed
 
     private void initComponentsExtra() {
         int i = 0;
@@ -11450,7 +11471,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     public void publicActionNotesEdit() {
         actionNotesEdit();  // public access to notes edition, used by notes grid
     }
+    
+    private int[] getSourceDpsKey() {
+        for (SDataDpsEntry entry : moDps.getDbmsDpsEntries()) {
+            if (!entry.getIsDeleted() && entry.getDbmsDpsLinksAsDestiny().size() > 0) {
+                for (SDataDpsDpsLink link : entry.getDbmsDpsLinksAsDestiny()) {
+                    return link.getDbmsSourceDpsKey();
+                }
+            }
+        }
 
+        return null;
+    }
+    
+    private void actionViewSourceDps() {
+        int[] dpsSourceKey = getSourceDpsKey();
+        if (dpsSourceKey != null) {
+            SDataDps dpsSource = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, dpsSourceKey, SLibConstants.EXEC_MODE_VERBOSE);
+
+            int gui = dpsSource.isDocumentPur() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+            
+            miClient.getGuiModule(gui).setFormComplement(dpsSource.getDpsTypeKey());
+            miClient.getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_RO,dpsSource.getPrimaryKey());
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -11682,6 +11727,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JButton jbViewDocumentPdf;
     private javax.swing.JButton jbViewDocumentXml;
+    private javax.swing.JButton jbViewDps;
     private javax.swing.JButton jbViewImportedDocument;
     private javax.swing.JComboBox jcbAccEntryItem;
     private javax.swing.JComboBox jcbAccEntryItemRef_n;

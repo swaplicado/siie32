@@ -100,7 +100,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Isabel Servín, Adrián Avilés, Claudio Peña, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -750,7 +750,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moBoolShowOnlyDocsDueDate.setPreferredSize(new Dimension(200, 23));
         
         moBoolShowDocsDueDateAndBefore = new SBeanFieldBoolean();
-        moBoolShowDocsDueDateAndBefore.setText("Documentos hasta el vecimiento");
+        moBoolShowDocsDueDateAndBefore.setText("Documentos pendientes a la fecha");
         moBoolShowDocsDueDateAndBefore.setPreferredSize(new Dimension(200, 23));
         
         moBoolShowOnlyBenefsWithAccounts = new SBeanFieldBoolean();
@@ -2069,7 +2069,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
             if (isModeForTransfersOfPayments()) {
                 for (SLayoutBankRow layoutBankRow : maAllLayoutBankRows) {
-                    if (!moBoolShowOnlyDocsDueDate.isSelected() || moDateDateDue.getValue().equals(layoutBankRow.getDpsDateMaturity())) {
+                    if (moBoolShowDocsDueDateAndBefore.isSelected() ? !layoutBankRow.getDpsDateMaturity().after(moDateDateDue.getValue()) : !moBoolShowOnlyDocsDueDate.isSelected() || moDateDateDue.getValue().equals(layoutBankRow.getDpsDateMaturity())) {
                         if (!moBoolShowOnlyBenefsWithAccounts.isSelected() || layoutBankRow.getAccountCredits().size() > 0) {
                             mltAccountCredits.add(layoutBankRow.getAccountCredits());
                             mltAgreementsReferences.add(moAgreementReferencesMap.get(layoutBankRow.getAgreement()));
@@ -2874,7 +2874,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     populateGridWithDocsFromDb(true);
                     moBoolShowOnlyDocsDueDate.setSelected(true); // select & trigger item-state-changed events
-                    moBoolShowDocsDueDateAndBefore.setSelected(true); // select & trigger item-state-changed events
+                    moBoolShowDocsDueDateAndBefore.setSelected(false); // select & trigger item-state-changed events
                     moBoolShowOnlyBenefsWithAccounts.setSelected(true); // select & trigger item-state-changed events
                     break;
                     
@@ -3437,15 +3437,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             jtfNumber.setText("");
             jtfRegistryKey.setText("");
         }
-//        else if (moRegistry.isRegistryNew()) {
-//            moBoolShowOnlyDocsDueDate.setSelected(true);
-//
-//            moRegistry.setDateLayout(miClient.getSession().getCurrentDate());
-//            moRegistry.setDateDue(miClient.getSession().getCurrentDate());
-//
-//            jtfNumber.setText("");
-//            jtfRegistryKey.setText("");
-//        }
         else {
             moBoolShowOnlyDocsDueDate.setSelected(false);
 

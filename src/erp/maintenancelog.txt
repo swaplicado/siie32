@@ -1,3 +1,11 @@
+SIIE 3.2 307.1/ 2026-08-31
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Filtro solicitudes de pago programadas hoy o anteriores hasta hoy en layouts bancarios en SIIE.
+2) Mostrar OC de partidas en forma de captura de facturas en SIIE.
+3) Mostrar documentos PDF cargados en PC junto a proformas al descargarlas en SIIE.
+4) Restringir cambio de precio proveniente de OC al modificar partidas de facturas en SIIE.
+
 ================================================================================
 SIIE 3.2 307.0/ 2026-08-25
 Edwin Omar CARMONA FIGUEROA
