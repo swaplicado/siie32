@@ -31,7 +31,7 @@ import erp.mtrn.form.SDialogDpsFinder;
 import erp.redis.SLockUtils;
 import erp.swap.SHttpConsts;
 import erp.swap.SSwapConsts;
-import erp.swap.utils.SAmeUtils;
+import erp.swap.utils.SAvoUtils;
 import erp.swap.utils.SExportUtils;
 import erp.swap.utils.SServicesUtils;
 import java.awt.BorderLayout;
@@ -1251,7 +1251,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         moRecordSLocksMap = new HashMap<>();
         
         try {
-            sAmeToken = SAmeUtils.loginToAmeOperationControl(miClient.getSession());
+            sAmeToken = SAvoUtils.loginToAvoOperationControl(miClient.getSession());
         } catch (Exception ex) {
             Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
         }
