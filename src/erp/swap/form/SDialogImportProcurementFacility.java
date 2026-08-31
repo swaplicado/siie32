@@ -756,7 +756,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbSelectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
         jbUnselectAll.setEnabled(setShowingProcurementFacilitiesModeOn);
         jbReverseAccounting.setEnabled(setShowingProcurementFacilitiesModeOn);
-        jbRejectWeek.setEnabled(setShowingProcurementFacilitiesModeOn);
+        jbRejectWeek.setEnabled(false);
     }
     
     private void initProgress() {
