@@ -79,6 +79,13 @@ public abstract class SSwapConsts {
      * JSON object for request attributes of avo service.
      */
     
+    public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT_MOVEMENTS = "season-export-movements";
+    public static final String CFG_OBJ_AVO_SRV_ACCOUNTING_ACCOUNTS = "accounting-accounts";
+    public static final String CFG_OBJ_AVO_SRV_COST_CENTERS = "cost-centers";
+    public static final String CFG_OBJ_AVO_SRV_ITEMS = "items";
+    public static final String CFG_OBJ_AVO_SRV_UPDATE_WEEK = "update-week-procurement-facility";
+    public static final String CFG_OBJ_AVO_SRV_BATCH_MOVEMENTS = "batch-movements";
+    public static final String CFG_OBJ_AVO_SRV_TOGGLE_ACCOUNTING = "toggle-accounting";
     public static final String CFG_OBJ_AVO_SRV = "avo-srv";
     public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
     public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
@@ -103,6 +110,8 @@ public abstract class SSwapConsts {
     public static final int TXN_DOC_TYPE_CREDIT_NOTE = 46;
     public static final int TXN_DOC_TYPE_RECEIPT_PAYMENT = 51;
     public static final int TXN_DOC_TYPE_PROFORMA = 52;
+    public static final int TXN_DOC_TYPE_AVO_WEEKS = 53;
+    public static final int TXN_DOC_TYPE_AVO_WEEKS_MOVEMENTS = 54;
     
     public static final int TXN_REF_TYPE_ORDER = 22;
     public static final int TXN_REF_TYPE_SCALE_IN = 91;

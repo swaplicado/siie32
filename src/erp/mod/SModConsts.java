@@ -120,6 +120,10 @@ public abstract class SModConsts {
     public static final int CFGX_SWAP_IMP_DOCS = 1015001;
     public static final int CFGX_SWAP_IMP_PROFS = 1015006;
     public static final int CFGX_SWAP_MASS_ACC = 1015011;
+    public static final int CFGX_SWAP_IMP_AVO_WEEKS = 1015021;
+    public static final int CFGX_SWAP_IMP_AVO_WEEKS_MOVEMENTS = 1015022;
+    public static final int CFGX_SWAP_PROCUREMENT_WEEKS = 1015023;
+    public static final int CFGX_SWAP_PROCUREMENT_WEEKS_MOV = 1015024;
     
     /*
      * Users

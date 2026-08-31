@@ -2428,25 +2428,33 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void actionOk() {
-        SFormValidation validation = null;
-
-        triggerFocusLost();     // this forces all pending focus lost function to be called
-
-        composeFinRecordEntry();
-        
-        validation = formValidate();
-
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
-            }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
-            }
+        //Aregado el if para deshabilitar el boton de "Aceptar" si es renglon de sistema
+        boolean canSave = moRecordEntry == null;
+        if (moRecordEntry != null) {
+            canSave = !moRecordEntry.isRowSystem();
         }
-        else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+        
+        if (canSave) {
+            SFormValidation validation = null;
+
+            triggerFocusLost();     // this forces all pending focus lost function to be called
+
+            composeFinRecordEntry();
+
+            validation = formValidate();
+
+            if (validation.getIsError()) {
+                if (validation.getComponent() != null) {
+                    validation.getComponent().requestFocus();
+                }
+                if (validation.getMessage().length() > 0) {
+                    miClient.showMsgBoxWarning(validation.getMessage());
+                }
+            }
+            else {
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
+                setVisible(false);
+            }
         }
     }
 
@@ -2581,6 +2589,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void formReset() {
+        jbOk.setEnabled(true);
         mbResetingForm = true;
 
         mnFormResult = SLibConstants.UNDEFINED;
@@ -2976,7 +2985,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mbResetingForm = true;
 
         moRecordEntry = (SDataRecordEntry) registry;
-
+        
+        boolean canSave = moRecordEntry == null;
+        if (moRecordEntry != null) {
+            canSave = !moRecordEntry.isRowSystem();
+        }
+        jbOk.setEnabled(canSave);
+        
         moFieldConcept.setFieldValue(moRecordEntry.getConcept());
         moFieldDebit.setFieldValue(moRecordEntry.getDebit());
         moFieldCredit.setFieldValue(moRecordEntry.getCredit());

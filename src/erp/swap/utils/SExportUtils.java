@@ -19,6 +19,7 @@ import erp.mod.cfg.db.SDbSyncLogEntry;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.swap.SHttpConsts;
+import erp.swap.SHttpStatusCodeException;
 import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
@@ -180,6 +181,10 @@ public abstract class SExportUtils {
 
                         System.out.println("HTTP Status (PATCH method): " + status);
                         System.out.println("Response: (PATCH method) " + responseBody);
+                        
+                        if (status < 200 || status >= 300) {
+                            throw new SHttpStatusCodeException("HTTP Error " + status + ": " + responseBody);
+                        }
                     }
                 }
             }
@@ -254,6 +259,10 @@ public abstract class SExportUtils {
 
                 try (Scanner scanner = new Scanner(responseStream, charset)) {
                     responseBody = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                }
+                
+                if (status < 200 || status >= 300) {
+                    throw new SHttpStatusCodeException("HTTP Error " + status + ": " + responseBody);
                 }
 
                 /*
