@@ -5,11 +5,13 @@
  */
 package erp.mod.trn.db;
 
-import erp.mod.trn.utils.SStockValuationLogUtils;
-import erp.mod.trn.utils.SStockValuationAdjustsUtils;
-import erp.mod.trn.utils.SStockValuationUtils;
-import erp.mod.trn.utils.SStockValuationRecordUtils;
 import erp.mod.SModConsts;
+import erp.mod.trn.utils.SStockValuationAdjustsUtils;
+import erp.mod.trn.utils.SStockValuationLogUtils;
+import erp.mod.trn.utils.SStockValuationRecordUtils;
+import erp.mod.trn.utils.SStockValuationUpdateStkUtils;
+import erp.mod.trn.utils.SStockValuationUtils;
+import erp.mod.trn.utils.SStockValuationVerify;
 import erp.mtrn.data.SDataDiog;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,11 +20,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -45,6 +44,9 @@ public class SDbStockValuation extends SDbRegistryUser {
     protected Date mtDateStart;
     // Fecha de fin de la valuación
     protected Date mtDateEnd;
+    // Descripción
+    protected String msDescription;
+    //protected boolean mbSystem;
     //protected boolean mbDeleted;
     //protected int mnFkUserInsertId;
     //protected int mnFkUserUpdateId;
@@ -75,8 +77,6 @@ public class SDbStockValuation extends SDbRegistryUser {
      * @throws java.lang.Exception 
      */
     public static Date computeStartDate(SGuiSession session, Date cutoffDate) throws SQLException, Exception {
-        ResultSet resultSet;
-
         Date tDateStart = null;
 
         String msSql = "SELECT DATE_ADD(dt_end, INTERVAL 1 DAY) "
@@ -130,129 +130,12 @@ public class SDbStockValuation extends SDbRegistryUser {
         }
     }
     
-    /**
-     * Agrupa y suma los valores de cantidad consumida y costo real de los movimientos de inventario.
-     * 
-     * @param stockValuations Lista de movimientos de valuación de inventario.
-     * @return Lista agrupada y sumada de movimientos de valuación.
-     */
-    private List<SDbStockValuationMvt> groupAndSumStockValuations(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por fecha de movimiento, id de ítem, id de unidad, id de sucursal, id de almacén y id de valuación
-        Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
-                .collect(Collectors.groupingBy(valuation ->
-                        valuation.getDateMove() + "_" +
-                        valuation.getFkItemId() + "_" +
-                        valuation.getFkUnitId() + "_" +
-                        valuation.getFkCompanyBranchId() + "_" +
-                        valuation.getFkWarehouseId() + "_" +
-                        valuation.getFkStockValuationId()));
-
-        // Crear nuevos objetos SDbStockValuationMvt con los valores sumados
-        return groupedValuations.values().stream()
-                .map(group -> {
-                    SDbStockValuationMvt summedValuation = new SDbStockValuationMvt();
-
-                    // Sumar cantidad consumida y costo real
-                    double sumQuantityConsumption = group.stream()
-                            .mapToDouble(SDbStockValuationMvt::getQuantityMovement)
-                            .sum();
-                    double sumCostR = group.stream()
-                            .mapToDouble(SDbStockValuationMvt::getCost_r)
-                            .sum();
-
-                    // Configurar el nuevo objeto SDbStockValuationMvt
-                    summedValuation.setDateMove(group.get(0).getDateMove());  // Tomar la fecha del primer elemento del grupo
-                    summedValuation.setFkItemId(group.get(0).getFkItemId());  // Tomar el ID del ítem del primer elemento del grupo
-                    summedValuation.setFkUnitId(group.get(0).getFkUnitId());  // Tomar el ID de la unidad del primer elemento del grupo
-                    summedValuation.setFkStockValuationId(group.get(0).getFkStockValuationId());  // Tomar el ID de la valuación del primer elemento del grupo
-                    summedValuation.setQuantityMovement(sumQuantityConsumption);
-                    summedValuation.setCost_r(SLibUtils.roundAmount(sumCostR));
-                    summedValuation.setFkCompanyBranchId(group.get(0).getFkCompanyBranchId());
-                    summedValuation.setFkWarehouseId(group.get(0).getFkWarehouseId());
-
-                    return summedValuation;
-                })
-                .collect(Collectors.toList());
-    }
-    
-    
-    /**
-     * Agrupa los movimientos por DIOG (documento de inventario) y calcula el costo unitario promedio.
-     * 
-     * @param stockValuations Lista de movimientos de valuación de inventario.
-     * @return Lista agrupada con el costo unitario promedio por grupo.
-     */
-    private List<SDbStockValuationMvt> groupByDiogEtyAndAverage(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por año, documento y entrada de DIOG
-        Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
-                .collect(Collectors.groupingBy(valuation ->
-                        valuation.getFkDiogYearOutId_n() + "_" +
-                        valuation.getFkDiogDocOutId_n() + "_" +
-                        valuation.getFkDiogEntryOutId_n()));
-
-        // Crear nuevos objetos SDbStockValuationMvt con el costo unitario promedio
-        return groupedValuations.values().stream()
-                .map(group -> {
-                    SDbStockValuationMvt averaged = new SDbStockValuationMvt();
-
-                    // Calcular el costo unitario promedio
-                    OptionalDouble avCostUnitary = group.stream()
-                            .mapToDouble(SDbStockValuationMvt::getCostUnitary)
-                            .average();
-
-                    // Configurar el nuevo objeto SDbStockValuationMvt
-                    averaged.setFkDiogYearOutId_n(group.get(0).getFkDiogYearOutId_n());  // Tomar el año del primer elemento del grupo
-                    averaged.setFkDiogDocOutId_n(group.get(0).getFkDiogDocOutId_n());  // Tomar doc del primer elemento del grupo
-                    averaged.setFkDiogEntryOutId_n(group.get(0).getFkDiogEntryOutId_n());  // Tomar id ety del primer elemento del grupo
-                    averaged.setCostUnitary(avCostUnitary.getAsDouble());
-
-                    return averaged;
-                })
-                .collect(Collectors.toList());
-    }
-    
-    /**
-     * Agrupa los movimientos por DIOG y calcula el costo unitario como suma de costos entre suma de cantidades.
-     * 
-     * @param stockValuations Lista de movimientos de valuación de inventario.
-     * @return Lista agrupada con el costo unitario calculado por grupo.
-     */
-    private List<SDbStockValuationMvt> groupByDiogEtyAndCalculateCost(ArrayList<SDbStockValuationMvt> stockValuations) {
-        // Agrupar por año, documento y entrada de DIOG
-        Map<String, List<SDbStockValuationMvt>> groupedValuations = stockValuations.stream()
-                .collect(Collectors.groupingBy(valuation ->
-                        valuation.getFkDiogYearOutId_n() + "_" +
-                        valuation.getFkDiogDocOutId_n() + "_" +
-                        valuation.getFkDiogEntryOutId_n()));
-
-        // Crear nuevos objetos SDbStockValuationMvt con el costo unitario calculado
-        return groupedValuations.values().stream()
-                .map(group -> {
-                    SDbStockValuationMvt averaged = new SDbStockValuationMvt();
-
-                    // Sumar costo real y cantidad
-                    double costR = group.stream()
-                            .mapToDouble(SDbStockValuationMvt::getCost_r)
-                            .sum();
-                    double quantityR = group.stream()
-                            .mapToDouble(SDbStockValuationMvt::getQuantityMovement)
-                            .sum();
-
-                    // Configurar el nuevo objeto SDbStockValuationMvt
-                    averaged.setFkDiogYearOutId_n(group.get(0).getFkDiogYearOutId_n());  // Tomar el año del primer elemento del grupo
-                    averaged.setFkDiogDocOutId_n(group.get(0).getFkDiogDocOutId_n());  // Tomar doc del primer elemento del grupo
-                    averaged.setFkDiogEntryOutId_n(group.get(0).getFkDiogEntryOutId_n());  // Tomar id ety del primer elemento del grupo
-                    averaged.setCostUnitary(costR / quantityR);
-
-                    return averaged;
-                })
-                .collect(Collectors.toList());
-    }
-    
     // Métodos setter y getter para los atributos de la clase
     public void setPkStockValuationId(int n) { mnPkStockValuationId = n; }
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
+    public void setDescription(String s) { msDescription = s; }
+    public void setSystem(boolean b) { mbSystem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -266,6 +149,8 @@ public class SDbStockValuation extends SDbRegistryUser {
     public int getPkStockValuationtId() { return mnPkStockValuationId; }
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
+    public String getDescription() { return msDescription; }
+    public boolean isSystem() { return mbSystem; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -292,6 +177,8 @@ public class SDbStockValuation extends SDbRegistryUser {
         
         mnPkStockValuationId = 0;
         mtDateStart = null;
+        msDescription = "";
+        mbSystem = false;
         mbDeleted = false;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -319,8 +206,6 @@ public class SDbStockValuation extends SDbRegistryUser {
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
-        ResultSet resultSet;
-
         mnPkStockValuationId = 0;
 
         msSql = "SELECT COALESCE(MAX(id_stk_val), 0) + 1 FROM " + getSqlTable() + " ";
@@ -334,7 +219,6 @@ public class SDbStockValuation extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        ResultSet resultSet;
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
@@ -349,6 +233,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                 mnPkStockValuationId = res.getInt("id_stk_val");
                 mtDateStart = res.getDate("dt_sta");
                 mtDateEnd = res.getDate("dt_end");
+                msDescription = res.getString("description");
+                mbSystem = res.getBoolean("b_sys");
                 mbDeleted = res.getBoolean("b_del");
                 mnFkUserInsertId = res.getInt("fk_usr_ins");
                 mnFkUserUpdateId = res.getInt("fk_usr_upd");
@@ -359,7 +245,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                         + "AND NOT b_del LIMIT 1;";
                 
                 try (java.sql.Statement st2 = session.getStatement().getConnection().createStatement();
-                     ResultSet res2 = st2.executeQuery(msSql)) {
+                    ResultSet res2 = st2.executeQuery(msSql)) {
                     if (res2.next()) {
                         moAuxRecordPk = new Object[] {
                                                     res2.getInt("fk_fin_rec_year_n"),
@@ -405,6 +291,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                     mnPkStockValuationId + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " + 
+                    "'" + (msDescription == null ? "" : msDescription) + "', " +
+                    (mbSystem ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -419,6 +307,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                     // "id_stk_val = " + mnPkValuationId + ", " +
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
                     "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
+                    "description = '" + (msDescription == null ? "" : msDescription) + "', " +
+                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -448,17 +338,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                     }
                 }
                 
-                System.out.println("Agrupando consumos...");
-                ArrayList<SDbStockValuationMvt> lGrouped = new ArrayList<>();
-                lGrouped.addAll(groupByDiogEtyAndCalculateCost(lConsumptions));
                 System.out.println("Actualizando costos en stock...");
-                for (SDbStockValuationMvt oRow : lGrouped) {
-                    SStockValuationUtils.updateTrnStockRowCostByDiog(session, oRow.getFkDiogYearOutId_n(), 
-                                            oRow.getFkDiogDocOutId_n(), 
-                                            oRow.getFkDiogEntryOutId_n(), 
-                                            oRow.getCostUnitary(),
-                                            SStockValuationUtils.CREDIT);
-                }
+                SStockValuationUpdateStkUtils.updateStockOutRows(session, mnPkStockValuationId);
                 lConsumptions.addAll(0, lMvtAdjs);
                 System.out.println("Ajustando inventario...");
                 List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateEnd, lMvtAdjs);
@@ -470,6 +351,14 @@ public class SDbStockValuation extends SDbRegistryUser {
                 
                 System.out.println("Generando pólizas...");
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
+                
+                System.out.println("Validando...");
+                String sErrors = SStockValuationVerify.verifyStockValuation(session);
+                if (!sErrors.isEmpty()) {
+                    throw new Exception("No se pudo completar el proceso.\n"
+                            + "Se encontraron errores en la valuación de inventarios:\n" + sErrors);
+                }
+                
                 System.out.println("Terminado.");
             }
             else {

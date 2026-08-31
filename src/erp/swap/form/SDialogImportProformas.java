@@ -7,6 +7,7 @@ package erp.swap.form;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.SFileUtilities;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -108,6 +109,8 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     protected boolean mbDocumentsBeingUpdated;
     protected boolean mbExportPaymentRequests;
 
+    protected SDialogPdfViewer moDialogPdfViewer;
+
     /**
      * Creates new form SDialogImportDocuments
      *
@@ -186,6 +189,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jpProcessingN = new javax.swing.JPanel();
         jpProcessingN1 = new javax.swing.JPanel();
         jlProforma = new javax.swing.JLabel();
+        jbViewDocPdf = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
         jtfProforma = new javax.swing.JTextField();
         jpProcessingN4 = new javax.swing.JPanel();
@@ -449,12 +453,17 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
 
         jpProcessingN.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
 
-        jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlProforma.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlProforma.setText((mnFormSubtype == SSwapConsts.TXN_DOC_TYPE_PROFORMA) ? "Proforma:" : "");
-        jlProforma.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlProforma.setPreferredSize(new java.awt.Dimension(125, 23));
         jpProcessingN1.add(jlProforma);
+
+        jbViewDocPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon-file-pdf.png"))); // NOI18N
+        jbViewDocPdf.setToolTipText("Ver PDF de la <document>...");
+        jbViewDocPdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN1.add(jbViewDocPdf);
 
         jpProcessingN.add(jpProcessingN1);
 
@@ -675,6 +684,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
     private javax.swing.JButton jbSelectRemainingProformas;
     private javax.swing.JButton jbShowProformas;
     private javax.swing.JButton jbViewDocInfo;
+    private javax.swing.JButton jbViewDocPdf;
     private javax.swing.JLabel jlDocUserAuthorize;
     private javax.swing.JLabel jlDocUserReview;
     private javax.swing.JLabel jlDocUserUpload;
@@ -867,6 +877,8 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jtfUserFuncSubAreas.setText(msUserFunctionalSubAreaCodes);
             jtfUserFuncSubAreas.setCaretPosition(0);
             jtfUserFuncSubAreas.setToolTipText("Subáreas funcionales: " + msUserFunctionalSubAreaCodes);
+
+            jbViewDocPdf.setToolTipText(jbViewDocPdf.getToolTipText().replaceAll("<document>", "Proformas"));
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
@@ -1578,6 +1590,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jbChangePaymentRequiredDate.setEnabled(false);
             jbChangePaymentScheduledDate.setEnabled(false);
             jbViewDocInfo.setEnabled(false);
+            jbViewDocPdf.setEnabled(false);
 
             jtfProforma.setText("");
             jtfProforma.setToolTipText(null);
@@ -1608,6 +1621,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             jbChangePaymentRequiredDate.setEnabled(true);
             jbChangePaymentScheduledDate.setEnabled(true);
             jbViewDocInfo.setEnabled(true);
+            jbViewDocPdf.setEnabled(true);
 
             jtfProforma.setText(proforma.getFolio()); // show folio of current proforma as a visual indicator that is an invoice already linked!
             jtfProforma.setToolTipText(getDocumentName("Aa") + ": " + proforma.getFolio());
@@ -1696,6 +1710,36 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
                 + "; mostrados: "
                 + SLibUtils.DecimalFormatInteger.format(mnFormType == SSwapConsts.TXN_DOC_TYPE_PROFORMA ? proformas.size() : crps.size()));
     }
+    
+    private void actionPerformedViewDocPdf() {
+        try {
+            SGridRow row = moImportationsGrid.getSelectedGridRow();
+            
+            if (row == null) {
+                throw new Exception(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SImportedProforma document = (SImportedProforma) row;
+                
+                if (moDialogPdfViewer == null) {
+                    moDialogPdfViewer = new SDialogPdfViewer(miClient);
+                }                
+                // retrieve PDF from SWAP Services:
+                File pdf = document.retrievePdf(miClient.getSession(), msSyncUrlDownload);
+
+                if (pdf != null) {
+                    moDialogPdfViewer.setPdf(new SDocumentInfo(document.NumberSeries, document.Number, document.ExternalDocumentUuid, document.Date, document.BizPartner, pdf.getName()),pdf);
+                    moDialogPdfViewer.setVisible(true);
+                }
+                else {
+                    miClient.showMsgBoxWarning("No se pudo obtener el archivo " + SFileUtilities.pdf.toUpperCase() + " de la  autorizada.");
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
 
     private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
         populateProformasGrid(maImportedDocuments, maCRPs, focusDocumentsGridTable);
@@ -1751,6 +1795,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jbChangePaymentRequiredDate.addActionListener(this);
         jbChangePaymentScheduledDate.addActionListener(this);
         jbViewDocInfo.addActionListener(this);
+        jbViewDocPdf.addActionListener(this);
     }
 
     @Override
@@ -1767,6 +1812,7 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
         jbChangePaymentRequiredDate.removeActionListener(this);
         jbChangePaymentScheduledDate.removeActionListener(this);
         jbViewDocInfo.removeActionListener(this);
+        jbViewDocPdf.removeActionListener(this);
     }
 
     @Override
@@ -1833,6 +1879,9 @@ public class SDialogImportProformas extends SBeanFormDialog implements ActionLis
             }
             else if (button == jbViewDocInfo) {
                 actionPerformedViewDocInfo();
+            }
+            else if (button == jbViewDocPdf) {
+                actionPerformedViewDocPdf();
             }
         }
     }

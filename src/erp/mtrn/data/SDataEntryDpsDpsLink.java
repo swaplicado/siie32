@@ -22,7 +22,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     protected double mdQuantity;
     protected double mdQuantityLinked;
     protected double mdQuantityLinkedActual;
-    protected boolean msSelected;
+    protected boolean mbSelected;
     protected double mdQuantityToLink;
     protected java.lang.String msUnitSymbol;
     protected double mdSurplusPercentage;
@@ -51,7 +51,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public void setQuantity(double d) { mdQuantity = d; }
     public void setQuantityLinked(double d) { mdQuantityLinked = d; }
     public void setQuantityLinkedActual(double d) { mdQuantityLinkedActual = d; }
-    public void setSelected(boolean b) { msSelected = b; }
+    public void setSelected(boolean b) { mbSelected = b; }
     public void setQuantityToLink(double d) { mdQuantityToLink = d; }
     public void setUnitSymbol(java.lang.String s) { msUnitSymbol = s; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
@@ -69,7 +69,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     public double getQuantity() { return mdQuantity; }
     public double getQuantityLinked() { return mdQuantityLinked; }
     public double getQuantityLinkedActual() { return mdQuantityLinkedActual; }
-    public boolean getSelected() { return msSelected; }
+    public boolean getSelected() { return mbSelected; }
     public double getQuantityToLink() { return mdQuantityToLink; }
     public java.lang.String getUnitSymbol() { return msUnitSymbol; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
@@ -102,7 +102,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mdQuantity = 0;
         mdQuantityLinked = 0;
         mdQuantityLinkedActual = 0;
-        msSelected = false;
+        mbSelected = false;
         mdQuantityToLink = 0;
         msUnitSymbol = "";
         mdSurplusPercentage = 0;
@@ -129,7 +129,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mvValues.add(mdQuantityLinkedActual);
         mvValues.add(getQuantityToBeLinked());
         if (mbIsSelectionRequired) {
-            mvValues.add(msSelected);
+            mvValues.add(mbSelected);
         }
         mvValues.add(mdQuantityToLink);
         mvValues.add(msUnitSymbol);

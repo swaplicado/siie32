@@ -17,7 +17,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Rodrigo Ayala
  */
 public abstract class SSwapUtils {
     
@@ -62,6 +62,12 @@ public abstract class SSwapUtils {
                     case PUR_PAYMENT_UPD:
                         translation = "PAGO COMPRAS ACTUALIZACIÓN";
                         break;
+                    case AVO_PARTNER_SUPPLIER:
+                        translation = "SOCIO PROVEEDOR AGUACATE";
+                        break;
+                    case AVO_PARTNER_EMPLOYEE:
+                        translation = "SOCIO EMPLEADO AGUACATE";
+                        break; 
                     default:
                         // nothing
                 }

@@ -36,9 +36,6 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
-    public static final String DESC_PRIORITY_NORMAL = "Normal";
-    public static final String DESC_PRIORITY_URGENT = "Urgente";
-    
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
@@ -46,6 +43,9 @@ public class SDbPayment extends SDbRegistryUser {
     public static final String ST_REJC = "RECHAZADO";
     public static final String ST_SCHED = "AUTORIZADO";
     public static final String ST_BLOCK = "BLOQUEADO";
+    
+    public static final int NOTES_LENGTH = 256;
+    public static final int NOTES_AUTH_LENGTH = 512;
     
     protected int mnPkPaymentId;
     protected String msPaymentType;
@@ -168,9 +168,9 @@ public class SDbPayment extends SDbRegistryUser {
     public void setPaymentWay(String s) { msPaymentWay = s; }
     public void setPaymentOperationType(int n) { mnPaymentOperationType = n; }
     public void setPriority(int n) { mnPriority = n; }
-    public void setNotes(String s) { msNotes = s; }
-    public void setNotesAuthorization(String s) { msNotesAuthorization = s; }
-    public void setNotesAuthorizationFlow(String s) { msNotesAuthorizationFlow = s; }
+    public void setNotes(String s) { msNotes = SLibUtils.textLeft(s, NOTES_LENGTH); }
+    public void setNotesAuthorization(String s) { msNotesAuthorization = SLibUtils.textLeft(s, NOTES_AUTH_LENGTH); }
+    public void setNotesAuthorizationFlow(String s) { msNotesAuthorizationFlow = SLibUtils.textLeft(s, NOTES_AUTH_LENGTH); }
     public void setReceiptPaymentRequired(boolean b) { mbReceiptPaymentRequired = b; }
     public void setRescheduled(boolean b) { mbRescheduled = b; }
     public void setExecutedManually(boolean b) { mbExecutedManually = b; }

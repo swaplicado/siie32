@@ -114,6 +114,7 @@ public abstract class STableConstants {
     public static final int ICON_VIEW_FOLDER = 1213;
     public static final int ICON_VIEW_FOLDER_ALERT = 1214;
     public static final int ICON_VIEW_SALES = 1215;
+    public static final int ICON_VIEW_EXCL = 1216;
 
     public static final int STYLE_BOLD = 1;
     public static final int STYLE_ITALIC = 2;

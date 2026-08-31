@@ -556,4 +556,19 @@ public abstract class STrnUtils {
         
         client.getSession().printReport(SModConsts.TRN_DVY, SLibConsts.UNDEFINED, null, params);
     }
+    
+    /**
+     * Update DPS priority.
+     * @param client GUI client.
+     * @param dpsKey DPS primary key.
+     * @param priority Priority.
+     * @throws Exception 
+     */
+    public static void updateDpsPriority(final SGuiClient client, final int[] dpsKey, final int priority) throws Exception {
+        String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
+                + "SET priority = " + priority + ", fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() "
+                + "WHERE id_year = " + dpsKey[0] +  " AND id_doc = " + dpsKey[1] + ";";
+        
+        client.getSession().getStatement().execute(sql);
+    }
 }

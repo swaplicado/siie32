@@ -44,6 +44,9 @@ import erp.mod.itm.db.SItmConsts;
 import erp.mod.log.db.SDbTankCar;
 import erp.mod.qlt.utils.SQltUtils;
 import erp.mod.trn.db.SDbDpsEntryAnalysis;
+import erp.mod.trn.db.SDbMaterialRequest;
+import erp.mod.trn.db.SDbMaterialRequestCostCenter;
+import erp.mod.trn.db.SDbMaterialRequestEntry;
 import erp.mod.trn.db.SDbScaleTicket;
 import erp.mod.trn.db.STrnConsts;
 import erp.mod.trn.db.STrnUtils;
@@ -100,6 +103,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
@@ -832,7 +836,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDiscountUnitaryPercentage.setText("Descto. unitario en pct.:");
+        jckIsDiscountUnitaryPercentage.setText("% descto. unitario:");
         jckIsDiscountUnitaryPercentage.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsDiscountUnitaryPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel19.add(jckIsDiscountUnitaryPercentage);
@@ -864,7 +868,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDiscountEntryPercentage.setText("Descto. partida en pct.:");
+        jckIsDiscountEntryPercentage.setText("% descto. partida:");
         jckIsDiscountEntryPercentage.setMargin(new java.awt.Insets(2, 0, 2, 2));
         jckIsDiscountEntryPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jckIsDiscountEntryPercentage);
@@ -6658,6 +6662,51 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                         if (!msgValidation.isEmpty()) {
                             validation.setMessage(msgValidation);
                             validation.setComponent(moCostCenterPanel.getTextNumberFirst());
+                        }
+                        
+                        if (msgValidation.isEmpty()) {
+                            if (moParamDps.isOrderPur() && moDpsEntry.getDbmsDpsEntryMatRequestLink() != null) {
+                                try {
+                                    SDataCostCenter oCostCenter = moCostCenterPanel.getSelectedDataCostCenter();
+                                    if (oCostCenter != null) {
+                                        SDbMaterialRequestEntry oMatRequestEntry = new SDbMaterialRequestEntry();
+                                        oMatRequestEntry.read(miClient.getSession(), new int[]{moDpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId(),
+                                            moDpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestEntryId()});
+                                        if (oMatRequestEntry.getQueryResultId() == SDbConsts.READ_OK) {
+                                            SDbMaterialRequest oMatRequest = new SDbMaterialRequest();
+                                            oMatRequest.read(miClient.getSession(), new int[]{moDpsEntry.getDbmsDpsEntryMatRequestLink().getFkMaterialRequestId()});
+                                            boolean isCostCenterValid = false;
+                                            if (oMatRequest.getQueryResultId() == SDbConsts.READ_OK) {
+                                                if (oMatRequest.getChildCostCenters() != null && oMatRequest.getChildCostCenters().size() > 1) {
+                                                    for (SDbMaterialRequestCostCenter oChildCostCenter : oMatRequest.getChildCostCenters()) {
+                                                        if (oChildCostCenter.getPkCostCenterId() == oCostCenter.getPkCostCenterId()) {
+                                                            isCostCenterValid = true;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    if ((oMatRequestEntry.getFkCostCenterId_n() > 0
+                                                            && oMatRequestEntry.getFkCostCenterId_n() != oCostCenter.getPkCostCenterId())
+                                                            || oMatRequestEntry.getFkCostCenterId_n() == 0) {
+                                                        if (!isCostCenterValid) {
+                                                            if (miClient.showMsgBoxConfirm("El centro de costo: " + oCostCenter.getPkCostCenterIdXXX()
+                                                                    + " " + oCostCenter.getCostCenter() + " \n"
+                                                                    + "No se encuentra en los configurados en la requisición,\n"
+                                                                    + "¿Desea continuar?") != JOptionPane.YES_OPTION) {
+                                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + moCostCenterPanel.getPanelAccountName() + "'.");
+                                                                validation.setComponent(moCostCenterPanel.getTextNumberFirst());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception ex) {
+                                    Logger.getLogger(SFormDpsEntry.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
                         }
                     }
                 }

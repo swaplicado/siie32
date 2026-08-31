@@ -74,7 +74,7 @@ import sa.lib.gui.SGuiSession;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de 
  * información con otros sistemas.
  * 
- * @author Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public abstract class SExportUtils {
     
@@ -505,6 +505,39 @@ public abstract class SExportUtils {
                             }
                         }
                         break;
+                        
+                    case AVO_PARTNER_SUPPLIER:
+                    case AVO_PARTNER_EMPLOYEE:
+                        for (JsonNode result : results){
+                            boolean entriesFound = false;
+                            
+                            if (result.has("partner")) {
+                                JsonNode partner = result.path("partner");
+                                
+                                if (partner.isObject() && partner.has("erp_id")) {
+                                    JsonNode erpId = partner.path("erp_id");
+                                    SDbSyncLogEntry entry = new SDbSyncLogEntry();
+                                    
+                                    entry.setResponseCode(result.path("status_code").asText());
+                                    // Evaluamos el mensaje:
+                                    if (Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_OK && Integer.parseInt(entry.getResponseCode()) != HttpURLConnection.HTTP_CREATED) {
+                                        entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()) + (result.has("error") ? " " + SJsonUtils.sanitizeJson(result.path("error").toPrettyString()) : ""));
+                                    }
+                                    else {
+                                        entry.setResponseBody(SJsonUtils.sanitizeJson(result.path("message").asText()));
+                                    }
+                                    
+                                    entry.setReferenceId(erpId.asText());
+                                    entries.add(entry);
+                                    
+                                    entriesFound = true;
+                                }
+                            }
+                            if (!entriesFound){
+                                processEntriesNotFound(result);
+                            }
+                        }
+                        break;
 
                     default:
                         throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
@@ -564,6 +597,8 @@ public abstract class SExportUtils {
                         case PARTNER_CUSTOMER:
                         case AUTH_ACTOR:
                         case AUTH_JOB_TITLE:
+                        case AVO_PARTNER_SUPPLIER:
+                        case AVO_PARTNER_EMPLOYEE:
                             log = new SDbSyncLog();
                             break;
 
@@ -615,6 +650,8 @@ public abstract class SExportUtils {
                             case PARTNER_CUSTOMER:
                             case AUTH_ACTOR:
                             case AUTH_JOB_TITLE:
+                            case AVO_PARTNER_SUPPLIER:
+                            case AVO_PARTNER_EMPLOYEE:
                                 log = new SDbSyncLog();
                                 break;
 
@@ -716,6 +753,8 @@ public abstract class SExportUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
+            case AVO_PARTNER_SUPPLIER:
+            case AVO_PARTNER_EMPLOYEE:
                 SExportDataUtils.markLastSyncCreatedAsOk(session.getStatement(), syncType, firstRequestDatetime, "");
                 break;
 
@@ -879,6 +918,8 @@ public abstract class SExportUtils {
                     
                 case PUR_PAYMENT:
                 case PUR_PAYMENT_UPD:
+                case AVO_PARTNER_SUPPLIER:
+                case AVO_PARTNER_EMPLOYEE:
                     testHost = "http://192.168.1.87:8003"; // today host in César Orozco's (30/09/2025)
                     break;
 
@@ -966,6 +1007,13 @@ public abstract class SExportUtils {
                         // nothing
                 }
                 break;
+            
+            case AVO_PARTNER_SUPPLIER:
+            case AVO_PARTNER_EMPLOYEE:
+                cfgParamKey = SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG;
+                jsonBaseKey = SSwapConsts.CFG_OBJ_AVO_SRV;
+                jsonConfigKey = SSwapConsts.CFG_OBJ_AVO_SRV_BUSINESS_PARTNERS;
+                break;
                 
             default:
                 throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
@@ -1005,6 +1053,26 @@ public abstract class SExportUtils {
         
         if (syncToken.isEmpty()) {
             syncToken = SAuthJsonUtils.getValueOfElementAsText(config, jsonConfigKey, SSwapConsts.CFG_ATT_TOKEN); // recuperar token específico del end point
+        }
+        
+        // Login dinámico Avo:
+        
+        if (syncType == SSyncType.AVO_PARTNER_SUPPLIER || syncType == SSyncType.AVO_PARTNER_EMPLOYEE) {
+            String jwt = "";
+            try {
+                jwt = SAvoUtils.loginToAvoOperationControl(session);
+                
+                if (jwt == null || jwt.trim().isEmpty()) {
+                    throw new Exception("Falló la conexión con la API de " + SSwapConsts.AVOCADO + ".");
+                }
+            } 
+            catch (Exception ex) {
+                // Registramos el fallo solo en la carpeta de Logs del servidor:
+                SAvoLoginLogger.logFailure(ex.getMessage());
+                throw ex; 
+            }
+            
+            syncToken = "Bearer " + jwt.replace("\"", "");
         }
         
         if (syncApiKey.isEmpty()) {
@@ -1095,6 +1163,12 @@ public abstract class SExportUtils {
                     paymentUpdatesBody.payments = (SExportDataPaymentUpdate[]) currentExportDatas.toArray(new SExportDataPaymentUpdate[0]);
                     requestBody = mapper.writeValueAsString(paymentUpdatesBody);
                     break;
+                
+                case AVO_PARTNER_SUPPLIER:
+                case AVO_PARTNER_EMPLOYEE:
+                    SExportDataAvoBp[] requestAvoBpBody = (SExportDataAvoBp[]) currentExportDatas.toArray(new SExportDataAvoBp[0]);
+                    requestBody = mapper.writeValueAsString(requestAvoBpBody);
+                    break;
                     
                 default:
                     // nada
@@ -1105,7 +1179,7 @@ public abstract class SExportUtils {
             Date requestDatetime = new Date();
             String responseBody = requestSwapService("", syncUrl, SHttpConsts.METHOD_POST, requestBody, syncToken, syncApiKey, SSwapConsts.TIME_180_SEC);
             Date responseDatetime = new Date();
-
+            
             if (firstRequestDatetime == null) {
                 firstRequestDatetime = requestDatetime;
             }
@@ -1260,6 +1334,7 @@ public abstract class SExportUtils {
                     case PARTNER_SUPPLIER:
                     case PARTNER_CUSTOMER:
                         // exportar antes actores para autorización:
+                        
                         syncTypeInProgress = SSyncType.AUTH_ACTOR;
                         info = computeRequest(session, syncTypeInProgress);
                         responses.getInfos().add(info);
@@ -1267,6 +1342,17 @@ public abstract class SExportUtils {
                         if (info.isResponseOk()) {
                             // exportar los datos solicitados:
                             syncTypeInProgress = syncType;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                        }
+                        
+                        if (syncType == SSyncType.PARTNER_SUPPLIER) {
+                            // Exportar también proveedores y empleados aguacate:
+                            syncTypeInProgress = SSyncType.AVO_PARTNER_SUPPLIER;
+                            info = computeRequest(session, syncTypeInProgress);
+                            responses.getInfos().add(info);
+                            
+                            syncTypeInProgress = SSyncType.AVO_PARTNER_EMPLOYEE;
                             info = computeRequest(session, syncTypeInProgress);
                             responses.getInfos().add(info);
                         }
@@ -1288,7 +1374,7 @@ public abstract class SExportUtils {
                             responses.getInfos().add(info);
                         }
                         break;
-
+                        
                     default:
                         throw new IllegalArgumentException(ERR_UNSUPPORTED_SYNC_TYPE + "'" + syncType + "'.");
                 }

@@ -28,7 +28,7 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Claudio Peña, Sergio Flores, Claudio Peña
+ * @author Claudio Peña, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
     
@@ -142,8 +142,12 @@ public class SViewBizPartnerUpdate extends erp.lib.table.STableTab implements ja
                 () -> {
                     try {
                         miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                        
+                        // Exportación SWAP Services:
+                        
                         SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.PARTNER_SUPPLIER, true, SExportUtils.EXPORT_MODE_CONFIRM);
                         SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_BPS, mnTabType);
+                        
                     }
                     catch (Exception e) {
                         SLibUtilities.printOutException(this, e);

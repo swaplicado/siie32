@@ -8,9 +8,13 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationVerify;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -28,11 +32,13 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona
  */
 public class SViewStockValuation extends SGridPaneView implements ActionListener {
 
     private int mnRightValMatConsLevel;
+
+    private javax.swing.JButton jbVerifyValuation;
     
     private SGridFilterDatePeriod moFilterDatePeriod;
     
@@ -53,6 +59,9 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
         jbRowDelete.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_MANAGER);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
+
+        jbVerifyValuation = SGridUtils.createButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_ok_green.png")), "Verificar valuación", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbVerifyValuation);
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
@@ -62,6 +71,25 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+    }
+
+    private void actionVerifyValuation() {
+        if (jbVerifyValuation.isEnabled()) {
+            try {
+                String sErrors = SStockValuationVerify.verifyStockValuation(miClient.getSession());
+                if (!sErrors.isEmpty()) {
+                    miClient.showMsgBoxError(sErrors);
+                }
+                else {
+                    miClient.showMsgBoxInformation("La valuación de inventarios se verificó correctamente.\n"
+                            + "No se encontraron errores.");
+                }
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+                miClient.showMsgBoxError(ex.getMessage());
+            }
+        }
     }
     
     @Override
@@ -94,6 +122,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "v.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
                 + "dt_sta, "
                 + "dt_end, "
+                + "v.description, "
                 + "IF(va.fk_fin_rec_year_n IS NULL, '', CONCAT(va.fk_fin_rec_year_n, '-', fk_fin_rec_per_n, '-', fk_fin_rec_tp_rec_n, '-', fk_fin_rec_num_n)) AS rec, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -115,8 +144,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "  fk_fin_rec_tp_rec_n, "
                 + "  fk_fin_rec_num_n "
                 + "  FROM "
-                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS tsva "
-                + "  ORDER BY ts_usr_upd DESC) AS va ON "
+                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS tsva) AS va ON "
                 + "va.fk_stk_val = v.id_stk_val "
                 + (where.isEmpty() ? "" : ("WHERE " + where));
     }
@@ -127,6 +155,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Fecha inicio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha fin"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "v.description", "Descripción"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "rec", "Póliza contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
@@ -147,6 +176,10 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
+
+            if (button == jbVerifyValuation) {
+                actionVerifyValuation();
+            }
         }
     }
 }

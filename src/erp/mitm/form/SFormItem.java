@@ -61,6 +61,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -69,13 +70,14 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Rodigo Ayala, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Edwin Carmona, Rodigo Ayala, Sergio Flores, Claudio Peña
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
+    private boolean mbIsCopy;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private boolean mbWasInventoriable;
@@ -3975,17 +3977,26 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         validation.setIsError(true);
                     }
                 }
-
                 if (!validation.getIsError()) {
-                    params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), moFieldItemKey.getString() };
-                    if (!moFieldItemKey.getString().isEmpty() && SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_KEY_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItemKey.getText() + "' ya existe, ¿desea conservalo? ") == JOptionPane.NO_OPTION) {
-                            validation.setComponent(jtfItemKey);
-                            validation.setTabbedPaneIndex(0);
-                            validation.setIsError(true);
+                    boolean validateKey = moItem == null || mbIsCopy;
+                    if (validateKey) {
+                        params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), moFieldItemKey.getString() };
+                        if (!moFieldItemKey.getString().isEmpty() && SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_KEY_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
+                            if (mbIsCopy) {
+                                miClient.showMsgBoxWarning("El valor del campo '" + jlItemKey.getText() + "' ya existe. No es posible guardar una copia con la misma clave.\nFavor de cambiar el valor '" + jlItemKey.getText() + "'");
+                                validation.setComponent(jtfItemKey);
+                                validation.setTabbedPaneIndex(0);
+                                validation.setIsError(true);
+                            }
+                            else {
+                                if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItemKey.getText() + "' ya existe, ¿desea conservarlo?") == JOptionPane.NO_OPTION) {
+                                    validation.setComponent(jtfItemKey);
+                                    validation.setTabbedPaneIndex(0);
+                                    validation.setIsError(true);
+                                }
+                            }
                         }
                     }
-
                     if (!validation.getIsError()) {
                         if (moFieldUnitsPackage.getDouble() != 0d && jcbFkItemPackageId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemPackageId_n.getText() + "'.");
@@ -4732,5 +4743,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public void keyReleased(KeyEvent e) {
         makeItemName();
+    }
+    
+    public void setIsCopy(final boolean isCopy) {
+        mbIsCopy = isCopy;
     }
 }

@@ -10,7 +10,9 @@ import erp.data.SDataConstantsSys;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.form.SDialogStockValuationNotes;
 import erp.mod.trn.utils.SStockValuationConsumptionUtils;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -49,6 +51,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewStockValuationConsumptions extends SGridPaneView implements ActionListener {
 
     private SGridFilterDateRange moFilterDateRange;
+    private SDialogStockValuationNotes moMvtNotesDialog;
     private JButton mjbToSearch;
     private JButton mjbCleanSearch;
     private JButton mjbSearchItemKey;
@@ -84,6 +87,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
             new SGuiDate(SGuiConsts.GUI_DATE_DATE, SViewStockValuationConsumptions.getEndDateOfMonth(month[0], month[1]).getTime())}
         );
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
+
+        moMvtNotesDialog = new SDialogStockValuationNotes(miClient, "Notas del movimiento");
         
         mjbToSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter.gif")), "Filtar", this);
         mjbCleanSearch = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif")), "Quitar filtro", this);
@@ -91,17 +96,17 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         mjbViewCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Filtrar ítem", this);
         
         mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
+        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
-        mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
-        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
+        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewDps.addActionListener(this);
-        mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
-        mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas del documento");
-        mjbViewLinks.setToolTipText("Ver vínculos del documento");
+        mjbViewNotes.addActionListener(this);
+        mjbViewDps.setToolTipText("Ver documento de entrada");
+        mjbViewLinks.setToolTipText("Ver vínculos del documento de entrada");
+        mjbViewNotes.setToolTipText("Ver notas del movimiento de valuación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateRange);
         moTextToSearch = new JTextField("");
@@ -195,8 +200,12 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                         + " '-', "
                         + " erp.lib_fix_int(r.id_num, 6))  LIKE '%" + text + "%' OR "
                         + "(IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
-                + "         'ACTIVO FIJO', "
-                + "         'PREDETERMINADO') LIKE '%" + text + "%' )";
+                        + "         'ACTIVO FIJO', "
+                        + "         'PREDETERMINADO') LIKE '%" + text + "%' ) OR "
+                        + "(SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
+                        + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
+                        + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
+                        + "  GROUP BY mvtn.fk_stk_val_mvt) LIKE '%" + text + "%' ";
                 
                 msSeekQueryText += ") ";
             }
@@ -274,12 +283,8 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
             }
             else {
-                int dpsKey[] = getDpsPrimaryKey(gridRow.getRowPrimaryKey());
-                if (dpsKey == null || dpsKey[0] == 0) {
-                    miClient.showMsgBoxWarning("Este consumo no tiene asociado un documento de compra");
-                    return;
-                }
-                SModuleUtilities.showDocumentNotes((SClientInterface) miClient, SDataConstants.TRN_DPS, dpsKey);
+                moMvtNotesDialog.setValue(0, gridRow.getRowPrimaryKey()[0]);
+                moMvtNotesDialog.setVisible(true);
             }
         }
     }
@@ -398,7 +403,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "u.symbol, "
                 + "mvt.qty_mov, "
                 + "mvt.cost_u, "
-                + "mvt.qty_mov * mvt.cost_u AS mvt_total, "
+                + "IF(mvt.qty_mov = 0, mvt.cost_r, mvt.qty_mov * mvt.cost_u) AS mvt_total, "
                 + "mvt.fk_ct_iog, "
                 + "ctd.ct_iog, "
                 + "CONCAT(di_in.num_ser, IF(LENGTH(di_in.num_ser) = 0, '', '-'), "
@@ -411,7 +416,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "    IF(LENGTH(dps.num_ser) = 0, '', '-'), "
                 + "    dps.num) AS f_num, "
                 + "dps.dt_doc, "
-                + "IF(dps.fid_dps_nat=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
+                + "IF(trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", dps.id_year, dps.id_doc)=" + SDataConstantsSys.TRNU_DPS_NAT_ASSET + ", "
                 + "         'ACTIVO FIJO', "
                 + "         'PREDETERMINADO') AS dps_nat, "
                 + "bp.bp, "
@@ -439,6 +444,10 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "facc.acc, "
                 + "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, "
                 + "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as fin_num, "
+                + " (SELECT GROUP_CONCAT(COALESCE(mvtn.nts, '') SEPARATOR ';') "
+                + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT_NOTE) + " AS mvtn "
+                + "  WHERE mvtn.fk_stk_val_mvt = mvt.id_stk_val_mvt "
+                + "  GROUP BY mvtn.fk_stk_val_mvt) AS _notes, "
                 + "r.id_year, "
                 + "r.id_per, "
                 + "r.id_bkc, "
@@ -502,7 +511,6 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 + "AND (r.b_del IS NULL OR NOT r.b_del) "
                 + "AND (re.b_del IS NULL OR NOT re.b_del) "
                 + "AND mvt.fk_ct_iog = 2 "
-//                + "AND (re.fid_cc_n IS NOT NULL) "
                 + where + " "
                 + "ORDER BY val.dt_sta ASC , "
                 + "mvt.dt_mov ASC , "
@@ -558,6 +566,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fid_acc", "No. cuenta contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "acc", "Cuenta contable"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "fin_num", "Póliza contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "_notes", "Notas valuación"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -591,7 +600,7 @@ public class SViewStockValuationConsumptions extends SGridPaneView implements Ac
                 actionViewDps();
             }
             else if (button == mjbViewNotes) {
-                actionViewNotes();
+               actionViewNotes();
             }
             else if (button == mjbViewLinks) {
                 actionViewLinks();

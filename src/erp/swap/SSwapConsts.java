@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, César Orozco, Edwin Carmona, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SSwapConsts {
 
@@ -20,6 +20,7 @@ public abstract class SSwapConsts {
     public static final String SWAP_SERVICES = "SWAP Services";
     public static final String PURCHASE_PORTAL = "Portal de Compras";
     public static final String SOM = "Seeds, Oils and Meals, SOM 1.0";
+    public static final String AVOCADO = "Avocado";
     
     public static final int TIME_30_SEC = 60 * 1000; // 30 segundos en milisegundos
     public static final int TIME_60_SEC = 60 * 1000; // 60 segundos en milisegundos
@@ -75,12 +76,9 @@ public abstract class SSwapConsts {
     public static final String QRY_DOCUMENT_TYPE = "document_type";
     
     /*
-     * JSON object for request attributes of ame service.
+     * JSON object for request attributes of avo service.
      */
     
-    public static final String CFG_OBJ_AVO_SRV = "ame-srv";
-    public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
-    public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
     public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT_MOVEMENTS = "season-export-movements";
     public static final String CFG_OBJ_AVO_SRV_ACCOUNTING_ACCOUNTS = "accounting-accounts";
     public static final String CFG_OBJ_AVO_SRV_COST_CENTERS = "cost-centers";
@@ -88,12 +86,22 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_AVO_SRV_UPDATE_WEEK = "update-week-procurement-facility";
     public static final String CFG_OBJ_AVO_SRV_BATCH_MOVEMENTS = "batch-movements";
     public static final String CFG_OBJ_AVO_SRV_TOGGLE_ACCOUNTING = "toggle-accounting";
+    public static final String CFG_OBJ_AVO_SRV = "avo-srv";
+    public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
+    public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
+    public static final String CFG_OBJ_AVO_SRV_BUSINESS_PARTNERS = "business-partners";
+    
+    // JSON names for Avo configuration:
+    public static final String CFG_ATT_AVO_CDR_IDS = "cdr_ids";
+    public static final String CFG_ATT_AVO_DBR_IDS = "dbr_ids";
     
     // JSON names for configuration attributes:
     public static final String CFG_ATT_URL = "url";
     public static final String CFG_ATT_TOKEN = "token";
     public static final String CFG_ATT_API_KEY = "api-key";
     public static final String CFG_ATT_LIMIT = "limit";
+    public static final String CFG_ATT_USER = "user";
+    public static final String CFG_ATT_PSWD = "pswd";
 
     // SWAP Services transaction constants:
     public static final int TXN_CAT_PURCHASE = 1;

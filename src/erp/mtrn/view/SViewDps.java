@@ -795,7 +795,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
         else if (mbIsDocOrders) {
             if (mbIsAuthWebPurchasing) {
-                aoTableColumns = new STableColumn[51];
+                aoTableColumns = new STableColumn[52];
             }
             else {
                 aoTableColumns = new STableColumn[46];
@@ -892,14 +892,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             
             if (mbIsDocOrders) {
                 if (mbIsAuthWebPurchasing) {
-                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "files", "Soportes de pedidos", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_priority", "Prioridad", STableConstants.WIDTH_ICON);
                     aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
-                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "send", "Enviado aut. app web", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_files", "Soportes de pedidos", STableConstants.WIDTH_ICON);
                     aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
-                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "stat_auth", "Autorización app web.", STableConstants.WIDTH_ITEM);
-                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "ico_send_warn", "Estatus de envío", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_send", "Enviado aut. app web", STableConstants.WIDTH_ICON);
                     aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
-                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "user_in_turn", "Usr. turno", STableConstants.WIDTH_USER);
+                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_stat_auth", "Autorización app web.", STableConstants.WIDTH_ITEM);
+                    aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico_send_warn", "Estatus de envío", STableConstants.WIDTH_ICON);
+                    aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+                    aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_user_in_turn", "Usr. turno", STableConstants.WIDTH_USER);
                 }
                 
                 aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_status", "Autorización", STableConstants.WIDTH_ICON);
@@ -3607,7 +3609,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     }
                                 }
                                 else {
-                                    miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo");
+                                    miClient.showMsgBoxWarning("Los comentarios son obligatorios para la cancelación del flujo.");
                                     return;
                                 }
                             }
@@ -3781,15 +3783,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
                 "COALESCE(dc.pay_met, 'N/D') AS _pay_method, " +
                 "COALESCE(dc.pay_way, 'N/D') AS _pay_way, " +
-                (mbIsAuthWebPurchasing && mbIsDocOrders ? "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS files, " +
-                "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SALES + ", 0) AS send, " +
+                (mbIsAuthWebPurchasing && mbIsDocOrders ? "IF(d.priority = " + SDataDps.PRIORITY_URGENT + ", " + STableConstants.ICON_VIEW_EXCL + ", 0) AS f_priority, " +
+                "IF(fl.id_sup_file IS NOT NULL, " + STableConstants.ICON_VIEW_FOLDER + ", 0) AS f_files, " +
+                "IF(COALESCE(sah.id_st_authorn, 0) > 1, " + STableConstants.ICON_VIEW_SALES + ", 0) AS f_send, " +
                 "IF(fl.id_sup_file IS NOT NULL, CASE d.fid_st_dps_authorn " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " THEN 'AUTORIZADO' " +
                 "WHEN " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT + " THEN 'RECHAZADO' " +
-                "ELSE sah.name END, sah.name) AS stat_auth, " +
+                "ELSE sah.name END, sah.name) AS f_stat_auth, " +
                 "IF(sah.id_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_SND + ", " + STableConstants.ICON_VIEW_LIG_YEL + ", " +
                 "IF(sah.id_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_SNDF + ", " + STableConstants.ICON_VIEW_LIG_RED + ", " +
-                STableConstants.ICON_NULL + ")) AS ico_send_warn, "
+                STableConstants.ICON_NULL + ")) AS f_ico_send_warn, "
                 : "");
         
         if (mbIsAuthWebPurchasing && mbIsDocOrders) {
@@ -3851,7 +3854,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     + "        AND gstp.fk_tp_authorn = " + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + " "
                     + "        AND gstp.res_pk_n1_n = d.id_year "
                     + "        AND gstp.res_pk_n2_n = d.id_doc "
-                    + "LIMIT 1), 'N/D')) AS user_in_turn, ";
+                    + "LIMIT 1), 'N/D')) AS f_user_in_turn, ";
         }
         
         String sqlOrders = mbIsDocInvoices ? (

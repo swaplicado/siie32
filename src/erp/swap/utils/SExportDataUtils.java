@@ -8,6 +8,7 @@ package erp.swap.utils;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.ver40.DCfdi40Catalogs;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
@@ -61,7 +62,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores, César Orozco
+ * @author Sergio Flores, César Orozco, Rodrigo Ayala
  */
 public abstract class SExportDataUtils {
 
@@ -86,6 +87,8 @@ public abstract class SExportDataUtils {
             case PARTNER_CUSTOMER:
             case AUTH_ACTOR:
             case AUTH_JOB_TITLE:
+            case AVO_PARTNER_SUPPLIER:
+            case AVO_PARTNER_EMPLOYEE:
                 table = SModConsts.TablesMap.get(SModConsts.CFG_SYNC_LOG);
                 break;
 
@@ -152,8 +155,10 @@ public abstract class SExportDataUtils {
                 || syncType == SSyncType.PARTNER_SUPPLIER
                 || syncType == SSyncType.PARTNER_CUSTOMER
                 || syncType == SSyncType.AUTH_JOB_TITLE
-                || syncType == SSyncType.FUNCTIONAL_AREA;
-
+                || syncType == SSyncType.FUNCTIONAL_AREA
+                || syncType == SSyncType.AVO_PARTNER_SUPPLIER
+                || syncType == SSyncType.AVO_PARTNER_EMPLOYEE;
+        
         return "SELECT "
                 + "DISTINCT sle.reference_id "
                 + "FROM "
@@ -165,7 +170,7 @@ public abstract class SExportDataUtils {
                 + "ORDER BY "
                 + (sortAsUnsigned ? "CONVERT(sle.reference_id, UNSIGNED)" : "sle.reference_id");
     }
-
+    
     /**
      * Obtiene la fecha de la última sincronización exitosa para el tipo de
      * sincronización indicado.
@@ -186,7 +191,7 @@ public abstract class SExportDataUtils {
                 + "FROM "
                 + table + " "
                 + "WHERE "
-                + "response_code = '" + SHttpConsts.RSC_SUCC_OK + "' "
+                + "response_code IN ('" + SHttpConsts.RSC_SUCC_OK + "', '" + SHttpConsts.RSC_SUCC_CREATED + "') " //se agregó Http(201)
                 + "AND sync_type = '" + syncType + "' "
                 + "ORDER BY "
                 + "id_sync_log DESC " // primero el registro más nuevo
@@ -628,7 +633,7 @@ public abstract class SExportDataUtils {
 
         return user;
     }
-
+    
     /**
      * Verifica si el socio de negocios es compañía en SWAP Services.
      *
@@ -1194,8 +1199,11 @@ public abstract class SExportDataUtils {
                         + "d.num_ser, d.num, d.dt, d.id_year, d.id_doc, "
                         + "d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.ts_edit, d.ts_authorn, d.ts_link, "
                         + "d.tot_r, d.tot_cur_r, d.exc_rate, d.fid_cur, d.fid_func_sub, d.fid_bp_r, c.cur_key, nat.dps_nat, "
+                        + "d.priority, "
                         + "COALESCE(d.acc_tag, '') AS _acc_tag, "
-                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
+                        + "COALESCE(dcfd.pay_met, '') AS _pay_met, "
+                        + "COALESCE(dcfd.cfd_use, '') AS _cfd_use, "
+                        + "d.fid_tp_pay, c_info.cecos, c_info.ref_items, "
                         + "IF(d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd, d.fid_st_dps_authorn, "
                         + "(SELECT GROUP_CONCAT(DISTINCT fid_mat_req) "
                         + "FROM "
@@ -1273,10 +1281,17 @@ public abstract class SExportDataUtils {
                     oDpsExport.notes = resultSet.getString("_notes");
                     oDpsExport.functional_area = resultSet.getInt("d.fid_func_sub");
                     oDpsExport.fiscal_use = resultSet.getString("_cfd_use");
-                    oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    String paymentMethod = resultSet.getString("_pay_met");
+                    if (paymentMethod != null && !paymentMethod.isEmpty()) {
+                        oDpsExport.payment_method = paymentMethod;
+                    }
+                    else {
+                        oDpsExport.payment_method = resultSet.getInt("d.fid_tp_pay") == SDataConstantsSys.TRNS_TP_PAY_CASH ? DCfdi40Catalogs.MDP_PUE : DCfdi40Catalogs.MDP_PPD;
+                    }
                     oDpsExport.concepts = resultSet.getString("c_info.ref_items");
                     oDpsExport.cost_profit_center = resultSet.getString("c_info.cecos");
                     oDpsExport.account_tag = resultSet.getString("_acc_tag");
+                    oDpsExport.priority = resultSet.getInt("d.priority");
                     oDpsExport.is_deleted = resultSet.getBoolean("d.b_del") || resultSet.getInt("d.fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                     rms = resultSet.getString("_rms");
 
@@ -2554,6 +2569,315 @@ public abstract class SExportDataUtils {
     }
 
     /**
+     * Otiene los parámetros de configuracion del Json de la DB para AVO.
+     * 
+     * @param session Sesión de usuario.
+     * @throws Exception Si ocurre un error.
+     * @return Las dos cadenas en un arreglo: [0] = Áreas Proveedor, [1] = Deptos Empleado, [2] = IDs Acreedores, [3] = IDs Deudores
+    */
+    private static String[] getSwapAvoConfig(SGuiSession session) throws Exception {
+        String jsonAvo = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_AVO); 
+        JsonNode configAvo = new ObjectMapper().readTree(jsonAvo);
+
+        if (configAvo.path("link-up").asInt(0) == 0) {
+            return null; // Retorna null si está apagado
+        }
+
+        String empDep = "", supArea = "", cdrIds = "", dbrIds = "";
+        if (configAvo.path("emp_departments").isArray()) {
+            for (JsonNode dep : configAvo.path("emp_departments")) empDep += (empDep.isEmpty() ? "" : ", ") + dep.asInt();
+        }
+        if (configAvo.path("sup_biz_areas").isArray()) {
+            for (JsonNode ba : configAvo.path("sup_biz_areas")) supArea += (supArea.isEmpty() ? "" : ", ") + ba.asInt();
+        }
+        if (configAvo.path("cdr_ids").isArray()) {
+            for (JsonNode cdr : configAvo.path("cdr_ids")) cdrIds += (cdrIds.isEmpty() ? "" : ", ") + cdr.asInt();
+        }
+        if (configAvo.path("dbr_ids").isArray()) {
+            for (JsonNode dbr : configAvo.path("dbr_ids")) dbrIds += (dbrIds.isEmpty() ? "" : ", ") + dbr.asInt();
+        }
+
+        return new String[] { supArea, empDep, cdrIds, dbrIds };
+    }
+    
+    /**
+     * Obtiene la consulta SQL base unificada para extraer asociados de negocios
+     * (proveedores y/o empleados) que se exportarán a Avocado.
+     *
+     * @param supBizAreas Cadena con los IDs de las áreas de negocio permitidas para proveedores, separados por comas.
+     * @param empDepartments Cadena con los IDs de los departamentos permitidos para empleados, separados por comas.
+     * @param sqlSyncedSup Cadena de una subconsulta SQL con los registros previamente sincronizados de proveedores.
+     * @param sqlSyncedEmp Cadena de una subconsulta SQL con los registros previamente sincronizados de empleados.
+     * @return Cadena con la sentencia SQL base unificada.
+     */
+    private static String getSqlQueryBaseAvo(String supBizAreas, String empDepartments, String cdrIds, String dbrIds, String sqlSyncedSup, String sqlSyncedEmp) {
+        String sqlSupArea = supBizAreas.isEmpty() ? "1 = 0" : "b.fid_ba IN (" + supBizAreas + ")";
+        String sqlEmpDep = empDepartments.isEmpty() ? "1 = 0" : "emp.fk_dep IN (" + empDepartments + ")";
+        String sqlCdrMatch = cdrIds.isEmpty() ? "1 = 0" : "(b.b_cdr = 1 AND b.id_bp IN (" + cdrIds + "))";
+        String sqlDbrMatch = dbrIds.isEmpty() ? "1 = 0" : "(b.b_dbr = 1 AND b.id_bp IN (" + dbrIds + "))";
+        
+        String sqlSupMatch = "((bc.id_bp IS NOT NULL AND " + sqlSupArea + ") OR " + sqlCdrMatch + " OR " + sqlDbrMatch + ")"; // es provedor o comodín
+        String referenceId = "CONVERT(b.id_bp, CHAR)";
+        
+        return "SELECT "
+                + "b.id_bp, b.bp, b.bp_comm, b.fiscal_id, "
+                
+                // Es proveedor o comodín:
+                // + "(bc.id_bp IS NOT NULL AND " + sqlSupArea + ") AS is_true_sup, "
+                + "(" + sqlCdrMatch + ") AS is_avo_cdr, "
+                + "(" + sqlDbrMatch + ") AS is_avo_dbr, "
+
+                // Identificación de rol general: Pertenece a Avo si es asociado de Aguacate actualmente (por área o comodín), o si ya se había exportado antes.
+                + "(" + sqlSupMatch + " OR " + referenceId + " IN (" + sqlSyncedSup + ")) AS is_avo_sup, "
+                + "(emp.id_emp IS NOT NULL AND (" + sqlEmpDep + " OR " + referenceId + " IN (" + sqlSyncedEmp + "))) AS is_avo_emp, "
+                
+                + "(" + referenceId + " IN (" + sqlSyncedSup + ") OR " + referenceId + " IN (" + sqlSyncedEmp + ")) AS was_synced_before, " // ver si ya se había exportado antes
+                
+                // Banderas para Proveedores (que engloba a proveedores y comodínes):
+                + "((bc.id_bp IS NOT NULL AND IFNULL(bc.b_del, 1) = 0) OR " + sqlCdrMatch + " OR " + sqlDbrMatch + ") AS sup_is_active, " // activo si es categoría válida o comodín
+                + "(b.b_del = 1 OR NOT " + sqlSupMatch + ") AS sup_is_deleted, " // si está eliminado el registro o ya no cumple el rol/área/comodín: se exporta eliminado
+                
+                // Banderas para Empleados:
+                + "(emp.b_act = 1 AND emp.b_del = 0) AS emp_is_active, " // si está inactivo o eliminado en HRSU se exporta inactivo, activo en caso contrario
+                + "(b.b_del = 1 OR b.b_att_emp = 0 OR NOT (" + sqlEmpDep + ")) AS emp_is_deleted " // si está eliminado el registro, dejó de ser empleado o ya no cumple el departamento: se exporta eliminado
+                
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON bc.id_bp = b.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = b.id_bp "
+                
+                /* Bitácora de actualizaciones */
+                + "LEFT OUTER JOIN ("
+                + "SELECT bul.id_bp, bul.ts_usr_upd "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bul "
+                + "INNER JOIN ("
+                + "SELECT bulx.id_bp, MAX(bulx.id_log) AS id_log "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_UPD_LOG) + " AS bulx "
+                + "GROUP BY bulx.id_bp "
+                + ") AS t ON t.id_bp = bul.id_bp AND t.id_log = bul.id_log "
+                + ") AS tbul ON tbul.id_bp = b.id_bp ";
+    }    
+    /**
+     * Crea el objeto DTO para socio de negocios (proveedor/empleado) hacia Avocado 
+     * a partir de un conjunto de datos previamente abierto.
+     *
+     * @param resultSet Conjunto de datos previamente abierto.
+     * @param syncType Tipo de sincronización que está ejecutando este método.
+     * @return DTO del asociado de negocios para Avocado, o null si el registro no tiene un tipo válido.
+     * @throws SQLException Si ocurre un error en la consulta.
+     */
+    public static SExportDataAvoBp createAvoBp(final ResultSet resultSet, final SSyncType syncType) throws SQLException {
+        String tradeName = SJsonUtils.sanitizeJson(resultSet.getString("bp_comm"));
+        SExportDataAvoBp avoBp = new SExportDataAvoBp();
+        
+        avoBp.erp_id = resultSet.getInt("id_bp");
+        avoBp.name = SJsonUtils.sanitizeJson(resultSet.getString("bp"));
+        avoBp.trade_name = (tradeName == null || tradeName.isEmpty()) ? null : tradeName;
+        avoBp.fiscal_id = SJsonUtils.sanitizeJson(resultSet.getString("fiscal_id"));
+        
+        boolean isAvoCdr = resultSet.getBoolean("is_avo_cdr");
+        boolean isAvoDbr = resultSet.getBoolean("is_avo_dbr");
+        
+        boolean isSup = resultSet.getBoolean("is_avo_sup"); // es/fue proveedor de Avocado (Área) o comodin
+        boolean isEmp = resultSet.getBoolean("is_avo_emp"); // es/fue empleado de Avocado (Departamento)
+        
+        boolean wasSyncedBefore = resultSet.getBoolean("was_synced_before");
+        
+        boolean supIsActive = resultSet.getBoolean("sup_is_active");
+        boolean supIsDeleted = resultSet.getBoolean("sup_is_deleted");
+        
+        boolean empIsActive = resultSet.getBoolean("emp_is_active");
+        boolean empIsDeleted = resultSet.getBoolean("emp_is_deleted");
+        
+        boolean validSup = supIsActive && !supIsDeleted; // es actualmente proveedor
+        boolean validEmp = empIsActive && !empIsDeleted; // es actualmente empleado
+        
+        // Filtro para evitar duplicidad al exportar asociados con doble rol pero uno inactivo:
+        if (syncType == SSyncType.AVO_PARTNER_SUPPLIER) {
+            if (!validSup && (!isSup || validEmp)) { // si no es/fue proveedor y es empleado actualmente
+                return null; // dejamos que se exporte con los empleados
+            }
+        }
+        else if (syncType == SSyncType.AVO_PARTNER_EMPLOYEE) {
+            if (!validEmp && (!isEmp || validSup)) { // si no es/fue empleado y es proveedor actualmente
+                return null; // ya se exportó como proveedor
+            }
+        }
+
+        // Asignamos el tipo de rol y su estatus dinámicamente:
+
+        // Si es/fue proveedor y empleado de Avo.
+        if (isSup && isEmp) {
+            int activeCount = (supIsActive && !supIsDeleted ? 1 : 0) + (empIsActive && !empIsDeleted ? 1 : 0); // llenamos el arreglo solo con los roles que están activos y vivos actualmente
+            
+            avoBp.types = new int[activeCount];
+            int index = 0;
+            
+            if (supIsActive && !supIsDeleted) {
+                if (isAvoCdr) { // protegemos en caso de que algun día tambien sean empleados
+                    avoBp.types[index++] = SAvoConsts.SWAP_AVO_BP_CREDITOR; 
+                } else if (isAvoDbr) {
+                    avoBp.types[index++] = SAvoConsts.SWAP_AVO_BP_DEBTOR;
+                } else {
+                    avoBp.types[index++] = SAvoConsts.SWAP_AVO_BP_SUPPLIER;
+                }
+            }
+            if (empIsActive && !empIsDeleted) {
+                avoBp.types[index++] = SAvoConsts.SWAP_AVO_BP_EMPLOYEE;
+            }
+            
+            avoBp.is_active = supIsActive || empIsActive; // si está activo en un rol se manda activo
+            avoBp.is_deleted = supIsDeleted && empIsDeleted; // sólo si está eliminado en ambos roles se manda eliminado
+        }
+        else if (isSup) {
+            if (supIsActive && !supIsDeleted) {
+                avoBp.types = new int[1];
+                
+                if (isAvoCdr) {
+                    avoBp.types[0] = SAvoConsts.SWAP_AVO_BP_CREDITOR;
+                } else if (isAvoDbr) {
+                    avoBp.types[0] = SAvoConsts.SWAP_AVO_BP_DEBTOR;
+                } else {
+                    avoBp.types[0] = SAvoConsts.SWAP_AVO_BP_SUPPLIER;
+                }
+            }
+            else {
+                avoBp.types = new int[0];
+            }
+            
+            avoBp.is_active = supIsActive;
+            avoBp.is_deleted = supIsDeleted;
+        }
+        else if (isEmp) {
+            if (empIsActive && !empIsDeleted) {
+                avoBp.types = new int[] {SAvoConsts.SWAP_AVO_BP_EMPLOYEE};
+            }
+            else {
+                avoBp.types = new int[0];
+            }
+            
+            avoBp.is_active = empIsActive;
+            avoBp.is_deleted = empIsDeleted;
+        }
+        else {
+            return null;
+        }
+                
+        if (avoBp.types.length == 0) {
+            if (!wasSyncedBefore) { 
+                return null; 
+            } 
+            else {  
+                avoBp.is_active = false;
+                avoBp.is_deleted = true;
+            }
+        }
+        
+        return avoBp;
+    }
+    /**
+     * Consulta los proveedores de Avocado (filtrados por áreas de negocios definidas en la configuración) listos para enviar.
+     * 
+     * @param session Sesión de usuario.
+     * @throws SQLException Si ocurre un error en la consulta.
+     * @throws Exception Si ocurre un error.
+     */
+    private static ArrayList<SExportData> getListOfAvoSuppliersToExport(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
+        ArrayList<SExportData> suppliers = new ArrayList<>();
+        
+        String[] avoConfig = getSwapAvoConfig(session);
+        if (avoConfig == null) return suppliers; // Si devuelve null, está apagado
+
+        String supBizAreas = avoConfig[0];
+        String empDepartments = avoConfig[1];
+        String cdrIds = avoConfig[2];
+        String dbrIds = avoConfig[3];
+        
+        String sqlSupArea = supBizAreas.isEmpty() ? "1 = 0" : "b.fid_ba IN (" + supBizAreas + ")";
+        String sqlCdrMatch = cdrIds.isEmpty() ? "1 = 0" : "b.id_bp IN (" + cdrIds + ")";
+        String sqlDbrMatch = dbrIds.isEmpty() ? "1 = 0" : "b.id_bp IN (" + dbrIds + ")";
+        String sqlSupGroup = "((bc.id_bp IS NOT NULL AND (" + sqlSupArea + ")) OR " + sqlCdrMatch + " OR " + sqlDbrMatch + ")";
+
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            String referenceId = "CONVERT(b.id_bp, CHAR)";
+            String sqlSyncedSup = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "");
+            String sqlSyncedEmp = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "");
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_SUPPLIER, "");
+
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments, cdrIds, dbrIds, sqlSyncedSup, sqlSyncedEmp)
+                    + "WHERE (" + sqlSupGroup + " OR " + referenceId + " IN (" + sqlSyncedSup + ")) AND "
+                    + "( "
+                    // Condición para nuevos: Vivos, activos, y cumplen el filtro de área de negocio o son comodines.
+                    + "  ((b.b_del = 0 AND ((b.b_sup = 1 AND IFNULL(bc.b_del, 1) = 0 AND " + sqlSupArea + ") OR " + sqlCdrMatch + " OR " + sqlDbrMatch + ")) AND " + referenceId + " NOT IN (" + sqlSyncedSup + ")) "
+                    
+                    // Condición para modificados: Si se modificó la tabla principal bpsu_bp, la configuración o hay cambios en la bitacora de actualizaciones.
+                    + (lastSyncDatetime == null ? "" : "  OR ((" + referenceId + " IN (" + sqlSyncedSup + ")) AND (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR bc.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))) ")  
+                    + ") "
+                    + "ORDER BY b.id_bp;";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SExportDataAvoBp supplier = createAvoBp(resultSet, syncType);
+                if (supplier != null) {
+                    suppliers.add(supplier);
+                }
+            }
+        }
+        return suppliers;
+    }
+    
+    /**
+     * Consulta los empleados de Avocado (filtrados por departamentos laborales definidas en la configuración), y los prepara para la exportación.
+     * 
+     * @param session Sesión de usuario.
+     * @throws SQLException Si ocurre un error en la consulta.
+     * @throws Exception Si ocurre un error.
+     */
+    private static ArrayList<SExportData> getListOfAvoEmployeesToExport(final SGuiSession session, final SSyncType syncType) throws SQLException, Exception {
+        ArrayList<SExportData> employees = new ArrayList<>();
+        
+        String[] avoConfig = getSwapAvoConfig(session);
+        if (avoConfig == null) return employees; // Si devuelve null, está apagado
+
+        String supBizAreas = avoConfig[0];
+        String empDepartments = avoConfig[1];
+        String cdrIds = avoConfig[2];
+        String dbrIds = avoConfig[3];
+        
+        String sqlEmpDep = empDepartments.isEmpty() ? "1 = 0" : "emp.fk_dep IN (" + empDepartments + ")";
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()){
+            String referenceId = "CONVERT(b.id_bp, CHAR)";
+            String sqlSyncedSup = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_SUPPLIER, "");
+            String sqlSyncedEmp = getSqlSubQuerySyncedRegistries(SSyncType.AVO_PARTNER_EMPLOYEE, "");
+            Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.AVO_PARTNER_EMPLOYEE, "");
+            
+            String sql = getSqlQueryBaseAvo(supBizAreas, empDepartments, cdrIds, dbrIds, sqlSyncedSup, sqlSyncedEmp)
+                    + "WHERE emp.id_emp IS NOT NULL AND " 
+                    + "( "
+                    // Condición para nuevos: Vivos, activos, son empleados y cumplen el filtro de departamento.
+                    + "  ((b.b_att_emp = 1 AND b.b_del = 0 AND emp.b_act = 1 AND emp.b_del = 0 AND " + sqlEmpDep + ") AND " + referenceId + " NOT IN (" + sqlSyncedEmp + ")) "
+                    
+                    // Condición para modificados: Si se modificó la tabla principal bpsu_bp, la de empleados o hay cambios en la bitacora de actualizaciones.
+                    + (lastSyncDatetime == null ? "" : "  OR ((" + referenceId + " IN (" + sqlSyncedEmp + ")) AND (b.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR emp.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
+                            + "OR (tbul.ts_usr_upd IS NOT NULL AND tbul.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'))) ")  
+                    + ") "
+                    + "ORDER BY b.id_bp;";
+
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                SExportDataAvoBp employee = createAvoBp(resultSet, syncType); 
+                if (employee != null) {
+                    employees.add(employee);
+                }
+            }
+        }
+        return employees;
+    }
+    
+    /**
      * Obtiene la lista de usuarios o proveedores a exportar según el tipo de
      * sincronización.
      *
@@ -2620,6 +2944,14 @@ public abstract class SExportDataUtils {
 
             case PUR_PAYMENT_UPD:
                 data = getListOfPurchasePaymentUpdatesToExport(session);
+                break;
+                
+            case AVO_PARTNER_SUPPLIER:
+                data = getListOfAvoSuppliersToExport(session, syncType);
+                break;
+                
+            case AVO_PARTNER_EMPLOYEE:
+                data = getListOfAvoEmployeesToExport(session, syncType);
                 break;
 
             default:
