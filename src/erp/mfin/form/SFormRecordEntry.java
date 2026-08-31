@@ -2429,7 +2429,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     private void actionOk() {
         //Aregado el if para deshabilitar el boton de "Aceptar" si es renglon de sistema
-        if (!moRecordEntry.isRowSystem()) {
+        boolean canSave = moRecordEntry == null;
+        if (moRecordEntry != null) {
+            canSave = !moRecordEntry.isRowSystem();
+        }
+        
+        if (canSave) {
             SFormValidation validation = null;
 
             triggerFocusLost();     // this forces all pending focus lost function to be called
@@ -2584,6 +2589,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public void formReset() {
+        jbOk.setEnabled(true);
         mbResetingForm = true;
 
         mnFormResult = SLibConstants.UNDEFINED;
@@ -2980,7 +2986,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         moRecordEntry = (SDataRecordEntry) registry;
         
-        jbOk.setEnabled(!moRecordEntry.isRowSystem());
+        boolean canSave = moRecordEntry == null;
+        if (moRecordEntry != null) {
+            canSave = !moRecordEntry.isRowSystem();
+        }
+        jbOk.setEnabled(canSave);
         
         moFieldConcept.setFieldValue(moRecordEntry.getConcept());
         moFieldDebit.setFieldValue(moRecordEntry.getDebit());
