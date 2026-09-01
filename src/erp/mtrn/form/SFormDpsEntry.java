@@ -4103,7 +4103,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 mbAllowDiscount = true;
 
                 jtfOriginalPriceUnitaryCy.setEditable(true);
+                jtfOriginalPriceUnitaryCy.setEnabled(true);
                 jtfOriginalPriceUnitaryCy.setFocusable(true);
+
                 jtfOriginalDiscountUnitaryCy.setEditable(true);
                 jtfOriginalDiscountUnitaryCy.setFocusable(true);
                 jtfDiscountEntryCy.setEditable(true);
@@ -4114,31 +4116,31 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jbOriginalPriceUnitaryCyWizard.setEnabled(true);
                 jbPriceHistory.setEnabled(true);
             }
-                       
+
             boolean isSalesFreightAllowed = isSalesFreightAllowed();
-            
+
             jckIsSalesFreightRequired.setEnabled(isSalesFreightAllowed);
             jlSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed);
-            jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
-            jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+                jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+                jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
             jlSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed);
-            jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
-            jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
-            
+                jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+                jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+
             itemStateIsSalesFreightRequired(false);
-            
+
             if (moItem.getIsFreeDiscountUnitary()) {
                 jckIsDiscountUnitaryPercentage.setEnabled(false);
             }
             else {
-                jckIsDiscountUnitaryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
+                    jckIsDiscountUnitaryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
             }
 
             if (moItem.getIsFreeDiscountEntry()) {
                 jckIsDiscountEntryPercentage.setEnabled(false);
             }
             else {
-                jckIsDiscountEntryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
+                    jckIsDiscountEntryPercentage.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
             }
 
             if (!moParamDps.getIsDiscountDocApplying() || moItem.getIsFreeDiscountDoc()) {
@@ -4147,9 +4149,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jtfDiscountDocPercentageRo.setText("");
             }
             else {
-                jckIsDiscountDocApplying.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
+                    jckIsDiscountDocApplying.setEnabled(mbAllowDiscount); // XXX requires user right to be enabled
                 jckIsDiscountDocApplying.setSelected(mbAllowDiscount);
-                jtfDiscountDocPercentageRo.setText(moParamDps.getIsDiscountDocPercentage() ? SLibUtils.getDecimalFormatPercentageDiscount().format(moParamDps.getDiscountDocPercentage()) : "");
+                    jtfDiscountDocPercentageRo.setText(moParamDps.getIsDiscountDocPercentage() ? SLibUtils.getDecimalFormatPercentageDiscount().format(moParamDps.getDiscountDocPercentage()) : "");
             }
 
             // Enable remaining fields:
@@ -4165,7 +4167,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jtfOriginalQuantity.setEditable(true);
             jtfOriginalQuantity.setFocusable(true);
-            
+
             jckAuxPreserveQuantity.setEnabled(moItem.getFkUnitAlternativeTypeId() != SDataConstantsSys.ITMU_TP_UNIT_NA);
             jckAuxPreserveQuantity.setSelected(jckAuxPreserveQuantity.isEnabled() && moItem.getUnitAlternativeBaseEquivalence() == 0);
 
@@ -4180,7 +4182,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             try {
                 SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { SDataUtilities.obtainCostCenterItem(miClient.getSession(), moItem.getPkItemId())}, SLibConstants.EXEC_MODE_SILENT);
-                
+
                 if (costCenter != null) {
                     moCostCenterPanel.setSelectedAccount(new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()));
                     jcbFkItemId.requestFocus();
@@ -4198,11 +4200,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfVolume.setEnabled(moItem.getDbmsDataItemGeneric().getIsVolumeApplying() && (moItem.getIsVolumeVariable() || moItem.getDbmsDataItemGeneric().getIsVolumeVariable()));
             jtfMass.setEnabled(moItem.getDbmsDataItemGeneric().getIsMassApplying() && (moItem.getIsMassVariable() || moItem.getDbmsDataItemGeneric().getIsMassVariable()));
             jtfWeightPackagingExtra.setEnabled(moItem.getDbmsDataItemGeneric().getIsWeightGrossApplying());
-            
+
             enableAccountFields(true);
-            
+
             jckIsSurplusPercentageApplying.setEnabled(true);
-            if (moParamDps.isForPurchases() && !mbRightFinAccountantPrice) {
+            
+            if (moParamDps.isForPurchases() && moDpsEntry.hasDpsLinksAsDestiny() && !mbRightPurPriceChange) {
                 jtfOriginalPriceUnitaryCy.setEditable(false);
                 jtfOriginalPriceUnitaryCy.setEnabled(false);
                 jtfOriginalPriceUnitaryCy.setFocusable(false);
@@ -4212,9 +4215,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jbOriginalPriceUnitaryCyWizard.setEnabled(false);
                 jbPriceHistory.setEnabled(false);
             }
-        }        
+        }
     }
-
+    
     private void enableAccountFields(boolean edit) {
         if (moFieldIsPrepayment.getBoolean() && moParamDps.isDocument()) {
             if (edit) {
