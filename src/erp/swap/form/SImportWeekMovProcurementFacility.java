@@ -70,6 +70,9 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public ProcurementFacility Facility;
     public MovementType Movement_type;
     public Item Item;
+    public boolean isPurchaseExpense;
+    public Item ItemPurchaseExpense;
+    public Item ItemAuxPurchaseExpense;
     public boolean Is_adjustment;
     public boolean Is_invoiced;
     public SDataAccount oDataAccount;
@@ -105,6 +108,8 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         Facility = null;
         Movement_type = null;
         Item = null;
+        ItemPurchaseExpense = null;
+        ItemAuxPurchaseExpense = null;
         Is_adjustment = false;
         Is_invoiced = false;
         oDataAccount = null;
@@ -119,6 +124,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         MovementTypeId = 0;
         MovementTypeName = "";
         oProcurementFacility = null;
+        isPurchaseExpense = false;
     }
     
     @SuppressWarnings("deprecation")
@@ -194,6 +200,37 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
             );
         } else {
             Item = new Item();
+        }
+        
+        JsonNode itemPurchaseNode = docNode.path("purchase_expense");
+        if (!itemPurchaseNode.isEmpty()) {
+            JsonNode itemPurchaseExpenseNode = itemPurchaseNode.path("base_item");
+            JsonNode itemAuxPurchaseExpenseNode = itemPurchaseNode.path("aux_item");
+            isPurchaseExpense = true;
+            if (!itemPurchaseExpenseNode.isEmpty()) {
+                ItemPurchaseExpense = new Item(
+                    itemPurchaseExpenseNode.get("erp_id").asInt(),
+                    itemPurchaseExpenseNode.get("code").isNull() ? "" : itemNode.get("code").asText(), 
+                    itemPurchaseExpenseNode.get("name").isNull() ? "" : itemNode.get("name").asText()
+                );
+            } else {
+                ItemPurchaseExpense = new Item();
+            }
+            
+            if (!itemAuxPurchaseExpenseNode.isEmpty()) {
+                ItemAuxPurchaseExpense = new Item(
+                    itemAuxPurchaseExpenseNode.get("erp_id").asInt(),
+                    itemAuxPurchaseExpenseNode.get("code").isNull() ? "" : itemNode.get("code").asText(), 
+                    itemAuxPurchaseExpenseNode.get("name").isNull() ? "" : itemNode.get("name").asText()
+                );
+            } else {
+                ItemAuxPurchaseExpense = new Item();
+            }
+            
+        } else {
+            ItemPurchaseExpense = new Item();
+            ItemAuxPurchaseExpense = new Item();
+            isPurchaseExpense = false;
         }
         
         Is_adjustment = docNode.get("is_adjustment").asBoolean();
@@ -330,6 +367,12 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public void setAccountingTypeName(String AccountingTypeName) { this.AccountingTypeName = AccountingTypeName; }
     public String getAccountingSubTypeName() { return AccountingSubTypeName; }
     public void setAccountingSubTypeName(String AccountingSubTypeName) { this.AccountingSubTypeName = AccountingSubTypeName; }
+    public boolean getIsPurchaseExpense() { return this.isPurchaseExpense; }
+    public void setIsPurchaseExpense(boolean isPurchaseExpense) { this.isPurchaseExpense = isPurchaseExpense; }
+    public Item getItemPurchaseExpense() { return ItemPurchaseExpense; }
+    public void setItemPurchaseExpense(int id, String code, String name) { this.ItemPurchaseExpense = new Item(id, code, name); }
+    public Item getItemAuxPurchaseExpense() { return ItemAuxPurchaseExpense; }
+    public void setItemAuxPurchaseExpense(int id, String code, String name) { this.ItemAuxPurchaseExpense = new Item(id, code, name); }
 
     @Override
     public int[] getRowPrimaryKey() {

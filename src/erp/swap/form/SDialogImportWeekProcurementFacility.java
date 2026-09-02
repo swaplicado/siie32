@@ -610,13 +610,20 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .append("\"cost_center_code\": \"").append( row.getDataCostCenter() != null ? row.getDataCostCenter().getPkCostCenterIdXXX() : "" ).append("\",")
                     .append("\"accounting_account_code\": \"").append( row.oDataAccount.getPkAccountIdXXX() ).append("\",")
                     .append("\"business_partners\": ").append( row.oDataBizPartner != null ? "[{ "
-                            + "\"business_partner_erp_id\":" + row.oDataBizPartner.getPkBizPartnerId() + ", "
-                            + "\"business_partner_type\":" + (row.oDataBizPartner.getIsAttributeEmployee() ? 2 : 1)
+                            + "\"business_partner_erp_id\": " + row.oDataBizPartner.getPkBizPartnerId() + ", "
+                            + "\"business_partner_type\": " + (row.oDataBizPartner.getIsAttributeEmployee() ? 2 : 1)
                             + " }]" : "[]" ).append(",")
                     .append("\"id_cob\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkCompanyBranchId() : "").append("\",")
-                    .append("\"id_ent\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkAccountCashId() : "").append("\"")
-                .append("}");
-                        
+                    .append("\"id_ent\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkAccountCashId() : "").append("\",")
+                    .append("\"is_purchase_expense\": ").append(row.isPurchaseExpense);
+
+                    if (row.isPurchaseExpense) {
+                        jsonMovements.append(", ").append("\"purchase_expense_base_item_erp_id\": ").append(row.ItemPurchaseExpense.Id).append(", ")
+                            .append("\"purchase_expense_aux_item_erp_id\": ").append(row.ItemAuxPurchaseExpense.Id);
+                    }
+
+                jsonMovements.append("}");
+
                 if (i < (smaEdited.size() - 1)) {
                     jsonMovements.append(",");
                 }
@@ -956,6 +963,20 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                         weekProcurementFacility.Item.Id,
                         weekProcurementFacility.Item.Code,
                         weekProcurementFacility.Item.Name
+                    );
+                    
+                    maImportedDocument.setIsPurchaseExpense(weekProcurementFacility.isPurchaseExpense);
+                    
+                    maImportedDocument.setItemPurchaseExpense(
+                        weekProcurementFacility.ItemPurchaseExpense.Id,
+                        weekProcurementFacility.ItemPurchaseExpense.Code,
+                        weekProcurementFacility.ItemPurchaseExpense.Name
+                    );
+                    
+                    maImportedDocument.setItemAuxPurchaseExpense(
+                        weekProcurementFacility.ItemAuxPurchaseExpense.Id,
+                        weekProcurementFacility.ItemAuxPurchaseExpense.Code,
+                        weekProcurementFacility.ItemAuxPurchaseExpense.Name
                     );
                     
                     maImportedDocument.setDataAccount(weekProcurementFacility.oDataAccount);

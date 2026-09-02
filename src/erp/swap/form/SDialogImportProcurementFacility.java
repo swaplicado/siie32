@@ -1059,6 +1059,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<month_number>", "" + jcbMonths.getSelectedIndex());
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<only_accountable>", "" + true);
                 urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<group_by_accounting_type>", "" + true);
+                urlQueryGetProcurementFacilities = urlQueryGetProcurementFacilities.replace("<company_id>", "" + miClient.getSession().getConfigCompany().getCompanyId());
                 
                 HttpURLConnection connectionGetProcurementFacilities = createConnection(urlQueryGetProcurementFacilities, SHttpConsts.METHOD_GET);
                 
@@ -1685,7 +1686,15 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 moFinRecordEntry.IsDeleted = false;
                 moFinRecordEntry.Reference = otWeekProcurementFacility.Reference;
                 moFinRecordEntry.IsReferenceTax = false;
-                moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item != null ? otWeekProcurementFacility.Item.Id : 0;
+                
+                if (otWeekProcurementFacility.ItemPurchaseExpense != null) {
+                    moFinRecordEntry.ItemKey = otWeekProcurementFacility.ItemPurchaseExpense != null ? otWeekProcurementFacility.ItemPurchaseExpense.Id : 0;
+                    moFinRecordEntry.ItemAuxKey = otWeekProcurementFacility.ItemAuxPurchaseExpense != null ? otWeekProcurementFacility.ItemAuxPurchaseExpense.Id : 0;
+                } else {
+                    moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item != null ? otWeekProcurementFacility.Item.Id : 0;
+                    moFinRecordEntry.ItemAuxKey = 0;
+                }
+                
                 moFinRecordEntry.Quantity = otWeekProcurementFacility.Stock_in;
                 moFinRecordEntry.Year = moCalYear.getValue();
                 moFinRecordEntry.CostCenter =  otWeekProcurementFacility.oDataCostCenter != null ? otWeekProcurementFacility.oDataCostCenter.getPkCostCenterIdXXX() : "";
