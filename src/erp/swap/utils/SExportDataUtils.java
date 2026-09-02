@@ -252,7 +252,7 @@ public abstract class SExportDataUtils {
      * @throws SQLException Si ocurre un error en la consulta.
      * @throws SQLException Si ocurre un error.
      */
-    private static void exportPurchaseOrdersFiles(final SGuiSession session) throws SQLException, Exception {
+    private static void exportPurchaseOrdersFiles(final SGuiSession session, final int idYear, final int idDoc) throws SQLException, Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -263,7 +263,6 @@ public abstract class SExportDataUtils {
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
-                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER_FILE, database);
                 ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
 
@@ -282,7 +281,13 @@ public abstract class SExportDataUtils {
 
                 statement.execute(sqlDelete);
 
-                // procesamiento de archivos de OC:
+                // condición común de autorización (se repite en ambas ramas, factorizada una sola vez):
+                String authorizedCondition = "NOT d.b_del "
+                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "AND d.b_authorn "
+                        + "AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " "
+                        + "AND da.fid_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_AUTH + " ";
+
                 String sql = "SELECT "
                         + "d.id_year, d.id_doc, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd "
@@ -290,25 +295,41 @@ public abstract class SExportDataUtils {
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                         + "INNER JOIN "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " AS da "
-                        + "ON d.id_year = da.id_year AND d.id_doc = da.id_doc and NOT da.b_del "
-                        + "WHERE "
-                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
-                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                        + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
-                        + "AND ("
-                        + "((NOT d.b_del "
-                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
-                        + "AND d.b_authorn "
-                        + "AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " "
-                        + "AND da.fid_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_AUTH + ") "
-                        //                        + ") AND MONTH(d.dt) >= 10 " // Se comenta para forzar sincronización en caso de reporte de archivos faltantes
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER_FILE, database) + ")) "
-                        + (lastSyncDatetime == null ? "" : " OR ("
-                                + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
-                        + ")";
+                        + "ON d.id_year = da.id_year AND d.id_doc = da.id_doc AND NOT da.b_del ";
+
+                if (idYear <= 0 || idDoc <= 0) {
+                    // caso masivo: solo documentos autorizados y no sincronizados aún (o modificados después del último sync)
+                    sql += "LEFT JOIN ( "
+                            + "SELECT sle.reference_id "
+                            + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS sl "
+                            + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS sle "
+                            + "ON sle.id_sync_log = sl.id_sync_log "
+                            + "WHERE sl.sync_type = '" + SSyncType.PUR_ORDER_FILE + "' "
+                            + "AND (sle.response_code = '200' OR sle.response_code = '201') "
+                            + "GROUP BY sle.reference_id "
+                            + ") AS synced ON synced.reference_id = CONCAT(d.id_year, '_', d.id_doc) "
+                            + "WHERE "
+                            + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                            + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                            + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                            + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
+                            + "AND " + authorizedCondition
+                            + "AND ("
+                            + "synced.reference_id IS NULL "
+                            + (lastSyncDatetime == null ? "" : "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'")
+                            + ")";
+                }
+                else {
+                    // caso puntual: forzar subida siempre que esté autorizado, sin revisar el log de sincronización
+                    sql += "WHERE "
+                            + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                            + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                            + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                            + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
+                            + "AND " + authorizedCondition
+                            + "AND d.id_year = " + idYear + " "
+                            + "AND d.id_doc = " + idDoc + " ";
+                }
                 sql += ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -2919,7 +2940,7 @@ public abstract class SExportDataUtils {
                 break;
 
             case PUR_ORDER:
-                exportPurchaseOrdersFiles(session);
+                exportPurchaseOrdersFiles(session, 0, 0);
                 boolean uploadPdf = true;
                 boolean withJsonData = false;
                 data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf, withJsonData);
