@@ -38,6 +38,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -249,11 +252,31 @@ public abstract class SExportDataUtils {
      * Exportación de archivos de pedidos de compras.
      *
      * @param session Sesión de usuario.
+     * @param idYear Año del documento de pedido de compras a exportar (opcional).
+     * @param idDoc Folio del documento de pedido de compras a exportar (opcional).
+     * @param startDate Fecha inicial de rango de documentos a exportar, formato: yyyy-mm-dd (opcional).
+     * @param endDate Fecha final de rango de documentos a exportar, formato: yyyy-mm-dd (opcional).
      * @throws SQLException Si ocurre un error en la consulta.
      * @throws SQLException Si ocurre un error.
      */
-    private static void exportPurchaseOrdersFiles(final SGuiSession session, final int idYear, final int idDoc) throws SQLException, Exception {
+    private static void exportPurchaseOrdersFiles(final SGuiSession session, final int idYear, final int idDoc,
+            final String startDate, final String endDate) throws SQLException, Exception {
         ObjectMapper mapper = new ObjectMapper();
+        boolean forceUploadByDate = startDate != null && !startDate.isEmpty()
+                && endDate != null && !endDate.isEmpty();
+
+        if (forceUploadByDate) {
+            try {
+                LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                if (start.isAfter(end)) {
+                    throw new IllegalArgumentException("La fecha inicial no puede ser posterior a la fecha final.");
+                }
+            }
+            catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Las fechas deben tener el formato yyyy-MM-dd.", e);
+            }
+        }
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -314,10 +337,12 @@ public abstract class SExportDataUtils {
                             + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
                             + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
                             + "AND " + authorizedCondition
-                            + "AND ("
-                            + "synced.reference_id IS NULL "
-                            + (lastSyncDatetime == null ? "" : "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'")
-                            + ")";
+                                + (forceUploadByDate
+                                    ? "AND d.dt BETWEEN '" + startDate + "' AND '" + endDate + "' "
+                                    : "AND ("
+                                    + "synced.reference_id IS NULL "
+                                    + (lastSyncDatetime == null ? "" : "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'")
+                                    + ")");
                 }
                 else {
                     // caso puntual: forzar subida siempre que esté autorizado, sin revisar el log de sincronización
@@ -328,7 +353,8 @@ public abstract class SExportDataUtils {
                             + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
                             + "AND " + authorizedCondition
                             + "AND d.id_year = " + idYear + " "
-                            + "AND d.id_doc = " + idDoc + " ";
+                            + "AND d.id_doc = " + idDoc + " "
+                            + (forceUploadByDate ? "AND d.dt BETWEEN '" + startDate + "' AND '" + endDate + "' " : "");
                 }
                 sql += ";";
 
@@ -347,7 +373,7 @@ public abstract class SExportDataUtils {
                     if (oLogEty != null) {
                         SFileData oFd = null;
                         // comparacion de last update para actualizar el archivo
-                        if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
+                        if (forceUploadByDate || oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
                             oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true, database);
                             lLogFiles.add(oLogEty);
@@ -2940,7 +2966,7 @@ public abstract class SExportDataUtils {
                 break;
 
             case PUR_ORDER:
-                exportPurchaseOrdersFiles(session, 0, 0);
+                exportPurchaseOrdersFiles(session, 0, 0, null, null);
                 boolean uploadPdf = true;
                 boolean withJsonData = false;
                 data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf, withJsonData);
