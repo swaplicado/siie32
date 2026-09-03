@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 307.5/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales: Validación restrictiva de diferencia de precios solo cuando no es Activo Fijo, cuando lo es solo aparece un warning.
+
+================================================================================
 SIIE 3.2 307.4/ 2026-09-02
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -377,6 +377,9 @@ public class SDbStockValuation extends SDbRegistryUser {
             Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
             throw new Exception(ex);
         }
+        finally {
+            session.getStatement().getConnection().setAutoCommit(true);
+        }
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;

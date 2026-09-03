@@ -126,13 +126,14 @@ public abstract class SStockValuationAdjustsUtils {
             SDbStockValuationMvtNote oMvtNote = null;
             String sComment;
             while (resultSet.next()) {
+                sComment = "";
                 oMvtRevised = new SDbStockValuationMvt();
                 oMvtRevised.setPkStockValuationMvtId(resultSet.getInt("id_stk_val_mvt"));
                 oMvtRevised.setRevised(true);
-
+                DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
                 double priceDiff = Math.abs(resultSet.getDouble("oc_e_price_u_real_cur_r") - resultSet.getDouble("fact_e_price_u_real_cur_r"));
                 if (priceDiff > (resultSet.getDouble("oc_e_price_u_real_cur_r") * priceDiffPercent)) {
-                    throw new Exception("El precio unitario de la entrada de la orden de compra es diferente al precio unitario de la factura del proveedor.\n"
+                    String sError = "El precio unitario de la entrada de la orden de compra es diferente al precio unitario de la factura del proveedor.\n"
                             + "Partida: " + resultSet.getString("fact_e_concept_key") + " - " + resultSet.getString("fact_e_concept") + "\n"
                             + "Diferencia: " + priceDiff + " MD > " + (resultSet.getDouble("oc_e_price_u_real_cur_r") * priceDiffPercent) + "  MD \n"
                             + "Pedido: " + resultSet.getString("oc_num_ser") + " " + resultSet.getString("oc_num") + " "
@@ -145,24 +146,27 @@ public abstract class SStockValuationAdjustsUtils {
                             + "con fecha: " + SLibUtils.DateFormatDate.format(resultSet.getDate("dt_fac")) + " "
                             + "[" + resultSet.getInt("fact_e_id_year") + ", "
                             + resultSet.getInt("fact_e_id_doc") + ", "
-                            + resultSet.getInt("fact_e_id_ety") + " ]");
+                            + resultSet.getInt("fact_e_id_ety") + " ]";
+                    if (documentNature.nature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
+                        throw new Exception(sError);
+                    }
+                    else {
+                        sComment += sError;
+                    }
                 }
 
                 if (resultSet.getDouble("fac_e.price_u_real_r") != resultSet.getDouble("mvt.cost_u")) {
                     oMvtAdjust = new SDbStockValuationMvt();
-                    sComment = "";
-
                     oMvtAdjust.setSystem(true);
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
                     oMvtAdjust.setQuantityMovement(0d);
-                    DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
                     if (documentNature.nature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                         oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                         oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov"))
                                 - resultSet.getDouble("mvt.cost_r"), 8));
                         oMvtAdjust.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_PRICE_ADJ);
                         // Crear comentario para el movimiento de ajuste:
-                        sComment = "Ajuste de costo unitario por diferencia de la factura de proveedor. "
+                        sComment += "Ajuste de costo unitario por diferencia de la factura de proveedor. "
                                 + "De OC: " + resultSet.getDouble("oc_e.price_u_real_r") + ", "
                                 + "FACT: " + resultSet.getDouble("fac_e.price_u_real_r") + ", "
                                 + "MVT: " + resultSet.getDouble("mvt.cost_r") + " - "
@@ -176,7 +180,7 @@ public abstract class SStockValuationAdjustsUtils {
                     else {
                         oMvtAdjust.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_ASSET_ADJ);
                         // Crear comentario para el movimiento de ajuste:
-                        sComment = "Ajuste de valor de activo. "
+                        sComment += "Ajuste de valor de activo. "
                                 + "De OC: " + resultSet.getDouble("oc_e.price_u_real_r") + ", "
                                 + "FACT: " + resultSet.getDouble("fac_e.price_u_real_r") + ", "
                                 + "MVT: " + resultSet.getDouble("mvt.cost_r") + " - "
