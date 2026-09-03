@@ -130,7 +130,9 @@ public abstract class SStockValuationAdjustsUtils {
                 oMvtRevised = new SDbStockValuationMvt();
                 oMvtRevised.setPkStockValuationMvtId(resultSet.getInt("id_stk_val_mvt"));
                 oMvtRevised.setRevised(true);
+                // Determinar la naturaleza del documento de la factura (inventario o activo fijo)
                 DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, resultSet.getInt("fact_e_id_year"), resultSet.getInt("fact_e_id_doc"));
+                // Verificar si la diferencia de precio entre OC y factura supera el porcentaje configurado
                 double priceDiff = Math.abs(resultSet.getDouble("oc_e_price_u_real_cur_r") - resultSet.getDouble("fact_e_price_u_real_cur_r"));
                 if (priceDiff > (resultSet.getDouble("oc_e_price_u_real_cur_r") * priceDiffPercent)) {
                     String sError = "El precio unitario de la entrada de la orden de compra es diferente al precio unitario de la factura del proveedor.\n"
@@ -156,10 +158,11 @@ public abstract class SStockValuationAdjustsUtils {
                 }
 
                 if (resultSet.getDouble("fac_e.price_u_real_r") != resultSet.getDouble("mvt.cost_u")) {
+                    // El costo del movimiento difiere del precio real de la factura: generar ajuste
                     oMvtAdjust = new SDbStockValuationMvt();
                     oMvtAdjust.setSystem(true);
                     oMvtAdjust.setDateMove(resultSet.getDate("dt_mov"));
-                    oMvtAdjust.setQuantityMovement(0d);
+                    oMvtAdjust.setQuantityMovement(0d); // ajuste de costo puro, sin cantidad
                     if (documentNature.nature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                         oMvtAdjust.setCostUnitary(resultSet.getDouble("fac_e.price_u_real_r"));
                         oMvtAdjust.setCost_r(SLibUtils.round((resultSet.getDouble("fac_e.price_u_real_r") * resultSet.getDouble("qty_mov"))
@@ -226,12 +229,15 @@ public abstract class SStockValuationAdjustsUtils {
                     oMvtAdjust.save(session);
 
                     lStkValMvtAdjusts.add(oMvtAdjust);
+                    // Vincular el movimiento revisado con el ajuste recién generado
                     oMvtRevised.setFkStockValuationMvtRevisionId_n(oMvtAdjust.getPkStockValuationMvtId());
                 }
                 else {
+                    // No hubo diferencia de costo: marcar como revisado sin ajuste
                     oMvtRevised.setFkStockValuationMvtRevisionId_n(0);
                 }
 
+                // Actualizar el estado de revisión del movimiento original en BD
                 SStockValuationAdjustsUtils.updateStockValuationMvt(session, oMvtRevised);
             }
 
@@ -240,11 +246,16 @@ public abstract class SStockValuationAdjustsUtils {
     }
 
     /**
-     * Actualiza el movimiento de valuación de inventario revisado.
+     * Actualiza el estado de revisión y la referencia al movimiento de ajuste
+     * de un movimiento de valuación que fue revisado.
+     * <p>
+     * Establece {@code b_rev = true} y {@code fk_stk_val_mvt_rev_n} al ID del
+     * movimiento de ajuste generado, o {@code NULL} si no se generó ajuste.
+     * </p>
      *
-     * @param session
-     * @param oStkValMvtRev
-     * @throws SQLException
+     * @param session sesión activa de base de datos
+     * @param oStkValMvtRev movimiento revisado con el ID del ajuste ya asignado
+     * @throws SQLException si ocurre un error al ejecutar la actualización
      */
     private static void updateStockValuationMvt(SGuiSession session, SDbStockValuationMvt oStkValMvtRev) throws SQLException {
         String sql = "UPDATE "
@@ -263,15 +274,25 @@ public abstract class SStockValuationAdjustsUtils {
     }
 
     /**
-     * Método para crear e insertar ajustes al inventario con cantidad 0 y el
-     * valor del ajuste.
+     * Crea y persiste los documentos de ajuste de inventario (diog) necesarios
+     * para registrar en almacén los ajustes de costo generados por la
+     * valuación.
+     * <p>
+     * Agrupa los movimientos de ajuste recibidos por combinación de sucursal y
+     * almacén ({@code fkCompanyBranchId_fkWarehouseId}). Por cada grupo crea un
+     * documento de ajuste de salida de inventario
+     * ({@code TRNS_TP_IOG_OUT_ADJ_INV}) con fecha igual a
+     * {@code oValEndDate + 1 día}, agrega un renglón por cada movimiento de
+     * ajuste y guarda el documento con el total acumulado.
+     * </p>
      *
-     * @param session
-     * @param oValEndDate
-     * @param lMvtAdjusts
-     * @return
-     *
-     * @throws java.sql.SQLException
+     * @param session sesión activa de base de datos
+     * @param oValEndDate fecha de fin de la valuación; los documentos se crean
+     * con fecha {@code oValEndDate + 1 día}
+     * @param lMvtAdjusts lista de movimientos de ajuste de entrada
+     * ({@code TRNS_CT_IOG_IN}) generados por la valuación
+     * @return lista de documentos de ajuste de inventario creados y guardados
+     * @throws SQLException si ocurre un error al guardar los documentos
      */
     public static List<SDataDiog> createDiogAdjusts(SGuiSession session, Date oValEndDate, List<SDbStockValuationMvt> lMvtAdjusts) throws SQLException {
         HashMap<String, SDataDiog> mDiogs = new HashMap<>();
@@ -286,8 +307,10 @@ public abstract class SStockValuationAdjustsUtils {
         String warehouseKey = null;
         for (SDbStockValuationMvt oSupply : lMvtAdjusts) {
             SDataDiog oDiog = null;
+            // Clave de agrupación: un documento de ajuste por combinación sucursal-almacén
             warehouseKey = oSupply.getFkCompanyBranchId() + "_" + oSupply.getFkWarehouseId();
             if (!mDiogs.containsKey(warehouseKey)) {
+                // Crear un nuevo documento de ajuste de salida de inventario para este almacén
                 oDiog = new SDataDiog();
 
                 oDiog.setPkYearId(pkYear);
@@ -391,12 +414,24 @@ public abstract class SStockValuationAdjustsUtils {
         return lDiogs;
     }
 
+    /**
+     * Obtiene el costo unitario real ({@code price_u_real_r}) del renglón de un
+     * documento de compra a partir de su llave primaria.
+     *
+     * @param session sesión activa de base de datos
+     * @param idDpsYear año del documento de compra
+     * @param idDpsDoc ID del documento de compra
+     * @param idDpsEty ID del renglón del documento de compra
+     * @return costo unitario real del renglón
+     * @throws Exception si no se encuentra el renglón o si ocurre un error de
+     * SQL
+     */
     public static double getDpsEtyCostUnitary(SGuiSession session, final int idDpsYear, final int idDpsDoc, final int idDpsEty) throws Exception {
         String sql = "SELECT price_u_real_r "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " "
                 + "WHERE id_year = " + idDpsYear + " AND id_doc = " + idDpsDoc + " AND id_ety = " + idDpsEty;
         try (java.sql.Statement st = session.getStatement().getConnection().createStatement();
-            ResultSet resultSet = st.executeQuery(sql)) {
+                ResultSet resultSet = st.executeQuery(sql)) {
             if (resultSet.next()) {
                 return resultSet.getDouble("price_u_real_r");
             }

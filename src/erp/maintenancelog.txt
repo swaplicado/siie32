@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 308.0/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+Implementa kardex para valuación de inventarios:
+
+1) Agrega entidades y utilidades para el manejo del kardex.
+2) Genera consumos, ajustes y movimientos de entradas y salidas.
+3) Actualiza los costos de existencias y movimientos de almacén.
+4) Registra cambios de referencias entre órdenes de compra y facturas.
+5) Incorpora validaciones de integridad para la valuación de inventarios.
+
+================================================================================
 SIIE 3.2 307.5/ 2026-09-03
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

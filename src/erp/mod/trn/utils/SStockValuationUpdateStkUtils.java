@@ -16,117 +16,142 @@ import sa.lib.gui.SGuiSession;
  * @author Edwin Carmona
  */
 public class SStockValuationUpdateStkUtils {
-    
+
     /**
-     * Actualiza las filas de stock de salida según los datos de valuación.
-     * 
-     * @param oSession
-     * @param idValuation
-     * @throws SQLException
+     * Actualiza el costo unitario y el importe (cargo o abono) de las filas de
+     * stock de <b>salida</b> cuyo costo difiere del calculado por la valuación.
+     * <p>
+     * Agrupa los movimientos de valuación de salida por renglón de almacén y
+     * compara el costo unitario y el abono registrado en {@code trn_stk} contra
+     * los totales calculados. Solo actualiza las filas donde exista diferencia.
+     * Si {@code idValuation} es 0 o negativo, aplica un filtro de fecha fija
+     * ({@code 2024-03-01}) en lugar de filtrar por valuación.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @param idValuation ID de la valuación; si es &le; 0 se procesan todas las
+     * salidas desde la fecha fija de referencia
+     * @throws SQLException si ocurre un error al ejecutar las consultas o la
+     * actualización
      */
     public static void updateStockOutRows(SGuiSession oSession, final int idValuation) throws SQLException {
-        String mainSql = "SELECT " +
-                    "    s.*, " +
-                    "    agg.mvts, " +
-                    "    agg.fid_dps_nat, " +
-                    "    agg.qty_t, " +
-                    "    agg.cost_t, " +
-                    "    ROUND(IF(s.mov_out <> 0, " +
-                    "        agg.cost_t / s.mov_out, " +
-                    "        0), 2) AS cost_stk, " +
-                    "    ABS(s.credit - agg.cost_t) AS cost_r_diff " +
-                    "FROM " +
-                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s " +
-                    "        INNER JOIN " +
-                    "    ( " +
-                    "        SELECT " +
-                    "            mvt.fk_diog_year_out_n AS fid_diog_year, " +
-                    "            mvt.fk_diog_doc_out_n AS fid_diog_doc, " +
-                    "            mvt.fk_diog_ety_out_n AS fid_diog_ety, " +
-                    "            GROUP_CONCAT(mvt.id_stk_val_mvt SEPARATOR '-') AS mvts, " +
-                    "            GROUP_CONCAT(DISTINCT d.fid_dps_nat SEPARATOR ',') AS fid_dps_nat, " +
-                    "            SUM(mvt.qty_mov) AS qty_t, " +
-                    "            SUM(mvt.cost_r) AS cost_t " +
-                    "        FROM " +
-                    "            " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS mvt " +
-                    "                INNER JOIN " +
-                    "            " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS v ON mvt.fk_stk_val = v.id_stk_val " +
-                    "                LEFT JOIN " +
-                    "            " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON mvt.fk_dps_year_in_n = d.id_year " +
-                    "                AND mvt.fk_dps_doc_in_n = d.id_doc " +
-                    "        WHERE " +
-                    "            mvt.b_del = 0 " +
-                    "            AND v.b_del = 0 ";
+        String mainSql = "SELECT "
+                + "    s.*, "
+                + "    agg.mvts, "
+                + "    agg.fid_dps_nat, "
+                + "    agg.qty_t, "
+                + "    agg.cost_t, "
+                + "    ROUND(IF(s.mov_out <> 0, "
+                + "        agg.cost_t / s.mov_out, "
+                + "        0), 2) AS cost_stk, "
+                + "    ABS(s.credit - agg.cost_t) AS cost_r_diff "
+                + "FROM "
+                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " AS s "
+                + "        INNER JOIN "
+                + "    ( "
+                + "        SELECT "
+                + "            mvt.fk_diog_year_out_n AS fid_diog_year, "
+                + "            mvt.fk_diog_doc_out_n AS fid_diog_doc, "
+                + "            mvt.fk_diog_ety_out_n AS fid_diog_ety, "
+                + "            GROUP_CONCAT(mvt.id_stk_val_mvt SEPARATOR '-') AS mvts, "
+                + "            GROUP_CONCAT(DISTINCT d.fid_dps_nat SEPARATOR ',') AS fid_dps_nat, "
+                + "            SUM(mvt.qty_mov) AS qty_t, "
+                + "            SUM(mvt.cost_r) AS cost_t "
+                + "        FROM "
+                + "            " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " AS mvt "
+                + "                INNER JOIN "
+                + "            " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " AS v ON mvt.fk_stk_val = v.id_stk_val "
+                + "                LEFT JOIN "
+                + "            " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d ON mvt.fk_dps_year_in_n = d.id_year "
+                + "                AND mvt.fk_dps_doc_in_n = d.id_doc "
+                + "        WHERE "
+                + "            mvt.b_del = 0 "
+                + "            AND v.b_del = 0 ";
         if (idValuation > 0) {
             mainSql += "AND v.id_stk_val = " + idValuation + " ";
         }
-        mainSql += "        GROUP BY " +
-                    "            mvt.fk_diog_year_out_n, " +
-                    "            mvt.fk_diog_doc_out_n, " +
-                    "            mvt.fk_diog_ety_out_n " +
-                    "    ) AS agg ON s.fid_diog_year = agg.fid_diog_year " +
-                    "        AND s.fid_diog_doc = agg.fid_diog_doc " +
-                    "        AND s.fid_diog_ety = agg.fid_diog_ety " +
-                    "WHERE " +
-                    "    s.b_del = 0 " +
-                    "    AND s.fid_ct_iog = 2 ";
+        mainSql += "        GROUP BY "
+                + "            mvt.fk_diog_year_out_n, "
+                + "            mvt.fk_diog_doc_out_n, "
+                + "            mvt.fk_diog_ety_out_n "
+                + "    ) AS agg ON s.fid_diog_year = agg.fid_diog_year "
+                + "        AND s.fid_diog_doc = agg.fid_diog_doc "
+                + "        AND s.fid_diog_ety = agg.fid_diog_ety "
+                + "WHERE "
+                + "    s.b_del = 0 "
+                + "    AND s.fid_ct_iog = 2 ";
         if (idValuation <= 0) {
             mainSql += "AND s.dt >= '2024-03-01' ";
         }
-        mainSql += "AND ( " +
-                   "    ROUND(IF(s.mov_out <> 0, agg.cost_t / s.mov_out, 0), 2) <> s.cost_u " +
-                   "    OR ABS(s.credit - agg.cost_t) > 0 " +
-                   ");";
+        mainSql += "AND ( "
+                + "    ROUND(IF(s.mov_out <> 0, agg.cost_t / s.mov_out, 0), 2) <> s.cost_u "
+                + "    OR ABS(s.credit - agg.cost_t) > 0 "
+                + ");";
 
-        ResultSet resultSet = oSession.getStatement().executeQuery(mainSql);
-        while (resultSet.next()) {
-            System.out.println("Salida: " + resultSet.getString("dt") + ". "
-                    + "Diferencia de costo: " + resultSet.getDouble("cost_r_diff") + ".");
+        try (java.sql.Statement st = oSession.getStatement().getConnection().createStatement();
+                ResultSet resultSet = st.executeQuery(mainSql)) {
+            while (resultSet.next()) {
+                System.out.println("Salida: " + resultSet.getString("dt") + ". "
+                        + "Diferencia de costo: " + resultSet.getDouble("cost_r_diff") + ".");
 
-            updateTrnStockRowCost(oSession,
-                    resultSet.getInt("id_year"),
-                    resultSet.getInt("id_item"),
-                    resultSet.getInt("id_unit"),
-                    resultSet.getInt("id_lot"),
-                    resultSet.getInt("id_cob"),
-                    resultSet.getInt("id_wh"),
-                    resultSet.getInt("id_mov"),
-                    resultSet.getDouble("cost_stk"),
-                    SStockValuationUtils.CREDIT);
+                updateTrnStockRowCost(oSession,
+                        resultSet.getInt("id_year"),
+                        resultSet.getInt("id_item"),
+                        resultSet.getInt("id_unit"),
+                        resultSet.getInt("id_lot"),
+                        resultSet.getInt("id_cob"),
+                        resultSet.getInt("id_wh"),
+                        resultSet.getInt("id_mov"),
+                        resultSet.getDouble("cost_stk"),
+                        SStockValuationUtils.CREDIT);
+            }
         }
     }
 
     /**
-     * Actualiza las filas de stock de entrada según los datos de valuación.
+     * Actualiza el costo unitario y el importe (cargo) de las filas de stock de
+     * <b>entrada</b> cuyo costo difiere en más de 1 unidad respecto al
+     * movimiento de valuación correspondiente.
+     * <p>
+     * Excluye los movimientos de tipo 4 ({@code fk_tp_stk_val_mvt <> 4}). Si
+     * {@code idValuation} es 0 o negativo, aplica un filtro de fecha fija
+     * ({@code 2024-03-01}) en lugar de filtrar por valuación. Si {@code sDate}
+     * no es nulo ni vacío, filtra además por fecha de movimiento de valuación
+     * mayor o igual a esa fecha.
+     * </p>
      *
-     * @param oSession Sesión de base de datos.
-     * @param idValuation ID de la valuación.
-     * @param sDate
-     * @throws SQLException
+     * @param oSession sesión activa de base de datos
+     * @param idValuation ID de la valuación; si es &le; 0 se procesan todas las
+     * entradas desde la fecha fija de referencia
+     * @param sDate fecha mínima de movimiento de valuación en formato
+     * {@code yyyy-MM-dd}, o {@code null}/vacío para no aplicar este filtro
+     * adicional
+     * @throws SQLException si ocurre un error al ejecutar las consultas o la
+     * actualización
      */
     public static void updateStockInRows(SGuiSession oSession, final int idValuation, final String sDate) throws SQLException {
-        String mainSql = "SELECT " +
-            "	ts.* , " +
-            "	tsvm.fk_diog_year_in_n, " +
-            "	tsvm.fk_diog_doc_in_n, " +
-            "	tsvm.fk_diog_ety_in_n, " +
-            "   tsvm.cost_u AS mvt_cost_u, " +
-            "	tsvm.cost_r AS mvt_cost_r " +
-            "FROM " +
-            "	" + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " ts " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " tsvm on " +
-            "	ts.fid_diog_year = tsvm.fk_diog_year_in_n " +
-            "	AND ts.fid_diog_doc = tsvm.fk_diog_doc_in_n " +
-            "	AND ts.fid_diog_ety = tsvm.fk_diog_ety_in_n " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " tsv on " +
-            "	tsvm.fk_stk_val = tsv.id_stk_val " +
-            "WHERE " +
-            "	ts.fid_ct_iog = 1 " +
-            "	AND ts.b_del = 0 " +
-            "   AND tsv.b_del = 0 " +
-            "	AND tsvm.fk_ct_iog = 1 " +
-            "   AND tsvm.fk_tp_stk_val_mvt <> 4 " +
-            "	AND tsvm.b_del = 0 ";
+        String mainSql = "SELECT "
+                + "	ts.* , "
+                + "	tsvm.fk_diog_year_in_n, "
+                + "	tsvm.fk_diog_doc_in_n, "
+                + "	tsvm.fk_diog_ety_in_n, "
+                + "   tsvm.cost_u AS mvt_cost_u, "
+                + "	tsvm.cost_r AS mvt_cost_r "
+                + "FROM "
+                + "	" + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " ts "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_MVT) + " tsvm on "
+                + "	ts.fid_diog_year = tsvm.fk_diog_year_in_n "
+                + "	AND ts.fid_diog_doc = tsvm.fk_diog_doc_in_n "
+                + "	AND ts.fid_diog_ety = tsvm.fk_diog_ety_in_n "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL) + " tsv on "
+                + "	tsvm.fk_stk_val = tsv.id_stk_val "
+                + "WHERE "
+                + "	ts.fid_ct_iog = 1 "
+                + "	AND ts.b_del = 0 "
+                + "   AND tsv.b_del = 0 "
+                + "	AND tsvm.fk_ct_iog = 1 "
+                + "   AND tsvm.fk_tp_stk_val_mvt <> 4 "
+                + "	AND tsvm.b_del = 0 ";
         if (sDate != null && !sDate.isEmpty()) {
             mainSql += "AND tsvm.dt_mov >= '" + sDate + "' ";
         }
@@ -138,45 +163,61 @@ public class SStockValuationUpdateStkUtils {
             mainSql += "AND ts.dt >= '2024-03-01' ";
         }
 
-        mainSql += "AND ts.debit <> tsvm.cost_r " +
-            "	AND ABS(ts.debit - tsvm.cost_r) > 1;";
+        mainSql += "AND ts.debit <> tsvm.cost_r "
+                + "	AND ABS(ts.debit - tsvm.cost_r) > 1;";
 
-        ResultSet resultSet = oSession.getStatement().getConnection().createStatement().executeQuery(mainSql);
-        while (resultSet.next()) {
-            System.out.println("Entrada: " + resultSet.getString("dt") + ". "
-                    + "Diferencia de costo: " + (resultSet.getDouble("debit") - resultSet.getDouble("mvt_cost_r")) + ".");
+        try (java.sql.Statement st = oSession.getStatement().getConnection().createStatement();
+                ResultSet resultSet = st.executeQuery(mainSql)) {
+            while (resultSet.next()) {
+                System.out.println("Entrada: " + resultSet.getString("dt") + ". "
+                        + "Diferencia de costo: " + (resultSet.getDouble("debit") - resultSet.getDouble("mvt_cost_r")) + ".");
 
-            updateTrnStockRowCost(oSession,
-                    resultSet.getInt("id_year"),
-                    resultSet.getInt("id_item"),
-                    resultSet.getInt("id_unit"),
-                    resultSet.getInt("id_lot"),
-                    resultSet.getInt("id_cob"),
-                    resultSet.getInt("id_wh"),
-                    resultSet.getInt("id_mov"),
-                    resultSet.getDouble("mvt_cost_u"),
-                    SStockValuationUtils.DEBIT);
+                updateTrnStockRowCost(oSession,
+                        resultSet.getInt("id_year"),
+                        resultSet.getInt("id_item"),
+                        resultSet.getInt("id_unit"),
+                        resultSet.getInt("id_lot"),
+                        resultSet.getInt("id_cob"),
+                        resultSet.getInt("id_wh"),
+                        resultSet.getInt("id_mov"),
+                        resultSet.getDouble("mvt_cost_u"),
+                        SStockValuationUtils.DEBIT);
+            }
         }
     }
 
+    /**
+     * Itera sobre todas las valuaciones cuya fecha de inicio sea mayor o igual
+     * a {@code sDate} y actualiza las filas de stock de entrada de cada una.
+     * <p>
+     * Llama a {@link #updateStockInRows} por cada valuación encontrada, pasando
+     * la misma {@code sDate} como filtro adicional de fecha. Los errores de SQL
+     * se capturan e imprimen en consola sin interrumpir el proceso.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @param sDate fecha mínima de inicio de valuación en formato
+     * {@code yyyy-MM-dd}
+     */
     public static void updateStockInRowsSinceDate(SGuiSession oSession, final String sDate) {
-        String sql = "SELECT " +
-                    "	v.id_stk_val " +
-                    "FROM " +
-                    "	trn_stk_val v " +
-                    "WHERE " +
-                    "	v.dt_sta >= '" + sDate + "' " +
-                    "	AND v.b_del = 0 " +
-                    "ORDER BY " +
-                    "	v.dt_sta ASC;";
-        
+        String sql = "SELECT "
+                + "	v.id_stk_val "
+                + "FROM "
+                + "	trn_stk_val v "
+                + "WHERE "
+                + "	v.dt_sta >= '" + sDate + "' "
+                + "	AND v.b_del = 0 "
+                + "ORDER BY "
+                + "	v.dt_sta ASC;";
+
         try {
             ResultSet resultSet = oSession.getStatement().getConnection().createStatement().executeQuery(sql);
             while (resultSet.next()) {
                 System.out.println("Valuación: " + resultSet.getInt("id_stk_val"));
                 updateStockInRows(oSession, resultSet.getInt("id_stk_val"), sDate);
             }
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             System.out.println(ex.toString());
         }
         System.out.println("¡Proceso terminado!");

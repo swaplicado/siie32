@@ -1795,6 +1795,7 @@ public abstract class SAuthorizationUtils {
             return true;
         }
         catch (Exception e) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
             client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
             return false;
         }

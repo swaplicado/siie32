@@ -13,6 +13,7 @@ import erp.data.SDataUtilities;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.core.SStockValuationKardexCore;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.db.SDbStockValuationMvt;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiClient;
@@ -81,146 +83,185 @@ public class SStockValuationUtils {
      * salida).
      * @param startDate Fecha de inicio del periodo.
      * @param cutDate Fecha de corte del periodo.
+     * @param isKardex
      * @return Consulta SQL como cadena.
      * @throws Exception
      */
-    protected static String getStockMovementsQuery(final Statement statement, final int diogCategory, final Date startDate, final Date cutDate) throws Exception {
+    public static String getStockMovementsQuery(final Statement statement,
+                                                 final int diogCategory,
+                                                 final Date startDate,
+                                                 final Date cutDate,
+                                                 final boolean isKardex) throws Exception {
         SStockValuationConfiguration oCfg;
         try (Statement st = statement.getConnection().createStatement()) {
             oCfg = SStockValuationUtils.getStockValuationConfig(st);
         }
-        String sql = "SELECT DISTINCT "
-                + "    stk.*, "
-                + "    d.num, "
-                + "    mre.fk_item_ref_n AS ref_ety, "
-                + "    mr.fk_item_ref_n ref_rm, "
-                + "    de.fid_cc, "
-                + "    de.id_doc AS de_id_doc, "
-                + "    de.id_ety AS de_id_ety, "
-                + "    tp.tp_iog, "
-                + "    i.item_key, "
-                + "    i.item AS item_name, "
-                + "    dps.num AS dps_num, "
-                + "    dps.dt AS dps_date, "
-                + "    dps.exc_rate, "
-                + "    dps.fid_cur, "
-                + "    dps.fid_dps_nat, "
-                + "    dps.fid_ct_dps, "
-                + "    dps.fid_cl_dps, "
-                + "    dps.fid_tp_dps, "
-                + "    dps_ety.price_u_real_r, "
-                + "    dps_ety.price_u_real_cur_r, "
-                + "    dps_ety.stot_r, "
-                + "    dps_ety.fid_cc_n AS dps_ety_cc, "
-                + "    dps_des.num AS des_num, "
-                + "    dps_des.exc_rate AS des_exc_rate, "
-                + "    dps_des.fid_cur AS des_fid_cur, "
-                + "    supp.id_des_year, "
-                + "    supp.id_des_doc, "
-                + "    supp.id_des_ety, "
-                + "    dps_ety_des.fid_cc_n AS ety_des_cc, "
-                + "    dps_ety_des.price_u_real_r AS ety_des_price_real, "
-                + "    dps_ety_des.price_u_real_cur_r AS ety_des_price_real_cur "
-                + "FROM "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk "
-                + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG) + " d ON stk.fid_diog_year = d.id_year "
-                + "        AND stk.fid_diog_doc = d.id_doc "
-                + "        AND NOT d.b_del "
-                + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY) + " de ON stk.fid_diog_year = de.id_year "
-                + "        AND stk.fid_diog_doc = de.id_doc "
-                + "        AND stk.fid_diog_ety = de.id_ety "
-                + "        AND NOT de.b_del "
-                + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " i ON stk.id_item = i.id_item "
-                + "        INNER JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG) + " tp ON stk.fid_ct_iog = tp.id_ct_iog "
-                + "        AND stk.fid_cl_iog = tp.id_cl_iog "
-                + "        AND stk.fid_tp_iog = tp.id_tp_iog "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " mre ON stk.fid_mat_req_n = mre.id_mat_req "
-                + "        AND stk.fid_mat_req_ety_n = mre.id_ety "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ) + " mr ON d.fid_mat_req_n = mr.id_mat_req "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " dps ON stk.fid_dps_year_n = dps.id_year AND stk.fid_dps_doc_n = dps.id_doc "
-                + "        AND dps.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
-                + "        AND dps.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
-                + "        AND NOT dps.b_del "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " dps_ety ON stk.fid_dps_year_n = dps_ety.id_year "
-                + "        AND stk.fid_dps_doc_n = dps_ety.id_doc "
-                + "        AND stk.fid_dps_ety_n = dps_ety.id_ety "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS supp ON stk.fid_dps_year_n = supp.id_src_year "
-                + "        AND stk.fid_dps_doc_n = supp.id_src_doc "
-                + "        AND stk.fid_dps_ety_n = supp.id_src_ety "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS dps_ety_des ON supp.id_des_year = dps_ety_des.id_year "
-                + "        AND supp.id_des_doc = dps_ety_des.id_doc "
-                + "        AND supp.id_des_ety = dps_ety_des.id_ety "
-                + "        LEFT JOIN "
-                + "    " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS dps_des ON supp.id_des_year = dps_des.id_year "
-                + "        AND supp.id_des_doc = dps_des.id_doc "
-                + "        AND dps_des.dt <= '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
-                + "        AND dps_des.fid_st_dps <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " "
-                + "        AND NOT dps_des.b_del "
-                + "WHERE "
-                + "    NOT stk.b_del "
-                + "    AND stk.id_year = YEAR('" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "') "
-                + "    AND stk.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(startDate) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(cutDate) + "' "
-                + "    AND stk.fid_ct_iog = " + diogCategory + " ";
 
-        // Determinar si son movimientos de entrada o salida
+        final String cutDateStr = SLibUtils.DbmsDateFormatDate.format(cutDate);
+        final String startDateStr = SLibUtils.DbmsDateFormatDate.format(startDate);
+        // Fecha fija de regla de sistema (no derivada de parámetros)
+        final String SYSTEM_LOWER_BOUND_DATE = "2024-03-01";
+
         boolean isIn = diogCategory == SModSysConsts.TRNS_CT_IOG_IN;
         ArrayList<int[]> iogTpmovs = isIn ? oCfg.getIogTpmovsIn() : oCfg.getIogTpmovsOut();
-        sql += isIn ? "AND stk.mov_in > 0 " : "AND stk.mov_out > 0 ";
-
         if (iogTpmovs.isEmpty()) {
             throw new Exception("No existe configuración de movimientos de almacén para la valuación");
         }
 
-        // Optimización: Agrupar por fid_cl_iog para reducir condiciones OR
         Map<Integer, List<Integer>> groupedTpmovs = new HashMap<>();
         for (int[] iogTpmov : iogTpmovs) {
             groupedTpmovs.computeIfAbsent(iogTpmov[1], k -> new ArrayList<>()).add(iogTpmov[2]);
         }
+        String tpmovCondition = buildTpmovCondition(groupedTpmovs, diogCategory);
 
-        // Construir condiciones SQL optimizadas
-        if (!groupedTpmovs.isEmpty()) {
-            sql += "AND (";
-            boolean firstGroup = true;
-
-            for (Map.Entry<Integer, List<Integer>> entry : groupedTpmovs.entrySet()) {
-                int fidClIog = entry.getKey();
-                List<Integer> tpIogs = entry.getValue();
-
-                for (Integer tpIog : tpIogs) {
-                    // Verifica si es el caso especial
-                    boolean isSpecial = (diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0]
-                            && fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1]
-                            && tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2]);
-                    if (!firstGroup) {
-                        sql += " OR ";
-                    }
-                    firstGroup = false;
-
-                    if (isSpecial) {
-                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d AND NOT d.b_sys)", fidClIog, tpIog);
-                    }
-                    else {
-                        sql += String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d)", fidClIog, tpIog);
-                    }
-                }
-            }
-
-            sql += ") ";
+        // Determina la fuente de "stk": tabla directa, o (para kardex de salidas)
+        // la subconsulta UNION que excluye duplicados con el rango histórico sin kardex
+        String stkSource;
+        if (isKardex && diogCategory == SModSysConsts.TRNS_CT_IOG_OUT) {
+            stkSource = "(" + buildStkUnionSubquery(startDateStr, cutDateStr, SYSTEM_LOWER_BOUND_DATE, tpmovCondition, diogCategory) + ") stk ";
+        }
+        else {
+            stkSource = SModConsts.TablesMap.get(SModConsts.TRN_STK) + " stk ";
         }
 
-        sql += "ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC";
+        StringBuilder sql = new StringBuilder(4096);
+        sql.append(buildBaseSelectFrom(cutDateStr, stkSource));
 
-        return sql;
+        if (isKardex && diogCategory == SModSysConsts.TRNS_CT_IOG_OUT) {
+            // El filtro de fechas/tipos de movimiento ya se aplicó dentro de la subconsulta stk;
+            // aquí solo quedan los filtros que dependen de las tablas adicionales (si los hubiera).
+            sql.append("WHERE NOT stk.b_del ")
+               .append("ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC");
+        }
+        else {
+            sql.append("WHERE NOT stk.b_del ")
+               .append("AND stk.id_year = YEAR('").append(cutDateStr).append("') ")
+               .append("AND stk.dt BETWEEN '").append(startDateStr).append("' AND '").append(cutDateStr).append("' ")
+               .append("AND stk.").append(diogCategory == SModSysConsts.TRNS_CT_IOG_OUT ? "mov_out" : "mov_in").append(" > 0 ")
+               .append("AND stk.fid_ct_iog = ").append(diogCategory).append(' ')
+               .append(tpmovCondition)
+               .append("ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC");
+        }
+
+        return sql.toString();
+    }
+
+    // ==========================================================
+    // Helpers
+    // ==========================================================
+
+    private static String buildStkUnionSubquery(String startDateStr, String cutDateStr,
+                                                  String systemLowerBoundDate, String tpmovCondition,
+                                                  int diogCategory) {
+        StringBuilder noKardexPart = new StringBuilder(512);
+        noKardexPart.append("SELECT stk.* FROM ")
+             .append(SModConsts.TablesMap.get(SModConsts.TRN_STK)).append(" stk ")
+             .append("INNER JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DIOG)).append(" d ")
+             .append("    ON stk.fid_diog_year = d.id_year ")
+             .append("    AND stk.fid_diog_doc = d.id_doc ")
+             .append("    AND NOT d.b_del ")
+             .append("WHERE stk.dt >= '").append(systemLowerBoundDate).append("' ")
+             .append("    AND stk.dt < '").append(startDateStr).append("' ")
+             .append("    AND stk.b_del = 0 ")
+             .append("    AND stk.fid_ct_iog = ").append(diogCategory).append(' ')
+             .append("    AND stk.").append(diogCategory == SModSysConsts.TRNS_CT_IOG_OUT ? "mov_out" : "mov_in").append(" > 0 ")
+             .append(tpmovCondition)  // Incluye las condiciones con OR y NOT d.b_sys según cada caso
+             .append("    AND NOT EXISTS ( ")
+             .append("        SELECT 1 FROM ").append(SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX)).append(" k ")
+             .append("        WHERE k.b_del = 0 ")
+             .append("          AND k.fk_diog_year_out_n = stk.fid_diog_year ")
+             .append("          AND k.fk_diog_doc_out_n  = stk.fid_diog_doc ")
+             .append("          AND k.fk_diog_ety_out_n  = stk.fid_diog_ety ")
+             .append("    )");
+        
+        StringBuilder stkPart = new StringBuilder(512);
+        stkPart.append("(SELECT stk.* FROM ")
+                .append(SModConsts.TablesMap.get(SModConsts.TRN_STK)).append(" stk ")
+                .append("WHERE NOT stk.b_del ")
+                .append("    AND stk.dt BETWEEN '").append(startDateStr).append("' AND '").append(cutDateStr).append("' ")
+                .append("    AND stk.fid_ct_iog = ").append(SModSysConsts.TRNS_CT_IOG_OUT).append(" ")
+                .append("    AND stk.").append(diogCategory == SModSysConsts.TRNS_CT_IOG_OUT ? "mov_out" : "mov_in").append(" > 0 ")
+                .append(tpmovCondition)
+                .append(")");
+
+        return " " + noKardexPart + " UNION " + stkPart;
+    }
+
+    private static String buildBaseSelectFrom(String cutDateStr, String stkSource) {
+        StringBuilder sb = new StringBuilder(3072);
+        sb.append("SELECT DISTINCT ")
+          .append("    stk.*, d.num, mre.fk_item_ref_n AS ref_ety, mr.fk_item_ref_n ref_rm, ")
+          .append("    de.fid_cc, de.id_doc AS de_id_doc, de.id_ety AS de_id_ety, tp.tp_iog, ")
+          .append("    i.item_key, i.item AS item_name, ")
+          .append("    dps.num AS dps_num, dps.dt AS dps_date, dps.exc_rate, dps.fid_cur, ")
+          .append("    dps.fid_dps_nat, dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, ")
+          .append("    dps_ety.price_u_real_r, dps_ety.price_u_real_cur_r, dps_ety.stot_r, dps_ety.fid_cc_n AS dps_ety_cc, ")
+          .append("    dps_des.num AS des_num, dps_des.exc_rate AS des_exc_rate, dps_des.fid_cur AS des_fid_cur, ")
+          .append("    dps_ety_des.id_year AS id_des_year, dps_ety_des.id_doc AS id_des_doc, dps_ety_des.id_ety AS id_des_ety, ")
+          .append("    dps_ety_des.fid_cc_n AS ety_des_cc, dps_ety_des.price_u_real_r AS ety_des_price_real, ")
+          .append("    dps_ety_des.price_u_real_cur_r AS ety_des_price_real_cur ")
+          .append("FROM ").append(stkSource)
+          .append("    INNER JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DIOG)).append(" d ")
+          .append("        ON stk.fid_diog_year = d.id_year AND stk.fid_diog_doc = d.id_doc AND NOT d.b_del ")
+          .append("    INNER JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DIOG_ETY)).append(" de ")
+          .append("        ON stk.fid_diog_year = de.id_year AND stk.fid_diog_doc = de.id_doc ")
+          .append("        AND stk.fid_diog_ety = de.id_ety AND NOT de.b_del ")
+          .append("    INNER JOIN ").append(SModConsts.TablesMap.get(SModConsts.ITMU_ITEM)).append(" i ")
+          .append("        ON stk.id_item = i.id_item ")
+          .append("    INNER JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRNS_TP_IOG)).append(" tp ")
+          .append("        ON stk.fid_ct_iog = tp.id_ct_iog AND stk.fid_cl_iog = tp.id_cl_iog AND stk.fid_tp_iog = tp.id_tp_iog ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY)).append(" mre ")
+          .append("        ON stk.fid_mat_req_n = mre.id_mat_req AND stk.fid_mat_req_ety_n = mre.id_ety ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ)).append(" mr ")
+          .append("        ON d.fid_mat_req_n = mr.id_mat_req ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DPS)).append(" dps ")
+          .append("        ON stk.fid_dps_year_n = dps.id_year AND stk.fid_dps_doc_n = dps.id_doc ")
+          .append("        AND dps.dt <= '").append(cutDateStr).append("' ")
+          .append("        AND dps.fid_st_dps <> ").append(SModSysConsts.TRNS_ST_DPS_ANNULED).append(" AND NOT dps.b_del ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY)).append(" dps_ety ")
+          .append("        ON stk.fid_dps_year_n = dps_ety.id_year AND stk.fid_dps_doc_n = dps_ety.id_doc ")
+          .append("        AND stk.fid_dps_ety_n = dps_ety.id_ety ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY)).append(" AS supp ")
+          .append("        ON stk.fid_dps_year_n = supp.id_src_year AND stk.fid_dps_doc_n = supp.id_src_doc ")
+          .append("        AND stk.fid_dps_ety_n = supp.id_src_ety ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY)).append(" AS dps_ety_des ")
+          .append("        ON supp.id_des_year = dps_ety_des.id_year AND supp.id_des_doc = dps_ety_des.id_doc ")
+          .append("        AND supp.id_des_ety = dps_ety_des.id_ety ")
+          .append("        AND dps_ety_des.b_del = 0 ")
+          .append("    LEFT JOIN ").append(SModConsts.TablesMap.get(SModConsts.TRN_DPS)).append(" AS dps_des ")
+          .append("        ON supp.id_des_year = dps_des.id_year AND supp.id_des_doc = dps_des.id_doc ")
+          .append("        AND dps_des.dt <= '").append(cutDateStr).append("' ")
+          .append("        AND dps_des.fid_st_dps <> ").append(SModSysConsts.TRNS_ST_DPS_ANNULED).append(" AND dps_des.b_del = 0 ");
+        return sb.toString();
+    }
+
+    private static String buildTpmovCondition(Map<Integer, List<Integer>> groupedTpmovs, int diogCategory) {
+        StringBuilder cond = new StringBuilder("AND (");
+        boolean first = true;
+        for (Map.Entry<Integer, List<Integer>> entry : groupedTpmovs.entrySet()) {
+            int fidClIog = entry.getKey();
+            List<Integer> normal = new ArrayList<>();
+            for (Integer tpIog : entry.getValue()) {
+                boolean isSpecial = diogCategory == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0]
+                        && fidClIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1]
+                        && tpIog == SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2];
+                if (isSpecial) {
+                    if (!first) cond.append(" OR ");
+                    first = false;
+                    cond.append(String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog = %d AND NOT d.b_sys)", fidClIog, tpIog));
+                } else {
+                    normal.add(tpIog);
+                }
+            }
+            if (!normal.isEmpty()) {
+                if (!first) cond.append(" OR ");
+                first = false;
+                String inList = normal.stream().map(String::valueOf).collect(Collectors.joining(","));
+                cond.append(String.format("(stk.fid_cl_iog = %d AND stk.fid_tp_iog IN (%s))", fidClIog, inList));
+            }
+        }
+        cond.append(") ");
+        return cond.toString();
     }
 
     /**
@@ -247,7 +288,7 @@ public class SStockValuationUtils {
                     e);
         }
         try (Statement st = session.getStatement().getConnection().createStatement()) {
-            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_IN, startDate, cutDate);
+            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_IN, startDate, cutDate, false);
             ResultSet res = st.executeQuery(sql);
             SDbStockValuationMvt oEntry;
             while (res.next()) {
@@ -283,7 +324,7 @@ public class SStockValuationUtils {
                             && oEntry.getAuxTypeDpsIn()[1] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1]
                             && oEntry.getAuxTypeDpsIn()[2] == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
                         // Si es OC y no tiene factura asociada
-                        if (res.getInt("supp.id_des_year") == 0 || res.getInt("supp.id_des_doc") == 0) {
+                        if (res.getInt("id_des_year") == 0 || res.getInt("id_des_doc") == 0) {
                             oEntry.setAuxItemDescription(res.getString("item_key") + " - " + res.getString("item_name"));
                             oEntry.setTemporalPrice(true);
                             oEntry.setExchangeRate(res.getDouble("exc_rate"));
@@ -320,15 +361,15 @@ public class SStockValuationUtils {
                         // Si es OC y sí tiene factura asociada
                         else {
                             DocNature documentNature = SStockValuationRecordUtils.getDocumentNature(session, 
-                                                                                    res.getInt("supp.id_des_year"), 
-                                                                                    res.getInt("supp.id_des_doc"));
+                                                                                    res.getInt("id_des_year"), 
+                                                                                    res.getInt("id_des_doc"));
                             if (documentNature.nature != SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                                 double unitaryOrderPriceCur = res.getDouble("price_u_real_cur_r");
                                 double unitaryInvoicePriceCur = res.getDouble("ety_des_price_real_cur");
 
                                 if (unitaryOrderPriceCur != 0) {
-                                    double priceDiff = Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur);
-                                    double priceDiffPercentCalc = priceDiff / unitaryOrderPriceCur;
+                                    double priceDiff = SLibUtils.roundAmount(Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur));
+                                    double priceDiffPercentCalc = SLibUtils.roundAmount(priceDiff / unitaryOrderPriceCur);
 
                                     if (priceDiffPercentCalc > priceDiffPercent) {
                                         String sLog = "No se puede continuar con la valuación.\n"
@@ -387,9 +428,9 @@ public class SStockValuationUtils {
                                 oEntry.getNotes().add(oMvtNote);
                             }
 
-                            oEntry.setFkDpsYearInId_n(res.getInt("supp.id_des_year"));
-                            oEntry.setFkDpsDocInId_n(res.getInt("supp.id_des_doc"));
-                            oEntry.setFkDpsEntryInId_n(res.getInt("supp.id_des_ety"));
+                            oEntry.setFkDpsYearInId_n(res.getInt("id_des_year"));
+                            oEntry.setFkDpsDocInId_n(res.getInt("id_des_doc"));
+                            oEntry.setFkDpsEntryInId_n(res.getInt("id_des_ety"));
 
                             oEntry.setAuxDpsCostCenterCode(res.getString("ety_des_cc"));
                         }
@@ -412,22 +453,24 @@ public class SStockValuationUtils {
                         }
                         else {
                             String sqlOrder = SStockValuationDpsUtils.getOrderFromInvoice(oEntry.getFkDpsYearInId_n(), oEntry.getFkDpsDocInId_n(), oEntry.getFkDpsEntryInId_n());
-                            ResultSet resOrder = session.getStatement().getConnection().createStatement().executeQuery(sqlOrder);
-                            if (resOrder.next()) {
-                                double unitaryOrderPriceCur = resOrder.getDouble("price_u_real_cur_r");
-                                double unitaryInvoicePriceCur = res.getDouble("price_u_real_cur_r");
-                                double priceDiff = Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur);
-                                if (priceDiff > (unitaryOrderPriceCur * priceDiffPercent)) {
-                                    throw new Exception("No se puede continuar con la valuación.\n"
-                                                    + "El pedido y la factura asociados al movimiento de entrada al almacén "
-                                                    + "con número de documento " + res.getInt("d.num") + " y "
-                                                    + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + "\n "
-                                                    + "tienen diferencia de costo unitario mayor a la configurada.\n "
-                                                    + "Factura: " + res.getString("dps_num") + " fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date"))
-                                                    + "Precio un: " + unitaryInvoicePriceCur + ". "
-                                                    + "Pedido folio: " + resOrder.getString("num_ser") + " " + resOrder.getString("num") + ", "
-                                                    + "fecha pedido: " + SLibUtils.DateFormatDate.format(resOrder.getDate("dt")) + " "
-                                                    + "Precio un: " + unitaryOrderPriceCur + ".");
+                            try (Statement stOrder = session.getStatement().getConnection().createStatement();
+                                    ResultSet resOrder = stOrder.executeQuery(sqlOrder)) {
+                                if (resOrder.next()) {
+                                    double unitaryOrderPriceCur = resOrder.getDouble("price_u_real_cur_r");
+                                    double unitaryInvoicePriceCur = res.getDouble("price_u_real_cur_r");
+                                    double priceDiff = SLibUtils.roundAmount(Math.abs(unitaryInvoicePriceCur - unitaryOrderPriceCur));
+                                    if (priceDiff > SLibUtils.roundAmount(unitaryOrderPriceCur * priceDiffPercent)) {
+                                        throw new Exception("No se puede continuar con la valuación.\n"
+                                                        + "El pedido y la factura asociados al movimiento de entrada al almacén "
+                                                        + "con número de documento " + res.getInt("d.num") + " y "
+                                                        + "fecha " + SLibUtils.DateFormatDate.format(oEntry.getDateMove()) + "\n "
+                                                        + "tienen diferencia de costo unitario mayor a la configurada.\n "
+                                                        + "Factura: " + res.getString("dps_num") + " fecha: " + SLibUtils.DateFormatDate.format(res.getDate("dps_date")) + " "
+                                                        + "Precio un: " + unitaryInvoicePriceCur + ". "
+                                                        + "Pedido folio: " + resOrder.getString("num_ser") + " " + resOrder.getString("num") + ", "
+                                                        + "fecha pedido: " + SLibUtils.DateFormatDate.format(resOrder.getDate("dt")) + " "
+                                                        + "Precio un: " + unitaryOrderPriceCur + ".");
+                                    }
                                 }
                             }
                             oEntry.setCostUnitaryCurrency(res.getDouble("price_u_real_cur_r"));
@@ -461,6 +504,7 @@ public class SStockValuationUtils {
                         oEntry.getFkDiogDocInId_n(),
                         oEntry.getFkDiogEntryInId_n())) {
                     oEntry.save(session);
+                    SStockValuationKardexCore.createKardexEntry(session, res, priceDiffPercent, oEntry.getPkStockValuationMvtId(), idValuation);
                 }
                 else {
                     String sLog = "Movimiento duplicado omitido: valuación=" + idValuation
@@ -513,7 +557,7 @@ public class SStockValuationUtils {
         String sql;
         ArrayList<SDbStockValuationMvt> lConsumptions = new ArrayList<>();
         try (Statement st = session.getStatement().getConnection().createStatement()) {
-            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_OUT, startDate, cutDate);
+            sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_OUT, startDate, cutDate, false);
             ResultSet res = st.executeQuery(sql);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startDate);
@@ -559,12 +603,12 @@ public class SStockValuationUtils {
 
                         warningPrice = false;
                         double consumeQuantity = 0d;
-                        double entryAvailableQuantity = entry.getQuantityMovement() - entry.getAuxConsumption();
+                        double entryAvailableQuantity = SLibUtils.round(entry.getQuantityMovement() - entry.getAuxConsumption(), 4);
                         if (qtyToConsume >= entryAvailableQuantity) {
                             entry.setAuxConsumed(true);
                             entry.setAuxConsumption(entry.getAuxConsumption() + entryAvailableQuantity);
                             consumeQuantity = entryAvailableQuantity;
-                            qtyToConsume = qtyToConsume - entryAvailableQuantity;
+                            qtyToConsume = SLibUtils.round(qtyToConsume - entryAvailableQuantity, 4);
                         }
                         else {
                             entry.setAuxConsumption(entry.getAuxConsumption() + qtyToConsume);
@@ -840,6 +884,43 @@ public class SStockValuationUtils {
 
         try (Statement st = session.getStatement().getConnection().createStatement()) {
             st.executeUpdate(sqlDelDiogs);
+        }
+
+        /**
+         * Eliminar notas de kardex de valuación
+         */
+        String sqlDelNotes = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_NOTE) + " SET b_del = 1 "
+                + "WHERE fk_stk_val_n = " + idValuation + ";";
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlDelNotes);
+        }
+
+        /**
+         * Revertir fk_dps_*_in_main_n usando el log de respaldo
+         */
+        String sqlRevertMain = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_MAIN_LOG) + " lg "
+                + "    ON k.id_stk_val_kardex = lg.fk_stk_val_kardex "
+                + "SET k.fk_dps_year_in_main_n = lg.fk_old_dps_year, "
+                + "    k.fk_dps_doc_in_main_n  = lg.fk_old_dps_doc, "
+                + "    k.fk_dps_ety_in_main_n  = lg.fk_old_dps_ety "
+                + "WHERE lg.fk_stk_val = " + idValuation + " AND k.b_del = 0;";
+
+        String sqlDelMainLog = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_MAIN_LOG)
+                + " WHERE fk_stk_val = " + idValuation + ";";
+
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlRevertMain);
+            st.executeUpdate(sqlDelMainLog);
+        }
+
+        /**
+         * Eliminar renglones del kardex de la valuación
+         */
+        String sqlDelKardex = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " SET b_del = 1 "
+                + "WHERE fk_stk_val_n = " + idValuation + ";";
+        try (Statement st = session.getStatement().getConnection().createStatement()) {
+            st.executeUpdate(sqlDelKardex);
         }
 
         return true;
@@ -1204,7 +1285,7 @@ public class SStockValuationUtils {
                 + "WHERE "
                 + "    NOT v.b_del AND NOT vm.b_del "
                 + "    AND v.id_stk_val = " + idValuation + " "
-                + "    AND (dps.ts_edit > v.ts_usr_upd OR dps.ts_edit > v.ts_usr_upd);";
+                + "    AND (dps.ts_edit > v.ts_usr_upd OR dpse.ts_edit > v.ts_usr_upd);";
         ArrayList<SDataDps> lDps = new ArrayList<>();
         try (Statement st = session.getStatement().getConnection().createStatement()) {
             ResultSet res = st.executeQuery(sql);

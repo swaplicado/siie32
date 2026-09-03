@@ -18,25 +18,29 @@ import sa.lib.gui.SGuiSession;
 /**
  * Utilería para verificar la integridad de la valuación de inventario.
  * <p>
- * Contiene verificaciones que detectan inconsistencias entre los movimientos
- * de almacén (trn_stk) y sus registros en la valuación (trn_stk_val_mvt),
- * así como movimientos cuya factura o artículo corresponde a activo fijo,
- * y consumos que rebasan la cantidad de entrada registrada.
+ * Contiene verificaciones que detectan inconsistencias entre los movimientos de
+ * almacén (trn_stk) y sus registros en la valuación (trn_stk_val_mvt), así como
+ * movimientos cuya factura o artículo corresponde a activo fijo, y consumos que
+ * rebasan la cantidad de entrada registrada.
  * </p>
  *
  * @author Edwin Carmona
  */
 public class SStockValuationVerify {
 
-    /** Fecha de inicio a partir de la cual se aplican las verificaciones de valuación. */
+    /**
+     * Fecha de inicio a partir de la cual se aplican las verificaciones de
+     * valuación.
+     */
     public static final String SINCE_DATE = "2026-07-01";
 
     /**
-     * Ejecuta todas las verificaciones de integridad de la valuación de inventario
-     * y devuelve la concatenación de todos los errores encontrados.
+     * Ejecuta todas las verificaciones de integridad de la valuación de
+     * inventario y devuelve la concatenación de todos los errores encontrados.
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con todos los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con todos los errores encontrados, o cadena vacía si no
+     * hay errores
      * @throws SQLException si ocurre un error al ejecutar alguna consulta
      */
     public static String verifyStockValuation(SGuiSession oSession) throws SQLException {
@@ -49,19 +53,21 @@ public class SStockValuationVerify {
                 + verifyStockValuationCostConsumptions(oSession)
                 + verifyPurchaseInvoiceWithZero(oSession)
                 + verifyOrdersWithoutInvoiceWithZero(oSession);
-                // + verifyStockEntryValue(oSession);
+        // + verifyStockEntryValue(oSession);
     }
 
     /**
-     * Verifica que todos los movimientos de entrada de almacén (trn_stk) existan
-     * como movimiento de entrada en la valuación (trn_stk_val_mvt).
+     * Verifica que todos los movimientos de entrada de almacén (trn_stk)
+     * existan como movimiento de entrada en la valuación (trn_stk_val_mvt).
      * <p>
      * Excluye los movimientos de tipo ajuste de inventario
-     * ({@code TRNS_TP_IOG_IN_ADJ_INV}), ya que estos no generan registro en valuación.
+     * ({@code TRNS_TP_IOG_IN_ADJ_INV}), ya que estos no generan registro en
+     * valuación.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyStkInMovements(SGuiSession oSession) throws SQLException {
@@ -97,11 +103,13 @@ public class SStockValuationVerify {
      * como movimiento de salida en la valuación (trn_stk_val_mvt).
      * <p>
      * Excluye los movimientos de tipo ajuste de inventario
-     * ({@code TRNS_TP_IOG_OUT_ADJ_INV}), ya que estos no generan registro en valuación.
+     * ({@code TRNS_TP_IOG_OUT_ADJ_INV}), ya que estos no generan registro en
+     * valuación.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyStkOutMovements(SGuiSession oSession) throws SQLException {
@@ -137,15 +145,16 @@ public class SStockValuationVerify {
 
     /**
      * Verifica que no existan movimientos de valuación cuya factura de compra
-     * haya sido contabilizada en cuentas de activo fijo (rango 1200 a 1399)
-     * y cuyo costo registrado sea diferente de cero.
+     * haya sido contabilizada en cuentas de activo fijo (rango 1200 a 1399) y
+     * cuyo costo registrado sea diferente de cero.
      * <p>
      * Este caso indica que el costo de un activo fijo fue incorrectamente
      * incluido en la valuación de inventario.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyAssetAccounting(SGuiSession oSession) throws SQLException {
@@ -184,11 +193,10 @@ public class SStockValuationVerify {
         return sErrors;
     }
 
-    
     /**
-     * Verifica que no existan movimientos de entrada en la valuación provenientes
-     * de facturas de compra contabilizadas como gasto (sin póliza en cuentas de
-     * activo fijo 1200-1399) pero valuadas a costo cero.
+     * Verifica que no existan movimientos de entrada en la valuación
+     * provenientes de facturas de compra contabilizadas como gasto (sin póliza
+     * en cuentas de activo fijo 1200-1399) pero valuadas a costo cero.
      * <p>
      * Una factura de compra contabilizada como gasto debería tener un costo
      * diferente de cero en la valuación. Si el costo es cero, indica que el
@@ -196,7 +204,8 @@ public class SStockValuationVerify {
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyPurchaseInvoiceWithZero(SGuiSession oSession) throws SQLException {
@@ -248,11 +257,12 @@ public class SStockValuationVerify {
     }
 
     /**
-     * Verifica que no existan movimientos de entrada en la valuación provenientes
-     * de órdenes de compra con naturaleza predeterminada ({@code TRNU_DPS_NAT_DEF})
-     * que estén valuados a costo cero, tengan importe mayor a cero en el renglón
-     * del documento, no tengan factura de destino asociada y cuyos artículos
-     * no sean de categoría activo fijo ({@code ITMS_CT_ITEM_ASS}).
+     * Verifica que no existan movimientos de entrada en la valuación
+     * provenientes de órdenes de compra con naturaleza predeterminada
+     * ({@code TRNU_DPS_NAT_DEF}) que estén valuados a costo cero, tengan
+     * importe mayor a cero en el renglón del documento, no tengan factura de
+     * destino asociada y cuyos artículos no sean de categoría activo fijo
+     * ({@code ITMS_CT_ITEM_ASS}).
      * <p>
      * Este caso indica que una orden de compra de inventario fue recibida en
      * almacén pero su costo no fue registrado en la valuación, posiblemente
@@ -260,7 +270,8 @@ public class SStockValuationVerify {
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyOrdersWithoutInvoiceWithZero(SGuiSession oSession) throws SQLException {
@@ -286,8 +297,8 @@ public class SStockValuationVerify {
                 + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
                 + "AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
                 + "AND mvt.cost_r = 0 "
-                + "AND tde.tot_r > 0 "                          // el renglón tiene importe
-                + "AND pt.id_des_doc IS NULL "                  // no tiene factura de destino ligada
+                + "AND tde.tot_r > 0 " // el renglón tiene importe
+                + "AND pt.id_des_doc IS NULL " // no tiene factura de destino ligada
                 + "AND td.fid_dps_nat = " + SDataConstantsSys.TRNU_DPS_NAT_DEF + " "
                 + "AND COALESCE(irg.fid_ct_item, 0) <> " + SModSysConsts.ITMS_CT_ITEM_ASS + " "
                 + "AND COALESCE(ig.fid_ct_item, 0) <> " + SModSysConsts.ITMS_CT_ITEM_ASS + " "
@@ -309,16 +320,17 @@ public class SStockValuationVerify {
 
     /**
      * Verifica que no existan movimientos de valuación provenientes de órdenes
-     * de compra con naturaleza de activo ({@code TRNU_DPS_NAT_ASSET}) cuyo costo
-     * sea diferente de cero y cuya factura de destino no esté contabilizada
-     * en cuentas de activo fijo.
+     * de compra con naturaleza de activo ({@code TRNU_DPS_NAT_ASSET}) cuyo
+     * costo sea diferente de cero y cuya factura de destino no esté
+     * contabilizada en cuentas de activo fijo.
      * <p>
      * Detecta órdenes de compra que fueron clasificadas como activo pero cuya
      * factura asociada no refleja esa contabilización.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyOrdersByDpsNature(SGuiSession oSession) throws SQLException {
@@ -371,15 +383,16 @@ public class SStockValuationVerify {
     /**
      * Verifica que no existan movimientos de salida de valuación provenientes
      * de órdenes de compra cuyos artículos pertenezcan a la categoría de activo
-     * fijo ({@code ITMS_CT_ITEM_ASS}), con costo diferente de cero y sin factura
-     * de destino contabilizada en cuentas de activo.
+     * fijo ({@code ITMS_CT_ITEM_ASS}), con costo diferente de cero y sin
+     * factura de destino contabilizada en cuentas de activo.
      * <p>
-     * Complementa {@link #verifyOrdersByDpsNature} detectando el caso en que
-     * la naturaleza de activo no está en el documento sino en el artículo mismo.
+     * Complementa {@link #verifyOrdersByDpsNature} detectando el caso en que la
+     * naturaleza de activo no está en el documento sino en el artículo mismo.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyOrdersWithAssetItems(SGuiSession oSession) throws SQLException {
@@ -430,16 +443,18 @@ public class SStockValuationVerify {
     }
 
     /**
-     * Verifica que ningún movimiento de entrada en la valuación tenga una cantidad
-     * total de consumos (salidas) mayor a su cantidad de entrada.
+     * Verifica que ningún movimiento de entrada en la valuación tenga una
+     * cantidad total de consumos (salidas) mayor a su cantidad de entrada.
      * <p>
-     * Agrupa por el identificador del movimiento de entrada (diog_year, diog_doc, diog_ety)
-     * y compara la suma de entradas contra la suma de salidas. Un resultado positivo
-     * indica que se consumió más de lo que entró, lo cual es un error de integridad.
+     * Agrupa por el identificador del movimiento de entrada (diog_year,
+     * diog_doc, diog_ety) y compara la suma de entradas contra la suma de
+     * salidas. Un resultado positivo indica que se consumió más de lo que
+     * entró, lo cual es un error de integridad.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyStockValuationQtyConsumptions(SGuiSession oSession) throws SQLException {
@@ -481,47 +496,103 @@ public class SStockValuationVerify {
      * Verifica que ningún movimiento de entrada en la valuación tenga un costo
      * total de consumos (salidas) mayor a su costo de entrada.
      * <p>
-     * Agrupa por el identificador del movimiento de entrada (diog_year, diog_doc, diog_ety)
-     * y compara la suma de costos de entradas contra la suma de costos de salidas.
-     * Un resultado positivo indica que se consumió más valor del que entró,
-     * lo cual es un error de integridad.
+     * Agrupa por el identificador del movimiento de entrada (diog_year,
+     * diog_doc, diog_ety) y compara la suma de costos de entradas contra la
+     * suma de costos de salidas. Un resultado positivo indica que se consumió
+     * más valor del que entró, lo cual es un error de integridad.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyStockValuationCostConsumptions(SGuiSession oSession) throws SQLException {
         Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando costos consumidos vs entradas...");
         String sErrors = "";
-        String sql = "SELECT " +
-            "	i.item_key, " +
-            "	mvt.fk_item, " +
-            "	mvt.fk_unit, " +
-            "	mvt.fk_diog_year_in_n,  " +
-            "	mvt.fk_diog_doc_in_n,  " +
-            "	mvt.fk_diog_ety_in_n, " +
-            "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", mvt.cost_r, 0)) AS cost_in, " +
-            "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", mvt.cost_r, 0)) AS cost_out " +
-            "FROM " +
-            "	trn_stk_val_mvt mvt " +
-            "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val " +
-            "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item " +
-            "INNER JOIN trn_diog diog_in ON mvt.fk_diog_year_in_n = diog_in.id_year AND mvt.fk_diog_doc_in_n = diog_in.id_doc " +
-            "WHERE " +
-            "	mvt.b_del = 0 " +
-            "	AND v.b_del = 0 " +
-            "	AND diog_in.dt >= '" + SINCE_DATE + "' " +
-            "GROUP BY mvt.fk_diog_year_in_n, mvt.fk_diog_doc_in_n, mvt.fk_diog_ety_in_n " +
-            "HAVING cost_out > cost_in AND ABS(cost_in - cost_out) > 1;";
+        String sLog = "";
+        boolean debugMovimientosCostos = false; // cambiar a true para inspeccionar los movimientos individuales
+
+        String sql = "SELECT "
+                + "	i.item_key, "
+                + "	i.item, "
+                + "	mvt.fk_item, "
+                + "	mvt.fk_unit, "
+                + "	mvt.fk_diog_year_in_n,  "
+                + "	mvt.fk_diog_doc_in_n,  "
+                + "	mvt.fk_diog_ety_in_n, "
+                + "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", mvt.cost_r, 0)) AS cost_in, "
+                + "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", mvt.cost_r, 0)) AS cost_out "
+                + "FROM "
+                + "	trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON mvt.fk_diog_year_in_n = diog_in.id_year AND mvt.fk_diog_doc_in_n = diog_in.id_doc "
+                + "WHERE "
+                + "	mvt.b_del = 0 "
+                + "	AND v.b_del = 0 "
+                + "	AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY mvt.fk_diog_year_in_n, mvt.fk_diog_doc_in_n, mvt.fk_diog_ety_in_n "
+                + "HAVING cost_out > cost_in AND ABS(cost_in - cost_out) > 1;";
+
         ResultSet rs = oSession.getStatement().executeQuery(sql);
         while (rs.next()) {
+            int yearIn = rs.getInt("mvt.fk_diog_year_in_n");
+            int docIn = rs.getInt("mvt.fk_diog_doc_in_n");
+            int etyIn = rs.getInt("mvt.fk_diog_ety_in_n");
+            double costIn = rs.getDouble("cost_in");
+            double costOut = rs.getDouble("cost_out");
+
             sErrors += "El movimiento de entrada de almacén con ID "
-                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
-                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
-                    + rs.getInt("mvt.fk_diog_ety_in_n") + "] \n "
+                    + "[" + yearIn + ", " + docIn + ", " + etyIn + "] \n "
                     + "tiene un costo de consumos que rebasan el costo de entrada.\n";
+            sLog = "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n"
+                    + "Entradas: $" + costIn + ", salidas: $" + costOut;
+            sErrors += sLog + "\n";
+
+            if (debugMovimientosCostos) {
+                StringBuilder sbDetails = new StringBuilder();
+                sbDetails.append("Movimientos individuales para [")
+                        .append(yearIn).append(", ")
+                        .append(docIn).append(", ")
+                        .append(etyIn).append("]:\n");
+
+                String sqlMovs = "SELECT "
+                        + "    mvt.*, "
+                        + "    i.item_key, "
+                        + "    i.item "
+                        + "FROM trn_stk_val_mvt mvt "
+                        + "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item "
+                        + "WHERE mvt.b_del = 0 "
+                        + "AND mvt.fk_diog_year_in_n = ? "
+                        + "AND mvt.fk_diog_doc_in_n = ? "
+                        + "AND mvt.fk_diog_ety_in_n = ? "
+                        + "ORDER BY mvt.dt_mov ASC;";
+
+                java.sql.PreparedStatement psMovs
+                        = oSession.getStatement().getConnection().prepareStatement(sqlMovs);
+                psMovs.setInt(1, yearIn);
+                psMovs.setInt(2, docIn);
+                psMovs.setInt(3, etyIn);
+
+                ResultSet rsMovs = psMovs.executeQuery();
+                while (rsMovs.next()) {
+                    sbDetails.append("  - tipo=").append(rsMovs.getInt("fk_ct_iog"))
+                            .append(" | qty=").append(rsMovs.getDouble("qty_mov"))
+                            .append(" | cost=").append(rsMovs.getDouble("cost_r"))
+                            .append(" | fecha=").append(rsMovs.getDate("dt_mov"))
+                            .append(" | doc_in=[").append(rsMovs.getInt("fk_diog_year_in_n"))
+                            .append(", ").append(rsMovs.getInt("fk_diog_doc_in_n"))
+                            .append(", ").append(rsMovs.getInt("fk_diog_ety_in_n")).append("]\n");
+                }
+
+                rsMovs.close();
+                psMovs.close();
+
+                sErrors += sbDetails.toString() + "\n";
+            }
         }
+
         if (!sErrors.isEmpty()) {
             Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
         }
@@ -529,19 +600,22 @@ public class SStockValuationVerify {
     }
 
     /**
-     * Verifica que los movimientos de entrada de almacén tengan un valor unitario
-     * consistente con el documento de origen (orden de compra o factura).
+     * Verifica que los movimientos de entrada de almacén tengan un valor
+     * unitario consistente con el documento de origen (orden de compra o
+     * factura).
      * <p>
      * Para entradas con naturaleza de inventario (nat = 1), compara el costo
-     * unitario del movimiento ({@code trn_stk.cost_u}) contra el precio unitario
-     * real del renglón del documento ({@code trn_dps_ety.price_u_real_r}).
-     * Para entradas con naturaleza de activo fijo (nat = 2), detecta movimientos
-     * que tengan cargo o abono contable ({@code debit > 0} o {@code credit > 0}),
-     * lo cual indica que fueron incorrectamente valuados.
+     * unitario del movimiento ({@code trn_stk.cost_u}) contra el precio
+     * unitario real del renglón del documento
+     * ({@code trn_dps_ety.price_u_real_r}). Para entradas con naturaleza de
+     * activo fijo (nat = 2), detecta movimientos que tengan cargo o abono
+     * contable ({@code debit > 0} o {@code credit > 0}), lo cual indica que
+     * fueron incorrectamente valuados.
      * </p>
      *
      * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay errores
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
      * @throws SQLException si ocurre un error al ejecutar la consulta
      */
     private static String verifyStockEntryValue(SGuiSession oSession) throws SQLException {
@@ -553,8 +627,8 @@ public class SStockValuationVerify {
             priceDiffPercent = oCfg.getDiffPricePercent();
         }
         catch (Exception e) {
-            Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, 
-                    "Error al obtener el porcentaje de diferencia de precio, definido en 0", 
+            Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE,
+                    "Error al obtener el porcentaje de diferencia de precio, definido en 0",
                     e);
         }
         SStockValuationUpdateStkUtils.updateStockInRowsSinceDate(oSession, SINCE_DATE);
@@ -595,7 +669,7 @@ public class SStockValuationVerify {
                 + "INNER JOIN trn_dps_ety de ON ie.fid_dps_year_n = de.id_year AND ie.fid_dps_doc_n = de.id_doc AND ie.fid_dps_ety_n = de.id_ety "
                 + "INNER JOIN trn_dps d ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
                 + "WHERE i.dt >= '" + SINCE_DATE + "' ";
-        
+
         sql += "AND ( "
                 // Si la naturaleza del documento es predeterminada y la diferencia del costo excede el porcentaje configurado
                 + "  (trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 1 AND "
@@ -611,7 +685,7 @@ public class SStockValuationVerify {
                     + "[" + rs.getInt("ie.id_year") + ", "
                     + rs.getInt("ie.id_doc") + ", "
                     + rs.getInt("ie.id_ety") + "] "
-                    + "precio unitario almacén ["+ rs.getDouble("s.cost_u") + "] vs "
+                    + "precio unitario almacén [" + rs.getDouble("s.cost_u") + "] vs "
                     + "precio documento [" + rs.getDouble("de.price_u_real_r") + "].\n "
                     + "Folio documento: " + rs.getString("dps_num_ser") + " " + rs.getString("dps_num") + ", "
                     + "fecha: " + SLibUtils.DateFormatDate.format(rs.getDate("dps_dt")) + " " + ", "
