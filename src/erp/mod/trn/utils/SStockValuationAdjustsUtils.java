@@ -341,10 +341,10 @@ public abstract class SStockValuationAdjustsUtils {
             SDataDiogEntry oDiogEty = new SDataDiogEntry();
 
             oDiogEty.setQuantity(0d);
-            oDiogEty.setValueUnitary(oSupply.getCostUnitary());
+            oDiogEty.setValueUnitary(oSupply.getCost_r());
             oDiogEty.setValue(oSupply.getCost_r());
             oDiogEty.setOriginalQuantity(0d);
-            oDiogEty.setOriginalValueUnitary(oSupply.getCostUnitary());
+            oDiogEty.setOriginalValueUnitary(oSupply.getCost_r());
             oDiogEty.setSortingPosition(0);
             oDiogEty.setIsInventoriable(true);
             oDiogEty.setIsDeleted(false);
