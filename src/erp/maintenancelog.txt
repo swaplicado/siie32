@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 307.6/ 2026-09-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de transacción de BD en valuaciones para soportar reevaluación masiva.
+2) Cambio en contabilización de consumos para tomar el CC de la requisición.
+
+================================================================================
 SIIE 3.2 307.5/ 2026-09-03
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
