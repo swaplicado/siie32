@@ -144,7 +144,7 @@ public class SStockValuationRecordUtils {
             nItemReference = 0;
             ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
             /**
-             * Si el consumo tiene asociada una requisición
+             * Si el consumo tiene asociada una partida de requisición
              */
             if (oConsumption.getAuxMaterialRequestEntryPk() != null) {
                 if (oConsumption.getAuxMaterialRequestEntryPk()[1] > 0) {
@@ -235,6 +235,7 @@ public class SStockValuationRecordUtils {
                 
                 // Se asigna el centro de costo del movimiento de almacén de salida:
                 // 2026-08-13 Se cambia CC a 0 para no usar el del diog, sino el de la RM o DPS
+                // 2026-09-04 Se queda el CC del Diog por RM de resurtido.
                 nIdDiogEtyCc = 0;
 
                 for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
@@ -246,22 +247,10 @@ public class SStockValuationRecordUtils {
                         oAccount.read(new String[]{oConfig.getAccountId()}, session.getStatement());
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
-                    
+
                     if (nIdDiogEtyCc > 1) {
                         nIdCC = nIdDiogEtyCc;
                         sCc = SFinUtils.getCostCenterFormerIdXXX(session, nIdCC);
-                    }
-                    else if (lPurAccConfigs.size() == 1 
-                                && oConsumption.getAuxDpsCostCenterCode() != null 
-                                && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
-                        if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
-                            nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
-                        }
-                        else {
-                            nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
-                            lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
-                        }
-                        sCc = oConsumption.getAuxDpsCostCenterCode();
                     }
                     else {
                         if (lCC.containsKey(oConfig.getCostCenterId())) {
@@ -271,13 +260,29 @@ public class SStockValuationRecordUtils {
                             nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
                             lCC.put(oConfig.getCostCenterId(), nIdCC);
                         }
-                        
+
                         if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
                             sCc = SDataUtilities.obtainCostCenterItem(session, oConsumption.getFkItemId());
                             if (sCc.isEmpty()) {
-                                throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                                if (lPurAccConfigs.size() == 1
+                                        && oConsumption.getAuxDpsCostCenterCode() != null
+                                        && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
+                                    if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
+                                        nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
+                                    }
+                                    else {
+                                        nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
+                                        lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
+                                    }
+                                    sCc = oConsumption.getAuxDpsCostCenterCode();
+                                }
+                                if (sCc.isEmpty()) {
+                                    throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                                }
                             }
-                            nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                            else {
+                                nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                            }
                         }
                         else {
                             sCc = oConfig.getCostCenterId();

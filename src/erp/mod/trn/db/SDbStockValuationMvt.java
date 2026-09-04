@@ -75,7 +75,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
     protected double mdAuxConsumption;
     protected int[] maAuxWarehousePk;
     protected int[] maAuxMaterialRequestEntryPk;
-    protected int mnAuxFkCostCenterId;
+    protected int mnAuxFkDiogEtyCostCenterId;
     protected String msAuxDpsCostCenterCode;
     protected String msAuxItemDescription;
     protected String msAuxDiogTypeDescription;
@@ -144,7 +144,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
 
     public void setAuxConsumed(boolean b) { mbAuxConsumed = b; }
     public void setAuxConsumption(double d) { mdAuxConsumption = d; }
-    public void setAuxFkCostCenterId(int n) { mnAuxFkCostCenterId = n; }
+    public void setAuxFkDiogEtyCostCenterId(int n) { mnAuxFkDiogEtyCostCenterId = n; }
     public void setAuxDpsCostCenterCode(String s) { msAuxDpsCostCenterCode = s; }
     public void setAuxItemDescription(String s) { msAuxItemDescription = s; }
     public void setAuxDiogTypeDescription(String s) { msAuxDiogTypeDescription = s; }
@@ -203,7 +203,7 @@ public class SDbStockValuationMvt extends SDbRegistryUser implements SGridRow, S
 
     public boolean isAuxConsumed() { return mbAuxConsumed; }
     public double getAuxConsumption() { return mdAuxConsumption; }
-    public int getAuxFkCostCenter() { return mnAuxFkCostCenterId; }
+    public int getAuxFkDiogEtyCostCenter() { return mnAuxFkDiogEtyCostCenterId; }
     public String getAuxDpsCostCenterCode() { return msAuxDpsCostCenterCode; }
     public String getAuxItemDescription() { return msAuxItemDescription; }
     public String getAuxDiogTypeDescription() { return msAuxDiogTypeDescription; }

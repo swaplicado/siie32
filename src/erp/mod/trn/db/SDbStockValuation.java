@@ -320,10 +320,13 @@ public class SDbStockValuation extends SDbRegistryUser {
                     "ts_usr_upd = " + "NOW()" + " "
                     + getSqlWhere();
         }
-
+        
+        boolean autoCommit = session.getStatement().getConnection().getAutoCommit();
         try {
-            session.getStatement().getConnection().setAutoCommit(false);
-
+            if (autoCommit) {
+                session.getStatement().getConnection().setAutoCommit(false);
+            }
+            
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
                 /**
@@ -400,8 +403,10 @@ public class SDbStockValuation extends SDbRegistryUser {
             else {
                 throw new Exception("Se desconoce el identificador de la póliza contable.");
             }
-
-            session.getStatement().getConnection().commit();
+            
+            if (autoCommit) {
+                session.getStatement().getConnection().commit();
+            }
         }
         catch (SQLException ex) {
             session.getStatement().getConnection().rollback();
@@ -414,7 +419,9 @@ public class SDbStockValuation extends SDbRegistryUser {
             throw new Exception(ex);
         }
         finally {
-            session.getStatement().getConnection().setAutoCommit(true);
+            if (autoCommit) {
+                session.getStatement().getConnection().setAutoCommit(true);
+            }
         }
 
         mbRegistryNew = false;
@@ -481,6 +488,8 @@ public class SDbStockValuation extends SDbRegistryUser {
         registry.setPkStockValuationId(this.getPkStockValuationtId());
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());
+        registry.setDescription(this.getDescription());
+        registry.setSystem(this.isSystem());
         registry.setDeleted(this.isDeleted());
         registry.setDescription(this.getDescription());
         registry.setFkUserInsertId(this.getFkUserInsertId());

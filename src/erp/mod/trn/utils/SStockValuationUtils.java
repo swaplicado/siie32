@@ -696,7 +696,7 @@ public class SStockValuationUtils {
                         oConsumption.setFkStockValuationId(idValuation);
                         oConsumption.setFkStockValuationMvtId_n(entry.getPkStockValuationMvtId());
                         oConsumption.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_CONSUMP);
-                        oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+                        oConsumption.setAuxFkDiogEtyCostCenterId(res.getInt("fid_cc"));
                         oConsumption.setAuxDpsCostCenterCode(entry.getAuxDpsCostCenterCode());
 
                         oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
@@ -739,7 +739,7 @@ public class SStockValuationUtils {
                     oConsumption.setFkStockValuationId(idValuation);
                     oConsumption.setFkStockValuationMvtId_n(0);
                     oConsumption.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_CONSUMP);
-                    oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+                    oConsumption.setAuxFkDiogEtyCostCenterId(res.getInt("fid_cc"));
 
                     oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
                     oConsumption.setFkWarehouseId(res.getInt("id_wh"));
@@ -959,8 +959,12 @@ public class SStockValuationUtils {
      * @throws SQLException
      */
     public static String revaluateValuations(SGuiClient client, ArrayList<SDbStockValuation> lValuations) throws SQLException {
+        Connection connection = client.getSession().getStatement().getConnection();
+        boolean autoCommit = connection.getAutoCommit();
         try {
-            client.getSession().getStatement().getConnection().setAutoCommit(false);
+            if (autoCommit) {
+                connection.setAutoCommit(false);
+            }
 
             SDbStockValuation oNewValuation;
             for (SDbStockValuation oValuation : lValuations) {
@@ -973,19 +977,32 @@ public class SStockValuationUtils {
                 oNewValuation.save(client.getSession());
             }
 
-            client.getSession().getStatement().getConnection().commit();
+            if (autoCommit) {
+                connection.commit();
+            }
         }
         catch (CloneNotSupportedException ex) {
             Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, null, ex);
 
-            client.getSession().getStatement().getConnection().rollback();
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+            }
 
             return ex.getMessage();
         }
         catch (Exception ex) {
             Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE, null, ex);
 
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+            }
+
             return ex.getMessage();
+        }
+        finally {
+            if (autoCommit && !connection.getAutoCommit()) {
+                connection.setAutoCommit(true);
+            }
         }
 
         return "";
