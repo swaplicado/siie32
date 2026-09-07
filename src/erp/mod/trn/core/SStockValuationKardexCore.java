@@ -52,10 +52,11 @@ public abstract class SStockValuationKardexCore {
      * @param session sesión activa de base de datos
      * @param startDate fecha de inicio del rango de movimientos a procesar
      * @param cutDate fecha de corte del rango de movimientos a procesar
+     * @param idValuation
      * @throws Exception si ocurre un error al resolver costos o al guardar
      * registros
      */
-    public static void createKardexEntries(SGuiSession session, final Date startDate, final Date cutDate) throws Exception {
+    public static void createKardexEntries(SGuiSession session, final Date startDate, final Date cutDate, final int idValuation) throws Exception {
         String sql;
         double priceDiffPercent = 0d;
         try {
@@ -73,7 +74,7 @@ public abstract class SStockValuationKardexCore {
             ResultSet res = st.executeQuery(sql);
             SDbStockKardexEntry oKardexEntry;
             while (res.next()) {
-                oKardexEntry = createKardexEntry(session, res, priceDiffPercent, 0, 0);
+                oKardexEntry = createKardexEntry(session, res, priceDiffPercent, 0, idValuation);
             }
         }
     }
@@ -227,13 +228,23 @@ public abstract class SStockValuationKardexCore {
                 int idUnit = res.getInt("id_unit");
                 int idLot = res.getInt("id_lot");
 
-                if (idItem == 23762) {
+                if (idItem == 19382) {
                     System.out.println("");
                 }
 
                 // Obtener las entradas disponibles para este artículo/unidad/lote en orden PEPS
                 String sItemKey = idItem + "-" + idUnit + "-" + idLot;
                 List<SRowKardexRemaining> lRemaining = SStockValuationKardexUtils.getRemaingingByItemKey(sItemKey, mapRemaining);
+                // Validar si no hay entradas para consumir correspondientes al item:
+                if (lRemaining == null || lRemaining.isEmpty()) {
+                    sWarnings += "ERROR: Sin existencias restantes para diog out "
+                            + "num: " + res.getString("num") + " " + ", fecha: " + res.getString("dt") + " "
+                            + "key = [" + outDiogYear + ", " + outDiogDoc + ", " + outDiogEty + " ].\n"
+                            + "Item: " + res.getString("item_key") + " - " + res.getString("item_name")
+                            + ", id_item: " + idItem + ", id_unit: " + idUnit + ", id_lot: " + idLot
+                            + ",\n salida qty=" + qtyOut + ", quedan por consumir=" + dQtyToConsume + ".\n";
+                    continue;
+                }
                 ArrayList<SDbStockValuationKardex> lStkOutConsump = new ArrayList<>();
                 int iRemIndex = -1;
                 for (SRowKardexRemaining oRemaining : lRemaining) {
@@ -286,8 +297,8 @@ public abstract class SStockValuationKardexCore {
                     // Calcular el costo unitario proporcional al remanente disponible
                     double costUnit = SLibUtils.roundAmount(oRemaining.getRemaining() / oRemaining.getQtyAvailable());
                     double costUnitCur = SLibUtils.roundAmount(oRemaining.getRemainingCurrency() / oRemaining.getQtyAvailable());
-                    double totalOut = SLibUtils.roundAmount(costUnit * dQtyKardexConsume);
-                    double totalOutCur = SLibUtils.roundAmount(costUnitCur * dQtyKardexConsume);
+                    double totalOut = SLibUtils.roundAmount(oRemaining.getRemaining() * dQtyKardexConsume / oRemaining.getQtyAvailable());
+                    double totalOutCur = SLibUtils.roundAmount(oRemaining.getRemainingCurrency() * dQtyKardexConsume / oRemaining.getQtyAvailable());
 
                     SDbStockValuationKardex oKardexOut = new SDbStockValuationKardex(idValuation);
 
@@ -382,10 +393,20 @@ public abstract class SStockValuationKardexCore {
         try (Statement st = session.getStatement().getConnection().createStatement()) {
             sql = SStockValuationUtils.getStockMovementsQuery(st, SModSysConsts.TRNS_CT_IOG_OUT, startDate, cutDate, false);
             ResultSet res = st.executeQuery(sql);
+            int idItem = 0;
 
             while (res.next()) {
                 // Buscar los registros de kardex de salida ya persistidos para este movimiento de almacén
                 int[] pkOutDiogEty = new int[]{res.getInt("fid_diog_year"), res.getInt("fid_diog_doc"), res.getInt("fid_diog_ety")};
+                idItem = res.getInt("id_item");
+                /**
+                 * Se deja este comentario para realizar una inspección en caso de ser necesario
+                 * Edwin Carmona
+                 * 2026-09-07
+                 */
+//                if (idItem == 19382) {
+//                    System.out.println("");
+//                }
                 List<SDbStockValuationKardex> lKardexOut = SStockValuationKardexUtils.getOutKardexOfStockMovements(session, pkOutDiogEty);
                 if (lKardexOut != null && !lKardexOut.isEmpty()) {
                     // Construir un movimiento de consumo por cada registro de kardex de salida
@@ -418,7 +439,7 @@ public abstract class SStockValuationKardexCore {
                         oConsumption.setFkStockValuationId(idValuation);
                         oConsumption.setFkStockValuationMvtId_n(0);
                         oConsumption.setFkStockTypeValuationMvtId(SDbStockValuationMvt.TYPE_VAL_MVT_CONSUMP);
-                        oConsumption.setAuxFkCostCenterId(res.getInt("fid_cc"));
+                        oConsumption.setAuxFkDiogEtyCostCenterId(res.getInt("fid_cc"));
                         oConsumption.setAuxDpsCostCenterCode(oKardexOut.getAuxDpsCostCenterCode());
 
                         oConsumption.setFkCompanyBranchId(res.getInt("id_cob"));
@@ -436,7 +457,8 @@ public abstract class SStockValuationKardexCore {
                 else {
                     String sError = "No hay movimientos en kardex correspondientes a la salida de almacén "
                             + " (fecha: " + res.getDate("dt") + ") " + "num: " + res.getString("num") + ".\n"
-                            + "Item: " + res.getString("item_key") + " - " + res.getString("item_name") + ". ";
+                            + "Item: " + res.getString("item_key") + " - " + res.getString("item_name") + " "
+                            + "ID: " + idItem + ". ";
                     throw new Exception(sError);
                 }
             }

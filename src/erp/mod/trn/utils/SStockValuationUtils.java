@@ -131,7 +131,7 @@ public class SStockValuationUtils {
             // El filtro de fechas/tipos de movimiento ya se aplicó dentro de la subconsulta stk;
             // aquí solo quedan los filtros que dependen de las tablas adicionales (si los hubiera).
             sql.append("WHERE NOT stk.b_del ")
-               .append("ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC");
+               .append("ORDER BY stk.dt ASC, stk.fid_diog_year ASC, stk.fid_diog_doc ASC, stk.fid_diog_ety ASC, de.id_doc ASC, de.id_ety ASC");
         }
         else {
             sql.append("WHERE NOT stk.b_del ")
@@ -140,7 +140,7 @@ public class SStockValuationUtils {
                .append("AND stk.").append(diogCategory == SModSysConsts.TRNS_CT_IOG_OUT ? "mov_out" : "mov_in").append(" > 0 ")
                .append("AND stk.fid_ct_iog = ").append(diogCategory).append(' ')
                .append(tpmovCondition)
-               .append("ORDER BY stk.dt ASC, de.id_doc ASC, de.id_ety ASC");
+               .append("ORDER BY stk.dt ASC, stk.fid_diog_year ASC, stk.fid_diog_doc ASC, stk.fid_diog_ety ASC, de.id_doc ASC, de.id_ety ASC");
         }
 
         return sql.toString();

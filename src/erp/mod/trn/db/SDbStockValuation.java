@@ -49,6 +49,8 @@ public class SDbStockValuation extends SDbRegistryUser {
     protected Date mtDateEnd;
     // Descripción
     protected String msDescription;
+    // Advertencias que se generaron al realizarse la valuación
+    protected String msWarnings;
     //protected boolean mbSystem;
     //protected boolean mbDeleted;
     //protected int mnFkUserInsertId;
@@ -138,6 +140,7 @@ public class SDbStockValuation extends SDbRegistryUser {
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setDescription(String s) { msDescription = s; }
+    public void setWarnings(String s) { msWarnings = s; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -153,6 +156,7 @@ public class SDbStockValuation extends SDbRegistryUser {
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
     public String getDescription() { return msDescription; }
+    public String getWarnings() { return msWarnings; }
     public boolean isSystem() { return mbSystem; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -181,6 +185,7 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnPkStockValuationId = 0;
         mtDateStart = null;
         msDescription = "";
+        msWarnings = "";
         mbSystem = false;
         mbDeleted = false;
         mnFkUserInsertId = 0;
@@ -237,6 +242,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 mtDateStart = res.getDate("dt_sta");
                 mtDateEnd = res.getDate("dt_end");
                 msDescription = res.getString("description");
+                msWarnings = res.getString("warnings");
                 mbSystem = res.getBoolean("b_sys");
                 mbDeleted = res.getBoolean("b_del");
                 mnFkUserInsertId = res.getInt("fk_usr_ins");
@@ -296,6 +302,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                     + "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', "
                     + "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', "
                     + "'" + (msDescription == null ? "" : msDescription) + "', "
+                    + "'" + (msWarnings == null ? "" : msWarnings) + "', "
                     + (mbSystem ? 1 : 0) + ", "
                     + (mbDeleted ? 1 : 0) + ", "
                     + mnFkUserInsertId + ", "
@@ -312,6 +319,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                     "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', "
                     + "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', "
                     + "description = '" + (msDescription == null ? "" : msDescription) + "', "
+                    + "warnings = '" + (msWarnings == null ? "" : msWarnings) + "', "
                     + "b_sys = " + (mbSystem ? 1 : 0) + ", "
                     + "b_del = " + (mbDeleted ? 1 : 0) + ", "
                     + //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -329,17 +337,18 @@ public class SDbStockValuation extends SDbRegistryUser {
             
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
+                msWarnings = "";
                 /**
                  * Este código se comenta por si se quiere regenerar todo el
                  * kardex
                  */
-                //    String fechaStr = "01/03/2024";
-                //    String fechaFin = "31/07/2026";
-                //    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                //    Date inicio = sdf.parse(fechaStr);
-                //    Date fin = sdf.parse(fechaFin);
-                //    SStockValuationKardexCore.createKardexEntries(session, inicio, fin);
-                //    SStockValuationKardexCore.createKardexOuts(session, inicio, fin, 0);
+//                String fechaStr = "01/03/2024";
+//                String fechaFin = "31/07/2026";
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+//                Date inicio = sdf.parse(fechaStr);
+//                Date fin = sdf.parse(fechaFin);
+//                SStockValuationKardexCore.createKardexEntries(session, inicio, fin, mnPkStockValuationId);
+//                msWarnings += SStockValuationKardexCore.createKardexOuts(session, inicio, fin, mnPkStockValuationId);
 
                 // Crear movimientos de ajuste de inventario
                 // System.out.println("Creando ajustes...");
@@ -350,8 +359,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                 // Crear entradas de inventario
                 System.out.println("Creando entries...");
                 SStockValuationUtils.createValuationEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
-                String warnings = SStockValuationKardexCore.createKardexOuts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
-                System.out.println(warnings);
+                msWarnings += SStockValuationKardexCore.createKardexOuts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                System.out.println(msWarnings);
 
                 // Consumir salidas de inventario desde kardex
                 ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationKardexCore.consumeFromKardex(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
@@ -396,6 +405,14 @@ public class SDbStockValuation extends SDbRegistryUser {
                 if (!sErrors.isEmpty()) {
                     throw new Exception("No se pudo completar el proceso.\n"
                             + "Se encontraron errores en la valuación de inventarios:\n" + sErrors);
+                }
+
+                // Si existen warnings, actualizar el campo:
+                if (!msWarnings.isEmpty()) {
+                    msSql = "UPDATE " + getSqlTable() + " SET "
+                            + "warnings = '" + msWarnings + "' "
+                            + getSqlWhere();
+                    session.getStatement().execute(msSql);
                 }
 
                 System.out.println("Terminado.");

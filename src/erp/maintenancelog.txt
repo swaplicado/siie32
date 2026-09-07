@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 308.1/ 2026-09-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Columna e ícono de advertencias en valuaciones.
+2) Warnings cuando no hay remanente para un movimiento de salida.
+3) Verificación de costos desde tabla de kardex de valuación.
+
+================================================================================
 SIIE 3.2 308.0/ 2026-09-03
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

@@ -43,7 +43,7 @@ public abstract class SStockValuationKardexUtils {
         return type[0] == expected[0] && type[1] == expected[1] && type[2] == expected[2];
     }
 
-    protected static void addNote(SDbStockValuationKardex oKardex, String msg) {
+    public static void addNote(SDbStockValuationKardex oKardex, String msg) {
         SDbStockValuationKardexNote note = new SDbStockValuationKardexNote();
         note.setNotes(msg);
         oKardex.getNotes().add(note);
@@ -77,7 +77,7 @@ public abstract class SStockValuationKardexUtils {
         }
     }
 
-    protected static List<SDbStockValuationKardex> getOutKardexOfStockMovements(SGuiSession session, final int[] pkDiogOut) throws SQLException, Exception {
+    public static List<SDbStockValuationKardex> getOutKardexOfStockMovements(SGuiSession session, final int[] pkDiogOut) throws SQLException, Exception {
         String sql = "";
         ArrayList<SDbStockValuationKardex> lKardexOuts = new ArrayList<>();
 
@@ -139,7 +139,7 @@ public abstract class SStockValuationKardexUtils {
         return lKardexOut;
     }
 
-    protected static HashMap<String, SRowKardexRemaining> getKardexRemaining(SGuiSession session) throws Exception {
+    public static HashMap<String, SRowKardexRemaining> getKardexRemaining(SGuiSession session) throws Exception {
         String sql = "SELECT "
                 + "    k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n, "
                 + "    k.dt_mov, k.fk_dps_year_in_main_n, k.fk_dps_doc_in_main_n, k.fk_dps_ety_in_main_n, k.fk_dps_cur_in_main_n, "
@@ -152,7 +152,7 @@ public abstract class SStockValuationKardexUtils {
                 + "WHERE k.b_del = 0 "
                 + "GROUP BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n "
                 + "HAVING qty_available > 0 "
-                + "ORDER BY k.dt_mov ASC;";
+                + "ORDER BY k.dt_mov ASC, k.fk_diog_year_in_n ASC, k.fk_diog_doc_in_n ASC, k.fk_diog_ety_in_n ASC;";
         HashMap<String, SRowKardexRemaining> map = new HashMap<>();
         try (Statement st = session.getStatement().getConnection().createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
@@ -182,10 +182,13 @@ public abstract class SStockValuationKardexUtils {
         return map;
     }
 
-    protected static List<SRowKardexRemaining> getRemaingingByItemKey(String sKey, HashMap<String, SRowKardexRemaining> mRemaining) {
+    public static List<SRowKardexRemaining> getRemaingingByItemKey(String sKey, HashMap<String, SRowKardexRemaining> mRemaining) {
         List<SRowKardexRemaining> lRemaining = mRemaining.values().stream()
                 .filter(p -> sKey.equals(p.getItemKey()))
-                .sorted(Comparator.comparing(SRowKardexRemaining::getMovDate))
+                .sorted(Comparator.comparing(SRowKardexRemaining::getMovDate)
+                        .thenComparingInt(SRowKardexRemaining::getFkDiogYearInId)
+                        .thenComparingInt(SRowKardexRemaining::getFkDiogDocInId)
+                        .thenComparingInt(SRowKardexRemaining::getFkDiogEntryInId))
                 .collect(Collectors.toList());
 
         return lRemaining;
@@ -409,7 +412,7 @@ public abstract class SStockValuationKardexUtils {
         oMvt.setFkWarehouseId(oKardex.getFkWarehouseId());
         
         oMvt.setAuxIsAdjust(oKardex.isAuxAdjust());
-        oMvt.setAuxFkCostCenterId(oKardex.getAuxFkCostCenter());
+        oMvt.setAuxFkDiogEtyCostCenterId(oKardex.getAuxFkCostCenter());
         oMvt.setAuxDpsCostCenterCode(oKardex.getAuxDpsCostCenterCode());
 
         // convertir las notas del kardex a movement valuación:
@@ -434,7 +437,7 @@ public abstract class SStockValuationKardexUtils {
      * @return true si ya existe, false si no existe.
      * @throws Exception
      */
-    protected static boolean existsKardexEntry(SGuiSession session, int diogYear, int diogDoc, int diogEty) throws Exception {
+    public static boolean existsKardexEntry(SGuiSession session, int diogYear, int diogDoc, int diogEty) throws Exception {
         String sql = "SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " "
                 + "WHERE fk_diog_year_in_n = " + diogYear
                 + " AND fk_diog_doc_in_n = " + diogDoc

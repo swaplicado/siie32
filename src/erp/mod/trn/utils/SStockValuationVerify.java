@@ -5,9 +5,10 @@
  */
 package erp.mod.trn.utils;
 
+
 import erp.data.SDataConstantsSys;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.trn.db.SStockValuationConfiguration;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -26,13 +27,36 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SStockValuationVerify {
+public abstract class SStockValuationVerify {
 
     /**
      * Fecha de inicio a partir de la cual se aplican las verificaciones de
      * valuación.
      */
     public static final String SINCE_DATE = "2026-07-01";
+
+    /**
+     * Obtiene las advertencias de una valuación específica.
+     *
+     * @param oSession sesión activa de base de datos
+     * @param idValuation ID de la valuación
+     * @return cadena con las advertencias de la valuación, o cadena vacía si
+     * no hay advertencias
+     */
+    public static String getValuationWarnings(SGuiSession oSession, final int idValuation) {
+        String sSql = "SELECT warnings FROM trn_stk_val v "
+                + "WHERE v.id_stk_val = " + idValuation + ";";
+        try {
+            ResultSet warnResultSet = oSession.getStatement().executeQuery(sSql);
+            if (warnResultSet.next()) {
+                return warnResultSet.getString("warnings");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return SLibUtils.textTrim("");
+    }
 
     /**
      * Ejecuta todas las verificaciones de integridad de la valuación de
@@ -484,7 +508,8 @@ public class SStockValuationVerify {
                     + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
                     + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
                     + rs.getInt("mvt.fk_diog_ety_in_n") + "] \n "
-                    + "tiene una cantidad de consumos que rebasan la cantidad de entrada.\n";
+                    + "tiene una cantidad de consumos que rebasan la cantidad de entrada.\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n";
         }
         if (!sErrors.isEmpty()) {
             Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
@@ -511,41 +536,49 @@ public class SStockValuationVerify {
         Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando costos consumidos vs entradas...");
         String sErrors = "";
         String sLog = "";
-        boolean debugMovimientosCostos = false; // cambiar a true para inspeccionar los movimientos individuales
+        boolean debugMovimientosCostos = true; // cambiar a true para inspeccionar los movimientos individuales
 
         String sql = "SELECT "
-                + "	i.item_key, "
-                + "	i.item, "
-                + "	mvt.fk_item, "
-                + "	mvt.fk_unit, "
-                + "	mvt.fk_diog_year_in_n,  "
-                + "	mvt.fk_diog_doc_in_n,  "
-                + "	mvt.fk_diog_ety_in_n, "
-                + "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", mvt.cost_r, 0)) AS cost_in, "
-                + "	SUM(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", mvt.cost_r, 0)) AS cost_out "
-                + "FROM "
-                + "	trn_stk_val_mvt mvt "
-                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
-                + "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item "
-                + "INNER JOIN trn_diog diog_in ON mvt.fk_diog_year_in_n = diog_in.id_year AND mvt.fk_diog_doc_in_n = diog_in.id_doc "
-                + "WHERE "
-                + "	mvt.b_del = 0 "
-                + "	AND v.b_del = 0 "
-                + "	AND diog_in.dt >= '" + SINCE_DATE + "' "
-                + "GROUP BY mvt.fk_diog_year_in_n, mvt.fk_diog_doc_in_n, mvt.fk_diog_ety_in_n "
-                + "HAVING cost_out > cost_in AND ABS(cost_in - cost_out) > 1;";
-
+                + "  i.item_key, "
+                + "  i.item, "
+                + "  k.fk_item, "
+                + "  k.fk_unit, "
+                + "  g.fk_diog_year_in_n, "
+                + "  g.fk_diog_doc_in_n, "
+                + "  g.fk_diog_ety_in_n, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", k.total_in, 0)) AS cost_in, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", k.total_out, 0)) AS cost_out, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", k.qty_mov_out, 0)) AS qty_out "
+                + "FROM ("
+                + "  SELECT DISTINCT fk_item, fk_unit, fk_diog_year_in_n, fk_diog_doc_in_n, fk_diog_ety_in_n "
+                + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX)
+                + "  WHERE b_del = 0 AND fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT
+                + "    AND fk_diog_year_in_n IS NOT NULL AND fk_diog_doc_in_n IS NOT NULL "
+                + "    AND fk_diog_year_in_n > 0 AND fk_diog_doc_in_n > 0 "
+                + ") g "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "  ON k.fk_item = g.fk_item "
+                + "  AND k.fk_diog_year_in_n = g.fk_diog_year_in_n "
+                + "  AND k.fk_diog_doc_in_n = g.fk_diog_doc_in_n "
+                + "  AND k.fk_diog_ety_in_n = g.fk_diog_ety_in_n "
+                + "  AND k.b_del = 0 "
+                + "INNER JOIN trn_diog diog_in ON g.fk_diog_year_in_n = diog_in.id_year AND g.fk_diog_doc_in_n = diog_in.id_doc "
+                + "INNER JOIN erp.itmu_item i ON g.fk_item = i.id_item "
+                + "WHERE diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY g.fk_diog_year_in_n, g.fk_diog_doc_in_n, g.fk_diog_ety_in_n "
+                + "HAVING cost_out > cost_in AND ABS(cost_in - cost_out) > GREATEST(1, qty_out * 0.01);";
         ResultSet rs = oSession.getStatement().executeQuery(sql);
         while (rs.next()) {
-            int yearIn = rs.getInt("mvt.fk_diog_year_in_n");
-            int docIn = rs.getInt("mvt.fk_diog_doc_in_n");
-            int etyIn = rs.getInt("mvt.fk_diog_ety_in_n");
+            int yearIn = rs.getInt("fk_diog_year_in_n");
+            int docIn = rs.getInt("fk_diog_doc_in_n");
+            int etyIn = rs.getInt("fk_diog_ety_in_n");
             double costIn = rs.getDouble("cost_in");
             double costOut = rs.getDouble("cost_out");
 
             sErrors += "El movimiento de entrada de almacén con ID "
                     + "[" + yearIn + ", " + docIn + ", " + etyIn + "] \n "
-                    + "tiene un costo de consumos que rebasan el costo de entrada.\n";
+                    + "tiene un costo de consumos que rebasan el costo de entrada.\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n";
             sLog = "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n"
                     + "Entradas: $" + costIn + ", salidas: $" + costOut;
             sErrors += sLog + "\n";
@@ -558,16 +591,16 @@ public class SStockValuationVerify {
                         .append(etyIn).append("]:\n");
 
                 String sqlMovs = "SELECT "
-                        + "    mvt.*, "
+                        + "    k.*, "
                         + "    i.item_key, "
                         + "    i.item "
-                        + "FROM trn_stk_val_mvt mvt "
-                        + "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item "
-                        + "WHERE mvt.b_del = 0 "
-                        + "AND mvt.fk_diog_year_in_n = ? "
-                        + "AND mvt.fk_diog_doc_in_n = ? "
-                        + "AND mvt.fk_diog_ety_in_n = ? "
-                        + "ORDER BY mvt.dt_mov ASC;";
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                        + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                        + "WHERE k.b_del = 0 "
+                        + "AND k.fk_diog_year_in_n = ? "
+                        + "AND k.fk_diog_doc_in_n = ? "
+                        + "AND k.fk_diog_ety_in_n = ? "
+                        + "ORDER BY k.dt_mov ASC;";
 
                 java.sql.PreparedStatement psMovs
                         = oSession.getStatement().getConnection().prepareStatement(sqlMovs);
@@ -578,8 +611,10 @@ public class SStockValuationVerify {
                 ResultSet rsMovs = psMovs.executeQuery();
                 while (rsMovs.next()) {
                     sbDetails.append("  - tipo=").append(rsMovs.getInt("fk_ct_iog"))
-                            .append(" | qty=").append(rsMovs.getDouble("qty_mov"))
-                            .append(" | cost=").append(rsMovs.getDouble("cost_r"))
+                            .append(" | qty=").append(rsMovs.getDouble("qty_mov_out"))
+                            .append(" | cost_u=").append(rsMovs.getDouble("cost_u"))
+                            .append(" | total_in=").append(rsMovs.getDouble("total_in"))
+                            .append(" | total_out=").append(rsMovs.getDouble("total_out"))
                             .append(" | fecha=").append(rsMovs.getDate("dt_mov"))
                             .append(" | doc_in=[").append(rsMovs.getInt("fk_diog_year_in_n"))
                             .append(", ").append(rsMovs.getInt("fk_diog_doc_in_n"))
@@ -593,104 +628,6 @@ public class SStockValuationVerify {
             }
         }
 
-        if (!sErrors.isEmpty()) {
-            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
-        }
-        return sErrors;
-    }
-
-    /**
-     * Verifica que los movimientos de entrada de almacén tengan un valor
-     * unitario consistente con el documento de origen (orden de compra o
-     * factura).
-     * <p>
-     * Para entradas con naturaleza de inventario (nat = 1), compara el costo
-     * unitario del movimiento ({@code trn_stk.cost_u}) contra el precio
-     * unitario real del renglón del documento
-     * ({@code trn_dps_ety.price_u_real_r}). Para entradas con naturaleza de
-     * activo fijo (nat = 2), detecta movimientos que tengan cargo o abono
-     * contable ({@code debit > 0} o {@code credit > 0}), lo cual indica que
-     * fueron incorrectamente valuados.
-     * </p>
-     *
-     * @param oSession sesión activa de base de datos
-     * @return cadena con los errores encontrados, o cadena vacía si no hay
-     * errores
-     * @throws SQLException si ocurre un error al ejecutar la consulta
-     */
-    private static String verifyStockEntryValue(SGuiSession oSession) throws SQLException {
-        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando valores de entradas de almacén...");
-        double priceDiffPercent = 0d;
-        try {
-            SStockValuationConfiguration oCfg = SStockValuationUtils.getStockValuationConfig(oSession.getStatement().getConnection().createStatement());
-            // P.ej. para el 10% se configura 0.10
-            priceDiffPercent = oCfg.getDiffPricePercent();
-        }
-        catch (Exception e) {
-            Logger.getLogger(SStockValuationUtils.class.getName()).log(Level.SEVERE,
-                    "Error al obtener el porcentaje de diferencia de precio, definido en 0",
-                    e);
-        }
-        SStockValuationUpdateStkUtils.updateStockInRowsSinceDate(oSession, SINCE_DATE);
-        String sErrors = "";
-        String sql = "SELECT "
-                + "  ie.id_year, "
-                + "  ie.id_doc, "
-                + "  ie.id_ety, "
-                + "  i.dt, "
-                + "  i.num, "
-                + "  trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 2 AS is_asset_nat, "
-                + "  de.id_year AS dps_year, "
-                + "  de.id_doc AS dps_doc, "
-                + "  de.id_ety AS dps_ety, "
-                + "  d.num_ser AS dps_num_ser, "
-                + "  d.num AS dps_num, "
-                + "  d.dt AS dps_dt, "
-                + "  d.fid_ct_dps, "
-                + "  d.fid_cl_dps, "
-                + "  d.fid_tp_dps, "
-                + "  ie.fid_item, "
-                + "  ie.fid_unit, "
-                + "  ie.val_u, "
-                + "  ie.qty, "
-                + "  ie.orig_qty, "
-                + "  ie.val, "
-                + "  s.cost_u, "
-                + "  de.fid_item, "
-                + "  de.fid_unit, "
-                + "  de.qty, "
-                + "  de.price_u_real_r "
-                + "FROM trn_diog i "
-                + "INNER JOIN trn_diog_ety ie ON i.id_year = ie.id_year AND i.id_doc = ie.id_doc "
-                + "INNER JOIN trn_stk s ON s.fid_diog_year = ie.id_year AND s.fid_diog_doc = ie.id_doc AND s.fid_diog_ety = ie.id_ety "
-                + "INNER JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_in_n = ie.id_year AND mvt.fk_diog_doc_in_n = ie.id_doc AND mvt.fk_diog_ety_in_n = ie.id_ety "
-                + " AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " AND mvt.b_del = 0 "
-                + "INNER JOIN trn_stk_val v ON v.id_stk_val = mvt.fk_stk_val AND v.b_del = 0 "
-                + "INNER JOIN trn_dps_ety de ON ie.fid_dps_year_n = de.id_year AND ie.fid_dps_doc_n = de.id_doc AND ie.fid_dps_ety_n = de.id_ety "
-                + "INNER JOIN trn_dps d ON de.id_year = d.id_year AND de.id_doc = d.id_doc "
-                + "WHERE i.dt >= '" + SINCE_DATE + "' ";
-
-        sql += "AND ( "
-                // Si la naturaleza del documento es predeterminada y la diferencia del costo excede el porcentaje configurado
-                + "  (trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 1 AND "
-                + "     ROUND(ABS(s.cost_u - de.price_u_real_r), 2) > ROUND((de.price_u_real_r * " + priceDiffPercent + "), 2)) "
-                // O si la naturaleza del documento es activo fijo y tiene cargo o abono contable
-                + "  OR (trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc) = 2 AND (s.debit > 0 OR s.credit > 0)) "
-                + ") "
-                + "AND i.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
-                + "AND i.b_del = 0 AND ie.b_del = 0 AND s.b_del = 0;";
-        ResultSet rs = oSession.getStatement().executeQuery(sql);
-        while (rs.next()) {
-            sErrors += "El movimiento de almacén con ID "
-                    + "[" + rs.getInt("ie.id_year") + ", "
-                    + rs.getInt("ie.id_doc") + ", "
-                    + rs.getInt("ie.id_ety") + "] "
-                    + "precio unitario almacén [" + rs.getDouble("s.cost_u") + "] vs "
-                    + "precio documento [" + rs.getDouble("de.price_u_real_r") + "].\n "
-                    + "Folio documento: " + rs.getString("dps_num_ser") + " " + rs.getString("dps_num") + ", "
-                    + "fecha: " + SLibUtils.DateFormatDate.format(rs.getDate("dps_dt")) + " " + ", "
-                    + "no tiene un valor de entrada consistente con su documento de origen.\n";
-        }
         if (!sErrors.isEmpty()) {
             Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
         }
