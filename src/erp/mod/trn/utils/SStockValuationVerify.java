@@ -9,6 +9,7 @@ package erp.mod.trn.utils;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbStockValuationKardex;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -34,6 +35,12 @@ public abstract class SStockValuationVerify {
      * valuación.
      */
     public static final String SINCE_DATE = "2026-07-01";
+    
+    /**
+     * Tolerancia (en unidades de costo) permitida para el remanente negativo
+     * de kardex antes de considerarse un error de integridad.
+     */
+    public static final double TOLERANCE_KARDEX_REMAINING = 1.0;
 
     /**
      * Obtiene las advertencias de una valuación específica.
@@ -76,8 +83,11 @@ public abstract class SStockValuationVerify {
                 + verifyStockValuationQtyConsumptions(oSession)
                 + verifyStockValuationCostConsumptions(oSession)
                 + verifyPurchaseInvoiceWithZero(oSession)
-                + verifyOrdersWithoutInvoiceWithZero(oSession);
-        // + verifyStockEntryValue(oSession);
+                + verifyOrdersWithoutInvoiceWithZero(oSession)
+                + verifyKardexEntriesWithoutMvt(oSession)
+                + verifyKardexOutsWithoutMvt(oSession)
+                + verifyNegativeKardexRemaining(oSession)
+                + verifyOrphanKardexAdjusts(oSession);
     }
 
     /**
@@ -628,6 +638,192 @@ public abstract class SStockValuationVerify {
             }
         }
 
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo registro de entrada en el kardex tenga su correspondiente
+     * movimiento de entrada en trn_stk_val_mvt.
+     * Detecta entradas procesadas en kardex que no se reflejaron en la valuacion.
+     */
+    private static String verifyKardexEntriesWithoutMvt(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando entradas de kardex sin mvt...");
+        String sErrors = "";
+        String sql = "SELECT k.fk_item, k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n, i.item_key "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON k.fk_diog_year_in_n = diog_in.id_year AND k.fk_diog_doc_in_n = diog_in.id_doc "
+                + "LEFT JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_in_n = k.fk_diog_year_in_n "
+                + "  AND mvt.fk_diog_doc_in_n = k.fk_diog_doc_in_n "
+                + "  AND mvt.fk_diog_ety_in_n = k.fk_diog_ety_in_n "
+                + "  AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " AND mvt.b_del = 0 "
+                + "WHERE k.b_del = 0 AND k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN
+                + "  AND k.fk_diog_year_in_n > 0 AND k.fk_diog_doc_in_n > 0 "
+                + "  AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "  AND mvt.id_stk_val_mvt IS NULL "
+                + "GROUP BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n "
+                + "ORDER BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "Entrada de kardex [" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", " + rs.getInt("fk_diog_ety_in_n") + "] "
+                    + "item: " + rs.getString("item_key") + " no tiene mvt de entrada en la valuacion.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo registro de salida en el kardex tenga su correspondiente
+     * movimiento de salida en trn_stk_val_mvt.
+     * Detecta consumos registrados en kardex que no se reflejaron en la valuacion.
+     */
+    private static String verifyKardexOutsWithoutMvt(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando salidas de kardex sin mvt...");
+        String sErrors = "";
+        String sql = "SELECT k.fk_item, k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n, i.item_key "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_out ON k.fk_diog_year_out_n = diog_out.id_year AND k.fk_diog_doc_out_n = diog_out.id_doc "
+                + "LEFT JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_out_n = k.fk_diog_year_out_n "
+                + "  AND mvt.fk_diog_doc_out_n = k.fk_diog_doc_out_n "
+                + "  AND mvt.fk_diog_ety_out_n = k.fk_diog_ety_out_n "
+                + "  AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + " AND mvt.b_del = 0 "
+                + "WHERE k.b_del = 0 AND k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT
+                + "  AND k.fk_diog_year_out_n > 0 AND k.fk_diog_doc_out_n > 0 "
+                + "  AND diog_out.dt >= '" + SINCE_DATE + "' "
+                + "  AND mvt.id_stk_val_mvt IS NULL "
+                + "GROUP BY k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n "
+                + "ORDER BY k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "Salida de kardex [" + rs.getInt("fk_diog_year_out_n") + ", "
+                    + rs.getInt("fk_diog_doc_out_n") + ", " + rs.getInt("fk_diog_ety_out_n") + "] "
+                    + "item: " + rs.getString("item_key") + " no tiene mvt de salida en la valuacion.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+    
+    /**
+     * Verifica que el remanente de costo de cada entrada de kardex (agrupada
+     * por su documento de entrada {@code fk_diog_*_in_n} e ítem) no sea
+     * negativo más allá de la tolerancia permitida.
+     * <p>
+     * Para cada grupo se calcula {@code SUM(total_in) - SUM(total_out)}. Un
+     * resultado menor a {@code -tolerancia} indica que se consumió más costo
+     * del que efectivamente entró, lo cual provocaría errores en valuaciones
+     * futuras (costos negativos, PPP mal calculado, etc.).
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyNegativeKardexRemaining(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando remanente negativo de kardex...");
+        String sErrors = "";
+        String sql = "SELECT "
+                + "  i.item_key, "
+                + "  i.item, "
+                + "  k.fk_item, "
+                + "  k.fk_unit, "
+                + "  k.fk_diog_year_in_n, "
+                + "  k.fk_diog_doc_in_n, "
+                + "  k.fk_diog_ety_in_n, "
+                + "  SUM(k.total_in) AS total_in, "
+                + "  SUM(k.total_out) AS total_out, "
+                + "  (SUM(k.total_in) - SUM(k.total_out)) AS remaining "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON k.fk_diog_year_in_n = diog_in.id_year AND k.fk_diog_doc_in_n = diog_in.id_doc "
+                + "WHERE k.b_del = 0 "
+                + "AND k.fk_diog_year_in_n IS NOT NULL AND k.fk_diog_doc_in_n IS NOT NULL "
+                + "AND k.fk_diog_year_in_n > 0 AND k.fk_diog_doc_in_n > 0 "
+                + "AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n, k.fk_item, k.fk_unit "
+                + "HAVING (SUM(k.total_in) - SUM(k.total_out)) < -" + TOLERANCE_KARDEX_REMAINING + ";";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "La entrada de kardex con ID "
+                    + "[" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", "
+                    + rs.getInt("fk_diog_ety_in_n") + "] \n "
+                    + "tiene un remanente de costo negativo (se consumió más costo del disponible).\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n"
+                    + "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n"
+                    + "Entradas: $" + rs.getDouble("total_in") + ", salidas: $" + rs.getDouble("total_out")
+                    + ", remanente: $" + rs.getDouble("remaining") + ".\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo ajuste de kardex de tipo
+     * {@code TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST} tenga un registro de
+     * entrada (IN) correspondiente, activo (no eliminado), con el mismo
+     * documento de entrada ({@code fk_diog_*_in_n}) y referenciado por
+     * {@code fk_stk_val_kardex_n}.
+     * <p>
+     * Un ajuste huérfano indica que se generó sobre una entrada que no
+     * existe, fue eliminada, o cuya referencia {@code fk_stk_val_kardex_n}
+     * no corresponde al documento de entrada del propio ajuste.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyOrphanKardexAdjusts(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando ajustes de kardex sin entrada base...");
+        String sErrors = "";
+        String sTable = SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX);
+        String sql = "SELECT "
+                + "  adj.id_stk_val_kardex, "
+                + "  adj.fk_item, "
+                + "  adj.fk_unit, "
+                + "  adj.fk_stk_val_kardex_n, "
+                + "  adj.fk_diog_year_in_n, "
+                + "  adj.fk_diog_doc_in_n, "
+                + "  adj.fk_diog_ety_in_n, "
+                + "  i.item_key, "
+                + "  i.item "
+                + "FROM " + sTable + " adj "
+                + "INNER JOIN erp.itmu_item i ON adj.fk_item = i.id_item "
+                + "LEFT JOIN " + sTable + " base "
+                + "  ON base.id_stk_val_kardex = adj.fk_stk_val_kardex_n "
+                + "  AND base.b_del = 0 "
+                + "  AND base.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TYPE_VAL_KARDEX_IN + " "
+                + "  AND base.fk_diog_year_in_n = adj.fk_diog_year_in_n "
+                + "  AND base.fk_diog_doc_in_n = adj.fk_diog_doc_in_n "
+                + "  AND base.fk_diog_ety_in_n = adj.fk_diog_ety_in_n "
+                + "WHERE adj.b_del = 0 "
+                + "AND adj.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST + " "
+                + "AND (adj.fk_stk_val_kardex_n IS NULL OR adj.fk_stk_val_kardex_n = 0 OR base.id_stk_val_kardex IS NULL) "
+                + "ORDER BY adj.fk_diog_year_in_n, adj.fk_diog_doc_in_n, adj.fk_diog_ety_in_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El ajuste de kardex con ID " + rs.getInt("id_stk_val_kardex") + " "
+                    + "[" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", "
+                    + rs.getInt("fk_diog_ety_in_n") + "] "
+                    + "no tiene una entrada base (IN) correspondiente para fk_stk_val_kardex_n = "
+                    + rs.getInt("fk_stk_val_kardex_n") + ".\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n"
+                    + "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n";
+        }
         if (!sErrors.isEmpty()) {
             Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
         }
