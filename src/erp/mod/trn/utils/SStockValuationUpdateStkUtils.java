@@ -15,7 +15,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SStockValuationUpdateStkUtils {
+public abstract class SStockValuationUpdateStkUtils {
 
     /**
      * Actualiza el costo unitario y el importe (cargo o abono) de las filas de

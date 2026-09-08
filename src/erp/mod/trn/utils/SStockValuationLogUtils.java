@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SStockValuationLogUtils {
+public abstract class SStockValuationLogUtils {
     private static final String LOG_DIRECTORY = "logs"; // Directorio donde se guardarán los logs
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

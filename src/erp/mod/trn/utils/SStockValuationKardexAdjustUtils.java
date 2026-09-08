@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.core;
+package erp.mod.trn.utils;
 
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SStockValuationKardexAdjustUtils {
+public abstract class SStockValuationKardexAdjustUtils {
 
     /**
      * Genera los ajustes de kardex para entradas de periodos anteriores al
@@ -243,37 +243,16 @@ public class SStockValuationKardexAdjustUtils {
 
         // Persistir todos los ajustes de kardex y convertirlos a movimientos de valuación
         List<SDbStockValuationMvt> lMvtAdjusts = new ArrayList<>();
-        SDbStockValuationMvt oAdjMvt;
-        for (SDbStockValuationKardex oKardex : lKardexAdjusts) {
-            oKardex.save(session);
-            oAdjMvt = SStockValuationKardexUtils.toMvt(oKardex);
-            oAdjMvt.save(session);
-            lMvtAdjusts.add(oAdjMvt);
+        SDbStockValuationMvt oAdjValMvt;
+        for (SDbStockValuationKardex oKardexAdjust : lKardexAdjusts) {
+            oKardexAdjust.save(session);
+            oAdjValMvt = SStockValuationKardexUtils.toMvt(oKardexAdjust);
+            oAdjValMvt.save(session);
+            lMvtAdjusts.add(oAdjValMvt);
         }
 
         return lMvtAdjusts;
     }
-
-//    private static List<SDbStockValuationKardex> getPendingAdjusts(SGuiSession session) throws SQLException, Exception {
-//        List<SDbStockValuationKardex> lKardexOuts = new ArrayList<>();
-//        String sql = "SELECT  " +
-//                    "    k.id_stk_val_kardex " +
-//                    "FROM " +
-//                    "    " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " AS k " +
-//                    "WHERE " +
-//                    "    k.adj_st = '" + SDbStockValuationKardex.ADJ_STATUS_TYPE_PENDING + "' AND k.b_del = 0 " +
-//                    "        AND k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ";";
-//        try (Statement st = session.getStatement().getConnection().createStatement()) {
-//            ResultSet res = st.executeQuery(sql);
-//            while (res.next()) {
-//                SDbStockValuationKardex oKardexConsumpt = new SDbStockValuationKardex(0);
-//                oKardexConsumpt.read(session, new int[]{res.getInt("id_stk_val_kardex")});
-//                lKardexOuts.add(oKardexConsumpt);
-//            }
-//        }
-//
-//        return lKardexOuts;
-//    }
 
     /**
      * Registra en la tabla de log el documento principal anterior del kardex y

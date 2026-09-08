@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona
  */
-public class SStockValNotesUtils {
+public abstract class SStockValNotesUtils {
     
     public static List<SDbStockValuationMvtNote> getAllStockValuationMvtNotes(SGuiSession session, int stockValuationMvtId) throws Exception {
         List<SDbStockValuationMvtNote> notes = new ArrayList<>();

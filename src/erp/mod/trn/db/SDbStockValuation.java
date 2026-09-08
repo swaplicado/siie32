@@ -7,8 +7,8 @@ package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.trn.core.SStockValuationKardexAdjustUtils;
-import erp.mod.trn.core.SStockValuationKardexCore;
+import erp.mod.trn.utils.SStockValuationKardexAdjustUtils;
+import erp.mod.trn.utils.SStockValuationKardexCore;
 import erp.mod.trn.utils.SStockValuationAdjustsUtils;
 import erp.mod.trn.utils.SStockValuationLogUtils;
 import erp.mod.trn.utils.SStockValuationRecordUtils;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mod.trn.core;
+package erp.mod.trn.utils;
 
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;

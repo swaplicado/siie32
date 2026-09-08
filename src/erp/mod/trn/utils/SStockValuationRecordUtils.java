@@ -38,7 +38,7 @@ import sa.lib.gui.SGuiSession;
  * 
  * @author Edwin Carmona
  */
-public class SStockValuationRecordUtils {
+public abstract class SStockValuationRecordUtils {
     
     private static final int TYPE_PUR = 1; // Tipo de movimiento: gasto
     private static final int TYPE_INV = 2; // Tipo de movimiento: inventario

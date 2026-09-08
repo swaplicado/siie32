@@ -13,7 +13,6 @@ import erp.data.SDataUtilities;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.trn.core.SStockValuationKardexCore;
 import erp.mod.trn.db.SDbMaterialRequest;
 import erp.mod.trn.db.SDbStockValuation;
 import erp.mod.trn.db.SDbStockValuationMvt;
@@ -48,7 +47,7 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Edwin Carmona, Rodrigo Ayala
  */
-public class SStockValuationUtils {
+public abstract class SStockValuationUtils {
 
     public static final int DEBIT = 1;
     public static final int CREDIT = 2;
