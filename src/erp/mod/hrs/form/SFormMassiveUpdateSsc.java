@@ -17,6 +17,7 @@ import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbMassiveSalarySscBase;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.ssc.SRowEmployeeSsc;
+import erp.mod.hrs.db.ssc.SSscEarning;
 import erp.mod.hrs.db.ssc.SSscUtils;
 import static erp.mod.hrs.db.ssc.SSscUtils.daysCalendarPeriod;
 import erp.mod.hrs.utils.SAnniversary;
@@ -73,6 +74,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     
     protected SGridPaneForm moGridSbcEmployees;
     
+    protected int mnBenVacations = 21;
     protected int mnLimitUmasSsc = 25;
     protected erp.lib.table.STablePane moTablePane;
     protected ArrayList<SDbEarning> maEarnings;
@@ -454,13 +456,13 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                     "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                     "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
                     "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') " +
+                    "WHERE pre.fk_tp_ben = " + mnBenVacations + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') " + 
                     "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
                     "FROM hrs_pay AS p " +
                     "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                     "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
                     "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') " +
+                    "WHERE prd.fk_tp_ben = " + mnBenVacations + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') " +//
                     "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
                     "ORDER BY id_emp , ben_year , ben_ann) AS t " +
                     "GROUP BY id_emp , ben_year , ben_ann " +
@@ -471,7 +473,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                     "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                     "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
                     "INNER JOIN erp.hrsu_emp AS e ON pr.id_emp = e.id_emp " +
-                    "WHERE pre.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "WHERE pre.fk_tp_ben = " + mnBenVacations + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND pre.ben_year = YEAR('" + dateEnd + "') - 1 " +
                     "GROUP BY pre.id_emp , pre.ben_year , pre.ben_ann " +
                     "UNION SELECT prd.id_emp, prd.ben_year, prd.ben_ann, - SUM(prd.unt) AS ben_unt, - SUM(prd.amt_r) AS ben_amt " +
                     "FROM hrs_pay AS p " +
@@ -482,7 +484,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                     "INNER JOIN erp.bpsu_bp AS bp ON va.id_emp = bp.id_bp " +
                     "INNER JOIN erp.usru_usr AS ui ON va.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN erp.usru_usr AS uu ON va.fk_usr_upd = uu.id_usr " +
-                    "WHERE prd.fk_tp_ben = 21 AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') - 1 " +
+                    "WHERE prd.fk_tp_ben = " + mnBenVacations + " AND e.b_act AND NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del AND prd.ben_year = YEAR('" + dateEnd + "') - 1 " + 
                     "GROUP BY prd.id_emp , prd.ben_year , prd.ben_ann " +
                     "ORDER BY id_emp , ben_year , ben_ann) AS t " +
                     "GROUP BY id_emp , ben_year , ben_ann " +
@@ -615,13 +617,18 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 earningExtra = 0;
                 int auxEarning = 0;
 
-                if (resultSet.next()) {
+                 if (resultSet.next()) {
                     if (resultSet.getDouble("SscRaw") < mdMaximumSalary) {
-                        for( auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size()-1; auxEarning++) {
-                        earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
+                        for (auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size() - 1; auxEarning++) {
+                            SSscEarning earning = rows.get(auxEmployee).getSbcEarnings().get(auxEarning);
+                            if (earning.EarningTypeId == SModSysConsts.HRSS_TP_EAR_SUN_BONUS) {
+                                earningExtra += earning.AmountTaxed + earning.AmountExempt;
+                            }
+                            else {
+                                earningExtra += earning.AmountTaxed;
+                            }
                         }
                     }
-
                     auxEmployee++;
                     auxEarning++;
                         if (resultSet.getDouble("SscRaw") < mdMaximumSalary) {  

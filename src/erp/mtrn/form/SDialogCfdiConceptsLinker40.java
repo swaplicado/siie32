@@ -53,7 +53,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Claudio Peña 
  */
 public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
 
@@ -593,7 +593,8 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
             isDataAvailable = true;
 
             entry = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);
-            if (entry.getQuantityToBeLinked() > 0) {
+//            if (entry.getQuantityToBeLinked() > 0) {
+            if (entry.getQuantityToBeLinkedWithSurplus() > 0) {
                 isDataLinkable = true;
                 break;
             }
@@ -812,20 +813,37 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         
         return SLibUtils.roundAmount(amount + taxCharged - taxRetained);
     }
-    
+
     private void actionSelectAll() {
         if (validateAllRowsLinks()) {
-            for (int i = 0; i < moTableDpsSourceEntries.getTableModelRowCount(); i++) {
-                SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);
-                entryDpsDpsLink.setSelected(true);
-                entryDpsDpsLink.setQuantityToLink(!isFormTypeLinkAsService() ? entryDpsDpsLink.getQuantityToBeLinked() : 1.0);
-                entryDpsDpsLink.prepareTableRow();
+
+            if (!isFormTypeLinkAsService()) {
+                double quantityCfdi = moRowCfdiImport.getConcepto().getAttCantidad().getDouble();
+                double quantityRemaining = quantityCfdi;
+
+                for (int i = 0; i < moTableDpsSourceEntries.getTableModelRowCount(); i++) {
+                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);
+                    double quantityAvailable = entryDpsDpsLink.getQuantityToBeLinkedWithSurplus();
+                    double quantityToLink = Math.min(quantityAvailable, quantityRemaining);
+                    entryDpsDpsLink.setSelected(quantityToLink > 0);
+                    entryDpsDpsLink.setQuantityToLink(quantityToLink);
+                    quantityRemaining -= quantityToLink;
+                    entryDpsDpsLink.prepareTableRow();
+                }
+            }
+            else {
+                for (int i = 0; i < moTableDpsSourceEntries.getTableModelRowCount(); i++) {
+                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);
+                    entryDpsDpsLink.setSelected(true);
+                    entryDpsDpsLink.setQuantityToLink(1.0);
+                    entryDpsDpsLink.prepareTableRow();
+                }
             }
         }
-        
+
         moTableDpsSourceEntries.renderTableRows();
     }
-
+    
     private void actionDeselectAll() {
         for (int i = 0; i < moTableDpsSourceEntries.getTableModelRowCount(); i++) {
             SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);

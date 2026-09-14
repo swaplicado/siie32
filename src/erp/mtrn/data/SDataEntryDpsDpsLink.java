@@ -7,7 +7,7 @@ package erp.mtrn.data;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
     
@@ -127,7 +127,7 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         mvValues.add(msUnitSymbol);
         mvValues.add(mdQuantityLinked);
         mvValues.add(mdQuantityLinkedActual);
-        mvValues.add(getQuantityToBeLinked());
+        mvValues.add(getQuantityToBeLinkedWithSurplus());
         if (mbIsSelectionRequired) {
             mvValues.add(mbSelected);
         }
@@ -137,5 +137,13 @@ public class SDataEntryDpsDpsLink extends erp.lib.table.STableRow {
         // to be shown only in SDialogCfdiPurchaseOrder40:
         mvValues.add(mdPrice);
         mvValues.add(msCurrencyCode);
+    }
+    
+    public double getQuantityMaxWithSurplus() {
+        return mdQuantity * (1d + mdSurplusPercentage);
+    }
+
+    public double getQuantityToBeLinkedWithSurplus() {
+        return getQuantityMaxWithSurplus() - mdQuantityLinked - mdQuantityLinkedActual;
     }
 }

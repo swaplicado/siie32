@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 307.8/ 2026-09-14
+Jhonatan Claudio Peña Hernández
+--------------------------------------------------------------------------------
+1) Corrección al SBC al incluir el gravado y exento de la prima dominical.
+2) Excedente de partidas de OC al importar facturas de proveedores en SIIE.
+================================================================================
 SIIE 3.2 307.7/ 2026-09-09
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
