@@ -139,6 +139,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow5 = new javax.swing.JPanel();
         jlDateRequired = new javax.swing.JLabel();
         moDateRequired = new sa.lib.gui.bean.SBeanFieldDate();
+        moBooleanReceiptPaymentReq = new sa.lib.gui.bean.SBeanFieldBoolean();
         jpPayCenterRow1 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
         moKeyCurrency = new sa.lib.gui.bean.SBeanFieldKey();
@@ -343,6 +344,10 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jpPayCenterRow5.add(jlDateRequired);
         jpPayCenterRow5.add(moDateRequired);
 
+        moBooleanReceiptPaymentReq.setText("Requiere complemento");
+        moBooleanReceiptPaymentReq.setPreferredSize(new java.awt.Dimension(160, 23));
+        jpPayCenterRow5.add(moBooleanReceiptPaymentReq);
+
         jpPayCenter.add(jpPayCenterRow5);
 
         jpPayCenterRow1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -481,6 +486,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jpPayWestRow7;
     private javax.swing.JPanel jpPayment;
     private javax.swing.JPanel jpRegistry;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanReceiptPaymentReq;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentApplication;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDate moDateApplication;
@@ -644,6 +650,26 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
         
         return excRate;
+    }
+    
+    private boolean calculateIsRecPayReq() {
+        if (moRadTypeAdvance.isSelected()) {
+            return moBooleanReceiptPaymentReq.getValue();
+        }
+
+        if (!moBp.isDomestic((SClientInterface) miClient)) {
+            return false;
+        }
+
+        if (moDps == null) {
+            return false;
+        }
+
+        if (moDps.getDbmsDataDpsCfd() != null) {
+            return moDps.getDbmsDataDpsCfd().getPaymentMethod().equalsIgnoreCase("PPD");
+        }
+
+        return moDps.getFkPaymentTypeId() == SModSysConsts.TRNS_TP_PAY_CREDIT;
     }
     
     private void clearDps(boolean cleanBp) {
@@ -840,6 +866,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         jbSetDpsBalanceNetCur.setEnabled(mbCanEdit && moRadTypePayment.isSelected());
         moRadNormalDoc.setEnabled(mbCanEdit && moRadTypePayment.isSelected());
         moRadAdvanceDoc.setEnabled(mbCanEdit && moRadTypePayment.isSelected());
+        moBooleanReceiptPaymentReq.setEnabled(mbCanEdit && moRadTypeAdvance.isSelected());
         
         bgDocumentType.setSelected(moRadNormalDoc.getModel(), true);
         
@@ -854,6 +881,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
             }
         }
         else {
+            moBooleanReceiptPaymentReq.setSelected(false);
             miClient.getSession().populateCatalogue(moKeyFunctionalArea, SModConsts.CFGU_FUNC_SUB, SLibConsts.UNDEFINED, null);
         }
     }
@@ -998,6 +1026,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         }
         
         moDateRequired.setValue(moRegistry.getDateRequired());
+        moBooleanReceiptPaymentReq.setValue(moRegistry.isReceiptPaymentRequired());
         moKeyCurrency.setValue(new int[] { moRegistry.getFkCurrencyId() });
         moKeyPriority.setValue(new int[] { moRegistry.getPriority() });
         moTextNotes.setValue(moRegistry.getNotes());
@@ -1087,13 +1116,7 @@ public class SFormPayment extends SBeanForm implements ActionListener, ItemListe
         registry.setNotes(moTextNotes.getValue());
         registry.setNotesAuthorization(moTextNotesAuthorization.getValue());
         registry.setNotesAuthorizationFlow("");
-        boolean isRecPayReq = false;
-        if (! moBp.isDomestic((SClientInterface) miClient)) {
-            isRecPayReq = false;
-        }
-        else {
-            isRecPayReq = moDps == null ? false : moDps.getFkPaymentTypeId() == SModSysConsts.TRNS_TP_PAY_CREDIT;
-        }
+        boolean isRecPayReq = calculateIsRecPayReq();
         registry.setReceiptPaymentRequired(isRecPayReq);
         registry.setRescheduled(false);
         registry.setExecutedManually(false);

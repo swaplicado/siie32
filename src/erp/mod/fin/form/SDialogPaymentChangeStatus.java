@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Adrián Avilés, Sergio Flores, Edwin Carmona, Claudio Peña
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -47,6 +47,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public final static int VALUE_PRIORITY = 4;
     public final static int VALUE_PAYMENT_BANK = 5;
     public final static int VALUE_BENEFIT_BANK = 6;
+    public final static int VALUE_IS_REC_PAY_REQ = 7;
     public final static int VALUE_NOTES = 11;
     public final static int VALUE_NOTES_AUTH = 12;
 
@@ -57,6 +58,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private HashMap<Integer, Date> moLastPaymentDaysMap;
     private double mdOriginalPaymentCy;
     private Date moOriginalPaymentDate;
+    private boolean mbIsAdvancePayment;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -111,6 +113,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanel11 = new javax.swing.JPanel();
         jchkIsSystem = new javax.swing.JCheckBox();
         jPanel12 = new javax.swing.JPanel();
+        moBooleanReceiptPaymentReq = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanelN2 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
@@ -257,6 +260,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanelN1.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBooleanReceiptPaymentReq.setText("Requiere complemento");
+        moBooleanReceiptPaymentReq.setPreferredSize(new java.awt.Dimension(170, 23));
+        jPanel12.add(moBooleanReceiptPaymentReq);
+
         jPanelN1.add(jPanel12);
 
         jPayment.add(jPanelN1, java.awt.BorderLayout.PAGE_START);
@@ -391,6 +399,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JTextField jtfPaymentId;
     private javax.swing.JTextField jtfPaymentType;
     private javax.swing.JTextField jtfStatus;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanReceiptPaymentReq;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDate moDateNewDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBeneffBank;
@@ -525,6 +534,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         SDbPaymentEntry singleEntry = moRegistry.getSingleEntry();
         mdOriginalPaymentCy = singleEntry.getDestinyPaymentApplicationEntryCy();
         moOriginalPaymentDate = moRegistry.getDateApplication();
+        mbIsAdvancePayment = singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE);
         
         jtfFolio.setText(moRegistry.getFolio());
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
@@ -546,6 +556,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         boolean markingAsPaid = false;
         boolean changingAccountBank = false;
         boolean changingExecDate = false;
+        boolean enableRecPayReq = false;
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
@@ -566,6 +577,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
                 markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
+                enableRecPayReq = true;
                 break;
                 
             case CASE_CHANGE_BANK_ACCOUNT:
@@ -574,11 +586,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
                 changingAccountBank = mnFormCase == CASE_CHANGE_BANK_ACCOUNT;
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
+                enableRecPayReq = true;
                 break;
                 
             case CASE_CHANGE_EXEC_DATE:
                 changingExecDate = true;
                 moDateNewDate.setValue(moRegistry.getDateExecution_n());
+                enableRecPayReq = true;
                 break;
                 
             default:
@@ -615,6 +629,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moKeyPriority.setEditable(reactivating);
         moTextNotes.setEditable(reactivating || rescheduling || changingExecDate);
         moTextNotesAuthorization.setEditable(reactivating);
+        moBooleanReceiptPaymentReq.setEditable(enableRecPayReq && mbIsAdvancePayment);
+        
+        moBooleanReceiptPaymentReq.setValue(moRegistry.isReceiptPaymentRequired());
         
         addAllListeners();
     }
@@ -774,6 +791,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 break;
             case VALUE_PRIORITY:
                 value = moKeyPriority.getValue()[0];
+                break;
+            case VALUE_IS_REC_PAY_REQ:
+                value = moBooleanReceiptPaymentReq.getValue();
                 break;
             case VALUE_NOTES:
                 value = moTextNotes.getValue();
