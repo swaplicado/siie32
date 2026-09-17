@@ -14,19 +14,27 @@ import sa.lib.SLibUtils;
 public class SSscEarning {
     
     public int EarningId;
+    public int EarningTypeId;
     public double AmountExempt;
     public double AmountTaxed;
      
     public SSscEarning(final int earningId) {
         this(earningId, 0, 0);
     }
-    
+
     public SSscEarning(final int earningId, final double amountExempt, final double amountTaxed) {
         EarningId = earningId;
         AmountExempt = amountExempt;
         AmountTaxed = amountTaxed;
     }
-    
+
+    public SSscEarning(final int earningId, final int earningTypeId, final double amountExempt, final double amountTaxed) {
+        EarningId = earningId;
+        EarningTypeId = earningTypeId;
+        AmountExempt = amountExempt;
+        AmountTaxed = amountTaxed;
+    }
+
     public double getAmout() {
         return SLibUtils.roundAmount(AmountExempt + AmountTaxed);
     }

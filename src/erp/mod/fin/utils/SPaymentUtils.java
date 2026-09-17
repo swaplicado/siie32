@@ -617,30 +617,6 @@ public class SPaymentUtils {
     }
     
     /**
-     * Mapea un tipo de archivo de pago interno a un tipo de archivo compatible con SWAP Services.
-     *
-     * <p>Esta función traduce los códigos de tipo de archivo definidos en {@link SDbPaymentFile}
-     * a las constantes de tipo de archivo definidas en {@link SSwapConsts} que se utilizan
-     * en la integración con SWAP Services.</p>
-     *
-     * <p>Los mapeos son los siguientes:</p>
-     * <ul>
-     *   <li><strong>FILE_TP_EF</strong> (Evidencia Final) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE}</li>
-     *   <li><strong>FILE_TP_RA</strong> (Reporte Avance) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE_PARTIAL}</li>
-     *   <li><strong>FILE_TP_PF</strong> (Papel Fiscal) → {@link SSwapConsts#FILE_TYPE_PAY_VOUCHER}</li>
-     *   <li><strong>FILE_TP_OS</strong> (Otros Soportes) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
-     *   <li><strong>Otros</strong> (Defecto) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
-     * </ul>
-     *
-     * @param paymentFileType código de tipo de archivo de pago a mapear
-     * @return constante entera que representa el tipo de archivo en SWAP Services;
-     *         retorna {@link SSwapConsts#FILE_TYPE_PAY_SUPP} como valor por defecto
-     *         si el tipo de archivo no coincide con ninguno de los casos definidos
-     * 
-     * @see SDbPaymentFile
-     * @see SSwapConsts
-     */
-    /**
      * Ejecuta la acción de marcar un pago como operado.
      *
      * @param miClient                   cliente de sesión
@@ -677,13 +653,22 @@ public class SPaymentUtils {
                 int[] paymentBankKey = (int[]) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT_BANK);
                 int[] benefBankKey = (int[]) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_BENEFIT_BANK);
                 SDbPaymentEntry oSingleEntry = oPayment.getSingleEntry();
+                boolean isAdvancePayment = oSingleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE);
+                oPayment.setAuxReloadEntries(false);
                 
                 if (oDialogPaymentChangeStatus.getFormCase() == SDialogPaymentChangeStatus.CASE_MARK_AS_PAID) {
-                    oPayment.setAuxReloadEntries(false);
+                    oPayment.setAuxReloadEntries(true);
                     oPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
                     oPayment.setDateExecution_n(date);
                     oPayment.setExecutedManually(true);
                     oPayment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                    if (oDialogPaymentChangeStatus.getFormCase() == SDialogPaymentChangeStatus.CASE_MARK_AS_PAID) {
+                        oPayment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, oSingleEntry.getDocInstallment(), oSingleEntry.getDocBalancePreviousCy());
+                    }
+                }
+                
+                if (isAdvancePayment) {
+                    oPayment.setReceiptPaymentRequired((Boolean) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_IS_REC_PAY_REQ));
                 }
 
                 if (paymentBankKey != null) {
@@ -703,10 +688,6 @@ public class SPaymentUtils {
                     oPayment.setFkBeneficiaryBankBizParterBranchId_n(0);
                     oPayment.setFkBeneficiaryBankAccountCashId_n(0);
                 }
-                
-                if (oDialogPaymentChangeStatus.getFormCase() == SDialogPaymentChangeStatus.CASE_MARK_AS_PAID) {
-                    oPayment.processPaymentAtExecution(miClient.getSession(), amount, exchangeRate, oSingleEntry.getDocInstallment(), oSingleEntry.getDocBalancePreviousCy());
-                }
 
                 miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
                         + SUGGESTION_SPEED_UP + "'" + exportButtonTooltip + "'.");
@@ -715,7 +696,8 @@ public class SPaymentUtils {
                 miClient.getSession().notifySuscriptors(gridType);
                 return true;
             }
-        } else {
+        }
+        else {
             switch (status) {
                 case SModSysConsts.FINS_ST_PAY_SCHED_P:
                     miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar autorizada.\n"
@@ -728,6 +710,242 @@ public class SPaymentUtils {
         return false;
     }
 
+    /**
+     * Reprograma o reactiva una solicitud de pago desde la vista de pagos ({@code SViewPayment}).
+     * <p>
+     * Aplica a pagos con estatus <em>rechazado</em> ({@code FINS_ST_PAY_REJC}) o
+     * <em>programado</em> ({@code FINS_ST_PAY_SCHED}). Abre el diálogo de cambio de estatus,
+     * recoge los datos del usuario y persiste los cambios.
+     * </p>
+     *
+     * @param miClient             cliente de sesión
+     * @param gridType             tipo de grid para notificar suscriptores
+     * @param primaryKey           llave primaria del pago a procesar
+     * @param oDialogPaymentChangeStatus               diálogo reutilizable de cambio de estatus (el caller controla su ciclo de vida)
+     * @param exportButtonTooltip  tooltip del botón de exportar (para el mensaje informativo)
+     * @throws Exception si ocurre un error durante el proceso
+     */
+    public static void reschedulePayment(SClientInterface miClient,
+                                         int gridType,
+                                         int[] primaryKey,
+                                         SDialogPaymentChangeStatus oDialogPaymentChangeStatus,
+                                         String exportButtonTooltip) throws Exception {
+        SDbPayment oPayment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, primaryKey);
+        int status = oPayment.getFkStatusPaymentId();
+        SDbPaymentEntry oSingleEntry = oPayment.getSingleEntry();
+        boolean isAdvancePayment = oSingleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE);
+
+        if (status == SModSysConsts.FINS_ST_PAY_REJC || status == SModSysConsts.FINS_ST_PAY_SCHED) {
+            int formCase = 0;
+
+            switch (status) {
+                case SModSysConsts.FINS_ST_PAY_REJC:
+                    formCase = SDialogPaymentChangeStatus.CASE_REACTIVATE;
+                    break;
+                case SModSysConsts.FINS_ST_PAY_SCHED:
+                    formCase = SDialogPaymentChangeStatus.CASE_RESCHEDULE;
+                    break;
+                default:
+                    // nothing
+            }
+
+            oDialogPaymentChangeStatus.setFormCase(formCase);
+            oDialogPaymentChangeStatus.setRegistry(oPayment);
+            oDialogPaymentChangeStatus.setVisible(true);
+
+            if (oDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                int newCurrencyId;
+
+                oPayment.setAuxReloadEntries(false);
+
+                switch (status) {
+                    case SModSysConsts.FINS_ST_PAY_REJC:
+                        // validate that currency can be changed, if necessary:
+                        newCurrencyId = (int) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_CURRENCY);
+                        if (newCurrencyId != oPayment.getFkCurrencyId()) {
+                            oPayment.changePaymentCurrency(miClient.getSession(), newCurrencyId);
+                        }
+
+                        // complete reschedule:
+                        oPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_NEW);
+                        oPayment.setDateRequired((Date) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+                        oPayment.setPriority((int) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PRIORITY));
+                        oPayment.setNotes((String) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
+                        oPayment.setNotesAuthorization((String) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES_AUTH));
+
+                        if (oPayment.isSystem()) {
+                            miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' se enviará nuevamente a autorizar de manera automática al " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                    + SUGGESTION_SPEED_UP + "'" + exportButtonTooltip + "'.");
+                        }
+                        else {
+                            miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' requiere enviarse nuevamente a autorizar de manera manual.\n"
+                                    + "Favor de hacerlo en la vista 'Solicitudes de pago'.");
+                        }
+                        break;
+
+                    case SModSysConsts.FINS_ST_PAY_SCHED:
+                        // validate that currency can be changed, if necessary:
+                        if (formCase == SDialogPaymentChangeStatus.CASE_RESCHEDULE || formCase == SDialogPaymentChangeStatus.CASE_CHANGE_CURRENCY) {
+                            newCurrencyId = (int) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_CURRENCY);
+                            if (newCurrencyId != oPayment.getFkCurrencyId()) {
+                                oPayment.changePaymentCurrency(miClient.getSession(), newCurrencyId);
+                            }
+                        }
+                        if (formCase == SDialogPaymentChangeStatus.CASE_RESCHEDULE) {
+                            Date date = (Date) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE);
+                            double exchangeRate = SDocumentUtils.getExchangeRate(miClient.getSession(), oPayment.getFkCurrencyId(), date);
+                            double amount = (double) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_PAYMENT);
+                            
+                            oPayment.setAuxReloadEntries(true);
+                            oPayment.processPaymentAtApplication(miClient.getSession(), 
+                                                                amount, 
+                                                                oPayment.getFkCurrencyId(), 
+                                                                exchangeRate, 
+                                                                oPayment.isReceiptPaymentRequired(), 
+                                                                oSingleEntry.getDocInstallment(), 
+                                                                oSingleEntry.getDocBalancePreviousCy());
+                        }
+                        
+                        // complete reschedule:
+                        oPayment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_SCHED_P);
+                        oPayment.setDateSchedule_n((Date) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+                        oPayment.setRescheduled(true);
+                        oPayment.setFkUserRescheduleId(miClient.getSession().getUser().getPkUserId());
+                        oPayment.setNotes((String) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
+                        if (isAdvancePayment) {
+                            oPayment.setReceiptPaymentRequired((Boolean) oDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_IS_REC_PAY_REQ));
+                        }
+
+                        miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                                + SUGGESTION_SPEED_UP + "'" + exportButtonTooltip + "'.");
+                        break;
+
+                    default:
+                        // nothing
+                }
+
+                oPayment.save(miClient.getSession());
+                miClient.getSession().notifySuscriptors(gridType);
+            }
+        }
+        else {
+            switch (status) {
+                case SModSysConsts.FINS_ST_PAY_REJC_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar rechazada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar operada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                default:
+                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+    }
+
+    /**
+     * Reprograma la fecha de ejecución de una solicitud de pago ejecutada manualmente,
+     * desde la vista de estatus de pagos ({@code SViewPaymentStatus}).
+     * <p>
+     * Aplica únicamente a pagos con estatus <em>ejecutado</em> ({@code FINS_ST_PAY_EXEC})
+     * que hayan sido ejecutados de forma manual. Abre el diálogo de cambio de estatus,
+     * recoge los datos del usuario y persiste los cambios.
+     * </p>
+     *
+     * @param miClient             cliente de sesión
+     * @param gridType             tipo de grid para notificar suscriptores
+     * @param primaryKey           llave primaria del pago a procesar
+     * @param dialog               diálogo reutilizable de cambio de estatus (el caller controla su ciclo de vida)
+     * @param exportButtonTooltip  tooltip del botón de exportar (para el mensaje informativo)
+     * @throws Exception si ocurre un error durante el proceso
+     */
+    public static void reschedulePaymentExecDate(SClientInterface miClient,
+                                                  int gridType,
+                                                  int[] primaryKey,
+                                                  SDialogPaymentChangeStatus dialog,
+                                                  String exportButtonTooltip) throws Exception {
+        SDbPayment payment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, primaryKey);
+        int status = payment.getFkStatusPaymentId();
+        SDbPaymentEntry singleEntry = payment.getSingleEntry();
+        boolean isAdvancePayment = singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE);
+
+        if (status == SModSysConsts.FINS_ST_PAY_EXEC) {
+            if (!payment.isExecutedManually()) {
+                miClient.showMsgBoxInformation("La solicitud de pago no fue ejecutada manualmente.\nEsta funcionalidad "
+                        + "está reservada solo para esos casos.");
+                return;
+            }
+
+            dialog.setFormCase(SDialogPaymentChangeStatus.CASE_CHANGE_EXEC_DATE);
+            dialog.setRegistry(payment);
+            dialog.setVisible(true);
+
+            if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                payment.setAuxReloadEntries(false);
+                payment.setDateExecution_n((Date) dialog.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
+                payment.setFkStatusPaymentId(SModSysConsts.FINS_ST_PAY_EXEC_P);
+                payment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
+                payment.setNotes((String) dialog.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
+                if (isAdvancePayment) {
+                    payment.setReceiptPaymentRequired((Boolean) dialog.getValue(SDialogPaymentChangeStatus.VALUE_IS_REC_PAY_REQ));
+                }
+
+                miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
+                        + SUGGESTION_SPEED_UP + "'" + exportButtonTooltip + "'.");
+
+                payment.save(miClient.getSession());
+                miClient.getSession().notifySuscriptors(gridType);
+            }
+        }
+        else {
+            switch (status) {
+                case SModSysConsts.FINS_ST_PAY_REJC_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar rechazada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                case SModSysConsts.FINS_ST_PAY_SCHED_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar autorizada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                    miClient.showMsgBoxInformation("La solicitud de pago '" + payment.getFolio() + "' está en proceso de quedar operada.\n"
+                            + "Intente más tarde de favor.");
+                    break;
+                default:
+                    throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
+        }
+    }
+
+    /**
+     * Mapea un tipo de archivo de pago interno a un tipo de archivo compatible con SWAP Services.
+     *
+     * <p>Esta función traduce los códigos de tipo de archivo definidos en {@link SDbPaymentFile}
+     * a las constantes de tipo de archivo definidas en {@link SSwapConsts} que se utilizan
+     * en la integración con SWAP Services.</p>
+     *
+     * <p>Los mapeos son los siguientes:</p>
+     * <ul>
+     *   <li><strong>FILE_TP_EF</strong> (Evidencia Final) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE}</li>
+     *   <li><strong>FILE_TP_RA</strong> (Reporte Avance) → {@link SSwapConsts#FILE_TYPE_GRAPHIC_EVIDENCE_PARTIAL}</li>
+     *   <li><strong>FILE_TP_PF</strong> (Papel Fiscal) → {@link SSwapConsts#FILE_TYPE_PAY_VOUCHER}</li>
+     *   <li><strong>FILE_TP_OS</strong> (Otros Soportes) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
+     *   <li><strong>Otros</strong> (Defecto) → {@link SSwapConsts#FILE_TYPE_PAY_SUPP}</li>
+     * </ul>
+     *
+     * @param paymentFileType código de tipo de archivo de pago a mapear
+     * @return constante entera que representa el tipo de archivo en SWAP Services;
+     *         retorna {@link SSwapConsts#FILE_TYPE_PAY_SUPP} como valor por defecto
+     *         si el tipo de archivo no coincide con ninguno de los casos definidos
+     * 
+     * @see SDbPaymentFile
+     * @see SSwapConsts
+     */
     public static int mapPaymentFileType(String paymentFileType) {
         switch (paymentFileType) {
             case SDbPaymentFile.FILE_TP_EF:

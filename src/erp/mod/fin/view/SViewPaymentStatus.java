@@ -10,7 +10,6 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentEntry;
 import erp.mod.fin.form.SDialogPaymentChangeStatus;
 import erp.mod.fin.utils.SPaymentUtils;
@@ -27,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -189,70 +187,12 @@ public class SViewPaymentStatus extends SGridPaneView implements ItemListener, A
         if (jbPaymentReschedule.isEnabled()) {
             if (isRowDataUpdatableSelected()) {
                 try {
+                    if (moDialogPaymentChangeStatus == null) {
+                        moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
+                    }
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-                    SDbPayment oPayment = (SDbPayment) miClient.getSession().readRegistry(SModConsts.FIN_PAY, gridRow.getRowPrimaryKey());
-                    int status = oPayment.getFkStatusPaymentId(); // convenience variable
-
-                    if (status == SModSysConsts.FINS_ST_PAY_EXEC) {
-                        int formCase = 0;
-
-                        switch (status) {
-                            case SModSysConsts.FINS_ST_PAY_EXEC:
-                                if (!oPayment.isExecutedManually()) {
-                                    miClient.showMsgBoxInformation("La solicitud de pago no fue ejecutada manualmente.\nEsta funcionalidad "
-                                            + "está reservada solo para esos casos.");
-                                    return;
-                                }
-                                formCase = SDialogPaymentChangeStatus.CASE_CHANGE_EXEC_DATE;
-                                break;
-                            default:
-                                // nothing
-                        }
-
-                        if (moDialogPaymentChangeStatus == null) {
-                            moDialogPaymentChangeStatus = new SDialogPaymentChangeStatus(miClient, "");
-                        }
-
-                        moDialogPaymentChangeStatus.setFormCase(formCase);
-                        moDialogPaymentChangeStatus.setRegistry(oPayment);
-                        moDialogPaymentChangeStatus.setVisible(true);
-
-                        if (moDialogPaymentChangeStatus.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            oPayment.setAuxReloadEntries(false);
-
-                            switch (status) {
-                                case SModSysConsts.FINS_ST_PAY_EXEC:
-                                    // validate that currency can be changed, if necessary:
-                                    oPayment.setDateExecution_n((Date) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_DATE));
-                                    oPayment.setFkUserExecutiondId(miClient.getSession().getUser().getPkUserId());
-                                    oPayment.setNotes((String) moDialogPaymentChangeStatus.getValue(SDialogPaymentChangeStatus.VALUE_NOTES));
-
-                                    miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' se actualizará de manera automática en el " + SSwapConsts.PURCHASE_PORTAL + ".\n"
-                                            + SPaymentUtils.SUGGESTION_SPEED_UP + "'" + jbExportDataToSwapServices.getToolTipText() + "'.");
-                                    break;
-
-                                default:
-                                    // nothing
-                            }
-
-                            oPayment.save(miClient.getSession());
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                    }
-                    else {
-                        switch (status) {
-                            case SModSysConsts.FINS_ST_PAY_REJC_P:
-                                miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar rechazada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            case SModSysConsts.FINS_ST_PAY_SCHED_P:
-                                miClient.showMsgBoxInformation("La solicitud de pago '" + oPayment.getFolio() + "' está en proceso de quedar autorizada.\n"
-                                        + "Intente más tarde de favor.");
-                                break;
-                            default:
-                                throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                    }
+                    SPaymentUtils.reschedulePaymentExecDate((SClientInterface) miClient, mnGridType, gridRow.getRowPrimaryKey(),
+                            moDialogPaymentChangeStatus, jbExportDataToSwapServices.getToolTipText());
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);

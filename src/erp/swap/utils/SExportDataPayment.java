@@ -5,17 +5,11 @@
  */
 package erp.swap.utils;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 /**
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SExportDataPayment implements SExportData {
-    
-    public int company;
-    
-    public int payment_id;
+public class SExportDataPayment extends SExportDataPaymentBase {
     
     public int functional_area;
     
@@ -27,63 +21,17 @@ public class SExportDataPayment implements SExportData {
     
     public String app_date;
     
-    public String req_date;
-    
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public String sched_date_n;
-    
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public String exec_date_n;
-    
-    public String currency;
-    
     public String amount;
     
     public String exchange_rate_app;
     
     public String amount_loc_app;
     
-    public String exchange_rate_exec;
-    
-    public String amount_loc_exec;
-    
-    public String payment_way;
-    
     public int priority;
-    
-    public String notes;
     
     public String notes_authz;
     
-    public int is_receipt_payment_req;
-    
-    public int payment_status;
-    
     public int authz_authorization_id;
-    
-    // cuenta pagadora
-    public String paying_bank;
-    
-    public String paying_bank_fiscal_id;
-    
-    public String paying_account;
-    
-    // cuenta beneficiaria
-    public String benef_bank;
-    
-    public String benef_bank_fiscal_id;
-    
-    public String benef_account;
-    
-    public Integer sched_user;
-    
-    public Integer exec_user;
-    
-    public String sched_at;
-    
-    public String exec_at;
-    
-    public int is_deleted;
     
     //public int created_by;
     
