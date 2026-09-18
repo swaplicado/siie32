@@ -90,6 +90,9 @@ public abstract class SSwapConsts {
     public static final String CFG_OBJ_AVO_SRV_LOGIN = "login";
     public static final String CFG_OBJ_AVO_SRV_SEASON_EXPORT = "season-export";
     public static final String CFG_OBJ_AVO_SRV_BUSINESS_PARTNERS = "business-partners";
+    public static final String CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC = "cfg-tax-trans-acc";
+    public static final String CFG_OBJ_AVO_SRV_CFG_TAX_RET_ACC = "cfg-tax-ret-acc";
+    public static final String CFG_OBJ_AVO_SRV_CFG_COUNTERPART = "counterpart";
     
     // JSON names for Avo configuration:
     public static final String CFG_ATT_AVO_CDR_IDS = "cdr_ids";
@@ -102,6 +105,8 @@ public abstract class SSwapConsts {
     public static final String CFG_ATT_LIMIT = "limit";
     public static final String CFG_ATT_USER = "user";
     public static final String CFG_ATT_PSWD = "pswd";
+    public static final String CFG_ATT_ACCOUNTING_ACCOUNT = "accountingAccount";
+    public static final String CFG_ATT_BUSINESS_PARTNER = "businessPartner";
 
     // SWAP Services transaction constants:
     public static final int TXN_CAT_PURCHASE = 1;

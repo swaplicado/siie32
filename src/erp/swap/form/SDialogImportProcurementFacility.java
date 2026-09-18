@@ -1530,8 +1530,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     oBatchWeekMovProcurementFacility.setMnAccountingTypeId(info.get("accounting_type_id").asInt());
                     
                     JsonNode cashHolding = info.path("cash_holding");
-                    oBatchWeekMovProcurementFacility.setMnCashHoldingIdCob(cashHolding.get("id_cob").asInt());
-                    oBatchWeekMovProcurementFacility.setMnCashHoldingIdEnt(cashHolding.get("id_ent").asInt());
+                    if (!cashHolding.isEmpty()) {
+                        oBatchWeekMovProcurementFacility.setMnCashHoldingIdCob(cashHolding.get("id_cob").asInt());
+                        oBatchWeekMovProcurementFacility.setMnCashHoldingIdEnt(cashHolding.get("id_ent").asInt());
+                    } else {
+                        oBatchWeekMovProcurementFacility.setMnCashHoldingIdCob(0);
+                        oBatchWeekMovProcurementFacility.setMnCashHoldingIdEnt(0);
+                    }
                     
                     Optional<SImportProcurementFacility> procurementFacility = arrfacilities.stream()
                     .filter(p -> info.get("facility_season_week_id").asInt() == p.FacilitySeasonWeekId )
@@ -1558,6 +1563,21 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                                     msErrorMessageToAccount += oValid.getErros();
                                 }
                             }
+                            
+                            ArrayList<SImportWeekMovProcurementFacility> taxes = generateTax(oWeekMovProcurementFacility);
+                            for (SImportWeekMovProcurementFacility taxe : taxes) {
+                                oValid = new SValidateMovementWeekProcurementFacility(miClient, taxe);
+
+                                if (oValid.isValid()) {
+                                    maWeekMovProcurementFacility.add(taxe);
+                                } else {
+                                    mbCanToAccount = false;
+                                    countErros += 1;
+                                    if(countErros < 10) {
+                                        msErrorMessageToAccount += oValid.getErros();
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -1571,6 +1591,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     
                     ArrayList<SImportWeekMovProcurementFacility> counterpart = genereateCounterpart(oBatchWeekMovProcurementFacility, maWeekMovProcurementFacility);
                     maWeekMovProcurementFacility.addAll(counterpart);
+                    
+//                    ArrayList<SImportWeekMovProcurementFacility> taxes = genereateTaxes(maWeekMovProcurementFacility);
+//                    maWeekMovProcurementFacility.addAll(taxes);
                     
                     oBatchWeekMovProcurementFacility.setMaWeekMovProcurementFacility(maWeekMovProcurementFacility);
                     maBatchWeekMovProcurementFacility.add(oBatchWeekMovProcurementFacility);
@@ -1674,11 +1697,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 moFinRecordEntry.Account = otWeekProcurementFacility.getDataAccount();
                 moFinRecordEntry.AccountMajor = otWeekProcurementFacility.getDataAccountMajor();
                 moFinRecordEntry.Concept = otWeekProcurementFacility.Concept;
-                moFinRecordEntry.Debit = otWeekProcurementFacility.Debe;
+                moFinRecordEntry.Debit = otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                 moFinRecordEntry.Credit = otWeekProcurementFacility.Haber;
                 moFinRecordEntry.ExchangeRate = 1;
                 moFinRecordEntry.ExchangeRateSystem = 1;
-                moFinRecordEntry.DebitCy = otWeekProcurementFacility.Debe;
+                moFinRecordEntry.DebitCy = otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                 moFinRecordEntry.CreditCy = otWeekProcurementFacility.Haber;
                 moFinRecordEntry.CurId = otWeekProcurementFacility.oCurrency.Id;
                 moFinRecordEntry.IsExchangeDifference = false;
@@ -1708,6 +1731,19 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 
                 if (otWeekProcurementFacility.getDataAccountCash() != null) {
                     moFinRecordEntry.EntityKey = new int[] {otWeekProcurementFacility.getDataAccountCash().getPkCompanyBranchId(), otWeekProcurementFacility.getDataAccountCash().getPkAccountCashId()};
+                }
+                
+                if (otWeekProcurementFacility.getIsIva16()) {
+                    moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyIva16();
+                    moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
+                }
+                if (otWeekProcurementFacility.getIsIva0()) {
+                    moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyIva0();
+                    moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
+                }
+                if (otWeekProcurementFacility.getIsIvaExcento()) {
+                    moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyExcento();
+                    moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
                 }
 
                 SDataRecordEntry moRecordEntry = SFinRecordUtils.composeRecordEntry((SClientInterface) miClient, null, moFinRecordEntry);
@@ -1755,7 +1791,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     oFacilityRec.setMnAccountingTypeId(oFacility.accountingTypeId);
                     oFacilityRec.save(con);
                     
-                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, oFacility.accountingTypeId, true);
+//                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, oFacility.accountingTypeId, true);
                 }
             }
             
@@ -2130,67 +2166,75 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             switch(checkAccountTypeResult.get(1)){
                 case "salida_caja_compras":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_compras += otWeekProcurementFacility.Debe;
+                        salida_caja_compras += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        salida_caja_compras -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_compras += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        salida_caja_compras += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "salida_caja_gastos":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_gastos += otWeekProcurementFacility.Debe;
+                        salida_caja_gastos += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        salida_caja_gastos -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_gastos += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        salida_caja_gastos += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "salida_caja_deudores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_deudores += otWeekProcurementFacility.Debe;
+                        salida_caja_deudores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        salida_caja_deudores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_deudores += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        salida_caja_deudores += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "salida_caja_acreedores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_acreedores += otWeekProcurementFacility.Debe;
+                        salida_caja_acreedores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        salida_caja_acreedores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        salida_caja_acreedores += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        salida_caja_acreedores += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "entrada_caja_deudores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        entrada_caja_deudores += otWeekProcurementFacility.Debe;
+                        entrada_caja_deudores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        entrada_caja_deudores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        entrada_caja_deudores += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        entrada_caja_deudores += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "entrada_caja_acreedor":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        entrada_caja_acreedores += otWeekProcurementFacility.Debe;
+                        entrada_caja_acreedores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        entrada_caja_acreedores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        entrada_caja_acreedores += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        entrada_caja_acreedores += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "caja_central":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        caja_central += otWeekProcurementFacility.Debe;
+                        caja_central += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        caja_central -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        caja_central += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        caja_central += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 case "caja_x":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
-                        caja_x += otWeekProcurementFacility.Debe;
+                        caja_x += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
+                        caja_x -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-                        caja_x += otWeekProcurementFacility.Haber;
-                    }
+//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
+//                        caja_x += otWeekProcurementFacility.Haber;
+//                    }
                     break;
                 default:
                     break;
@@ -2212,7 +2256,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "CAJA CENTRAL SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setHaber(caja_central);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (salida_caja_compras != 0) {
@@ -2228,7 +2272,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X COMPRAS SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setHaber(salida_caja_compras);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (salida_caja_gastos != 0) {
@@ -2244,7 +2288,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X GASTOS SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setHaber(salida_caja_gastos);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (salida_caja_deudores != 0) {
@@ -2260,7 +2304,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "SALIDA CAJA" + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X DEUDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setHaber(salida_caja_deudores);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (salida_caja_acreedores != 0) {
@@ -2276,7 +2320,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "SALIDA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X ACREEDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setHaber(salida_caja_acreedores);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (entrada_caja_deudores != 0) {
@@ -2292,7 +2336,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "ENTRADA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X DEUDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setDebe(entrada_caja_deudores);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (entrada_caja_acreedores != 0) {
@@ -2308,7 +2352,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "ENTRADA CAJA " + oBatchWeekMovProcurementFacility.getMsProcurementName() + " X ACREEDORES SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setDebe(entrada_caja_acreedores);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         if (caja_x != 0) {
@@ -2324,7 +2368,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             concept = "CAJA X SEMANA " + oBatchWeekMovProcurementFacility.getMnWeekNumebr();
             counterpart.setConcept(concept);
             counterpart.setDebe(caja_x);
-            
+            counterpart.setDataBizPartner(mov.getDataBizPartner());
             maCounterpart.add(counterpart);
         }
         
@@ -2344,30 +2388,44 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             Statement statement = miClient.getSession().getStatement();
             SDataAccount oAccount = new SDataAccount();
             SDataAccount oAccountLedger = new SDataAccount();
+            SDataBizPartner bp = new SDataBizPartner();
             
             SImportWeekMovProcurementFacility weekMov = new SImportWeekMovProcurementFacility();
             
-            sql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, e.b_act, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) \n" +
-                    "AS f_acc, cob.id_bpb, cob.bpb, a.acc, c.cur_key, c.id_cur, c.cur\n" +
-                    "FROM fin_acc_cash AS ac \n" +
-                    "INNER JOIN erp.cfgu_cob_ent AS e ON ac.id_cob = e.id_cob AND ac.id_acc_cash = e.id_ent \n" +
-                    "INNER JOIN erp.bpsu_bpb AS cob ON ac.id_cob = cob.id_bpb \n" +
-                    "INNER JOIN fin_acc AS a ON ac.fid_acc = a.id_acc \n" +
-                    "INNER JOIN erp.cfgu_cur AS c ON ac.fid_cur = c.id_cur \n" +
-                    "WHERE cob.fid_bp = " + client.getSessionXXX().getCurrentCompany().getPkCompanyId() +
-                    " AND ac.fid_ct_acc_cash = " + SDataConstantsSys.FINS_CT_ACC_CASH_CASH + " AND ac.b_del = FALSE" +
-                    " AND ac.id_acc_cash = " + id_ent +
-                    " AND cob.id_bpb = " + id_cob + ";";
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG));
             
-            ResultSet resultSet = statement.executeQuery(sql);
-            
-            if (!resultSet.next()) {
-                throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+            if (config == null) {
+                sql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, e.b_act, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) \n" +
+                        "AS f_acc, cob.id_bpb, cob.bpb, a.acc, c.cur_key, c.id_cur, c.cur\n" +
+                        "FROM fin_acc_cash AS ac \n" +
+                        "INNER JOIN erp.cfgu_cob_ent AS e ON ac.id_cob = e.id_cob AND ac.id_acc_cash = e.id_ent \n" +
+                        "INNER JOIN erp.bpsu_bpb AS cob ON ac.id_cob = cob.id_bpb \n" +
+                        "INNER JOIN fin_acc AS a ON ac.fid_acc = a.id_acc \n" +
+                        "INNER JOIN erp.cfgu_cur AS c ON ac.fid_cur = c.id_cur \n" +
+                        "WHERE cob.fid_bp = " + client.getSessionXXX().getCurrentCompany().getPkCompanyId() +
+                        " AND ac.fid_ct_acc_cash = " + SDataConstantsSys.FINS_CT_ACC_CASH_CASH + " AND ac.b_del = FALSE" +
+                        " AND ac.id_acc_cash = " + id_ent +
+                        " AND cob.id_bpb = " + id_cob + ";";
+
+                ResultSet resultSet = statement.executeQuery(sql);
+                
+                if (!resultSet.next()) {
+                    throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
+                }
+
+                weekMov.setCurrency(resultSet.getInt("id_cur"), resultSet.getString("cur_key"), resultSet.getString("cur"));
+
+                oAccount.read(new String[] {resultSet.getString("fid_acc")}, statement);
+            } else {
+                String accountingAccount = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_COUNTERPART, SSwapConsts.CFG_ATT_ACCOUNTING_ACCOUNT);
+                String businessParter = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_COUNTERPART, SSwapConsts.CFG_ATT_BUSINESS_PARTNER);
+                
+                oAccount.read(new String[] {accountingAccount}, statement);
+                bp.read(new int[] { Integer.parseInt(businessParter) }, statement);
+                weekMov.setDataBizPartner(bp);
             }
             
-            weekMov.setCurrency(resultSet.getInt("id_cur"), resultSet.getString("cur_key"), resultSet.getString("cur"));
-            
-            oAccount.read(new String[] {resultSet.getString("fid_acc")}, statement);
             oAccount.getDbmsPkLedgerAccountIdXXX();
             oAccountLedger.read( new String[] { oAccount.getDbmsPkLedgerAccountIdXXX() }, statement);
             
@@ -2408,5 +2466,114 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 formRecord.setFormVisible(true);
             }
         }
+    }
+    
+    public ArrayList<SImportWeekMovProcurementFacility> generateTax(SImportWeekMovProcurementFacility oWeekMovProcurementFacility) {
+        ArrayList<SImportWeekMovProcurementFacility> maTaxes = new ArrayList<>();
+        
+        if (oWeekMovProcurementFacility.getImpuesto16() > 0) {
+            SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            oMov.setDebe(oMov.getImpuesto16());
+            oMov.setConcept("IVA PAGADO 16%");
+            oMov.setItem(0, "", "");
+            oMov.setItemPurchaseExpense(0, "", "");
+            oMov.setItemAuxPurchaseExpense(0, "", "");
+            oMov.setCost_center(0, "", "");
+            oMov.setDataCostCenter(null);
+            oMov.setDataAccount(oMov.getAccIva16());
+            oMov.setReference("");
+            oMov.setRetention1(0);
+            oMov.setRetention2(0);
+            oMov.setIsIva16(true);
+            oMov.setIsIva0(false);
+            oMov.setIsIvaExcento(false);
+            oMov.setIsRetention1(false);
+            oMov.setIsRetention2(false);
+            maTaxes.add(oMov);
+        }
+        
+        if (oWeekMovProcurementFacility.getImpuesto0() > 0) {
+            SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            oMov.setDebe(oMov.getImpuesto0());
+            oMov.setItem(0, "", "");
+            oMov.setItemPurchaseExpense(0, "", "");
+            oMov.setItemAuxPurchaseExpense(0, "", "");
+            oMov.setCost_center(0, "", "");
+            oMov.setReference("");
+            oMov.setDataCostCenter(null);
+            oMov.setRetention1(0);
+            oMov.setRetention2(0);
+            oMov.setIsIva0(true);
+            oMov.setIsIva16(false);
+            oMov.setIsIvaExcento(false);
+            oMov.setIsRetention1(false);
+            oMov.setIsRetention2(false);
+            maTaxes.add(oMov);
+        }
+        
+        if (oWeekMovProcurementFacility.getImpuestoExcento()> 0) {
+            SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            oMov.setDebe(oMov.getImpuestoExcento());
+            oMov.setItem(0, "", "");
+            oMov.setItemPurchaseExpense(0, "", "");
+            oMov.setItemAuxPurchaseExpense(0, "", "");
+            oMov.setCost_center(0, "", "");
+            oMov.setReference("");
+            oMov.setDataCostCenter(null);
+            oMov.setRetention1(0);
+            oMov.setRetention2(0);
+            oMov.setIsIvaExcento(true);
+            oMov.setIsIva16(false);
+            oMov.setIsIva0(false);
+            oMov.setIsRetention1(false);
+            oMov.setIsRetention2(false);
+            maTaxes.add(oMov);
+        }
+        
+        if (oWeekMovProcurementFacility.getRetention1() > 0) {
+            SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            oMov.setDebe(0);
+            oMov.setHaber(oMov.getRetention1());
+            oMov.setConcept("RET. ISR ADMINISTRACIÓN");
+            oMov.setDataAccount(oMov.getAccRetention1());
+            oMov.setDataAccountMajor(oMov.getAccLedgerRetention1());
+            oMov.setItem(0, "", "");
+            oMov.setItemPurchaseExpense(0, "", "");
+            oMov.setItemAuxPurchaseExpense(0, "", "");
+            oMov.setCost_center(0, "", "");
+            oMov.setReference("");
+            oMov.setDataCostCenter(null);
+            oMov.setRetention1(0);
+            oMov.setIsIvaExcento(false);
+            oMov.setIsIva16(false);
+            oMov.setIsIva0(false);
+            oMov.setIsRetention1(true);
+            oMov.setIsRetention2(false);
+            maTaxes.add(oMov);
+        }
+        
+        if (oWeekMovProcurementFacility.getRetention2() > 0) {
+            SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            oMov.setDebe(0);
+            oMov.setHaber(oMov.getRetention2());
+            oMov.setItem(0, "", "");
+            oMov.setItemPurchaseExpense(0, "", "");
+            oMov.setItemAuxPurchaseExpense(0, "", "");
+            oMov.setCost_center(0, "", "");
+            oMov.setReference("");
+            oMov.setDataCostCenter(null);
+            oMov.setRetention1(0);
+            oMov.setRetention2(0);
+            oMov.setDataAccount(oMov.getAccRetention1());
+            oMov.setDataAccountMajor(oMov.getAccLedgerRetention1());
+            oMov.setIsIvaExcento(false);
+            oMov.setIsIva16(false);
+            oMov.setIsIva0(false);
+            oMov.setIsRetention1(false);
+            oMov.setIsRetention2(true);
+            maTaxes.add(oMov);
+        }
+        
+        return maTaxes;
     }
 }

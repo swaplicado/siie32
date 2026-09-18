@@ -185,6 +185,40 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpProcessingN18 = new javax.swing.JPanel();
         jpProcessingN19 = new javax.swing.JPanel();
         jpProcessingN20 = new javax.swing.JPanel();
+        jpProcessingN3 = new javax.swing.JPanel();
+        jpProcessingN21 = new javax.swing.JPanel();
+        jlAccountingAccount = new javax.swing.JLabel();
+        jpProcessingN22 = new javax.swing.JPanel();
+        jtfAccountingAccount = new javax.swing.JTextField();
+        jpProcessingN23 = new javax.swing.JPanel();
+        jlDebe = new javax.swing.JLabel();
+        jpProcessingN24 = new javax.swing.JPanel();
+        jtfDebe = new javax.swing.JTextField();
+        jpProcessingN25 = new javax.swing.JPanel();
+        jlHaber = new javax.swing.JLabel();
+        jpProcessingN26 = new javax.swing.JPanel();
+        jtfHaber = new javax.swing.JTextField();
+        jpProcessingN27 = new javax.swing.JPanel();
+        jlItem = new javax.swing.JLabel();
+        jpProcessingN28 = new javax.swing.JPanel();
+        jtfItem = new javax.swing.JTextField();
+        jpProcessingN29 = new javax.swing.JPanel();
+        jlEntity = new javax.swing.JLabel();
+        jpProcessingN30 = new javax.swing.JPanel();
+        jtfEntity = new javax.swing.JTextField();
+        jpProcessingN31 = new javax.swing.JPanel();
+        jlImpuestoIVA16 = new javax.swing.JLabel();
+        jpProcessingN32 = new javax.swing.JPanel();
+        jtfImpuestoIVA16 = new javax.swing.JTextField();
+        jpProcessingN33 = new javax.swing.JPanel();
+        jlSubTotalIva16 = new javax.swing.JLabel();
+        jpProcessingN34 = new javax.swing.JPanel();
+        jtfSubTotalIva16 = new javax.swing.JTextField();
+        jpProcessingN35 = new javax.swing.JPanel();
+        jlSubTotalIVA0 = new javax.swing.JLabel();
+        jpProcessingN36 = new javax.swing.JPanel();
+        jtfSubTotalIVA0 = new javax.swing.JTextField();
+        jpProcessingN37 = new javax.swing.JPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -371,6 +405,167 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
         jpDocumentsProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
 
+        jpProcessingN3.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
+
+        jpProcessingN21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccountingAccount.setText("Cuenta contable:");
+        jlAccountingAccount.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN21.add(jlAccountingAccount);
+
+        jpProcessingN3.add(jpProcessingN21);
+
+        jpProcessingN22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfAccountingAccount.setEditable(false);
+        jtfAccountingAccount.setToolTipText("");
+        jtfAccountingAccount.setFocusable(false);
+        jtfAccountingAccount.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfAccountingAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfAccountingAccountActionPerformed(evt);
+            }
+        });
+        jpProcessingN22.add(jtfAccountingAccount);
+
+        jpProcessingN3.add(jpProcessingN22);
+
+        jpProcessingN23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDebe.setText("Debe:");
+        jlDebe.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN23.add(jlDebe);
+
+        jpProcessingN3.add(jpProcessingN23);
+
+        jpProcessingN24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfDebe.setEditable(false);
+        jtfDebe.setToolTipText("");
+        jtfDebe.setFocusable(false);
+        jtfDebe.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN24.add(jtfDebe);
+
+        jpProcessingN3.add(jpProcessingN24);
+
+        jpProcessingN25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlHaber.setText("Haber:");
+        jlHaber.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN25.add(jlHaber);
+
+        jpProcessingN3.add(jpProcessingN25);
+
+        jpProcessingN26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfHaber.setEditable(false);
+        jtfHaber.setToolTipText("");
+        jtfHaber.setFocusable(false);
+        jtfHaber.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN26.add(jtfHaber);
+
+        jpProcessingN3.add(jpProcessingN26);
+
+        jpProcessingN27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlItem.setText("Item:");
+        jlItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN27.add(jlItem);
+
+        jpProcessingN3.add(jpProcessingN27);
+
+        jpProcessingN28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfItem.setEditable(false);
+        jtfItem.setToolTipText("");
+        jtfItem.setFocusable(false);
+        jtfItem.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN28.add(jtfItem);
+
+        jpProcessingN3.add(jpProcessingN28);
+
+        jpProcessingN29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlEntity.setText("Cuenta dinero:*");
+        jlEntity.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN29.add(jlEntity);
+
+        jpProcessingN3.add(jpProcessingN29);
+
+        jpProcessingN30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfEntity.setEditable(false);
+        jtfEntity.setToolTipText("");
+        jtfEntity.setFocusable(false);
+        jtfEntity.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN30.add(jtfEntity);
+
+        jpProcessingN3.add(jpProcessingN30);
+
+        jpProcessingN31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlImpuestoIVA16.setText("Impuesto IVA 16:");
+        jlImpuestoIVA16.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN31.add(jlImpuestoIVA16);
+
+        jpProcessingN3.add(jpProcessingN31);
+
+        jpProcessingN32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfImpuestoIVA16.setEditable(false);
+        jtfImpuestoIVA16.setToolTipText("");
+        jtfImpuestoIVA16.setFocusable(false);
+        jtfImpuestoIVA16.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN32.add(jtfImpuestoIVA16);
+
+        jpProcessingN3.add(jpProcessingN32);
+
+        jpProcessingN33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSubTotalIva16.setText("Subtotal IVA 16:");
+        jlSubTotalIva16.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN33.add(jlSubTotalIva16);
+
+        jpProcessingN3.add(jpProcessingN33);
+
+        jpProcessingN34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfSubTotalIva16.setEditable(false);
+        jtfSubTotalIva16.setToolTipText("");
+        jtfSubTotalIva16.setFocusable(false);
+        jtfSubTotalIva16.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfSubTotalIva16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfSubTotalIva16ActionPerformed(evt);
+            }
+        });
+        jpProcessingN34.add(jtfSubTotalIva16);
+
+        jpProcessingN3.add(jpProcessingN34);
+
+        jpProcessingN35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSubTotalIVA0.setText("Subtotal IVA 0:");
+        jlSubTotalIVA0.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN35.add(jlSubTotalIVA0);
+
+        jpProcessingN3.add(jpProcessingN35);
+
+        jpProcessingN36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jtfSubTotalIVA0.setEditable(false);
+        jtfSubTotalIVA0.setToolTipText("");
+        jtfSubTotalIVA0.setFocusable(false);
+        jtfSubTotalIVA0.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN36.add(jtfSubTotalIVA0);
+
+        jpProcessingN3.add(jpProcessingN36);
+
+        jpProcessingN37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jpProcessingN3.add(jpProcessingN37);
+
+        jpDocumentsProcessing.add(jpProcessingN3, java.awt.BorderLayout.NORTH);
+
         jpDocuments.add(jpDocumentsProcessing, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jpDocuments, java.awt.BorderLayout.CENTER);
@@ -380,6 +575,14 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
+
+    private void jtfAccountingAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfAccountingAccountActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfAccountingAccountActionPerformed
+
+    private void jtfSubTotalIva16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfSubTotalIva16ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfSubTotalIva16ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
@@ -395,7 +598,15 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JLabel jLabel3b3;
     private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbOpenProcurementFacility;
+    private javax.swing.JLabel jlAccountingAccount;
+    private javax.swing.JLabel jlDebe;
+    private javax.swing.JLabel jlEntity;
+    private javax.swing.JLabel jlHaber;
+    private javax.swing.JLabel jlImpuestoIVA16;
+    private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlProgress;
+    private javax.swing.JLabel jlSubTotalIVA0;
+    private javax.swing.JLabel jlSubTotalIva16;
     private javax.swing.JLabel jlUser;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid;
@@ -428,12 +639,38 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JPanel jpProcessingN19;
     private javax.swing.JPanel jpProcessingN2;
     private javax.swing.JPanel jpProcessingN20;
+    private javax.swing.JPanel jpProcessingN21;
+    private javax.swing.JPanel jpProcessingN22;
+    private javax.swing.JPanel jpProcessingN23;
+    private javax.swing.JPanel jpProcessingN24;
+    private javax.swing.JPanel jpProcessingN25;
+    private javax.swing.JPanel jpProcessingN26;
+    private javax.swing.JPanel jpProcessingN27;
+    private javax.swing.JPanel jpProcessingN28;
+    private javax.swing.JPanel jpProcessingN29;
+    private javax.swing.JPanel jpProcessingN3;
+    private javax.swing.JPanel jpProcessingN30;
+    private javax.swing.JPanel jpProcessingN31;
+    private javax.swing.JPanel jpProcessingN32;
+    private javax.swing.JPanel jpProcessingN33;
+    private javax.swing.JPanel jpProcessingN34;
+    private javax.swing.JPanel jpProcessingN35;
+    private javax.swing.JPanel jpProcessingN36;
+    private javax.swing.JPanel jpProcessingN37;
     private javax.swing.JPanel jpProcessingN4;
     private javax.swing.JPanel jpProcessingN5;
     private javax.swing.JPanel jpProcessingN6;
     private javax.swing.JPanel jpProcessingN7;
     private javax.swing.JPanel jpProcessingN8;
     private javax.swing.JPanel jpProcessingN9;
+    private javax.swing.JTextField jtfAccountingAccount;
+    private javax.swing.JTextField jtfDebe;
+    private javax.swing.JTextField jtfEntity;
+    private javax.swing.JTextField jtfHaber;
+    private javax.swing.JTextField jtfImpuestoIVA16;
+    private javax.swing.JTextField jtfItem;
+    private javax.swing.JTextField jtfSubTotalIVA0;
+    private javax.swing.JTextField jtfSubTotalIva16;
     private javax.swing.JTextField jtfUserName;
     // End of variables declaration//GEN-END:variables
 
@@ -988,6 +1225,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     if (!smaEdited.contains(i)) {
                         smaEdited.add(i);
                     }
+                    
+                    maImportedDocument.setImpuesto16(weekProcurementFacility.impuesto16);
+                    maImportedDocument.setSubtotal16(weekProcurementFacility.subtotal16);
+                    maImportedDocument.setSubtotal0(weekProcurementFacility.subtotal0);
                 }
             }
             moImportationsGrid.renderGridRows();
@@ -1014,6 +1255,34 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
     private void itemStateChangedDocType(final boolean focusDocumentsGridTable) {
         populateWeekProcurementFacilityGrid(maImportedDocuments, focusDocumentsGridTable);
+    }
+    
+    private void renderCurrentMovement() {
+        SGridRow row = moImportationsGrid.getSelectedGridRow();
+        
+        if(row != null) {
+            SImportWeekMovProcurementFacility oMov = (SImportWeekMovProcurementFacility) row;
+            
+            jtfAccountingAccount.setText(oMov.getDataAccount().getAccount());
+            jtfDebe.setText(String.valueOf(oMov.getDebe()));
+            jtfHaber.setText(String.valueOf(oMov.getHaber()));
+            jtfItem.setText(String.valueOf(oMov.getItem().Name));
+            if (oMov.getDataAccountCash() != null) {
+                jtfEntity.setText(String.valueOf(oMov.getDataAccountCash().getPkAccountCashId()));
+            }
+            jtfSubTotalIva16.setText(String.valueOf(oMov.getSubtotal16()));
+            jtfImpuestoIVA16.setText(String.valueOf(oMov.getImpuesto16()));
+            jtfSubTotalIVA0.setText(String.valueOf(oMov.getSubtotal0()));
+        } else {
+            jtfAccountingAccount.setText("");
+            jtfDebe.setText("");
+            jtfHaber.setText("");
+            jtfItem.setText("");
+            jtfEntity.setText("");
+            jtfSubTotalIva16.setText("");
+            jtfImpuestoIVA16.setText("");
+            jtfSubTotalIVA0.setText("");
+        }
     }
 
     /*
@@ -1099,7 +1368,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-
+            renderCurrentMovement();
         }
     }
     
