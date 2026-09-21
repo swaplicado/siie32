@@ -355,8 +355,7 @@ public class SPaymentUtils {
                     + "   " + SModSysConsts.FINS_ST_PAY_CANC_P + ", "
                     + "   " + SModSysConsts.FINS_ST_PAY_CANC + ") "
                     + "                    AND l.b_del = 0 "
-                    + "                    AND l.tra_pay = l.tra "
-                    + "                    AND l.tra_pay > 0) "
+                    + "                    AND ((l.tra_pay = l.tra AND l.tra_pay > 0) OR l.b_clo_pay = 1)) "
                     + "    GROUP BY pe.fk_doc_year_n , pe.fk_doc_doc_n) AS ps ON ps.id_year = d.id_year "
                     + "        AND ps.id_doc = d.id_doc "
                     + "LEFT JOIN "
@@ -380,6 +379,7 @@ public class SPaymentUtils {
                     + "        AND l.b_del = 0 "
                     + "        AND l.tra_pay < l.tra "
                     + "        AND l.tra > 0 "
+                    + "        AND l.b_clo_pay = 0 "
                     + "GROUP BY pe.fk_doc_year_n , pe.fk_doc_doc_n "
                     + "ORDER BY l.id_lay_bank DESC) AS plays ON plays.id_year = d.id_year "
                     + "        AND plays.id_doc = d.id_doc ";
@@ -1099,5 +1099,25 @@ public class SPaymentUtils {
         }
         
         return paymentClass;
+    }
+
+    /**
+     * Obtiene el estatus actual del pago por su identificador.
+     *
+     * @param connection conexión activa a la base de datos
+     * @param idPay identificador del pago
+     * @return identificador del estatus del pago, o 0 si no existe
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    public static int getPaymentStatus(Connection connection, int idPay) throws SQLException {
+        String sql = "SELECT fk_st_pay FROM fin_pay WHERE NOT b_del AND id_pay = " + idPay;
+        try (Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                return resultSet.getInt("fk_st_pay");
+            }
+        }
+        
+        return 0;
     }
 }
