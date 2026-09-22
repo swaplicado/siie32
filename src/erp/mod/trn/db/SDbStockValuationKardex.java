@@ -115,16 +115,16 @@ public class SDbStockValuationKardex extends SDbRegistryUser implements Serializ
     // 23	AJUSTE SALIDA A LO CONSUMIDO
     // 24	AJUSTE ACTIVO FIJO
     
-    public static final int TYPE_VAL_KARDEX_IN = 11;
-    public static final int TYPE_VAL_KARDEX_IN_RET_CONSUM = 12;
-    public static final int TYPE_VAL_KARDEX_IN_ADJUST_CONSUM = 13;
-    public static final int TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST = 14;
+    public static final int TRNS_TP_STK_VAL_KARDEX_IN = 11;
+    public static final int TRNS_TP_STK_VAL_KARDEX_IN_RET_CONSUM = 12;
+    public static final int TRNS_TP_STK_VAL_KARDEX_IN_ADJUST_CONSUM = 13;
+    public static final int TRNS_TP_STK_VAL_KARDEX_IN_ADJUST_DIFF_COST = 14;
 
-    public static final int TYPE_VAL_KARDEX_OUT = 21;
-    public static final int TYPE_VAL_KARDEX_OUT_CONSUM = 22;
-    public static final int TYPE_VAL_KARDEX_OUT_ADJUST_CONSUM = 23;
-    public static final int TYPE_VAL_KARDEX_OUT_ADJUST_DIFF_COST = 24;
-    public static final int TYPE_VAL_KARDEX_OUT_ADJUST_FIX_ASSET = 25;
+    public static final int TRNS_TP_STK_VAL_KARDEX_OUT = 21;
+    public static final int TRNS_TP_STK_VAL_KARDEX_OUT_CONSUM = 22;
+    public static final int TRNS_TP_STK_VAL_KARDEX_OUT_ADJUST_CONSUM = 23;
+    public static final int TRNS_TP_STK_VAL_KARDEX_OUT_ADJUST_DIFF_COST = 24;
+    public static final int TRNS_TP_STK_VAL_KARDEX_OUT_ADJUST_FIX_ASSET = 25;
 
     public static final String ADJ_STATUS_TYPE_NA = "N";
     public static final String ADJ_STATUS_TYPE_PENDING = "P";

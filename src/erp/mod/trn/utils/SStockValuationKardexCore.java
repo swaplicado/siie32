@@ -313,7 +313,7 @@ public abstract class SStockValuationKardexCore {
                     oKardexOut.setTotalOutCurrency(totalOutCur);
                     oKardexOut.setExchangeRate(oRemaining.getExchangeRate());
                     oKardexOut.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_OUT);
-                    oKardexOut.setFkStockValuationKardexTypeId(SDbStockValuationKardex.TYPE_VAL_KARDEX_OUT_CONSUM);
+                    oKardexOut.setFkStockValuationKardexTypeId(SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_OUT_CONSUM);
                     oKardexOut.setFkStockValuationKardexId_n(oRemaining.getPkKardexId());
                     oKardexOut.setFkDiogYearInId_n(oRemaining.getFkDiogYearInId());
                     oKardexOut.setFkDiogDocInId_n(oRemaining.getFkDiogDocInId());

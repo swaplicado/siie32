@@ -888,7 +888,7 @@ public abstract class SStockValuationUtils {
         /**
          * Eliminar notas de kardex de valuación
          */
-        String sqlDelNotes = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_NOTE) + " SET b_del = 1 "
+        String sqlDelNotes = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_NTS) + " SET b_del = 1 "
                 + "WHERE fk_stk_val_n = " + idValuation + ";";
         try (Statement st = session.getStatement().getConnection().createStatement()) {
             st.executeUpdate(sqlDelNotes);

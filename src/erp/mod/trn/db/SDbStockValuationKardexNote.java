@@ -33,7 +33,7 @@ public class SDbStockValuationKardexNote extends SDbRegistryUser implements Seri
 //    protected Date mtTsUserUpdate;
 
     public SDbStockValuationKardexNote() {
-        super(SModConsts.TRN_STK_VAL_KARDEX_NOTE);
+        super(SModConsts.TRN_STK_VAL_KARDEX_NTS);
     }
     
     public void setPkStockValKardexNote(int n) { mnPkStockValKardexNote = n; }
@@ -59,7 +59,7 @@ public class SDbStockValuationKardexNote extends SDbRegistryUser implements Seri
     // public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     public static void deleteAllNotesFromMvt(SGuiSession session, int fkStockValuationMvtId) throws SQLException, Exception {
-        String sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_NOTE) + " WHERE fk_stk_val_kardex = " + fkStockValuationMvtId;
+        String sql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX_NTS) + " WHERE fk_stk_val_kardex = " + fkStockValuationMvtId;
         session.getStatement().execute(sql);
     }
 

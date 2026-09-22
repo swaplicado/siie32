@@ -163,8 +163,8 @@ public abstract class SStockValuationKardexAdjustUtils {
                 if (res.getInt("f_nat") == SDataConstantsSys.TRNU_DPS_NAT_ASSET) {
                     // Naturaleza activo: todo debió entrar y consumirse en $0
                     if (consumedCost > 0) {
-                        // Ajuste de retiro: reversa el costo consumido para dejarlo en $0
-                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TYPE_VAL_KARDEX_IN_RET_CONSUM,
+                        // Ajuste de entrada: reversa el costo consumido para dejarlo en $0
+                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN_RET_CONSUM,
                                 pkKardex, pkDiogEtyIn, pkMainOcDpsEtyIn, pkInvoiceDps, fkItem, fkUnit, fkLot, fkCob, fkWh);
                         oAdjust.setMovDate(startDate);
                         oAdjust.setQuantityIn(0d);
@@ -180,7 +180,7 @@ public abstract class SStockValuationKardexAdjustUtils {
                     }
                     if (totalIn > 0) {
                         // Ajuste de salida: elimina el costo de entrada registrado con precio de OC
-                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TYPE_VAL_KARDEX_OUT_ADJUST_FIX_ASSET,
+                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_OUT_ADJUST_FIX_ASSET,
                                 pkKardex, pkDiogEtyIn, pkMainOcDpsEtyIn, pkInvoiceDps, fkItem, fkUnit, fkLot, fkCob, fkWh);
                         oAdjust.setMovDate(startDate);
                         oAdjust.setQuantityOut(0d);
@@ -201,7 +201,7 @@ public abstract class SStockValuationKardexAdjustUtils {
                         // (consumedQuantity * precioFactura) - costoConsumidoConPrecioOC
                         double totalAdjust = SLibUtils.roundAmount((consumedQuantity * fPrice) - consumedCost);
                         double totalAdjustCur = SLibUtils.roundAmount((consumedQuantity * fPriceCur) - consumedCostCur);
-                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TYPE_VAL_KARDEX_OUT_ADJUST_DIFF_COST,
+                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_OUT_ADJUST_DIFF_COST,
                                 pkKardex, pkDiogEtyIn, pkMainOcDpsEtyIn, pkInvoiceDps, fkItem, fkUnit, fkLot, fkCob, fkWh);
                         oAdjust.setMovDate(startDate);
                         oAdjust.setQuantityOut(0d);
@@ -220,7 +220,7 @@ public abstract class SStockValuationKardexAdjustUtils {
                     double totalAdjust = SLibUtils.roundAmount(newTotalIn - totalIn);
                     double totalAdjustCur = SLibUtils.roundAmount(newTotalInCur - totalInCur);
                     if (totalAdjust != 0 || totalAdjustCur != 0) {
-                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST,
+                        SDbStockValuationKardex oAdjust = buildAdjust(idValuation, SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN_ADJUST_DIFF_COST,
                                 pkKardex, pkDiogEtyIn, pkMainOcDpsEtyIn, pkInvoiceDps, fkItem, fkUnit, fkLot, fkCob, fkWh);
                         oAdjust.setMovDate(startDate);
                         oAdjust.setQuantityIn(0d);

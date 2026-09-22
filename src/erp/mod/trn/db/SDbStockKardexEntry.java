@@ -17,7 +17,7 @@ public class SDbStockKardexEntry extends SDbStockValuationKardex {
     public SDbStockKardexEntry(final Date dt, final int idDiogYear, final int idDiogDoc, final int idDiogEty, final int idValuation) {
         super(idValuation);
         this.setMovDate(dt);
-        this.setFkStockValuationKardexTypeId(TYPE_VAL_KARDEX_IN);
+        this.setFkStockValuationKardexTypeId(TRNS_TP_STK_VAL_KARDEX_IN);
         this.setFkDiogCategoryId(SModSysConsts.TRNS_CT_IOG_IN);
         this.setFkDiogYearInId_n(idDiogYear);
         this.setFkDiogDocInId_n(idDiogDoc);

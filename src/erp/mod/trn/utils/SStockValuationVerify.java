@@ -805,12 +805,12 @@ public abstract class SStockValuationVerify {
                 + "LEFT JOIN " + sTable + " base "
                 + "  ON base.id_stk_val_kardex = adj.fk_stk_val_kardex_n "
                 + "  AND base.b_del = 0 "
-                + "  AND base.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TYPE_VAL_KARDEX_IN + " "
+                + "  AND base.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN + " "
                 + "  AND base.fk_diog_year_in_n = adj.fk_diog_year_in_n "
                 + "  AND base.fk_diog_doc_in_n = adj.fk_diog_doc_in_n "
                 + "  AND base.fk_diog_ety_in_n = adj.fk_diog_ety_in_n "
                 + "WHERE adj.b_del = 0 "
-                + "AND adj.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST + " "
+                + "AND adj.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN_ADJUST_DIFF_COST + " "
                 + "AND (adj.fk_stk_val_kardex_n IS NULL OR adj.fk_stk_val_kardex_n = 0 OR base.id_stk_val_kardex IS NULL) "
                 + "ORDER BY adj.fk_diog_year_in_n, adj.fk_diog_doc_in_n, adj.fk_diog_ety_in_n;";
         ResultSet rs = oSession.getStatement().executeQuery(sql);
