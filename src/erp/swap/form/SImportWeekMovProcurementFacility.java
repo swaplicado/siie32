@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.StreamSupport;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiSession;
@@ -57,7 +58,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     private final String ACCOUNTING_ACCOUNT_IVA = "1160-0002-0000";
     private final String OCASSIONAL_FISCAL_ID = "XAXX010101000";
     private final int[] TAX_KEY = new int[]{1 , 14};
-    
+
     private final int LIMIT_TO_IVA = 1;
             
     private final String[] months = {
@@ -135,6 +136,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public int[] TaxKeyIva0;
     public int[] TaxKeyExcento;
     public int[] TaxKeyRetention1;
+    public int[] TaxKeyRetention2;
     
     public double taxableBase16;
     public double taxableBase0;
@@ -486,16 +488,73 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         
         JsonNode invoice = docNode.path("invoice");
         if(!invoice.isEmpty()){
-//            ameIva = invoice.get("iva").asInt();
-//            ameRetention = invoice.get("retention").asInt();
+            ameIva = invoice.get("iva").asDouble();
+            ameRetention = invoice.get("retention").asDouble();
         }
-
-        ameIva = 136.93;
-        ameRetention = 10;
         
         if(ameIva > 0.0) {
-            calcularIva();
+            JsonNode taxesInfo = docNode.path("taxes_info");
             readJsonConfig(miClient.getSession(), statement);
+            if (taxesInfo.isEmpty()) {
+                calcularIva();
+            } else {
+                JsonNode oIva16 = taxesInfo.path("iva16");
+                JsonNode oIva0 = taxesInfo.path("iva0");
+                JsonNode oIvaExcento = taxesInfo.path("ivaExcento");
+                JsonNode oRetention1 = taxesInfo.path("retention1");
+                JsonNode oRetention2 = taxesInfo.path("retention2");
+                
+                if (!oIva16.isEmpty()) {
+                    JsonNode keysNode = oIva16.get("taxKey");
+                    int[] key16 = StreamSupport.stream(keysNode.spliterator(), false)
+                            .mapToInt(JsonNode::asInt)
+                            .toArray();
+                    
+                    TaxKeyIva16 = key16;
+                    impuesto16 = oIva16.get("impuesto").asDouble();
+                    taxableBase16 = oIva16.get("taxableBase").asDouble();
+                }
+                if (!oIva0.isEmpty()) {
+                    JsonNode keysNode = oIva0.get("taxKey");
+                    int[] key0 = StreamSupport.stream(keysNode.spliterator(), false)
+                            .mapToInt(JsonNode::asInt)
+                            .toArray();
+                    
+                    TaxKeyIva0 = key0;
+                    impuesto0 = oIva0.get("impuesto").asDouble();
+                    taxableBase0 = oIva0.get("taxableBase").asDouble();
+                }
+                if (!oIvaExcento.isEmpty()) {
+                    JsonNode keysNode = oIvaExcento.get("taxKey");
+                    int[] keyExcento = StreamSupport.stream(keysNode.spliterator(), false)
+                            .mapToInt(JsonNode::asInt)
+                            .toArray();
+                    
+                    TaxKeyExcento = keyExcento;
+                    impuestoExcento = oIvaExcento.get("impuesto").asDouble();
+                    taxableBaseExcento = oIvaExcento.get("taxableBase").asDouble();
+                }
+                if (!oRetention1.isEmpty()) {
+                    JsonNode keysNode = oRetention1.get("taxKey");
+                    int[] keyRetention1 = StreamSupport.stream(keysNode.spliterator(), false)
+                            .mapToInt(JsonNode::asInt)
+                            .toArray();
+                    
+                    TaxKeyRetention1 = keyRetention1;
+                    retention1 = oRetention1.get("impuesto").asDouble();
+                }
+                if (!oRetention2.isEmpty()) {
+                    JsonNode keysNode = oRetention2.get("taxKey");
+                    int[] keyRetention2 = StreamSupport.stream(keysNode.spliterator(), false)
+                            .mapToInt(JsonNode::asInt)
+                            .toArray();
+                    
+                    TaxKeyRetention2 = keyRetention2;
+                    retention2 = oRetention2.get("impuesto").asDouble();
+                }
+                
+                totalSinIva = Debe - ( impuesto16 != 0 ? impuesto16 : taxableBase16 ) - ( impuesto0 != 0 ? impuesto0 : taxableBase0 ) - ( impuestoExcento != 0 ? impuestoExcento : taxableBaseExcento );
+            }
         }
         
         if (AccountingTypeId == ACCOUNTING_TYPE_COMPRA_ID && Item.Code.equals(AGUACATE_MADURO)) {
@@ -632,11 +691,19 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
     public boolean getIsIvaExcento(){ return isIvaExcento; }
     public void setIsRetention1(boolean isRetention1) { this.isRetention1 = isRetention1; }
     public boolean getIsRetention1(){ return isRetention1; }
-    public void setIsRetention2(boolean isRetention2) { this.isRetention2 = isRetention1; }
+    public void setIsRetention2(boolean isRetention2) { this.isRetention2 = isRetention2; }
     public boolean getIsRetention2(){ return isRetention2; }
     public int[] getTaxKeyIva16() { return TaxKeyIva16; }
     public int[] getTaxKeyIva0() { return TaxKeyIva0; }
     public int[] getTaxKeyExcento() { return TaxKeyExcento; }
+    public int[] getTaxKeyRetention1() { return TaxKeyRetention1; }
+    public int[] getTaxKeyRetention2() { return TaxKeyRetention2; }
+    public void setTaxKeyIva16(int [] taxKeyIva16) { this.TaxKeyIva16 = taxKeyIva16; }
+    public void setTaxKeyIva0(int [] taxKeyIva0) { this.TaxKeyIva0 = taxKeyIva0; }
+    public void setTaxKeyExcento(int [] taxKeyExcento) { this.TaxKeyExcento = taxKeyExcento; }
+    public void setTaxKeyRetention1 (int [] taxKeyRetention1) { this.TaxKeyRetention1 = taxKeyRetention1; }
+    public void setTaxKeyRetention2 (int [] taxKeyRetention2) { this.TaxKeyRetention2 = taxKeyRetention2; }
+    
     public double getTotalSinIva() { return totalSinIva; }
     
     @Override
@@ -930,52 +997,73 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         
         return result;
     }
-    
-//    public void calcularIva() {
-//        double total = Debe != 0 ? Debe : Haber;
-//        double sub16 = total / 1.16;
-//        double montoConIva = sub16 + ameIva;
-//        double sub0 = 0;
-//        
-//        if (SLibUtils.compareAmount(total, montoConIva)) {
-//            subtotal0 = sub0;
-//            subtotal16 = SLibUtils.roundAmount(sub16);
-//            impuesto16 = ameIva;
-//            taza16 = 0.16;
-//        } else {
-//            montoConIva = SLibUtils.roundAmount(sub16) + SLibUtils.roundAmount(ameIva);
-//            sub0 = total - montoConIva;
-//            subtotal0 = SLibUtils.roundAmount(sub0);
-//            subtotal16 = SLibUtils.roundAmount(sub16);
-//            impuesto16 = ameIva;
-//            taza16 = 0.16;
-//        }
-//    }
-    
+
     public void calcularIva() {
-        double total = Debe;
-        double sub16 = total / 1.16;
-        double montoConIva = sub16 + ameIva;
-        double sub0 = 0;
-        double iva16Calculado = SLibUtils.roundAmount( (total / 1.16) * 0.16 );
-        
-        sub16 = total - (ameIva + sub0);
-        taxableBase16 = total / 1.16;
-        taxableBase0 = total  - taxableBase16 - ameIva;
-        
-        if (iva16Calculado > ameIva) {
-            if ( (total - montoConIva) > LIMIT_TO_IVA ) {
-                sub16 = ameIva / 0.16;
-                sub0 = total - (ameIva + sub16);
-            }
+        final double IVA_RATE = 0.16;
+        final double LIMIT_SUBTOTAL = 1.0;
+
+        double total = Debe; // Total neto capturado
+
+        // IVA calculado a partir del total neto capturado
+        double ivaCalculadoBruto = total - (total / (1 + IVA_RATE));
+        double ivaCalculado = SLibUtils.roundAmount(ivaCalculadoBruto);
+
+        // IVA capturado en Portal AME
+        double ivaCapturado = ameIva;
+
+        // Diferencia
+        double diferencia = ivaCapturado - ivaCalculado;
+        double absDiferencia = SLibUtils.roundAmount(Math.abs(diferencia));
+
+        // ¿IVA capturado >= IVA calculado?
+        boolean ivaCapturadoMayorIgual = ivaCapturado >= ivaCalculado;
+
+        // Subtotal IVA 16% calculado a partir del IVA capturado
+        double sub16CalculadoBruto = ivaCapturado / IVA_RATE;
+        double sub16Calculado = SLibUtils.roundAmount(sub16CalculadoBruto);
+
+        // Subtotal sin IVA calculado
+        double sub0Calculado = total - ivaCapturado - sub16Calculado;
+
+        // ¿Subtotal sin IVA > límite?
+        boolean sub0MayorLimite = sub0Calculado > LIMIT_SUBTOTAL;
+
+        // Subtotal sin IVA a agregarse a subtotal IVA 16%
+        double sub0AgregarASub16;
+        if (ivaCapturadoMayorIgual) {
+            sub0AgregarASub16 = 0;
+        } else {
+            sub0AgregarASub16 = !sub0MayorLimite ? sub0Calculado : 0;
         }
-        
-        subtotal0 = SLibUtils.roundAmount(sub0);
-        subtotal16 = SLibUtils.roundAmount(sub16);
-        impuesto16 = ameIva;
-        impuesto0 = subtotal0;
-        
-        totalSinIva = total - impuesto16 - impuesto0;
+
+        // Subtotal sin IVA a contabilizar
+        double sub0AContabilizar;
+        if (ivaCapturadoMayorIgual) {
+            sub0AContabilizar = 0;
+        } else {
+            sub0AContabilizar = sub0MayorLimite ? sub0Calculado : 0;
+        }
+
+        // Contabilización SIIE
+        impuesto16 = ivaCapturado;
+        impuesto0 = 0;
+
+        double subtotal16SIIE;
+        if (ivaCapturadoMayorIgual) {
+            subtotal16SIIE = total - ivaCapturado;
+        } else {
+            subtotal16SIIE = sub16Calculado;
+        }
+        subtotal16SIIE += sub0AgregarASub16;
+        subtotal16 = SLibUtils.roundAmount(subtotal16SIIE);
+
+        subtotal0 = SLibUtils.roundAmount(sub0AContabilizar);
+
+        taxableBase16 = subtotal16;
+        taxableBase0 = subtotal0;
+
+//        totalSinIva = total - impuesto16 - impuesto0;
+        totalSinIva = Debe - ( impuesto16 != 0 ? impuesto16 : taxableBase16 ) - ( impuesto0 != 0 ? impuesto0 : taxableBase0 ) - ( impuestoExcento != 0 ? impuestoExcento : taxableBaseExcento );
         retention1 = ameRetention;
     }
     
@@ -991,6 +1079,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         TaxKeyIva0 = new int[] { Integer.valueOf(arrPkAccTaxIva0.get(0)), Integer.valueOf(arrPkAccTaxIva0.get(1)) };
         TaxKeyExcento = new int[] { Integer.valueOf(arrPkAccTaxExc.get(0)), Integer.valueOf(arrPkAccTaxExc.get(1)) };
         TaxKeyRetention1 = new int[] { Integer.valueOf(arrPkAccRetention1.get(0)), Integer.valueOf(arrPkAccRetention1.get(1)) };
+        TaxKeyRetention2 = new int[] { };
         
         SDataAccount oAccountIVA = new SDataAccount();
         oAccountIVA.read( new String[] { ACCOUNTING_ACCOUNT_IVA }, statement);

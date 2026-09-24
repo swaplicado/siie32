@@ -89,6 +89,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     protected ArrayList<SImportItems> maImportedItems;
     protected List<Integer> smaEdited = new ArrayList<>();
     protected int mnAccountingTypeId;
+    double totDebe = 0.0;
+    double totHaber = 0.0;
 
     /**
      * Creates new form SDialogImportDocuments
@@ -153,6 +155,35 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jLabel31 = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
         jLabel3b3 = new javax.swing.JLabel();
+        jpDownloadW4 = new javax.swing.JPanel();
+        jpDownloadE4 = new javax.swing.JPanel();
+        jLabel33 = new javax.swing.JLabel();
+        jlprocurement = new javax.swing.JLabel();
+        jtfProcurement = new javax.swing.JTextField();
+        jLabel2b5 = new javax.swing.JLabel();
+        jpDownloadE5 = new javax.swing.JPanel();
+        jLabel34 = new javax.swing.JLabel();
+        jlWeek = new javax.swing.JLabel();
+        jtfWeek = new javax.swing.JTextField();
+        jLabel2b6 = new javax.swing.JLabel();
+        jpDownloadW5 = new javax.swing.JPanel();
+        jpDownloadE6 = new javax.swing.JPanel();
+        jLabel35 = new javax.swing.JLabel();
+        jlprocurement1 = new javax.swing.JLabel();
+        jtfHeadProcurement = new javax.swing.JTextField();
+        jpDownloadE7 = new javax.swing.JPanel();
+        jLabel36 = new javax.swing.JLabel();
+        jlWeek1 = new javax.swing.JLabel();
+        jtfHeadWeek = new javax.swing.JTextField();
+        jpDownloadE8 = new javax.swing.JPanel();
+        jLabel37 = new javax.swing.JLabel();
+        jlTotDebe = new javax.swing.JLabel();
+        jtfTotDebe = new javax.swing.JTextField();
+        jpDownloadE9 = new javax.swing.JPanel();
+        jLabel38 = new javax.swing.JLabel();
+        jLabel2b4 = new javax.swing.JLabel();
+        jlTotHaber = new javax.swing.JLabel();
+        jtfTotHaber = new javax.swing.JTextField();
         jpDocuments = new javax.swing.JPanel();
         jpDocumentsGrid = new javax.swing.JPanel();
         jpDocumentsGrid1 = new javax.swing.JPanel();
@@ -249,6 +280,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
         jpDownload.add(jpDownloadW, java.awt.BorderLayout.WEST);
 
+        jpDownloadE.setPreferredSize(new java.awt.Dimension(270, 71));
         jpDownloadE.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
 
         jpDownloadE1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
@@ -296,6 +328,133 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpDownloadE.add(jpDownloadE3);
 
         jpDownload.add(jpDownloadE, java.awt.BorderLayout.EAST);
+
+        jpDownloadW4.setPreferredSize(new java.awt.Dimension(500, 23));
+        jpDownloadW4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jpDownloadE4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel33.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE4.add(jLabel33);
+
+        jlprocurement.setText("Bodega:");
+        jlprocurement.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE4.add(jlprocurement);
+
+        jtfProcurement.setEditable(false);
+        jtfProcurement.setText("Bodega");
+        jtfProcurement.setToolTipText("Usuario actual");
+        jtfProcurement.setFocusable(false);
+        jtfProcurement.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadE4.add(jtfProcurement);
+
+        jLabel2b5.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE4.add(jLabel2b5);
+
+        jpDownloadW4.add(jpDownloadE4);
+
+        jpDownloadE5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel34.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE5.add(jLabel34);
+
+        jlWeek.setText("Semana:");
+        jlWeek.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE5.add(jlWeek);
+
+        jtfWeek.setEditable(false);
+        jtfWeek.setText("Semana");
+        jtfWeek.setToolTipText("Usuario actual");
+        jtfWeek.setFocusable(false);
+        jtfWeek.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadE5.add(jtfWeek);
+
+        jLabel2b6.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE5.add(jLabel2b6);
+
+        jpDownloadW4.add(jpDownloadE5);
+
+        jpDownload.add(jpDownloadW4, java.awt.BorderLayout.CENTER);
+
+        jpDownloadW5.setPreferredSize(new java.awt.Dimension(500, 23));
+        jpDownloadW5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jpDownloadE6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel35.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE6.add(jLabel35);
+
+        jlprocurement1.setText("Bodega:");
+        jlprocurement1.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE6.add(jlprocurement1);
+
+        jtfHeadProcurement.setEditable(false);
+        jtfHeadProcurement.setText("Bodega");
+        jtfHeadProcurement.setToolTipText("Usuario actual");
+        jtfHeadProcurement.setFocusable(false);
+        jtfHeadProcurement.setPreferredSize(new java.awt.Dimension(150, 21));
+        jpDownloadE6.add(jtfHeadProcurement);
+
+        jpDownloadW5.add(jpDownloadE6);
+
+        jpDownloadE7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel36.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE7.add(jLabel36);
+
+        jlWeek1.setText("Semana:");
+        jlWeek1.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE7.add(jlWeek1);
+
+        jtfHeadWeek.setEditable(false);
+        jtfHeadWeek.setText("Semana");
+        jtfHeadWeek.setToolTipText("Usuario actual");
+        jtfHeadWeek.setFocusable(false);
+        jtfHeadWeek.setPreferredSize(new java.awt.Dimension(150, 21));
+        jpDownloadE7.add(jtfHeadWeek);
+
+        jpDownloadW5.add(jpDownloadE7);
+
+        jpDownloadE8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel37.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE8.add(jLabel37);
+
+        jlTotDebe.setText("Total Debe:");
+        jlTotDebe.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE8.add(jlTotDebe);
+
+        jtfTotDebe.setEditable(false);
+        jtfTotDebe.setText("Debe");
+        jtfTotDebe.setToolTipText("Usuario actual");
+        jtfTotDebe.setFocusable(false);
+        jtfTotDebe.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadE8.add(jtfTotDebe);
+
+        jpDownloadW5.add(jpDownloadE8);
+
+        jpDownloadE9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
+
+        jLabel38.setPreferredSize(new java.awt.Dimension(5, 23));
+        jpDownloadE9.add(jLabel38);
+
+        jLabel2b4.setPreferredSize(new java.awt.Dimension(42, 23));
+        jpDownloadE9.add(jLabel2b4);
+
+        jlTotHaber.setText("Total Haber:");
+        jlTotHaber.setPreferredSize(new java.awt.Dimension(75, 21));
+        jpDownloadE9.add(jlTotHaber);
+
+        jtfTotHaber.setEditable(false);
+        jtfTotHaber.setText("Haber");
+        jtfTotHaber.setToolTipText("Usuario actual");
+        jtfTotHaber.setFocusable(false);
+        jtfTotHaber.setPreferredSize(new java.awt.Dimension(103, 21));
+        jpDownloadE9.add(jtfTotHaber);
+
+        jpDownloadW5.add(jpDownloadE9);
+
+        jpDownload.add(jpDownloadW5, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jpDownload, java.awt.BorderLayout.NORTH);
         jpDownload.getAccessibleContext().setAccessibleName("Búsqueda de  autorizadas:");
@@ -592,8 +751,17 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel2b3;
+    private javax.swing.JLabel jLabel2b4;
+    private javax.swing.JLabel jLabel2b5;
+    private javax.swing.JLabel jLabel2b6;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel3b1;
     private javax.swing.JLabel jLabel3b3;
     private javax.swing.JProgressBar jProgressBar;
@@ -607,7 +775,13 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JLabel jlProgress;
     private javax.swing.JLabel jlSubTotalIVA0;
     private javax.swing.JLabel jlSubTotalIva16;
+    private javax.swing.JLabel jlTotDebe;
+    private javax.swing.JLabel jlTotHaber;
     private javax.swing.JLabel jlUser;
+    private javax.swing.JLabel jlWeek;
+    private javax.swing.JLabel jlWeek1;
+    private javax.swing.JLabel jlprocurement;
+    private javax.swing.JLabel jlprocurement1;
     private javax.swing.JPanel jpDocuments;
     private javax.swing.JPanel jpDocumentsGrid;
     private javax.swing.JPanel jpDocumentsGrid1;
@@ -623,8 +797,16 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JPanel jpDownloadE1;
     private javax.swing.JPanel jpDownloadE2;
     private javax.swing.JPanel jpDownloadE3;
+    private javax.swing.JPanel jpDownloadE4;
+    private javax.swing.JPanel jpDownloadE5;
+    private javax.swing.JPanel jpDownloadE6;
+    private javax.swing.JPanel jpDownloadE7;
+    private javax.swing.JPanel jpDownloadE8;
+    private javax.swing.JPanel jpDownloadE9;
     private javax.swing.JPanel jpDownloadW;
     private javax.swing.JPanel jpDownloadW1;
+    private javax.swing.JPanel jpDownloadW4;
+    private javax.swing.JPanel jpDownloadW5;
     private javax.swing.JPanel jpProcessingN;
     private javax.swing.JPanel jpProcessingN1;
     private javax.swing.JPanel jpProcessingN10;
@@ -667,11 +849,17 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JTextField jtfDebe;
     private javax.swing.JTextField jtfEntity;
     private javax.swing.JTextField jtfHaber;
+    private javax.swing.JTextField jtfHeadProcurement;
+    private javax.swing.JTextField jtfHeadWeek;
     private javax.swing.JTextField jtfImpuestoIVA16;
     private javax.swing.JTextField jtfItem;
+    private javax.swing.JTextField jtfProcurement;
     private javax.swing.JTextField jtfSubTotalIVA0;
     private javax.swing.JTextField jtfSubTotalIva16;
+    private javax.swing.JTextField jtfTotDebe;
+    private javax.swing.JTextField jtfTotHaber;
     private javax.swing.JTextField jtfUserName;
+    private javax.swing.JTextField jtfWeek;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -688,6 +876,11 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         msCompanyName = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.CFGU_CO, new int[]{miClient.getSession().getConfigCompany().getCompanyId()}, SLibConstants.DESCRIPTION_NAME);
 
         moImportationsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_PROCUREMENT_WEEKS_MOV, 1, "Movimientos", null) {
+            @Override
+            public void actionMouseClicked() {
+                actionOpenSelectedWeekProcurementFacility();
+            }
+            
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -853,6 +1046,39 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     .append("\"id_cob\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkCompanyBranchId() : "").append("\",")
                     .append("\"id_ent\": \"").append( row.moDataAccountCash != null ? row.moDataAccountCash.getPkAccountCashId() : "").append("\",")
                     .append("\"is_purchase_expense\": ").append(row.isPurchaseExpense);
+                       
+                    if (row.Is_invoiced) {
+                        jsonMovements.append(", ").append("\"taxes_info\": ").append("{"
+                                + "\"iva16\": " 
+                                    + "{"
+                                        + "\"taxKey\" : " + (row.getTaxKeyIva16().length > 0 ? "[" + row.getTaxKeyIva16()[0] + ", " + row.getTaxKeyIva16()[1] + "]" : "[]" ) +  ", "
+                                        + "\"taxableBase\" : " + row.getTaxableBase16() + ", "
+                                        + "\"impuesto\" : " + row.getImpuesto16()
+                                    + "},"
+                                + "\"iva0\": "
+                                    + "{"
+                                        + "\"taxKey\" : " + (row.getTaxKeyIva0().length > 0 ? "[" + row.getTaxKeyIva0()[0] + ", " + row.getTaxKeyIva0()[1] + "]" : "[]" ) +  ", "
+                                        + "\"taxableBase\" : " + row.getTaxableBase0() + ", "
+                                        + "\"impuesto\" : " + row.getImpuesto0()
+                                    + "},"
+                                + "\"ivaExcento\": "
+                                    + "{"
+                                        + "\"taxKey\" : " + (row.getTaxKeyExcento().length > 0 ? "[" + row.getTaxKeyExcento()[0] + ", " + row.getTaxKeyExcento()[1] + "]" : "[]" ) +  ", "
+                                        + "\"taxableBase\" : " + row.getTaxableBaseExcento() + ", "
+                                        + "\"impuesto\" : " + row.getImpuestoExcento()
+                                    + "},"
+                                + "\"retention1\": "
+                                    + "{"
+                                        + "\"taxKey\" : " + (row.getTaxKeyRetention1().length > 0 ? "[" + row.getTaxKeyRetention1()[0] + ", " + row.getTaxKeyRetention1()[1] + "]" : "[]" ) +  ", "
+                                        + "\"impuesto\" : " + row.getRetention1()
+                                    + "},"
+                                + "\"retention2\": "
+                                    + "{"
+                                        + "\"taxKey\" : " + (row.getTaxKeyRetention2().length > 0 ? "[" + row.getTaxKeyRetention2()[0] + ", " + row.getTaxKeyRetention2()[1] + "]" : "[]" ) +  ", "
+                                        + "\"impuesto\" : " + row.getRetention2()
+                                    + "}"
+                                + "}");
+                    }
 
                     if (row.isPurchaseExpense) {
                         jsonMovements.append(", ").append("\"purchase_expense_base_item_erp_id\": ").append(row.ItemPurchaseExpense.Id).append(", ")
@@ -1034,16 +1260,19 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                 
                 SClientInterface client = (SClientInterface) miClient;
                 
-                String message = "Resumen de la búsqueda de movimiento de la bodega: " + oProcurementFacility.ProcurementFacilityName + "\n\n"
-                        + "Semana del " + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.StartDate) + " a " + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.EndDate) + "\n\n"
-                        + "Movimientos totales: " + countRetreived;
-
-                if (countRetreived == 0) {
-                    message = "No se encontraron movimientos para la bodega:  " + oProcurementFacility.ProcurementFacilityName + "\n\n"
-                            + "Semana del " + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.StartDate) + " a " + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.EndDate) + "\n\n";
-                }
-                miClient.showMsgBoxInformation(message);
+                jtfHeadProcurement.setText(oProcurementFacility.ProcurementFacilityName);
+                jtfHeadWeek.setText(client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.StartDate) + " a " + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(oProcurementFacility.EndDate));
                 
+                totDebe = 0;
+                totHaber = 0;
+                
+                for(SImportWeekMovProcurementFacility oMov: maImportedDocuments){
+                    totDebe += oMov.getDebe();
+                    totHaber += oMov.getHaber();
+                }
+                
+                jtfTotDebe.setText(String.valueOf(totDebe));
+                jtfTotHaber.setText(String.valueOf(totHaber));
                 itemStateChangedDocType(true);
             }
         }
@@ -1226,9 +1455,27 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                         smaEdited.add(i);
                     }
                     
+//                    maImportedDocument.setImpuesto16(weekProcurementFacility.impuesto16);
+//                    maImportedDocument.setSubtotal16(weekProcurementFacility.subtotal16);
+//                    maImportedDocument.setSubtotal0(weekProcurementFacility.subtotal0);
+                    
+                    maImportedDocument.setTaxKeyIva16(weekProcurementFacility.TaxKeyIva16);
+                    maImportedDocument.setTaxKeyIva0(weekProcurementFacility.TaxKeyIva0);
+                    maImportedDocument.setTaxKeyExcento(weekProcurementFacility.TaxKeyExcento);
+                    
                     maImportedDocument.setImpuesto16(weekProcurementFacility.impuesto16);
-                    maImportedDocument.setSubtotal16(weekProcurementFacility.subtotal16);
-                    maImportedDocument.setSubtotal0(weekProcurementFacility.subtotal0);
+                    maImportedDocument.setImpuesto0(weekProcurementFacility.impuesto0);
+                    maImportedDocument.setImpuestoExcento(weekProcurementFacility.impuestoExcento);
+                    
+                    maImportedDocument.setTaxableBase16(weekProcurementFacility.taxableBase16);
+                    maImportedDocument.setTaxableBase0(weekProcurementFacility.taxableBase0);
+                    maImportedDocument.setTaxableBaseExcento(weekProcurementFacility.taxableBaseExcento);
+                    
+                    maImportedDocument.setTaxKeyRetention1(weekProcurementFacility.TaxKeyRetention1);
+                    maImportedDocument.setTaxKeyRetention2(weekProcurementFacility.TaxKeyRetention2);
+                    
+                    maImportedDocument.setRetention1(weekProcurementFacility.retention1);
+                    maImportedDocument.setRetention2(weekProcurementFacility.retention2);
                 }
             }
             moImportationsGrid.renderGridRows();

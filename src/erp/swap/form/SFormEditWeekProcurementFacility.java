@@ -67,6 +67,12 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private int mnOptionsEntityType;
     private SFormField moFieldFkItemId_n;
     
+    private SFormField moAccIva16;
+    private SFormField moAccIva0;
+    private SFormField moAccExcento;
+    private SFormField moAccRetention1;
+    private SFormField moAccRetention2;
+    
     private int mnOptionsItemType;
     private boolean mbIsItemRequired;
     
@@ -156,39 +162,39 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jPanel15 = new javax.swing.JPanel();
         jlSubTotal16 = new javax.swing.JLabel();
         moSubTotal16 = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jckIsInvoiced = new javax.swing.JCheckBox();
         jPanel21 = new javax.swing.JPanel();
-        jlSubTotal1 = new javax.swing.JLabel();
-        jlSubTotal2 = new javax.swing.JLabel();
-        jlSubTotal6 = new javax.swing.JLabel();
-        jlSubTotal4 = new javax.swing.JLabel();
+        jPanel23 = new javax.swing.JPanel();
+        jlTaxPassed = new javax.swing.JLabel();
+        jlTaxableBase = new javax.swing.JLabel();
+        jlTaxes = new javax.swing.JLabel();
+        jlImpuesto20 = new javax.swing.JLabel();
+        jlTaxRetention = new javax.swing.JLabel();
+        jlRetentions = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
-        jlImpuesto16 = new javax.swing.JLabel();
+        jcbAccIva16 = new javax.swing.JComboBox<>();
         moTaxableBaseIva16 = new sa.lib.gui.bean.SBeanFieldDecimal();
         moIva16 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jcbAccIva16 = new sa.lib.gui.bean.SBeanFieldKey();
         jlImpuesto17 = new javax.swing.JLabel();
+        jcbAccRetention1 = new javax.swing.JComboBox<>();
         moRetention1 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jcbAccRetention1 = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel20 = new javax.swing.JPanel();
-        jlSubTotal0 = new javax.swing.JLabel();
+        jcbAccIva0 = new javax.swing.JComboBox<>();
         moTaxableBaseIva0 = new sa.lib.gui.bean.SBeanFieldDecimal();
         moIva0 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jcbAccIva0 = new sa.lib.gui.bean.SBeanFieldKey();
         jlImpuesto18 = new javax.swing.JLabel();
+        jcbAccRetention2 = new javax.swing.JComboBox<>();
         moRetention2 = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jcbAccRetention2 = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel22 = new javax.swing.JPanel();
-        jlSubTotal5 = new javax.swing.JLabel();
+        jcbAccExcento = new javax.swing.JComboBox<>();
         moTaxableBaseIvaExcento = new sa.lib.gui.bean.SBeanFieldDecimal();
         moExcento = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jcbAccExcento = new sa.lib.gui.bean.SBeanFieldKey();
         jlImpuesto19 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         moCostCenterPanel = new erp.gui.account.SBeanPanelAccount();
 
         setTitle("Agregar prestación");
         setMinimumSize(new java.awt.Dimension(700, 680));
-        setPreferredSize(new java.awt.Dimension(700, 622));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setMinimumSize(new java.awt.Dimension(700, 722));
@@ -207,7 +213,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
 
         jPanel8.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(16, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(17, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -403,31 +409,55 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jPanel15.add(jlSubTotal16);
         jPanel15.add(moSubTotal16);
 
+        jckIsInvoiced.setText("Facturado");
+        jckIsInvoiced.setFocusable(false);
+        jckIsInvoiced.setPreferredSize(new java.awt.Dimension(150, 23));
+        jckIsInvoiced.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jckIsInvoicedActionPerformed(evt);
+            }
+        });
+        jPanel15.add(jckIsInvoiced);
+
         jPanel2.add(jPanel15);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlSubTotal1.setPreferredSize(new java.awt.Dimension(190, 23));
-        jPanel21.add(jlSubTotal1);
-
-        jlSubTotal2.setText("Impuesto trasladado");
-        jlSubTotal2.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel21.add(jlSubTotal2);
-
-        jlSubTotal6.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel21.add(jlSubTotal6);
-
-        jlSubTotal4.setText("Impuesto retenido");
-        jlSubTotal4.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel21.add(jlSubTotal4);
-
         jPanel2.add(jPanel21);
+
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTaxPassed.setText("Impuesto trasladado:");
+        jlTaxPassed.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel23.add(jlTaxPassed);
+
+        jlTaxableBase.setText("Base gravable:");
+        jlTaxableBase.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel23.add(jlTaxableBase);
+
+        jlTaxes.setText("Traslado:");
+        jlTaxes.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel23.add(jlTaxes);
+
+        jlImpuesto20.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel23.add(jlImpuesto20);
+
+        jlTaxRetention.setText("Impuesto retenido:");
+        jlTaxRetention.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel23.add(jlTaxRetention);
+
+        jlRetentions.setText("Retención:");
+        jlRetentions.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel23.add(jlRetentions);
+
+        jPanel2.add(jPanel23);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlImpuesto16.setText("IVA 16:");
-        jlImpuesto16.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel18.add(jlImpuesto16);
+        jcbAccIva16.setMaximumRowCount(16);
+        jcbAccIva16.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbAccIva16.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbAccIva16.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel18.add(jcbAccIva16);
 
         moTaxableBaseIva16.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -443,14 +473,14 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         });
         jPanel18.add(moIva16);
 
-        jcbAccIva16.setEditable(true);
-        jcbAccIva16.setMaximumSize(new java.awt.Dimension(315, 23));
-        jcbAccIva16.setMinimumSize(new java.awt.Dimension(315, 23));
-        jcbAccIva16.setName(""); // NOI18N
-        jPanel18.add(jcbAccIva16);
-
         jlImpuesto17.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel18.add(jlImpuesto17);
+
+        jcbAccRetention1.setMaximumRowCount(16);
+        jcbAccRetention1.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbAccRetention1.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbAccRetention1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel18.add(jcbAccRetention1);
 
         moRetention1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -459,19 +489,15 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         });
         jPanel18.add(moRetention1);
 
-        jcbAccRetention1.setEditable(true);
-        jcbAccRetention1.setMaximumSize(new java.awt.Dimension(315, 23));
-        jcbAccRetention1.setMinimumSize(new java.awt.Dimension(315, 23));
-        jcbAccRetention1.setName(""); // NOI18N
-        jPanel18.add(jcbAccRetention1);
-
         jPanel2.add(jPanel18);
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSubTotal0.setText("IVA 0:");
-        jlSubTotal0.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel20.add(jlSubTotal0);
+        jcbAccIva0.setMaximumRowCount(16);
+        jcbAccIva0.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbAccIva0.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbAccIva0.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel20.add(jcbAccIva0);
 
         moTaxableBaseIva0.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -481,14 +507,14 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jPanel20.add(moTaxableBaseIva0);
         jPanel20.add(moIva0);
 
-        jcbAccIva0.setEditable(true);
-        jcbAccIva0.setMaximumSize(new java.awt.Dimension(315, 23));
-        jcbAccIva0.setMinimumSize(new java.awt.Dimension(315, 23));
-        jcbAccIva0.setName(""); // NOI18N
-        jPanel20.add(jcbAccIva0);
-
         jlImpuesto18.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel20.add(jlImpuesto18);
+
+        jcbAccRetention2.setMaximumRowCount(16);
+        jcbAccRetention2.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbAccRetention2.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbAccRetention2.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel20.add(jcbAccRetention2);
 
         moRetention2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -497,19 +523,15 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         });
         jPanel20.add(moRetention2);
 
-        jcbAccRetention2.setEditable(true);
-        jcbAccRetention2.setMaximumSize(new java.awt.Dimension(315, 23));
-        jcbAccRetention2.setMinimumSize(new java.awt.Dimension(315, 23));
-        jcbAccRetention2.setName(""); // NOI18N
-        jPanel20.add(jcbAccRetention2);
-
         jPanel2.add(jPanel20);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSubTotal5.setText("Excento:");
-        jlSubTotal5.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel22.add(jlSubTotal5);
+        jcbAccExcento.setMaximumRowCount(16);
+        jcbAccExcento.setMaximumSize(new java.awt.Dimension(315, 23));
+        jcbAccExcento.setMinimumSize(new java.awt.Dimension(315, 23));
+        jcbAccExcento.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel22.add(jcbAccExcento);
 
         moTaxableBaseIvaExcento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -518,12 +540,6 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         });
         jPanel22.add(moTaxableBaseIvaExcento);
         jPanel22.add(moExcento);
-
-        jcbAccExcento.setEditable(true);
-        jcbAccExcento.setMaximumSize(new java.awt.Dimension(315, 23));
-        jcbAccExcento.setMinimumSize(new java.awt.Dimension(315, 23));
-        jcbAccExcento.setName(""); // NOI18N
-        jPanel22.add(jcbAccExcento);
 
         jlImpuesto19.setPreferredSize(new java.awt.Dimension(10, 23));
         jPanel22.add(jlImpuesto19);
@@ -577,6 +593,10 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         // TODO add your handling code here:
     }//GEN-LAST:event_moTaxableBaseIvaExcentoActionPerformed
 
+    private void jckIsInvoicedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jckIsInvoicedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jckIsInvoicedActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -592,6 +612,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -601,13 +622,14 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbFkBizPartnerId_nr;
     private javax.swing.JButton jbFkEntityId_n;
-    private sa.lib.gui.bean.SBeanFieldKey jcbAccExcento;
-    private sa.lib.gui.bean.SBeanFieldKey jcbAccIva0;
-    private sa.lib.gui.bean.SBeanFieldKey jcbAccIva16;
-    private sa.lib.gui.bean.SBeanFieldKey jcbAccRetention1;
-    private sa.lib.gui.bean.SBeanFieldKey jcbAccRetention2;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAccExcento;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAccIva0;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAccIva16;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAccRetention1;
+    private javax.swing.JComboBox<SFormComponentItem> jcbAccRetention2;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerId_nr;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkEntityId_n;
+    private javax.swing.JCheckBox jckIsInvoiced;
     private javax.swing.JCheckBox jckIsPurchaseExpensive;
     private javax.swing.JLabel jlConcept;
     private javax.swing.JLabel jlCurrencyId;
@@ -615,24 +637,23 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
     private javax.swing.JLabel jlFkBizPartnerId_nr;
     private javax.swing.JLabel jlFkEntityId_n;
     private javax.swing.JLabel jlHaber;
-    private javax.swing.JLabel jlImpuesto16;
     private javax.swing.JLabel jlImpuesto17;
     private javax.swing.JLabel jlImpuesto18;
     private javax.swing.JLabel jlImpuesto19;
+    private javax.swing.JLabel jlImpuesto20;
     private javax.swing.JLabel jlItem;
     private javax.swing.JLabel jlItem1;
     private javax.swing.JLabel jlItem2;
     private javax.swing.JLabel jlKilos;
     private javax.swing.JLabel jlReference;
+    private javax.swing.JLabel jlRetentions;
     private javax.swing.JLabel jlStockIn;
     private javax.swing.JLabel jlStockIn1;
-    private javax.swing.JLabel jlSubTotal0;
-    private javax.swing.JLabel jlSubTotal1;
     private javax.swing.JLabel jlSubTotal16;
-    private javax.swing.JLabel jlSubTotal2;
-    private javax.swing.JLabel jlSubTotal4;
-    private javax.swing.JLabel jlSubTotal5;
-    private javax.swing.JLabel jlSubTotal6;
+    private javax.swing.JLabel jlTaxPassed;
+    private javax.swing.JLabel jlTaxRetention;
+    private javax.swing.JLabel jlTaxableBase;
+    private javax.swing.JLabel jlTaxes;
     private javax.swing.JLabel jlUnitCost;
     private erp.gui.account.SBeanPanelAccount moAccountPanel;
     private sa.lib.gui.bean.SBeanFieldText moConcept;
@@ -690,9 +711,22 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moFieldFkEntityId_n = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkEntityId_n, jlFkEntityId_n);
         moFieldFkEntityId_n.setPickerButton(jbFkEntityId_n);
         
+        moAccIva16 = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccIva16, jlTaxPassed);
+        moAccIva0 = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccIva0, jlTaxPassed);
+        moAccExcento = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccExcento, jlTaxPassed);
+        moAccRetention1 = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccRetention1, jlTaxRetention);
+        moAccRetention2 = new SFormField((SClientInterface) miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccRetention2, jlTaxRetention);
+        
         moSubTotal16.setDecimalSettings(SGuiUtils.getLabelName(jlSubTotal16), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moIva16.setDecimalSettings(SGuiUtils.getLabelName(jlImpuesto16), SGuiConsts.GUI_TYPE_DEC_AMT, false);
-        moIva0.setDecimalSettings(SGuiUtils.getLabelName(jlSubTotal0), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moTaxableBaseIva16.setDecimalSettings(SGuiUtils.getLabelName(jlTaxableBase), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moIva16.setDecimalSettings(SGuiUtils.getLabelName(jlTaxes), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moIva0.setDecimalSettings(SGuiUtils.getLabelName(jlTaxes), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moTaxableBaseIva0.setDecimalSettings(SGuiUtils.getLabelName(jlTaxableBase), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moTaxableBaseIvaExcento.setDecimalSettings(SGuiUtils.getLabelName(jlTaxableBase), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moExcento.setDecimalSettings(SGuiUtils.getLabelName(jlTaxes), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        
+        moRetention1.setDecimalSettings(SGuiUtils.getLabelName(jlRetentions), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moRetention2.setDecimalSettings(SGuiUtils.getLabelName(jlRetentions), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
         moFields.addField(moConcept);
         moFields.addField(moReference);
@@ -707,8 +741,15 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moFields.addField(moCurrencyId);
         
         moFields.addField(moSubTotal16);
+        moFields.addField(moTaxableBaseIva16);
         moFields.addField(moIva16);
         moFields.addField(moIva0);
+        moFields.addField(moTaxableBaseIva0);
+        moFields.addField(moTaxableBaseIvaExcento);
+        moFields.addField(moExcento);
+        
+        moFields.addField(moRetention1);
+        moFields.addField(moRetention2);
         
         moFields.setFormButton(jbSave);
         
@@ -723,6 +764,7 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moCurrencyId.setEnabled(false);
         
         jckIsPurchaseExpensive.setEnabled(true);
+        jckIsInvoiced.setEnabled(false);
         
         moItem1.setEditable(false);
         moItem1.setEnabled(false);
@@ -730,8 +772,15 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moItem2.setEnabled(false);
         
         moSubTotal16.setEditable(true);
+        moTaxableBaseIva16.setEditable(true);
         moIva16.setEditable(true);
         moIva0.setEditable(true);
+        moTaxableBaseIva0.setEditable(true);
+        moTaxableBaseIvaExcento.setEditable(true);
+        moExcento.setEditable(true);
+        
+        moRetention1.setEditable(true);
+        moRetention2.setEditable(true);
         
         moAccountPanel.setRetrieveDataAccounts(true);
         moAccountPanel.setPanelAccountOwner(this);
@@ -800,10 +849,20 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         mnOptionsBizPartnerType = SDataConstantsSys.UNDEFINED;
         mnAccountSystemTypeId = SDataConstantsSys.UNDEFINED;
         SFormUtilities.populateComboBox((SClientInterface) miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
-
         mnOptionsItemType = SDataConstants.UNDEFINED;
         mbIsBizPartnerRequired = false;
         mbIsItemRequired = false;
+        
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbAccIva16, SDataConstants.FINX_TAX_BAS_TAX);
+        moAccIva16.setFieldValue(null);
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbAccIva0, SDataConstants.FINX_TAX_BAS_TAX);
+        moAccIva0.setFieldValue(null);
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbAccExcento, SDataConstants.FINX_TAX_BAS_TAX);
+        moAccExcento.setFieldValue(null);
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbAccRetention1, SDataConstants.FINX_TAX_BAS_TAX);
+        moAccRetention1.setFieldValue(null);
+        SFormUtilities.populateComboBox((SClientInterface) miClient, jcbAccRetention2, SDataConstants.FINX_TAX_BAS_TAX);
+        moAccRetention2.setFieldValue(null);
     }
 
     @Override
@@ -866,10 +925,18 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         jbFkEntityId_n.addActionListener(this);
         
         jckIsPurchaseExpensive.addItemListener(this);
+        jckIsInvoiced.addItemListener(this);
         
         moSubTotal16.addActionListener(this);
+        moTaxableBaseIva16.addActionListener(this);
         moIva16.addActionListener(this);
         moIva0.addActionListener(this);
+        moTaxableBaseIva0.addActionListener(this);
+        moTaxableBaseIvaExcento.addActionListener(this);
+        moExcento.addActionListener(this);
+        
+        moRetention1.addActionListener(this);
+        moRetention2.addActionListener(this);
     }
 
     @Override
@@ -887,10 +954,18 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moCurrencyId.removeItemListener(this);
         
         jckIsPurchaseExpensive.removeActionListener(this);
+        jckIsInvoiced.removeActionListener(this);
         
         moSubTotal16.removeActionListener(this);
+        moTaxableBaseIva16.removeActionListener(this);
         moIva16.removeActionListener(this);
         moIva0.removeActionListener(this);
+        moTaxableBaseIva0.removeActionListener(this);
+        moTaxableBaseIvaExcento.removeActionListener(this);
+        moExcento.removeActionListener(this);
+        
+        moRetention1.removeActionListener(this);
+        moRetention2.removeActionListener(this);
     }
     
     private void setData(SImportWeekMovProcurementFacility weekProcurementFacility) {
@@ -902,8 +977,14 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         moUnitCost.setValue(oWeekProcurementFacility.Unit_cost);
         
         moSubTotal16.setValue(oWeekProcurementFacility.subtotal16);
+        moTaxableBaseIva16.setValue(oWeekProcurementFacility.taxableBase16);
         moIva16.setValue(oWeekProcurementFacility.impuesto16);
-        moIva0.setValue(oWeekProcurementFacility.subtotal0);
+        moIva0.setValue(oWeekProcurementFacility.impuesto0);
+        moTaxableBaseIva0.setValue(oWeekProcurementFacility.taxableBase0);
+        moTaxableBaseIvaExcento.setValue(oWeekProcurementFacility.taxableBaseExcento);
+        moExcento.setValue(oWeekProcurementFacility.impuestoExcento);
+        moRetention1.setValue(oWeekProcurementFacility.retention1);
+        moRetention2.setValue(oWeekProcurementFacility.retention2);
                 
         if(oWeekProcurementFacility.Item.Id == ITEM_REQUIRING_KILO) {
             moKilos.setEditable(true);
@@ -924,6 +1005,28 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         isResetForm = false;
         
         jckIsPurchaseExpensive.setSelected(oWeekProcurementFacility.ItemPurchaseExpense.Id != 0);
+        jckIsInvoiced.setSelected(oWeekProcurementFacility.Is_invoiced);
+        
+        moAccIva16.setFieldValue(oWeekProcurementFacility.getTaxKeyIva16());
+        moAccIva0.setFieldValue(oWeekProcurementFacility.getTaxKeyIva0());
+        moAccExcento.setFieldValue(oWeekProcurementFacility.getTaxKeyExcento());
+        moAccRetention1.setFieldValue(oWeekProcurementFacility.getTaxKeyRetention1());
+        moAccRetention2.setFieldValue(oWeekProcurementFacility.getTaxKeyRetention2());
+        
+        jcbAccIva16.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        jcbAccIva0.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        jcbAccExcento.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        moTaxableBaseIva16.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        moTaxableBaseIva0.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        moTaxableBaseIvaExcento.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        jcbAccRetention1.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        jcbAccRetention2.setEnabled(oWeekProcurementFacility.Is_invoiced);
+        moIva16.setEditable(oWeekProcurementFacility.Is_invoiced);
+        moIva0.setEditable(oWeekProcurementFacility.Is_invoiced);
+        moExcento.setEditable(oWeekProcurementFacility.Is_invoiced);
+        moRetention1.setEditable(oWeekProcurementFacility.Is_invoiced);
+        moRetention2.setEditable(oWeekProcurementFacility.Is_invoiced);
+        moSubTotal16.setEditable(oWeekProcurementFacility.Is_invoiced);
     }
     
     /**
@@ -998,7 +1101,20 @@ public class SFormEditWeekProcurementFacility extends SBeanFormDialog implements
         
         weekProcurementFacility.setSubtotal16(moSubTotal16.getValue());
         weekProcurementFacility.setImpuesto16(moIva16.getValue());
-        weekProcurementFacility.setSubtotal0(moIva0.getValue());
+        weekProcurementFacility.setImpuesto0(moIva0.getValue());
+        weekProcurementFacility.setImpuestoExcento(moExcento.getValue());
+        weekProcurementFacility.setTaxableBase16(moTaxableBaseIva16.getValue());
+        weekProcurementFacility.setTaxableBase0(moTaxableBaseIva0.getValue());
+        weekProcurementFacility.setTaxableBaseExcento(moTaxableBaseIvaExcento.getValue());
+        
+        weekProcurementFacility.setRetention1(moRetention1.getValue());
+        weekProcurementFacility.setRetention2(moRetention2.getValue());
+        
+        weekProcurementFacility.setTaxKeyIva16(moAccIva16.getKeyAsIntArray());
+        weekProcurementFacility.setTaxKeyIva0(moAccIva0.getKeyAsIntArray());
+        weekProcurementFacility.setTaxKeyExcento(moAccExcento.getKeyAsIntArray());
+        weekProcurementFacility.setTaxKeyRetention1(moAccRetention1.getKeyAsIntArray());
+        weekProcurementFacility.setTaxKeyRetention2(moAccRetention2.getKeyAsIntArray());
         
         return weekProcurementFacility;
     }

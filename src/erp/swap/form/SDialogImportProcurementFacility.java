@@ -50,6 +50,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,6 +125,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     List<SImportProcurementFacility> arrfacilities;
     List<SDataFacilityRec> arrDataFacilityRec;
     private java.util.HashMap<java.lang.String, sa.lib.srv.SLock> moRecordSLocksMap;
+    
+    public int[] TaxKeyIva16;
+    public int[] TaxKeyIva0;
     
     protected boolean showMessageGetWeeks;
 
@@ -662,6 +666,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         
         moImportationsGrid = new SGridPaneForm(miClient, SModConsts.CFGX_SWAP_PROCUREMENT_WEEKS, 1, "Bodegas", null) {
             @Override
+            public void actionMouseClicked() {
+                actionOpenSelectedProcurementFacility();
+            }
+            
+            @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
             }
@@ -730,6 +739,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             msSyncUrlGetLItems = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_ITEMS, SSwapConsts.CFG_ATT_URL);
             msSyncUrlGetMovements = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_BATCH_MOVEMENTS, SSwapConsts.CFG_ATT_URL);
             msSyncUrlPostToggleAccounting = syncHost + SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_TOGGLE_ACCOUNTING, SSwapConsts.CFG_ATT_URL);
+            
+            ArrayList<String> arrPkAccTaxIva16 = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC, "1");
+            ArrayList<String> arrPkAccTaxIva0 = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC, "2");
+            TaxKeyIva16 = new int[] { Integer.valueOf(arrPkAccTaxIva16.get(0)), Integer.valueOf(arrPkAccTaxIva16.get(1)) };
+            TaxKeyIva0 = new int[] { Integer.valueOf(arrPkAccTaxIva0.get(0)), Integer.valueOf(arrPkAccTaxIva0.get(1)) };
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -1745,6 +1759,14 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyExcento();
                     moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
                 }
+                if (otWeekProcurementFacility.getIsRetention1()) {
+                    moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyRetention1();
+                    moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
+                }
+                if (otWeekProcurementFacility.getIsRetention2()) {
+                    moFinRecordEntry.TaxKey = otWeekProcurementFacility.getTaxKeyRetention2();
+                    moFinRecordEntry.OccasionalFiscalId = otWeekProcurementFacility.getOccasionalFiscalId();
+                }
 
                 SDataRecordEntry moRecordEntry = SFinRecordUtils.composeRecordEntry((SClientInterface) miClient, null, moFinRecordEntry);
                 
@@ -1991,6 +2013,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                                         + ProcurementFacility.getProcurementFacilityName() 
                                         +  " no ha sido aprovada, no se puede contabilizar."
                         );
+                        jbToAccount.setEnabled(true);
                         return;
                     }
                     
@@ -2005,6 +2028,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                                     + ProcurementFacility.WeekMonthNumber 
                                     + " de la bodega: " + ProcurementFacility.ProcurementFacilityName
                                     + " ya ha sido contabilizada." + "\n";
+                            jbToAccount.setEnabled(true);
                         }
                     }
                 }
@@ -2012,11 +2036,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             
             if (arrfacilities.size() < 1) {
                 miClient.showMsgBoxWarning("Seleccione al menos una semana para contabilizar.");
+                jbToAccount.setEnabled(true);
                 return;
             }
             
             if (!mbCanToAccount) {
                 miClient.showMsgBoxWarning(msErrorMessageToAccount);
+                jbToAccount.setEnabled(true);
                 return;
             }
             
@@ -2169,72 +2195,48 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                         salida_caja_compras += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         salida_caja_compras -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        salida_caja_compras += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "salida_caja_gastos":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         salida_caja_gastos += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         salida_caja_gastos -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        salida_caja_gastos += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "salida_caja_deudores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         salida_caja_deudores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         salida_caja_deudores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        salida_caja_deudores += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "salida_caja_acreedores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         salida_caja_acreedores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         salida_caja_acreedores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        salida_caja_acreedores += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "entrada_caja_deudores":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         entrada_caja_deudores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         entrada_caja_deudores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        entrada_caja_deudores += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "entrada_caja_acreedor":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         entrada_caja_acreedores += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         entrada_caja_acreedores -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        entrada_caja_acreedores += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "caja_central":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         caja_central += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         caja_central -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        caja_central += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 case "caja_x":
                     if ("debe".equals(checkAccountTypeResult.get(0))) {
                         caja_x += otWeekProcurementFacility.totalSinIva != 0 ? otWeekProcurementFacility.totalSinIva : otWeekProcurementFacility.Debe;
                         caja_x -= otWeekProcurementFacility.retention1 - otWeekProcurementFacility.retention2;
                     }
-//                    if ("haber".equals(checkAccountTypeResult.get(0))) {
-//                        caja_x += otWeekProcurementFacility.Haber;
-//                    }
                     break;
                 default:
                     break;
@@ -2394,8 +2396,9 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             
             ObjectMapper mapper = new ObjectMapper();
             JsonNode config = mapper.readTree(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG));
+            String acc = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_COUNTERPART, SSwapConsts.CFG_ATT_ACCOUNTING_ACCOUNT);
             
-            if (config == null) {
+            if (acc.isEmpty()) {
                 sql = "SELECT ac.id_cob, ac.id_acc_cash, e.ent, e.code, e.b_act, ac.b_del, ac.fid_acc, f_acc_usr(" + ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount() + ", a.code) \n" +
                         "AS f_acc, cob.id_bpb, cob.bpb, a.acc, c.cur_key, c.id_cur, c.cur\n" +
                         "FROM fin_acc_cash AS ac \n" +
@@ -2471,16 +2474,28 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     public ArrayList<SImportWeekMovProcurementFacility> generateTax(SImportWeekMovProcurementFacility oWeekMovProcurementFacility) {
         ArrayList<SImportWeekMovProcurementFacility> maTaxes = new ArrayList<>();
         
-        if (oWeekMovProcurementFacility.getImpuesto16() > 0) {
+        if (oWeekMovProcurementFacility.getImpuesto16() > 0 || oWeekMovProcurementFacility.getTaxableBase16() > 0) {
             SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            
             oMov.setDebe(oMov.getImpuesto16());
-            oMov.setConcept("IVA PAGADO 16%");
+            if (oMov.getImpuesto16() == 0) {
+                oMov.setDebe(oMov.getTaxableBase16());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyIva16(), TaxKeyIva0)) {
+                oMov.setDebe(oMov.getTaxableBase16());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyIva16(), TaxKeyIva16)) {
+                oMov.setConcept("IVA PAGADO 16%");
+                oMov.setDataAccount(oMov.getAccIva16());
+            }
+            
             oMov.setItem(0, "", "");
             oMov.setItemPurchaseExpense(0, "", "");
             oMov.setItemAuxPurchaseExpense(0, "", "");
             oMov.setCost_center(0, "", "");
             oMov.setDataCostCenter(null);
-            oMov.setDataAccount(oMov.getAccIva16());
             oMov.setReference("");
             oMov.setRetention1(0);
             oMov.setRetention2(0);
@@ -2492,9 +2507,24 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             maTaxes.add(oMov);
         }
         
-        if (oWeekMovProcurementFacility.getImpuesto0() > 0) {
+        if (oWeekMovProcurementFacility.getTaxableBase0() > 0 || oWeekMovProcurementFacility.getImpuesto0()> 0) {
             SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
+            
             oMov.setDebe(oMov.getImpuesto0());
+            
+            if (oMov.getImpuesto0() == 0) {
+                oMov.setDebe(oMov.getTaxableBase0());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyIva0(), TaxKeyIva0)) {
+                oMov.setDebe(oMov.getTaxableBase0());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyIva0(), TaxKeyIva16)) {
+                oMov.setConcept("IVA PAGADO 16%");
+                oMov.setDataAccount(oMov.getAccIva16());
+            }
+            
             oMov.setItem(0, "", "");
             oMov.setItemPurchaseExpense(0, "", "");
             oMov.setItemAuxPurchaseExpense(0, "", "");
@@ -2511,9 +2541,23 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             maTaxes.add(oMov);
         }
         
-        if (oWeekMovProcurementFacility.getImpuestoExcento()> 0) {
+        if (oWeekMovProcurementFacility.getImpuestoExcento() > 0 || oWeekMovProcurementFacility.getTaxableBaseExcento() > 0) {
             SImportWeekMovProcurementFacility oMov = new SImportWeekMovProcurementFacility(oWeekMovProcurementFacility);
             oMov.setDebe(oMov.getImpuestoExcento());
+            
+            if (oMov.getImpuestoExcento()== 0) {
+                oMov.setDebe(oMov.getTaxableBaseExcento());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyExcento(), TaxKeyIva0)) {
+                oMov.setDebe(oMov.getTaxableBaseExcento());
+            }
+            
+            if (Arrays.equals(oMov.getTaxKeyExcento(), TaxKeyIva16)) {
+                oMov.setConcept("IVA PAGADO 16%");
+                oMov.setDataAccount(oMov.getAccIva16());
+            }
+            
             oMov.setItem(0, "", "");
             oMov.setItemPurchaseExpense(0, "", "");
             oMov.setItemAuxPurchaseExpense(0, "", "");
