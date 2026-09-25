@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiSession;
 
 /**
  *
@@ -103,35 +104,65 @@ public class SExportPayments extends Thread {
     }
     
     private SExportDataPayment createExportDataPayment() throws Exception {
-        SExportDataPayment payment = new SExportDataPayment();
-        
-        SDataBizPartnerBranchBankAccount benef = 
-                getBranchBankAcc(new int[] { moPayment.getFkBeneficiaryBankBizParterBranchId_n(), moPayment.getFkBeneficiaryBankAccountCashId_n()});
-        
+        return (SExportDataPayment) createExportPaymentData(moPayment, 1);
+    }
+    
+    private SExportDataPaymentUpdate createExportDataPaymentUpdate() throws Exception {
+        return (SExportDataPaymentUpdate) createExportPaymentData(moPayment, 2);
+    }
+    
+    public SExportDataPaymentBase createExportPaymentData(SDbPayment oPayment, final int exportMode) {
+        SDataBizPartnerBranchBankAccount benef =
+                SExportPayments.getBranchBankAcc(miClient.getSession(), new int[] { oPayment.getFkBeneficiaryBankBizParterBranchId_n(), oPayment.getFkBeneficiaryBankAccountCashId_n() });
+
+        if (exportMode == 1) {
+            SExportDataPayment payment = new SExportDataPayment();
+            fillCommonPaymentFields(payment, oPayment, benef, exportMode);
+
+            payment.functional_area = oPayment.getFkFunctionalAreaId();
+            payment.benef = oPayment.getFkBeneficiaryId();
+            payment.series = oPayment.getSeries();
+            payment.number = oPayment.getNumber() + "";
+            payment.app_date = SLibUtils.DbmsDateFormatDate.format(oPayment.getDateApplication());
+            payment.currency = oPayment.getDbmsDataCurrency().getKey();
+            payment.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(oPayment.getPaymentApplicationCy()));
+            payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(oPayment.getPaymentExchangeRateApplication(), SExportUtils.DECS_PAY_EXC_RATE));
+            payment.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(oPayment.getPaymentApplication()));
+            payment.priority = oPayment.getPriority();
+            payment.notes_authz = oPayment.getNotesAuthorization();
+            payment.authz_authorization_id = SModSysConsts.TRNS_ST_DPS_AUTHORN_NA;
+            payment.user_id = miClient.getSession().getUser().getPkUserId();
+            payment.flow = mnFlowModel;
+
+            return payment;
+        }
+        else if (exportMode == 2) {
+            SExportDataPaymentUpdate paymentUpdate = new SExportDataPaymentUpdate();
+            fillCommonPaymentFields(paymentUpdate, oPayment, benef, exportMode);
+
+            paymentUpdate.authorized_by = null;
+            paymentUpdate.authorized_at = null;
+            paymentUpdate.deleted_by = null;
+
+            return paymentUpdate;
+        }
+
+        throw new IllegalArgumentException("Unsupported export mode: " + exportMode);
+    }
+
+    private void fillCommonPaymentFields(SExportDataPaymentBase payment, SDbPayment oPayment, SDataBizPartnerBranchBankAccount benef, final int exportMode) {
         payment.company = miClient.getSession().getConfigCompany().getCompanyId();
-        payment.payment_id = moPayment.getPkPaymentId();
-        payment.functional_area = moPayment.getFkFunctionalAreaId();
-        payment.functional_area = moPayment.getFkFunctionalSubareaId();
-        payment.benef = moPayment.getFkBeneficiaryId();
-        payment.series = moPayment.getSeries();
-        payment.number = moPayment.getNumber() + "";
-        payment.app_date = SLibUtils.DbmsDateFormatDate.format(moPayment.getDateApplication());
-        payment.req_date = SLibUtils.DbmsDateFormatDate.format(moPayment.getDateRequired());
-        payment.sched_date_n = moPayment.getDateSchedule_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateSchedule_n());
-        payment.exec_date_n = moPayment.getDateExecution_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(moPayment.getDateExecution_n());
-        payment.currency = moPayment.getDbmsDataCurrency().getKey();
-        payment.amount = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentApplicationCy()));
-        payment.exchange_rate_app = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRateApplication(), SExportUtils.DECS_PAY_EXC_RATE));
-        payment.amount_loc_app = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPaymentApplication()));
-        payment.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(moPayment.getPaymentExchangeRate(), SExportUtils.DECS_PAY_EXC_RATE));
-        payment.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(moPayment.getPayment()));
-        payment.payment_way = moPayment.getPaymentWay();
-        payment.priority = moPayment.getPriority();
-        payment.notes = moPayment.getNotes();
-        payment.notes_authz = moPayment.getNotesAuthorization();
-        payment.is_receipt_payment_req = moPayment.isReceiptPaymentRequired() ? 1 : 0;
-        payment.payment_status = moPayment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW ? SModSysConsts.FINS_ST_PAY_IN_AUTH : moPayment.getFkStatusPaymentId();
-        payment.authz_authorization_id = SModSysConsts.TRNS_ST_DPS_AUTHORN_NA;
+        payment.payment_id = oPayment.getPkPaymentId();
+        payment.req_date = SLibUtils.DbmsDateFormatDate.format(oPayment.getDateRequired());
+        payment.sched_date_n = oPayment.getDateSchedule_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(oPayment.getDateSchedule_n());
+        payment.exec_date_n = oPayment.getDateExecution_n() == null ? null : SLibUtils.DbmsDateFormatDate.format(oPayment.getDateExecution_n());
+        payment.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(oPayment.getPaymentExchangeRate(), SExportUtils.DECS_PAY_EXC_RATE));
+        payment.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(oPayment.getPayment()));
+        payment.payment_way = oPayment.getPaymentWay();
+        payment.is_receipt_payment_req = oPayment.isReceiptPaymentRequired() ? 1 : 0;
+        payment.notes = oPayment.getNotes();
+        payment.is_deleted = oPayment.isDeleted() ? 1 : 0;
+        payment.payment_status = oPayment.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW ? SModSysConsts.FINS_ST_PAY_IN_AUTH : oPayment.getFkStatusPaymentId();
         payment.paying_bank = "";
         payment.paying_bank_fiscal_id = "";
         payment.paying_account = "";
@@ -142,11 +173,6 @@ public class SExportPayments extends Thread {
         payment.exec_user = null;
         payment.sched_at = null;
         payment.exec_at = null;
-        payment.is_deleted = moPayment.isDeleted() ? 1 : 0;
-        payment.user_id = miClient.getSession().getUser().getPkUserId(); 
-        payment.flow = mnFlowModel;
-        
-        return payment;
     }
     
     private SExportDataPaymentEntry[] createExportDataPaymentEntry() throws Exception {
@@ -199,11 +225,11 @@ public class SExportPayments extends Thread {
         return entries.toArray(new SExportDataPaymentEntry[0]);
     }
 
-    private SDataBizPartnerBranchBankAccount getBranchBankAcc(int[] pk) {
+    public static SDataBizPartnerBranchBankAccount getBranchBankAcc(SGuiSession oSession, int[] pk) {
         SDataBizPartnerBranchBankAccount ba = new SDataBizPartnerBranchBankAccount();
         try {
             if (pk != null && pk.length > 0 && pk[0] > 1) {
-                ba.read(pk, miClient.getSession().getStatement());
+                ba.read(pk, oSession.getStatement());
             }
             else {
                 return ba;
@@ -211,7 +237,7 @@ public class SExportPayments extends Thread {
         }
         catch (Exception e) {
             Logger.getLogger(SExportPayments.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
-            miClient.showMsgBoxError(e.getMessage());
+            return null;
         }
         return ba;
     }

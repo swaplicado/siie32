@@ -9,9 +9,9 @@ package erp.swap.utils;
  *
  * @author Edwin Carmona
  */
-public class SResourceStatusResponse {
+public class SResourceResponse {
 
-    public SResourceStatusResponse() {
+    public SResourceResponse() {
         status_code = 0;
         message = "";
         data = "";

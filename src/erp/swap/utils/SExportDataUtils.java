@@ -14,6 +14,7 @@ import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import com.swaplicado.data.CloudStorageFile;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -32,12 +33,13 @@ import erp.swap.SSwapConsts;
 import erp.swap.SSwapUtils;
 import erp.swap.SSyncType;
 import java.io.File;
-import java.net.HttpURLConnection;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,7 +64,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores, César Orozco, Rodrigo Ayala
+ * @author Sergio Flores, César Orozco, Rodrigo Ayala, Edwin Carmona
  */
 public abstract class SExportDataUtils {
 
@@ -249,11 +251,31 @@ public abstract class SExportDataUtils {
      * Exportación de archivos de pedidos de compras.
      *
      * @param session Sesión de usuario.
+     * @param idYear Año del documento de pedido de compras a exportar (opcional).
+     * @param idDoc Folio del documento de pedido de compras a exportar (opcional).
+     * @param startDate Fecha inicial de rango de documentos a exportar, formato: yyyy-mm-dd (opcional).
+     * @param endDate Fecha final de rango de documentos a exportar, formato: yyyy-mm-dd (opcional).
      * @throws SQLException Si ocurre un error en la consulta.
      * @throws SQLException Si ocurre un error.
      */
-    private static void exportPurchaseOrdersFiles(final SGuiSession session) throws SQLException, Exception {
+    private static void exportPurchaseOrdersFiles(final SGuiSession session, final int idYear, final int idDoc,
+            final String startDate, final String endDate) throws SQLException, Exception {
         ObjectMapper mapper = new ObjectMapper();
+        boolean forceUploadByDate = startDate != null && !startDate.isEmpty()
+                && endDate != null && !endDate.isEmpty();
+
+        if (forceUploadByDate) {
+            try {
+                LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_LOCAL_DATE);
+                if (start.isAfter(end)) {
+                    throw new IllegalArgumentException("La fecha inicial no puede ser posterior a la fecha final.");
+                }
+            }
+            catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Las fechas deben tener el formato yyyy-MM-dd.", e);
+            }
+        }
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
@@ -263,7 +285,6 @@ public abstract class SExportDataUtils {
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
                 String database = databasesMap.get(companyId);
-                String referenceId = "CONCAT(d.id_year, '_', d.id_doc)"; // ID año + '_' + ID documento
                 Date lastSyncDatetime = getLastSyncDatetime(session.getStatement(), SSyncType.PUR_ORDER_FILE, database);
                 ArrayList<SDbSyncLogEntry> lLogFiles = new ArrayList<>();
 
@@ -282,7 +303,13 @@ public abstract class SExportDataUtils {
 
                 statement.execute(sqlDelete);
 
-                // procesamiento de archivos de OC:
+                // condición común de autorización (se repite en ambas ramas, factorizada una sola vez):
+                String authorizedCondition = "NOT d.b_del "
+                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
+                        + "AND d.b_authorn "
+                        + "AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " "
+                        + "AND da.fid_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_AUTH + " ";
+
                 String sql = "SELECT "
                         + "d.id_year, d.id_doc, "
                         + "IF (d.ts_authorn > d.ts_edit, d.ts_authorn, d.ts_edit) as _last_upd "
@@ -290,25 +317,44 @@ public abstract class SExportDataUtils {
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
                         + "INNER JOIN "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " AS da "
-                        + "ON d.id_year = da.id_year AND d.id_doc = da.id_doc and NOT da.b_del "
-                        + "WHERE "
-                        + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
-                        + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
-                        + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
-                        + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
-                        + "AND ("
-                        + "((NOT d.b_del "
-                        + "AND d.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
-                        + "AND d.b_authorn "
-                        + "AND d.fid_st_dps_authorn = " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN + " "
-                        + "AND da.fid_st_authorn = " + SDataConstantsSys.CFGS_ST_AUTHORN_AUTH + ") "
-                        //                        + ") AND MONTH(d.dt) >= 10 " // Se comenta para forzar sincronización en caso de reporte de archivos faltantes
-                        + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_ORDER_FILE, database) + ")) "
-                        + (lastSyncDatetime == null ? "" : " OR ("
-                                + "(d.ts_edit >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "' "
-                                + "AND (d.b_del OR d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ")) "
-                                + "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
-                        + ")";
+                        + "ON d.id_year = da.id_year AND d.id_doc = da.id_doc AND NOT da.b_del ";
+
+                if (idYear <= 0 || idDoc <= 0) {
+                    // caso masivo: solo documentos autorizados y no sincronizados aún (o modificados después del último sync)
+                    sql += "LEFT JOIN ( "
+                            + "SELECT sle.reference_id "
+                            + "FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG) + " AS sl "
+                            + "INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.CFG_COM_SYNC_LOG_ETY) + " AS sle "
+                            + "ON sle.id_sync_log = sl.id_sync_log "
+                            + "WHERE sl.sync_type = '" + SSyncType.PUR_ORDER_FILE + "' "
+                            + "AND (sle.response_code = '200' OR sle.response_code = '201') "
+                            + "GROUP BY sle.reference_id "
+                            + ") AS synced ON synced.reference_id = CONCAT(d.id_year, '_', d.id_doc) "
+                            + "WHERE "
+                            + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                            + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                            + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                            + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
+                            + "AND " + authorizedCondition
+                                + (forceUploadByDate
+                                    ? "AND d.dt BETWEEN '" + startDate + "' AND '" + endDate + "' "
+                                    : "AND ("
+                                    + "synced.reference_id IS NULL "
+                                    + (lastSyncDatetime == null ? "" : "OR d.ts_authorn >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "'")
+                                    + ")");
+                }
+                else {
+                    // caso puntual: forzar subida siempre que esté autorizado, sin revisar el log de sincronización
+                    sql += "WHERE "
+                            + "d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] + " "
+                            + "AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] + " "
+                            + "AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2] + " "
+                            + "AND d.id_year >= " + SSwapConsts.SINCE_YEAR + " "
+                            + "AND " + authorizedCondition
+                            + "AND d.id_year = " + idYear + " "
+                            + "AND d.id_doc = " + idDoc + " "
+                            + (forceUploadByDate ? "AND d.dt BETWEEN '" + startDate + "' AND '" + endDate + "' " : "");
+                }
                 sql += ";";
 
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -326,7 +372,7 @@ public abstract class SExportDataUtils {
                     if (oLogEty != null) {
                         SFileData oFd = null;
                         // comparacion de last update para actualizar el archivo
-                        if (oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
+                        if (forceUploadByDate || oLogEty.getTsSync().before(resultSet.getTimestamp("_last_upd"))) {
                             oFd = new SFileData(oDpsExport.id_year, oDpsExport.id_doc, database, resultSet.getTimestamp("_last_upd"));
                             oLogEty = SDpsGoogleCloudUtils.processSingleRecord(session, oFd, null, true, database);
                             lLogFiles.add(oLogEty);
@@ -2177,7 +2223,7 @@ public abstract class SExportDataUtils {
                         + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
                         + "p.pay_app_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
                         + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
-                        + "p.nts_auth, p.fk_usr_ins, p.fk_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec, "
+                        + "p.nts_auth, p.fk_usr_ins, p.fk_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec, p.ts_usr_upd, "
                         // payment entry:
                         + "pe.ety_tp, pe.ety_pay_app_cur, pe.ety_pay_app, pe.conv_rate_app, pe.des_pay_app_ety_cur, "
                         + "pe.install, pe.doc_bal_prev_app_cur, pe.doc_bal_unpd_app_cur_r, pe.fk_ety_cur AS _pay_ety_cur_id, cpe.cur_key AS _pay_ety_cur_key, "
@@ -2224,7 +2270,11 @@ public abstract class SExportDataUtils {
                         + "AND " + referenceId + " NOT IN (" + getSqlSubQuerySyncedRegistries(SSyncType.PUR_PAYMENT, database) + "))"
                         + (lastSyncDatetime == null ? "" : " OR (p.ts_usr_upd >= '" + SLibUtils.DbmsDateFormatDatetime.format(lastSyncDatetime) + "')")
                         + ") "
-                        + "AND ((p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_NEW + " AND p.b_sys) OR p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_EXEC_P + ") "
+                        + "AND ("
+                        + "(p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_NEW + " AND p.b_sys) OR "
+                        + "(p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_EXEC_P + " "
+                        + "OR p.fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED_P + ")"
+                        + ") "
                         + "ORDER BY "
                         + "p.ser, p.num, p.id_pay;";
 
@@ -2272,6 +2322,12 @@ public abstract class SExportDataUtils {
                         currentPayment.authz_authorization_id = SSwapConsts.AUTHZ_STATUS_PENDING;
                         if (resultSet.getString("p.nts_auth") != null && !resultSet.getString("p.nts_auth").isEmpty()) {
                             currentPayment.notes_authz = resultSet.getString("p.nts_auth");
+                        }
+                        boolean isSchedule = resultSet.getTimestamp("p.ts_usr_upd").equals(resultSet.getTimestamp("p.ts_usr_sched")); // both TS of update and schedule are the same when payment was scheduled!
+                        if (isSchedule) {
+                            // only if payment is scheduled, excluding a reschedule, export as well authorization data (that happens to be the same as the corresponding schedule data!):
+                            currentPayment.authorized_by = resultSet.getInt("p.fk_usr_upd");
+                            currentPayment.authorized_at = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.ts_usr_upd"));
                         }
 
                         // paying account:
@@ -2452,12 +2508,19 @@ public abstract class SExportDataUtils {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
 
             HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            /**
+             * Edwin Carmona
+             * 2026-09-15
+             * Se comentan los estatus SModSysConsts.FINS_ST_PAY_SCHED_P y SModSysConsts.FINS_ST_PAY_EXEC_P
+             * Para que sean sincronizados como registros completos y su monto se actualice en PC
+             */
             String statesToUpdateAllways
                     = SModSysConsts.FINS_ST_PAY_REJC_P + ", "
-                    + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
+//                    + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
                     //+ SModSysConsts.FINS_ST_PAY_OPER_P + ", " // no aplica, se exporta como nuevo pago
                     + SModSysConsts.FINS_ST_PAY_SUBR_P + ", " // exportar como "eliminado", se integra a un nuevo pago
                     + SModSysConsts.FINS_ST_PAY_RCPT_P + ", "
+//                    + SModSysConsts.FINS_ST_PAY_EXEC_P + ", " // para que la fecha de ejecución se actualice en PC
                     //+ SModSysConsts.FINS_ST_PAY_BLOC_P + ", " // no aplica
                     + SModSysConsts.FINS_ST_PAY_CANC_P; // exportar como "eliminado"
 
@@ -2471,9 +2534,34 @@ public abstract class SExportDataUtils {
 
                 String sql = "SELECT "
                         // payment:
-                        + "p.id_pay, p.ser AS _pay_ser, p.num AS _pay_num, CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, p.dt_app, p.dt_req, p.dt_sched_n, p.dt_exec_n, "
-                        + "p.pay_app_cur, p.pay_exc_rate_app, p.pay_app, p.pay_way, p.priority, p.nts, p.nts_auth, p.b_rcpt_pay_req, p.b_del, p.b_sys, "
-                        + "p.fk_st_pay, p.fk_cur AS _pay_cur_id, cp.cur_key AS _pay_cur_key, p.fk_ben, p.fk_func, p.fk_func_sub, "
+                        + "p.id_pay, "
+                        + "p.ser AS _pay_ser, "
+                        + "p.num AS _pay_num, "
+                        + "CONCAT(p.ser, IF(p.ser = '', '', '-'), p.num) AS _pay_folio, "
+                        + "p.dt_app, "
+                        + "p.dt_req, "
+                        + "p.dt_sched_n, "
+                        + "p.dt_exec_n, "
+                        + "p.pay, "
+                        + "p.pay_app_cur, "
+                        + "p.pay_exc_rate_app, "
+                        + "p.pay_exc_rate, "
+                        + "p.pay_app, "
+                        + "p.pay_way, "
+                        + "p.priority, "
+                        + "p.nts, "
+                        + "p.nts_auth, "
+                        + "p.b_rcpt_pay_req, "
+                        + "p.b_del, "
+                        + "p.b_sys, "
+                        + "p.fk_st_pay, "
+                        + "p.fk_cur AS _pay_cur_id, "
+                        + "cp.cur_key AS _pay_cur_key, "
+                        + "p.fk_ben, "
+                        + "p.fk_func, "
+                        + "p.fk_func_sub, "
+                        + "p.fk_ben_bank_cob_n, "
+                        + "p.fk_ben_bank_acc_cash_n, "
                         + "p.fk_usr_ins, p.fk_usr_upd, p.ts_usr_ins, p.ts_usr_upd, p.fk_usr_sched, p.fk_usr_exec, p.ts_usr_sched, p.ts_usr_exec "
                         + "FROM "
                         + database + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS p "
@@ -2514,6 +2602,11 @@ public abstract class SExportDataUtils {
                                 paymentUpdate.sched_date_n = SLibUtils.DbmsDateFormatDate.format(dateScheduled);
                                 paymentUpdate.sched_user = resultSet.getInt("p.fk_usr_sched");
                                 paymentUpdate.sched_at = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.ts_usr_sched"));
+                                paymentUpdate.is_receipt_payment_req = resultSet.getBoolean("p.b_rcpt_pay_req") ? 1 : 0;
+                                paymentUpdate.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(resultSet.getDouble("pay_exc_rate"), SExportUtils.DECS_PAY_EXC_RATE));
+                                paymentUpdate.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(resultSet.getDouble("pay")));
+                                paymentUpdate.currency = resultSet.getString("_pay_cur_key");
+                                paymentUpdate.notes = resultSet.getString("nts");
 
                                 if (isSchedule) {
                                     // only if payment is scheduled, excluding a reschedule, export as well authorization data (that happens to be the same as the corresponding schedule data!):
@@ -2527,6 +2620,29 @@ public abstract class SExportDataUtils {
                                         new Object[]{paymentId});
                                 continue; // omitir pago inconsistente
                             }
+                            break;
+                            
+                        case SModSysConsts.FINS_ST_PAY_EXEC_P:
+                            SDataBizPartnerBranchBankAccount oBenef = SExportPayments.getBranchBankAcc(session, new int[] { resultSet.getInt("fk_ben_bank_cob_n"),
+                                                                                                            resultSet.getInt("fk_ben_bank_acc_cash_n") });
+                            if (oBenef != null) {
+                                paymentUpdate.benef_bank = oBenef.getDbmsBank() == null ? "" : oBenef.getDbmsBank();
+                                paymentUpdate.benef_bank_fiscal_id = oBenef.getDbmsBankFiscalId() == null ? "" : oBenef.getDbmsBankFiscalId();
+                                paymentUpdate.benef_account = oBenef.getBankAccountNumber();
+                            }
+                            else {
+                                Logger.getLogger(SExportUtils.class.getName()).log(Level.INFO,
+                                        "Pago con errores (cuenta bancaria beneficiario no encontrada): Pago ID = {0}.",
+                                        new Object[]{paymentId});
+                            }
+                                                                                                            
+                            paymentUpdate.exchange_rate_exec = SExportUtils.FormatPayExchangeRate.format(SLibUtils.round(resultSet.getDouble("pay_exc_rate"), SExportUtils.DECS_PAY_EXC_RATE));
+                            paymentUpdate.amount_loc_exec = SExportUtils.FormatStdAmount.format(SLibUtils.roundAmount(resultSet.getDouble("pay")));
+                            paymentUpdate.exec_date_n = SLibUtils.DbmsDateFormatDatetime.format(resultSet.getTimestamp("p.dt_exec_n"));
+                            paymentUpdate.currency = resultSet.getString("_pay_cur_key");
+                            paymentUpdate.is_receipt_payment_req = resultSet.getBoolean("p.b_rcpt_pay_req") ? 1 : 0;
+                            paymentUpdate.notes = resultSet.getString("nts");
+                            
                             break;
 
                         case SModSysConsts.FINS_ST_PAY_REJC_P:
@@ -2919,7 +3035,7 @@ public abstract class SExportDataUtils {
                 break;
 
             case PUR_ORDER:
-                exportPurchaseOrdersFiles(session);
+                exportPurchaseOrdersFiles(session, 0, 0, null, null);
                 boolean uploadPdf = true;
                 boolean withJsonData = false;
                 data = getListOfPurchaseOrdersToExport(session, 0, 0, uploadPdf, withJsonData);
@@ -2992,130 +3108,6 @@ public abstract class SExportDataUtils {
         }
 
         return user;
-    }
-
-    /**
-     * Update status of authorizable resource.
-     *
-     * @param statement
-     * @param companyDbName
-     * @param resourceType
-     * @param resourceId
-     * @param authStatusId
-     * @param userId
-     * @param notes
-     * @param newAmount
-     * @param newDate
-     * @return
-     */
-    public static SResourceStatusResponse updateResourceStatus(final Statement statement, final String companyDbName, final int resourceType, final String resourceId, final int authStatusId,
-            final int userId, final String notes, final double newAmount, final String newDate) {
-        SResourceStatusResponse oResponse;
-
-        try {
-            oResponse = new SResourceStatusResponse();
-            String sTable = "";
-            String sWhere = "";
-            String sUpdate = "";
-            String sSecondQuery = "";
-
-            switch (resourceType) {
-                case SSwapConsts.RESOURCE_TYPE_PUR_PAYMENT:
-                    sTable = SModConsts.TablesMap.get(SModConsts.FIN_PAY);
-
-                    switch (authStatusId) {
-                        case SSwapConsts.AUTHZ_STATUS_OK:
-                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_SCHED_P + ", "
-                                    + "fk_usr_sched = " + userId + ", "
-                                    + "ts_usr_sched = NOW(), ";
-                            if (newAmount > 0) {
-                                // en partida: des_pay_app_ety_cur
-                                sSecondQuery = "UPDATE " + companyDbName + "." + SModConsts.TablesMap.get(SModConsts.FIN_PAY_ETY) + " SET "
-                                        + "des_pay_app_ety_cur = " + newAmount + " "
-                                        + "WHERE (id_pay = " + resourceId + ") and (id_ety = 1);";
-                            }
-                            if (newDate != null && !newDate.isEmpty()) {
-                                sUpdate += "dt_sched_n = '" + newDate + "', ";
-                            }
-                            else {
-                                sUpdate += "dt_sched_n = dt_req, ";
-                            }
-                            break;
-
-                        case SSwapConsts.AUTHZ_STATUS_REJECTED:
-                            sUpdate = "fk_st_pay = " + SModSysConsts.FINS_ST_PAY_REJC_P + ", "
-                                    + "dt_sched_n = NULL, "
-                                    + "fk_usr_sched = " + SUtilConsts.USR_NA_ID + ", "
-                                    + "ts_usr_sched = NOW(), "; // XXX se puede actualizar este TS o no en el rechazo, por lo pronto se deja
-                            break;
-
-                        default:
-                            oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
-                            oResponse.message = "El tipo de estatus de autorización es desconocido (" + authStatusId + ").";
-                            oResponse.error = "Tipo de estatus de autorización desconocido.";
-
-                            return oResponse;
-                    }
-
-                    sUpdate += "nts_auth_flow = '" + SLibUtils.textToSql(notes) + "', "
-                            + "fk_usr_upd = " + userId + ", "
-                            + "ts_usr_upd = NOW() ";
-
-                    sWhere = "WHERE id_pay = " + resourceId;
-                    break;
-
-                default:
-                    oResponse.status_code = HttpURLConnection.HTTP_BAD_REQUEST;
-                    oResponse.message = "No se encontró tipo de recurso.";
-                    oResponse.error = "No se encontró tipo de recurso.";
-
-                    return oResponse;
-            }
-
-            String sql = "UPDATE " + companyDbName + "." + sTable + " SET " + sUpdate + sWhere + ";";
-            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PAGO, company: {0}. QUERY: {1} ", new Object[]{companyDbName, sql});
-
-            // Iniciar transacción
-            Connection conn = statement.getConnection();
-            boolean autoCommit = conn.getAutoCommit();
-            try {
-                conn.setAutoCommit(false);
-
-                int res = statement.executeUpdate(sql);
-                if (sSecondQuery != null && !sSecondQuery.isEmpty()) {
-                    Logger.getLogger(SExportDataUtils.class.getName()).log(Level.INFO, "ACTUALIZAR PARTIDA PAGO, company: {0}. QUERY{1}: ", new Object[]{companyDbName, sSecondQuery});
-                    res = statement.getConnection().createStatement().executeUpdate(sSecondQuery);
-                }
-                if (res != 1) {
-                    conn.rollback();
-                    oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
-                    oResponse.message = "No se realizó ninguna actualización.";
-                    oResponse.error = "No se realizó ninguna actualización.";
-                }
-                else {
-                    conn.commit();
-                    oResponse.status_code = HttpURLConnection.HTTP_OK;
-                    oResponse.message = "OK";
-                }
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
-                conn.rollback();
-                throw ex;
-            }
-            finally {
-                conn.setAutoCommit(autoCommit);
-            }
-        }
-        catch (SQLException ex) {
-            oResponse = new SResourceStatusResponse();
-            oResponse.status_code = HttpURLConnection.HTTP_INTERNAL_ERROR;
-            oResponse.message = "Error al actualizar el estatus del recurso.";
-            oResponse.error = ex.getMessage();
-            Logger.getLogger(SExportDataUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return oResponse;
     }
 
     public static class BankAccount {

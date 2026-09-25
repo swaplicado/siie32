@@ -81,7 +81,7 @@ import sa.lib.gui.SGuiUtils;
 /**
  * Diálogo para importar CFDI 4.0 tipo "I" en un nuevo DPS.
  * 
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Claudio Peña
  */
 public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
     
@@ -1375,7 +1375,10 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                 }
 
                 jtfPoProcessedQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantityLinked() + processedQuantityCurrent));
-                jtfPoPendingQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(entryDpsDpsLink.getQuantity() - entryDpsDpsLink.getQuantityLinked() - processedQuantityCurrent)); 
+                double quantityMax = entryDpsDpsLink.getQuantity() * (1d + entryDpsDpsLink.getSurplusPercentage());
+                double pendingQuantityCurrent = quantityMax - entryDpsDpsLink.getQuantityLinked() - processedQuantityCurrent;
+                jtfPoPendingQuantityCurrent.setText(SLibUtils.DecimalFormatValue2D.format(pendingQuantityCurrent)
+                );
             }
         }
     }
@@ -2138,6 +2141,13 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                         
                         if (totConcept < toLink) {
                             validation.setMessage(msgPrefix + "tiene vinculada una cantidad mayor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
+                            System.out.println(
+    "CFDI VALIDACION"
+    + " | CantConcept: " + cantConcept
+    + " | ConvFact: " + convFact
+    + " | TotConcept: " + totConcept
+    + " | ToLink: " + toLink
+);
                         }
                         else if (totConcept > toLink) {
                             validation.setMessage(msgPrefix + "tiene vinculada una cantidad menor (" + toLink + ") a la cantidad del concepto (" + totConcept + ").");
@@ -2235,21 +2245,52 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
                             break;
                         }
                         else {
-                            if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
-                                ArrayList<SDataDpsEntry> newDpsEntries = row.getNewDpsEntries(); // variable de conveniencia
-                                ArrayList<SDataDpsEntry> importedDpsEntries = row.getImportedDpsEntries(); // variable de conveniencia
+//                            if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
+//                                ArrayList<SDataDpsEntry> newDpsEntries = row.getNewDpsEntries(); // variable de conveniencia
+//                                ArrayList<SDataDpsEntry> importedDpsEntries = row.getImportedDpsEntries(); // variable de conveniencia
+//
+//                                if (newDpsEntries.size() == importedDpsEntries.size()) {
+//                                    for (int j = 0; j < newDpsEntries.size(); j++) {
+//                                        if (newDpsEntries.get(j).getSubtotalCy_r() > importedDpsEntries.get(j).getSubtotalCy_r()) {
+//                                            validation.setMessage(msgPrefix + "tiene un importe mayor ($" + SLibUtils.getDecimalFormatAmount().format(newDpsEntries.get(j).getSubtotalCy_r()) + ") "
+//                                                    + "que el de la partida de la " + msDocumentName + " elegida ($" + SLibUtils.getDecimalFormatAmount().format(importedDpsEntries.get(j).getSubtotalCy_r()) + ").");
+//                                            break;
+//                                        }
+//                                    }
+//                                }
+//                            }
+                              if (!validation.getIsError() && !row.getImportedDpsEntries().isEmpty()) {
+        ArrayList<SDataDpsEntry> newDpsEntries = row.getNewDpsEntries();
+        ArrayList<SDataDpsEntry> importedDpsEntries = row.getImportedDpsEntries();
 
-                                if (newDpsEntries.size() == importedDpsEntries.size()) {
-                                    for (int j = 0; j < newDpsEntries.size(); j++) {
-                                        if (newDpsEntries.get(j).getSubtotalCy_r() > importedDpsEntries.get(j).getSubtotalCy_r()) {
-                                            validation.setMessage(msgPrefix + "tiene un importe mayor ($" + SLibUtils.getDecimalFormatAmount().format(newDpsEntries.get(j).getSubtotalCy_r()) + ") "
-                                                    + "que el de la partida de la " + msDocumentName + " elegida ($" + SLibUtils.getDecimalFormatAmount().format(importedDpsEntries.get(j).getSubtotalCy_r()) + ").");
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+        if (newDpsEntries.size() == importedDpsEntries.size()) {
+            for (int j = 0; j < newDpsEntries.size(); j++) {
 
+                double subtotalNew = newDpsEntries.get(j).getSubtotalCy_r();
+                double subtotalOc = importedDpsEntries.get(j).getSubtotalCy_r();
+                double surplusPercentage = importedDpsEntries.get(j).getSurplusPercentage();
+
+                double subtotalMax = subtotalOc * (1d + surplusPercentage);
+
+                System.out.println(
+                        "VALIDACION IMPORTE"
+                        + " | Nuevo subtotal: " + subtotalNew
+                        + " | OC subtotal: " + subtotalOc
+                        + " | Excedente: " + surplusPercentage
+                        + " | Subtotal máximo: " + subtotalMax
+                );
+
+                if (subtotalNew > subtotalMax) {
+                    validation.setMessage(msgPrefix + "tiene un importe mayor ($"
+                            + SLibUtils.getDecimalFormatAmount().format(subtotalNew) + ") "
+                            + "que el máximo permitido de la partida de la " + msDocumentName
+                            + " ($" + SLibUtils.getDecimalFormatAmount().format(subtotalMax) + ").");
+                    break;
+                }
+            }
+        }
+    }
+                            
                             if (!validation.getIsError()) {
                                 if (concepto.getEltOpcConceptoImpuestos() != null) {
                                     if (concepto.getEltOpcConceptoImpuestos().getEltOpcImpuestosTrasladados() != null) {
@@ -2358,7 +2399,7 @@ public class SDialogCfdiImport40 extends javax.swing.JDialog implements java.awt
     }
     
     private void actionOk() {
-        SFormValidation validation = validateForm();
+            SFormValidation validation = validateForm();
                 
         if (!validation.getIsError()) {
             moNewDps = createDps();

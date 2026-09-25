@@ -470,14 +470,14 @@ public class SDialogShowDocumentLinks extends javax.swing.JDialog implements erp
                         "SELECT DISTINCT 21 AS f_id_type, 'UNIFICACIÓN DE PARTIDAS' AS f_type, d.dt, t.code AS f_code, CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                         "d.tot_r AS f_tot, d.tot_cur_r AS f_tot_cur, c.cur_key AS f_cur, b.code AS f_cob, de.sort_pos AS f_sp, de.concept_key AS f_cpt_key, de.concept AS f_cpt, " +
                         "me.orig_qty AS f_qty, u.symbol AS f_us, me.orig_qty * me.price_u AS f_tot_de, me.orig_qty * me.price_u_cur AS f_tot_cur_de, c.cur_key AS f_cur_de " +
-                        "FROM trn_dps_dps_merge AS me INNER JOIN trn_dps_ety AS de ON me.fk_dps_year_orig = de.id_year AND me.fk_dps_doc_orig = de.id_doc AND me.fk_dps_ety_orig = de.id_ety " +
+                        "FROM trn_dps_dps_merge AS me INNER JOIN trn_dps_ety AS de ON me.fid_dps_old_year = de.id_year AND me.fid_dps_old_doc = de.id_doc AND me.fid_dps_old_ety = de.id_ety " +
                         "INNER JOIN trn_dps AS d ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                         "INNER JOIN erp.itmu_unit AS u ON de.fid_orig_unit = u.id_unit " +
                         "INNER JOIN erp.trnu_tp_dps AS t ON d.fid_ct_dps = t.id_ct_dps AND d.fid_cl_dps = t.id_cl_dps AND d.fid_tp_dps = t.id_tp_dps " +
                         "INNER JOIN erp.bpsu_bpb AS b ON d.fid_cob = b.id_bpb " +
                         "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
-                        "WHERE me.fk_dps_year_des = " + moParamDpsEntry.getPkYearId() + " AND me.fk_dps_doc_des = " + moParamDpsEntry.getPkDocId() + " AND me.fk_dps_ety_des = " + moParamDpsEntry.getPkEntryId() + " AND me.b_del = 0 " +
-                        "AND me.ver = (SELECT COALESCE(MAX(ver), 1) FROM trn_dps_dps_merge WHERE fk_dps_year_des = " + moParamDpsEntry.getPkYearId() + " AND fk_dps_doc_des = " + moParamDpsEntry.getPkDocId() + " AND fk_dps_ety_des = " + moParamDpsEntry.getPkEntryId() + " AND b_del = 0 AND ver <> 0) " +
+                        "WHERE me.fid_dps_new_year = " + moParamDpsEntry.getPkYearId() + " AND me.fid_dps_new_doc = " + moParamDpsEntry.getPkDocId() + " AND me.fid_dps_new_ety = " + moParamDpsEntry.getPkEntryId() + " AND me.b_del = 0 " +
+                        "AND me.ver = (SELECT COALESCE(MAX(ver), 1) FROM trn_dps_dps_merge WHERE fid_dps_new_year = " + moParamDpsEntry.getPkYearId() + " AND fid_dps_new_doc = " + moParamDpsEntry.getPkDocId() + " AND fid_dps_new_ety = " + moParamDpsEntry.getPkEntryId() + " AND b_del = 0 AND ver <> 0) " +
                         "ORDER BY f_id_type, f_code, f_num ";
 
                 oRequest = new SServerRequest(SServerConstants.REQ_DB_QUERY_SIMPLE, sSql);

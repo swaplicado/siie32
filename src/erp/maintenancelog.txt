@@ -1,4 +1,75 @@
 ================================================================================
+SIIE 3.2 309.2/ 2026-09-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan verificaciones de la valuación (trn_stk_val_mvt) vs kardex (trn_stk_val_kardex).
+
+================================================================================
+SIIE 3.2 309.1/ 2026-09-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Columna e ícono de advertencias en valuaciones.
+2) Warnings cuando no hay remanente para un movimiento de salida.
+3) Verificación de costos desde tabla de kardex de valuación.
+
+================================================================================
+SIIE 3.2 309.0/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+Implementa kardex para valuación de inventarios:
+
+1) Agrega entidades y utilidades para el manejo del kardex.
+2) Genera consumos, ajustes y movimientos de entradas y salidas.
+3) Actualiza los costos de existencias y movimientos de almacén.
+4) Registra cambios de referencias entre órdenes de compra y facturas.
+5) Incorpora validaciones de integridad para la valuación de inventarios.
+
+================================================================================
+SIIE 3.2 307.9/ 2026-09-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Permitir marcar si pagos de anticipos requieren CRP en SIIE. PDC-959
+2) Cambio en exportación de pagos y solicitudes de pago dependiendo del estatus.
+
+================================================================================
+SIIE 3.2 307.8/ 2026-09-14
+Jhonatan Claudio Peña Hernández
+--------------------------------------------------------------------------------
+1) Corrección al SBC al incluir el gravado y exento de la prima dominical.
+2) Excedente de partidas de OC al importar facturas de proveedores en SIIE.
+
+================================================================================
+SIIE 3.2 307.7/ 2026-09-09
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Fix de bandera de requerimiento de complemento de pago en creación de pagos.
+
+================================================================================
+SIIE 3.2 307.6/ 2026-09-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de transacción de BD en valuaciones para soportar reevaluación masiva.
+2) Cambio en contabilización de consumos para tomar el CC de la requisición.
+
+================================================================================
+SIIE 3.2 307.5/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales: Validación restrictiva de diferencia de precios solo cuando no es Activo Fijo, cuando lo es solo aparece un warning.
+
+================================================================================
+SIIE 3.2 307.4/ 2026-09-02
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Optimizar query de exportPurchaseOrdersFiles y forzar subida en export de documento puntual
+
+================================================================================
+SIIE 3.2 307.3/ 2026-09-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección al resetear el campo precio unitario al abrirse previamente por un vinculo
+
+================================================================================
 SIIE 3.2 307.2/ 2026-08-31
 Adrian Alejandro AVILES GOMEZ
 --------------------------------------------------------------------------------

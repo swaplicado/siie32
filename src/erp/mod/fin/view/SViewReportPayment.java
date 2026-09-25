@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Claudio Pela, Sergio Flores
+ * @author Claudio Peña, Sergio Flores
  */
 public class SViewReportPayment extends SGridPaneView implements ActionListener, ItemListener {
         

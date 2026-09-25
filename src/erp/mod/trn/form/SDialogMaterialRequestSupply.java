@@ -707,6 +707,9 @@ public class SDialogMaterialRequestSupply extends SBeanFormDialog implements Lis
             if (oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied() > 0 && ! oMatReqRow.isItemNew()) {
                 oMatReqRow.setAuxToSupply(oMatReqRow.getQuantity() - oMatReqRow.getAuxSupplied());
             }
+            else {
+                oMatReqRow.setAuxToSupply(0d);
+            }
         }
         
         this.actionSupply();

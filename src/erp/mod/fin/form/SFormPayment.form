@@ -438,6 +438,14 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDateRequired">
                     </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBooleanReceiptPaymentReq">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Requiere complemento"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[160, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jpPayCenterRow1">

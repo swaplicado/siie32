@@ -6,6 +6,9 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationKardexAdjustUtils;
+import erp.mod.trn.utils.SStockValuationKardexCore;
 import erp.mod.trn.utils.SStockValuationAdjustsUtils;
 import erp.mod.trn.utils.SStockValuationLogUtils;
 import erp.mod.trn.utils.SStockValuationRecordUtils;
@@ -46,6 +49,8 @@ public class SDbStockValuation extends SDbRegistryUser {
     protected Date mtDateEnd;
     // Descripción
     protected String msDescription;
+    // Advertencias que se generaron al realizarse la valuación
+    protected String msWarnings;
     //protected boolean mbSystem;
     //protected boolean mbDeleted;
     //protected int mnFkUserInsertId;
@@ -135,6 +140,7 @@ public class SDbStockValuation extends SDbRegistryUser {
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setDescription(String s) { msDescription = s; }
+    public void setWarnings(String s) { msWarnings = s; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -150,6 +156,7 @@ public class SDbStockValuation extends SDbRegistryUser {
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
     public String getDescription() { return msDescription; }
+    public String getWarnings() { return msWarnings; }
     public boolean isSystem() { return mbSystem; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -178,6 +185,7 @@ public class SDbStockValuation extends SDbRegistryUser {
         mnPkStockValuationId = 0;
         mtDateStart = null;
         msDescription = "";
+        msWarnings = "";
         mbSystem = false;
         mbDeleted = false;
         mnFkUserInsertId = 0;
@@ -234,6 +242,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                 mtDateStart = res.getDate("dt_sta");
                 mtDateEnd = res.getDate("dt_end");
                 msDescription = res.getString("description");
+                msWarnings = res.getString("warnings");
                 mbSystem = res.getBoolean("b_sys");
                 mbDeleted = res.getBoolean("b_del");
                 mnFkUserInsertId = res.getInt("fk_usr_ins");
@@ -265,10 +274,11 @@ public class SDbStockValuation extends SDbRegistryUser {
     }
 
     /**
-     * Guarda la valuación de inventario en la base de datos.
-     * Si es un registro nuevo, lo inserta; si no, lo actualiza.
-     * Además, realiza los procesos de creación de movimientos, consumos, agrupaciones, ajustes y generación de pólizas.
-     * 
+     * Guarda la valuación de inventario en la base de datos. Si es un registro
+     * nuevo, lo inserta; si no, lo actualiza. Además, realiza los procesos de
+     * creación de movimientos, consumos, agrupaciones, ajustes y generación de
+     * pólizas.
+     *
      * @param session Sesión de la GUI para ejecutar consultas SQL.
      * @throws SQLException
      * @throws Exception
@@ -277,95 +287,143 @@ public class SDbStockValuation extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-        
+
         if (mbRegistryNew) {
             computePrimaryKey(session);
-            if (! mbAuxIsAllInsert) {
+            if (!mbAuxIsAllInsert) {
                 mtDateStart = SDbStockValuation.computeStartDate(session, mtDateEnd);
             }
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
-            
-            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkStockValuationId + ", " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " + 
-                    "'" + (msDescription == null ? "" : msDescription) + "', " +
-                    (mbSystem ? 1 : 0) + ", " +
-                    (mbDeleted ? 1 : 0) + ", " +
-                    mnFkUserInsertId + ", " + 
-                    mnFkUserUpdateId + ", " + 
-                    "NOW()" + ", " + 
-                    "NOW()" + " " +
-                    ")" ;
+
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES ("
+                    + mnPkStockValuationId + ", "
+                    + "'" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', "
+                    + "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', "
+                    + "'" + (msDescription == null ? "" : msDescription) + "', "
+                    + "'" + (msWarnings == null ? "" : msWarnings) + "', "
+                    + (mbSystem ? 1 : 0) + ", "
+                    + (mbDeleted ? 1 : 0) + ", "
+                    + mnFkUserInsertId + ", "
+                    + mnFkUserUpdateId + ", "
+                    + "NOW()" + ", "
+                    + "NOW()" + " "
+                    + ")";
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
-            
-            msSql = "UPDATE " + getSqlTable() + " SET " +
-                    // "id_stk_val = " + mnPkValuationId + ", " +
-                    "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', " +
-                    "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
-                    "description = '" + (msDescription == null ? "" : msDescription) + "', " +
-                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
-                    "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                    "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    //"ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + " "  + 
-                    getSqlWhere();
+
+            msSql = "UPDATE " + getSqlTable() + " SET "
+                    + // "id_stk_val = " + mnPkValuationId + ", " +
+                    "dt_sta = '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "', "
+                    + "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', "
+                    + "description = '" + (msDescription == null ? "" : msDescription) + "', "
+                    + "warnings = '" + (msWarnings == null ? "" : msWarnings) + "', "
+                    + "b_sys = " + (mbSystem ? 1 : 0) + ", "
+                    + "b_del = " + (mbDeleted ? 1 : 0) + ", "
+                    + //"fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    "fk_usr_upd = " + mnFkUserUpdateId + ", "
+                    + //"ts_usr_ins = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " "
+                    + getSqlWhere();
         }
         
+        boolean autoCommit = session.getStatement().getConnection().getAutoCommit();
         try {
-            session.getStatement().getConnection().setAutoCommit(false);
+            if (autoCommit) {
+                session.getStatement().getConnection().setAutoCommit(false);
+            }
             
             if (moAuxRecordPk != null) {
                 session.getStatement().getConnection().createStatement().execute(msSql);
-                // Crear movimientos de ajuste de inventario
-                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.createStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
-                System.out.println("Creando entries...");
-                // Crear entradas de inventario
-                SStockValuationUtils.createValuationEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                msWarnings = "";
+                /**
+                 * Este código se comenta por si se quiere regenerar todo el
+                 * kardex
+                 */
+//                String fechaStr = "01/03/2024";
+//                String fechaFin = "31/07/2026";
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+//                Date inicio = sdf.parse(fechaStr);
+//                Date fin = sdf.parse(fechaFin);
+//                SStockValuationKardexCore.createKardexEntries(session, inicio, fin, mnPkStockValuationId);
+//                msWarnings += SStockValuationKardexCore.createKardexOuts(session, inicio, fin, mnPkStockValuationId);
 
-                // Consumir salidas de inventario
-                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationUtils.consumeEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                // Crear movimientos de ajuste de inventario
+                // System.out.println("Creando ajustes...");
+                // List<SDbStockValuationMvt> lMvtAdjs = SStockValuationAdjustsUtils.createStockValuationAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                System.out.println("Guardando ajustes de kardex...");
+                List<SDbStockValuationMvt> lMvtAdjs = SStockValuationKardexAdjustUtils.generateKardexAdjusts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+
+                // Crear entradas de inventario
+                System.out.println("Creando entries...");
+                SStockValuationUtils.createValuationEntries(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                msWarnings += SStockValuationKardexCore.createKardexOuts(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
+                System.out.println(msWarnings);
+
+                // Consumir salidas de inventario desde kardex
+                ArrayList<SDbStockValuationMvt> lConsumptions = SStockValuationKardexCore.consumeFromKardex(session, mtDateStart, mtDateEnd, mnPkStockValuationId);
                 System.out.println("Guardando consumos...");
                 for (SDbStockValuationMvt consumption : lConsumptions) {
                     consumption.save(session);
-                    if (consumption.getLogMessage() != null && ! consumption.getLogMessage().isEmpty()) {
+                    if (consumption.getLogMessage() != null && !consumption.getLogMessage().isEmpty()) {
                         SStockValuationLogUtils.logConsume(mtDateStart, mtDateEnd, consumption, consumption.getLogMessage());
                     }
                 }
-                
+
                 System.out.println("Actualizando costos en stock...");
                 SStockValuationUpdateStkUtils.updateStockOutRows(session, mnPkStockValuationId);
-                lConsumptions.addAll(0, lMvtAdjs);
+
                 System.out.println("Ajustando inventario...");
-                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateEnd, lMvtAdjs);
+                List<SDbStockValuationMvt> lMvtAdjsIn = new ArrayList<>();
+                for (SDbStockValuationMvt mv : lMvtAdjs) {
+                    if (mv.getFkDiogCategoryId() == SModSysConsts.TRNS_CT_IOG_IN) {
+                        lMvtAdjsIn.add(mv);
+                    }
+                }
+                List<SDataDiog> lDiogs = SStockValuationAdjustsUtils.createDiogAdjusts(session, mtDateEnd, lMvtAdjsIn);
                 SDbStockValuationDiogAdjust oValDiogAdj;
                 for (SDataDiog oDiog : lDiogs) {
                     oValDiogAdj = new SDbStockValuationDiogAdjust(mnPkStockValuationId, oDiog.getPkYearId(), oDiog.getPkDocId());
                     oValDiogAdj.save(session);
                 }
-                
+
                 System.out.println("Generando pólizas...");
+                List<SDbStockValuationMvt> lMvtAdjsOut = new ArrayList<>();
+                for (SDbStockValuationMvt mv : lMvtAdjs) {
+                    if (mv.getFkDiogCategoryId() == SModSysConsts.TRNS_CT_IOG_OUT) {
+                        lMvtAdjsOut.add(mv);
+                    }
+                }
+
+                lConsumptions.addAll(0, lMvtAdjsOut);
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
-                
+
                 System.out.println("Validando...");
                 String sErrors = SStockValuationVerify.verifyStockValuation(session);
                 if (!sErrors.isEmpty()) {
                     throw new Exception("No se pudo completar el proceso.\n"
                             + "Se encontraron errores en la valuación de inventarios:\n" + sErrors);
                 }
-                
+
+                // Si existen warnings, actualizar el campo:
+                if (!msWarnings.isEmpty()) {
+                    msSql = "UPDATE " + getSqlTable() + " SET "
+                            + "warnings = '" + msWarnings + "' "
+                            + getSqlWhere();
+                    session.getStatement().execute(msSql);
+                }
+
                 System.out.println("Terminado.");
             }
             else {
                 throw new Exception("Se desconoce el identificador de la póliza contable.");
             }
             
-            session.getStatement().getConnection().commit();
+            if (autoCommit) {
+                session.getStatement().getConnection().commit();
+            }
         }
         catch (SQLException ex) {
             session.getStatement().getConnection().rollback();
@@ -377,7 +435,12 @@ public class SDbStockValuation extends SDbRegistryUser {
             Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE, null, ex);
             throw new Exception(ex);
         }
-        
+        finally {
+            if (autoCommit) {
+                session.getStatement().getConnection().setAutoCommit(true);
+            }
+        }
+
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -442,7 +505,10 @@ public class SDbStockValuation extends SDbRegistryUser {
         registry.setPkStockValuationId(this.getPkStockValuationtId());
         registry.setDateStart(this.getDateStart());
         registry.setDateEnd(this.getDateEnd());
+        registry.setDescription(this.getDescription());
+        registry.setSystem(this.isSystem());
         registry.setDeleted(this.isDeleted());
+        registry.setDescription(this.getDescription());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
