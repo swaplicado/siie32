@@ -554,6 +554,7 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
                 }
                 
                 totalSinIva = Debe - ( impuesto16 != 0 ? impuesto16 : taxableBase16 ) - ( impuesto0 != 0 ? impuesto0 : taxableBase0 ) - ( impuestoExcento != 0 ? impuestoExcento : taxableBaseExcento );
+                subtotal16 = Debe - ( impuesto16 != 0 ? impuesto16 : taxableBase16 ) - ( impuesto0 != 0 ? impuesto0 : taxableBase0 ) - ( impuestoExcento != 0 ? impuestoExcento : taxableBaseExcento );
             }
         }
         
@@ -1062,7 +1063,6 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         taxableBase16 = subtotal16;
         taxableBase0 = subtotal0;
 
-//        totalSinIva = total - impuesto16 - impuesto0;
         totalSinIva = Debe - ( impuesto16 != 0 ? impuesto16 : taxableBase16 ) - ( impuesto0 != 0 ? impuesto0 : taxableBase0 ) - ( impuestoExcento != 0 ? impuestoExcento : taxableBaseExcento );
         retention1 = ameRetention;
     }
@@ -1102,65 +1102,4 @@ public class SImportWeekMovProcurementFacility implements SGridRow, Serializable
         accLedgerRetention1 = oAccountLedgerRetention1;
         accLedgerretention2 = null;
     }
-    
-//    public void readJsonConfig(SGuiSession session, Statement statement) throws Exception {
-//        ObjectMapper mapper = new ObjectMapper();
-//        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_AVO_CONFIG));
-//        ArrayList<String> arrPkAccTaxIva16 = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC, "1");
-//        ArrayList<String> arrPkAccTaxIva0 = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC, "2");
-//        ArrayList<String> arrPkAccTaxExc = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_TRANS_ACC, "3");
-//        ArrayList<String> arrPkAccRetention1 = SAuthJsonUtils.getValueOfElementAsTextArray(config, SSwapConsts.CFG_OBJ_AVO_SRV_CFG_TAX_RET_ACC, "1");
-//        
-//        SDataAccountTax oDataAccountTax16 = new SDataAccountTax();
-//        String[] pkIva16 = {arrPkAccTaxIva16.get(0), arrPkAccTaxIva16.get(1), arrPkAccTaxIva16.get(2), arrPkAccTaxIva16.get(3)};
-//        oDataAccountTax16.read(pkIva16, statement);
-//        
-//        SDataAccountTax oDataAccountTax0 = new SDataAccountTax();
-//        String[] pkIva0 = {arrPkAccTaxIva0.get(0), arrPkAccTaxIva0.get(1), arrPkAccTaxIva0.get(2), arrPkAccTaxIva0.get(3)};
-//        oDataAccountTax0.read(pkIva0, statement);
-//        
-//        SDataAccountTax oDataAccountTaxExc = new SDataAccountTax();
-//        String[] pkIvaExc = {arrPkAccTaxExc.get(0), arrPkAccTaxExc.get(1), arrPkAccTaxExc.get(2), arrPkAccTaxExc.get(3)};
-//        oDataAccountTaxExc.read(pkIvaExc, statement);
-//        
-//        SDataAccountTax oDataAccountRet = new SDataAccountTax();
-//        String[] pkRet = {arrPkAccRetention1.get(0), arrPkAccRetention1.get(1), arrPkAccRetention1.get(2), arrPkAccRetention1.get(3)};
-//        oDataAccountRet.read(pkRet, statement);
-//        
-//        SDataAccount oAccountIVA16 = new SDataAccount();
-//        oAccountIVA16.read( new String[] { oDataAccountTax16.getFkAccountPaymentId() }, statement);
-//        
-//        SDataAccount oAccountLedgerIVA16 = new SDataAccount();
-//        oAccountLedgerIVA16.read( new String[] { oAccountIVA16.getDbmsPkLedgerAccountIdXXX() }, statement);
-//        
-//        SDataAccount oAccountIVA0 = new SDataAccount();
-//        oAccountIVA0.read( new String[] { oDataAccountTax0.getFkAccountPaymentId() }, statement);
-//        
-//        SDataAccount oAccountLedgerIVA0 = new SDataAccount();
-//        oAccountLedgerIVA0.read( new String[] { oAccountIVA0.getDbmsPkLedgerAccountIdXXX() }, statement);
-//        
-//        SDataAccount oAccountExc = new SDataAccount();
-//        oAccountExc.read( new String[] { oDataAccountTaxExc.getFkAccountPaymentId() }, statement);
-//        
-//        SDataAccount oAccountLedgerExc = new SDataAccount();
-//        oAccountLedgerExc.read( new String[] { oAccountExc.getDbmsPkLedgerAccountIdXXX() }, statement);
-//        
-//        SDataAccount oAccountRetention1 = new SDataAccount();
-//        oAccountRetention1.read( new String[] { oDataAccountRet.getFkAccountPaymentId() }, statement);
-//        
-//        SDataAccount oAccountLedgerRetention1 = new SDataAccount();
-//        oAccountLedgerRetention1.read( new String[] { oAccountRetention1.getDbmsPkLedgerAccountIdXXX() }, statement);
-//        
-//        accIva16 = oAccountIVA16;
-//        accIva0 = oAccountIVA0;
-//        accExcento = oAccountExc;
-//        accRetention1 = oAccountRetention1;
-//        accretention2 = null;
-//        
-//        accLedgerIva16 = oAccountLedgerIVA16;
-//        accLedgerIva0 = oAccountLedgerIVA0;
-//        accLedgerExcento = oAccountLedgerExc;
-//        accLedgerRetention1 = oAccountRetention1;
-//        accLedgerretention2 = null;
-//    }
 }

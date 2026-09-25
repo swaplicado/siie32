@@ -145,7 +145,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpDownloadE1 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jbOpenProcurementFacility = new javax.swing.JButton();
         jpDownloadE2 = new javax.swing.JPanel();
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
@@ -181,7 +180,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jtfTotDebe = new javax.swing.JTextField();
         jpDownloadE9 = new javax.swing.JPanel();
         jLabel38 = new javax.swing.JLabel();
-        jLabel2b4 = new javax.swing.JLabel();
         jlTotHaber = new javax.swing.JLabel();
         jtfTotHaber = new javax.swing.JTextField();
         jpDocuments = new javax.swing.JPanel();
@@ -217,6 +215,8 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpProcessingN19 = new javax.swing.JPanel();
         jpProcessingN20 = new javax.swing.JPanel();
         jpProcessingN3 = new javax.swing.JPanel();
+        jpProcessingN37 = new javax.swing.JPanel();
+        jbOpenProcurementFacility = new javax.swing.JButton();
         jpProcessingN21 = new javax.swing.JPanel();
         jlAccountingAccount = new javax.swing.JLabel();
         jpProcessingN22 = new javax.swing.JPanel();
@@ -249,7 +249,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jlSubTotalIVA0 = new javax.swing.JLabel();
         jpProcessingN36 = new javax.swing.JPanel();
         jtfSubTotalIVA0 = new javax.swing.JTextField();
-        jpProcessingN37 = new javax.swing.JPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -290,11 +289,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
         jLabel12.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel12);
-
-        jbOpenProcurementFacility.setText("Modificar");
-        jbOpenProcurementFacility.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbOpenProcurementFacility.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbOpenProcurementFacility);
 
         jpDownloadE.add(jpDownloadE1);
 
@@ -428,7 +422,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jtfTotDebe.setText("Debe");
         jtfTotDebe.setToolTipText("Usuario actual");
         jtfTotDebe.setFocusable(false);
-        jtfTotDebe.setPreferredSize(new java.awt.Dimension(103, 21));
+        jtfTotDebe.setPreferredSize(new java.awt.Dimension(150, 21));
         jpDownloadE8.add(jtfTotDebe);
 
         jpDownloadW5.add(jpDownloadE8);
@@ -438,9 +432,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jLabel38.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE9.add(jLabel38);
 
-        jLabel2b4.setPreferredSize(new java.awt.Dimension(42, 23));
-        jpDownloadE9.add(jLabel2b4);
-
         jlTotHaber.setText("Total Haber:");
         jlTotHaber.setPreferredSize(new java.awt.Dimension(75, 21));
         jpDownloadE9.add(jlTotHaber);
@@ -449,7 +440,12 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jtfTotHaber.setText("Haber");
         jtfTotHaber.setToolTipText("Usuario actual");
         jtfTotHaber.setFocusable(false);
-        jtfTotHaber.setPreferredSize(new java.awt.Dimension(103, 21));
+        jtfTotHaber.setPreferredSize(new java.awt.Dimension(150, 21));
+        jtfTotHaber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfTotHaberActionPerformed(evt);
+            }
+        });
         jpDownloadE9.add(jtfTotHaber);
 
         jpDownloadW5.add(jpDownloadE9);
@@ -565,6 +561,15 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         jpDocumentsProcessing.add(jpProcessingN, java.awt.BorderLayout.NORTH);
 
         jpProcessingN3.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
+
+        jpProcessingN37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbOpenProcurementFacility.setText("Modificar");
+        jbOpenProcurementFacility.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbOpenProcurementFacility.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN37.add(jbOpenProcurementFacility);
+
+        jpProcessingN3.add(jpProcessingN37);
 
         jpProcessingN21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -720,9 +725,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
 
         jpProcessingN3.add(jpProcessingN36);
 
-        jpProcessingN37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpProcessingN3.add(jpProcessingN37);
-
         jpDocumentsProcessing.add(jpProcessingN3, java.awt.BorderLayout.NORTH);
 
         jpDocuments.add(jpDocumentsProcessing, java.awt.BorderLayout.EAST);
@@ -743,6 +745,10 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfSubTotalIva16ActionPerformed
 
+    private void jtfTotHaberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfTotHaberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtfTotHaberActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
     private javax.swing.ButtonGroup bgSearchBy;
@@ -751,7 +757,6 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel2b3;
-    private javax.swing.JLabel jLabel2b4;
     private javax.swing.JLabel jLabel2b5;
     private javax.swing.JLabel jLabel2b6;
     private javax.swing.JLabel jLabel31;
@@ -1454,11 +1459,7 @@ public class SDialogImportWeekProcurementFacility extends SBeanFormDialog implem
                     if (!smaEdited.contains(i)) {
                         smaEdited.add(i);
                     }
-                    
-//                    maImportedDocument.setImpuesto16(weekProcurementFacility.impuesto16);
-//                    maImportedDocument.setSubtotal16(weekProcurementFacility.subtotal16);
-//                    maImportedDocument.setSubtotal0(weekProcurementFacility.subtotal0);
-                    
+
                     maImportedDocument.setTaxKeyIva16(weekProcurementFacility.TaxKeyIva16);
                     maImportedDocument.setTaxKeyIva0(weekProcurementFacility.TaxKeyIva0);
                     maImportedDocument.setTaxKeyExcento(weekProcurementFacility.TaxKeyExcento);

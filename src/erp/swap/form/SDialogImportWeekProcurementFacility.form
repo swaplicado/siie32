@@ -132,17 +132,6 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jbOpenProcurementFacility">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Modificar"/>
-                    <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-                      <Insets value="[2, 2, 2, 2]"/>
-                    </Property>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="jpDownloadE2">
@@ -433,7 +422,7 @@
                     <Property name="toolTipText" type="java.lang.String" value="Usuario actual"/>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[103, 21]"/>
+                      <Dimension value="[150, 21]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -453,13 +442,6 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabel2b4">
-                  <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[42, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
                 <Component class="javax.swing.JLabel" name="jlTotHaber">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Total Haber:"/>
@@ -475,9 +457,12 @@
                     <Property name="toolTipText" type="java.lang.String" value="Usuario actual"/>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[103, 21]"/>
+                      <Dimension value="[150, 21]"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jtfTotHaberActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -781,6 +766,26 @@
                 <Property name="verticalGap" type="int" value="1"/>
               </Layout>
               <SubComponents>
+                <Container class="javax.swing.JPanel" name="jpProcessingN37">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                    <Property name="verticalGap" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="jbOpenProcurementFacility">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Modificar"/>
+                        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                          <Insets value="[2, 2, 2, 2]"/>
+                        </Property>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[150, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
                 <Container class="javax.swing.JPanel" name="jpProcessingN21">
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
@@ -1074,13 +1079,6 @@
                       </Properties>
                     </Component>
                   </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="jpProcessingN37">
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                    <Property name="alignment" type="int" value="0"/>
-                    <Property name="verticalGap" type="int" value="0"/>
-                  </Layout>
                 </Container>
               </SubComponents>
             </Container>

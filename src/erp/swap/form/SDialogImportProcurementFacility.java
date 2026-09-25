@@ -169,19 +169,19 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jpDownloadE = new javax.swing.JPanel();
         jpDownloadE1 = new javax.swing.JPanel();
         jbShowWeeks = new javax.swing.JButton();
+        jbSelectAll = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
-        jbOpenProcurementFacility = new javax.swing.JButton();
         jbRecord = new javax.swing.JButton();
         jtfRecordSelected = new javax.swing.JTextField();
         jpDownloadE2 = new javax.swing.JPanel();
         jbClearWeeksProcurements = new javax.swing.JButton();
+        jbUnselectAll = new javax.swing.JButton();
         jLabel21 = new javax.swing.JLabel();
-        jbSelectAll = new javax.swing.JButton();
         jbToAccount = new javax.swing.JButton();
         jbRejectWeek = new javax.swing.JButton();
         jpDownloadE3 = new javax.swing.JPanel();
+        jLabel2b6 = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
-        jbUnselectAll = new javax.swing.JButton();
         jbReverseAccounting = new javax.swing.JButton();
         jLabel2b5 = new javax.swing.JLabel();
         jpDownloadW4 = new javax.swing.JPanel();
@@ -199,8 +199,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jProgressBar = new javax.swing.JProgressBar();
         jpDocumentsProcessing = new javax.swing.JPanel();
         jpProcessingN = new javax.swing.JPanel();
+        jpProcessingN13 = new javax.swing.JPanel();
+        jbOpenProcurementFacility = new javax.swing.JButton();
         jpProcessingN1 = new javax.swing.JPanel();
         jlFolioRecord = new javax.swing.JLabel();
+        jbOpenRecord1 = new javax.swing.JButton();
         jpProcessingN2 = new javax.swing.JPanel();
         jtfFolioRecord = new javax.swing.JTextField();
         jpProcessingN4 = new javax.swing.JPanel();
@@ -216,8 +219,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jpProcessingN11 = new javax.swing.JPanel();
         jtfRecordCostCenter = new javax.swing.JTextField();
         jpProcessingN12 = new javax.swing.JPanel();
-        jbOpenRecord = new javax.swing.JButton();
-        jpProcessingN13 = new javax.swing.JPanel();
         jpProcessingN14 = new javax.swing.JPanel();
         jpProcessingN15 = new javax.swing.JPanel();
         jpProcessingN16 = new javax.swing.JPanel();
@@ -292,15 +293,20 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbShowWeeks.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbShowWeeks);
 
+        jbSelectAll.setText("Seleccionar todas");
+        jbSelectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbSelectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jbSelectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSelectAllActionPerformed(evt);
+            }
+        });
+        jpDownloadE1.add(jbSelectAll);
+
         jLabel11.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE1.add(jLabel11);
 
-        jbOpenProcurementFacility.setText("Ver semana");
-        jbOpenProcurementFacility.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbOpenProcurementFacility.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE1.add(jbOpenProcurementFacility);
-
-        jbRecord.setText("Pólizas");
+        jbRecord.setText("Seleccionar póliza");
         jbRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
         jbRecord.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE1.add(jbRecord);
@@ -327,13 +333,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbClearWeeksProcurements.setPreferredSize(new java.awt.Dimension(150, 23));
         jpDownloadE2.add(jbClearWeeksProcurements);
 
+        jbUnselectAll.setText("Deleccionar todas");
+        jbUnselectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbUnselectAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE2.add(jbUnselectAll);
+
         jLabel21.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE2.add(jLabel21);
-
-        jbSelectAll.setText("Seleccionar todas");
-        jbSelectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbSelectAll.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE2.add(jbSelectAll);
 
         jbToAccount.setText("Contabilizar");
         jbToAccount.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -349,13 +355,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
 
         jpDownloadE3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
+        jLabel2b6.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpDownloadE3.add(jLabel2b6);
+
         jLabel32.setPreferredSize(new java.awt.Dimension(5, 23));
         jpDownloadE3.add(jLabel32);
-
-        jbUnselectAll.setText("Deleccionar todas");
-        jbUnselectAll.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbUnselectAll.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpDownloadE3.add(jbUnselectAll);
 
         jbReverseAccounting.setText("Descontabilizar");
         jbReverseAccounting.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -431,11 +435,25 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
 
         jpProcessingN.setLayout(new java.awt.GridLayout(20, 1, 0, 1));
 
+        jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbOpenProcurementFacility.setText("Ver semana");
+        jbOpenProcurementFacility.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbOpenProcurementFacility.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpProcessingN13.add(jbOpenProcurementFacility);
+
+        jpProcessingN.add(jpProcessingN13);
+
         jpProcessingN1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFolioRecord.setText("Folio póliza:");
-        jlFolioRecord.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFolioRecord.setPreferredSize(new java.awt.Dimension(125, 23));
         jpProcessingN1.add(jlFolioRecord);
+
+        jbOpenRecord1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbOpenRecord1.setToolTipText("Cambiar fecha requerida de pago...");
+        jbOpenRecord1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpProcessingN1.add(jbOpenRecord1);
 
         jpProcessingN.add(jpProcessingN1);
 
@@ -508,16 +526,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jpProcessingN.add(jpProcessingN11);
 
         jpProcessingN12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jbOpenRecord.setText("Abrir póliza");
-        jbOpenRecord.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        jbOpenRecord.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpProcessingN12.add(jbOpenRecord);
-
         jpProcessingN.add(jpProcessingN12);
-
-        jpProcessingN13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jpProcessingN.add(jpProcessingN13);
 
         jpProcessingN14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         jpProcessingN.add(jpProcessingN14);
@@ -564,17 +573,22 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         // TODO add your handling code here:
     }//GEN-LAST:event_jtfRecordSelectedActionPerformed
 
+    private void jbSelectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSelectAllActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbSelectAllActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgDocMode;
     private javax.swing.ButtonGroup bgSearchBy;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel2b5;
+    private javax.swing.JLabel jLabel2b6;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JProgressBar jProgressBar;
     private javax.swing.JButton jbClearWeeksProcurements;
     private javax.swing.JButton jbOpenProcurementFacility;
-    private javax.swing.JButton jbOpenRecord;
+    private javax.swing.JButton jbOpenRecord1;
     private javax.swing.JButton jbRecord;
     private javax.swing.JButton jbRejectWeek;
     private javax.swing.JButton jbReverseAccounting;
@@ -1208,13 +1222,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     jtfRecordPeriod.setText(oProcurement.moRecord.getRecordPeriod());
                     jtfRecordbranch.setText(oProcurement.moRecord.getDbmsCompanyBranchCode());
                     jtfRecordCostCenter.setText(oProcurement.moRecord.getDbmsBookkeepingCenterCode());
-                    jbOpenRecord.setEnabled(true);
+                    jbOpenRecord1.setEnabled(true);
                 } else {
                     jtfFolioRecord.setText("");
                     jtfRecordPeriod.setText("");
                     jtfRecordbranch.setText("");
                     jtfRecordCostCenter.setText("");
-                    jbOpenRecord.setEnabled(false);
+                    jbOpenRecord1.setEnabled(false);
                 }
             }
         }
@@ -1284,7 +1298,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jtfRecordPeriod.setText("");
         jtfRecordbranch.setText("");
         jtfRecordCostCenter.setText("");
-        jbOpenRecord.setEnabled(false);
+        jbOpenRecord1.setEnabled(false);
 
         jcbMonths.setSelectedIndex(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1] - 1);
         moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
@@ -1308,7 +1322,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbToAccount.addActionListener(this);
         jbReverseAccounting.addActionListener(this);
         jbRejectWeek.addActionListener(this);
-        jbOpenRecord.addActionListener(this);
+        jbOpenRecord1.addActionListener(this);
     }
 
     @Override
@@ -1322,7 +1336,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
         jbToAccount.removeActionListener(this);
         jbReverseAccounting.removeActionListener(this);
         jbRejectWeek.removeActionListener(this);
-        jbOpenRecord.removeActionListener(this);
+        jbOpenRecord1.removeActionListener(this);
     }
 
     @Override
@@ -1347,6 +1361,11 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
 
     @Override
     public void windowClosed() {
+        try {
+            releaseAllRecordLocks();
+        } catch (Exception ex) {
+            Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
+        }
         super.windowClosed();
     }
 
@@ -1385,7 +1404,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             else if (button == jbRejectWeek) {
                 actionRejectWeek();
             }
-            else if (button == jbOpenRecord) {
+            else if (button == jbOpenRecord1) {
                 openRecord();
             }
         }
@@ -1606,9 +1625,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     ArrayList<SImportWeekMovProcurementFacility> counterpart = genereateCounterpart(oBatchWeekMovProcurementFacility, maWeekMovProcurementFacility);
                     maWeekMovProcurementFacility.addAll(counterpart);
                     
-//                    ArrayList<SImportWeekMovProcurementFacility> taxes = genereateTaxes(maWeekMovProcurementFacility);
-//                    maWeekMovProcurementFacility.addAll(taxes);
-                    
                     oBatchWeekMovProcurementFacility.setMaWeekMovProcurementFacility(maWeekMovProcurementFacility);
                     maBatchWeekMovProcurementFacility.add(oBatchWeekMovProcurementFacility);
                 }
@@ -1632,12 +1648,31 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
      * @param accounting_type_id
      * @param action
      */
-    private void processPostToggleAccounting(int facilityWeekId, int accounting_type_id, boolean action) throws Exception {
+    private void processPostToggleAccounting(int facilityWeekId, int accounting_type_id, boolean action, ArrayList<SImportWeekMovProcurementFacility> arrWeekMov) throws Exception {
         int company_id = miClient.getSession().getConfigCompany().getCompanyId();
 
         try {
             // Iniciar el progreso
             startProgress();
+            
+            int[] idsUnicos = arrWeekMov.stream()
+                                .map(SImportWeekMovProcurementFacility::getId)
+                                .filter(id -> id != null && id != 0)
+                                .distinct()
+                                .mapToInt(Integer::intValue)
+                                .toArray();
+            
+            
+            String movements = ", \"movements\": [";
+
+            for (int i = 0; i < idsUnicos.length; i++) {
+                if (i > 0) {
+                    movements += ", ";
+                }
+                movements += "{ \"id\": " + idsUnicos[i] + ", \"status\": " + (action ? 2 : 3) + " }";
+            }
+
+            movements += " ]";
 
             // Construir el JSON de manera más eficiente
             StringBuilder jsonBody = new StringBuilder("");
@@ -1649,6 +1684,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                         .append("\"company_erp_id\": ").append(company_id).append(",")
                         .append("\"action\": ").append( action ? 1 : 0 ).append(",")
                         .append("\"accounting_type_id\": ").append(accounting_type_id)
+                        .append(movements)
                     .append("}");
 
             // Hacer la petición HTTP
@@ -1725,8 +1761,13 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 moFinRecordEntry.IsReferenceTax = false;
                 
                 if (otWeekProcurementFacility.ItemPurchaseExpense != null) {
-                    moFinRecordEntry.ItemKey = otWeekProcurementFacility.ItemPurchaseExpense != null ? otWeekProcurementFacility.ItemPurchaseExpense.Id : 0;
-                    moFinRecordEntry.ItemAuxKey = otWeekProcurementFacility.ItemAuxPurchaseExpense != null ? otWeekProcurementFacility.ItemAuxPurchaseExpense.Id : 0;
+                    if (otWeekProcurementFacility.ItemPurchaseExpense.Id != 0) {
+                        moFinRecordEntry.ItemKey = otWeekProcurementFacility.ItemPurchaseExpense != null ? otWeekProcurementFacility.ItemPurchaseExpense.Id : 0;
+                        moFinRecordEntry.ItemAuxKey = otWeekProcurementFacility.ItemAuxPurchaseExpense != null ? otWeekProcurementFacility.ItemAuxPurchaseExpense.Id : 0;
+                    } else {
+                        moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item != null ? otWeekProcurementFacility.Item.Id : 0;
+                        moFinRecordEntry.ItemAuxKey = 0;
+                    }
                 } else {
                     moFinRecordEntry.ItemKey = otWeekProcurementFacility.Item != null ? otWeekProcurementFacility.Item.Id : 0;
                     moFinRecordEntry.ItemAuxKey = 0;
@@ -1813,7 +1854,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                     oFacilityRec.setMnAccountingTypeId(oFacility.accountingTypeId);
                     oFacilityRec.save(con);
                     
-//                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, oFacility.accountingTypeId, true);
+                    processPostToggleAccounting(oFacility.FacilitySeasonWeekId, oFacility.accountingTypeId, true, arrWeekMov);
                 }
             }
             
@@ -1830,7 +1871,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
      * @param initPercentaje 
      */
     private boolean reverseAccounting(final SProgressCallback callback, int percentaje, int initPercentaje) throws SQLException {
-        arrfacilities = new ArrayList<>();
         arrDataFacilityRec = new ArrayList<>();
         mbCanToAccount = true;
         msErrorMessageToAccount = "";
@@ -1895,7 +1935,17 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                 oDataFacilityRec.delete(con);
                 
                 try {
-                    processPostToggleAccounting(ProcurementFacility.FacilitySeasonWeekId, ProcurementFacility.accountingTypeId, false);
+                    Optional<SImportedBatchWeekMovProcurementFacility> optionalFacility = maBatchWeekMovProcurementFacility.stream()
+                            .filter(obj ->
+                                    obj.getMnFacilitySeasonWeekId() == ProcurementFacility.FacilitySeasonWeekId
+                            )
+                            .findFirst();
+                    
+                    if (optionalFacility.isPresent()) {
+                        SImportedBatchWeekMovProcurementFacility oFacility = optionalFacility.get();
+                        processPostToggleAccounting(ProcurementFacility.FacilitySeasonWeekId, ProcurementFacility.accountingTypeId, false, oFacility.getMaWeekMovProcurementFacility());
+                    }
+                    
                 } catch (Exception ex) {
                     Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1920,15 +1970,56 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
     private void actionReverseAccounting() {
         try {
             jbReverseAccounting.setEnabled(false);
+            arrfacilities = new ArrayList<>();
+            msErrorMessageToAccount = "";
+            mbCanToAccount = true;
+            
+            int countFacility = 0;
+            
+            for (int i = 0; i < maImportedDocuments.size(); i++) {
+                SImportProcurementFacility ProcurementFacility = maImportedDocuments.get(i);
+                if(ProcurementFacility.ToAccount){
+                    countFacility += 1;
+                    if (ProcurementFacility.isAccountedFor) {
+                        arrfacilities.add(ProcurementFacility);
+                    } else {
+                        mbCanToAccount = false;
+                        if (countFacility <= 10) {
+                            msErrorMessageToAccount += "La Semana: " 
+                                    + ProcurementFacility.WeekMonthNumber 
+                                    + " de la bodega: " + ProcurementFacility.ProcurementFacilityName
+                                    + " no ha sido contabilizada." + "\n";
+                            jbReverseAccounting.setEnabled(true);
+                        }
+                    }
+                }
+            }
+            
+            if (countFacility < 1) {
+                miClient.showMsgBoxWarning("Seleccione al menos una semana para descontabilizar.");
+                jbReverseAccounting.setEnabled(true);
+                return;
+            }
+            
+            if (!mbCanToAccount) {
+                miClient.showMsgBoxWarning(msErrorMessageToAccount);
+                jbReverseAccounting.setEnabled(true);
+                return;
+            }
+
             initProgress();
 
             SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    processGetMovements(progress -> {
+                        publish(progress);
+                    }, 50, 0);
+                    
                     reverseAccounting(progress -> {
-                            publish(progress);
-                        }, 100, 0);
+                        publish(progress);
+                    }, 100, 0);
                     
                     return null;
                 }
@@ -1947,7 +2038,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                         jbReverseAccounting.setEnabled(true);
                         SwingUtilities.invokeLater(() -> {
                             try {
-//                                moImportationsGrid.renderGridRows();
                                 actionShowWeeks();
                             } catch (Exception e) {
                                 handleShowException(e);
@@ -1974,6 +2064,7 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
             msErrorMessageToAccount = "";
         } catch (Exception e) {
             jbReverseAccounting.setEnabled(true);
+            Logger.getLogger(SDialogImportProcurementFacility.class.getName()).log(Level.SEVERE, null, e);
             handleShowException(e);
         }
     }
@@ -2077,7 +2168,6 @@ public class SDialogImportProcurementFacility extends SBeanFormDialog implements
                         SwingUtilities.invokeLater(() -> {
                             jbToAccount.setEnabled(true);
                             try {
-//                                moImportationsGrid.renderGridRows();
                                 actionShowWeeks();
                             } catch (Exception e) {
                                 handleShowException(e);
