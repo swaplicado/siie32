@@ -2202,6 +2202,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jtfInsurance.setEnabled(isCustomer);
             jckInsuranceInProcess.setEnabled(isCustomer);
             
+            jlCfdiPaymentWay.setEnabled(false);
+            jcbCfdiPaymentWay.setEnabled(false);
+            jbEditCfdiPaymentWay.setEnabled(true);
+            jlCfdiCfdiUsage.setEnabled(false);
+            jcbCfdiCfdiUsage.setEnabled(false);
+            jbEditCfdiCfdiUsage.setEnabled(true);
             jlTaxRegime.setEnabled(true);
             jcbTaxRegime.setEnabled(true);
             jlFkCfdAddendaTypeId.setEnabled(isCustomer);
@@ -2216,6 +2222,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             jbAddBranch.setEnabled(true);
         }
         else {
+            boolean isCompany = isCompany();
+            
             jlNumberExporter.setEnabled(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO);
             jtfNumberExporter.setEnabled(mnParamBizPartnerTypeX == SDataConstants.BPSX_BP_CO);
             jckIsCreditByUser.setEnabled(false);
@@ -2239,10 +2247,12 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
             
             jlCfdiPaymentWay.setEnabled(false);
             jcbCfdiPaymentWay.setEnabled(false);
+            jbEditCfdiPaymentWay.setEnabled(isCompany);
             jlCfdiCfdiUsage.setEnabled(false);
             jcbCfdiCfdiUsage.setEnabled(false);
-            jlTaxRegime.setEnabled(false);
-            jcbTaxRegime.setEnabled(false);
+            jbEditCfdiCfdiUsage.setEnabled(isCompany);
+            jlTaxRegime.setEnabled(isCompany);
+            jcbTaxRegime.setEnabled(isCompany);
             jlFkCfdAddendaTypeId.setEnabled(false);
             jcbFkCfdAddendaTypeId.setEnabled(false);
             jlFkUserAnalystId.setEnabled(false);
@@ -3226,6 +3236,16 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jtfBizPartner);
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartner.getText() + "'.");
             }
+            else if (applyOrgNamesPolicy() && moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG && jtfBizPartnerFiscal.getText().isEmpty()) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfBizPartnerFiscal);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlBizPartnerFiscal.getText() + "'.");
+            }
+            else if (applyOrgNamesPolicy() && moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG && jtfBizPartnerCapitalRegime.getText().isEmpty()) {
+                validation.setTabbedPaneIndex(TAB_MAIN);
+                validation.setComponent(jtfBizPartnerCapitalRegime);
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jtfBizPartnerCapitalRegime.getToolTipText() + "'.");
+            }
             else if (fiscalId.isEmpty()) {
                 validation.setTabbedPaneIndex(TAB_MAIN);
                 validation.setComponent(jtfFiscalId);
@@ -3371,34 +3391,53 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
                     }
                 }
                 
-                if (!validation.getIsError() && isForeign) {
-                    if (jcbCfdiPaymentWay.getSelectedIndex() > 0) {
-                        validation.setComponent(jcbCfdiPaymentWay);
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiPaymentWay.getText() + "'");
-                    }
-                    else if (jcbCfdiCfdiUsage.getSelectedIndex() > 0) {
-                        validation.setComponent(jcbCfdiCfdiUsage);
-                        validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiCfdiUsage.getText() + "'");
-                    }
-                    else if (!((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros) && 
-                            !((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalSinObligacionesFiscales)) {
-                        validation.setComponent(jcbTaxRegime);
-                        validation.setMessage("El valor para el campo '" + jlTaxRegime.getText() + "' debe ser " +
-                                DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros + " o " + DCfdi40Catalogs.ClaveRégimenFiscalSinObligacionesFiscales + " para asociados de negocio extranjeros.");
-                    }
-                }
-                
-                if (!validation.getIsError() && !isForeign) {
-                    if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
-                        if (!moXmlCatalogs.getEntryIsTaxpayerPerson(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, (String) moFieldTaxRegime.getKey())){
+                if (!validation.getIsError()) {
+                    if (isSupplier() || isCustomer() || isCompany()) {
+                        // check tax regime, payment way and CFDI usage:
+
+                        validation.setTabbedPaneIndex(TAB_ADIT);
+
+                        if (jcbTaxRegime.getSelectedIndex() <= 0) {
                             validation.setComponent(jcbTaxRegime);
-                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlTaxRegime.getText() + "', ya que el valor seleccionado no corresponde a una persona fisica.");
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlTaxRegime.getText() + "'.");
                         }
-                    }
-                    else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG) {
-                        if (!moXmlCatalogs.getEntryIsTaxpayerOrganization(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, (String) moFieldTaxRegime.getKey())){
-                            validation.setComponent(jcbTaxRegime);
-                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlTaxRegime.getText() + "', ya que el valor seleccionado no corresponde a una persona moral.");
+                        else {
+                            if (!isForeign) {
+                                if (jcbCfdiPaymentWay.getSelectedIndex() <= 0 && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlCfdiPaymentWay.getText() + "'?") != JOptionPane.YES_OPTION) {
+                                    validation.setComponent(jcbCfdiPaymentWay.isEnabled() ? jcbCfdiPaymentWay : jbEditCfdiPaymentWay);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiPaymentWay.getText() + "'.");
+                                }
+                                else if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0 && miClient.showMsgBoxConfirm("¿Está seguro que desea dejar sin valor al campo '" + jlCfdiCfdiUsage.getText() + "'?") != JOptionPane.YES_OPTION) {
+                                    validation.setComponent(jcbCfdiCfdiUsage.isEnabled() ? jcbCfdiCfdiUsage : jbEditCfdiCfdiUsage);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdiCfdiUsage.getText() + "'.");
+                                }
+                                else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER &&
+                                        !moXmlCatalogs.getEntryIsTaxpayerPerson(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, (String) moFieldTaxRegime.getKey())) {
+                                    validation.setComponent(jcbTaxRegime);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlTaxRegime.getText() + "', ya que el valor seleccionado no corresponde a una persona física.");
+                                }
+                                else if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_ORG &&
+                                        !moXmlCatalogs.getEntryIsTaxpayerOrganization(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, (String) moFieldTaxRegime.getKey())) {
+                                    validation.setComponent(jcbTaxRegime);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlTaxRegime.getText() + "', ya que el valor seleccionado no corresponde a una persona moral.");
+                                }
+                            }
+                            else {
+                                if (jcbCfdiPaymentWay.getSelectedIndex() > 0) {
+                                    validation.setComponent(jcbCfdiPaymentWay.isEnabled() ? jcbCfdiPaymentWay : jbEditCfdiPaymentWay);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiPaymentWay.getText() + "'.");
+                                }
+                                else if (jcbCfdiCfdiUsage.getSelectedIndex() > 0) {
+                                    validation.setComponent(jcbCfdiCfdiUsage.isEnabled() ? jcbCfdiCfdiUsage : jbEditCfdiCfdiUsage);
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlCfdiCfdiUsage.getText() + "'.");
+                                }
+                                else if (!((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros) && 
+                                        !((String) moFieldTaxRegime.getKey()).equals(DCfdi40Catalogs.ClaveRégimenFiscalSinObligacionesFiscales)) {
+                                    validation.setComponent(jcbTaxRegime);
+                                    validation.setMessage("El valor para el campo '" + jlTaxRegime.getText() + "' debe ser " +
+                                            DCfdi40Catalogs.ClaveRégimenFiscalResidentesExtranjeros + " o " + DCfdi40Catalogs.ClaveRégimenFiscalSinObligacionesFiscales + " para asociados de negocio extranjeros.");
+                                }
+                            }
                         }
                     }
                 }
