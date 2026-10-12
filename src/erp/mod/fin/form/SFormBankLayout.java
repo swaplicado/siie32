@@ -2104,18 +2104,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void updateAllLayoutBankRowsFromGridRows() {
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
             SLayoutBankRow layoutBankRow = (SLayoutBankRow) gridRow;
-            
             ArrayList<SDataBizPartnerBranchBankAccount> accounts = layoutBankRow.getBranchBankAccountCredits();
+            
             for (SDataBizPartnerBranchBankAccount account : accounts) {
                 if (!layoutBankRow.getBeneficiaryAccountNumber().isEmpty() && (
                         layoutBankRow.getBeneficiaryAccountNumber().equals(account.getBankAccountNumber()) || 
                         layoutBankRow.getBeneficiaryAccountNumber().equals(account.getBankAccountNumberStd()))) {
-                    layoutBankRow.setBankAccPk(new int[] {account.getPkBizPartnerBranchId(), account.getPkBankAccountId()});
+                    layoutBankRow.setBankAccPk(new int[] { account.getPkBizPartnerBranchId(), account.getPkBankAccountId() });
                     break;
                 }
                 else if (!layoutBankRow.getAgreement().isEmpty() && (
                         layoutBankRow.getAgreement().equals(account.getAgree()))) {
-                    layoutBankRow.setBankAccPk(new int[] {account.getPkBizPartnerBranchId(), account.getPkBankAccountId()});
+                    layoutBankRow.setBankAccPk(new int[] { account.getPkBizPartnerBranchId(), account.getPkBankAccountId() });
                 }
             }
             
