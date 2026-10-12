@@ -464,7 +464,6 @@ public class SDbStockValuationKardex extends SDbRegistryUser implements Serializ
             mdTotalIn = resultSet.getDouble("total_in");
             mdTotalInCurrency = resultSet.getDouble("total_in_cur");
             mdExchangeRate = resultSet.getDouble("exc_rate");
-//            msAdjustStatus = resultSet.getString("adj_st");
             mbSystem = resultSet.getBoolean("b_sys");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkDiogCategoryId = resultSet.getInt("fk_ct_iog");
@@ -516,7 +515,19 @@ public class SDbStockValuationKardex extends SDbRegistryUser implements Serializ
             
             mbRegistryNew = false;
         }
-        
+
+        mlNotes = new ArrayList<>();
+        String sqlNotes = "SELECT * "
+                + "FROM trn_stk_val_kardex_nts "
+                + "WHERE fk_stk_val_kardex = " + mnPkStockValuationKardexId + " "
+                + "AND b_del = 0 "
+                + "ORDER BY id_stk_val_kardex_nts ASC ";
+        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sqlNotes);
+        while (resultSet.next()) {
+            SDbStockValuationKardexNote note = new SDbStockValuationKardexNote();
+            note.read(session, new int[] { resultSet.getInt("id_stk_val_kardex_nts") });
+            mlNotes.add(note);
+        }
         mnQueryResultId = SDbConsts.READ_OK;
     }
 

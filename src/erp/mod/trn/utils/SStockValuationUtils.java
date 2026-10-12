@@ -1301,7 +1301,7 @@ public abstract class SStockValuationUtils {
                 + "WHERE "
                 + "    NOT v.b_del AND NOT vm.b_del "
                 + "    AND v.id_stk_val = " + idValuation + " "
-                + "    AND (dps.ts_edit > v.ts_usr_upd OR dpse.ts_edit > v.ts_usr_upd);";
+                + "    AND (dps.ts_edit >= v.ts_usr_upd OR dpse.ts_edit >= v.ts_usr_upd);";
         ArrayList<SDataDps> lDps = new ArrayList<>();
         try (Statement st = session.getStatement().getConnection().createStatement()) {
             ResultSet res = st.executeQuery(sql);

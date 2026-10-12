@@ -7,9 +7,9 @@ package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationAdjustsUtils;
 import erp.mod.trn.utils.SStockValuationKardexAdjustUtils;
 import erp.mod.trn.utils.SStockValuationKardexCore;
-import erp.mod.trn.utils.SStockValuationAdjustsUtils;
 import erp.mod.trn.utils.SStockValuationLogUtils;
 import erp.mod.trn.utils.SStockValuationRecordUtils;
 import erp.mod.trn.utils.SStockValuationUpdateStkUtils;
@@ -343,7 +343,7 @@ public class SDbStockValuation extends SDbRegistryUser {
                  * kardex
                  */
 //                String fechaStr = "01/03/2024";
-//                String fechaFin = "31/07/2026";
+//                String fechaFin = "31/08/2026";
 //                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 //                Date inicio = sdf.parse(fechaStr);
 //                Date fin = sdf.parse(fechaFin);

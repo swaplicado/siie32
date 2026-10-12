@@ -8,10 +8,11 @@ package erp.mod.trn.utils;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockKardexEntry;
 import erp.mod.trn.db.SDbStockValuationKardex;
+import erp.mod.trn.db.SDbStockValuationKardexNote;
 import erp.mod.trn.db.SDbStockValuationMvt;
+import erp.mod.trn.db.SDbStockValuationMvtNote;
 import erp.mod.trn.db.SRowKardexRemaining;
 import erp.mod.trn.db.SStockValuationConfiguration;
-import erp.mod.trn.utils.SStockValuationUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -449,6 +450,13 @@ public abstract class SStockValuationKardexCore {
                         if (res.getInt("fid_mat_req_n") > 0) {
                             oConsumption.setFkMaterialRequestId_n(oKardexOut.getFkMatRequestId_n());
                             oConsumption.setFkMaterialRequestEntryId_n(oKardexOut.getFkMatRequestEntryId_n());
+                        }
+
+                        // Agregar las notas del kardex al consumo:
+                        for (SDbStockValuationKardexNote oNote : oKardexOut.getNotes()) {
+                            SDbStockValuationMvtNote oMvtNote = new SDbStockValuationMvtNote();
+                            oMvtNote.setNotes(oNote.getNotes());
+                            oConsumption.getNotes().add(oMvtNote);
                         }
 
                         lConsumptions.add(oConsumption);
