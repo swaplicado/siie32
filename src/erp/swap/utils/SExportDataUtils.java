@@ -1753,7 +1753,7 @@ public abstract class SExportDataUtils {
      * @return Lista de referencias de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    public static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExport(final SGuiSession session, final int idYear, final int idDoc) throws SQLException, Exception {
+    private static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExport(final SGuiSession session, final int idYear, final int idDoc) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
         boolean specificDocument = idYear > 0 && idDoc > 0;
 
