@@ -8,6 +8,7 @@ package erp.mod.trn.db;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.utils.SStockValuationAdjustsUtils;
+import erp.mod.trn.utils.SStockValuationEvidenceUtils;
 import erp.mod.trn.utils.SStockValuationKardexAdjustUtils;
 import erp.mod.trn.utils.SStockValuationKardexCore;
 import erp.mod.trn.utils.SStockValuationLogUtils;
@@ -287,6 +288,7 @@ public class SDbStockValuation extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
+        SStockValuationVerify.VerificationResult verificationResult = null;
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -401,7 +403,8 @@ public class SDbStockValuation extends SDbRegistryUser {
                 SStockValuationRecordUtils.makeRecordEntriesFromConsumptions(session, moAuxRecordPk, mtDateStart, lConsumptions);
 
                 System.out.println("Validando...");
-                String sErrors = SStockValuationVerify.verifyStockValuation(session);
+                verificationResult = SStockValuationVerify.verifyStockValuationWithEvidence(session);
+                String sErrors = verificationResult.getErrors();
                 if (!sErrors.isEmpty()) {
                     throw new Exception("No se pudo completar el proceso.\n"
                             + "Se encontraron errores en la valuación de inventarios:\n" + sErrors);
@@ -438,6 +441,18 @@ public class SDbStockValuation extends SDbRegistryUser {
         finally {
             if (autoCommit) {
                 session.getStatement().getConnection().setAutoCommit(true);
+            }
+        }
+
+        if (verificationResult != null) {
+            try {
+                SStockValuationEvidenceUtils.save(session, verificationResult, mtDateStart, mtDateEnd);
+            }
+            catch (Exception ex) {
+                Logger.getLogger(SDbStockValuation.class.getName()).log(Level.SEVERE,
+                        "La valuación terminó, pero no se pudo guardar toda la evidencia en logs/valuation.", ex);
+                session.getClient().showMsgBoxError("La valuación se completó, pero no se pudo guardar toda la evidencia en logs/valuation:\n"
+                        + ex.getMessage());
             }
         }
 
