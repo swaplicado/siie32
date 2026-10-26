@@ -2007,6 +2007,7 @@ public abstract class SExportDataUtils {
                     reference.owner_id = resultSet.getInt("fid_usr_new");
                     reference.is_deleted = resultSet.getBoolean("b_del")
                             || resultSet.getInt("fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED
+                            || resultSet.getInt("fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT
                             || !resultSet.getBoolean("b_authorn")
                             || resultSet.getBoolean("b_link");
                     reference.auth_comments = resultSet.getString("authz_nts");
