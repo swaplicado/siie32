@@ -6,6 +6,7 @@
 package erp.mod.fin.db;
 
 import erp.mod.SModSysConsts;
+import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
@@ -45,6 +46,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
     protected SLayoutBankPayment moLayoutBankPayment;
     protected SLayoutBankRecordKey moLayoutBankRecordKey;
     protected SLayoutBankRecordKey moLayoutBankRecordKeyOld;
+    protected ArrayList<Integer> maPaymentIds;
 
     public SLayoutBankPaymentRow(SGuiClient client) {
         miClient = client;
@@ -79,6 +81,7 @@ public class SLayoutBankPaymentRow implements SGridRow {
         moLayoutBankPayment = null;
         moLayoutBankRecordKey = null;
         moLayoutBankRecordKeyOld = null;
+        maPaymentIds = new ArrayList<>();
     }
     
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
@@ -136,6 +139,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public SLayoutBankPayment getLayoutBankPayment() { return moLayoutBankPayment; }
     public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
     public SLayoutBankRecordKey getLayoutBankRecordKeyOld() { return moLayoutBankRecordKeyOld; }
+    public ArrayList<Integer> getPaymentIds() { return maPaymentIds; }
+    public void setPaymentIds(ArrayList<Integer> ids) { maPaymentIds = ids; }
+    public void addPaymentId(int id) { maPaymentIds.add(id); }
 
     public void setPrimaryKey(int[] pk) {
         mnBizPartnerId = pk[0];
@@ -293,6 +299,9 @@ public class SLayoutBankPaymentRow implements SGridRow {
         
         if (this.getLayoutBankRecordKeyOld() != null) {
             clone.setLayoutBankRecordKeyOld(this.getLayoutBankRecordKeyOld().clone());
+        }
+        if (this.getPaymentIds() != null) {
+            clone.getPaymentIds().addAll(this.getPaymentIds());
         }
         
         return clone;

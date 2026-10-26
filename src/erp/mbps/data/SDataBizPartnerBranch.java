@@ -81,7 +81,6 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
-
     
     public int getPkBizPartnerBranchId() { return mnPkBizPartnerBranchId; }
     public java.lang.String getBizPartnerBranch() { return msBizPartnerBranch; }

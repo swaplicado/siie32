@@ -289,7 +289,7 @@ public abstract class SDataReadDescriptions {
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "dps_nat") + " AS descrip FROM erp.trnu_dps_nat WHERE id_dps_nat = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.TRN_DPS:
-                sql = "SELECT CONCAT(td.code, ' ', CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip FROM trn_dps AS d INNER JOIN erp.TRNU_TP_DPS AS td ON d.fid_ct_dps = td.id_ct_dps " +
+                sql = "SELECT CONCAT(td.code, ' ', CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip FROM trn_dps AS d INNER JOIN erp.trnu_tp_dps AS td ON d.fid_ct_dps = td.id_ct_dps " +
                        "AND d.fid_cl_dps = td.id_cl_dps AND d.fid_tp_dps = td.id_tp_dps WHERE id_year = " + ((int[]) pk)[0] +" AND id_doc = " + ((int[]) pk)[1] + " ";
                 break;    
             case SDataConstants.TRN_DPS_ADD:

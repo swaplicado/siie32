@@ -1,16 +1,18 @@
 package erp.mod.cfg.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.cfg.db.SDbAuthorizationStep;
-import erp.mod.cfg.swap.SHttpConsts;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.model.FlowResponse;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SServicesUtils;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.model.FlowResponse;
+import erp.swap.utils.SAuthzUtils;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SServicesUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -107,13 +109,22 @@ public class SAuthDBUtils {
      */
     public static void refreshAuthMsAuthData(SGuiSession session, final String query, final boolean isYear) {
         try {
-            List<String> resourceIds = extractResourceIds(session, query);
-            if (resourceIds.isEmpty()) {
+            List<DocPkStatus> lResources = extractResourceIds(session, query);
+            if (lResources.isEmpty()) {
                 return;
             }
 
-            String cacheKey = session.getConfigCompany().getCompanyId() + "_auth_" 
-                    + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + "_" + String.join(",", resourceIds).hashCode();
+            List<String> resourceIdStrings = new ArrayList<>();
+            List<DocPkStatus> pendingResources = new ArrayList<>();
+            for (DocPkStatus oResource : lResources) {
+                resourceIdStrings.add(oResource.getStringPk());
+                if (oResource.trnAuthStatus == SAuthorizationUtils.AUTH_STATUS_SENDING) {
+                    pendingResources.add(oResource);
+                }
+            }
+
+            String cacheKey = session.getConfigCompany().getCompanyId() + "_auth_"
+                    + SAuthorizationUtils.AUTH_TYPE_GOOGLE_DPS + "_" + String.join(",", resourceIdStrings).hashCode();
             CacheEntry cached = CACHE.get(cacheKey);
             
             if (cached != null && !cached.isExpired()) {
@@ -124,15 +135,20 @@ public class SAuthDBUtils {
                 return;
             }
 
-            JsonNode flowDetails = fetchFlowDetailsFromMsAuth(session, SSwapConsts.RESOURCE_TYPE_PUR_ORDER, resourceIds);
+            JsonNode flowDetails = fetchFlowDetailsFromMsAuth(session, SSwapConsts.RESOURCE_TYPE_PUR_ORDER, resourceIdStrings);
             if (flowDetails == null) {
                 return;
             }
 
             loadValidUserIds(session);
-            deleteAuthStepsByResources(session, resourceIds);
+            deleteAuthStepsByResources(session, resourceIdStrings);
             List<SDbAuthorizationStep> authSteps = parseAuthorizationSteps(flowDetails);
             insertAuthorizationSteps(session, authSteps);
+            for (DocPkStatus oResource : pendingResources) {
+                SAuthzUtils.forceCheckAuthStatus(session,
+                        SSwapConsts.RESOURCE_TYPE_PUR_ORDER,
+                        oResource.getArrayPk());
+            }
             CACHE.put(cacheKey, new CacheEntry(flowDetails));
         }
         catch (Exception ex) {
@@ -169,14 +185,14 @@ public class SAuthDBUtils {
      * @param query Consulta SQL que contiene los documentos
      * @return Lista de IDs de recursos en formato "año_documento"
      */
-    private static List<String> extractResourceIds(SGuiSession session, String query) {
-        List<String> resourceIds = new ArrayList<>();
-        String sql = "SELECT d.id_year, d.id_doc " + query.substring(query.toLowerCase().indexOf("from trn_dps as d"));
+    private static List<DocPkStatus> extractResourceIds(SGuiSession session, String query) {
+        List<DocPkStatus> resourceIds = new ArrayList<>();
+        String sql = "SELECT d.id_year, d.id_doc, ah.fid_st_authorn " + query.substring(query.toLowerCase().indexOf("from trn_dps as d"));
 
         try (Statement stmt = session.getStatement().getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                resourceIds.add(rs.getInt("id_year") + "_" + rs.getInt("id_doc"));
+                resourceIds.add(new DocPkStatus(rs.getInt("id_year"), rs.getInt("id_doc"), rs.getInt("fid_st_authorn")));
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al extraer IDs de recursos", e);
@@ -252,6 +268,47 @@ public class SAuthDBUtils {
         FlowResponse oFlow = mapper.treeToValue(responseJson.get("flow"), FlowResponse.class);
 
         return oFlow;
+    }
+
+    public static JsonNode getResourceManagmentData(SGuiSession session, 
+                                                        final int resourceTypeId, 
+                                                        final String idResource, 
+                                                        final int idCompany) throws JsonProcessingException, Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode config = mapper.readTree(SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_SERVICES_CONFIG));
+        String baseUrl = SAuthJsonUtils.getValueOfElementAsText(config, SSwapConsts.CFG_OBJ_TXN_SRV, SSwapConsts.CFG_ATT_URL);
+        String url = baseUrl + SServicesUtils.URL_GET_RESOURCE_MANAGMENT_DATA + "/";
+        SManagmentRequest request = new SManagmentRequest();
+        request.setIdExternalSystem(1);
+        request.setBHistory(1);
+        List<SManagmentRequestRow> lRows = new ArrayList<>();
+        SManagmentRequestRow oRow;
+        if (resourceTypeId != SSwapConsts.RESOURCE_TYPE_PUR_INVOICE) {
+            oRow = new SManagmentRequestRow("", idResource, idCompany, resourceTypeId);
+        }
+        else {
+            oRow = new SManagmentRequestRow(idResource, "", idCompany, resourceTypeId);
+        }
+        lRows.add(oRow);
+        request.setRows(lRows);
+        String requestBody = mapper.writeValueAsString(request);
+        String responseBody = SExportUtils.requestSwapService("", url, SHttpConsts.METHOD_POST, requestBody, "", "", SSwapConsts.TIME_30_SEC);
+        JsonNode responseJson = mapper.readTree(responseBody);
+        // La petición devuleve un array, se obtiene el primer elemento que corresponde al recurso solicitado
+        if (responseJson.isArray() && responseJson.size() > 0) {
+            responseJson = responseJson.get(0);
+        }
+        else {
+            LOGGER.log(Level.SEVERE, "Respuesta inesperada desde el servicio de gestión de autorizaciones: " + responseBody);
+            return null;
+        }
+
+        if (responseJson.has("error")) {
+            LOGGER.log(Level.SEVERE, "Error desde MS Auth: " + responseJson.get("error").asText());
+            return null;
+        }
+        
+        return responseJson;
     }
 
     /**
@@ -355,6 +412,26 @@ public class SAuthDBUtils {
         
         for (SDbAuthorizationStep authStep : authSteps) {
             authStep.save(session);
+        }
+    }
+    
+    private static class DocPkStatus {
+        int idYear;
+        int idDoc;
+        int trnAuthStatus;
+
+        public DocPkStatus(int idYear, int idDoc, int trnAuthStatus) {
+            this.idYear = idYear;
+            this.idDoc = idDoc;
+            this.trnAuthStatus = trnAuthStatus;
+        }
+        
+        public String getStringPk() {
+            return this.idYear + "_" + this.idDoc;
+        }
+        
+        public int[] getArrayPk() {
+            return new int[] {this.idYear, this.idDoc};
         }
     }
 }

@@ -141,8 +141,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
 
         col = 0;
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bkc.code", "Centro contable", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bkc.code", "Centro contable póliza", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cob.code", "Sucursal empresa póliza", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Número póliza", STableConstants.WIDTH_RECORD_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "r.dt", "Fecha póliza", STableConstants.WIDTH_DATE);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "r.concept", "Concepto póliza", 200);

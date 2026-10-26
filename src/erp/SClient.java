@@ -10,6 +10,7 @@ import cfd.DCfdConsts;
 import cfd.DCfdSignature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swaplicado.cloudstoragemanager.CloudStorageManager;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -56,7 +57,6 @@ import erp.mod.SModuleMkt;
 import erp.mod.SModuleQlt;
 import erp.mod.SModuleTrn;
 import erp.mod.SModuleUsr;
-import erp.mod.cfg.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthJsonUtils;
 import erp.mod.usr.db.SDbUserGui;
 import erp.mtrn.data.SCfdUtils;
@@ -66,6 +66,7 @@ import erp.server.SLoginRequest;
 import erp.server.SLoginResponse;
 import erp.server.SServerRemote;
 import erp.server.SSessionXXX;
+import erp.swap.SSwapConsts;
 import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
@@ -120,13 +121,13 @@ import sa.lib.xml.SXmlUtils;
  * Arguments:
  * dev | dev=1 - (Optional) Development mode enabled. To print to console control points to evaluate Client performance at start.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Edwin Carmona, Claudio Peña, Rodrigo Ayala, Sergio Flores
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores, Rodrigo Ayala, Edwin Carmona
  * @version 3.2
  */
 public class SClient extends JFrame implements SClientInterface, SGuiClient, ActionListener {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 297.2"; // release date: 2026-04-01
+    public static final String APP_RELEASE = "3.2 309.4"; // release date: 2026-10-22
 
     public static final String APP_COPYRIGHT = "2007-2026";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
@@ -773,7 +774,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         moIconDocType = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif"));
         moIconDocImport = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import.gif"));
         moIconDocImportCfd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"));
-        moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif"));
+        moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_dps.gif"));
         moIconDocImportMatReq = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_mat_req.gif"));
         moIconDocOpen = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif"));
         moIconDocClose = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif"));
@@ -1444,8 +1445,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             showMsgBoxWarning(SLibConstants.MSG_ERR_LOGIN_USR_CO);
                             break;
                         case SLibConstants.LOGIN_OK:
-                            // login concedido
-                            // IMPORTANTE: ¡Favor de no cambiar el orden de las instrucciones de esta sección!
+                            // IMPORTANTE: ¡No cambiar el orden de las instrucciones de esta sección!
                             
                             markDevControlPoint("Creating session...");
                     
@@ -1456,6 +1456,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
                             prepareGui();
                             createSession();
                             retrieveSwapServicesSettings();
+                            initCloudStorageManager(); 
                             SCfdUtils.resetDataSetForPayroll();
 
                             boolean actionOk = actionFileSession(true);
@@ -1859,6 +1860,29 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
         }
         catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+        }
+    }
+
+    /**
+     * Initialize Google Cloud Storage Manager.
+     * NOTICE: SWAP Services Settings must have been already retrieved!
+     */
+    private void initCloudStorageManager() {
+        if (mbSwapServicesLinkUp) {
+            try {
+                String config = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CONFIG);
+
+                if (!config.isEmpty()) {
+                    String credentials = SCfgUtils.getParamValue(moSession.getStatement(), SDataConstantsSys.CFG_PARAM_GCS_CREDENTIALS);
+
+                    if (!credentials.isEmpty()) {
+                        CloudStorageManager.setCredentialsAndConfigJson(config, credentials);
+                    }
+                }
+            }
+            catch (Exception e) {
+                Logger.getLogger(getClass().getName()).log(Level.WARNING, null, e);
+            }
         }
     }
     
@@ -2282,7 +2306,7 @@ public class SClient extends JFrame implements SClientInterface, SGuiClient, Act
             case SLibConstants.ICON_DOC_IMPORT_CFD:
                 imageIcon = moIconDocImportCfd;
                 break;
-            case SLibConstants.ICON_DOC_IMPORT_CFD_ORD:
+            case SLibConstants.ICON_DOC_IMPORT_CFD_DPS:
                 imageIcon = moIconDocImportCfdOrd;
                 break;
             case SLibConstants.ICON_DOC_IMPORT_MAT_REQ:

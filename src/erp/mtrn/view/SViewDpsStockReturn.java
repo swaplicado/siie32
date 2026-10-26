@@ -19,6 +19,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.table.SFilterConstants;
@@ -39,7 +40,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -56,6 +57,8 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
+    private final boolean mbWithoutFunctionalArea;
+    private int mnRealTabTypeAux02;
     /**
      * @param client Client interface.
      * @param tabTitle View tab title.
@@ -65,6 +68,8 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
      */
     public SViewDpsStockReturn(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int auxType01, int auxType02) {
         super(client, tabTitle, tabType, auxType01, auxType02);
+        mnRealTabTypeAux02 = auxType02;
+        mbWithoutFunctionalArea = auxType02 == SModConsts.TRNX_MAT_FUN_ARE_ALL;
         initComponents();
     }
 
@@ -134,8 +139,9 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterDocumentType = new STabFilterDocumentType(miClient, this, SDataConstants.TRNU_TP_DPS, new int[] { mnTabTypeAux01, mnTabTypeAux02 });
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
-
+        if (mbWithoutFunctionalArea) {
+            moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        }
         if (isViewForPurchases()) {
             levelRightAllDocs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
             levelRightDocTransaction = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_PUR).Level;
@@ -164,7 +170,9 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentType);
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        if (mbWithoutFunctionalArea ) {
+            addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        }
 
         mjbReturn.setEnabled(isViewForReturn() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         mjbClose.setEnabled(isViewForReturn() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -422,10 +430,11 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
                 sqlFilter += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (!((String) setting.getSetting()).isEmpty()) {
+                if (mbWithoutFunctionalArea &&
+                        !((String) setting.getSetting()).isEmpty()) {
                     sqlFilter += (sqlFilter.length() == 0 ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
-            }
+            }      
         }
 
         if (isViewForPurchases()) {
@@ -506,7 +515,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND " +
                 "d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND " +
-                "d.fid_ct_dps = " + mnTabTypeAux01 + " AND d.fid_cl_dps = " + mnTabTypeAux02 + " " + sqlFilter +
+                "d.fid_ct_dps = " + mnTabTypeAux01 + " AND d.fid_cl_dps =  " + (mbWithoutFunctionalArea ? SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] : mnTabTypeAux02) + " " + sqlFilter +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +

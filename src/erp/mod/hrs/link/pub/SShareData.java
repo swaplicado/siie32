@@ -2,6 +2,9 @@ package erp.mod.hrs.link.pub;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.SModConsts;
+import erp.swap.SPublicInterface;
+import erp.swap.utils.SExportDataUser;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import erp.mod.hrs.link.utils.SPrepayroll;
@@ -156,6 +159,30 @@ public class SShareData {
             return SUtilsJSON.personalInfo(idEmp);
         } catch (IOException ex) {
             Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, (String)null, ex);
+        }
+    }
+    
+    public SWebDps getDpsByPk(Integer idYear, Integer idDoc, Integer idCompany, boolean withUrl, SGuiSession oSession) throws Exception {
+        if (this.oMysql == null && oSession == null) {
+            Logger.getLogger(SShareData.class.getName()).log(Level.SEVERE, "No existe la conexión a la base de datos al obtener un DPS");
+            throw new Exception("No existe la conexión a la base de datos al obtener un DPS");
+        }
+        SWebDps oWebDocument = new SWebDps(idCompany, idYear, idDoc);
+        STrnDBCore oTrnCore;
+        STrnDBDocuments oDocCore;
+        if (this.oMysql != null) {
+            oTrnCore = new STrnDBCore(this.oMysql, idCompany);
+            oDocCore = new STrnDBDocuments(this.oMysql, idCompany);
+        }
+        else {
+            oTrnCore = new STrnDBCore(oSession, idCompany);
+            oDocCore = new STrnDBDocuments(oSession, idCompany);
+        }
+        /**
+         * Se obtiene el DPS
+         */
+        SWebDpsRow oDps = oTrnCore.getDocumentByPk(idYear, idDoc);
+        if (oDps == null) {
             return null;
         } 
     }

@@ -18,7 +18,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDataDpsEntryQuantityChange extends SDataRegistry {
     

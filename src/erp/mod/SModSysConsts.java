@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores, Rodrigo Ayala
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Rodrigo Ayala, Sergio Flores, César Orozco
  */
 public abstract class SModSysConsts {
 
@@ -497,16 +497,18 @@ public abstract class SModSysConsts {
     public static final int FINS_FISCAL_ACC_NA = 1;
     public static final String FINS_FISCAL_ACC_NA_CODE = "0";
     public static final String FINS_FISCAL_ACC_NA_NAME = "(N/A)";
-    public static final int FINS_FISCAL_CUR_JPY_ID = 72;
-    public static final int FINS_FISCAL_CUR_EUR_ID = 48;
-    public static final int FINS_FISCAL_CUR_MXN_ID = 101;
-    public static final int FINS_FISCAL_CUR_USD_ID = 147;
-    public static final int FINS_FISCAL_CUR_XXX_ID = 172;
-    public static final String FINS_FISCAL_CUR_JPY_NAME = "JPY";
-    public static final String FINS_FISCAL_CUR_EUR_NAME = "EUR";
-    public static final String FINS_FISCAL_CUR_MXN_NAME = "MXN";
-    public static final String FINS_FISCAL_CUR_USD_NAME = "USD";
-    public static final String FINS_FISCAL_CUR_XXX_NAME = "XXX";
+    public static final int FINS_FISCAL_CUR_MXN_ID = 101; // Peso mexicano
+    public static final int FINS_FISCAL_CUR_USD_ID = 147; // Dólar estadounidense
+    public static final int FINS_FISCAL_CUR_EUR_ID = 48; // Euro
+    public static final int FINS_FISCAL_CUR_GBP_ID = 51; // Libra esterlina (libra de Gran Bretaña)
+    public static final int FINS_FISCAL_CUR_JPY_ID = 72; // Yen japonés
+    public static final int FINS_FISCAL_CUR_XXX_ID = 172; // Sin divisa
+    public static final String FINS_FISCAL_CUR_MXN = "MXN"; // Peso mexicano
+    public static final String FINS_FISCAL_CUR_USD = "USD"; // Dólar estadounidense
+    public static final String FINS_FISCAL_CUR_EUR = "EUR"; // Euro
+    public static final String FINS_FISCAL_CUR_GBP = "GBP"; // Libra esterlina (libra de Gran Bretaña)
+    public static final String FINS_FISCAL_CUR_JPY = "JPY"; // Yen japonés
+    public static final String FINS_FISCAL_CUR_XXX = "XXX"; // Sin divisa
     public static final int FINS_FISCAL_BANK_NA = 999;
     public static final int FINS_FISCAL_PAY_MET_NA = 98;
 
@@ -527,6 +529,12 @@ public abstract class SModSysConsts {
     public static final int FINS_CFD_TAX_ISR = 1;
     public static final int FINS_CFD_TAX_IVA = 2;
     public static final int FINS_CFD_TAX_IEPS = 3;
+    
+    public static final int FINS_CL_PAY_ND = 0;
+    public static final int FINS_CL_PAY_ASSET = 1;
+    public static final int FINS_CL_PAY_PURCHASE = 2;
+    public static final int FINS_CL_PAY_EXPENSE = 3;
+    public static final int FINS_CL_PAY_ADVANCE = 4;
     
     public static final int FINS_ST_PAY_NEW = 1; // nuevo
     public static final int FINS_ST_PAY_IN_AUTH = 2; // en autorización
@@ -961,6 +969,8 @@ public abstract class SModSysConsts {
 
     public static final int HRSS_TP_PAY_WEE = 1;    // Weekly 
     public static final int HRSS_TP_PAY_FOR = 2;    // Fortnightly 
+    
+    public static final int HRSS_WEEKLY_BONUS_WEEKS = 1; // Cuantas semanas para checar bonos de nóminas semanales
 
     public static final int HRSS_TP_PAY_SHT_NOR = 1;    // Normal
     public static final int HRSS_TP_PAY_SHT_SPE = 2;    // Special

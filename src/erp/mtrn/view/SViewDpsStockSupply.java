@@ -19,6 +19,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.table.SFilterConstants;
@@ -40,7 +41,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -57,6 +58,8 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
+    private final boolean mbWithoutFunctionalArea;
+    private int mnRealTabTypeAux02;
     /**
      * @param client Client interface.
      * @param tabTitle View tab title.
@@ -64,8 +67,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
      * @param auxType01 DPS category. Constats defined in SDataConstatsSys (TRNS_CL_DPS_...[0]).
      * @param auxType02 DPS class. Constats defined in SDataConstatsSys (TRNS_CT_DPS_...[1]).
      */
-    public SViewDpsStockSupply(erp.client.SClientInterface client, java.lang.String tabTitle, int tabType, int auxType01, int auxType02) {
+    public SViewDpsStockSupply(erp.client.SClientInterface client, String tabTitle, int tabType, int auxType01, int auxType02) {
         super(client, tabTitle, tabType, auxType01, auxType02);
+        mnRealTabTypeAux02 = auxType02;
+        mbWithoutFunctionalArea = auxType02 == SModConsts.TRNX_MAT_FUN_ARE_ALL;
         initComponents();
     }
 
@@ -135,7 +140,9 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterDocumentType = new STabFilterDocumentType(miClient, this, SDataConstants.TRNU_TP_DPS, new int[] { mnTabTypeAux01, mnTabTypeAux02 });
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        if (mbWithoutFunctionalArea) {
+            moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
+        }
 
         if (isViewForPurchases()) {
             levelRightAllDocs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
@@ -165,8 +172,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentType);
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
-
+        if (mbWithoutFunctionalArea ) {
+            addTaskBarUpperComponent(moTabFilterFunctionalArea);
+        }
+        
         mjbSupply.setEnabled(isViewForSupply() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         mjbClose.setEnabled(isViewForSupply() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         mjbOpen.setEnabled(!isViewForSupply() && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
@@ -444,9 +453,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 if ((Integer) setting.getSetting() != 0) {
                     filter = "d.fid_bp_r = " + (Integer) setting.getSetting() + " ";
                 }
-            }
+            }            
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (!((String) setting.getSetting()).isEmpty()) {
+                if (mbWithoutFunctionalArea &&
+                        !((String) setting.getSetting()).isEmpty()) {
                     filter = "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
@@ -523,8 +533,7 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "dt.code AS f_dt_code, cb.code AS f_cb_code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, ";
-        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
-            && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL ) {
                 // Si la vista es para pedidos de compra, fac_oc.id_year será nulo si no tiene factura relacionada
                 msSql += "COALESCE(fac_oc.id_year, 0) AS f_has_doc, ";
         }
@@ -553,7 +562,8 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps AND " +
                 "d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND " +
-                "d.fid_ct_dps = " + mnTabTypeAux01 + " AND d.fid_cl_dps = " + mnTabTypeAux02 + " " + (sqlFilter.isEmpty() ? "" : "AND " + sqlFilter) +
+                "d.fid_ct_dps = " + mnTabTypeAux01 +  " AND d.fid_cl_dps = " + (mbWithoutFunctionalArea ? SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] : mnTabTypeAux02) + " " +
+                (sqlFilter.isEmpty() ? "" : "AND " + sqlFilter) +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cb ON d.fid_cob = cb.id_bpb " +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
@@ -565,9 +575,8 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit ";
-        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
-                && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
-            msSql += "LEFT JOIN trn_dps_dps_supply AS dpss ON "
+                if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL) {
+                msSql += "LEFT JOIN trn_dps_dps_supply AS dpss ON "
                             + "de.id_year = dpss.id_src_year AND "
                             + "de.id_doc = dpss.id_src_doc AND "
                             + "de.id_ety = dpss.id_src_ety "
@@ -586,8 +595,7 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
 
         if (mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND || mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY) {
             msSql += "HAVING (f_orig_qty - f_adj_orig_qty - f_sup_orig_qty) <> 0 AND d.b_close = 0 ";
-            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0]
-                && mnTabTypeAux02 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]) {
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL) {
                 msSql += "AND f_has_doc = 0 ";
             }
         }

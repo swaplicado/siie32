@@ -49,6 +49,8 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
     private JButton jbResearch;
     private JLabel jlText;
     
+    private boolean mbIsAdvanceDocPayment;
+    
     private int mnCurrrencyLayout;
     private int mnCurPaymentDoc;
     private int mnBankPaymentTypeId;
@@ -63,6 +65,7 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
      */
     public SPickerPayments(SGuiClient client, int subType, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_PAY_LAY_BANK, subType, title);
+        this.mbIsAdvanceDocPayment = false;
         initComponents();
         initComponentsCustom();
     }
@@ -135,10 +138,10 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Beneficiario pago", 250));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha programada pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Documento pago"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Solicitud pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto del pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda del pago"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "Tipo de cambio"));
@@ -179,6 +182,9 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                 entryTp = SDbPaymentEntry.TYPE_PAYMENT;
                 where += "AND EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") ";
+                if (mbIsAdvanceDocPayment) {
+                    where += "AND p.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " ";
+                }
             }
             else {
                 entryTp = SDbPaymentEntry.TYPE_ADVANCE;
@@ -197,6 +203,7 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     "p.fk_func, p.fk_func_sub, " +
                     "p.fk_ben, " +
                     "p.nts, " +
+                    "p.pay_tp_op, " +
                     "p.dt_sched_n, " +
                     "pe.install, " +
                     "pe.doc_bal_prev_app_cur, " +
@@ -235,6 +242,8 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
                     row.setFuncSubarea(resultSet.getInt("p.fk_func_sub"));
                     row.setIdBeneficiary(resultSet.getInt("p.fk_ben"));
                     row.setNotes(resultSet.getString("p.nts"));
+                    row.setOperationType(resultSet.getInt("p.pay_tp_op"));
+                    row.setIsDocAdvance(row.getOperationType() == SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED);
                     row.setDateScheduled(resultSet.getDate("p.dt_sched_n"));
                     row.setInstallment(resultSet.getInt("pe.install"));
                     row.setDocBalancePrevAppCy(resultSet.getInt("pe.doc_bal_prev_app_cur"));
@@ -351,6 +360,10 @@ public class SPickerPayments extends SBeanFormDialog implements ActionListener {
     
     public void setFormResult(int n) {
         mnFormResult = n;
+    }
+    
+    public void setIsAdvanceDocuments(boolean b) {
+        mbIsAdvanceDocPayment = b;
     }
     
     @Override

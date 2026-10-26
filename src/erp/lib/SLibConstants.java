@@ -7,7 +7,7 @@ package erp.lib;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public abstract class SLibConstants {
 
@@ -95,7 +95,7 @@ public abstract class SLibConstants {
     public static final int ICON_DOC_XML_SIGN = 1111;
     public static final int ICON_DOC_DELIVERY = 1112;
     public static final int ICON_DOC_IMPORT_CFD = 1113;
-    public static final int ICON_DOC_IMPORT_CFD_ORD = 1114;
+    public static final int ICON_DOC_IMPORT_CFD_DPS = 1114;
     public static final int ICON_DOC_IMPORT_MAT_REQ = 1117;
     public static final int ICON_DOC_XML_DIRECT = 1115;
     public static final int ICON_DOC_XML_INDIRECT = 1116;
@@ -152,9 +152,10 @@ public abstract class SLibConstants {
     public static final int VALUE_IS_MAT_REQ = 15;
     public static final int VALUE_INV_NOT = 11;
     public static final int VALUE_INV_ONLY = 12;
-    public static final int VALUE_IS_COPY = 13;
+    public static final int VALUE_ADV_ONLY = 13;
     @Deprecated
     public static final int VALUE_IS_IMPORTED = 14;
+    public static final int VALUE_IS_COPY = 16;
     public static final int VALUE_POST_EMIT_EDIT = 21;
     
     public static final double RES_VAL_DECS = 0.01;

@@ -16,9 +16,11 @@ import erp.mfin.data.SFinAccountConfig;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mtrn.data.SDataDps;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Logger;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -221,6 +223,76 @@ public class SLayoutBankAccountingAdvance {
         
         return entry;
     }
+    
+    private SDataRecordEntry createAdvanceAccountingRecordEntry(java.lang.String accountId, java.lang.String costCenterId, int dpsIdYear, int dpsIdDoc) {
+        SDataRecordEntry entry = null;
+        
+        entry = new SDataRecordEntry();
+        /*
+        entry.setPkYearId();
+        entry.setPkPeriodId();
+        entry.setPkBookkeepingCenterId();
+        entry.setPkRecordTypeId();
+        entry.setPkNumberId();
+        */
+        entry.setPkEntryId(SLibConsts.UNDEFINED);
+        entry.setConcept("");
+        entry.setReference(msReferenceRecord);
+        entry.setIsReferenceTax(false);
+        entry.setDebit(SLibUtils.roundAmount(mdAmount * mdExchangeRate));
+        entry.setCredit(0);
+        entry.setExchangeRate(mdExchangeRate);
+        entry.setExchangeRateSystem(mdExchangeRateSystem);
+        entry.setDebitCy(mdAmount);
+        entry.setCreditCy(0);
+        entry.setUnits(0);
+        entry.setSortingPosition(SLibConsts.UNDEFINED);
+        entry.setIsSystem(true);
+        entry.setIsDeleted(false);
+        entry.setFkAccountIdXXX(accountId);
+        entry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
+        entry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
+        entry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
+        entry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MO_SUP_PAY[0]);
+        entry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MO_SUP_PAY[1]);
+        entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL[0]);
+        entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_BPR_SUP_BAL[1]);
+        entry.setFkSystemMoveCategoryIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_NA[0]);
+        entry.setFkSystemMoveTypeIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_NA[1]);
+        entry.setFkCurrencyId(mnCurrencyId);
+        entry.setFkCostCenterIdXXX_n(costCenterId);
+        entry.setFkCheckWalletId_n(SLibConsts.UNDEFINED);
+        entry.setFkCheckId_n(SLibConsts.UNDEFINED);
+        
+        entry.setFkBizPartnerId_nr(mnBizPartnerId);
+        entry.setFkBizPartnerBranchId_n(mnBizPartnerBranchId);
+        entry.setFkReferenceCategoryId_n(SLibConsts.UNDEFINED);
+        
+        entry.setFkCompanyBranchId_n(mnCompanyBranchId);
+        entry.setFkEntityId_n(mnCompanyBranchAccountDebitId);
+        entry.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
+        entry.setFkTaxId_n(SLibConsts.UNDEFINED);
+        entry.setFkYearId_n(SLibConsts.UNDEFINED);
+        entry.setFkBookkeepingYearId_n(mnFkBookkeepingYearId_n);
+        entry.setFkBookkeepingNumberId_n(mnFkBookkeepingNumberId_n);
+
+        entry.setFkDpsYearId_n(dpsIdYear);
+        entry.setFkDpsDocId_n(dpsIdDoc);
+        entry.setFkDpsAdjustmentYearId_n(SLibConsts.UNDEFINED);
+        entry.setFkDpsAdjustmentDocId_n(SLibConsts.UNDEFINED);
+
+        entry.setFkDiogYearId_n(SLibConsts.UNDEFINED);
+        entry.setFkDiogDocId_n(SLibConsts.UNDEFINED);
+        entry.setFkItemId_n(SLibConsts.UNDEFINED);
+        entry.setFkItemAuxId_n(SLibConsts.UNDEFINED);
+        entry.setFkUnitId_n(SLibConsts.UNDEFINED);
+
+        entry.setFkUserNewId(moSession.getUser().getPkUserId());
+        //entry.setFkUserEditId(...);
+        //entry.setFkUserDeleteId(...);
+        
+        return entry;
+    }
 
     private SDataRecordEntry createRecordEntryAccountCash() throws Exception {
         int[] keySystemMoveType = null;
@@ -342,8 +414,36 @@ public class SLayoutBankAccountingAdvance {
         }
     }
     
-    public ArrayList<SDataRecordEntry> getDbmsRecordEntries() { 
+    private ArrayList<SDataRecordEntry> createAdvanceRecordEntries(SDataDps oDps) {
+        ArrayList<SDataRecordEntry> advanceRecordEntries = new ArrayList<>();
+        try {
+            String concept = "F " + oDps.getNumber() + " / " + createConceptRecordEntry();
+            SFinAccountConfig oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
+                                                            mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL_PEND_APPLY, false, null, moSession.getStatement()));
+            SDataRecordEntry entry = null;
+            for (int j = 0; j < oConfigBizPartnerOps.getAccountConfigEntries().size(); j++) {
+                entry = createAdvanceAccountingRecordEntry(oConfigBizPartnerOps.getAccountConfigEntries().get(j).getAccountId(),
+                        oConfigBizPartnerOps.getAccountConfigEntries().get(j).getCostCenterId(), oDps.getPkYearId(), oDps.getPkDocId());
+                entry.setConcept(concept);
+                advanceRecordEntries.add(entry);
+            }
+        }
+        catch (Exception e) {
+            Logger.getLogger(SLayoutBankAccountingAdvance.class.getName()).log(java.util.logging.Level.SEVERE, null, e);
+            SLibUtils.showException(this, e);
+            advanceRecordEntries = new ArrayList<>();
+        }
+
+        return advanceRecordEntries;
+    }
+    
+    public ArrayList<SDataRecordEntry> getDbmsRecordEntries() {
         createRecordEntries();
         return maRecordEntries; 
+    }
+
+    public ArrayList<SDataRecordEntry> getDbmsAdvanceRecordEntries(SDataDps oDps) { 
+        ArrayList<SDataRecordEntry> advanceRecordEntries = createAdvanceRecordEntries(oDps);
+        return advanceRecordEntries; 
     }
 }

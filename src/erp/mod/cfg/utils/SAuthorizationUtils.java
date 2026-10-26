@@ -18,20 +18,22 @@ import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbAuthorizationPath;
 import erp.mod.cfg.db.SDbAuthorizationStep;
 import erp.mod.cfg.db.SDbMms;
-import erp.mod.cfg.swap.SHttpConsts;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.utils.SExportDataFile;
-import erp.mod.cfg.swap.utils.SExportPayments;
-import erp.mod.cfg.swap.utils.SExportUtils;
 import erp.mod.fin.db.SDbPayment;
 import erp.mod.fin.db.SDbPaymentFile;
+import erp.mod.fin.utils.SPaymentUtils;
 import erp.mod.hrs.utils.SDocUtils;
 import erp.mod.trn.db.SDbSupplierFileProcess;
+import erp.mod.trn.db.STrnUtils;
 import erp.mod.trn.form.SDialogSelectOrderAuthornPath;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SProcDpsSendAuthornWeb;
 import erp.mtrn.data.STrnUtilities;
 import erp.siieapp.SUserResource;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.utils.SExportDataFile;
+import erp.swap.utils.SExportPayments;
+import erp.swap.utils.SExportUtils;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -89,6 +91,8 @@ public abstract class SAuthorizationUtils {
     public static final int AUTH_STATUS_IN_PROCESS = 3;
     public static final int AUTH_STATUS_AUTHORIZED = 4;
     public static final int AUTH_STATUS_REJECTED = 5;
+    public static final int AUTH_STATUS_SENDING = 11;
+    public static final int AUTH_STATUS_SENT_FAIL = 12;
     
     public static final HashMap<Integer, String> AUTH_STATUS_DESC = new HashMap<>();
     
@@ -218,7 +222,6 @@ public abstract class SAuthorizationUtils {
                             "        ORDER BY step2.lev ASC " +
                             "        LIMIT 1);";
                 
-                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
                 ResultSet res = statement.executeQuery(sql);
                 while(res.next()) {
                     lUsers.add(res.getInt("step1.fk_usr_step"));
@@ -248,7 +251,6 @@ public abstract class SAuthorizationUtils {
                             "        ORDER BY step2.lev ASC " +
                             "        LIMIT 1);";
                
-                Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.INFO, sql);
                 ResultSet res = statement.getConnection().createStatement().executeQuery(sql);
                 while(res.next()) {
                     lUsers.addAll(SAuthorizationUtils.getUsersOfAutorizationNode(statement.getConnection(), res.getInt("step1.fk_node_step_n"), toNotification));
@@ -1748,20 +1750,29 @@ public abstract class SAuthorizationUtils {
         }
     }
     
-    public static boolean sendAuthornPurchaseOrderAppWeb(SClientInterface client, int[] pk) {
+    public static boolean sendAuthornPurchaseOrderAppWeb(SClientInterface client, int[] dpsKey) {
         try {
             SDbSupplierFileProcess fileProcess = new SDbSupplierFileProcess();
-            fileProcess.read(client.getSession(), pk);
+            fileProcess.read(client.getSession(), dpsKey);
+            
             if (fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA || 
                     fileProcess.getDps().getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) {
                 if (canSendAuthornOrderAppWeb(client, fileProcess)) {
+                    int oldPriority = fileProcess.getDps().getPriority();
                     SDialogAuthornPathPicker picker = new SDialogAuthornPathPicker((SGuiClient) client, SSwapConsts.RESOURCE_TYPE_PUR_ORDER);
                     picker.setNotes("");
-                    picker.setPriority(0);
+                    picker.setPriority(oldPriority);
+                    
                     if (picker.hasAuthornPaths()) {
                         picker.setVisible(true);
+                        
                         if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            new SProcDpsSendAuthornWeb(client, fileProcess, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                            int newPriority = picker.getSelectedPriority();
+                            if (newPriority != oldPriority) {
+                                STrnUtils.updateDpsPriority((SGuiClient) client, dpsKey, newPriority);
+                            }
+                            
+                            new SProcDpsSendAuthornWeb(client, fileProcess, picker.getSelectedAuthPath(), newPriority, picker.getAuthornNotes()).start();
                         }
                         else {
                             return false;
@@ -1778,12 +1789,13 @@ public abstract class SAuthorizationUtils {
                 }
             }
             else {
-                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es " + fileProcess.getDpsStatus());
+                client.showMsgBoxWarning("No se puede enviar el documento a autorizar debido a que su estatus es '" + fileProcess.getDpsStatus() + "'.");
                 return false;
             }
             return true;
         }
         catch (Exception e) {
+            Logger.getLogger(SAuthorizationUtils.class.getName()).log(Level.SEVERE, null, e);
             client.showMsgBoxWarning("No se puede enviar el documento a autorizar, intente más tarde.");
             return false;
         }
@@ -1801,7 +1813,8 @@ public abstract class SAuthorizationUtils {
                     if (picker.hasAuthornPaths()) {
                         picker.setVisible(true);
                         if (picker.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            new SExportPayments((SGuiClient) client, payment, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes()).start();
+                            SExportPayments export = new SExportPayments((SGuiClient) client, payment, picker.getSelectedAuthPath(), picker.getSelectedPriority(), picker.getAuthornNotes());
+                            export.start();
                         }
                         else {
                             return false;
@@ -1845,25 +1858,26 @@ public abstract class SAuthorizationUtils {
         if (!hasError) {
             ArrayList<SDbPaymentFile> lFileNamesToUpload = new ArrayList<>();
             
-            for (SDbPaymentFile oFile : payment.getFiles()) {
+            for (SDbPaymentFile oPayFile : payment.getFiles()) {
                 try {
                     // Obtener bytes del archivo y generar un nombrfe único para el amacenamiento en la nube
-                    byte[] fileBytes = SDocUtils.getFileBytes(client.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oFile.getFilevaultId());
+                    byte[] fileBytes = SDocUtils.getFileBytes(client.getSession(), SDocUtils.BUCKET_DOC_DPS_SUPPLIER, oPayFile.getFilevaultId());
                     String name = SDocUtils.generatePaymentFileName(client.getSession().getDatabase().getDbName(), 
-                            payment.getPkPaymentId(), oFile.getPkFileId(), oFile.getFileType());
+                            payment.getPkPaymentId(), oPayFile.getPkFileId(), oPayFile.getFileType());
                     
                     // Subir archivo a la nube
                     CloudStorageFile oGcsFile = CloudStorageManager.uploadFileData(fileBytes, name);
                     if (oGcsFile != null) {
                         SExportDataFile expFile = new SExportDataFile();
-                        oFile.setFileStorageName(oGcsFile.getFileName());
-                        oFile.save(client.getSession());
-                        lFileNamesToUpload.add(oFile);
-                        expFile.filename_storage = oFile.getFileStorageName();
-                        expFile.filename_original = oFile.getFileName();
-                        expFile.url_storage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
-                        expFile.url_database = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
-                        expFile.bucket_name = oGcsFile.getBucketName();
+                        oPayFile.setFileStorageName(oGcsFile.getFileName());
+                        oPayFile.save(client.getSession());
+                        lFileNamesToUpload.add(oPayFile);
+                        expFile.filenameStorage = oPayFile.getFileStorageName();
+                        expFile.filenameOriginal = oPayFile.getFileName();
+                        expFile.urlStorage = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.urlDatabase = oGcsFile.getFilePath() == null ? "#" : oGcsFile.getFilePath();
+                        expFile.bucketName = oGcsFile.getBucketName();
+                        expFile.fileTypeId = SPaymentUtils.mapPaymentFileType(oPayFile.getFileType());
                         expFiles.add(expFile);
                     }
                     else {

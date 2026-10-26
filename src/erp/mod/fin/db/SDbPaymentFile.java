@@ -207,7 +207,9 @@ public class SDbPaymentFile extends SDbRegistryUser implements SGridRow, Seriali
                     mnPkPaymentId + ", " + 
                     mnPkFileId + ", " + 
                     "'" + msPaymentFileType + "', " + 
-                    "'" + msFileDescription + "', " + 
+                    "'" + (msFileDescription == null || msFileDescription.isEmpty() ? 
+                    getFileTypeDescription(msPaymentFileType) :
+                    msFileDescription) + "', " + 
                     mnSortingPos + ", " + 
                     "'" + msFilevaultId + "', " + 
                     "NOW()" + ", " + 
@@ -228,7 +230,9 @@ public class SDbPaymentFile extends SDbRegistryUser implements SGridRow, Seriali
                     //"id_pay = " + mnPkPaymentId + ", " +
                     //"id_file = " + mnPkFileId + ", " +
                     "pay_file_type = '" + msPaymentFileType + "', " +
-                    "file_descrip = '" + msFileDescription + "', " +
+                    "file_descrip = '" + (msFileDescription == null || msFileDescription.isEmpty() ? 
+                                        getFileTypeDescription(msPaymentFileType) :
+                                        msFileDescription) + "', " +
                     "sort = " + mnSortingPos + ", " +
                     "filevault_id = '" + msFilevaultId + "', " +
                     "filevault_ts_n = " + "NOW()" + ", " +

@@ -37,7 +37,7 @@ import sa.lib.SLibTimeUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -53,7 +53,6 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
     private erp.table.STabFilterDocumentType moTabFilterTypeDocument;
-    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
     private boolean mbHasRigLastDaysMovs;
 
@@ -75,7 +74,6 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moTabFilterTypeDocument = new STabFilterDocumentType(miClient, this, SDataConstants.TRNS_TP_IOG);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
 
         if (mnTabTypeAux01 != SLibConstants.UNDEFINED && mnTabTypeAux02 != SLibConstants.UNDEFINED) {
             moTabFilterTypeDocument.setFixedDocumentType(new int[] { mnTabTypeAux01, mnTabTypeAux02, 1 });
@@ -145,7 +143,6 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         addTaskBarUpperSeparator();
         
         addTaskBarUpperComponent(moTabFilterTypeDocument);
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         
         mbHasRigLastDaysMovs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_LAST_DAYS_MOVS).HasRight;
         
@@ -333,11 +330,6 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
                 key = (int[]) setting.getSetting();
                 if (key != null) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_ct_iog = " + key[0] + " AND iog.fid_cl_iog = " + key[1] + " AND iog.fid_tp_iog = " + key[2] + " ";
-                }
-            }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "(dps.fid_func IS NULL OR dps.fid_func IN (" + ((String) setting.getSetting()) + ")) ";
                 }
             }
         }

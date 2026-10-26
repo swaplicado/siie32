@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.SClientApi;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -36,37 +35,59 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiSession;
 
 /**
+ * API para gestión de autorizaciones desde servicios externos.
+ *
+ * Proporciona funcionalidad para autorizar o rechazar recursos (documentos,
+ * solicitudes) desde portales de compras, aplicaciones móviles u otros
+ * servicios externos. Maneja la lógica de aprobación, actualización de estados,
+ * notificaciones por correo y gestión de usuarios en turno de autorización.
+ *
+ * Soporta múltiples tipos de recursos: - DPS (Documentos de Provisión de
+ * Servicios/Compra) - Material Requests (Solicitudes de Materiales)
  *
  * @author Adrián Avilés, Edwin Carmona, Isabel Servín
+ * @version 1.0
  */
 public class SAuthorizationsAPI {
 
+    /**
+     * Sesión del usuario para acceso a datos
+     */
     private final SGuiSession oSession;
 
+    /**
+     * Constructor que inicializa la API con una sesión de usuario.
+     *
+     * @param session sesión del usuario para acceso a datos
+     */
     public SAuthorizationsAPI(SGuiSession session) {
         oSession = session;
     }
-    
-    private SClientApi createClientApi(int userId) {
-        SClientApi clientApi = new SClientApi(oSession, userId);
-        return clientApi;
-    }
 
     /**
-     * Autorizar recurso
-     * 
-     * @param typeResource
-     * @param pk
-     * @param userId
-     * @param comments
-     * @param isSwapServicesRequest
-     * @return 
+     * Autoriza un recurso desde servicios externos.
+     *
+     * Procesa la autorización de un recurso específico (DPS, Solicitud de
+     * Material, etc.) realizando las siguientes acciones según el tipo de
+     * recurso: - Actualiza el estado del documento a autorizado - Envía
+     * notificaciones por correo al usuario que autorizó - Si hay pasos de
+     * autorización pendientes, notifica a los usuarios en turno - Registra
+     * datos de auditoría (usuario, timestamp)
+     *
+     * @param typeResource tipo de recurso a autorizar (constantes AUTH_TYPE_*)
+     * @param pk clave primaria del recurso (generalmente int[]{año, documento})
+     * @param userId identificador del usuario que autoriza
+     * @param comments comentarios adicionales sobre la autorización
+     * @param isSwapServicesRequest indica si la petición viene desde portal de
+     * servicios
+     * @return estructura con respuesta incluyendo código, mensaje, folio y
+     * usuarios en turno
      */
     public SAppLinkResponse approbeResource(int typeResource, Object pk, int userId, String comments, boolean isSwapServicesRequest) {
         SAppLinkResponse oResponse = new SAppLinkResponse();
         try {
             String message;
-            if (! isSwapServicesRequest) {
+            if (!isSwapServicesRequest) {
                 message = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_AUTHORIZE, typeResource, pk, userId, comments);
             }
             else {
@@ -74,7 +95,7 @@ public class SAuthorizationsAPI {
             }
             oResponse.setMessage(message);
             if (oResponse.getMessage() != null && oResponse.getMessage().isEmpty()) {
-                switch(typeResource) {
+                switch (typeResource) {
                     case AUTH_TYPE_MAT_REQUEST:
                         try {
                             SDbMaterialRequest req = new SDbMaterialRequest();
@@ -85,7 +106,7 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
-                        
+
                     case AUTH_TYPE_DPS:
                         // Cuando llega una petición desde portal de compras, significa que ya fue aprobado.
                         if (isSwapServicesRequest) {
@@ -95,7 +116,7 @@ public class SAuthorizationsAPI {
                                     0);
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
                         }
-                        if (! isSwapServicesRequest && SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
+                        if (!isSwapServicesRequest && SAuthorizationUtils.isAuthorized(oSession, typeResource, pk)) {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "DPS[{0},{1}] autorizado", new Object[]{((int[]) pk)[0], ((int[]) pk)[1]});
                             try {
                                 String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
@@ -112,17 +133,18 @@ public class SAuthorizationsAPI {
                         }
                         else {
                             /**
-                             * Envia una notificación mail cuando al recurso aún le faltan pasos por autorizar.
+                             * Envia una notificación mail cuando al recurso aún
+                             * le faltan pasos por autorizar.
                              */
                             ArrayList<Integer> lUsers;
                             ArrayList<Integer> lUsersNotified;
                             try {
-                                if (! isSwapServicesRequest) {
+                                if (!isSwapServicesRequest) {
                                     boolean toNotification = true;
                                     lUsers = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotification);
-                                    if (! lUsers.isEmpty()) {
+                                    if (!lUsers.isEmpty()) {
                                         HashMap<String, String> lMails = SAuthorizationUtils.getMailsOfUsers(oSession.getStatement().getConnection().createStatement(), lUsers);
-                                        if (! lMails.isEmpty()) {
+                                        if (!lMails.isEmpty()) {
                                             for (Map.Entry<String, String> oRow : lMails.entrySet()) {
                                                 String userMail = oRow.getValue();
                                                 Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.INFO, "Enviando mail a: {0}", userMail);
@@ -130,7 +152,7 @@ public class SAuthorizationsAPI {
                                             }
                                         }
                                     }
-                                    
+
                                     boolean toNotificationPush = false;
                                     lUsersNotified = SAuthorizationUtils.getUsersInTurnAuth(oSession.getStatement().getConnection().createStatement(), typeResource, ((int[]) pk), toNotificationPush);
                                     oResponse.getNextUsers().addAll(lUsersNotified);
@@ -147,42 +169,49 @@ public class SAuthorizationsAPI {
                             }
                         }
                         break;
-                        
+
                     default:
-                        // nothing
+                    // nothing
                 }
             }
-            
+
         }
         catch (Exception ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return oResponse;
     }
-    
+
     /**
-     * Rechazar recurso
-     * 
-     * @param typeResource
-     * @param pk
-     * @param userId
-     * @param comment
-     * @param isSwapServicesRequest
-     * @return 
+     * Rechaza un recurso desde servicios externos.
+     *
+     * Procesa el rechazo de un recurso específico realizando las siguientes
+     * acciones: - Actualiza el estado del documento a rechazado - Envía
+     * notificación por correo al usuario que rechazó - Si el proveedor había
+     * autorizado parcialmente, puede enviar notificación adicional - Registra
+     * datos de auditoría (usuario, timestamp, comentario)
+     *
+     * @param typeResource tipo de recurso a rechazar (constantes AUTH_TYPE_*)
+     * @param pk clave primaria del recurso (generalmente int[]{año, documento})
+     * @param userId identificador del usuario que rechaza
+     * @param comment comentarios sobre el motivo del rechazo
+     * @param isSwapServicesRequest indica si la petición viene desde portal de
+     * servicios
+     * @return mensaje de resultado o descripción de error
      */
     public String rejectResource(int typeResource, Object pk, int userId, String comment, boolean isSwapServicesRequest) {
         String res;
         try {
             String actionUserName = SAuthorizationUtils.getUserName(oSession.getStatement().getConnection().createStatement(), userId);
-            if (! isSwapServicesRequest) {
+            if (!isSwapServicesRequest) {
                 res = SAuthorizationUtils.authOrRejResource(oSession, SAuthorizationUtils.AUTH_ACTION_REJECT, typeResource, pk, userId, comment);
             }
             else {
                 res = "";
             }
             if (res != null && res.isEmpty()) {
-                switch(typeResource) {
+                switch (typeResource) {
                     case AUTH_TYPE_MAT_REQUEST:
                         try {
                             SDbMaterialRequest req = new SDbMaterialRequest();
@@ -193,22 +222,22 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
-                        
+
                     case AUTH_TYPE_DPS:
                         try {
                             SDataDps dps = new SDataDps();
                             dps.read((int[]) pk, oSession.getStatement());
                             boolean sendProvMail = dps.getIsAuthorized();
-                            
-                            System.out.println("DPS["+((int[]) pk)[0]+","+((int[]) pk)[1]+"] a rechazo");
+
+                            System.out.println("DPS[" + ((int[]) pk)[0] + "," + ((int[]) pk)[1] + "] a rechazo");
                             updateDpsAuthStatus(pk,
                                     SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT,
                                     userId,
                                     0);
-                            if (! isSwapServicesRequest) {
+                            if (!isSwapServicesRequest) {
                                 SAuthorizationUtils.sendAuthornMails(oSession, SAuthorizationUtils.AUTH_MAIL_AUTH_REJ, "", "", "", ((int[]) pk), actionUserName, comment);
                             }
-                            
+
                             if (sendProvMail) {
                                 //SAuthorizationUtils.sendAutomaticProviderAuthornMails(createClientApi(userId), ((int[]) pk));
                             }
@@ -217,22 +246,35 @@ public class SAuthorizationsAPI {
                             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         break;
-                        
+
                     default:
-                        // nothing
+                    // nothing
                 }
             }
-            
+
             return res;
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
             res = ex.getMessage();
         }
-        
+
         return res;
     }
-    
+
+    /**
+     * Actualiza el estado de autorización de un documento (DPS).
+     *
+     * Realiza una actualización en cascada del estado de autorización del
+     * documento: 1. Actualiza la tabla TRN_DPS con el nuevo estado 2. Actualiza
+     * la tabla TRN_DPS_AUTHORN con el estado correlativo
+     *
+     * @param pk clave primaria del documento
+     * @param authAction acción realizada (aprobado o rechazado)
+     * @param userId identificador del usuario que realiza la acción
+     * @param authornStatus estado de autorización (0 = calcular
+     * automáticamente)
+     */
     private void updateDpsAuthStatus(Object pk, final int authAction, final int userId, final int authornStatus) {
         String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
                 + "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
@@ -243,37 +285,72 @@ public class SAuthorizationsAPI {
 
         try {
             int res = oSession.getDatabase().getConnection().createStatement().executeUpdate(sql);
-            this.updateDpsAuthornStatus(pk, 
-                                        authornStatus == 0 ? (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN ? 
-                                            SDataConstantsSys.CFGS_ST_AUTHORN_AUTH : 
-                                            SDataConstantsSys.CFGS_ST_AUTHORN_REJ) : authornStatus,
-                                        userId);
+            this.updateDpsAuthornStatus(pk,
+                    authornStatus == 0 ? (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN
+                                    ? SDataConstantsSys.CFGS_ST_AUTHORN_AUTH
+                                    : SDataConstantsSys.CFGS_ST_AUTHORN_REJ) : authornStatus,
+                    userId);
         }
         catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Actualiza el estado en la tabla de autorizaciones del documento.
+     *
+     * Registra el resultado de la autorización (aprobado o rechazado) en la
+     * tabla de historial de autorizaciones, incluyendo información del usuario
+     * que realizó la acción y timestamp.
+     *
+     * @param pk clave primaria del documento
+     * @param idStatus estado a asignar (aprobado, rechazado, etc.)
+     * @param userId identificador del usuario que realiza la acción
+     * @throws SQLException si hay error en acceso a base de datos
+     */
     public void updateDpsAuthornStatus(final Object pk, final int idStatus, final int userId) throws SQLException {
         String sqlDpsAuth = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_AUTHORN) + " "
-                                + "SET fid_st_authorn = " + idStatus + ",  "
-                                + "fid_usr_edit = " + (userId == 0 ? oSession.getUser().getPkUserId() : userId) + ", "
-                                + "ts_edit = NOW() "
-                                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
-    
+                + "SET fid_st_authorn = " + idStatus + ",  "
+                + "fid_usr_edit = " + (userId == 0 ? oSession.getUser().getPkUserId() : userId) + ", "
+                + "ts_edit = NOW() "
+                + "WHERE id_year = " + ((int[]) pk)[0] + " AND id_doc = " + ((int[]) pk)[1] + " AND NOT b_del;";
+
         oSession.getDatabase().getConnection().createStatement().execute(sqlDpsAuth);
     }
 
+    /**
+     * Verifica si un documento está autorizado.
+     *
+     * @param pk identificador del documento (documento principal)
+     * @return true si el documento está completamente autorizado, false en caso
+     * contrario
+     */
     public boolean isAutorized(int pk) {
         boolean res = SAuthorizationUtils.isAuthorized(oSession, 1, new int[]{pk});
         return res;
     }
 
+    /**
+     * Obtiene el estado actual de autorización de un documento.
+     *
+     * @param pk identificador del documento (documento principal)
+     * @return código de estado de autorización
+     */
     public int getStatus(int pk) {
         int res = SAuthorizationUtils.getAuthStatus(oSession, 1, new int[]{pk});
         return res;
     }
 
+    /**
+     * Obtiene la lista de recursos pendientes de autorización.
+     *
+     * Consulta todos los recursos que están esperando autorización de acuerdo a
+     * los criterios de filtro definidos en el sistema, incluyendo información
+     * de estado, usuarios, fechas y asociados de negocios involucrados.
+     *
+     * @return representación en JSON de la lista de recursos pendientes
+     * @throws SQLException si hay error en acceso a base de datos
+     */
     public String getResources() throws SQLException {
         String jsonDr = "";
         ArrayList<SAuthorizationsData> lAuthData = new ArrayList<>();
@@ -365,26 +442,26 @@ public class SAuthorizationsAPI {
                 + "LEFT JOIN " + SModConsts.TablesMap.get(SModConsts.CFGS_TP_AUTHORN) + " AS cta ON "
                 + "v.fk_tp_authorn = cta.id_tp_authorn AND NOT v.b_del "
                 + "WHERE "
-                + "NOT tmr.b_del AND tmr.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " AND ( " +
-                "    v.res_pk_n1_n IS NULL OR ( " +
-                "        v.res_pk_n1_n IS NOT NULL AND ( " +
-//                "            -- Cuando authorn_grouper_n no es nulo, obtener el más alto " +
-                "            v.authorn_grouper_n = ( " +
-                "                SELECT MAX(stps.authorn_grouper_n) " +
-                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
-                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
-                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
-                "                    AND stps.res_pk_len = v.res_pk_len " +
-                "                    AND NOT stps.b_del " +
-                "            ) " +
-//                "            -- Cuando authorn_grouper_n es nulo, igualar a id_authorn_step más alto " +
-                "            OR v.id_authorn_step = ( " +
-                "                SELECT MAX(stps.id_authorn_step) " +
-                "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps " +
-                "                WHERE stps.res_tab_name_n = v.res_tab_name_n " +
-                "                    AND stps.res_pk_n1_n = v.res_pk_n1_n " +
-                "                    AND stps.res_pk_len = v.res_pk_len " +
-                "                    AND NOT stps.b_del))));";
+                + "NOT tmr.b_del AND tmr.fk_st_mat_req = " + SModSysConsts.TRNS_ST_MAT_REQ_AUTH + " AND ( "
+                + "    v.res_pk_n1_n IS NULL OR ( "
+                + "        v.res_pk_n1_n IS NOT NULL AND ( "
+                + //                "            -- Cuando authorn_grouper_n no es nulo, obtener el más alto " +
+                "            v.authorn_grouper_n = ( "
+                + "                SELECT MAX(stps.authorn_grouper_n) "
+                + "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps "
+                + "                WHERE stps.res_tab_name_n = v.res_tab_name_n "
+                + "                    AND stps.res_pk_n1_n = v.res_pk_n1_n "
+                + "                    AND stps.res_pk_len = v.res_pk_len "
+                + "                    AND NOT stps.b_del "
+                + "            ) "
+                + //                "            -- Cuando authorn_grouper_n es nulo, igualar a id_authorn_step más alto " +
+                "            OR v.id_authorn_step = ( "
+                + "                SELECT MAX(stps.id_authorn_step) "
+                + "                FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_AUTHORN_STEP) + " AS stps "
+                + "                WHERE stps.res_tab_name_n = v.res_tab_name_n "
+                + "                    AND stps.res_pk_n1_n = v.res_pk_n1_n "
+                + "                    AND stps.res_pk_len = v.res_pk_len "
+                + "                    AND NOT stps.b_del))));";
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataResponse dr = new SDataResponse();
@@ -426,7 +503,7 @@ public class SAuthorizationsAPI {
                         au.setPriority(res.getString("priority"));
                         au.setDataTypeName("REQUISICIÓN");
                         au.setDataType(1);
-                        
+
                         break;
                     default:
                         au.setIdData(new int[]{res.getInt("id_mat_req")});
@@ -444,14 +521,14 @@ public class SAuthorizationsAPI {
                         au.setPriority(res.getString("priority"));
                         au.setDataTypeName("REQUISICIÓN");
                         au.setDataType(1);
-                        
-                    break;
+
+                        break;
                 }
                 au.setAuthorizationStatusName(res.getString("doc_authorn_status"));
                 au.setAuthorizationTypeName(res.getString("authorn_type"));
                 au.setAuthorizationStatus(res.getInt("authorn_status"));
                 au.setAuthorizationUser(res.getString("authorn_usr"));
-                
+
                 lAuthData.add(au);
             }
 
@@ -461,7 +538,8 @@ public class SAuthorizationsAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dr);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -496,18 +574,18 @@ public class SAuthorizationsAPI {
         String jsonDr = "";
 
         String sql = "SELECT t.*, ui.id_item, ui.item_key, ui.item, uu.id_unit, uu.unit, uu.symbol, "
-                    + "IF(ISNULL(entc.name), trn_get_cons_info(t.id_mat_req, 1), entc.name) AS ent_cons, "
-                    + "IF(ISNULL(sentc.name), trn_get_cons_info(t.id_mat_req, 2), sentc.name) AS s_ent_cons, "
-                    + "IF(ISNULL(fcc.id_cc), trn_get_cons_info(t.id_mat_req, 3), fcc.id_cc) AS f_cc "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " as t "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " as ui ON ui.id_item = t.fk_item "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " as uu ON uu.id_unit = t.fk_unit "
-                    + "LEFT JOIN trn_mat_cons_ent AS entc ON t.fk_ent_mat_cons_ent_n = entc.id_mat_cons_ent "
-                    + "LEFT JOIN trn_mat_cons_subent AS sentc ON t.fk_subent_mat_cons_ent_n = sentc.id_mat_cons_ent "
-                    + "AND t.fk_subent_mat_cons_subent_n = sentc.id_mat_cons_subent "
-                    + "LEFT JOIN fin_cc AS fcc ON t.fk_cc_n = fcc.pk_cc "
-                    + "WHERE t.id_mat_req = " + pk + " AND NOT t.b_del";
-        
+                + "IF(ISNULL(entc.name), trn_get_cons_info(t.id_mat_req, 1), entc.name) AS ent_cons, "
+                + "IF(ISNULL(sentc.name), trn_get_cons_info(t.id_mat_req, 2), sentc.name) AS s_ent_cons, "
+                + "IF(ISNULL(fcc.id_cc), trn_get_cons_info(t.id_mat_req, 3), fcc.id_cc) AS f_cc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_MAT_REQ_ETY) + " as t "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " as ui ON ui.id_item = t.fk_item "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_UNIT) + " as uu ON uu.id_unit = t.fk_unit "
+                + "LEFT JOIN trn_mat_cons_ent AS entc ON t.fk_ent_mat_cons_ent_n = entc.id_mat_cons_ent "
+                + "LEFT JOIN trn_mat_cons_subent AS sentc ON t.fk_subent_mat_cons_ent_n = sentc.id_mat_cons_ent "
+                + "AND t.fk_subent_mat_cons_subent_n = sentc.id_mat_cons_subent "
+                + "LEFT JOIN fin_cc AS fcc ON t.fk_cc_n = fcc.pk_cc "
+                + "WHERE t.id_mat_req = " + pk + " AND NOT t.b_del";
+
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(sql)) {
             while (res.next()) {
                 SAuthorizationEty auEty = new SAuthorizationEty();
@@ -534,15 +612,17 @@ public class SAuthorizationsAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lAuthEtyData);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SAuthorizationsAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return jsonDr;
     }
-    
+
     public void executeTrnDpsUpd(
             Connection connection,
             int idYear,
@@ -578,6 +658,7 @@ public class SAuthorizationsAPI {
 
     // Clase para manejar parámetros de salida
     public static class OutputHolder<T> {
+
         private T value;
 
         public T getValue() {

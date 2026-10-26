@@ -34,6 +34,10 @@ import sa.lib.SLibUtils;
  * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López, Isabel Servín, Edwin Carmona
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final int LEN_CONCEPT_KEY = 35;
+    public static final int LEN_CONCEPT = 130;
+    public static final int LEN_REFERENCE = 25;
 
     protected int mnPkYearId;
     protected int mnPkDocId;
@@ -187,6 +191,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsDps;
     protected java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> mvDbmsDpsAdjustmentsAsAdjustment;
     protected java.util.Vector<SDataScaleTicketDpsEntry> mvDbmsScaleTicketsEty;
+    protected ArrayList<SDataDpsDpsMerge> mlDbmsDpsMergeRows;
     
     protected erp.mtrn.data.SDataDpsCfdEntry moDbmsDpsCfdEntry;
 
@@ -215,6 +220,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnAuxFkOriginalUnitOld;
     protected boolean mbAuxIsLinkedAsService;
     
+    protected boolean mbAuxUndoMerged;
+    
     /**
      * Overrides java.lang.Object.clone() function.
      */
@@ -235,6 +242,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mvDbmsDpsAdjustmentsAsDps = new Vector<>();
         mvDbmsDpsAdjustmentsAsAdjustment = new Vector<>();
         mvDbmsScaleTicketsEty = new Vector<>();
+        mlDbmsDpsMergeRows = new ArrayList<>();
 
         mbFlagReadLinksAswell = true; // must be independent of a reset!
 
@@ -533,6 +541,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsDps() { return mvDbmsDpsAdjustmentsAsDps; }
     public java.util.Vector<erp.mtrn.data.SDataDpsDpsAdjustment> getDbmsDpsAdjustmentsAsAdjustment() { return mvDbmsDpsAdjustmentsAsAdjustment; }
     public java.util.Vector<erp.mtrn.data.SDataScaleTicketDpsEntry> getDbmsScaleTicketsEty() { return mvDbmsScaleTicketsEty; }
+    public ArrayList<SDataDpsDpsMerge> getDbmsDpsEntryMerges() { return mlDbmsDpsMergeRows; }
 
     public void setDbmsDpsCfdEntry(erp.mtrn.data.SDataDpsCfdEntry o) { moDbmsDpsCfdEntry = o; }
 
@@ -578,6 +587,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setAuxFkUnitOld(int i) { mnAuxFkUnitOld = i; }
     public void setAuxFkOriginalUnitOld(int i) { mnAuxFkOriginalUnitOld = i; }
     public void setAuxIsLinkedAsService(boolean b) { mbAuxIsLinkedAsService = b; }
+    public void setAuxUndoMerged(boolean b) { mbAuxUndoMerged = b; }
     
     public int getAuxFkItemOld() { return mnAuxFkItemOld; }
     public double getAuxQuantityOld() { return mdAuxQuantityOld; }
@@ -585,6 +595,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int getAuxFkUnitOld() { return mnAuxFkUnitOld; }
     public int getAuxFkOriginalUnitOld() { return mnAuxFkOriginalUnitOld; }
     public boolean getAuxIsLinkedAsService() { return mbAuxIsLinkedAsService; }
+    public boolean getAuxUndoMerged() { return mbAuxUndoMerged; }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -781,6 +792,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnAuxFkUnitOld = 0;
         mnAuxFkOriginalUnitOld = 0;
         mbAuxIsLinkedAsService = false;
+        mbAuxUndoMerged = false;
     }
 
     @Override
@@ -1508,15 +1520,15 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                         link.setPkDestinyYearId(mnPkYearId);
                         link.setPkDestinyDocId(mnPkDocId);
                         link.setPkDestinyEntryId(mnPkEntryId);
-                                               
+
                         if (link.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                         }
                         
                         // Redirect inventory movements references
-                        
-                        if (link.getDbmsIsSourceOrderSupplied()) {
-                            aSql = new String[] { 
+                        int[] entryOrderPk = new int[] { link.getPkSourceYearId(), link.getPkSourceDocId(), link.getPkSourceEntryId() };
+                        if (STrnDpsUtilities.isSourceOrderSupplied(connection.createStatement(), entryOrderPk)) {
+                            aSql = new String[] {
                                 "UPDATE trn_diog SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + " " +
                                 "WHERE fid_dps_year_n = " + link.getPkSourceYearId() + " AND fid_dps_doc_n = " + link.getPkSourceDocId() + " ",
                                 "UPDATE trn_diog_ety SET fid_dps_year_n = " + mnPkYearId + ", fid_dps_doc_n = " + mnPkDocId + ", fid_dps_ety_n = " + mnPkEntryId + " " +
@@ -1529,6 +1541,23 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                             for (String sql : aSql) {
                                statement.execute(sql);
+                            }
+                        }
+                    }
+                    
+                    if ((mlDbmsDpsMergeRows != null && !mlDbmsDpsMergeRows.isEmpty()) || mbAuxUndoMerged) {
+                        if (mbAuxUndoMerged) {
+                            SDataDpsDpsMerge.deleteAllVersions(connection.createStatement(), mnPkYearId, mnPkDocId);
+                        }
+                        else {
+                            SDataDpsDpsMerge.deletePastVersions(connection.createStatement(), mnPkYearId, mnPkDocId, mlDbmsDpsMergeRows.get(mlDbmsDpsMergeRows.size()-1).getVersion());
+                            for (SDataDpsDpsMerge oMerge : mlDbmsDpsMergeRows) {
+                                if (oMerge.getFkDpsNewEntryId() == 0) {
+                                    oMerge.setFkDpsNewEntryId(mnPkEntryId);
+                                }
+                                if (oMerge.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                                }
                             }
                         }
                     }
@@ -1898,7 +1927,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         }
 
         for (SDataDpsDpsLink link : mvDbmsDpsLinksAsDestiny) {
-            link.setOriginalQuantity(mbAuxIsLinkedAsService ? 0 : mdOriginalQuantity);
+            if (mvDbmsDpsLinksAsDestiny.size() == 1 && link.getOriginalQuantity() >= mdOriginalQuantity) {
+                link.setOriginalQuantity(mbAuxIsLinkedAsService ? 0 : mdOriginalQuantity);
+            }
             link.setQuantity(mbAuxIsLinkedAsService ? 0 : SLibUtilities.round(link.getOriginalQuantity() * dFactQty, nDecsQty));
         }
 

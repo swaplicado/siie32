@@ -57,7 +57,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín 
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogRecordApportionment extends javax.swing.JDialog implements SFormInterface, ActionListener, FocusListener, ItemListener, SBeanPanelAccountOwner {
 
@@ -108,11 +108,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
     private SDataAccountCash moEntryAccountCash;
     
     private String msCurrentAccountId;
-    
-    /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-    private erp.mfin.form.SPanelAccount moPanelFkAccountId;
-    private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
-    */
     
     private HashMap<Integer, String> maFormNames;
     private HashMap<Integer, JComponent> maFormComponents;
@@ -662,25 +657,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
 
         // Create and add form panels:
         
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        try {
-            // account and const center panels:
-            moPanelFkAccountId = new SPanelAccount(miClient, SDataConstants.FIN_ACC, false, true, false);
-            moPanelFkAccountId.setBorder(new TitledBorder("Cuenta contable:"));
-            moPanelFkCostCenterId_n = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
-            moPanelFkCostCenterId_n.setBorder(new TitledBorder("Centro de costo:"));
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-
-        jpRegistry.remove(jlDummyAccount);
-        jpRegistry.add(moPanelFkAccountId, BorderLayout.NORTH);
-
-        jPanel5.remove(jlDummyCostCenter);
-        jPanel5.add(moPanelFkCostCenterId_n, BorderLayout.NORTH);
-        */
-        
         moAccountPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_ACCOUNT, true, true, false);
         moCostCenterPanel.setPanelSettings((SGuiClient) miClient, SAccountConsts.TYPE_COST_CENTER, true, true, true);
         
@@ -794,7 +770,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
         jcbFkItemId_n.addItemListener(this);
         jcbFkItemAuxId_n.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
-        //moPanelFkAccountId.getFieldAccount().getComponent().addFocusListener(this); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         jcbFkCurrencyId.addFocusListener(this);
         jtfDebitCy.addFocusListener(this);
         jtfCreditCy.addFocusListener(this);
@@ -865,17 +840,12 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
             mbFirstTime = false;
             if (mbFirstTime) {
                 mbFirstTime = false;
-                //moPanelFkAccountId.getFieldAccount().getComponent().requestFocus(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
                 moAccountPanel.getTextNumberFirst().requestFocus();
             }
         }
     }
     
     private void triggerFocusLost() {
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        if (moPanelFkAccountId.getFieldAccount().getComponent().isFocusOwner()) {
-            actionFkAccountIdFocusLost();
-        }*/
         if (jcbFkCurrencyId.isFocusOwner()) {
             actionFkCurrencyIdFocusLost();
         }
@@ -930,7 +900,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
         mbResetingForm = true;
         
         mbIsCurrentAccountDiogAccount = false;
-        //msCurrentAccountId = moPanelFkAccountId.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         
         int[] anAuxBizParnerKey = (int[]) moFieldFkBizPartnerId_nr.getKey();
         int[] anAuxTaxKey = (int[]) moFieldFkTaxId_n.getKey();
@@ -966,11 +935,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
 
         //account = moPanelFkAccountId.getCurrentInputAccount();
 
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        if (!moPanelFkAccountId.isEmptyAccountId()) {
-            oAccountMajor = moPanelFkAccountId.getDataAccountMajor();
-        }
-        */
         oAccountMajor = moAccountPanel.getSelectedDataAccountLedger();
 
         if (oAccountMajor == null) {
@@ -1015,10 +979,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
             boolean isAccSysTax = SLibUtilities.belongsTo(mnAccountSystemTypeId, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT });
             
             try {
-                /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-                mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
-                        SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
-                */
                 mbIsCurrentAccountDiogAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), oAccountMajor) || 
                         SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moAccountPanel.getSelectedDataAccount());
             }
@@ -1088,7 +1048,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
             }
 
             // Check if it is necesary to enable tax fields:
-            //int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moPanelFkAccountId.getFieldAccount().getString()); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             int[] taxFk = SValidationUtils.getTaxFkByAcc(miClient.getSession(), moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX());
             if (isAccSysTax || isAccSysPurchases || taxFk != null) {
                 mbIsTaxRequired = isAccSysTax;
@@ -1322,13 +1281,11 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
     private SFinRecordEntry composeFinRecordEntry(SDialogRecordApportionmentRow row) {
         SFinRecordEntry finEntry = new SFinRecordEntry();
         
-        //finEntry.AccountId = moPanelFkAccountId.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         finEntry.AccountId = moAccountPanel.getSelectedDataAccount().getPkAccountIdXXX();
         finEntry.Concept = moFieldConcept.getString();
         finEntry.ExchangeRate = moFieldExchangeRate.getDouble();
         finEntry.ExchangeRateSystem = 1d;
         finEntry.CurId = moFieldFkCurrencyId.getKeyAsIntArray()[0];
-        //finEntry.CostCenter = moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
         finEntry.CostCenter = moCostCenterPanel.getSelectedDataCostCenter() == null ? "" : moCostCenterPanel.getSelectedDataCostCenter().getPkCostCenterIdXXX();
         
         if (row == null) {
@@ -1369,8 +1326,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
         
         finEntry.IsTaxCash = jrbTaxCash.isSelected();
         
-        //finEntry.Account = moPanelFkAccountId.getCurrentInputAccount(); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        //finEntry.AccountMajor = moPanelFkAccountId.getDataAccountMajor();
         finEntry.Account = moAccountPanel.getSelectedDataAccount();
         finEntry.AccountMajor = moAccountPanel.getSelectedDataAccountLedger();
         
@@ -1482,20 +1437,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
         
         return maRecordEntries;
     }
-    
-    /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-    private void actionFkAccountIdFocusGained() {
-        if (!msCurrentAccountId.equals(moPanelFkAccountId.getFieldAccount().getString())) {
-            renderAccountSettings();
-        }
-    }
-
-    private void actionFkAccountIdFocusLost() {
-        if (!msCurrentAccountId.equals(moPanelFkAccountId.getFieldAccount().getString())) {
-            renderAccountSettings();
-        }
-    }
-    */
     
     private void actionFkCurrencyIdFocusGained() {
         manLastCurrencyKey = moFieldFkCurrencyId.getKeyAsIntArray();
@@ -1749,7 +1690,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
             row.setDebitCy(SLibUtils.round(moFieldDebitCy.getDouble() * moFieldApportionment.getDouble(), 2));
             row.setCreditCy(SLibUtils.round(moFieldCreditCy.getDouble() * moFieldApportionment.getDouble(), 2));
             maEntryRows.add(row);
-            //moPanelFkAccountId.setReadOnly(true); //XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
             moAccountPanel.setPanelEditable(false);
             
             populateGrid(-1);
@@ -1961,12 +1901,6 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
 
         moFieldFkCurrencyId.setFieldValue(new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
         
-        /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-        moPanelFkAccountId.resetPanel();
-        moPanelFkAccountId.setReadOnly(false);
-        moPanelFkCostCenterId_n.resetPanel();
-        */
-        
         moAccountPanel.initPanel();
         moCostCenterPanel.initPanel();
 
@@ -2123,15 +2057,7 @@ public class SDialogRecordApportionment extends javax.swing.JDialog implements S
 
     @Override
     public void focusGained(FocusEvent e) {
-        if (e.getSource() instanceof javax.swing.JFormattedTextField) {
-            JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
-            /* XXX Isabel Servín, 2025-03-27: código correspondiente al panel anterior de captura de cuentas cotables y centro de costo.
-            if (formattedTextField == moPanelFkAccountId.getFieldAccount().getComponent()) {
-                actionFkAccountIdFocusGained();
-            }
-            */
-        }
-        else if (e.getSource() instanceof javax.swing.JComboBox) {
+        if (e.getSource() instanceof javax.swing.JComboBox) {
             JComboBox comboBox = (JComboBox) e.getSource();
 
             if (comboBox == jcbFkCurrencyId) {

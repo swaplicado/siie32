@@ -4,6 +4,7 @@
  */
 package erp.mod.trn.form;
 
+import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.itm.db.SDbPriceCommercialLog;
 import java.awt.BorderLayout;
@@ -28,7 +29,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores
+ * @author Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelectionListener{
     
@@ -69,7 +70,7 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jpPriceList.setBorder(javax.swing.BorderFactory.createTitledBorder("Precios comerciales del ítem:"));
+        jpPriceList.setBorder(javax.swing.BorderFactory.createTitledBorder("Historial de precios comerciales del ítem:"));
         jpPriceList.setPreferredSize(new java.awt.Dimension(100, 200));
         jpPriceList.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpPriceList, java.awt.BorderLayout.CENTER);
@@ -114,8 +115,9 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Ítem"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Precio comercial"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha doc."));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Folio doc.", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Moneda local", STableConstants.WIDTH_CURRENCY_KEY));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha doc. origen"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "Folio doc. origen", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Asoc. negocios"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, SGridConsts.COL_TITLE_IS_SYS));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, SGridConsts.COL_TITLE_IS_DEL));
@@ -151,6 +153,7 @@ public class SDialogItemPriceCardex extends SBeanFormDialog implements ListSelec
                 while (resultSet.next()) {
                     SDbPriceCommercialLog log = new SDbPriceCommercialLog();
                     log.read(miClient.getSession(), new int[] { pk[0], pk[1], resultSet.getInt(1) });
+                    log.setAuxLocalCurrency(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
                     maPriceComLog.add(log);
                 }
             }

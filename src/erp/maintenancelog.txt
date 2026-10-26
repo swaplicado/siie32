@@ -1,4 +1,750 @@
 ================================================================================
+SIIE 3.2 309.4/ 2026-10-22
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Guardado de bitácora de verificación de valuación de consumos de materiales
+
+================================================================================
+SIIE 3.2 309.3/ 2026-09-25
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Funcionalidad para contabilizar semanas de bodegas facturadas
+
+================================================================================
+SIIE 3.2 309.2/ 2026-09-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan verificaciones de la valuación (trn_stk_val_mvt) vs kardex (trn_stk_val_kardex).
+
+================================================================================
+SIIE 3.2 309.1/ 2026-09-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Columna e ícono de advertencias en valuaciones.
+2) Warnings cuando no hay remanente para un movimiento de salida.
+3) Verificación de costos desde tabla de kardex de valuación.
+
+================================================================================
+SIIE 3.2 309.0/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+Implementa kardex para valuación de inventarios:
+
+1) Agrega entidades y utilidades para el manejo del kardex.
+2) Genera consumos, ajustes y movimientos de entradas y salidas.
+3) Actualiza los costos de existencias y movimientos de almacén.
+4) Registra cambios de referencias entre órdenes de compra y facturas.
+5) Incorpora validaciones de integridad para la valuación de inventarios.
+
+================================================================================
+SIIE 3.2 307.9/ 2026-09-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Permitir marcar si pagos de anticipos requieren CRP en SIIE. PDC-959
+2) Cambio en exportación de pagos y solicitudes de pago dependiendo del estatus.
+
+================================================================================
+SIIE 3.2 307.8/ 2026-09-14
+Jhonatan Claudio Peña Hernández
+--------------------------------------------------------------------------------
+1) Corrección al SBC al incluir el gravado y exento de la prima dominical.
+2) Excedente de partidas de OC al importar facturas de proveedores en SIIE.
+
+================================================================================
+SIIE 3.2 307.7/ 2026-09-09
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Fix de bandera de requerimiento de complemento de pago en creación de pagos.
+
+================================================================================
+SIIE 3.2 307.6/ 2026-09-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de transacción de BD en valuaciones para soportar reevaluación masiva.
+2) Cambio en contabilización de consumos para tomar el CC de la requisición.
+
+================================================================================
+SIIE 3.2 307.5/ 2026-09-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales: Validación restrictiva de diferencia de precios solo cuando no es Activo Fijo, cuando lo es solo aparece un warning.
+
+================================================================================
+SIIE 3.2 307.4/ 2026-09-02
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Optimizar query de exportPurchaseOrdersFiles y forzar subida en export de documento puntual
+
+================================================================================
+SIIE 3.2 307.3/ 2026-09-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección al resetear el campo precio unitario al abrirse previamente por un vinculo
+
+================================================================================
+SIIE 3.2 307.2/ 2026-08-31
+Adrian Alejandro AVILES GOMEZ
+--------------------------------------------------------------------------------
+1) Funcionalidad para importar gastos de bodegas por semana desde el portal AME.
+2) Edición de movimientos de gastos de bodegas y su actualización en el portal AME.
+3) Contabilización / descontabilización de semanas de bodegas.
+4) Habilitación para abrir partidas de sistema en pólizas pero no se pueden guardar.
+
+================================================================================
+SIIE 3.2 307.1/ 2026-08-31
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Filtro solicitudes de pago programadas hoy o anteriores hasta hoy en layouts bancarios en SIIE.
+2) Mostrar OC de partidas en forma de captura de facturas en SIIE.
+3) Mostrar documentos PDF cargados en PC junto a proformas al descargarlas en SIIE.
+4) Restringir cambio de precio proveniente de OC al modificar partidas de facturas en SIIE.
+
+================================================================================
+SIIE 3.2 307.0/ 2026-08-25
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación de costo unitario cuando en valuación de consumos hay un surtido de factura, se busca la OC para determinar si la diferencia del costo no excede la configurada.
+
+================================================================================
+SIIE 3.2 306.2/ 2026-08-18
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Restricción de cambiar la fecha de pago programada a fechas posteriores a la fecha autorizada.
+2) Reporte de embarques especial para Saporis.
+3) Corrección de clase subida por error con código de prueba  
+
+================================================================================
+SIIE 3.2 306.1/ 2026-08-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Unión de partidas de facturas provenientes de distintas entregas mensuales en SIIE. DMS-92.
+
+================================================================================
+SIIE 3.2 306.0/ 2026-08-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan columnas de moneda extranjera a valuación.
+2) Validaciones extra al terminar el proceso.
+3) Configuración de porcentaje de diferencia de precio OC vs Factura.
+
+================================================================================
+SIIE 3.2 305.7/ 2026-08-13
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Reforzamiento de validaciones de atributos activo y eliminado al exportar proveedores y empleados a la aplicación de compras y gastos de aguacate (Avocado).
+2) Optimización en la presentación de resultados al finalizar el proceso de exportación de Avocado.
+3) Blindaje del proceso de autenticación (Login dinámico) hacia servicios de Avocado.
+4) Exportación de acreedor y deudor comodín.
+
+================================================================================
+SIIE 3.2 305.6/ 2026-08-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de consulta "detalle comercial de contratos por procesar", tanto de compras como de ventas.
+
+================================================================================
+SIIE 3.2 305.5/ 2026-08-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega visualización de notas a vista de Valuación a detalle.
+2) Datos de naturaleza del documento en vista de Valuación a detalle.
+3) Optimización de notas en movimientos de valuación.
+4) Separación de naturaleza de documento y contabilización en valuación.
+
+================================================================================
+SIIE 3.2 305.4/ 2026-08-04
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de funcionalidad para la exportación de proveedores y empleados a la aplicación de compras y gastos de aguacate.
+2) Arreglo de exportación de empleados activos.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de columna "área de negocios" en vista de clientes y proveedores.
+
+================================================================================
+SIIE 3.2 305.3/ 2026-07-28
+Jhonatan Claudio PEÑA HERNÁNDEZ
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Reforzamiento de validaciones en la clave del ítem al crear un ítem (si es modificación, no se valida; si es nuevo, advierte, pero deja guardar; si es copia, valida y no deja repetir la clave).
+2) Funcionalidad para bajar el monto autorizado para pago en las solicitudes de pago autorizadas.
+--------------------------------------------------------------------------------
+1) Sincronización del campo prioridad en exportación de OC.
+2) Validación en Valuación de consumos de materiales para reportar déficit en un consumo.
+3) Validación de Documentos de compra actualizados después de la valuación.
+
+================================================================================
+SIIE 3.2 305.2/ 2026-07-24
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección de validaciones de régimen fiscal al crear una orden de compra
+
+================================================================================
+SIIE 3.2 305.1/ 2026-07-23
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Saporis tiene un formato especial JasperReports para la impresión de ordenes de compra. El archivo se llama trn_dps_order - SAPORIS.jasper, y al igual que todos los demás formatos JasperReports, está en la carpeta /reps.
+Cada vez que se actualicen reportes en SAPORIS, hay que renombrar el formato original trn_dps_order.jasper como trn_dps_order - ORIGINAL.jasper, y al archivo del formato propio de SAPORIS hay que quitar la parte " - SAPORIS", para que quede como trn_dps_order.jasper.
+2) Eliminación de botones de marcar y desmarcar como urgentes y cancelar autorización WEB desde la vista de pedidos por autorizar desde APP WEB
+
+================================================================================
+SIIE 3.2 305.0/ 2026-07-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación del campo "Prioridad" para Documentos, haciéndolo modificable en la captura y en la solicitud de autorización de pedidos de compras.
+2) Reset a bandera "Es moneda local" en la forma de captura de Documentos, para evitar el cambio inesperado de moneda extranjera a moneda local al abrir documentos para modificarlos.
+3) Restricción de largo máximo de campos "Notas" de Pagos, para evitar errores en la inserción en la BD.
+
+================================================================================
+SIIE 3.2 304.0/ 2026-07-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Valuación de consumos de materiales. Validación de entradas y salidas de activo fijo con costo así como de naturaleza predeterminada sin costo.
+2) Se agregan comentarios a la valuación cuando ocurran casos especiales.
+3) Se agrega tipo de movimiento a movimientos de valuación.
+
+================================================================================
+SIIE 3.2 303.11/ 2026-07-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Reforzamiento de la validación de captura de pedidos de compra para hacer concordar la naturaleza del documento con el Uso del CFDI.
+
+================================================================================
+SIIE 3.2 303.10/ 2026-07-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Mejorar visibilidad de envío a autorización de OC en SIIE. PDC-677
+2) Excluir solicitudes de pago eliminadas y canceladas de consulta de pagos existentes de un documento en SIIE. PDC-890
+3) Permitir cambiar fecha de pago (de operación) de solicitudes y pagos que ya están pagados (operados) en SIIE. PDC-888
+4) Cambio en la manera de obtención de el método de pago al exportar OC.
+
+================================================================================
+SIIE 3.2 303.9/ 2026-07-13
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Se añadio funcionalidad para modificar la fecha y el uso de CFDI de un pedido de compras en la pantalla de pedidos de compras.
+
+================================================================================
+SIIE 3.2 303.8/ 2026-07-10
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Eliminación de la sincronización de cantidad hacia las requisiciones asociadas.
+2) Auditoría en requisición asociada a una OC al modificarla.
+3) Agregado de una nota aclaratoria que la cantidad de la requisición no será modificada.
+
+================================================================================
+SIIE 3.2 303.8/ 2026-07-08
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación del saldo de los documentos al crear las solicitudes de pago: Se toma en cuenta el monto de los pagos contabilizados y se resta a los pagos existentes.
+
+================================================================================
+SIIE 3.2 303.7/ 2026-07-07
+Cesar Iván OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Se agrega en la funcionalidad que importa las prenóminas a siie, un mensaje que indica si algún colaborador tuvo un error al generar la prenómina en CAP.
+
+================================================================================
+SIIE 3.2 303.7/ 2026-07-03
+Cesar Iván OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Se modifica la ruta del log de Humand estaba hacia C y no funcionaba.
+
+================================================================================
+SIIE 3.2 303.7/ 2026-07-03
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección vista pedidos, para que no intente leer los estatus de google en caso de que no este habilitado en esa empresa.
+
+================================================================================
+SIIE 3.2 303.6/ 2026-07-02
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de la vista de todas mis RM, constante incorrecta.
+
+================================================================================
+SIIE 3.2 303.5/ 2026-07-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Optimización de la vista de todas mis RM (52 a 37 segundos).
+
+================================================================================
+SIIE 3.2 303.5/ 2026-07-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al envío automático de correos de OC autorizadas mediante la implementación del método de obtención del estatus de SWAP Services disponibles en erp.SClientApi.
+2) Adición de método de impresión bonita de una cadena JSON en erp.swap.utils.SJsonUtils.
+
+================================================================================
+SIIE 3.2 303.4/ 2026-06-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Validación del saldo de los documentos al crear las solicitudes de pago.
+2) Validación del saldo de los documentos al guardar y contabilizar los layouts.
+3) Validación de pagos en otros layouts para los documentos de los pagos en dicho layout.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Exclusión de adición de información alusiva al Portal de Compras (PC) en el cuerpo de las notificaciones de correo sobre la autorización de pedidos de compras (OC),
+    porque erróneamente se dejó habilitada para todas las empresas, sin considerar si tenían o no PC.
+2) Formalización, mediante constantes, de los casos de servicio mensajería de correo (MMS) para la determinación del remitente de los mensajes de correo,
+    incluyendo además un caso nuevo no documentado para pedidos de compras (OC) y su autorización en empresas con PC,
+    y habilitación de tag reemplazable para insertar el folio del pedido de compras (OC) en el asunto del mensaje de correos de notificación.
+
+================================================================================
+SIIE 3.2 303.3/ 2026-06-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Ajuste en valuación de consumos de inventarios para determinar si las partidas son de activo fijo.
+2) Se agrega columna en vista de consumos de valuación de inventarios.
+
+================================================================================
+SIIE 3.2 303.2/ 2026-06-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de más opciones de filtrado en el guardado masivod de CFDI de nóminas, con opción a hacerlo para una sola nómina,
+    y también con opción a guardar por separado los CFDI de cada nómina en subcarpetas individuales.
+
+================================================================================
+SIIE 3.2 303.1/ 2026-06-23
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Adición de subtotales a reportes de cobros o pagos por período.
+2) Corrección al importar facturas en SThinDpsCfd, al leer los datos de CFDI de recepción de pagos o la importación de documentos desde SWAP Services (alias incorrecto).
+
+================================================================================
+SIIE 3.2 303.0/ 2026-06-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Eliminación de carpetas temporales obsoletas de descarga de archivos de facturas desde SWAP Services, estas son, las creadas el día anterior o antes.
+2) Extensión de longitud de columna "símbolo", a 15 carácteres, en el catálogo de unidades de medida.
+
+================================================================================
+SIIE 3.2 302.6/ 2026-06-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Revisar indicación en pagos de requerir CRP en SIIE. PDC-866
+2) Reasignación de archivos a pagos tipo 'P' en layouts.
+
+================================================================================
+SIIE 3.2 302.5/ 2026-06-17
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Clasificación de pagos 1. Activo Fijo, 2. Compra, 3. Gasto, 4. Anticipo.
+2) Se agrega clase de pago e ítem de referencia a exportación de pagos.
+
+--------------------------------------------------------------------------------
+Sergio Abraham FLORES GUTIÉRREZ
+1) Condicionamiento de inicialización del Google Cloud Stora Manager solo si la empresa tiene habilitados los SWAP Services.
+
+================================================================================
+SIIE 3.2 302.4/ 2026-06-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la funcionalidad de sustitución del archivo PDF de facturas y notas de crédito de compras en la forma de captura de documentos.
+2) Mejoramiento a la gestión del archivo XML de facturas y notas de crédito de compras.
+3) Mejoramiento a la obtención y guardado de los archivos XML y PDF de facturas y notas de crédito de compras.
+
+================================================================================
+SIIE 3.2 302.3/ 2026-06-08
+Cesar Iván OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) Funcionalidad para dar de alta en Human a los empleados que se den de alta en
+SIIE, tambien si se modifican se envian cambios a Human, si se da de baja, se 
+borra en Human, la reactivación realmente generá una alta nueva.
+
+================================================================================
+SIIE 3.2 302.2/ 2026-06-05
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección en el seguimiento de compras cuando el surtido con almacén fue realizado por factura.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ajuste provisional a la inicialización de Google Cloud Storage Manager, para realizarse solamente si los parámetros de configuración correspondientes no están vacíos.
+   NOTA: La inicialización de Google Cloud Storage Manager se invoque hasta el momento justo en que sea requerido.
+
+================================================================================
+SIIE 3.2 302.1/ 2026-06-02
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de botones para agregar y modificar notas de partidas al formulario de modificación de datos complementarios de pedidos de compras (OC).
+2) Propagación de las modificaciones realizadas en las partidas de las OC hacia sus respectivas requisiciones vinculadas.
+3) Incorporación de validación que impide la modificación del centro de costo (CeCo) si la requisición asociada carece de un subcentro de consumo seleccionado, o si el CeCo elegido no está autorizado para el mismo.
+4) Adición de validación para la confirmación sobre los documentos vinculados a la OC que serán afectados en cascada.
+5) Inserción de una nueva columna para visualizar las notas en el formulario de modificación de datos complementarios de OC.
+6) Incorporación de funcionalidad y validación de conteo de valuaciones de inventario asociadas a la OC y a la factura vinculada a dicha OC.
+7) Implementación de validación de confirmación al usuario sobre los documentos asociados a la factura (pedidos, justes y ahora requisiciones) que se verán afectados por los cambios.
+8) Adición de restricción en el formulario de modificación de facturas que impide el guardado si el ítem de referencia nuevo seleccionado es idéntico al ítem de referencia actual.
+9) Integración de la actualización automática de datos hacia las requisiciones y todas las notas de crédito (NC) vinculadas a la partida de la factura modificada.
+10) Actualización de la contabilización en las pólizas contables de la factura y sus NC.
+11) Refactorización del método de generación de historial de cambios a partidas de facturas para permitir el registro adecuado de los cambios provenientes de las partidas de OC.
+12) Segmentación de la vista historial de cambios en 6 subvistas especializadas, estructuradas de acuerdo con el módulo operativo (Compras o Ventas) y la categoría del documento (Órdenes, Facturas o NC).
+13) Parametrización dinámica de la interfaz de la tabla, ajustando automáticamente el tipo de filtro de período, la cantidad de columnas y los títulos de los encabezados en función de la subvista instanciada.
+14) Incorporación de botones en la vista de historial de cambios a partidas de documentos para la visualización directa del documento, las notas adjuntas y vínculos del registro seleccionado.
+15) Ampliación de la funcionalidad de rastreo de documentos vinculados, añadiendo la capacidad de buscar y mostrar las requisiciones asociadas al documento.
+16) Segmentación de la vista de precios comerciales en una vista para "precios vigentes" (edición y eliminación inhabilitados) y otra para "todos los precios" que facilita el rastreo del historial.
+17) Incorporación de columna de moneda local en ambas vistas de precios comerciales.
+18) Se deshabilitó en el formulario de modificación de precios los campos "ítem" y "unidad" en registros existentes, previniendo así la alteración accidental de precios de sistema.
+19) Adición de restricción que impide la creación de un nuevo precio comercial si ya existe un registro para el mismo ítem y unidad en la fecha especificada.
+20) Implementación de validación en caso de seleccionar una unidad de medida en el precio comercial que difiera de la unidad base configurada en el catálogo del ítem.
+21) Implementación de funcionalidad para la actualización y validación de nuevo precio comercial al modificar requisiciones.
+
+================================================================================
+SIIE 3.2 302.0/ 2026-06-01
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Autenticación a Google Cloud Storage desde la configuración de la BD.
+
+================================================================================
+SIIE 3.2 301.8/ 2026-06-01
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Habilitación de la importación de proveedores
+2) Corrección de validación de XML activos solo a los pagos seleccionados
+3) Adición de los botones de ver detalle en el seguimiento de compras
+
+================================================================================
+SIIE 3.2 301.7/ 2026-05-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de las vistas de flujo de efectivo de cobros y pagos por período en la moneda local o en la de la transacción.
+
+================================================================================
+SIIE 3.2 301.6/ 2026-05-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Modificación de proceso en OC para soporte de multiempresa en exportación masiva (JSON).
+
+================================================================================
+SIIE 3.2 301.5/ 2026-05-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Modificación en la determinación de surtidos existentes en un pedio al guardar una factura.
+
+================================================================================
+SIIE 3.2 301.4/ 2026-05-26
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Habilitar obtención del reporte de movimientos contables de clientes y proveedores por documento, mostrando los movimientos y saldos en la moneda de los movimientos. Y agregar al pie advertencia de existencia de movimientos en otras monedas. DMS-77
+2) Corrección en diálogo de historial de autorización de OC con proceso anterior.
+
+================================================================================
+SIIE 3.2 301.3/ 2026-05-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de la generación de los reportes de flujo de efectivo de cobros y pagos por período en la moneda de la transacción (de las facturas y anticipos).
+
+================================================================================
+SIIE 3.2 301.2/ 2026-05-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de la generación de los reportes de movimientos contables de cuentas de dinero (caja y cuentas bancarias) en la moneda propia de la cuenta.
+
+================================================================================
+SIIE 3.2 301.1/ 2026-05-19
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio de asociado de negocios como destinatario para facturas y notas de crédito de ventas, se agrega al log de cambios al guardar DPS.
+2) Mejorar claridad del mensaje cuando no es posible mostrar XML de CFDI y revisar habilitación del botón en forma de captura de documentos en SIIE. PDC-839
+
+================================================================================
+SIIE 3.2 300.9/ 2026-05-18
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección al rechazar y autorizar pedidos de compras en empresas sin autorización vía APP/WEB.
+2) Vistas de surtidos, devoluciones y seguimientos de almacén sin filtro de áreas funcionales.
+3) Adición de consulta de solicitudes de pago en em modulo de compras.
+4) Adición de pantalla de carga cuando se exportan datos manualmente a SWAP Services.
+5) Importación proveedores desde portal de compras a SIIE.
+
+================================================================================
+SIIE 3.2 300.8/ 2026-05-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Importación y contabilización de notas de crédito autorizadas de operaciones, de ajuste de facturación de anticipos y de aplicación de anticipos facturados desde SWAP Services.
+2) Vinculación, desvinculación de notas de crédito autorizadas y notas de crédito SIIE, y rechazo de notas de crédito autorizadas de SWAP Services.
+
+================================================================================
+SIIE 3.2 301.0/ 2026-05-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio de destinatario propio para facturas y notas de crédito de ventas, se agrega log de cambios al guardar DPS.
+
+================================================================================
+SIIE 3.2 300.6/ 2026-05-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Formateo de mensaje de validación de fecha programada de pagos vs fecha de póliza contable.
+
+================================================================================
+SIIE 3.2 300.5/ 2026-05-13
+Cesar Ivan OROZCO NATIVIDAD
+--------------------------------------------------------------------------------
+1) El calculo de las fechas solo se hacia para mostrarlo en el mensaje internamente no se hacia correctamente
+
+================================================================================
+SIIE 3.2 300.4/ 2026-05-08
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Habilitar la visualización de datos de importación de DPS y permitir visualización de XML y PDF en forma de captura de DPS en SIIE. PDC-826.
+
+================================================================================
+SIIE 3.2 300.3/ 2026-05-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Documentar y formatear todas las clases del paquete erp.siieapp en SIIE. PDC-825.
+
+================================================================================
+SIIE 3.2 300.2/ 2026-05-07
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Filtro de texto en vista de precios comerciales en el módulo de compras.
+2) Botón de ver documento en misma vista.
+
+================================================================================
+SIIE 3.2 300.1/ 2026-05-06
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Cambio de cuenta bancaria pagadora y de beneficiario en vista de pagos operados. PDC-823.
+
+================================================================================
+SIIE 3.2 300.0/ 2026-05-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de consulta de información de carga, revisión y autorización de facturas y proformas en SWAP Services en los diálogos correspondientes para su procesamiento y registro.
+2) Trabajo en proceso para el procesamiento y registro de notas de crédito desde SWAP Services.
+
+================================================================================
+SIIE 3.2 299.20/ 2026-05-04
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agregan tipos de documento en archivos para OC, cotizaciones y pagos. PDC-821.
+
+================================================================================
+SIIE 3.2 299.19/ 2026-05-04
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Contabilización de facturas de anticipos de proveedores tanto en la importación individual de CFDI como en la importación de facturas autorizadas de compras desde SWAP Services.
+2) Consulta visual de XML tanto la importación de facturas autorizadas de compras como en la contabilización masiva desde SWAP Services.
+
+================================================================================
+SIIE 3.2 299.18/ 2026-04-30
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de la exportación de datos a Swap Services desde la clase independiente ejecutada en el servidor.
+2) Se agrega condición para que se habilite la pestaña de contabilización solo que sea diferente a pedido en la forma de captura de documentos.
+
+================================================================================
+SIIE 3.2 299.17/ 2026-04-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Habilitación de los diálogos de visor de PDF y del renderizador de XML de CFDI para que sean "flotantes".
+
+================================================================================
+SIIE 3.2 299.16/ 2026-04-28
+Edwin Omar CARMONA FIGUEROA
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Actualizar parcialidad y saldo del documento al crear solicitudes de pago a facturas en SIIE. PDC-637.
+2) Corrección de vistas de pagos al consultar los estatus de tabla TRN_SWAP_DATA_PRC
+
+================================================================================
+SIIE 3.2 299.15/ 2026-04-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de exportación de referencias de compra, se reduce el tiempo de ejecución de la consulta.
+
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de método de validación de estatus SAT de CFDI para invocarse indistintamente en la importación individual de CFDI como en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.
+2) Validación de estatus SAT de CFDI en la contabilización masiva de facturas de fletes y compras de materiales provenientes de SWAP Services.
+3) Corrección a la validación de contabilización de documentos en la creación de solicitudes de pago en la importación de facturas desde SWAP Services.
+
+================================================================================
+SIIE 3.2 299.14/ 2026-04-27
+Jhonatan Claudio PEÑA HERNANDEZ
+--------------------------------------------------------------------------------
+1) Corrección de números mágicos en las vistas de pagos.
+
+================================================================================
+SIIE 3.2 299.13/ 2026-04-27
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corregir creación incorrecta de PDF de OC al autorizarse en carpeta temp en siie32. PDC-484.
+2) Corregir mensaje "Registro no encontrado" al exportar pagos a SWAP Services en SIIE. PDC-636.
+
+================================================================================
+SIIE 3.2 299.12/ 2026-04-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización de la descarga masiva de archivos de facturas importadas desde SWAP Services, para hacerlo en lotes de cierto número predeterminado de documentos. Provisionalmente son 100 los documentos procesados en cada bloque.
+2) Inclusión del dato naturaleza del documento en la exportación a SWAP Services de pedidos de compras (OC) y referencias de pedidos de compras (OC).
+3) Modificación a validación de captura de partidas de documentos para hacer posible no tener impuestos, y permitir tener conceptos de CFDI, cuando aplique, que no sean objeto de impuestos, clave "01" ("No objeto de impuesto.").
+
+================================================================================
+SIIE 3.2 299.11/ 2026-04-24
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega botón de consulta de flujo de autorización en vista de facturas de compras y pagos.
+
+================================================================================
+SIIE 3.2 299.10/ 2026-04-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Reforzamiento a las advertencias de existencia de anticipos a proveedores en la creación de facturas desde SWAP Services y en su contabilización masiva.
+2) Refactorización para concentrar en un método la creación de facturas desde CFDI y cuando se hace desde cero cuando se importan desde SWAP Services.
+3) Asignación de 1 semana a la constante que controla la obtención de datos del dispositivo de control de asistencia para el procesamiento de bonos de nóminas semanales.
+4) Visualicación del tipo de procesamiento de documentos ("caso documento") de SWAP Services en la vista de documentos solamente para facturas y notas de crédito de compras.
+
+================================================================================
+SIIE 3.2 299.9/ 2026-04-22
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se agrega sumatoria de monto en moneda del documento en la lectura de layouts de transferencias
+
+================================================================================
+SIIE 3.2 299.8/ 2026-04-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de advertencia de anticipos a proveedores en la importación de facturas y en su contabilización masiva desde SWAP Services.
+
+=================================================================================
+SIIE 3.2 299.7/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-594: Hacer en la invocación del envío a autorizar, si la OC se quedó en estatus inconsistente, 
+primero la validación de estatus en PC para corregirlo en SIIE, 
+tal como si el usuario solicitara hacer esta misma validación con el botón de verificación de estatus.
+
+=================================================================================
+SIIE 3.2 299.6/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-587: Corrección cuando se elimina una OC o boleto de báscula, y se crea otra con 
+el mismo folio en SIIE o SOM, se exporta como eliminada a PC.
+
+=================================================================================
+SIIE 3.2 299.5/ 2026-04-20
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PCD-508: Restringir comandos de vistas de solicitudes de pagos en SIIE.
+
+================================================================================
+SIIE 3.2 299.6/ 2026-04-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de información de pago requerido en el diálogo de consulta de importación de documentos en la forma de captura de documentos.
+2) Habilitación de reordenamiento de columnas en los diálogos de importación de documentos, importación de proformas y CRP y contabilización masiva, pero aún sin preservarse estas preferencias de usuario.
+
+================================================================================
+SIIE 3.2 299.5/ 2026-04-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Consulta de boleto de báscula en la contabilización asistida de fletes de materias primas.
+2) Descarte de generación de solicitud de pago o cambio de monto a pagar en la importación de facturas desde SWAP Services.
+3) Obtención del ID del boleto de báscula a partir de su número, desde la BD de SOM.
+4) Cambio a la generación del archivo PDF de boletos de báscula para guardarse en la carpeta temporal del sistema operativo.
+5) Corrección a la visualización de compras de materias primas en la contabilización asistida.
+
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Corrección de selección de renglón al refrescar la vista de Descripciones extendidas de ítems.
+2) Corrección de campo de check-box de Descripción extendida eliminada.
+
+================================================================================
+SIIE 3.2 299.4/ 2026-04-17
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Implementación de botón de descripción extendida de ítem en forma de documentos de compras-ventas.
+
+=================================================================================
+SIIE 3.2 299.3/ 2026-04-16
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) PDC-409: Descarga de Comprobantes de Recepción de Pagos de compras en SIIE.
+
+=================================================================================
+SIIE 3.2 299.2/ 2026-04-16
+Adrián Alejandro AVILÉS GÓMEZ
+--------------------------------------------------------------------------------
+1) Restringir eliminación de vínculos entre pedidos y facturas que se hayan importado desde PC
+
+=================================================================================
+SIIE 3.2 299.1/ 2026-04-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la primera versión de la contabilización asistida de facturas de fletes y compras de materias primas.
+
+=================================================================================
+SIIE 3.2 299.0/ 2026-04-16
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Insertar descripción extendida de ítems por partida al reporte de orden de compra.
+2) Insertar descripción extendida de ítems por partida al e-mail de solicitud de cotización.
+
+=================================================================================
+SIIE 3.2 298.2/ 2026-04-16
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Condición de sincronización de boletos de som.
+2) Refactorización de funcionalidad de generación de PDF de ticket de revuelta.
+
+=================================================================================
+SIIE 3.2 298.1/ 2026-04-15
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Generar el PDF de boletos de báscula Revuelta residentes en SOM, con el formato de 
+impresión similar al de Revuelta, y exportarlos a Google Cloud para que estén disponibles en PC.
+
+=================================================================================
+SIIE 3.2 298.0/ 2026-04-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Pago de facturas de anticipos.
+2) Refactorización de layouts y modificación de forma de captura de pagos.
+3) Adición de columnas tipo de operación en pagos y layouts.
+
+=================================================================================
+SIIE 3.2 297.11/ 2026-04-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Desarrollar vista de facturas de anticipos pendientes de pagarse en SIIE (PDC-793)
+
+=================================================================================
+SIIE 3.2 297.8/ 2026-04-13
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Funcionalidad de descarga de todos los archivos relacionados con los pedidos y facturas
+2) Adición de las columnas de tipo de carga en las vistas de solicitudes de pago
+
+=================================================================================
+SIIE 3.2 298.0-b1/ 2026-04-10
+Adrián Alejandro AVILES GOMEZ
+--------------------------------------------------------------------------------
+1) Log de consulta de CFDI ante el SAT.
+
+=================================================================================
+SIIE 3.2 297.6/ 2026-04-10
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Agrupación y desagrupación de pagos y documentos en layouts de pago
+
+=================================================================================
+2026-04-07, 3.2 297.4
+Rodrigo Abel AYALA VÁZQUEZ
+1) Corrección en la consulta del "getOptionItemPicker" al seleccionar la descripción extendida del ítem.
+
+================================================================================
+SIIE 3.2 297.3/ 2026-04-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la obtención de opciones de selección de subáreas funcionales.
+- (Se cambió el sentido original de búsqueda de opciones, y se dejó una condición que, en empresas sin áreas funcionales, anulaba la posibilidad de obtener renglones en la consulta SQL ("... AND 1 = 0").)
+2) WIP: contabilización asistida de facturas de compras y fletes de materias primas.
+
+================================================================================
 SIIE 3.2 297.2/ 2026-04-01
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

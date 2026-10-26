@@ -56,30 +56,6 @@
             <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanel24">
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                <Property name="alignment" type="int" value="0"/>
-                <Property name="verticalGap" type="int" value="0"/>
-              </Layout>
-              <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlDate">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Fecha:*"/>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDate">
-                  <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[105, 23]"/>
-                    </Property>
-                  </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
             <Container class="javax.swing.JPanel" name="jPanel25">
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
@@ -89,6 +65,9 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlItem">
                   <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
+                    </Property>
                     <Property name="text" type="java.lang.String" value="&#xcd;tem:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
@@ -123,6 +102,9 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlUnit">
                   <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
+                    </Property>
                     <Property name="text" type="java.lang.String" value="Unidad:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
@@ -133,6 +115,30 @@
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[300, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel24">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jlDate">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Vigente desde:*"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[100, 23]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="sa.lib.gui.bean.SBeanFieldDate" name="moDate">
+                  <Properties>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[105, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

@@ -45,6 +45,7 @@ public class SDbDps extends SDbRegistryUser {
     protected String msNumber;
     protected String msNumberReference;
     protected String msCommissionsReference;
+    protected java.lang.String msConditionsPayment;
     protected int mnApproveYear;
     protected int mnApproveNumber;
     protected int mnDaysOfCredit;
@@ -74,6 +75,8 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnPayments;
     protected String msPaymentMethod;
     protected String msPaymentAccount;
+    protected java.lang.String msAccountingTag;
+    protected int mnPriority;
     protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
@@ -101,6 +104,7 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnFkDpsNatureId;
     protected int mnFkCompanyBranchId;
     protected int mnFkFunctionalAreaId;
+    protected int mnFkFunctionalSubAreaId;
     protected int mnFkBizPartnerId_r;
     protected int mnFkBizPartnerBranchId;
     protected int mnFkBizPartnerBranchAddressId;
@@ -129,6 +133,7 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnFkCarrierId_n;
     protected int mnFkVehicleTypeId_n;
     protected int mnFkVehicleId_n;
+    protected int mnFkBillOfLading_n;
     protected int mnFkSourceYearId_n;
     protected int mnFkSourceDocId_n;
     protected int mnFkMfgYearId_n;
@@ -206,6 +211,8 @@ public class SDbDps extends SDbRegistryUser {
     public void setPayments(int n) { mnPayments = n; }
     public void setPaymentMethod(String s) { msPaymentMethod = s; }
     public void setPaymentAccount(String s) { msPaymentAccount = s; }
+    public void setAccountingTag(java.lang.String s) { msAccountingTag = s; }
+    public void setPriority(int n) { mnPriority = n; }
     public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
@@ -233,6 +240,7 @@ public class SDbDps extends SDbRegistryUser {
     public void setFkDpsNatureId(int n) { mnFkDpsNatureId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkFunctionalAreaId(int n) { mnFkFunctionalAreaId = n; }
+    public void setFkFunctionalSubAreaId(int n) { mnFkFunctionalSubAreaId = n; }
     public void setFkBizPartnerId_r(int n) { mnFkBizPartnerId_r = n; }
     public void setFkBizPartnerBranchId(int n) { mnFkBizPartnerBranchId = n; }
     public void setFkBizPartnerBranchAddressId(int n) { mnFkBizPartnerBranchAddressId = n; }
@@ -261,6 +269,7 @@ public class SDbDps extends SDbRegistryUser {
     public void setFkCarrierId_n(int n) { mnFkCarrierId_n = n; }
     public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
     public void setFkVehicleId_n(int n) { mnFkVehicleId_n = n; }
+    public void setFkBillOfLading_n(int n) { mnFkBillOfLading_n = n; }
     public void setFkSourceYearId_n(int n) { mnFkSourceYearId_n = n; }
     public void setFkSourceDocId_n(int n) { mnFkSourceDocId_n = n; }
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
@@ -328,6 +337,8 @@ public class SDbDps extends SDbRegistryUser {
     public int getPayments() { return mnPayments; }
     public String getPaymentMethod() { return msPaymentMethod; }
     public String getPaymentAccount() { return msPaymentAccount; }
+    public java.lang.String getAccountingTag() { return msAccountingTag; }
+    public int getPriority() { return mnPriority; }
     public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
@@ -355,6 +366,7 @@ public class SDbDps extends SDbRegistryUser {
     public int getFkDpsNatureId() { return mnFkDpsNatureId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkFunctionalAreaId() { return mnFkFunctionalAreaId; }
+    public int getFkFunctionalSubAreaId() { return mnFkFunctionalSubAreaId; }
     public int getFkBizPartnerId_r() { return mnFkBizPartnerId_r; }
     public int getFkBizPartnerBranchId() { return mnFkBizPartnerBranchId; }
     public int getFkBizPartnerBranchAddressId() { return mnFkBizPartnerBranchAddressId; }
@@ -383,6 +395,7 @@ public class SDbDps extends SDbRegistryUser {
     public int getFkCarrierId_n() { return mnFkCarrierId_n; }
     public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
     public int getFkVehicleId_n() { return mnFkVehicleId_n; }
+    public int getFkBillOfLading_n() { return mnFkBillOfLading_n; }
     public int getFkSourceYearId_n() { return mnFkSourceYearId_n; }
     public int getFkSourceDocId_n() { return mnFkSourceDocId_n; }
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
@@ -476,6 +489,8 @@ public class SDbDps extends SDbRegistryUser {
         mnPayments = 0;
         msPaymentMethod = "";
         msPaymentAccount = "";
+        msAccountingTag = "";
+        mnPriority = 0;
         mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
@@ -503,6 +518,7 @@ public class SDbDps extends SDbRegistryUser {
         mnFkDpsNatureId = 0;
         mnFkCompanyBranchId = 0;
         mnFkFunctionalAreaId = 0;
+        mnFkFunctionalSubAreaId = 0;
         mnFkBizPartnerId_r = 0;
         mnFkBizPartnerBranchId = 0;
         mnFkBizPartnerBranchAddressId = 0;
@@ -531,6 +547,7 @@ public class SDbDps extends SDbRegistryUser {
         mnFkCarrierId_n = 0;
         mnFkVehicleTypeId_n = 0;
         mnFkVehicleId_n = 0;
+        mnFkBillOfLading_n = 0;
         mnFkSourceYearId_n = 0;
         mnFkSourceDocId_n = 0;
         mnFkMfgYearId_n = 0;
@@ -639,6 +656,8 @@ public class SDbDps extends SDbRegistryUser {
             mnPayments = resultSet.getInt("payments");
             msPaymentMethod = resultSet.getString("pay_method");
             msPaymentAccount = resultSet.getString("pay_account");
+            msAccountingTag = resultSet.getString("acc_tag");
+            mnPriority = resultSet.getInt("priority");
             mnAutomaticAuthorizationRejection = resultSet.getInt("aut_authorn_rej");
             mbIsPublic = resultSet.getBoolean("b_pub");
             mbIsLinked = resultSet.getBoolean("b_link");
@@ -666,6 +685,7 @@ public class SDbDps extends SDbRegistryUser {
             mnFkDpsNatureId = resultSet.getInt("fid_dps_nat");
             mnFkCompanyBranchId = resultSet.getInt("fid_cob");
             mnFkFunctionalAreaId = resultSet.getInt("fid_func");
+            mnFkFunctionalSubAreaId = resultSet.getInt("fid_func_sub");
             mnFkBizPartnerId_r = resultSet.getInt("fid_bp_r");
             mnFkBizPartnerBranchId = resultSet.getInt("fid_bpb");
             mnFkBizPartnerBranchAddressId = resultSet.getInt("fid_add");
@@ -694,6 +714,7 @@ public class SDbDps extends SDbRegistryUser {
             mnFkCarrierId_n = resultSet.getInt("fid_car_n");
             mnFkVehicleTypeId_n = resultSet.getInt("fid_tp_veh_n");
             mnFkVehicleId_n = resultSet.getInt("fid_veh_n");
+            mnFkBillOfLading_n = resultSet.getInt("fid_bol_n");
             mnFkSourceYearId_n = resultSet.getInt("fid_src_year_n");
             mnFkSourceDocId_n = resultSet.getInt("fid_src_doc_n");
             mnFkMfgYearId_n = resultSet.getInt("fid_mfg_year_n");

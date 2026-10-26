@@ -3047,7 +3047,10 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 SDataRecordEntry entry = (SDataRecordEntry) row.getData();
 
                 jbEntryNewCopy.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbNonEditable);
-                jbEntryEdit.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbNonEditable);
+                //Comentado para mantener la versión anterior a la funcionalidad de contabilización de gastos de bodega
+                //jbEntryEdit.setEnabled(!jckIsSystem.isSelected() && !entry.getIsSystem() && !mbNonEditable);
+                //Se quito la restricción de no poder abrir el renglon si es de sistema
+                jbEntryEdit.setEnabled(!jckIsSystem.isSelected() && !mbNonEditable);
                 jbEntryDelete.setEnabled(!jckIsSystem.isSelected() && (!entry.getIsSystem() || entry.getUserId() != 0) && !mbNonEditable);
             }
         }

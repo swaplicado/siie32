@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Adrián Avilés
+ * @author Isabel Servín, Adrián Avilés, Sergio Flores, Claudio Peña, Edwin Carmona
  */
 public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     
@@ -38,6 +38,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public static final int CASE_RESCHEDULE = 2; // payment must be scheduled
     public static final int CASE_CHANGE_CURRENCY = 3; // payment must be scheduled
     public static final int CASE_MARK_AS_PAID = 4; // payment must be scheduled
+    public static final int CASE_CHANGE_BANK_ACCOUNT = 5; // payment must be operated
+    public static final int CASE_CHANGE_EXEC_DATE = 6; // only change execution date
     
     public final static int VALUE_PAYMENT = 1;
     public final static int VALUE_DATE = 2;
@@ -45,6 +47,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     public final static int VALUE_PRIORITY = 4;
     public final static int VALUE_PAYMENT_BANK = 5;
     public final static int VALUE_BENEFIT_BANK = 6;
+    public final static int VALUE_IS_REC_PAY_REQ = 7;
     public final static int VALUE_NOTES = 11;
     public final static int VALUE_NOTES_AUTH = 12;
 
@@ -53,6 +56,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private SPanelDps moPanelDps;
     private int mnFormCase;
     private HashMap<Integer, Date> moLastPaymentDaysMap;
+    private double mdOriginalPaymentCy;
+    private Date moOriginalPaymentDate;
+    private boolean mbIsAdvancePayment;
     
     /**
      * Creates new form SDialogPaymentChangeStatus
@@ -107,6 +113,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanel11 = new javax.swing.JPanel();
         jchkIsSystem = new javax.swing.JCheckBox();
         jPanel12 = new javax.swing.JPanel();
+        moBooleanReceiptPaymentReq = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanelN2 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
@@ -253,6 +260,11 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         jPanelN1.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBooleanReceiptPaymentReq.setText("Requiere complemento");
+        moBooleanReceiptPaymentReq.setPreferredSize(new java.awt.Dimension(170, 23));
+        jPanel12.add(moBooleanReceiptPaymentReq);
+
         jPanelN1.add(jPanel12);
 
         jPayment.add(jPanelN1, java.awt.BorderLayout.PAGE_START);
@@ -387,6 +399,7 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     private javax.swing.JTextField jtfPaymentId;
     private javax.swing.JTextField jtfPaymentType;
     private javax.swing.JTextField jtfStatus;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBooleanReceiptPaymentReq;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPaymentCy;
     private sa.lib.gui.bean.SBeanFieldDate moDateNewDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBeneffBank;
@@ -458,6 +471,18 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
                 break;
                 
+            case CASE_CHANGE_BANK_ACCOUNT: // payment is operated
+                setTitle("Cambiar cuenta bancaria");
+                jlPaymentCy.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha de pago:*"); // to get a new date
+                break;
+                
+            case CASE_CHANGE_EXEC_DATE: // payment is operated
+                setTitle("Cambio de fecha de ejecución");
+                jlPaymentCy.setText("Monto pagado:"); // to show amount
+                jlDateNewDate.setText("Fecha ejecución:*"); // to get a new date
+                break;
+                
             default:
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -465,6 +490,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDateNewDate.setFieldName(SGuiUtils.getLabelName(jlDateNewDate)); // update field name of "new date" component
         
         mnFormCase = formCase;
+    }
+    
+    public int getFormCase() {
+        return mnFormCase;
     }
     
     @Override
@@ -503,6 +532,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         reloadCatalogues();
         
         SDbPaymentEntry singleEntry = moRegistry.getSingleEntry();
+        mdOriginalPaymentCy = singleEntry.getDestinyPaymentApplicationEntryCy();
+        moOriginalPaymentDate = moRegistry.getDateApplication();
+        mbIsAdvancePayment = singleEntry.getEntryType().equals(SDbPaymentEntry.TYPE_ADVANCE);
         
         jtfFolio.setText(moRegistry.getFolio());
         jtfStatus.setText((String) miClient.getSession().readField(SModConsts.FINS_ST_PAY, new int[] { moRegistry.getFkStatusPaymentId() }, SDbRegistry.FIELD_NAME));
@@ -522,6 +554,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         boolean rescheduling = false;
         boolean changingCurrency = false;
         boolean markingAsPaid = false;
+        boolean changingAccountBank = false;
+        boolean changingExecDate = false;
+        boolean enableRecPayReq = false;
         
         switch (mnFormCase) {
             case CASE_REACTIVATE:
@@ -542,6 +577,22 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
                 markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
                 moDateNewDate.setValue(moRegistry.getDateSchedule_n());
+                enableRecPayReq = true;
+                break;
+                
+            case CASE_CHANGE_BANK_ACCOUNT:
+                rescheduling = mnFormCase == CASE_RESCHEDULE;
+                changingCurrency = mnFormCase == CASE_CHANGE_CURRENCY;
+                markingAsPaid = mnFormCase == CASE_MARK_AS_PAID;
+                changingAccountBank = mnFormCase == CASE_CHANGE_BANK_ACCOUNT;
+                moDateNewDate.setValue(moRegistry.getDateSchedule_n());
+                enableRecPayReq = true;
+                break;
+                
+            case CASE_CHANGE_EXEC_DATE:
+                changingExecDate = true;
+                moDateNewDate.setValue(moRegistry.getDateExecution_n());
+                enableRecPayReq = true;
                 break;
                 
             default:
@@ -569,14 +620,18 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
         moDps = moRegistry.getChildEntries().get(0).getDpsRelated();
         moPanelDps.setDps(moDps, moDps == null ? null : miClient.getSession().getSystemDate());
 
-        moCurPaymentCy.setEditable(markingAsPaid);
-        moDateNewDate.setEditable(!changingCurrency);
+//        moCurPaymentCy.setEditable(markingAsPaid);
+        moCurPaymentCy.setEditable(markingAsPaid || rescheduling);
+        moDateNewDate.setEditable((!changingCurrency && !changingAccountBank) || changingExecDate);
         moKeyCurrency.setEditable(rescheduling || changingCurrency);
-        moKeyPaymentBank.setEditable(markingAsPaid);
-        moKeyBeneffBank.setEditable(markingAsPaid);
+        moKeyPaymentBank.setEditable(markingAsPaid || changingAccountBank);
+        moKeyBeneffBank.setEditable(markingAsPaid || changingAccountBank);
         moKeyPriority.setEditable(reactivating);
-        moTextNotes.setEditable(reactivating || rescheduling);
+        moTextNotes.setEditable(reactivating || rescheduling || changingExecDate);
         moTextNotesAuthorization.setEditable(reactivating);
+        moBooleanReceiptPaymentReq.setEditable(enableRecPayReq && mbIsAdvancePayment);
+        
+        moBooleanReceiptPaymentReq.setValue(moRegistry.isReceiptPaymentRequired());
         
         addAllListeners();
     }
@@ -589,6 +644,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+                
+        if (validation.isValid() && moDateNewDate.getValue() != null) {
+            if (moDateNewDate.getValue().before(moOriginalPaymentDate)) {
+                validation.setMessage("La fecha programada no puede ser anterior a la fecha del pago: " + SLibUtils.DateFormatDate.format(moOriginalPaymentDate) + ".");
+                validation.setComponent(moDateNewDate.getComponent());
+            }
+        }
         
         if (validation.isValid()) {
             if (mnFormCase == CASE_CHANGE_CURRENCY && moRegistry.getOldFkCurrencyId() == moKeyCurrency.getValue()[0]) {
@@ -606,14 +668,48 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                     validation.setComponent(moKeyCurrency);
                 }
             }
+            else if ((mnFormCase == CASE_RESCHEDULE || mnFormCase == CASE_MARK_AS_PAID) && moDateNewDate.getValue() == null) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moDateNewDate.getFieldName() + "'.");
+                validation.setComponent(moDateNewDate.getComponent());
+            }
             
             if (validation.isValid()) {
                 switch (mnFormCase) {
-                    case CASE_REACTIVATE:
-                    case CASE_RESCHEDULE:
-                    case CASE_CHANGE_CURRENCY:
+                      case CASE_REACTIVATE:
                         int paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
                         Date lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+                        
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_RESCHEDULE:
+                        if (moCurPaymentCy.getField().getValue() > mdOriginalPaymentCy) {
+                            validation.setMessage("El monto a pagar no puede ser mayor al monto original.");
+                            validation.setComponent(moCurPaymentCy.getField().getComponent());
+                            break;
+                        }
+
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
+
+                        if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
+                            String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " "
+                                    + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", " + "último día de pago del año " + paymentYear + ".\n" + SGuiConsts.MSG_CNF_CONT_OMIT_VAL;
+                            if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moDateNewDate.getFieldName() + "'.");
+                                validation.setComponent(moDateNewDate.getComponent());
+                            }
+                        }
+                        break;
+                    case CASE_CHANGE_CURRENCY:
+                        paymentYear = SLibTimeUtils.digestYear(moDateNewDate.getValue())[0];
+                        lastPaymentDay = moLastPaymentDaysMap.get(paymentYear);
 
                         if (lastPaymentDay != null && moDateNewDate.getValue().after(lastPaymentDay)) {
                             String confirm = SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + moDateNewDate.getFieldName() + "' " + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + " " + SLibUtils.DateFormatDate.format(lastPaymentDay) + ", "
@@ -637,7 +733,8 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                                 validation.setComponent(moCurPaymentCy.getField().getComponent());
                             }
                         }
-                        
+                    
+                    case CASE_CHANGE_BANK_ACCOUNT:
                         if (moKeyPaymentBank.getSelectedIndex() <= 0 && moKeyBeneffBank.getSelectedIndex() <= 0) {
                             String confirm = SGuiConsts.MSG_CNF_FIELD_VAL_ + "\'" + moKeyPaymentBank.getFieldName() + "\' y \'" + moKeyBeneffBank.getFieldName() + "\'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF;
                             if (miClient.showMsgBoxConfirm(confirm) != JOptionPane.YES_OPTION) {
@@ -660,6 +757,13 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                             }
                         }
                         
+                        break;
+
+                    case CASE_CHANGE_EXEC_DATE:
+                        if (moDateNewDate.getValue() == null) {
+                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moDateNewDate.getFieldName() + "'.");
+                            validation.setComponent(moDateNewDate.getComponent());
+                        }
                         break;
 
                     default:
@@ -688,6 +792,9 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
             case VALUE_PRIORITY:
                 value = moKeyPriority.getValue()[0];
                 break;
+            case VALUE_IS_REC_PAY_REQ:
+                value = moBooleanReceiptPaymentReq.getValue();
+                break;
             case VALUE_NOTES:
                 value = moTextNotes.getValue();
                 break;
@@ -695,20 +802,10 @@ public class SDialogPaymentChangeStatus extends SBeanFormDialog {
                 value = moTextNotesAuthorization.getValue();
                 break;
             case VALUE_PAYMENT_BANK:
-                if (moKeyPaymentBank.getSelectedIndex() > 0) {
-                    value = moKeyPaymentBank.getValue();
-                }
-                else {
-                    value = null;
-                }
+                value = moKeyPaymentBank.getSelectedIndex() > 0 ? moKeyPaymentBank.getValue() : null;
                 break;
             case VALUE_BENEFIT_BANK:
-                if (moKeyBeneffBank.getSelectedIndex() > 0) {
-                    value = moKeyBeneffBank.getValue();
-                }
-                else {
-                    value = null;
-                }
+                value = moKeyBeneffBank.getSelectedIndex() > 0 ? moKeyBeneffBank.getValue() : null;
                 break;
             default:
                 // nothing

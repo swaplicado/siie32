@@ -589,7 +589,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         }
     }
     
-    private String getFiyeType() {
+    private String getFileType() {
         String fileType = "?";
         
         if (moRadPhoto.isSelected()) {
@@ -614,7 +614,7 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
             if (validation.isValid()) {
                 enableFileControls(false);
                 SDbPaymentFile file = new SDbPaymentFile();
-                file.setPaymentFileType(getFiyeType());
+                file.setPaymentFileType(getFileType());
                 file.setAuxFile(moFile);
                 file.setFileName(moFile.getName());
                 file.setFileDescription(moTextDescription.getValue());
@@ -770,9 +770,10 @@ public class SFormPaymentFile extends SBeanForm implements ActionListener, ListS
         populateGridFiles();
         
         if (moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_NEW || 
-                moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC) { 
+                moRegistry.getFkStatusPaymentId() == SModSysConsts.FINS_ST_PAY_REJC) {
             mbCanCapture = true;
             enablePayComponets(true);
+            jbSave.setEnabled(true);
         }
         else {
             mbCanCapture = false;

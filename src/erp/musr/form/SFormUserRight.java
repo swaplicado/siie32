@@ -18,7 +18,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
-import erp.mod.cfg.swap.SSwapConsts;
+import erp.swap.SSwapConsts;
 import erp.musr.data.SDataUserPrivilegeCompany;
 import erp.musr.data.SDataUserPrivilegeCompanyRow;
 import erp.musr.data.SDataUserPrivilegeRow;

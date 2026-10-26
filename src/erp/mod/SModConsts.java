@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Sergio Flores, Claudio Peña, Rodrigo Ayala
+ * @author Sergio Flores, Uriel Castañeda, Isabel Servín, Edwin Carmona, Rodrigo Ayala, Sergio Flores, Claudio Peña
  */
 public abstract class SModConsts {
 
@@ -23,6 +23,7 @@ public abstract class SModConsts {
     public static final int VIEW_SC_DET = 22;       // detail
     public static final int OPC_BAL_ALL = 1;        // balance: all registries
     public static final int OPC_BAL_BAL = 2;        // balance: registries with balance
+    public static final int TRNX_MAT_FUN_ARE_ALL = 1001; // Without functional areas stock
 
     public static final int MOD_CFG = 101000;
     public static final int MOD_FIN = 102000;
@@ -115,6 +116,14 @@ public abstract class SModConsts {
     
     public static final int CFGX_AUTHORN_COMMENTS = 1014001;
     public static final int CFGX_FUNC_SUB = 1014012;
+    
+    public static final int CFGX_SWAP_IMP_DOCS = 1015001;
+    public static final int CFGX_SWAP_IMP_PROFS = 1015006;
+    public static final int CFGX_SWAP_MASS_ACC = 1015011;
+    public static final int CFGX_SWAP_IMP_AVO_WEEKS = 1015021;
+    public static final int CFGX_SWAP_IMP_AVO_WEEKS_MOVEMENTS = 1015022;
+    public static final int CFGX_SWAP_PROCUREMENT_WEEKS = 1015023;
+    public static final int CFGX_SWAP_PROCUREMENT_WEEKS_MOV = 1015024;
     
     /*
      * Users
@@ -246,9 +255,12 @@ public abstract class SModConsts {
 
     public static final int ITMU_MATCH_ITEM_CPT_BP_COMP = 1052121;
     public static final int ITMU_PRICE_COMM_LOG = 1052122;
+            
     public static final int ITMU_ITEM_COMP = 1052141;
     
     public static final int ITMX_IGEN_INV = 1053001;
+    public static final int ITMX_PRICE_COMM_LOG_CURR = 1053006;
+    public static final int ITMX_PRICE_COMM_LOG_ALL = 1053011;
 
     /*
      * Finance
@@ -357,7 +369,6 @@ public abstract class SModConsts {
     public static final int FIN_REP_CUS_ACC_USR = 2013494;
     public static final int FIN_PAY = 2013496;
     public static final int FIN_PAY_ETY = 2013497;
-    public static final int FIN_PAY_REP = 2013498;
     public static final int FIN_PAY_LAY_BANK = 2013498;
     public static final int FIN_PAY_FILE = 2013499;
 
@@ -369,6 +380,7 @@ public abstract class SModConsts {
     public static final int FINX_ACC_CASH_PAY = 2014004;
     public static final int FINX_PAY_ST = 2014005;
     public static final int FINX_PAY_AUTH_PATH = 2014006;
+    public static final int FINX_PAY_REP = 2014011;
     public static final int FINX_CUST_REPS_EXPS = 2014100; // custom reports expenses
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
@@ -436,6 +448,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_SND_LOG = 2023012;
     public static final int TRN_DPS_CFD = 2023201;
     public static final int TRN_DPS_CFD_ETY = 2023202;
+    public static final int TRN_DPS_DEST_CHG_LOG = 2023261;
     public static final int TRN_DPS_ADD = 2023013;
     public static final int TRN_DPS_ADD_ETY = 2023014;
     public static final int TRN_DPS_EVT = 2023016;
@@ -459,6 +472,7 @@ public abstract class SModConsts {
     public static final int TRN_DPS_REPL = 2023023;
     public static final int TRN_DPS_DPS_SUPPLY = 2023024;
     public static final int TRN_DPS_DPS_ADJ = 2023025;
+    public static final int TRN_DPS_DPS_MERGE = 2023068;
     public static final int TRN_DPS_MAT_REQ = 2023067;
     public static final int TRN_DPS_IOG_CHG = 2023026;
     public static final int TRN_DPS_IOG_WAR = 2023027;
@@ -497,6 +511,10 @@ public abstract class SModConsts {
     public static final int TRN_STK_VAL_MVT = 2023087;
     public static final int TRN_STK_VAL_ACC = 2023088;
     public static final int TRN_STK_VAL_DIOG_ADJ = 2023089;
+    public static final int TRN_STK_VAL_MVT_NOTE = 2023090;
+    public static final int TRN_STK_VAL_KARDEX = 2023186;
+    public static final int TRN_STK_VAL_KARDEX_MAIN_LOG = 2023187;
+    public static final int TRN_STK_VAL_KARDEX_NTS = 2023188;
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
@@ -509,6 +527,7 @@ public abstract class SModConsts {
     public static final int TRN_CFD_SND_LOG = 2023054;
     public static final int TRN_CFD_FIN_REC = 2023058;
     public static final int TRN_CFD_PAY = 2023091;
+    public static final int TRN_CFD_ST_LOG = 2023092;
     public static final int TRN_PAY = 2023401;
     public static final int TRN_PAY_PAY = 2023402;
     public static final int TRN_PAY_PAY_TAX = 2023403;
@@ -624,6 +643,7 @@ public abstract class SModConsts {
     public static final int TRNX_STK_VAL_IN_CARDEX = 2024099;
     public static final int TRNX_STK_SEG = 2024100;
     public static final int TRNX_PUR_PROCESS = 2024101;
+    public static final int TRNX_DPS_PUR_ADVANCE = 2024102;
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1324,6 +1344,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_SND_LOG, "trn_dps_snd_log");
         TablesMap.put(TRN_DPS_CFD, "trn_dps_cfd");
         TablesMap.put(TRN_DPS_CFD_ETY, "trn_dps_cfd_ety");
+        TablesMap.put(TRN_DPS_DEST_CHG_LOG, "trn_dps_dest_chg_log");
         TablesMap.put(TRN_DPS_ADD, "trn_dps_add");
         TablesMap.put(TRN_DPS_ADD_ETY, "trn_dps_add_ety");
         TablesMap.put(TRN_DPS_EVT, "trn_dps_evt");
@@ -1347,6 +1368,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
         TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
+        TablesMap.put(TRN_DPS_DPS_MERGE, "trn_dps_dps_merge");
         TablesMap.put(TRN_DPS_MAT_REQ, "trn_dps_mat_req");
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");
@@ -1385,6 +1407,10 @@ public abstract class SModConsts {
         TablesMap.put(TRN_STK_VAL_MVT, "trn_stk_val_mvt");
         TablesMap.put(TRN_STK_VAL_ACC, "trn_stk_val_acc");
         TablesMap.put(TRN_STK_VAL_DIOG_ADJ, "trn_stk_val_diog_adj");
+        TablesMap.put(TRN_STK_VAL_MVT_NOTE, "trn_stk_val_mvt_nts");
+        TablesMap.put(TRN_STK_VAL_KARDEX, "trn_stk_val_kardex");
+        TablesMap.put(TRN_STK_VAL_KARDEX_MAIN_LOG, "trn_stk_val_kardex_main_log");
+        TablesMap.put(TRN_STK_VAL_KARDEX_NTS, "trn_stk_val_kardex_nts");
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");
@@ -1397,6 +1423,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
         TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
         TablesMap.put(TRN_CFD_PAY, "trn_cfd_pay");
+        TablesMap.put(TRN_CFD_ST_LOG, "trn_cfd_st_log");
         TablesMap.put(TRN_PAY, "trn_pay");
         TablesMap.put(TRN_PAY_PAY, "trn_pay_pay");
         TablesMap.put(TRN_PAY_PAY_TAX, "trn_pay_pay_tax");

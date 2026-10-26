@@ -108,7 +108,7 @@ public class SViewItem extends erp.lib.table.STableTab implements java.awt.event
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "i.surplus_per", "Excedente por defecto entre doctos.", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i++].setCellRenderer(new STableCellRendererNumber(new DecimalFormat("#,##0" + "." + SLibUtilities.textRepeat("0", 4) + "%")));
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_ref", "Referencia obligatoria", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo para facturarse", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "brd.brd", "Marca", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "mfr.mfr", "Fabricante", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emt.emt", "Elemento", 100);

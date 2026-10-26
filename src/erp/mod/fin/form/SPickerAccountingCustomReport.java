@@ -20,7 +20,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SPickerAccountingCustomReport extends SBeanFormDialog implements ActionListener {
 

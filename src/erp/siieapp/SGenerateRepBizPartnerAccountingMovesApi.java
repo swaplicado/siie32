@@ -31,21 +31,52 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
- * @author Adrian Aviles
+ * Generador de reportes PDF de movimientos contables de asociados de negocios.
+ * 
+ * Utiliza JasperReports para generar reportes en PDF mostrando los movimientos
+ * contables de un asociado de negocios (proveedor) para un período específico.
+ * Integra datos del ERP incluyendo información de crédito, moneda y parámetros
+ * configurables del sistema.
+ * 
+ * @author Adrián Aviles
+ * @version 1.0
  */
 public class SGenerateRepBizPartnerAccountingMovesApi {
 
+    /** Sesión del usuario para acceso a datos */
     private SGuiSession oSession;
 
+    /**
+     * Constructor que inicializa el generador con una sesión específica.
+     * @param session sesión del usuario
+     */
     public SGenerateRepBizPartnerAccountingMovesApi(SGuiSession session) {
         oSession = session;
     }
 
+    /**
+     * Constructor por defecto. Sesión será nula hasta que se configure.
+     */
     public SGenerateRepBizPartnerAccountingMovesApi() {
 
     }
 
+    /**
+     * Genera un reporte PDF con los movimientos contables de un asociado de negocios.
+     * 
+     * Obtiene información del asociado de negocios (proveedor) desde la base de datos,
+     * junto con parámetros del sistema y detalles de crédito. Llena un template
+     * JasperReports con estos datos y exporta el resultado como PDF.
+     * 
+     * Nota: Actualmente utiliza una conexión hardcodeada a IP 192.168.1.233 para
+     * un usuario y empresa específicos. Considerar parametrizar en futuras versiones.
+     * 
+     * @param pkBizPartner identificador del asociado de negocios (proveedor)
+     * @param sBd nombre de la base de datos
+     * @param year año fiscal para el cual generar el reporte
+     * @return contenido del PDF como arreglo de bytes
+     * @throws Exception si hay error en generación de reporte o acceso a datos
+     */
     public byte[] generateReportPdf(int pkBizPartner, String sBd, int year) throws Exception {
         try {
             Map<String, Object> map = null;
@@ -58,11 +89,12 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
             java.lang.String msBizPartnerCatSng = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_SNG);
             java.lang.String msBizPartnerCatPlr = SBpsUtils.getBizPartnerCategoryName(mnBizPartnerCategoryId, SUtilConsts.NUM_PLR);
 
-            String host = "192.168.1.233";
-            String port = "3306";
+            String host = "192.168.1.233"; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
+            String port = "3306"; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
             String db = sBd;
-            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN);
-            SClientApi apiClient = new SClientApi(client.getSession(), client.getSession().getUser().getPkUserId());
+            int idDefaultCompany = 2852; // XXX 2026-07-02, Sergio Flores: parametrizar este valor en duro.
+            SSwapClient client = new SSwapClient(host, SLibUtils.parseInt(port), db, false, SDataConstantsSys.USRX_USER_ADMIN, idDefaultCompany);
+            SClientApi apiClient = new SClientApi(client.getSession(), client.getSession().getUser().getPkUserId(), true);
 
             SDataBizPartner oBizPartner = new SDataBizPartner();
             int result = oBizPartner.read((Object) moFieldBizPartner, client.getSession().getStatement());
@@ -89,6 +121,7 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
                     bizPartnerCategory = oBizPartner.getDbmsCategorySettingsCus();
                     break;
                 default:
+                    // nothing
             }
 
             String sql = SDataReadDescriptions.createQueryForCatalogue(SDataConstants.BPSS_TP_CRED, new int[]{bizPartnerCategory.getEffectiveCreditTypeId()}, 0);
@@ -113,7 +146,8 @@ public class SGenerateRepBizPartnerAccountingMovesApi {
             }
 
             return JasperExportManager.exportReportToPdf(jasperPrint);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println(e);
             throw e;
         }

@@ -15,7 +15,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona
+ * @author Isabel Servín, Edwin Carmona, Sergio Flores
  */
 public abstract class SItemUtilities {
     
@@ -43,54 +43,32 @@ public abstract class SItemUtilities {
     }
     
     /**
-     * Obtiene el código de la unidad a travez del ID del catálogo de unidades del SAT.
-     * @param statement
-     * @param claveUnidadId
-     * @return 
-     * @throws java.lang.Exception
+     * Obtiene el ID el empate preexistente de item vs. concepto de asociado de negocios.
+     * @param client Cliente GUI.
+     * @param conceptKey Clave del concepto que maneja el asociado de negocios, definido por él.
+     * @param conceptProdServ Clave de Producto o Servico del concepto que maneja el asociado de negocios, definido por el SAT.
+     * @param bizPartnerId ID del asociado de negocios requerido.
+     * @return ID del empate preexistente. En caso de no existir, se devuelve cero. 
      */
-    public static String getClaveUnidad(final Statement statement, final int claveUnidadId) throws Exception {
-        String clave = "";
-        
-        String sql = "SELECT code "
-                + "FROM erp.itms_cfd_unit "
-                + "WHERE id_cfd_unit = " + claveUnidadId + ";";
-
-        try (ResultSet resultSet = statement.executeQuery(sql)) {
-            if (resultSet.next()) {
-                clave = resultSet.getString("code");
-            }
-        }
-        
-        return clave;
+    public static int getMatchingItemBizPartnerConceptId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId){
+        return getMatchingItemBizPartnerConceptId(client, conceptKey, conceptProdServ, bizPartnerId, 0);
     }
     
     /**
-     * Obtiene el ID el empate preexistente.
-     * @param client
-     * @param conceptKey
-     * @param conceptProdServ
-     * @param bizPartnerId
+     * Obtiene el ID el empate preexistente de item vs. concepto de asociado de negocios.
+     * @param client Cliente GUI.
+     * @param conceptKey Clave del concepto que maneja el asociado de negocios, definido por él.
+     * @param conceptProdServ Clave de Producto o Servico del concepto que maneja el asociado de negocios, definido por el SAT.
+     * @param bizPartnerId ID del asociado de negocios requerido.
+     * @param itemId ID del ítem requerido.
      * @return ID del empate preexistente. En caso de no existir, se devuelve cero. 
      */
-    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId){
-        return getMatchItemBizPartnerId(client, conceptKey, conceptProdServ, bizPartnerId, 0);
-    }
-    
-    /**
-     * Obtiene el ID el empate preexistente.
-     * @param client
-     * @param conceptKey
-     * @param conceptProdServ
-     * @param bizPartnerId
-     * @param itemId
-     * @return ID del empate preexistente. En caso de no existir, se devuelve cero. 
-     */
-    public static int getMatchItemBizPartnerId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId, final int itemId) {
+    public static int getMatchingItemBizPartnerConceptId(final SClientInterface client, final String conceptKey, final String conceptProdServ, final int bizPartnerId, final int itemId) {
         int id = 0;
         
         try {
-            String sql = "SELECT id_match FROM erp.itmu_match_item_cpt_bp "
+            String sql = "SELECT id_match "
+                    + "FROM erp.itmu_match_item_cpt_bp "
                     + "WHERE cpt_key = '" + conceptKey + "' "
                     + "AND cpt_prod_serv = '" + conceptProdServ + "' "
                     + "AND fid_bp = " + bizPartnerId + " "

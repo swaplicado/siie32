@@ -20,27 +20,70 @@ import org.json.simple.parser.ParseException;
 import sa.lib.gui.SGuiSession;
 
 /**
+ * API para consultar solicitudes de cotización en el portal de proveedores.
+ * <p>
+ * Expone dos operaciones:
+ * <ul>
+ * <li>{@link #getResources(String)} – Lista de solicitudes de cotización para
+ * un conjunto de proveedores.</li>
+ * <li>{@link #getResoursesEty(String)} – Partidas de una solicitud de
+ * cotización específica.</li>
+ * </ul>
+ * </p>
  *
  * @author César Orozco
  */
 public class SEstimateRequestAPI {
+
+    /**
+     * Sesión activa del cliente, usada para obtener la conexión a la base de
+     * datos.
+     */
     private SGuiSession oSession;
 
+    /**
+     * Crea una instancia de la API con la sesión del cliente.
+     *
+     * @param session sesión activa del cliente
+     */
     public SEstimateRequestAPI(SGuiSession session) {
         oSession = session;
     }
 
+    /**
+     * Constructor por defecto no soportado. Se debe usar
+     * {@link #SEstimateRequestAPI(SGuiSession)}.
+     */
     public SEstimateRequestAPI() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    /**
+     * Consulta las solicitudes de cotización para un conjunto de proveedores y
+     * las retorna como JSON.
+     * <p>
+     * Filtra las solicitudes cuya fecha de creación sea posterior a
+     * {@code date} y cuyos destinatarios ({@code trn_est_req_rec}) pertenezcan
+     * a alguno de los proveedores en {@code aBp}.
+     * </p>
+     *
+     * @param sJson JSON con los parámetros de consulta. Campos esperados:
+     * <ul>
+     * <li>{@code idBp} – ID del socio de negocio (proveedor)</li>
+     * <li>{@code date} – Fecha límite inferior de creación (timestamp SQL)</li>
+     * <li>{@code aBp} – Arreglo JSON de IDs de proveedores a consultar</li>
+     * </ul>
+     * @return JSON con la lista de solicitudes de cotización
+     * ({@link SDataEstimateRequestResponse}), o cadena vacía si ocurre un error
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
     public String getResources(String sJson) throws SQLException {
-       String jsonDr = "";
+        String jsonDr = "";
         ArrayList<SEstimateRequestData> lERData = new ArrayList<>();
         int bp = 0;
         String date = "";
         String arregloAuxiliar = "";
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
@@ -50,29 +93,26 @@ public class SEstimateRequestAPI {
             arregloAuxiliar = arregloAuxiliar + root.get("aBp").toString();
             arregloAuxiliar = arregloAuxiliar.replace("[", "(");
             arregloAuxiliar = arregloAuxiliar.replace("]", ")");
-            
-        } catch (ParseException ex) {
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
+
         String msSql = "SELECT er.id_est_req, num, prov_name, mails_to,"
                 + " subject, body, fk_bp_n, YEAR(ts_usr) as idYear, ts_usr as date "
                 + " FROM trn_est_req AS er "
                 + " INNER JOIN trn_est_req_rec AS rr "
                 + " ON er.id_est_req = rr.id_est_req "
                 + " WHERE er.b_del = 0 AND rr.b_del = 0 "
-                + " AND ts_usr > " + date 
+                + " AND ts_usr > " + date
                 + " AND rr.fk_bp_n IN " + arregloAuxiliar + " ";
-                
-                
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataEstimateRequestResponse er = new SDataEstimateRequestResponse();
             while (res.next()) {
                 SEstimateRequestData erd = new SEstimateRequestData();
-                
+
                 erd.setIdEstimateRequest(res.getInt("er.id_est_req"));
                 erd.setNumber(res.getInt("num"));
                 erd.setNameBp(res.getString("prov_name"));
@@ -81,7 +121,7 @@ public class SEstimateRequestAPI {
                 erd.setMailsTo(res.getString("mails_to"));
                 erd.setBody(res.getString("body"));
                 erd.setDate(res.getString("date"));
-                
+
                 lERData.add(erd);
             }
 
@@ -91,26 +131,44 @@ public class SEstimateRequestAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(er);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SEstimateRequestAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return jsonDr;
-        
+
     }
-    
-    public String getResoursesEty(String sJson){
+
+    /**
+     * Consulta las partidas de una solicitud de cotización y las retorna como
+     * JSON.
+     * <p>
+     * Retorna los artículos solicitados (item, unidad, cantidad) de la
+     * solicitud indicada.
+     * </p>
+     *
+     * @param sJson JSON con los parámetros de consulta. Campos esperados:
+     * <ul>
+     * <li>{@code idEstReq} – ID de la solicitud de cotización</li>
+     * </ul>
+     * @return JSON con la lista de partidas
+     * ({@link SDataEstimateRequestEtyResponse}), o cadena vacía si ocurre un
+     * error
+     */
+    public String getResoursesEty(String sJson) {
         String jsonDr = "";
         ArrayList<SEstimateRequestEtyData> lEREData = new ArrayList<>();
         int idEstReq = 0;
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
             root = (JSONObject) parser.parse(sJson);
             idEstReq = Integer.parseInt(root.get("idEstReq").toString());
-            
-        } catch (ParseException ex) {
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SEstimateRequestAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
         String msSql = "SELECT id_est_req, id_ety, qty, "
@@ -124,10 +182,10 @@ public class SEstimateRequestAPI {
                 + "AND ere.b_del = 0;";
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
-            SDataEstimateRequestEtyResponse  dr = new SDataEstimateRequestEtyResponse ();
+            SDataEstimateRequestEtyResponse dr = new SDataEstimateRequestEtyResponse();
             while (res.next()) {
                 SEstimateRequestEtyData ered = new SEstimateRequestEtyData();
-                
+
                 ered.setIdEstimateRequest(res.getInt("id_est_req"));
                 ered.setIdEty(res.getInt("id_ety"));
                 ered.setQty(res.getDouble("qty"));
@@ -136,7 +194,7 @@ public class SEstimateRequestAPI {
                 ered.setIdUnit(res.getInt("u.id_unit"));
                 ered.setNameUnit(res.getString("u.unit"));
                 ered.setSymbol(res.getString("u.symbol"));
-               
+
                 lEREData.add(ered);
             }
             dr.setlEREData(lEREData);
@@ -144,9 +202,11 @@ public class SEstimateRequestAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dr);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
         return jsonDr;

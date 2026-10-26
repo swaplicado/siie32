@@ -115,6 +115,10 @@ public final class STrnDpsType implements java.io.Serializable {
     public boolean isDpsTypeContractSal() {
         return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
     }
+    
+    public boolean isDpsTypeInvoiceSal() {
+        return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_INV);
+    }
 
     public int[] getDpsCategoryKey() { return new int[] { mnDpsCategoryId }; }
     public int[] getDpsClassKey() { return new int[] { mnDpsCategoryId, mnDpsClassId }; }

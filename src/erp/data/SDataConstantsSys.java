@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores, Rodrigo Ayala
  * 
  */
 public abstract class SDataConstantsSys {
@@ -151,8 +151,13 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SIIE_CFG_MASS_ACC = "SIIE_CFG_MASS_ACC";
     public static final String CFG_PARAM_SWAP_SERVICES_CONFIG = "SWAP_SERVICES_CONFIG";
     public static final String CFG_PARAM_SWAP_SERVICES_AUTH_CONFIG = "SWAP_SERVICES_AUTH_CONFIG";
+    public static final String CFG_PARAM_SWAP_SERVICES_AVO_CONFIG = "SWAP_SERVICES_AVO_CONFIG";
+    public static final String CFG_PARAM_SWAP_AVO = "SWAP_AVO";
     public static final String CFG_PARAM_SWAP_SOM = "SWAP_SOM";
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";
+    public static final String CFG_PARAM_GCS_CONFIG = "GCS_CONFIG"; // Google Cloud Credentials
+    public static final String CFG_PARAM_GCS_CREDENTIALS = "GCS_CREDENTIALS"; // Google Cloud Credentials
+    public static final String CFG_PARAM_HUMAND_CONFIG = "HUMAND_CONFIG";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";
     public static final String CFG_PARAM_DOC_HRS_DEP = "DOC_HRS_DEP";
@@ -1387,7 +1392,6 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DPS_SAL_DOC_AUT_AUT = 58;
     public static final int TRNX_DPS_SAL_DOC_AUT_PEND = 59;
     public static final int TRNX_DPS_SAL_DOC_AUT_REJ = 60;
-    
 
     public static final int TRNX_TP_IOG_IN_PUR_PUR = 101;
     public static final int TRNX_TP_IOG_IN_SAL_SAL = 102;
@@ -1474,6 +1478,7 @@ public abstract class SDataConstantsSys {
     /** Sales document entries from one business partner and/or item at a time. Entries from invoices and credit notes are shown together. */
     public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_ONE = 315;
     public static final int TRNX_SAL_DPS_BY_ITEM_N_BP_SAL = 322;
+    public static final int TRNX_SAL_DPS_BY_CHANGE_ITEM_CONCEPT = 323;
 
     public static final int TRNX_PUR_BACKORDER_CON = 11;
     public static final int TRNX_PUR_BACKORDER_CON_ITEM = 12;
@@ -1511,11 +1516,11 @@ public abstract class SDataConstantsSys {
     
     public static final int TRNX_OPS_TYPE_OPS_OPS = 11;             // operations
     public static final int TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY = 12;  // operations - application of prepayment invoiced as discount
-    public static final int TRNX_OPS_TYPE_OPS_PREPAY = 13;          // prepayment invoiced
+    public static final int TRNX_OPS_TYPE_OPS_PREPAY_INVOICED = 13; // prepayment invoiced
 
     public static final int TRNX_OPS_TYPE_ADJ_OPS = 21;             // adjustment of operations
     public static final int TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY = 22;  // adjustment of operations - application of prepayment invoiced as discount
-    public static final int TRNX_OPS_TYPE_ADJ_PREPAY = 23;          // adjustment of prepayment invoiced
+    public static final int TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED = 23; // adjustment of prepayment invoiced
     public static final int TRNX_OPS_TYPE_ADJ_APP_PREPAY = 26;      // application of prepayment invoiced
     
     public static final int MKTU_SAL_ROUTE_DEFAULT = 1;
@@ -1527,11 +1532,11 @@ public abstract class SDataConstantsSys {
     static {
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS, "Operación");
         OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, "Operación con aplicación anticipo facturado");
-        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY, "Facturación de anticipo");
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY_INVOICED, "Facturación de anticipo");
         
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS, "Ajuste operación");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY, "Ajuste operación con aplicación anticipo facturado");
-        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY, "Ajuste facturación de anticipo");
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED, "Ajuste facturación de anticipo");
         OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_APP_PREPAY, "Aplicación anticipo facturado");
         
         StatusDpsAuthorn.put(TRNS_ST_DPS_AUTHORN_NA, "(N/A)");
@@ -1848,6 +1853,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_ADV = 207037;
     public static final int REP_TRN_MAT_CONS_BUDGET = 207039;
     
+    public static final int REP_TRN_SOM_TICKET = 207040;
+    
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
     public static final int REP_TRN_CFDI_33 = 207112;
@@ -1922,6 +1929,15 @@ public abstract class SDataConstantsSys {
         "SET @FINS_CT_SYS_MOV_BPS_CUS = " + FINS_TP_SYS_MOV_BPS_CUS[0],
         "SET @FINS_TP_SYS_MOV_BPS_CUS = " + FINS_TP_SYS_MOV_BPS_CUS[1],
         "SET @FINS_ST_CHECK_NULL = " + TRNS_ST_DPS_ANNULED,
+        "SET @FINX_ACC_ASSET_CUR = '1000'",
+        "SET @FINX_ACC_ASSET_NON_CUR = '1200'",
+        "SET @FINX_ACC_LIABILITY_CUR = '2000'",
+        "SET @FINX_ACC_LIABILITY_NON_CUR = '2200'",
+        "SET @FINX_ACC_EQUITY = '3000'",
+        "SET @FINX_ACC_REVENUE = '4000'",
+        "SET @FINX_ACC_PURCHASES = '5000'",
+        "SET @FINX_ACC_COG = '5500'",
+        "SET @FINX_ACC_EXPENSES = '6000'",
         "SET @BPSS_CT_BP_CO = " + BPSS_CT_BP_CO,
         "SET @BPSS_CT_BP_SUP = " + BPSS_CT_BP_SUP,
         "SET @BPSS_CT_BP_CUS = " + BPSS_CT_BP_CUS,
@@ -1931,6 +1947,14 @@ public abstract class SDataConstantsSys {
         "SET @TRN_DIOG = " + SDataConstants.TRN_DIOG,
         "SET @TRNS_CT_DPS_PUR = " + TRNS_CT_DPS_PUR,
         "SET @TRNS_CT_DPS_SAL = " + TRNS_CT_DPS_SAL,
+        "SET @TRNX_DPS_ORD_CL = " + TRNU_TP_DPS_PUR_ORD[1],
+        "SET @TRNX_DPS_ORD_TP = " + TRNU_TP_DPS_PUR_ORD[2],
+        "SET @TRNX_DPS_INV_CL = " + TRNU_TP_DPS_PUR_INV[1],
+        "SET @TRNX_DPS_INV_TP = " + TRNU_TP_DPS_PUR_INV[2],
+        "SET @TRNX_DPS_CN_CL = " + TRNU_TP_DPS_PUR_CN[1],
+        "SET @TRNX_DPS_CN_TP = " + TRNU_TP_DPS_PUR_CN[2],
+        "SET @TRNU_DPS_NAT_DEF = " + TRNU_DPS_NAT_DEF,
+        "SET @TRNU_DPS_NAT_ASSET = " + TRNU_DPS_NAT_ASSET,
         "SET @ITMS_NAM_ORD_POS_QTY = " + ITMS_NAM_ORD_POS_QTY,
         "SET @ITMS_NAM_LINE_POS_QTY = " + ITMS_NAM_LINE_POS_QTY,
         "SET @ITMS_KEY_ORD_POS_QTY = " + ITMS_KEY_ORD_POS_QTY,

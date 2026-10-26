@@ -19,29 +19,71 @@ import sa.lib.gui.SGuiSession;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
+ * API para consultar órdenes de compra en el portal de proveedores.
+ * <p>
+ * Expone dos operaciones:
+ * <ul>
+ * <li>{@link #getResources(String)} – Lista de órdenes de compra autorizadas
+ * para un conjunto de proveedores.</li>
+ * <li>{@link #getResoursesEty(String)} – Partidas de una orden de compra
+ * específica.</li>
+ * </ul>
+ * </p>
  *
  * @author swaplicado
  */
 public class SPurcharseOrdersAPI {
+
+    /**
+     * Sesión activa del cliente, usada para obtener la conexión a la base de
+     * datos.
+     */
     private SGuiSession oSession;
 
+    /**
+     * Crea una instancia de la API con la sesión del cliente.
+     *
+     * @param session sesión activa del cliente
+     */
     public SPurcharseOrdersAPI(SGuiSession session) {
         oSession = session;
     }
 
+    /**
+     * Constructor por defecto no soportado. Se debe usar
+     * {@link #SPurcharseOrdersAPI(SGuiSession)}.
+     */
     public SPurcharseOrdersAPI() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    /**
+     * Consulta las órdenes de compra autorizadas para un conjunto de
+     * proveedores y las retorna como JSON.
+     * <p>
+     * Solo retorna órdenes de compra activas, autorizadas y con fecha posterior
+     * a {@code date}.
+     * </p>
+     *
+     * @param sJson JSON con los parámetros de consulta. Campos esperados:
+     * <ul>
+     * <li>{@code idBp} – ID del socio de negocio (proveedor)</li>
+     * <li>{@code date} – Fecha límite inferior del documento (formato
+     * {@code YYYY-MM-DD})</li>
+     * <li>{@code aBp} – Arreglo JSON de IDs de proveedores a consultar</li>
+     * </ul>
+     * @return JSON con la lista de órdenes de compra ({@link SDataResponse}), o
+     * cadena vacía si ocurre un error
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
     public String getResources(String sJson) throws SQLException {
         String jsonDr = "";
         ArrayList<SPurcharseOrdersData> lOCData = new ArrayList<>();
         int bp = 0;
         String date = "";
         String arregloAuxiliar = "";
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
@@ -50,14 +92,13 @@ public class SPurcharseOrdersAPI {
             date = root.get("date").toString();
             arregloAuxiliar = arregloAuxiliar + root.get("aBp").toString();
             arregloAuxiliar = arregloAuxiliar.replace("[", "(");
-            arregloAuxiliar = arregloAuxiliar.replace("]", ")");  
-            
-        } catch (ParseException ex) {
+            arregloAuxiliar = arregloAuxiliar.replace("]", ")");
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
+
         String msSql = "SELECT "
                 + "d.id_year, "
                 + "d.id_doc, "
@@ -112,9 +153,8 @@ public class SPurcharseOrdersAPI {
                 + " AND d.fid_st_dps_authorn = 4 "
                 + " AND d.b_authorn = 1 "
                 + " AND d.fid_func IN (1,2,3,4,5,6) "
-                + " AND d.dt > '" + date + "' " 
+                + " AND d.dt > '" + date + "' "
                 + " AND bp.id_bp IN " + arregloAuxiliar + " ";
-                
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataResponse dr = new SDataResponse();
@@ -145,7 +185,7 @@ public class SPurcharseOrdersAPI {
                 ocd.setBpb(res.getString("bpb.bpb"));
                 ocd.setfCurKey(res.getString("f_cur_key"));
                 ocd.setfCurKeyLocal(res.getString("f_cur_key_local"));
-               
+
                 lOCData.add(ocd);
             }
 
@@ -155,27 +195,44 @@ public class SPurcharseOrdersAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dr);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return jsonDr;
     }
-    
-    public String getResoursesEty(String sJson){
+
+    /**
+     * Consulta las partidas de una orden de compra y las retorna como JSON.
+     * <p>
+     * Retorna los artículos, cantidades, precios e impuestos de cada partida en
+     * moneda local y en moneda extranjera.
+     * </p>
+     *
+     * @param sJson JSON con los parámetros de consulta. Campos esperados:
+     * <ul>
+     * <li>{@code idDoc} – ID del documento (orden de compra)</li>
+     * <li>{@code idYear} – Año fiscal del documento</li>
+     * </ul>
+     * @return JSON con la lista de partidas ({@link SDataEtyResponse}), o
+     * cadena vacía si ocurre un error
+     */
+    public String getResoursesEty(String sJson) {
         String jsonDr = "";
         ArrayList<SPurcharseOrderEtyData> lPOEData = new ArrayList<>();
         int idDoc = 0;
         int idYear = 0;
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
             root = (JSONObject) parser.parse(sJson);
             idDoc = Integer.parseInt(root.get("idDoc").toString());
             idYear = Integer.parseInt(root.get("idYear").toString());
-            
-        } catch (ParseException ex) {
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
         String msSql = "SELECT "
@@ -210,10 +267,9 @@ public class SPurcharseOrdersAPI {
                 + " INNER JOIN erp.itmu_item AS i ON ety.fid_item = i.id_item "
                 + " INNER JOIN erp.itmu_unit AS u ON ety.fid_unit = u.id_unit "
                 + " INNER JOIN erp.itmu_unit AS ou ON ety.fid_unit = ou.id_unit "
-                + " WHERE ety.id_year = " + idYear 
+                + " WHERE ety.id_year = " + idYear
                 + " AND ety.id_doc = " + idDoc
                 + " AND ety.b_del = 0; ";
-                
 
         try (ResultSet res = oSession.getDatabase().getConnection().createStatement().executeQuery(msSql)) {
             SDataEtyResponse dr = new SDataEtyResponse();
@@ -246,7 +302,7 @@ public class SPurcharseOrdersAPI {
                 poed.setIdUnit(res.getInt("u.id_unit"));
                 poed.setOriginalUnit(res.getString("ou.unit"));
                 poed.setIdOriginalUnit(res.getInt("ou.id_unit"));
-               
+
                 lPOEData.add(poed);
             }
 
@@ -256,11 +312,13 @@ public class SPurcharseOrdersAPI {
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
             jsonDr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(dr);
-        } catch (JsonProcessingException ex) {
+        }
+        catch (JsonProcessingException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
         return jsonDr;
-    } 
+    }
 }

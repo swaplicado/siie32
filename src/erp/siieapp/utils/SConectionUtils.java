@@ -5,7 +5,6 @@
  */
 package erp.siieapp.utils;
 
-import erp.siieapp.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -14,19 +13,60 @@ import java.net.URL;
 import sa.lib.gui.SGuiClient;
 
 /**
+ * Utilidad para realizar peticiones HTTP hacia la aplicación SIIE App.
+ * <p>
+ * Encapsula la apertura de una conexión {@link HttpURLConnection}, el envío del
+ * cuerpo de la petición (en peticiones POST) y la lectura de la respuesta. El
+ * código de respuesta HTTP y el cuerpo de la respuesta quedan disponibles en
+ * los campos públicos {@link #responseCode} y {@link #response} tras llamar a
+ * {@link #conectWithSiieApp}.
+ * </p>
  *
  * @author Adrián Avilés
  */
 public class SConectionUtils {
 
+    /**
+     * Cliente de sesión activo.
+     */
     private SGuiClient miClient;
+    /**
+     * Código de respuesta HTTP obtenido en la última petición (ej. 200, 401,
+     * 500).
+     */
     public int responseCode;
+    /**
+     * Cuerpo de la respuesta HTTP obtenido en la última petición.
+     */
     public StringBuffer response;
 
+    /**
+     * Crea una instancia de la utilidad con el cliente de sesión indicado.
+     *
+     * @param client cliente de sesión activo
+     */
     public SConectionUtils(SGuiClient client) {
         miClient = client;
     }
 
+    /**
+     * Realiza una petición HTTP a SIIE App y almacena el resultado en
+     * {@link #responseCode} y {@link #response}.
+     * <p>
+     * Siempre envía las cabeceras {@code Content-Type: application/json} y
+     * {@code Accept: application/json}. El cuerpo ({@code data}) solo se
+     * escribe en el stream de salida cuando {@code method} es {@code "POST"}.
+     * Si ocurre cualquier excepción durante la conexión, se ignora
+     * silenciosamente.
+     * </p>
+     *
+     * @param url URL completa del endpoint a invocar
+     * @param method método HTTP a usar ({@code "GET"} o {@code "POST"})
+     * @param data cuerpo de la petición en formato JSON; solo se usa cuando
+     * {@code method} es {@code "POST"}
+     * @param authorization valor del encabezado {@code Authorization} (ej.
+     * {@code "Bearer <token>"}), o {@code null} para omitirlo
+     */
     public void conectWithSiieApp(String url, String method, String data, String authorization) {
         try {
             // URL del servidor web
@@ -68,7 +108,8 @@ public class SConectionUtils {
                 this.response.append(line);
             }
             reader.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
         }
     }

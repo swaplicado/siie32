@@ -41,7 +41,6 @@ import erp.mitm.data.SDataUnit;
 import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
-import erp.mod.cfg.swap.form.SDocumentUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -51,6 +50,7 @@ import erp.mtrn.data.SDataDpsEntryTaxRow;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
 import erp.mtrn.data.SRowCfdiImport33;
 import erp.mtrn.data.SRowCfdiTaxImport33;
+import erp.swap.form.SDocumentUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -71,7 +71,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt.event.ActionListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
     
@@ -103,7 +103,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     private SFormField moFieldTaxRegionDps; 
     private SFormOptionPicker moPickerOpsType;
     private final File moCfdiFile;
-    private SDialogCfdiPurchaseOrder33 moDialogCfdiPurchaseOrder;
+    private SDialogCfdiConceptsLinker33 moDialogCfdiPurchaseOrder;
     
     SRowCfdiImport33 moRowCfdiCopy;
 
@@ -972,7 +972,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         */
         
         DElementConcepto concepto = rowCfdiImport.getConcepto();
-        int matchId = SItemUtilities.getMatchItemBizPartnerId(miClient, concepto.getAttNoIdentificacion().getString(), concepto.getAttClaveProdServ().getString(), moBizPartnerEmisor.getPkBizPartnerId());
+        int matchId = SItemUtilities.getMatchingItemBizPartnerConceptId(miClient, concepto.getAttNoIdentificacion().getString(), concepto.getAttClaveProdServ().getString(), moBizPartnerEmisor.getPkBizPartnerId());
         
         if (matchId != 0) {
             // Se cargan los datos del empate anterior:
@@ -1542,7 +1542,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 SRowCfdiImport33 rowCfdiImport = (SRowCfdiImport33) moConceptTablePane.getSelectedTableRow();
                 
                 if (moDialogCfdiPurchaseOrder == null) {
-                    moDialogCfdiPurchaseOrder = new SDialogCfdiPurchaseOrder33(miClient);
+                    moDialogCfdiPurchaseOrder = new SDialogCfdiConceptsLinker33(miClient);
                 }
                 moDialogCfdiPurchaseOrder.setValue(SDataConstants.TRN_DPS, moPurchaseOrder);
                 
@@ -1563,16 +1563,16 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                     }
                 }
                 
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
-                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
+                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_PURCHASE_ORDER_ENTRIES, purchaseOrderEntries);
+                moDialogCfdiPurchaseOrder.setValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_ROW_CFDI, rowCfdiImport);
                 
                 moDialogCfdiPurchaseOrder.setFormVisible(true);
                 
                 if (moDialogCfdiPurchaseOrder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_ENTRY_DPS_DPS_LINK);
+                    SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_ENTRY_DPS_DPS_LINK);
                     rowCfdiImport.setEntryDpsDpsLink(entryDpsDpsLink); 
                     
-                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiPurchaseOrder33.VALUE_TYPE_FACTOR_CONV));
+                    rowCfdiImport.setConvFactor((double) moDialogCfdiPurchaseOrder.getValue(SDialogCfdiConceptsLinker33.VALUE_TYPE_FACTOR_CONV));
                     setMatchDataByPurchaseOrder(rowCfdiImport, (SDataDpsEntry) moDialogCfdiPurchaseOrder.getValue(SDataConstants.TRN_DPS_ETY));
                     setSiieTaxes(rowCfdiImport);
                     rowCfdiImport.prepareTableRow();
@@ -1637,7 +1637,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
     private void updateNameItem() {
         if (((SRowCfdiImport33) moConceptTablePane.getSelectedTableRow()).getItem().getDbmsDataItemGeneric().getIsItemNameEditable()) {
             String concept = ((String) moConceptTablePane.getSelectedTableRow().getValues().get(COL_ITEM_NAME)); 
-            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SFormDpsEntry.CONCEPT_LENGTH_MAX);
+            concept = SLibUtils.textLeft(SLibUtils.textTrim(concept.toUpperCase()), SDataDpsEntry.LEN_CONCEPT);
             SRowCfdiImport33 row = (SRowCfdiImport33) moConceptTablePane.getSelectedTableRow();
             row.getItem().setItem(concept);
             row.getDpsEntry().setConcept(concept);
@@ -1681,43 +1681,47 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
             DElementConcepto concepto = row.getConcepto(); // variable de conveniencia
             String descripcion = (concepto.getAttNoIdentificacion().getString().isEmpty() ? "" : concepto.getAttNoIdentificacion().getString() + " - ") +
                     concepto.getAttDescripcion().getString();
-            String rowMsg = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
+            String msgPrefix = "El concepto del renglón #" + (i + 1) + ", \"" + descripcion + "\", ";
             boolean isItemRefReq = row.getItem().getDbmsDataItemGeneric().getIsItemReferenceRequired();
             
             if (mbWithPurchaseOrder && row.getEntryDpsDpsLink() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una partida de la OC.");
+                validation.setMessage(msgPrefix + "no tiene asignada una partida de la OC.");
                 break;
             }
             else if (row.getItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem.");
+                validation.setMessage(msgPrefix + "no tiene asignado un ítem.");
                 break;
             }
             else if (isItemRefReq && row.getReferenceItem() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un ítem de referencia.");
+                validation.setMessage(msgPrefix + "no tiene asignado un ítem de referencia.");
                 break;
             }
             else if (isItemRefReq && row.getReferenceItem().getPkItemId() == row.getItem().getPkItemId()) {
-                validation.setMessage(rowMsg + "tiene asignado el mismo ítem de referencia que el ítem principal.");
+                validation.setMessage(msgPrefix + "tiene asignado el mismo ítem de referencia que el ítem principal.");
                 break;
             }
             else if (row.getUnit() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una unidad.");
+                validation.setMessage(msgPrefix + "no tiene asignada una unidad.");
+                break;
+            }
+            else if (row.getUnit().getDbmsClaveUnidad().isEmpty()) {
+                validation.setMessage(msgPrefix + "su unidad asignada carece de ClaveUnidad SAT.");
                 break;
             }
             else if (row.getTaxRegion() == null) {
-                validation.setMessage(rowMsg + "no tiene asignada una región de impuestos.");
+                validation.setMessage(msgPrefix + "no tiene asignada una región de impuestos.");
                 break;
             }
             else if (row.getOperationTypePk() == 0) {
-                validation.setMessage(rowMsg + "no tiene asignado un tipo de operación.");
+                validation.setMessage(msgPrefix + "no tiene asignado un tipo de operación.");
                 break;
             }
             else if (row.getCostCenter() == null) {
-                validation.setMessage(rowMsg + "no tiene asignado un centro de costo.");
+                validation.setMessage(msgPrefix + "no tiene asignado un centro de costo.");
                 break;
             }
             else if (row.getConvFactor() == 0.0) {
-                validation.setMessage(rowMsg + "no tiene factor de conversión especificado.");
+                validation.setMessage(msgPrefix + "no tiene factor de conversión especificado.");
                 break;
             }
             else {
@@ -1727,7 +1731,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                         TAXES:
                         for (DElementConceptoImpuestoTraslado traslado : traslados) {
                             if (!row.getTaxChargedMatched().contains(traslado)) {
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n" 
+                                validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n" 
                                         + "Impuesto: " + DCfdi33Catalogs.Impuesto.get(traslado.getAttImpuesto().getString()) + ".\n"
                                         + "Tipo: trasladado. \n"
                                         + "Factor: " + traslado.getAttTipoFactor().getString() + " de "
@@ -1742,7 +1746,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                         TAXES:
                         for (DElementConceptoImpuestoRetencion retencion : retenciones) {
                             if (!row.getTaxRetainedMatched().contains(retencion)) { 
-                                validation.setMessage(rowMsg + "no tiene empatado el impuesto:\n"
+                                validation.setMessage(msgPrefix + "no tiene empatado el impuesto:\n"
                                         + "Impuesto: " + DCfdi33Catalogs.Impuesto.get(retencion.getAttImpuesto().getString()) + ".\n"
                                         + "Tipo: retenido. \n"
                                         + "Factor: " +retencion.getAttTipoFactor().getString() + " de "
@@ -1774,7 +1778,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
                 }
                 
                 if (!validation.getIsError()) {
-                    if (row.getClaveUnidadCfdi().equals(row.getClaveUnidadSiie())) {
+                    if (concepto.getAttClaveUnidad().getString().equals(row.getUnit().getDbmsClaveUnidad())) {
                         if (row.getConvFactor() != 1) {
                             if (miClient.showMsgBoxConfirm(rowMsg + "es diferente de 1.0,\n"
                                     + "pero las unidades SAT del concepto y del ítem seleccionado son iguales.\n"
@@ -2049,7 +2053,7 @@ public class SDialogCfdiImport33 extends javax.swing.JDialog implements java.awt
         try {
             SDataMatchingItemBizPartnerConcept match = new SDataMatchingItemBizPartnerConcept();
             
-            int key = SItemUtilities.getMatchItemBizPartnerId(miClient, 
+            int key = SItemUtilities.getMatchingItemBizPartnerConceptId(miClient, 
                 rowCfdiImport.getConcepto().getAttNoIdentificacion().getString(), 
                 rowCfdiImport.getConcepto().getAttClaveProdServ().getString(),
                 moBizPartnerEmisor.getPkBizPartnerId(), 

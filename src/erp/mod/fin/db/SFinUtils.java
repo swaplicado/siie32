@@ -416,7 +416,8 @@ public abstract class SFinUtils {
     }
 
     /**
-     * Obtiener el saldo de un documento agrupado por impuesto, en caso que el documento haya sido contabilizado así, por impuesto.
+     * Obtener el saldo de un documento agrupado por impuesto, en caso que el documento haya sido contabilizado así, por impuesto.
+     * 
      * En caso contrario, sólo se devuelve una entrada en el arreglo con el saldo global del documento, asociado a la clave no asociada a algún impuesto en particular (ID impuesto básico = 0 e ID impuesto = 0).
      * @param connection DB connection.
      * @param accYear Accounting year.
@@ -456,6 +457,87 @@ public abstract class SFinUtils {
                     tax.setTaxId(resultSet.getInt("fid_tax_n"));
                     
                     if (sysMoveType == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) {
+                        tax.setBalanceLocal(resultSet.getDouble("f_bal"));
+                        tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur"));
+                    }
+                    else {
+                        tax.setBalanceLocal(resultSet.getDouble("f_bal") * -1);
+                        tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur") * -1);
+                    }
+                    
+                    taxBalances.add(tax);
+                }
+            }
+        }
+        catch (SQLException ex) { 
+            Logger.getLogger(SFinUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return taxBalances;
+    }
+    
+    /**
+     * Obtener el saldo de un documento agrupado por impuesto, en caso que el documento haya sido contabilizado así, por impuesto.
+     * 
+     * En caso contrario, sólo se devuelve una entrada en el arreglo con el saldo global del documento, asociado a la clave no asociada a algún impuesto en particular (ID impuesto básico = 0 e ID impuesto = 0).
+     * @param connection DB connection.
+     * @param accYear Accounting year.
+     * @param dpsYearId Documents primary key's year.
+     * @param dpsDocId Document primary key's document.
+     * @param sysMoveTypes Pairs of {sysMoveCategory, sysMoveType} to match.
+     * @param record Accounting record (journal voucher to exclude.)
+     * @return ArrayList
+     */
+    public static ArrayList<SFinBalanceTax> getDocumentAdvanceBalanceByTax(final Connection connection,
+                                                                        final int accYear,
+                                                                        final int dpsYearId,
+                                                                        final int dpsDocId,
+                                                                        final ArrayList<Integer[]> sysMoveTypes,
+                                                                        final SDataRecord record) {
+        ArrayList<SFinBalanceTax> taxBalances = new ArrayList<>();
+        String sqlRecordToExclude = "";
+        
+        if (record != null) {
+            sqlRecordToExclude = "AND NOT (re.id_year = " + record.getPkYearId() + " AND re.id_per = " + record.getPkPeriodId()+ " AND "
+                    + "re.id_bkc = " + record.getPkBookkeepingCenterId() + " AND re.id_tp_rec = '" + record.getPkRecordTypeId()+ "' AND re.id_num = " + record.getPkNumberId()+ " )";
+        }
+        
+        StringBuilder sqlTypes = new StringBuilder("(");
+        int i = 0;
+        for (Integer[] aType : sysMoveTypes) {
+            if (i > 0) sqlTypes.append(" OR ");
+            sqlTypes.append("(re.fid_ct_sys_mov_xxx = ").append(aType[0])
+                    .append(" AND re.fid_tp_sys_mov_xxx = ").append(aType[1]).append(")");
+            i++;
+        }
+        sqlTypes.append(")");
+        
+        String sql = "SELECT re.fid_tax_bas_n, re.fid_tax_n, "
+                + "SUM(re.debit - re.credit) AS f_bal, "
+                + "SUM(IF(d.fid_cur <> re.fid_cur, 0, re.debit_cur - re.credit_cur)) AS f_bal_cur "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + accYear + " "
+                + "AND " + sqlTypes + " "
+                + "AND re.fid_dps_year_n = " + dpsYearId + " AND re.fid_dps_doc_n = " + dpsDocId + " " + sqlRecordToExclude
+                + "GROUP BY re.fid_tax_bas_n, re.fid_tax_n "
+                + "HAVING f_bal <> 0 OR f_bal_cur <> 0 "
+                + "ORDER BY re.fid_tax_bas_n, re.fid_tax_n;";
+        
+        try {
+            try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+                while (resultSet.next()) {
+                    SFinBalanceTax tax = new SFinBalanceTax();
+                    tax.setTaxBasicId(resultSet.getInt("fid_tax_bas_n"));
+                    tax.setTaxId(resultSet.getInt("fid_tax_n"));
+                    
+                    boolean isCusType = false;
+                    for (Integer[] aType : sysMoveTypes) {
+                        if (aType[1] == SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) { isCusType = true; break; }
+                    }
+                    
+                    if (isCusType) {
                         tax.setBalanceLocal(resultSet.getDouble("f_bal"));
                         tax.setBalanceCurrency(resultSet.getDouble("f_bal_cur"));
                     }

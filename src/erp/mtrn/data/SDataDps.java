@@ -61,14 +61,15 @@ import erp.mfin.data.SFinMovementType;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.form.SImportedDocument;
 import erp.mod.trn.db.SDbMmsConfig;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.trn.db.STrnUtils;
 import erp.mqlt.data.SDpsQualityUtils;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlHeader;
 import erp.mtrn.data.cfd.SAddendaAmc71XmlLine;
 import erp.mtrn.data.cfd.SAddendaUtils;
+import erp.swap.SSwapConsts;
+import erp.swap.form.SImportedDocument;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -103,7 +104,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Daniel López, Isabel Servín, Adrián Avilés, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
 
@@ -115,6 +116,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int FIELD_USR = 6;
     public static final int LEN_SERIES = 25; // maximum length of number series
     public static final int LEN_NUMBER = SSwapConsts.LEN_UUID; // maximum length of number
+    public static final int PRIORITY_NORMAL = 0;
+    public static final int PRIORITY_URGENT = 1;
     public static final String TXT_PREPAY_INV = "facturación anticipos";
     public static final String TXT_OPS_TYPE = "tipo de operación";
     public static final String MSG_ERR_FIN_REC_USR = "No se ha especificado la póliza contable de usuario.";
@@ -185,6 +188,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msPaymentMethod;
     protected java.lang.String msPaymentAccount;
     protected java.lang.String msAccountingTag;
+    protected int mnPriority;
     protected int mnAutomaticAuthorizationRejection;
     protected boolean mbIsPublic;
     protected boolean mbIsLinked;
@@ -298,6 +302,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxCheckDpsLinks;
     protected boolean mbXtaHasSuppFiles;
     protected boolean mbXtaHasAuthWeb;
+    protected boolean mbAuxIsDocAdvance;
     /** Imported Document from SWAP Services, just for reference purposes. */
     protected SImportedDocument moXtaImportedDocument;
     
@@ -953,7 +958,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double amountPrepayment = 0;
         
         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY)) {
+            if (!entry.getIsDeleted() && entry.getIsPrepayment() && (entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED)) {
                 for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
                     taxAmount = SLibUtils.roundAmount(taxAmount + (amountPrepaymentType == AMT_PRE_PAY_CY ? entryTax.getTaxCy() : entryTax.getTax()));
                 }
@@ -1829,6 +1834,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return moXtaDpsType.isDpsTypeContractSal();
     }
     
+    public boolean isDpsTypeInvoiceSal() {
+        return moXtaDpsType.isDpsTypeInvoiceSal();
+    }
+    
     public boolean isPrepaymentOnly() {
         boolean hasAccountableEntries = false;
         boolean isPrepaymentOnly = true;
@@ -1910,6 +1919,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
     public void setPaymentAccount(java.lang.String s) { msPaymentAccount = s; }
     public void setAccountingTag(java.lang.String s) { msAccountingTag = s; }
+    public void setPriority(int n) { mnPriority = n; }
     public void setAutomaticAuthorizationRejection(int n) { mnAutomaticAuthorizationRejection = n; }
     public void setIsPublic(boolean b) { mbIsPublic = b; }
     public void setIsLinked(boolean b) { mbIsLinked = b; }
@@ -2036,6 +2046,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getPaymentMethod() { return msPaymentMethod; }
     public java.lang.String getPaymentAccount() { return msPaymentAccount; }
     public java.lang.String getAccountingTag() { return msAccountingTag; }
+    public int getPriority() { return mnPriority; }
     public int getAutomaticAuthorizationRejection() { return mnAutomaticAuthorizationRejection; }
     public boolean getIsPublic() { return mbIsPublic; }
     public boolean getIsLinked() { return mbIsLinked; }
@@ -2149,6 +2160,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxCheckDpsLinks(boolean b) { mbAuxCheckDpsLinks = b; }
     public void setXtaHasSuppFiles(boolean b) { mbXtaHasSuppFiles = b;}
     public void setXtaHasAuthWeb(boolean b) { mbXtaHasAuthWeb = b;}
+    public void setAuxIsDocAdvanced(boolean b) { mbAuxIsDocAdvance = b; }
     public void setXtaImportedDocument(SImportedDocument o) { moXtaImportedDocument = o; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
@@ -2191,6 +2203,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxCheckDpsLinks() { return mbAuxCheckDpsLinks; }
     public boolean getXtaHasSuppFiles() { return mbXtaHasSuppFiles; }
     public boolean getXtaHasAuthWeb() { return mbXtaHasAuthWeb; }
+    public boolean getAuxIsDocAdvanced() { return mbAuxIsDocAdvance; }
     public SImportedDocument getXtaImportedDocument() { return moXtaImportedDocument; }
     /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
     public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
@@ -2390,6 +2403,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         msPaymentMethod = "";
         msPaymentAccount = "";
         msAccountingTag = "";
+        mnPriority = 0;
         mnAutomaticAuthorizationRejection = 0;
         mbIsPublic = false;
         mbIsLinked = false;
@@ -2503,6 +2517,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxCheckDpsLinks = true; // 'true', yes!, 'true' by default!
         mbXtaHasSuppFiles = false;
         mbXtaHasAuthWeb = false;
+        mbAuxIsDocAdvance = false;
         moXtaImportedDocument = null;
         /* Bloque de codigo de respaldo correspondiente a la version antigua sin Redis de candado de acceso exclusivo a registro
         moAuxUserLock = null;
@@ -2594,7 +2609,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnPayments = oResultSet.getInt("d.payments");
                 msPaymentMethod = oResultSet.getString("d.pay_method");
                 msPaymentAccount = oResultSet.getString("d.pay_account");
-                msAccountingTag = oResultSet.getString("acc_tag");
+                msAccountingTag = oResultSet.getString("d.acc_tag");
+                mnPriority = oResultSet.getInt("d.priority");
                 mnAutomaticAuthorizationRejection = oResultSet.getInt("d.aut_authorn_rej");
                 mbIsPublic = oResultSet.getBoolean("d.b_pub");
                 mbIsLinked = oResultSet.getBoolean("d.b_link");
@@ -2622,7 +2638,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkDpsNatureId = oResultSet.getInt("d.fid_dps_nat");
                 mnFkCompanyBranchId = oResultSet.getInt("d.fid_cob");
                 mnFkFunctionalAreaId = oResultSet.getInt("d.fid_func");
-                mnFkFunctionalSubAreaId = oResultSet.getInt("fid_func_sub");
+                mnFkFunctionalSubAreaId = oResultSet.getInt("d.fid_func_sub");
                 mnFkBizPartnerId_r = oResultSet.getInt("d.fid_bp_r");
                 mnFkBizPartnerBranchId = oResultSet.getInt("d.fid_bpb");
                 mnFkBizPartnerBranchAddressId = oResultSet.getInt("d.fid_add");
@@ -2923,7 +2939,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 if (isDocumentOrAdjustmentPur()) {
-                    moXtaImportedDocument = SImportedDocument.createBasicImportedDocumentFromProcessedDps(statement, anKey);
+                    String dataType = isDocument() ? SDbSwapDataProcessing.DATA_TYPE_INV : SDbSwapDataProcessing.DATA_TYPE_CN;
+                    moXtaImportedDocument = SImportedDocument.createImportedDocumentFromProcessedDps(statement, dataType, anKey);
                 }
                 
                 mbIsRegistryNew = false;
@@ -3002,7 +3019,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -3047,6 +3064,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setString(nParam++, msPaymentMethod);
             oCallableStatement.setString(nParam++, msPaymentAccount);
             oCallableStatement.setString(nParam++, msAccountingTag);
+            oCallableStatement.setInt(nParam++, mnPriority);
             oCallableStatement.setInt(nParam++, mnAutomaticAuthorizationRejection);
             oCallableStatement.setBoolean(nParam++, mbIsPublic);
             oCallableStatement.setBoolean(nParam++, mbIsLinked);
@@ -3147,7 +3165,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 nSortingPosition = 0;
                 dAdminPriceAvg = 0;
                 
-                if (SLibUtils.compareKeys(this.getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
+                if (SLibUtils.compareKeys(getDpsTypeKey(), SModSysConsts.TRNU_TP_DPS_PUR_INV)) {
                     int paramAdministrativeConceptType = SLibUtils.parseInt(
                             erp.mcfg.data.SCfgUtils.getParamValue(connection.createStatement(), 
                             SDataConstantsSys.CFG_PARAM_TRN_PUR_EXP_TP_ADM_CPT));
@@ -3505,8 +3523,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 
                                 if (SLibUtils.belongsTo(dpsEntry.getOperationsType(),
                                         new int[] {
-                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY,
-                                            SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY
+                                            SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED,
+                                            SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED
                                         })) {
                                     // caso: anticipos facturados:
                                     
@@ -3953,8 +3971,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS:               // adjustment of operations
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY:    // adjustment of operations - application of advance invoiced as discount
                                             boolean hasMaterialRequest = false;
-                                            Date tAccDpsDate = this.getDateDoc();
-                                            if (this.isAdjustment()) {
+                                            Date tAccDpsDate = getDateDoc();
+                                            if (isAdjustment()) {
                                                 if (! dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
                                                     SDataDps dps = new SDataDps();
                                                     dps.read(dpsEntry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), connection.createStatement());
@@ -4080,7 +4098,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                                     int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, dpsEntry.getFkItemId());
                                                     if (aWh == null) {
                                                         // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
-                                                        aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                                        aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, getFkCompanyBranchId());
                                                         if (aWh == null) {
                                                             throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
                                                                     dpsEntry.getConcept());
@@ -4096,8 +4114,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                             break;
 
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY:        // prepayments invoiced
-                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
+                                        case SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED:        // prepayments invoiced
+                                        case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY_INVOICED:        // adjustment of prepayments invoiced
                                         case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
 
                                             boolean hasConfig = false;
@@ -4523,22 +4541,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 oStatement.execute(sSql);
                 
                 if (moDbmsDataDpsCfd != null) {
-                    if (((this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0]
-                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1])
-                            || (this.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[0]
-                            && this.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1]))) {
-                        if (this.getComprobanteVersion().equals("" + DCfdConsts.CFDI_VER_40)) {
-                            // Cuando el documento sea factura de compras o nc de compras y
-                            // el objeto comprobante no sea nulo se actualizan los datos
-                            if (moDbmsDataDpsCfd.getAuxComprobante40() != null) {
-                                moDbmsDataDpsCfd.setPaymentMethod(moDbmsDataDpsCfd.getAuxComprobante40().getAttMetodoPago().getString());
-                                moDbmsDataDpsCfd.setPaymentWay(moDbmsDataDpsCfd.getAuxComprobante40().getAttFormaPago().getString());
-                                moDbmsDataDpsCfd.setTaxRegimeIssuing(moDbmsDataDpsCfd.getAuxComprobante40().getEltEmisor().getAttRegimenFiscal().getString());
-                                moDbmsDataDpsCfd.setTaxRegimeReceiver(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttRegimenFiscalReceptor().getString());
-                                moDbmsDataDpsCfd.setCfdiUsage(moDbmsDataDpsCfd.getAuxComprobante40().getEltReceptor().getAttUsoCFDI().getString());
-                            }
-                        }
+                    if (isDocumentOrAdjustmentPur() && moDbmsDataDpsCfd.getAuxComprobante40() != null) {
+                        cfd.ver40.DElementComprobante comprobante = moDbmsDataDpsCfd.getAuxComprobante40();
+                        moDbmsDataDpsCfd.setPaymentMethod(comprobante.getAttMetodoPago().getString());
+                        moDbmsDataDpsCfd.setPaymentWay(comprobante.getAttFormaPago().getString());
+                        moDbmsDataDpsCfd.setTaxRegimeIssuing(comprobante.getEltEmisor().getAttRegimenFiscal().getString());
+                        moDbmsDataDpsCfd.setTaxRegimeReceiver(comprobante.getEltReceptor().getAttRegimenFiscalReceptor().getString());
+                        moDbmsDataDpsCfd.setCfdiUsage(comprobante.getEltReceptor().getAttUsoCFDI().getString());
                     }
+                    
                     moDbmsDataDpsCfd.setPkYearId(mnPkYearId);
                     moDbmsDataDpsCfd.setPkDocId(mnPkDocId);
                     moDbmsDataDpsCfd.setVersion(getComprobanteVersion());
@@ -4556,6 +4567,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (mnAuxInitiativeId != 0) {
                     sSql = "INSERT INTO trn_init_dps VALUES(" + mnAuxInitiativeId + ", " + mnPkYearId + ", " + mnPkDocId + ");";
                     oStatement.execute(sSql);
+                }
+                
+                // Save fid_bp_addee_n changes log
+                if (isDpsTypeInvoiceSal() || isAdjustmentSal()) {
+                    String sSaved = STrnUtilities.saveDpsBizPartnerAddresseeChangeLog(connection, 
+                                                new int[] { mnPkYearId, mnPkDocId }, 
+                                                mnFkBizPartnerAddresseeId_n, 
+                                                mnFkBizPartnerId_r,
+                                                mnFkBizPartnerBranchId,
+                                                mnFkBizPartnerBranchAddressId,
+                                                mnFkUserEditId);
+                    if (!sSaved.isEmpty()) {
+                        Logger.getLogger(SDataDps.class.getName()).log(Level.SEVERE, sSaved);
+                    }
                 }
                         
                 mbIsRegistryNew = false;
@@ -4647,8 +4672,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     }
                                 }
                                 
-                                Date tAccDpsDate = this.getDateDoc();
-                                if (this.isAdjustment()) {
+                                Date tAccDpsDate = getDateDoc();
+                                if (isAdjustment()) {
                                     if (! entry.getDbmsDpsAdjustmentsAsAdjustment().isEmpty()) {
                                         SDataDps dps = new SDataDps();
                                         dps.read(entry.getDbmsDpsAdjustmentsAsAdjustment().get(0).getDbmsDpsKey(), statement);
@@ -4703,6 +4728,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     idAccount = config.getAccountId();
                                     idAccount = idAccount.replaceAll("0", "");
                                     idAccount = idAccount.replaceAll("-", "");
+                                    
                                     if (idAccount.length() == 0) {
                                         msDbmsError = MSG_ERR_ACC_EMP_ + "ítem:\n'" + name + "'.";
                                         throw new Exception(msDbmsError);
@@ -4722,7 +4748,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         int[] aWh = STrnUtilities.getAppropiateWarehouseForItem(connection, entry.getFkItemId());
                                         if (aWh == null) {
                                             // En caso de que no haya un almacén asignado por ítem se consulta si hay uno configurado por default
-                                            aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, this.getFkCompanyBranchId());
+                                            aWh = STrnUtilities.getDefaultCompanyBranchWarehouse(connection, getFkCompanyBranchId());
                                             if (aWh == null) {
                                                 throw new Exception("No hay una configuración de almacén prederminado para el ítem de la partida: " + 
                                                         entry.getConcept());
@@ -5245,11 +5271,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                                 mvDbmsDpsEntries,
-                                                                oSimpleDateFormat.format(this.getDate()),
-                                                                oSimpleDateFormat.format(this.getDateDoc()),
-                                                                this.getNumber(), 
-                                                                this.getNumberReference(), 
-                                                                this.getNumberSeries(), 
+                                                                oSimpleDateFormat.format(getDate()),
+                                                                oSimpleDateFormat.format(getDateDoc()),
+                                                                getNumber(), 
+                                                                getNumberReference(), 
+                                                                getNumberSeries(), 
                                                                 companyName, bpName);
 
                 if (qualityBody != null) {
@@ -5273,7 +5299,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Object images = null;
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
-                                        (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                        (getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
                                         toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }
@@ -5381,11 +5407,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 qualityBody = SDpsQualityUtils.createDpsBodyMail(client.getSession(),
                                                                 mvDbmsDpsEntries,
-                                                                oSimpleDateFormat.format(this.getDate()),
-                                                                oSimpleDateFormat.format(this.getDateDoc()),
-                                                                this.getNumber(), 
-                                                                this.getNumberReference(), 
-                                                                this.getNumberSeries(), 
+                                                                oSimpleDateFormat.format(getDate()),
+                                                                oSimpleDateFormat.format(getDateDoc()),
+                                                                getNumber(), 
+                                                                getNumberReference(), 
+                                                                getNumberSeries(), 
                                                                 companyName, bpName);
 
                 if (qualityBody != null) {
@@ -5409,7 +5435,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         Object images = null;
                         Date sentDate = null;
                         STrnUtilities.sendMail(client, mmsType, qualityBody, 
-                                        (this.getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
+                                        (getIsRegistryNew() ? "(NUEVO) " : "(MODIF.) ") + "Análisis de calidad. Folio: " + getDpsNumber(), 
                                         toRecipients, toRecipientsCC, null, (SMailSender) sender, (Map<String, String>) images, sentDate, false);
                         toRecipients.clear();
                     }

@@ -17,7 +17,7 @@ import sa.lib.SLibUtils;
 /**
  * GUI data structure for input of an individual document payment of a payment for CFDI of Payments.
  * Represents the XML element pago20:DoctoRelacionado, child of the element pago20:Pago.
- * @author Sergio Flores, Isabel Servin
+ * @author Sergio Flores, Isabel Servín
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     

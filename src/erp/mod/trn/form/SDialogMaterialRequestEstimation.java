@@ -55,7 +55,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Rodrigo Ayala
  */
 public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements ListSelectionListener, ItemListener, ActionListener {
     
@@ -364,7 +364,7 @@ public class SDialogMaterialRequestEstimation extends SBeanFormDialog implements
                 msBodyRows = "";
             }
             
-            msBodyRows += SMaterialRequestEstimationUtils.getBodyEntries(lRows);
+            msBodyRows += SMaterialRequestEstimationUtils.getBodyEntries(miClient.getSession(), lRows);
         }
         else {
             msBodyRows = "---";

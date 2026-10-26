@@ -24,6 +24,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -329,8 +330,8 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         getContentPane().add(jPanel5, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-648)/2, (screenSize.height-434)/2, 648, 434);
+        setSize(new java.awt.Dimension(648, 434));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -338,14 +339,14 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        jcbCompanyBranch.requestFocus();
+        jcbCompanyBranch.requestFocusInWindow();
     }//GEN-LAST:event_formWindowOpened
 
     private void initComponentsExtra() {
         moFieldWorkingDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftWorkingDate, jlWorkingDate);
         moFieldWorkingDate.setPickerButton(jbWorkingDate);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldWorkingDate);
 
         jbOk.addActionListener(this);
@@ -354,19 +355,43 @@ public class SLoginSession extends javax.swing.JDialog implements java.awt.event
 
         jcbCompanyBranch.addItemListener(this);
 
+        AbstractAction actionEnterCompanyBranchKey = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jftWorkingDate.requestFocusInWindow();
+            }
+        };
+        
+        jcbCompanyBranch.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterCompanyBranch");
+        jcbCompanyBranch.getActionMap().put("enterCompanyBranch", actionEnterCompanyBranchKey);
+        
+        AbstractAction actionEnterWorkingDate = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jbOk.requestFocusInWindow();
+            }
+        };
+        
+        jftWorkingDate.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterWorkingDate");
+        jftWorkingDate.getActionMap().put("enterWorkingDate", actionEnterWorkingDate);
+        
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionOk(); }
+            public void actionPerformed(ActionEvent e) {
+                actionOk();
+            }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.putActionMap(getRootPane(), actionOk, "ctrlEnter", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
 
         AbstractAction actionCancel = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { actionCancel(); }
+            public void actionPerformed(ActionEvent e) {
+                actionCancel();
+            }
         };
 
-        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "escape", KeyEvent.VK_ESCAPE, 0);
     }
 
     private void windowActivated() {

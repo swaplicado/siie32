@@ -1,0 +1,1057 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package erp.mod.trn.utils;
+
+
+import erp.SFileUtilities;
+import erp.data.SDataConstantsSys;
+import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbStockValuationKardex;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
+
+/**
+ * Utilería para verificar la integridad de la valuación de inventario.
+ * <p>
+ * Contiene verificaciones que detectan inconsistencias entre los movimientos de
+ * almacén (trn_stk) y sus registros en la valuación (trn_stk_val_mvt), así como
+ * movimientos cuya factura o artículo corresponde a activo fijo, y consumos que
+ * rebasan la cantidad de entrada registrada.
+ * </p>
+ *
+ * @author Edwin Carmona
+ */
+public abstract class SStockValuationVerify {
+
+    /**
+     * Fecha de inicio a partir de la cual se aplican las verificaciones de
+     * valuación.
+     */
+    public static final String SINCE_DATE = "2026-07-01";
+    
+    /**
+     * Tolerancia (en unidades de costo) permitida para el remanente negativo
+     * de kardex antes de considerarse un error de integridad.
+     */
+    public static final double TOLERANCE_KARDEX_REMAINING = 1.0;
+
+    /**
+     * Obtiene las advertencias de una valuación específica.
+     *
+     * @param oSession sesión activa de base de datos
+     * @param idValuation ID de la valuación
+     * @return cadena con las advertencias de la valuación, o cadena vacía si
+     * no hay advertencias
+     */
+    public static String getValuationWarnings(SGuiSession oSession, final int idValuation) {
+        String sSql = "SELECT warnings FROM trn_stk_val v "
+                + "WHERE v.id_stk_val = " + idValuation + ";";
+        try {
+            ResultSet warnResultSet = oSession.getStatement().executeQuery(sSql);
+            if (warnResultSet.next()) {
+                return warnResultSet.getString("warnings");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return SLibUtils.textTrim("");
+    }
+
+    /**
+     * Ejecuta todas las verificaciones de integridad de la valuación de
+     * inventario y devuelve la concatenación de todos los errores encontrados.
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con todos los errores encontrados, o cadena vacía si no
+     * hay errores
+     * @throws SQLException si ocurre un error al ejecutar alguna consulta
+     */
+    public static String verifyStockValuation(SGuiSession oSession) throws SQLException {
+        return verifyStockValuationWithEvidence(oSession).getErrors();
+    }
+
+    /**
+     * Ejecuta todas las verificaciones y conserva el resultado de cada una
+     * para generar una bitácora en Excel.
+     *
+     * @param oSession sesión activa de base de datos
+     * @return resultado detallado de la verificación
+     * @throws SQLException si ocurre un error al ejecutar alguna consulta
+     */
+    public static VerificationResult verifyStockValuationWithEvidence(SGuiSession oSession) throws SQLException {
+        VerificationResult result = new VerificationResult(
+                new Date(),
+                oSession.getUser().getName(),
+                Integer.toString(oSession.getConfigCompany().getCompanyId()));
+
+        addCheck(result, "Movimientos de entrada al almacén", oSession, SStockValuationVerify::verifyStkInMovements);
+        addCheck(result, "Movimientos de salida del almacén", oSession, SStockValuationVerify::verifyStkOutMovements);
+        addCheck(result, "Contabilización de activos fijos", oSession, SStockValuationVerify::verifyAssetAccounting);
+        addCheck(result, "Órdenes de compra por naturaleza", oSession, SStockValuationVerify::verifyOrdersByDpsNature);
+        addCheck(result, "Órdenes de compra con artículos de activo fijo", oSession, SStockValuationVerify::verifyOrdersWithAssetItems);
+        addCheck(result, "Cantidad de consumos de valuación", oSession, SStockValuationVerify::verifyStockValuationQtyConsumptions);
+        addCheck(result, "Costo de consumos de valuación", oSession, SStockValuationVerify::verifyStockValuationCostConsumptions);
+        addCheck(result, "Facturas de compra con costo cero", oSession, SStockValuationVerify::verifyPurchaseInvoiceWithZero);
+        addCheck(result, "Órdenes sin factura con costo cero", oSession, SStockValuationVerify::verifyOrdersWithoutInvoiceWithZero);
+        addCheck(result, "Entradas de kardex sin movimiento de valuación", oSession, SStockValuationVerify::verifyKardexEntriesWithoutMvt);
+        addCheck(result, "Salidas de kardex sin movimiento de valuación", oSession, SStockValuationVerify::verifyKardexOutsWithoutMvt);
+        addCheck(result, "Remanente negativo de kardex", oSession, SStockValuationVerify::verifyNegativeKardexRemaining);
+        addCheck(result, "Ajustes de kardex huérfanos", oSession, SStockValuationVerify::verifyOrphanKardexAdjusts);
+
+        result.finish(new Date());
+        return result;
+    }
+
+    private static void addCheck(VerificationResult result, String name, SGuiSession session, StockValuationCheck check) throws SQLException {
+        String errors = check.execute(session);
+        result.addCheck(name, errors);
+    }
+
+    @FunctionalInterface
+    private interface StockValuationCheck {
+        String execute(SGuiSession session) throws SQLException;
+    }
+
+    /**
+     * Resultado de una ejecución de verificaciones, utilizable para mostrar
+     * los errores actuales o exportar una bitácora Excel.
+     */
+    public static final class VerificationResult {
+        private final Date startedAt;
+        private final String userName;
+        private final String companyId;
+        private Date finishedAt;
+        private final List<VerificationCheckResult> checks;
+        private final StringBuilder errors;
+
+        private VerificationResult(Date startedAt, String userName, String companyId) {
+            this.startedAt = startedAt;
+            this.userName = userName;
+            this.companyId = companyId;
+            this.checks = new ArrayList<>();
+            this.errors = new StringBuilder();
+        }
+
+        private void addCheck(String name, String checkErrors) {
+            checks.add(new VerificationCheckResult(name, checkErrors));
+            errors.append(checkErrors);
+        }
+
+        private void finish(Date finishedAt) {
+            this.finishedAt = finishedAt;
+        }
+
+        public String getErrors() {
+            return errors.toString();
+        }
+
+        public Date getStartedAt() {
+            return new Date(startedAt.getTime());
+        }
+
+        public Date getFinishedAt() {
+            return new Date(finishedAt.getTime());
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getCompanyId() {
+            return companyId;
+        }
+
+        public void writeTo(File file) throws IOException {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            writeSummary(workbook);
+            writeFindings(workbook);
+            try (FileOutputStream output = new FileOutputStream(file)) {
+                workbook.write(output);
+            }
+        }
+
+        private void writeSummary(XSSFWorkbook workbook) {
+            Sheet sheet = workbook.createSheet("Resumen");
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Row title = sheet.createRow(0);
+            title.createCell(0).setCellValue("Bitácora de verificación de valuación de inventarios");
+            title.getCell(0).setCellStyle(headerStyle);
+
+            writeSummaryValue(sheet, 2, "Inicio de ejecución", dateFormat.format(startedAt));
+            writeSummaryValue(sheet, 3, "Fin de ejecución", dateFormat.format(finishedAt));
+            writeSummaryValue(sheet, 4, "Usuario", userName);
+            writeSummaryValue(sheet, 5, "Empresa (ID)", companyId);
+            writeSummaryValue(sheet, 6, "Resultado general", hasFindings() ? "CON HALLAZGOS" : "PASÓ");
+            writeSummaryValue(sheet, 7, "Periodo de movimientos evaluado desde", SINCE_DATE);
+            writeSummaryValue(sheet, 8, "Tolerancia de remanente negativo", Double.toString(TOLERANCE_KARDEX_REMAINING));
+            writeSummaryValue(sheet, 9, "Validaciones ejecutadas", Integer.toString(checks.size()));
+            writeSummaryValue(sheet, 10, "Validaciones sin hallazgos", Integer.toString(getPassedCheckCount()));
+            writeSummaryValue(sheet, 11, "Validaciones con hallazgos", Integer.toString(checks.size() - getPassedCheckCount()));
+            writeSummaryValue(sheet, 13, "Alcance", "Resultado de las consultas de verificación ejecutadas secuencialmente; no es una copia completa ni un bloqueo transaccional de la base de datos.");
+
+            Row header = sheet.createRow(15);
+            writeCell(header, 0, "Validación", headerStyle);
+            writeCell(header, 1, "Resultado", headerStyle);
+            for (int index = 0; index < checks.size(); index++) {
+                VerificationCheckResult check = checks.get(index);
+                Row row = sheet.createRow(index + 16);
+                row.createCell(0).setCellValue(check.name);
+                row.createCell(1).setCellValue(check.hasFindings() ? "CON HALLAZGOS" : "SIN HALLAZGOS");
+            }
+
+            sheet.setColumnWidth(0, 15000);
+            sheet.setColumnWidth(1, 6000);
+        }
+
+        private void writeFindings(XSSFWorkbook workbook) {
+            Sheet sheet = workbook.createSheet("Hallazgos");
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            Row header = sheet.createRow(0);
+            writeCell(header, 0, "Validación", headerStyle);
+            writeCell(header, 1, "Detalle", headerStyle);
+
+            int rowIndex = 1;
+            for (VerificationCheckResult check : checks) {
+                if (check.hasFindings()) {
+                    String[] lines = check.errors.split("\\r?\\n");
+                    for (String line : lines) {
+                        if (!line.trim().isEmpty()) {
+                            Row row = sheet.createRow(rowIndex++);
+                            row.createCell(0).setCellValue(check.name);
+                            row.createCell(1).setCellValue(line);
+                        }
+                    }
+                }
+            }
+            if (rowIndex == 1) {
+                Row row = sheet.createRow(1);
+                row.createCell(0).setCellValue("Todas las validaciones");
+                row.createCell(1).setCellValue("No se encontraron hallazgos.");
+            }
+
+            sheet.setColumnWidth(0, 15000);
+            sheet.setColumnWidth(1, 18000);
+        }
+
+        private boolean hasFindings() {
+            for (VerificationCheckResult check : checks) {
+                if (check.hasFindings()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private int getPassedCheckCount() {
+            int count = 0;
+            for (VerificationCheckResult check : checks) {
+                if (!check.hasFindings()) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private static void writeSummaryValue(Sheet sheet, int rowIndex, String label, String value) {
+            Row row = sheet.createRow(rowIndex);
+            row.createCell(0).setCellValue(label);
+            row.createCell(1).setCellValue(value);
+        }
+
+        private static void writeCell(Row row, int columnIndex, String value, CellStyle style) {
+            Cell cell = row.createCell(columnIndex);
+            cell.setCellValue(value);
+            cell.setCellStyle(style);
+        }
+
+        private static CellStyle createHeaderStyle(XSSFWorkbook workbook) {
+            Font font = workbook.createFont();
+            font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            font.setColor(IndexedColors.WHITE.getIndex());
+            CellStyle style = workbook.createCellStyle();
+            style.setFont(font);
+            style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+            style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+            return style;
+        }
+    }
+
+    private static final class VerificationCheckResult {
+        private final String name;
+        private final String errors;
+
+        private VerificationCheckResult(String name, String errors) {
+            this.name = name;
+            this.errors = errors == null ? "" : errors;
+        }
+
+        private boolean hasFindings() {
+            return !errors.trim().isEmpty();
+        }
+    }
+
+    /**
+     * Verifica que todos los movimientos de entrada de almacén (trn_stk)
+     * existan como movimiento de entrada en la valuación (trn_stk_val_mvt).
+     * <p>
+     * Excluye los movimientos de tipo ajuste de inventario
+     * ({@code TRNS_TP_IOG_IN_ADJ_INV}), ya que estos no generan registro en
+     * valuación.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyStkInMovements(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando movimientos de entrada al almacén...");
+        String sErrors = "";
+        String sql = "SELECT s.* FROM trn_stk s "
+                + "LEFT JOIN trn_stk_val_mvt mvt ON s.fid_diog_year = mvt.fk_diog_year_in_n "
+                + "AND s.fid_diog_doc = mvt.fk_diog_doc_in_n AND s.fid_diog_ety = mvt.fk_diog_ety_in_n AND mvt.b_del = 0 "
+                + "LEFT JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val AND v.b_del = 0 "
+                + "WHERE s.id_year >= 2026 AND s.b_del = 0 "
+                + "AND s.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND mvt.id_stk_val_mvt IS NULL "
+                + "AND s.dt <= (SELECT COALESCE(vf.dt_end, NOW()) FROM trn_stk_val vf WHERE vf.b_del = 0 ORDER BY vf.dt_end DESC LIMIT 1) "
+                + "AND NOT (fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[0] + " "
+                + "         AND fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[1] + " "
+                + "         AND fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV[2] + ") "
+                + "ORDER BY s.dt ASC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de entrada al almacén con ID "
+                    + "[" + rs.getInt("s.fid_diog_year") + ", "
+                    + rs.getInt("s.fid_diog_doc") + ", "
+                    + rs.getInt("s.fid_diog_ety") + "] no existe en la valuación.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todos los movimientos de salida de almacén (trn_stk) existan
+     * como movimiento de salida en la valuación (trn_stk_val_mvt).
+     * <p>
+     * Excluye los movimientos de tipo ajuste de inventario
+     * ({@code TRNS_TP_IOG_OUT_ADJ_INV}), ya que estos no generan registro en
+     * valuación.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyStkOutMovements(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando movimientos de salida del almacén...");
+        String sErrors = "";
+        String sql = "SELECT s.* FROM trn_stk s "
+                + "LEFT JOIN trn_stk_val_mvt mvt "
+                + "ON  s.fid_diog_year = mvt.fk_diog_year_out_n "
+                + "AND s.fid_diog_doc = mvt.fk_diog_doc_out_n "
+                + "AND s.fid_diog_ety = mvt.fk_diog_ety_out_n "
+                + "AND mvt.b_del = 0 "
+                + "LEFT JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val AND v.b_del = 0 "
+                + "WHERE s.id_year >= 2026 AND s.b_del = 0 "
+                + "AND s.fid_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + " "
+                + "AND mvt.id_stk_val_mvt IS NULL "
+                + "AND s.dt <= (SELECT COALESCE(vf.dt_end, NOW()) FROM trn_stk_val vf WHERE vf.b_del = 0 ORDER BY vf.dt_end DESC LIMIT 1) "
+                + "AND NOT (fid_ct_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_ADJ_INV[0] + " "
+                + "         AND fid_cl_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_ADJ_INV[1] + " "
+                + "         AND fid_tp_iog = " + SModSysConsts.TRNS_TP_IOG_OUT_ADJ_INV[2] + ") "
+                + "ORDER BY s.dt ASC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de salida del almacén con ID "
+                    + "[" + rs.getInt("s.fid_diog_year") + ", "
+                    + rs.getInt("s.fid_diog_doc") + ", "
+                    + rs.getInt("s.fid_diog_ety") + "] no existe en la valuación.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que no existan movimientos de valuación cuya factura de compra
+     * haya sido contabilizada en cuentas de activo fijo (rango 1200 a 1399) y
+     * cuyo costo registrado sea diferente de cero.
+     * <p>
+     * Este caso indica que el costo de un activo fijo fue incorrectamente
+     * incluido en la valuación de inventario.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyAssetAccounting(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando contabilización de activos fijos...");
+        String sErrors = "";
+        String sql = "SELECT DISTINCT mvt.* FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN trn_dps td ON mvt.fk_dps_year_in_n = td.id_year AND mvt.fk_dps_doc_in_n = td.id_doc "
+                + "INNER JOIN ("
+                + "  SELECT DISTINCT td.id_year, td.id_doc, fre.fid_acc FROM fin_rec fr "
+                + "  INNER JOIN fin_rec_ety fre ON fr.id_year = fre.id_year AND fr.id_per = fre.id_per "
+                + "    AND fr.id_bkc = fre.id_bkc AND fr.id_tp_rec = fre.id_tp_rec AND fr.id_num = fre.id_num "
+                + "  INNER JOIN fin_acc fa ON fre.fk_acc = fa.pk_acc "
+                + "  INNER JOIN trn_dps td ON fre.fid_dps_year_n = td.id_year AND fre.fid_dps_doc_n = td.id_doc "
+                + "  WHERE fr.b_del = 0 AND fre.b_del = 0 AND td.b_del = 0 "
+                + "    AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "    AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "    AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "    AND fre.fid_acc BETWEEN '1200-0000-0000' AND '1399-9999-9999'"
+                + ") AS acc_ins ON td.id_year = acc_ins.id_year AND td.id_doc = acc_ins.id_doc "
+                + "WHERE td.b_del = 0 AND mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND mvt.dt_mov >= '" + SINCE_DATE + "' "
+                + "AND mvt.cost_r <> 0 "
+                + "ORDER BY mvt.dt_mov DESC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "]\n "
+                    + "corresponde a una factura contabilizada como activo y valuada a costo diferente de cero.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que no existan movimientos de entrada en la valuación
+     * provenientes de facturas de compra contabilizadas como gasto (sin póliza
+     * en cuentas de activo fijo 1200-1399) pero valuadas a costo cero.
+     * <p>
+     * Una factura de compra contabilizada como gasto debería tener un costo
+     * diferente de cero en la valuación. Si el costo es cero, indica que el
+     * movimiento no fue correctamente valorizado al momento de la entrada.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyPurchaseInvoiceWithZero(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando facturas de compra con costo cero...");
+        String sErrors = "";
+        String sql = "SELECT DISTINCT mvt.* FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN trn_dps_ety tde ON mvt.fk_dps_year_in_n = tde.id_year "
+                + "  AND mvt.fk_dps_doc_in_n = tde.id_doc AND mvt.fk_dps_ety_in_n = tde.id_ety "
+                + "INNER JOIN trn_dps td ON td.id_year = tde.id_year AND td.id_doc = tde.id_doc "
+                // Subquery: facturas de compra sin contabilización en cuentas de activo fijo
+                + "INNER JOIN ("
+                + "  SELECT DISTINCT td.id_year, td.id_doc FROM trn_dps td "
+                + "  WHERE td.b_del = 0 "
+                + "    AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "    AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "    AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "    AND td.id_year >= 2024 "
+                + "    AND NOT EXISTS ("
+                + "      SELECT 1 FROM fin_rec fr "
+                + "      INNER JOIN fin_rec_ety fre ON fr.id_year = fre.id_year AND fr.id_per = fre.id_per "
+                + "        AND fr.id_bkc = fre.id_bkc AND fr.id_tp_rec = fre.id_tp_rec AND fr.id_num = fre.id_num "
+                + "      WHERE fr.b_del = 0 AND fre.b_del = 0 "
+                + "        AND fre.fid_dps_year_n = td.id_year AND fre.fid_dps_doc_n = td.id_doc "
+                + "        AND fre.fid_acc BETWEEN '1200-0000-0000' AND '1399-9999-9999'"
+                + "    )"
+                + ") AS acc_ins ON td.id_year = acc_ins.id_year AND td.id_doc = acc_ins.id_doc "
+                + "WHERE td.b_del = 0 AND mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND td.id_year >= 2024 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND mvt.cost_r = 0 "
+                + "AND mvt.dt_mov >= '" + SINCE_DATE + "' "
+                + "ORDER BY mvt.dt_mov DESC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "] "
+                    + "corresponde a una factura de compra contabilizada como gasto pero valuada a costo cero.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que no existan movimientos de entrada en la valuación
+     * provenientes de órdenes de compra con naturaleza predeterminada
+     * ({@code TRNU_DPS_NAT_DEF}) que estén valuados a costo cero, tengan
+     * importe mayor a cero en el renglón del documento, no tengan factura de
+     * destino asociada y cuyos artículos no sean de categoría activo fijo
+     * ({@code ITMS_CT_ITEM_ASS}).
+     * <p>
+     * Este caso indica que una orden de compra de inventario fue recibida en
+     * almacén pero su costo no fue registrado en la valuación, posiblemente
+     * porque la factura correspondiente aún no ha sido capturada o ligada.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyOrdersWithoutInvoiceWithZero(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando órdenes de compra sin factura con costo cero...");
+        String sErrors = "";
+        String sql = "SELECT DISTINCT mvt.* FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN trn_dps_ety tde ON mvt.fk_dps_year_in_n = tde.id_year "
+                + "  AND mvt.fk_dps_doc_in_n = tde.id_doc AND mvt.fk_dps_ety_in_n = tde.id_ety "
+                + "INNER JOIN trn_dps td ON td.id_year = tde.id_year AND td.id_doc = tde.id_doc "
+                // Joins para obtener la categoría del artículo de referencia y del artículo del renglón
+                + "LEFT JOIN erp.itmu_item ir ON tde.fid_item_ref_n = ir.id_item "
+                + "LEFT JOIN erp.itmu_igen irg ON ir.fid_igen = irg.id_igen "
+                + "LEFT JOIN erp.itmu_item i ON tde.fid_item = i.id_item "
+                + "LEFT JOIN erp.itmu_igen ig ON i.fid_igen = ig.id_igen "
+                // Join para verificar si el renglón ya tiene factura de destino ligada
+                + "LEFT JOIN trn_dps_dps_supply pt ON tde.id_year = pt.id_src_year "
+                + "  AND tde.id_doc = pt.id_src_doc AND tde.id_ety = pt.id_src_ety "
+                + "WHERE td.b_del = 0 AND mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND td.id_year >= 2024 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " "
+                + "AND mvt.cost_r = 0 "
+                + "AND tde.tot_r > 0 " // el renglón tiene importe
+                + "AND pt.id_des_doc IS NULL " // no tiene factura de destino ligada
+                + "AND td.fid_dps_nat = " + SDataConstantsSys.TRNU_DPS_NAT_DEF + " "
+                + "AND COALESCE(irg.fid_ct_item, 0) <> " + SModSysConsts.ITMS_CT_ITEM_ASS + " "
+                + "AND COALESCE(ig.fid_ct_item, 0) <> " + SModSysConsts.ITMS_CT_ITEM_ASS + " "
+                + "AND mvt.dt_mov >= '" + SINCE_DATE + "' "
+                + "ORDER BY mvt.dt_mov DESC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "] "
+                    + "corresponde a una orden de compra con naturaleza predeterminada valuada a costo cero.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que no existan movimientos de valuación provenientes de órdenes
+     * de compra con naturaleza de activo ({@code TRNU_DPS_NAT_ASSET}) cuyo
+     * costo sea diferente de cero y cuya factura de destino no esté
+     * contabilizada en cuentas de activo fijo.
+     * <p>
+     * Detecta órdenes de compra que fueron clasificadas como activo pero cuya
+     * factura asociada no refleja esa contabilización.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyOrdersByDpsNature(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando órdenes de compra por naturaleza de documento...");
+        String sErrors = "";
+        String sql = "SELECT DISTINCT mvt.* FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN trn_dps td ON mvt.fk_dps_year_in_n = td.id_year AND mvt.fk_dps_doc_in_n = td.id_doc "
+                + "INNER JOIN trn_dps_ety tde ON td.id_year = tde.id_year AND td.id_doc = tde.id_doc "
+                + "LEFT JOIN erp.itmu_item ir ON tde.fid_item_ref_n = ir.id_item "
+                + "LEFT JOIN erp.itmu_igen irg ON ir.fid_igen = irg.id_igen "
+                + "LEFT JOIN erp.itmu_item i ON tde.fid_item = i.id_item "
+                + "LEFT JOIN erp.itmu_igen ig ON i.fid_igen = ig.id_igen "
+                + "LEFT JOIN trn_dps_dps_supply pt ON tde.id_year = pt.id_src_year AND tde.id_doc = pt.id_src_doc AND tde.id_ety = pt.id_src_ety "
+                + "LEFT JOIN ("
+                + "  SELECT DISTINCT td.id_year, td.id_doc FROM fin_rec fr "
+                + "  INNER JOIN fin_rec_ety fre ON fr.id_year = fre.id_year AND fr.id_per = fre.id_per "
+                + "    AND fr.id_bkc = fre.id_bkc AND fr.id_tp_rec = fre.id_tp_rec AND fr.id_num = fre.id_num "
+                + "  INNER JOIN fin_acc fa ON fre.fk_acc = fa.pk_acc "
+                + "  INNER JOIN trn_dps td ON fre.fid_dps_year_n = td.id_year AND fre.fid_dps_doc_n = td.id_doc "
+                + "  WHERE fr.b_del = 0 AND fre.b_del = 0 AND td.b_del = 0 "
+                + "    AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "    AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "    AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "    AND fre.fid_acc BETWEEN '1200-0000-0000' AND '1399-9999-9999'"
+                + ") AS acc_ins ON pt.id_des_year = acc_ins.id_year AND pt.id_des_doc = acc_ins.id_doc "
+                + "WHERE td.b_del = 0 AND mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND acc_ins.id_doc IS NULL "
+                + "AND mvt.cost_r <> 0 "
+                + "AND td.fid_dps_nat = " + SDataConstantsSys.TRNU_DPS_NAT_ASSET + " "
+                + "AND mvt.dt_mov >= '" + SINCE_DATE + "' "
+                + "ORDER BY mvt.dt_mov DESC;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "]\n "
+                    + "corresponde a una orden de compra con naturaleza activo y valuada a costo diferente de cero.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que no existan movimientos de salida de valuación provenientes
+     * de órdenes de compra cuyos artículos pertenezcan a la categoría de activo
+     * fijo ({@code ITMS_CT_ITEM_ASS}), con costo diferente de cero y sin
+     * factura de destino contabilizada en cuentas de activo.
+     * <p>
+     * Complementa {@link #verifyOrdersByDpsNature} detectando el caso en que la
+     * naturaleza de activo no está en el documento sino en el artículo mismo.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyOrdersWithAssetItems(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando órdenes de compra con ítems de activo fijo...");
+        String sErrors = "";
+        String sql = "SELECT DISTINCT mvt.*, acc_ins.id_doc FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN trn_dps td ON mvt.fk_dps_year_in_n = td.id_year AND mvt.fk_dps_doc_in_n = td.id_doc "
+                + "INNER JOIN trn_dps_ety tde ON td.id_year = tde.id_year AND td.id_doc = tde.id_doc "
+                + "LEFT JOIN erp.itmu_item ir ON tde.fid_item_ref_n = ir.id_item "
+                + "LEFT JOIN erp.itmu_igen irg ON ir.fid_igen = irg.id_igen "
+                + "LEFT JOIN erp.itmu_item i ON tde.fid_item = i.id_item "
+                + "LEFT JOIN erp.itmu_igen ig ON i.fid_igen = ig.id_igen "
+                + "LEFT JOIN trn_dps_dps_supply pt ON tde.id_year = pt.id_src_year AND tde.id_doc = pt.id_src_doc AND tde.id_ety = pt.id_src_ety "
+                + "LEFT JOIN ("
+                + "  SELECT DISTINCT td.id_year, td.id_doc FROM fin_rec fr "
+                + "  INNER JOIN fin_rec_ety fre ON fr.id_year = fre.id_year AND fr.id_per = fre.id_per "
+                + "    AND fr.id_bkc = fre.id_bkc AND fr.id_tp_rec = fre.id_tp_rec AND fr.id_num = fre.id_num "
+                + "  INNER JOIN fin_acc fa ON fre.fk_acc = fa.pk_acc "
+                + "  INNER JOIN trn_dps td ON fre.fid_dps_year_n = td.id_year AND fre.fid_dps_doc_n = td.id_doc "
+                + "  WHERE fr.b_del = 0 AND fre.b_del = 0 AND td.b_del = 0 "
+                + "    AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "    AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "    AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "    AND fre.fid_acc BETWEEN '1200-0000-0000' AND '1399-9999-9999'"
+                + ") AS acc_ins ON pt.id_des_year = acc_ins.id_year AND pt.id_des_doc = acc_ins.id_doc "
+                + "WHERE td.b_del = 0 AND mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_ORD[2] + " "
+                + "AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + " "
+                + "AND mvt.cost_r <> 0 AND acc_ins.id_doc IS NULL "
+                + "AND td.fid_dps_nat = " + SDataConstantsSys.TRNU_DPS_NAT_ASSET + " "
+                + "AND mvt.dt_mov >= '" + SINCE_DATE + "' "
+                + "AND (COALESCE(irg.fid_ct_item, 0) = " + SModSysConsts.ITMS_CT_ITEM_ASS + " OR COALESCE(ig.fid_ct_item, 0) = " + SModSysConsts.ITMS_CT_ITEM_ASS + ");";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "]\n "
+                    + "corresponde a una orden de compra con ítems de activo fijo y valuada con costo diferente de cero.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que ningún movimiento de entrada en la valuación tenga una
+     * cantidad total de consumos (salidas) mayor a su cantidad de entrada.
+     * <p>
+     * Agrupa por el identificador del movimiento de entrada (diog_year,
+     * diog_doc, diog_ety) y compara la suma de entradas contra la suma de
+     * salidas. Un resultado positivo indica que se consumió más de lo que
+     * entró, lo cual es un error de integridad.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyStockValuationQtyConsumptions(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando cantidades consumidas vs entradas...");
+        String sErrors = "";
+        String sql = "SELECT "
+                + "  i.item_key, "
+                + "  mvt.fk_item, "
+                + "  mvt.fk_unit, "
+                + "  mvt.fk_diog_year_in_n, "
+                + "  mvt.fk_diog_doc_in_n, "
+                + "  mvt.fk_diog_ety_in_n, "
+                + "  sum(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", mvt.qty_mov, 0)) AS mvt_in, "
+                + "  sum(IF (mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", mvt.qty_mov, 0)) AS mvt_out "
+                + "FROM trn_stk_val_mvt mvt "
+                + "INNER JOIN trn_stk_val v ON mvt.fk_stk_val = v.id_stk_val "
+                + "INNER JOIN erp.itmu_item i ON mvt.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON mvt.fk_diog_year_in_n = diog_in.id_year AND mvt.fk_diog_doc_in_n = diog_in.id_doc "
+                + "WHERE mvt.b_del = 0 AND v.b_del = 0 "
+                + "AND mvt.fk_diog_doc_in_n IS NOT NULL "
+                + "AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY mvt.fk_diog_year_in_n, mvt.fk_diog_doc_in_n, mvt.fk_diog_ety_in_n "
+                + "HAVING mvt_out > mvt_in;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El movimiento de entrada de almacén con ID "
+                    + "[" + rs.getInt("mvt.fk_diog_year_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_doc_in_n") + ", "
+                    + rs.getInt("mvt.fk_diog_ety_in_n") + "] \n "
+                    + "tiene una cantidad de consumos que rebasan la cantidad de entrada.\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que ningún movimiento de entrada en la valuación tenga un costo
+     * total de consumos (salidas) mayor a su costo de entrada.
+     * <p>
+     * Agrupa por el identificador del movimiento de entrada (diog_year,
+     * diog_doc, diog_ety) y compara la suma de costos de entradas contra la
+     * suma de costos de salidas. Un resultado positivo indica que se consumió
+     * más valor del que entró, lo cual es un error de integridad.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyStockValuationCostConsumptions(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando costos consumidos vs entradas...");
+        String sErrors = "";
+        String sLog = "";
+        boolean debugMovimientosCostos = true; // cambiar a true para inspeccionar los movimientos individuales
+
+        String sql = "SELECT "
+                + "  i.item_key, "
+                + "  i.item, "
+                + "  k.fk_item, "
+                + "  k.fk_unit, "
+                + "  g.fk_diog_year_in_n, "
+                + "  g.fk_diog_doc_in_n, "
+                + "  g.fk_diog_ety_in_n, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + ", k.total_in, 0)) AS cost_in, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", k.total_out, 0)) AS cost_out, "
+                + "  SUM(IF(k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + ", k.qty_mov_out, 0)) AS qty_out "
+                + "FROM ("
+                + "  SELECT DISTINCT fk_item, fk_unit, fk_diog_year_in_n, fk_diog_doc_in_n, fk_diog_ety_in_n "
+                + "  FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX)
+                + "  WHERE b_del = 0 AND fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT
+                + "    AND fk_diog_year_in_n IS NOT NULL AND fk_diog_doc_in_n IS NOT NULL "
+                + "    AND fk_diog_year_in_n > 0 AND fk_diog_doc_in_n > 0 "
+                + ") g "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "  ON k.fk_item = g.fk_item "
+                + "  AND k.fk_diog_year_in_n = g.fk_diog_year_in_n "
+                + "  AND k.fk_diog_doc_in_n = g.fk_diog_doc_in_n "
+                + "  AND k.fk_diog_ety_in_n = g.fk_diog_ety_in_n "
+                + "  AND k.b_del = 0 "
+                + "INNER JOIN trn_diog diog_in ON g.fk_diog_year_in_n = diog_in.id_year AND g.fk_diog_doc_in_n = diog_in.id_doc "
+                + "INNER JOIN erp.itmu_item i ON g.fk_item = i.id_item "
+                + "WHERE diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY g.fk_diog_year_in_n, g.fk_diog_doc_in_n, g.fk_diog_ety_in_n "
+                + "HAVING cost_out > cost_in AND ABS(cost_in - cost_out) > GREATEST(1, qty_out * 0.01);";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            int yearIn = rs.getInt("fk_diog_year_in_n");
+            int docIn = rs.getInt("fk_diog_doc_in_n");
+            int etyIn = rs.getInt("fk_diog_ety_in_n");
+            double costIn = rs.getDouble("cost_in");
+            double costOut = rs.getDouble("cost_out");
+
+            sErrors += "El movimiento de entrada de almacén con ID "
+                    + "[" + yearIn + ", " + docIn + ", " + etyIn + "] \n "
+                    + "tiene un costo de consumos que rebasan el costo de entrada.\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n";
+            sLog = "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n"
+                    + "Entradas: $" + costIn + ", salidas: $" + costOut;
+            sErrors += sLog + "\n";
+
+            if (debugMovimientosCostos) {
+                StringBuilder sbDetails = new StringBuilder();
+                sbDetails.append("Movimientos individuales para [")
+                        .append(yearIn).append(", ")
+                        .append(docIn).append(", ")
+                        .append(etyIn).append("]:\n");
+
+                String sqlMovs = "SELECT "
+                        + "    k.*, "
+                        + "    i.item_key, "
+                        + "    i.item "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                        + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                        + "WHERE k.b_del = 0 "
+                        + "AND k.fk_diog_year_in_n = ? "
+                        + "AND k.fk_diog_doc_in_n = ? "
+                        + "AND k.fk_diog_ety_in_n = ? "
+                        + "ORDER BY k.dt_mov ASC;";
+
+                java.sql.PreparedStatement psMovs
+                        = oSession.getStatement().getConnection().prepareStatement(sqlMovs);
+                psMovs.setInt(1, yearIn);
+                psMovs.setInt(2, docIn);
+                psMovs.setInt(3, etyIn);
+
+                ResultSet rsMovs = psMovs.executeQuery();
+                while (rsMovs.next()) {
+                    sbDetails.append("  - tipo=").append(rsMovs.getInt("fk_ct_iog"))
+                            .append(" | qty=").append(rsMovs.getDouble("qty_mov_out"))
+                            .append(" | cost_u=").append(rsMovs.getDouble("cost_u"))
+                            .append(" | total_in=").append(rsMovs.getDouble("total_in"))
+                            .append(" | total_out=").append(rsMovs.getDouble("total_out"))
+                            .append(" | fecha=").append(rsMovs.getDate("dt_mov"))
+                            .append(" | doc_in=[").append(rsMovs.getInt("fk_diog_year_in_n"))
+                            .append(", ").append(rsMovs.getInt("fk_diog_doc_in_n"))
+                            .append(", ").append(rsMovs.getInt("fk_diog_ety_in_n")).append("]\n");
+                }
+
+                rsMovs.close();
+                psMovs.close();
+
+                sErrors += sbDetails.toString() + "\n";
+            }
+        }
+
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo registro de entrada en el kardex tenga su correspondiente
+     * movimiento de entrada en trn_stk_val_mvt.
+     * Detecta entradas procesadas en kardex que no se reflejaron en la valuacion.
+     */
+    private static String verifyKardexEntriesWithoutMvt(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando entradas de kardex sin mvt...");
+        String sErrors = "";
+        String sql = "SELECT k.fk_item, k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n, i.item_key "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON k.fk_diog_year_in_n = diog_in.id_year AND k.fk_diog_doc_in_n = diog_in.id_doc "
+                + "LEFT JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_in_n = k.fk_diog_year_in_n "
+                + "  AND mvt.fk_diog_doc_in_n = k.fk_diog_doc_in_n "
+                + "  AND mvt.fk_diog_ety_in_n = k.fk_diog_ety_in_n "
+                + "  AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN + " AND mvt.b_del = 0 "
+                + "WHERE k.b_del = 0 AND k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_IN
+                + "  AND k.fk_diog_year_in_n > 0 AND k.fk_diog_doc_in_n > 0 "
+                + "  AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "  AND mvt.id_stk_val_mvt IS NULL "
+                + "GROUP BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n "
+                + "ORDER BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "Entrada de kardex [" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", " + rs.getInt("fk_diog_ety_in_n") + "] "
+                    + "item: " + rs.getString("item_key") + " no tiene mvt de entrada en la valuacion.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo registro de salida en el kardex tenga su correspondiente
+     * movimiento de salida en trn_stk_val_mvt.
+     * Detecta consumos registrados en kardex que no se reflejaron en la valuacion.
+     */
+    private static String verifyKardexOutsWithoutMvt(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando salidas de kardex sin mvt...");
+        String sErrors = "";
+        String sql = "SELECT k.fk_item, k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n, i.item_key "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_out ON k.fk_diog_year_out_n = diog_out.id_year AND k.fk_diog_doc_out_n = diog_out.id_doc "
+                + "LEFT JOIN trn_stk_val_mvt mvt ON mvt.fk_diog_year_out_n = k.fk_diog_year_out_n "
+                + "  AND mvt.fk_diog_doc_out_n = k.fk_diog_doc_out_n "
+                + "  AND mvt.fk_diog_ety_out_n = k.fk_diog_ety_out_n "
+                + "  AND mvt.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT + " AND mvt.b_del = 0 "
+                + "WHERE k.b_del = 0 AND k.fk_ct_iog = " + SModSysConsts.TRNS_CT_IOG_OUT
+                + "  AND k.fk_diog_year_out_n > 0 AND k.fk_diog_doc_out_n > 0 "
+                + "  AND diog_out.dt >= '" + SINCE_DATE + "' "
+                + "  AND mvt.id_stk_val_mvt IS NULL "
+                + "GROUP BY k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n "
+                + "ORDER BY k.fk_diog_year_out_n, k.fk_diog_doc_out_n, k.fk_diog_ety_out_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "Salida de kardex [" + rs.getInt("fk_diog_year_out_n") + ", "
+                    + rs.getInt("fk_diog_doc_out_n") + ", " + rs.getInt("fk_diog_ety_out_n") + "] "
+                    + "item: " + rs.getString("item_key") + " no tiene mvt de salida en la valuacion.\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+    
+    /**
+     * Verifica que el remanente de costo de cada entrada de kardex (agrupada
+     * por su documento de entrada {@code fk_diog_*_in_n} e ítem) no sea
+     * negativo más allá de la tolerancia permitida.
+     * <p>
+     * Para cada grupo se calcula {@code SUM(total_in) - SUM(total_out)}. Un
+     * resultado menor a {@code -tolerancia} indica que se consumió más costo
+     * del que efectivamente entró, lo cual provocaría errores en valuaciones
+     * futuras (costos negativos, PPP mal calculado, etc.).
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyNegativeKardexRemaining(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando remanente negativo de kardex...");
+        String sErrors = "";
+        String sql = "SELECT "
+                + "  i.item_key, "
+                + "  i.item, "
+                + "  k.fk_item, "
+                + "  k.fk_unit, "
+                + "  k.fk_diog_year_in_n, "
+                + "  k.fk_diog_doc_in_n, "
+                + "  k.fk_diog_ety_in_n, "
+                + "  SUM(k.total_in) AS total_in, "
+                + "  SUM(k.total_out) AS total_out, "
+                + "  (SUM(k.total_in) - SUM(k.total_out)) AS remaining "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN erp.itmu_item i ON k.fk_item = i.id_item "
+                + "INNER JOIN trn_diog diog_in ON k.fk_diog_year_in_n = diog_in.id_year AND k.fk_diog_doc_in_n = diog_in.id_doc "
+                + "WHERE k.b_del = 0 "
+                + "AND k.fk_diog_year_in_n IS NOT NULL AND k.fk_diog_doc_in_n IS NOT NULL "
+                + "AND k.fk_diog_year_in_n > 0 AND k.fk_diog_doc_in_n > 0 "
+                + "AND diog_in.dt >= '" + SINCE_DATE + "' "
+                + "GROUP BY k.fk_diog_year_in_n, k.fk_diog_doc_in_n, k.fk_diog_ety_in_n, k.fk_item, k.fk_unit "
+                + "HAVING (SUM(k.total_in) - SUM(k.total_out)) < -" + TOLERANCE_KARDEX_REMAINING + ";";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "La entrada de kardex con ID "
+                    + "[" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", "
+                    + rs.getInt("fk_diog_ety_in_n") + "] \n "
+                    + "tiene un remanente de costo negativo (se consumió más costo del disponible).\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n"
+                    + "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n"
+                    + "Entradas: $" + rs.getDouble("total_in") + ", salidas: $" + rs.getDouble("total_out")
+                    + ", remanente: $" + rs.getDouble("remaining") + ".\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+
+    /**
+     * Verifica que todo ajuste de kardex de tipo
+     * {@code TYPE_VAL_KARDEX_IN_ADJUST_DIFF_COST} tenga un registro de
+     * entrada (IN) correspondiente, activo (no eliminado), con el mismo
+     * documento de entrada ({@code fk_diog_*_in_n}) y referenciado por
+     * {@code fk_stk_val_kardex_n}.
+     * <p>
+     * Un ajuste huérfano indica que se generó sobre una entrada que no
+     * existe, fue eliminada, o cuya referencia {@code fk_stk_val_kardex_n}
+     * no corresponde al documento de entrada del propio ajuste.
+     * </p>
+     *
+     * @param oSession sesión activa de base de datos
+     * @return cadena con los errores encontrados, o cadena vacía si no hay
+     * errores
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyOrphanKardexAdjusts(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando ajustes de kardex sin entrada base...");
+        String sErrors = "";
+        String sTable = SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX);
+        String sql = "SELECT "
+                + "  adj.id_stk_val_kardex, "
+                + "  adj.fk_item, "
+                + "  adj.fk_unit, "
+                + "  adj.fk_stk_val_kardex_n, "
+                + "  adj.fk_diog_year_in_n, "
+                + "  adj.fk_diog_doc_in_n, "
+                + "  adj.fk_diog_ety_in_n, "
+                + "  i.item_key, "
+                + "  i.item "
+                + "FROM " + sTable + " adj "
+                + "INNER JOIN erp.itmu_item i ON adj.fk_item = i.id_item "
+                + "LEFT JOIN " + sTable + " base "
+                + "  ON base.id_stk_val_kardex = adj.fk_stk_val_kardex_n "
+                + "  AND base.b_del = 0 "
+                + "  AND base.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN + " "
+                + "  AND base.fk_diog_year_in_n = adj.fk_diog_year_in_n "
+                + "  AND base.fk_diog_doc_in_n = adj.fk_diog_doc_in_n "
+                + "  AND base.fk_diog_ety_in_n = adj.fk_diog_ety_in_n "
+                + "WHERE adj.b_del = 0 "
+                + "AND adj.fk_tp_stk_val_kardex = " + SDbStockValuationKardex.TRNS_TP_STK_VAL_KARDEX_IN_ADJUST_DIFF_COST + " "
+                + "AND (adj.fk_stk_val_kardex_n IS NULL OR adj.fk_stk_val_kardex_n = 0 OR base.id_stk_val_kardex IS NULL) "
+                + "ORDER BY adj.fk_diog_year_in_n, adj.fk_diog_doc_in_n, adj.fk_diog_ety_in_n;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            sErrors += "El ajuste de kardex con ID " + rs.getInt("id_stk_val_kardex") + " "
+                    + "[" + rs.getInt("fk_diog_year_in_n") + ", "
+                    + rs.getInt("fk_diog_doc_in_n") + ", "
+                    + rs.getInt("fk_diog_ety_in_n") + "] "
+                    + "no tiene una entrada base (IN) correspondiente para fk_stk_val_kardex_n = "
+                    + rs.getInt("fk_stk_val_kardex_n") + ".\n"
+                    + "ID Item: " + rs.getInt("fk_item") + ", ID Unit: " + rs.getInt("fk_unit") + ".\n"
+                    + "Item: " + rs.getString("item_key") + " - " + rs.getString("item") + "\n";
+        }
+        if (!sErrors.isEmpty()) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(sErrors);
+        }
+        return sErrors;
+    }
+}

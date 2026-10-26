@@ -44,6 +44,7 @@ import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import erp.mod.itm.db.SDbItemDescription;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -51,6 +52,7 @@ import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import erp.server.SSessionServer;
+import erp.swap.SSwapConsts;
 import java.awt.Cursor;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -93,7 +95,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores, Adrián Avilés, Sergio Flores, Claudio Peña, Rodrigo Ayala
  */
 public abstract class STrnUtilities {
     
@@ -1922,7 +1924,7 @@ public abstract class STrnUtilities {
         mailToSend = bizPartner.getBizPartnerBranchContactMail(new int[] { oDps.getFkBizPartnerBranchId() });
         
         if (mailToSend.isEmpty()) {
-            throw new Exception("El receptor del documento no tiene buzones de correo-e.");
+            throw new Exception("El receptor del documento, " + bizPartner.getBizPartner() + " (ID " + bizPartner.getPkBizPartnerId() + "), no tiene buzones de correo-e.");
         }
         
         return mailToSend;
@@ -2042,6 +2044,7 @@ public abstract class STrnUtilities {
             if (confirmSending && client.isGui()) {
                 send = confirmSend(client, SCfdUtils.TXT_SEND_DPS, null, dps, dps.getFkBizPartnerId_r(), dps.getFkBizPartnerBranchId());
             }
+            
             if (send) {
                 oPdf = sendMailOrder(client, dps, bReturnFile);
                 if (! bReturnFile) {
@@ -2062,72 +2065,83 @@ public abstract class STrnUtilities {
     private static File sendMailOrder(final SClientInterface client, SDataDps oDps, boolean bReturnFile) throws IOException {
         String addressee = "";
         String msg = "";
-        String userMail = "";
         int nUserId = 0;
         String bizPartnerMail = "";
         boolean canSend = true;
-        SMailSender sender;
-        SMail mail;
-        ArrayList<String> toRecipients;
-        ArrayList<String> toRecipientsCc = new ArrayList<>();
         File pdf = null;
         SDbMms mms;     
         SDataBizPartner bizPartnerUserSend;
-        String series = oDps.getNumberSeries() == null ? "" : oDps.getNumberSeries();
-        String fNum = series + (series.isEmpty() ? "" : "-") + oDps.getNumber();    
+        String folio = oDps.getDpsNumber();
         
         try {
             int dpsCategory = oDps.getFkDpsCategoryId();
+            
             if (client.isGui()) {
                 client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             }
+            
             mms = getMms(client, dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR ? SModSysConsts.CFGS_TP_MMS_ORD_PUR : SModSysConsts.CFGS_TP_MMS_ORD_SAL);
             
             bizPartnerMail = getMailToSendForOrder(client, oDps);
+            
             if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-                client.showMsgBoxWarning("No existe ningún correo-e configurado para envío de pedidos.");
+                String warning = "No existe ningún correo-e configurado para envío de pedidos.";
+                if (client.isGui()) {
+                    client.showMsgBoxWarning(warning);
+                }
+                else {
+                    System.err.println(warning);
+                }
             }
             else {
-                //Si es un pedido 
-                if (oDps.getFkDpsCategoryId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] 
-                    && oDps.getFkDpsClassId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] 
-                        && oDps.getFkDpsTypeId() == SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[2]) {
-                    //Si viene de la interfaz, se valida si hay correo del usuario de la sesion
+                String replyTo = "";
+                
+                // Si es un pedido de compras:
+                if (oDps.isOrderPur()) {
+                    // Si viene de la interfaz, se valida si hay correo del usuario de la sesión:
                     if (client.isGui()) {
-                        userMail = ((SDataUser) client.getSession().getUser()).getEmail();
+                        replyTo = ((SDataUser) client.getSession().getUser()).getEmail();
                         nUserId = client.getSession().getUser().getPkUserId();
                     }
-                    //Si no hay correo entonces se busca el del creador de la OC
-                    if (userMail.isEmpty()) {
+                    
+                    // Si no hay correo entonces se busca el del creador de la OC:
+                    if (replyTo.isEmpty()) {
                         SDataUser user = new SDataUser();
                         user.read(new int[] { oDps.getFkUserNewId() }, client.getSession().getStatement());
                         nUserId = oDps.getFkUserNewId();
-                        userMail = user.getEmail();
+                        replyTo = user.getEmail();
                     }
-                    //Si no hay correo se usa el institucional
-                    if (userMail.isEmpty()) {
-                        userMail = mms.getUser();
+                    
+                    // Si no hay correo se usa el del servicio de mensajería mail (MMS):
+                    if (replyTo.isEmpty()) {
+                        replyTo = mms.getUser();
                     }
                 }
                 else {
                     if (((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                         bizPartnerUserSend = new SDataBizPartner();
                         bizPartnerUserSend.read(new int[] { ((SDataUser) client.getSession().getUser()).getFkBizPartnerId_n() }, client.getSession().getStatement());
-                        userMail = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
+                        replyTo = bizPartnerUserSend.getBizPartnerContactMail(SDataConstantsSys.BPSS_TP_CON_ADM);
                     }
                 }
                 
-                sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), (userMail.isEmpty() ? mms.getUser() : userMail));
-                if (mms.getMmsCase() == 5) {
-                    sender.setMailReplyTo(userMail);
+                SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), ! replyTo.isEmpty() ? replyTo : mms.getUser());
+                ArrayList<String> toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
+                ArrayList<String> toRecipientsCc = new ArrayList<>();
+                
+                if (mms.getMmsCase() == SDbMms.CASE_5_SWAP_SERVICES_PUR_ORD) {
+                    sender.setMailReplyTo(replyTo);
                     
                     String sCfg = SCfgUtils.getParamValue(client.getSession().getStatement().getConnection().createStatement(), SDataConstantsSys.CFG_PARAM_TRN_DPS_AUTH_USR_GRP);
+                    
                     if (! sCfg.isEmpty() && nUserId > 0) {
                         ObjectMapper mapper = new ObjectMapper();
                         JsonNode rootNode = mapper.readTree(sCfg);
                         List<Integer> toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosCompras", "to", nUserId);
+                        
                         if (toUsers.isEmpty()) {
                             toUsers = SAuthJsonUtils.getArrayIfContains(rootNode, "usuariosProyectos", "to", nUserId);
+                            
                             if (toUsers.isEmpty()) {
                                 toUsers.add(nUserId);
                             }
@@ -2141,34 +2155,44 @@ public abstract class STrnUtilities {
                 else {
                     sender.setMailReplyTo(mms.getXtaMailReplyTo());
                 }
-                toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(bizPartnerMail, ";")));
-
+                
                 if (toRecipients.isEmpty()) {
-                    client.showMsgBoxWarning("No existe ningún correo-e destinatario configurado.");
+                    String waring = "No existe ningún correo-e destinatario configurado (documento: " + folio + ").";
+                    if (client.isGui()) {
+                        client.showMsgBoxWarning(waring);
+                    }
+                    else {
+                        System.err.println(waring);
+                    }
+                    
                     canSend = false;
                 }
                 else {
-                      if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {                                                 
-                            String body = "Le informamos que la orden de compra " + fNum + " adjunta ha sido " 
-                             + (oDps.getIsAuthorized() ? "AUTORIZADA." : "RECHAZADA.");
-                            body += "<p><b>Favor de registrarse en nuestro nuevo portal de proveedores</b><br>"
-                                 + "En el siguiente enlace: "
-                                 + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a></p>";
-                            body += "<p>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, "
-                                 + "facturas, pagos y comprobantes de pago.</p>";
-                            body += "<p>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, "
-                                 + "fuera de esta fecha no se pueden recibir.</p>";
-                            body += "<br><br>Atentamente,<br>"
-                            + client.getSessionXXX().getCurrentCompanyName() + "."
-                            + "<br><br>" + composeMailFooter("", mms.getMmsCase());
+                      if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                            String body = "Le informamos que la orden de compra " + folio + " adjunta ha sido "
+                             + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + ".";
+                            
+                            if ((boolean) client.getSwapServicesSetting(SSwapConsts.CFG_NVP_LINK_UP)) {
+                                body += "<p><b>Favor de registrarse en nuestro " + SSwapConsts.PURCHASE_PORTAL + ".</b><br>"
+                                     + "Ingrese al siguiente enlace: "
+                                     + "<a href='https://aeth.swaplicado.com'>aeth.swaplicado.com</a></p>";
+                                body += "<p>A trav&eacute;s de este portal se dar&aacute; seguimiento a &oacute;rdenes de compra, "
+                                     + "facturas, pagos y comprobantes de pago.</p>";
+                                body += "<p>Favor de apegarse al calendario de aceptaci&oacute;n de facturas, "
+                                     + "fuera de esta fecha no se pueden recibir.</p>";
+                            }
+                                                        
+                            body += "<br>Atentamente,<br>"
+                            + client.getSessionXXX().getCurrentCompanyName() + "<br><br>"
+                            + "<hr>" + composeMailFooter("", mms.getMmsCase());
 
                         mms.setTextBody(body);
                     }
                 }
-                String subjectOriginal = mms.getTextSubject(); // "Orden de compra Aceites Especiales TH"
-                String subjectConcatenado = subjectOriginal.replaceFirst("Orden de compra", "Orden de compra " + fNum);
-                mail = new SMail(sender, subjectConcatenado, mms.getTextBody(), toRecipients, toRecipientsCc);
+                
+                String subject = mms.getTextSubject().replaceAll(SDbMms.TAG_NUM, folio); // replacee tag "<num>" wigh the folio of the order!
 
+                SMail mail = new SMail(sender, subject, mms.getTextBody(), toRecipients, toRecipientsCc);
                 mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
 
                 if (canSend) {
@@ -2185,7 +2209,7 @@ public abstract class STrnUtilities {
                         addressee += (addressee.isEmpty() ? "" : ";") + recipient;
                     }
 
-                    if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, true)) {
+                    if (!STrnUtilities.insertDpsSendLog(client, oDps, addressee, true)) { // XXX 2026-06-30, Sergio Flores: ¿Qué ocurre con este bloque de código que no hace nada?
                     }
                     
                     if (! bReturnFile) {
@@ -2194,10 +2218,22 @@ public abstract class STrnUtilities {
                     }
                     
                     if (dpsCategory == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                        client.showMsgBoxInformation("La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e");
+                        String information = "La orden de compra " + (oDps.getIsAuthorized() ? "AUTORIZADA" : "RECHAZADA") + " fue enviada al proveedor por correo-e.";
+                        if (client.isGui()) {
+                            client.showMsgBoxWarning(information);
+                        }
+                        else {
+                            System.out.println(information);
+                        }
                     }
                     else {
-                        client.showMsgBoxInformation("El correo-e ha sido enviado.\n" + msg);
+                        String information = "El correo-e ha sido enviado.\n" + msg;
+                        if (client.isGui()) {
+                            client.showMsgBoxWarning(information);
+                        }
+                        else {
+                            System.out.println(information);
+                        }
                     }
                 }
             }
@@ -2969,6 +3005,27 @@ public abstract class STrnUtilities {
             map.put("sTaxRegimeRec", taxRegimeRec);
             map.put("sCfdiUsage", cfdiUsage);
 
+            HashMap<Integer, String> itemDescsMap = new HashMap<>();
+                
+            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                if (entry.isAccountable()) {
+                    SDbItemDescription oItemDesc = new SDbItemDescription();
+
+                    try {
+                        oItemDesc.read(client.getSession(), new int[] { entry.getFkItemId() });
+
+                        if (!oItemDesc.getIsDeleted() && oItemDesc.getItemDescription() != null && !oItemDesc.getItemDescription().trim().isEmpty()) {
+                            itemDescsMap.put(entry.getPkEntryId(), sa.lib.SLibUtils.htmlToPlainText(oItemDesc.getItemDescription()));
+                        }
+                    }
+                    catch (Exception e) {
+//                        SLibUtilities.renderException(STrnUtilities.class.getName(), e);
+                    }
+                }
+            }
+
+            map.put("oItemDescsMap", itemDescsMap);
+            
             if (client.isGui() && (dbName == null || dbName.isEmpty())) {
                 jasperPrint = SDataUtilities.fillReport(client, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
             }
@@ -3752,10 +3809,10 @@ public abstract class STrnUtilities {
                 + "</html>";
     }
     
-    public static String composeMailFooter(final String htmlClass, final int caseMms) {
+    public static String composeMailFooter(final String htmlClass, final int mmsCase) {
         return "<p" + (htmlClass.isEmpty() ? "" : " class=\"" +  htmlClass+ "\"") + ">"
-                + (caseMms != 5 ? "<b>Favor de no responder a este correo-e.</b><br>" : "")
-                + "Generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
+                + (mmsCase != SDbMms.CASE_5_SWAP_SERVICES_PUR_ORD ? "<b>Favor de no responder a este correo-e.</b><br>" : "")
+                + "Generado de forma autom&aacute;tica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
                 + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE + "<br>"
                 + SClient.APP_RELEASE
                 + "</p>";
@@ -4105,23 +4162,125 @@ public abstract class STrnUtilities {
         return sent;
     }
     
-    public static boolean updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {
+    /**
+     * Actualiza la dirección de entrega en un documento de venta.
+     * 
+     * @param client Cliente GUI.
+     * @param idBranchAddress ID de la dirección de la sucursal.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * 
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
+     */
+    public static String updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {
         String sql = "";
         Statement statement = null;
-        boolean updated = false;
+        String updated = "";
         
         try {
             sql = "UPDATE trn_dps SET fid_add = " + idBranchAddress[1] + " WHERE id_year = " + pkTrnDps[0] + " and id_doc = " + pkTrnDps[1] + ";";
 
             statement = client.getSession().getDatabase().getConnection().createStatement();
             statement.executeUpdate(sql);
-            updated = true;
+            updated = "";
         }
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            updated = "Ocurrió un error al actualizar el destinatario del negocio. " + e.getMessage();
         }
         
         return updated;
+    }
+
+    /**
+     * Actualiza el destinatario del negocio en un documento de venta.
+     * 
+     * @param oConn Conexión a la base de datos.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idBizPartnerDes ID del negocio destinatario.
+     * @param idBizPartnerDesBranch ID de la sucursal del negocio destinatario.
+     * @param idBizPartnerDesBranchAddress ID de la dirección de la sucursal del negocio destinatario.
+     * @param idUser ID del usuario que realiza la actualización.
+     * 
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
+     */
+    public static String updateDpsBizPartnerAddressee(Connection oConn, 
+                                                        int[] pkTrnDps, 
+                                                        int idBizPartnerAddressee,
+                                                        int idBizPartnerDes,
+                                                        int idBizPartnerDesBranch,
+                                                        int idBizPartnerDesBranchAddress,
+                                                        int idUser) {
+        String sql = "";
+        Statement statement = null;
+
+        try {
+            sql = "UPDATE trn_dps "
+                    + "SET ";
+            if (idBizPartnerAddressee > 0) {
+                   sql += "fid_bp_addee_n = " + idBizPartnerAddressee + ", "
+                    + "fid_add_bp_nr = NULL, "
+                    + "fid_add_bpb_n = NULL, "
+                    + "fid_add_add_n = NULL, ";
+            }
+            else if (idBizPartnerDes > 0) {
+                sql += "fid_bp_addee_n = NULL, "
+                    + "fid_add_bp_nr = " + idBizPartnerDes + ", "
+                    + "fid_add_bpb_n = " + idBizPartnerDesBranch + ","
+                    + "fid_add_add_n = " + idBizPartnerDesBranchAddress + ", ";
+            }
+            else {
+                return "Ocurrió un error al actualizar el destinatario del negocio, no se especificó un destinatario válido.";
+            }
+            sql += "fid_usr_edit = " + idUser + ", "
+                    + "ts_edit = NOW() "
+                    + "WHERE id_year = " + pkTrnDps[0] + " AND id_doc = " + pkTrnDps[1] + ";";
+
+            statement = oConn.createStatement();
+            statement.executeUpdate(sql);
+            return "";
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+            return "Ocurrió un error al actualizar el destinatario del negocio. " + e.getMessage();
+        }
+    }
+    
+    /**
+     * Guarda el registro de cambios en el destinatario del negocio para un documento de venta.
+     * @param oConn Conexión a la base de datos.
+     * @param pkTrnDps Clave primaria del documento de venta.
+     * @param idBizPartnerAddressee ID del nuevo destinatario del negocio.
+     * @param idBizPartnerDes ID del negocio destinatario.
+     * @param idBizPartnerDesBranch ID de la sucursal del negocio destinatario.
+     * @param idBizPartnerDesBranchAddress ID de la dirección de la sucursal del negocio destinatario.
+     * @param idUser ID del usuario que realiza la actualización.
+     * @return Cadena vacía si la actualización fue exitosa, mensaje de error en caso contrario.
+     */
+    public static String saveDpsBizPartnerAddresseeChangeLog(Connection oConn, 
+                                                                int[] pkTrnDps, 
+                                                                int idBizPartnerAddressee,
+                                                                int idBizPartnerDes,
+                                                                int idBizPartnerDesBranch,
+                                                                int idBizPartnerDesBranchAddress,
+                                                                int idUser) {
+        try {
+            SDataDpsDestinyChangesLog oLog = new SDataDpsDestinyChangesLog();
+            oLog.setPkYearId(pkTrnDps[0]);
+            oLog.setPkDocId(pkTrnDps[1]);
+            oLog.setFkBizPartnerAddresseeId_n(idBizPartnerAddressee);
+            oLog.setFkAddresseeBizPartnerId_nr(idBizPartnerDes);
+            oLog.setFkAddresseeBizPartnerBranchId_n(idBizPartnerDesBranch);
+            oLog.setFkAddresseeBizPartnerBranchAddressId_n(idBizPartnerDesBranchAddress);
+            oLog.setFkUserChangedId(idUser);
+            oLog.save(oConn);
+        }
+        catch (Exception e) {
+            Logger.getLogger(STrnUtilities.class.getName()).log(Level.SEVERE, null, e);
+            return "Ocurrió un error al guardar el registro de cambios en el destinatario del negocio. " + e.getMessage();
+        }
+
+        return "";
     }
     
     /**
@@ -4419,45 +4578,60 @@ public abstract class STrnUtilities {
         
     }
     
-    public static void insertDpsEtyHist(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
-        Statement statement = null;
-        String sql = "";
-        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
-        statement = miClient.getSession().getStatement().getConnection().createStatement();
+    // Método de compatibilidad para Facturas
+    public static void insertDpsEtyHist(SClientInterface miClient, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
+            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
         
-        int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+        Connection connection = miClient.getSession().getStatement().getConnection();
+        int usrId = miClient.getSession().getUser().getPkUserId();
         
-        sql = ("INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
-                    + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
-                    + "VALUES (" + pkYearId + ", "
-                    + "" + pkDocId + ", "
-                    + "" + moDpsEntry.getPkEntryId() + ", " 
-                    + "" + histEty + ", "
-                    + "'" + moDpsEntry.getConceptKey() + "', "
-                    + "'" + conceptKeyNew + "', "
-                    + "'" + moDpsEntry.getConcept() + "', "
-                    + "'" + conceptNew + "', "
-                    + "'" + moDpsEntry.getDbmsFkItemGenericId() + "', "
-                    + "'" + itemRef + "', "
-
-                    + "'" + moDpsEntry.getFkItemId()+ "', "
-                    + "'" + moDpsEntry.getFkItemId() + "', "
-                    + "'" + moDpsDoc[0][0] + "', "
-                    + "'" + moDpsDoc[0][1] + "', "
-                    + "'" + moDpsDoc[0][2] + "', "
-
-                    + "" + miClient.getSession().getUser().getPkUserId() + ", "
-                    + " NOW()); ");
-           
-        statement.executeUpdate(sql);
+        insertDpsEtyHist(connection, usrId, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allRelatedDocs);
+    }
+    
+    // Método Core y transaccional para Pedidos
+    public static void insertDpsEtyHist(Connection connection, int usrId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
+            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
         
-        
+        try (Statement statement = connection.createStatement()) {
+            
+            String valItemRefOld = (moDpsEntry.getDbmsFkItemGenericId() > 0) ? String.valueOf(moDpsEntry.getDbmsFkItemGenericId()) : "NULL";
+            String valItemRefNew = (itemRef > 0) ? String.valueOf(itemRef) : "NULL";
+            
+            String finalConceptKey = conceptKeyNew.isEmpty() ? moDpsEntry.getConceptKey() : conceptKeyNew;
+            String finalConcept = conceptNew.isEmpty() ? moDpsEntry.getConcept() : conceptNew;
+            
+            for (int[] docKey : allRelatedDocs) {
+                int pkYearId = docKey[0];
+                int pkDocId = docKey[1];
+                int pkEtyId = docKey[2];
+                int ctDps = docKey[3];
+                int clDps = docKey[4];
+                int tpDps = docKey[5];
+                
+                int histEty = 1;
+                try (ResultSet rs = statement.executeQuery("SELECT COALESCE(MAX(id_hist), 0) + 1 FROM trn_dps_ety_hist WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + pkEtyId)) {
+                    if (rs.next()) histEty = rs.getInt(1);
+                }
+                
+                String sql = "INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
+                        + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
+                        + "VALUES (" + pkYearId + ", " + pkDocId + ", " + pkEtyId + ", " + histEty + ", "
+                        + "'" + moDpsEntry.getConceptKey() + "', '" + finalConceptKey + "', "
+                        + "'" + moDpsEntry.getConcept() + "', '" + finalConcept + "', "
+                        + valItemRefOld + ", " + valItemRefNew + ", "
+                        + "'" + moDpsEntry.getFkItemId() + "', '" + moDpsEntry.getFkItemId() + "', "
+                        + ctDps + ", " + clDps + ", " + tpDps + ", "
+                        + usrId + ", NOW());";
+                        
+                statement.executeUpdate(sql);
+            }
+        }
     }
     
     public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {
         Statement statement = null;
         String sql = "";
-        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
+        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId()); //Truena porque se usa este mismo para todos los docs relacionados
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
@@ -4490,40 +4664,151 @@ public abstract class STrnUtilities {
     }
 
     public static void updateItemRefInvoice(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
-        Statement statement = null;
-        String sql = "";
+        
         String mySql = "";
-        insertDpsEtyHist(miClient, pkYearId, pkDocId, moDpsEntry, conceptKeyNew, conceptNew, itemRef );
         
-        statement = miClient.getSession().getStatement().getConnection().createStatement();
-        
-        if(!conceptKeyNew.isEmpty()) {
-            mySql = "concept_key = '" + conceptKeyNew + "' "; 
+        if (!conceptKeyNew.isEmpty()) {
+            mySql += "concept_key = '" + conceptKeyNew + "' ";
         }
-        if(!conceptNew.isEmpty()) {
-            if (mySql.isEmpty()) {
-                mySql += "concept = '" + conceptNew + "' ";
-            }
-            else {
-                mySql += ", concept = '" + conceptNew + "' ";
-            }
+        if (!conceptNew.isEmpty()) {
+            mySql += (mySql.isEmpty() ? "" : ", ") + "concept = '" + conceptNew + "' ";
         }        
-        if(itemRef > 0) {
-            if (mySql.isEmpty()) {
-                mySql += "fid_item_ref_n = '" + itemRef + "' ";
+        if (itemRef > 0) {
+            mySql += (mySql.isEmpty() ? "" : ", ") + "fid_item_ref_n = " + itemRef + " ";
+        }
+        
+        if (mySql.isEmpty()) {
+            return; 
+        }
+        
+        java.util.List<int[]> sourceDoc = new java.util.ArrayList<>();
+        java.util.List<int[]> sourceReq = new java.util.ArrayList<>();
+        java.util.List<int[]> adjDocs = new java.util.ArrayList<>();
+        java.util.List<int[]> allDocsToLog = new java.util.ArrayList<>(); // Lista de documentos para la bitácora
+        int itemRefOld = moDpsEntry.getFkItemRefId_n();
+
+        try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement()) {
+            
+            int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+            allDocsToLog.add(new int[] { pkYearId, pkDocId, moDpsEntry.getPkEntryId(), moDpsDoc[0][0], moDpsDoc[0][1], moDpsDoc[0][2] });
+            
+            // Factura:
+            
+            String sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
+            statement.executeUpdate(sql);
+
+            // Orden de C/V padres:
+            
+            sql = "SELECT DISTINCT id_src_year, id_src_doc, id_src_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " + //DISTINCT para entregas fraccionadas (Dos DPS mismas Facturas)
+                  "FROM trn_dps_dps_supply AS s " +
+                  "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc " +
+                  "WHERE s.id_des_year = " + pkYearId + " AND s.id_des_doc = " + pkDocId + " AND s.id_des_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                if (resultSet.next()) {
+                    int[] srcData = new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety") };
+                    sourceDoc.add(srcData);
+                    allDocsToLog.add(new int[] { srcData[0], srcData[1], srcData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
+                }
             }
-            else {
-                 mySql += ",fid_item_ref_n = '" + itemRef + "' ";
+            
+            // Requisiciones:
+            
+            sql = "SELECT fid_mat_req, fid_mat_req_ety FROM trn_dps_mat_req " + 
+                  "WHERE fid_dps_year = " + pkYearId + " AND fid_dps_doc = " + pkDocId + " AND fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                if (resultSet.next()) {
+                    sourceReq.add(new int[] { resultSet.getInt("fid_mat_req"), resultSet.getInt("fid_mat_req_ety") });
+                }
+            }
+            
+            // Notas de credito hijos (todos los asociados):
+            
+            sql = "SELECT DISTINCT a.id_adj_year, a.id_adj_doc, a.id_adj_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " +
+                  "FROM trn_dps_dps_adj AS a " +
+                  "INNER JOIN trn_dps AS d ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
+                  "WHERE a.id_dps_year = " + pkYearId + " AND a.id_dps_doc = " + pkDocId + " AND a.id_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+            
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    int[] adjData = new int[] { resultSet.getInt("id_adj_year"), resultSet.getInt("id_adj_doc"), resultSet.getInt("id_adj_ety") };
+                    adjDocs.add(adjData);
+                    allDocsToLog.add(new int[] { adjData[0], adjData[1], adjData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
+                }
+            }
+            
+            // Procesamos ordenes:
+            
+            if (!sourceDoc.isEmpty()) {
+                for (int[] srcKey : sourceDoc) {
+                    sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + srcKey[0] + " AND id_doc = " + srcKey[1] + " AND id_ety = " + srcKey[2] + ";";
+                    statement.executeUpdate(sql);
+                    
+                    // Si se modificó referencia de ítem se actualiza en requisicion abuelo:
+                    if (itemRef > 0) {
+                        sql = "UPDATE trn_mat_req_ety AS mre " +
+                              "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
+                              "SET mre.fk_item_ref_n = " + itemRef + " " +
+                              "WHERE mr.fid_dps_year = " + srcKey[0] + " AND mr.fid_dps_doc = " + srcKey[1] + " AND mr.fid_dps_ety = " + srcKey[2] + ";";
+                        statement.executeUpdate(sql);
+                    }
+                }
+            }
+            else if (!sourceReq.isEmpty()) {
+                
+                // Actualizar Requisición directa de la Factura:
+                if (itemRef > 0) { 
+                    sql = "UPDATE trn_mat_req_ety AS mre " +
+                          "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
+                          "SET mre.fk_item_ref_n = " + itemRef + " " +
+                          "WHERE mr.fid_dps_year = " + pkYearId + " AND mr.fid_dps_doc = " + pkDocId + " AND mr.fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
+                    statement.executeUpdate(sql);
+                }
+            }
+            
+            // Procesamos notas de credito:
+            
+            for (int[] adjKey : adjDocs) {
+                sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + adjKey[0] + " AND id_doc = " + adjKey[1] + " AND id_ety = " + adjKey[2] + ";";
+                statement.executeUpdate(sql);
             }
         }
-            
-        sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " " + 
-                "AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
         
-        statement.executeUpdate(sql);
+        insertDpsEtyHist(miClient, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allDocsToLog); //registro en bitácora
         
-    }
-    
+        // Actualización de contabilización de Factura y NC:
+        
+        if (itemRefOld > 0 && itemRef > 0) {
+            try (Statement statement = connection.createStatement()){
+                int userId = miClient.getSession().getUser().getPkUserId();
+                
+                String sqlRecEty = "UPDATE fin_rec_ety " +
+                                   "SET fid_item_n = " + itemRef + ", " + 
+                                   "fid_usr_edit = " + userId + ", " +
+                                   "ts_edit = NOW() " +
+                                   "WHERE fid_dps_year_n = " + pkYearId + " " +
+                                   "AND fid_dps_doc_n = " + pkDocId + " " +
+                                   "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
+                                   "AND b_del = 0;";
+                
+                statement.executeUpdate(sqlRecEty);
+
+                for (int[] adjKey : adjDocs) {
+                    sqlRecEty = "UPDATE fin_rec_ety " +
+                                "SET fid_item_n = " + itemRef + ", " +
+                                "fid_usr_edit = " + userId + ", " +
+                                "ts_edit = NOW() " +
+                                "WHERE fid_dps_year_n = " + adjKey[0] + " " +
+                                "AND fid_dps_doc_n = " + adjKey[1] + " " +
+                                "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
+                                "AND b_del = 0;";
+                    statement.executeUpdate(sqlRecEty);
+                }
+            }
+        }
+    }    
+
     public static void updateDpsItemAll(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew) throws SQLException {
         Statement statement = null;
         String sql = "";

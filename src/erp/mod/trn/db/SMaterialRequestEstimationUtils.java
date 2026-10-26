@@ -11,6 +11,7 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
+import erp.mod.itm.db.SDbItemDescription;
 import erp.mtrn.data.STrnUtilities;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,11 +25,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiSession;
 import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Edwin Carmona, Claudio Peña
+ * @author Edwin Carmona, Claudio Peña, Rodrigo Ayala
  */
 public abstract class SMaterialRequestEstimationUtils {
     
@@ -60,19 +62,35 @@ public abstract class SMaterialRequestEstimationUtils {
         return "";
     }
     
-    public static String getBodyEntries(ArrayList<SMaterialRequestEntryRow> estimationRows) {
+    public static String getBodyEntries(SGuiSession session, ArrayList<SMaterialRequestEntryRow> estimationRows) {
         String rowsBody = "";
         
         int ety = 1;
         String row = "";
+        
         for (SMaterialRequestEntryRow estimationRow : estimationRows) {
+            String itemDescription = "";
+            
+            try {
+                SDbItemDescription itemDesc = new SDbItemDescription();
+                itemDesc.read(session, new int[] {estimationRow.getFkItemId()});
+                
+                if(!itemDesc.getIsDeleted() && itemDesc.getItemDescription() != null && !itemDesc.getItemDescription().trim().isEmpty()){
+                    itemDescription = "\nDescripción: " + SLibUtils.htmlToPlainText(itemDesc.getItemDescription());
+                }
+            }
+            catch(Exception e){
+                //SLibUtils.printException(SMaterialRequestEstimationUtils.class.getName(), e);
+            }
+            
             row = "PARTIDA #" + SMaterialRequestEstimationUtils.padLeft(ety + "", 2, '0') + "\n" + 
                     "CANTIDAD: " + SMaterialRequestEstimationUtils.padLeft(estimationRow.getAuxQuantityToEstimate() + "", 5, ' ')  + " " + estimationRow.getAuxUnitCode() + "     " +
                     "CONCEPTO: " + estimationRow.getAuxItemName() + 
-                    ((estimationRow.getAuxPartNumber() != null && !estimationRow.getAuxPartNumber().isEmpty()) ? ("     " + estimationRow.getAuxPartNumber()) : "") + 
+                    ((estimationRow.getAuxPartNumber() != null && !estimationRow.getAuxPartNumber().isEmpty()) ? ("     " + estimationRow.getAuxPartNumber()) : "") +
+                    itemDescription +
                     (estimationRow.getDateRequired() != null ? ("\nFecha requerida entrega: " + SLibUtils.DateFormatDate.format(estimationRow.getDateRequired())) : "") +
                     (estimationRow.getNotes().isEmpty() ? "" : "\nComentarios: " + estimationRow.getNotes());
-            
+                    
             row += "\n\n";
             
             rowsBody += row;

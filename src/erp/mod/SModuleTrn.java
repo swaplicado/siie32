@@ -97,6 +97,7 @@ import erp.mod.trn.view.SViewCurrencyBalance;
 import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsAccountTag;
+import erp.mod.trn.view.SViewDpsAdvance;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsEtyAcidityPercentage;
 import erp.mod.trn.view.SViewDpsSendWebService;
@@ -966,6 +967,9 @@ public class SModuleTrn extends SGuiModule {
                         break;
                 }
                 view = new SViewDpsAccountTag(miClient, subtype, title);
+                break;
+            case SModConsts.TRNX_DPS_PUR_ADVANCE:
+                view = new SViewDpsAdvance(miClient, "Facturas de anticipos");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

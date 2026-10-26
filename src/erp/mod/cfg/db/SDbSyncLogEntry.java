@@ -6,7 +6,7 @@
 package erp.mod.cfg.db;
 
 import erp.mod.SModConsts;
-import erp.mod.cfg.swap.SSwapConsts;
+import erp.swap.SSwapConsts;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;

@@ -4444,7 +4444,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
-        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession().getStatement(), asociadoNegocios.getBizPartnerCountryId()));
 
         comprobante.setEltEmisor((cfd.ver32.DElementEmisor) asociadoNegocios.createRootElementEmisor());
         comprobante.getAttLugarExpedicion().setString(asociadoNegocios.getCfdLugarExpedicion());
@@ -4461,7 +4461,7 @@ public abstract class SCfdUtils implements Serializable {
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
         asociadoNegocios.setVersion(DCfdConsts.CFDI_VER_32);
         asociadoNegocios.setCfdiType(xmlCfdi.getCfdType());
-        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession(), asociadoNegocios.getBizPartnerCountryId()));
+        asociadoNegocios.setIsStateCodeAssociate(SLocUtils.hasStates(client.getSession().getStatement(), asociadoNegocios.getBizPartnerCountryId()));
 
         comprobante.setEltReceptor((cfd.ver32.DElementReceptor) asociadoNegocios.createRootElementReceptor());
         
@@ -4568,7 +4568,7 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
         comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
-        if (xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0 && xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_XXX_NAME) != 0) {
+        if (xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0 && xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_XXX) != 0) {
             comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoCambio());
         }
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
@@ -4782,7 +4782,7 @@ public abstract class SCfdUtils implements Serializable {
         comprobante.getAttSubTotal().setDouble(xmlCfdi.getComprobanteSubtotal());
         comprobante.getAttDescuento().setDouble(xmlCfdi.getComprobanteDescuento());
         comprobante.getAttMoneda().setString(xmlCfdi.getComprobanteMoneda());
-        if (xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0 && xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_XXX_NAME) != 0) {
+        if (xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0 && xmlCfdi.getComprobanteMoneda().compareTo(SModSysConsts.FINS_FISCAL_CUR_XXX) != 0) {
             comprobante.getAttTipoCambio().setDouble(xmlCfdi.getComprobanteTipoCambio());
         }
         comprobante.getAttTotal().setDouble(xmlCfdi.getComprobanteTotal());
@@ -5803,11 +5803,6 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static File getXmlPdfInTempFile(final SClientInterface client, final int[] pk) throws Exception {
-        SDataPdf pdf = (SDataPdf) SDataUtilities.readRegistry(client, SDataConstants.TRN_PDF, pk, SLibConstants.EXEC_MODE_SILENT);
-        return pdf == null ? null : pdf.downloadPdfFile(client, SDataPdf.MODE_TEMP_DIR);
-    }
-    
     public static void getAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro del CFDI del comprobante.");

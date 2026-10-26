@@ -8,12 +8,23 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationEvidenceUtils;
+import erp.mod.trn.utils.SStockValuationVerify;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Cursor;
+import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -21,6 +32,7 @@ import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -28,11 +40,14 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Edwin Carmona, Sergio Flores
+ * @author Edwin Carmona
  */
 public class SViewStockValuation extends SGridPaneView implements ActionListener {
 
     private int mnRightValMatConsLevel;
+
+    private javax.swing.JButton jbVerifyValuation;
+    private javax.swing.JButton jbShowWarnings;
     
     private SGridFilterDatePeriod moFilterDatePeriod;
     
@@ -53,6 +68,12 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
         jbRowDelete.setEnabled(mnRightValMatConsLevel >= SUtilConsts.LEV_MANAGER);
         jbRowDisable.setEnabled(false);
         jbRowCopy.setEnabled(false);
+
+        jbVerifyValuation = SGridUtils.createButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_ok_green.png")), "Verificar valuación", this);
+        jbVerifyValuation.setToolTipText("Verificar datos de valuación para detectar inconsistencias");
+        jbShowWarnings = SGridUtils.createButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_warn.png")), "Mostrar advertencias", this);
+        jbShowWarnings.setToolTipText("Mostrar advertencias de valuación");
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbVerifyValuation);
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_PEND_ESTIMATE) {
@@ -62,6 +83,103 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         }
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowWarnings);
+    }
+
+    private void actionVerifyValuation() {
+        if (jbVerifyValuation.isEnabled()) {
+            try {
+                SStockValuationVerify.VerificationResult result = SStockValuationVerify.verifyStockValuationWithEvidence(miClient.getSession());
+                saveVerificationEvidence(result);
+                String sErrors = result.getErrors();
+                if (!sErrors.isEmpty()) {
+                    miClient.showMsgBoxError(sErrors);
+                }
+                else {
+                    miClient.showMsgBoxInformation("La valuación de inventarios se verificó correctamente.\n"
+                            + "No se encontraron errores.");
+                }
+            }
+            catch (SQLException ex) {
+                Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, null, ex);
+                miClient.showMsgBoxError(ex.getMessage());
+            }
+        }
+    }
+
+    private void saveVerificationEvidence(SStockValuationVerify.VerificationResult result) {
+        jbVerifyValuation.setEnabled(false);
+        Cursor previousCursor = miClient.getFrame().getCursor();
+        miClient.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        JOptionPane progressPane = new JOptionPane(
+                "Guardando la bitácora y los datos fuente de la verificación. "
+                + "La exportación puede tardar; la aplicación seguirá disponible.",
+                JOptionPane.INFORMATION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION);
+        JDialog progressDialog = progressPane.createDialog(miClient.getFrame(), "Evidencia de valuación");
+        progressDialog.setModal(false);
+        progressDialog.setVisible(true);
+
+        new SwingWorker<File[], Void>() {
+            @Override
+            protected File[] doInBackground() throws Exception {
+                return SStockValuationEvidenceUtils.save(miClient.getSession(), result);
+            }
+
+            @Override
+            protected void done() {
+                progressDialog.dispose();
+                miClient.getFrame().setCursor(previousCursor);
+                jbVerifyValuation.setEnabled(true);
+                try {
+                    File[] files = get();
+                    StringBuilder message = new StringBuilder("La evidencia de verificación se guardó en:\n");
+                    for (File file : files) {
+                        message.append(file.getAbsolutePath()).append('\n');
+                    }
+                    miClient.showMsgBoxInformation(message.toString());
+                }
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, "Se interrumpió el guardado de la evidencia de valuación.", ex);
+                    miClient.showMsgBoxError("Se interrumpió el guardado de la evidencia de valuación.");
+                }
+                catch (java.util.concurrent.ExecutionException ex) {
+                    Throwable cause = ex.getCause();
+                    Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, "No se pudo guardar la evidencia de valuación.", cause);
+                    miClient.showMsgBoxError("No se pudo guardar la evidencia de valuación:\n" + cause.getMessage());
+                }
+            }
+        }.execute();
+    }
+
+    private void actionShowWarnings() {
+        if (jbShowWarnings.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else {
+                    try {
+                        int idValuation = gridRow.getRowPrimaryKey()[0];
+                        String warnings = SStockValuationVerify.getValuationWarnings(miClient.getSession(), idValuation);
+                        if (warnings.isEmpty()) {
+                            warnings = "No hay advertencias ni errores en la valuación seleccionada.";
+                        }
+                        miClient.showMsgBoxWarning(warnings);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
     }
     
     @Override
@@ -94,6 +212,8 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "v.dt_sta AS " + SDbConsts.FIELD_DATE + ", "
                 + "dt_sta, "
                 + "dt_end, "
+                + "v.description, "
+                + "IF(LENGTH(v.warnings) > 0, '" + SGridConsts.ICON_WARN + "', '') AS f_icon_warn, "
                 + "IF(va.fk_fin_rec_year_n IS NULL, '', CONCAT(va.fk_fin_rec_year_n, '-', fk_fin_rec_per_n, '-', fk_fin_rec_tp_rec_n, '-', fk_fin_rec_num_n)) AS rec, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
@@ -115,8 +235,7 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 + "  fk_fin_rec_tp_rec_n, "
                 + "  fk_fin_rec_num_n "
                 + "  FROM "
-                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS tsva "
-                + "  ORDER BY ts_usr_upd DESC) AS va ON "
+                + " " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_ACC) + " AS tsva) AS va ON "
                 + "va.fk_stk_val = v.id_stk_val "
                 + (where.isEmpty() ? "" : ("WHERE " + where));
     }
@@ -127,7 +246,9 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_sta", "Fecha inicio"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "Fecha fin"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "v.description", "Descripción"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "rec", "Póliza contable"));
+        columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_icon_warn", "Advertencias"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
@@ -147,6 +268,13 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
+
+            if (button == jbVerifyValuation) {
+                actionVerifyValuation();
+            }
+            else if (button == jbShowWarnings) {
+                actionShowWarnings();
+            }
         }
     }
 }

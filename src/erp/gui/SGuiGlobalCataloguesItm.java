@@ -62,7 +62,7 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín, Rodrigo Ayala
+ * @author Sergio Flores, Sergio Flores, Isabel Servín, Rodrigo Ayala, Claudio Peña
  */
 public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -386,8 +386,9 @@ public class SGuiGlobalCataloguesItm extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.ITMU_ITEM:
                 case SDataConstants.ITMU_ITEM_DESC:
                     if (moFormItem == null) {
-                        moFormItem = new SFormItem(miClient);
+                       moFormItem = new SFormItem(miClient);
                     }
+                    moFormItem.setIsCopy(isCopy);
                     if (pk != null) {
                         moRegistry = new SDataItem();
                     }

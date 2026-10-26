@@ -130,7 +130,7 @@ public abstract class SSscUtils {
                     + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
                     + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act  "
                     + "AND emp.dt_sal_ssc <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
-//                    + "AND pr.id_emp = 1907 " // Renglón para pruebas por empleados, no remover
+//                    + "AND pr.id_emp = 7665 " // Renglón para pruebas por empleados, no remover XXX
                     + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
@@ -195,6 +195,7 @@ public abstract class SSscUtils {
                 // procesar las percepciones pagadas al empleado:
                 
                 int currentEarningId = 0;
+                int currentEarningTypeId = 0;
                 double totalAmountExempt = 0;
                 double totalAmountTaxed = 0;
 
@@ -217,11 +218,13 @@ public abstract class SSscUtils {
                         if (currentEarningId != resultSet.getInt("e.id_ear")) {
                             if (currentEarningId != 0) {
                                 SSscEarning sbcEarning = row.getSbcEarnginById(currentEarningId);
+                                sbcEarning.EarningTypeId = currentEarningTypeId;
                                 sbcEarning.AmountExempt = totalAmountExempt;
                                 sbcEarning.AmountTaxed = totalAmountTaxed;
                             }
                             
                             currentEarningId = resultSet.getInt("e.id_ear");
+                            currentEarningTypeId = resultSet.getInt("fk_tp_ear");
                             totalAmountExempt = 0;
                             totalAmountTaxed = 0;
                         }
@@ -321,6 +324,7 @@ public abstract class SSscUtils {
                     
                     if (currentEarningId != 0) {
                         SSscEarning sbcEarning = row.getSbcEarnginById(currentEarningId);
+                        sbcEarning.EarningTypeId = currentEarningTypeId;
                         sbcEarning.AmountExempt = totalAmountExempt;
                         sbcEarning.AmountTaxed = totalAmountTaxed;
                     }

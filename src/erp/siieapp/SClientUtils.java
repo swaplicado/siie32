@@ -39,21 +39,58 @@ import sa.lib.gui.SGuiYearMonthPicker;
 import sa.lib.gui.SGuiYearPicker;
 
 /**
+ * Utilidad para configurar y gestionar sesiones de cliente desde servicios
+ * externos.
+ *
+ * Proporciona funcionalidad para inicializar sesiones GUI de cliente a partir
+ * de configuraciones JSON o parámetros de conexión MySQL. Permite establecer la
+ * conexión a la base de datos, configurar la sesión del usuario y módulos del
+ * sistema.
  *
  * @author Adrián Avilés
+ * @version 1.0
  */
 public class SClientUtils {
 
+    /**
+     * Identificador del usuario asociado a la sesión
+     */
     private int userId;
 
+    /**
+     * Constructor que inicializa con un identificador de usuario específico.
+     *
+     * @param userId identificador del usuario
+     */
     public SClientUtils(int userId) {
         this.userId = userId;
     }
 
+    /**
+     * Constructor por defecto. Inicializa el usuario con ID no asignado.
+     */
     public SClientUtils() {
         this.userId = SUtilConsts.USR_NA_ID;
     }
 
+    /**
+     * Configura una sesión de cliente basada en parámetros JSON de conexión.
+     *
+     * Establece la conexión MySQL, obtiene información de la empresa desde la
+     * base de datos y crea una sesión GUI con el cliente y módulos del sistema
+     * inicializados.
+     *
+     * Nota: Muchas operaciones se implementan lanzando
+     * UnsupportedOperationException ya que la sesión se crea en contexto de
+     * servicios externos sin interfaz gráfica completa.
+     *
+     * @param sjon parámetro JSON o string con configuración MySQL
+     * @return sesión configurada lista para usar
+     * @throws SConfigException si hay error de configuración
+     * @throws ClassNotFoundException si falta driver JDBC
+     * @throws SQLException si hay error en acceso a base de datos
+     * @throws ParseException si hay error procesando JSON
+     */
     public SGuiSession setSession(String sjon) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet = null;
@@ -231,6 +268,24 @@ public class SClientUtils {
 
         return session;
     }
+
+    /**
+     * Configura una sesión de cliente basada en parámetros JSON incluido el ID
+     * de empresa.
+     *
+     * Similar a setSession(String), pero permite especificar un parámetro JSON
+     * adicional que contiene el identificador de la empresa (database) a
+     * conectar, permitiendo selectividad entre múltiples empresas en el
+     * sistema.
+     *
+     * @param sjon parámetro JSON o string con configuración MySQL
+     * @param sConfig parámetro JSON adicional con configuración incluyendo idDB
+     * @return sesión configurada lista para usar
+     * @throws SConfigException si hay error de configuración
+     * @throws ClassNotFoundException si falta driver JDBC
+     * @throws SQLException si hay error en acceso a base de datos
+     * @throws ParseException si hay error procesando JSON
+     */
     public SGuiSession setSession(String sjon, String sConfig) throws SConfigException, ClassNotFoundException, SQLException, ParseException {
         SDbDatabase database = new SDbDatabase(SDbConsts.DBMS_MYSQL);
         ResultSet resultSet = null;
@@ -241,17 +296,18 @@ public class SClientUtils {
         if (conn == null) {
 
         }
-        
+
         JSONParser parser = new JSONParser();
         JSONObject root;
         try {
             root = (JSONObject) parser.parse(sConfig);
             idDB = Integer.parseInt(root.get("idDB").toString());
-            
-        } catch (ParseException ex) {
+
+        }
+        catch (ParseException ex) {
             Logger.getLogger(SPurcharseOrdersAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         String companies = "SELECT * "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " "
                 + "WHERE id_co = " + idDB;

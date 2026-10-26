@@ -19,18 +19,18 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Uriel Castañeda, Adrián Avilés, Isabel Servín
+ * @author Uriel Castañeda, Adrián Avilés, Isabel Servín, Sergio Flores
  */
 public abstract class STrnDpsUtilities {
  
     /**
      * Obtain total quantity supplied for a DPS in inventory.
-     * @param client GUI client.
+     * @param statement
      * @param entryKey Entry key.
      * @return Total quantity supplied in inventory movements
      * @throws Exception
      */
-    public static double obtainEntryTotalQuantitySupplied(final SClientInterface client, final int[] entryKey) throws Exception {
+    public static double obtainEntryTotalQuantitySupplied(final Statement statement, final int[] entryKey) throws Exception {
         String sql;
         ResultSet resulSet;
         double totalSupplied = 0;
@@ -41,7 +41,7 @@ public abstract class STrnDpsUtilities {
                 + "WHERE NOT d.b_del AND NOT de.b_del AND "
                 + "de.fid_dps_year_n = " + entryKey[0] + " AND de.fid_dps_doc_n = " + entryKey[1] + " AND de.fid_dps_ety_n = " + entryKey[2] + " ";
 
-        resulSet = client.getSession().getStatement().executeQuery(sql);
+        resulSet = statement.getConnection().createStatement().executeQuery(sql);
         if (resulSet.next()) {
             totalSupplied = resulSet.getDouble("tot_qty_sup");
         }
@@ -103,18 +103,38 @@ public abstract class STrnDpsUtilities {
     
     /**
      * Verify is a DPS is an order and if it has any inventory document
-     * @param client
-     * @param dps
-     * @param entry
+     * @param statement
+     * @param entryPk
      * @return 
      * @throws Exception 
      */
-    public static boolean isSourceOrderSupplied(final SClientInterface client, final SDataDps dps, final SDataDpsEntry entry) throws Exception {
-        double totalQtySupplied = 0;    
-        
-        totalQtySupplied = obtainEntryTotalQuantitySupplied(client, new int[] { entry.getPkYearId(), entry.getPkDocId(), entry.getPkEntryId() });
-       
-        return dps.isOrder() && totalQtySupplied > 0;
+    public static boolean isSourceOrderSupplied(final Statement statement, final int[] entryPk) throws Exception {
+        double totalQtySupplied = 0;
+        if (entryPk == null || entryPk.length != 3) {
+            Logger.getLogger(STrnDpsUtilities.class.getName()).log(Level.SEVERE, "No se pudo obtener la cantidad suministrada del documento. El arreglo de la clave de la partida no es correcto.");
+            throw new Exception("No se pudo obtener la cantidad suministrada del documento.");
+        }
+        if (entryPk[0] == 0 || entryPk[1] == 0 || entryPk[2] == 0) {
+            Logger.getLogger(STrnDpsUtilities.class.getName()).log(Level.SEVERE, "No se pudo obtener la cantidad suministrada del documento. La clave de la partida no es válida.");
+            throw new Exception("No se pudo obtener la cantidad suministrada del documento.");
+        }
+
+        totalQtySupplied = obtainEntryTotalQuantitySupplied(statement, new int[]{entryPk[0], entryPk[1], entryPk[2]});
+
+        String sql = "SELECT 1 FROM trn_dps AS d "
+                + "WHERE d.id_year = " + entryPk[0] + " AND d.id_doc = " + entryPk[1] + " "
+                + "AND d.b_del = 0 "
+                + "AND ((d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1] + ")"
+                + "     OR (d.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_SAL_ORD[1] + ")"
+                + "     )";
+        boolean isOrder = false;
+        try (ResultSet resultSet = statement.getConnection().createStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                isOrder = true;
+            }
+        }
+
+        return isOrder && totalQtySupplied > 0;
     }
 
     /**
@@ -252,5 +272,75 @@ public abstract class STrnDpsUtilities {
         double sumPricesUnitary = 0;
         sumPricesUnitary = dpsEntries.stream().map((importedDps) -> importedDps.getOriginalPriceUnitaryCy()).reduce(sumPricesUnitary, (accumulator, _item) -> accumulator + _item);
         return SLibUtils.round(priceUnitary / sumPricesUnitary, SErpConsts.VAL_QTY_MAX_DECS);
+    }
+    
+    /**
+     * Prepara la partida complementaria a agregarse a la factura afectada por descuentos de cadenas comerciales o aplicación de anticipos facturados.
+     * @param client Cliente GUI.
+     * @param creditNote Nota de crédito a la que pertenece la partida de ajuste.
+     * @param creditNoteEntry Partida de la nota de crédito para descuentos comerciales o aplicación de anticipos facturados.
+     * @param invoiceEntryComplementary Partida complementaria a agregarse a la factura afectada.
+     */
+    public static void prepareDpsEntryComplementaryAndCreateAdjustment(final erp.client.SClientInterface client, final SDataDps creditNote, final SDataDpsEntry creditNoteEntry, final SDataDpsEntry invoiceEntryComplementary) {
+        invoiceEntryComplementary.setConceptKey(creditNoteEntry.getConceptKey());
+        invoiceEntryComplementary.setConcept(creditNoteEntry.getConcept());
+        invoiceEntryComplementary.setOriginalQuantity(0);
+        invoiceEntryComplementary.setOriginalPriceUnitaryCy(0);
+        invoiceEntryComplementary.setOriginalPriceUnitarySystemCy(0);
+        invoiceEntryComplementary.setOriginalDiscountUnitaryCy(0);
+        invoiceEntryComplementary.setOriginalDiscountUnitarySystemCy(0);
+
+        invoiceEntryComplementary.setLength(0);
+        invoiceEntryComplementary.setSurface(0);
+        invoiceEntryComplementary.setVolume(0);
+        invoiceEntryComplementary.setMass(0);
+        invoiceEntryComplementary.setWeightGross(0);
+        invoiceEntryComplementary.setWeightDelivery(0);
+        invoiceEntryComplementary.setSurplusPercentage(0);
+        invoiceEntryComplementary.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+        invoiceEntryComplementary.setUserId(SLibConstants.UNDEFINED);
+        invoiceEntryComplementary.setSortingPosition(0);
+        invoiceEntryComplementary.setIsTaxesAutomaticApplying(true);
+        invoiceEntryComplementary.setIsInventoriable(false);
+        invoiceEntryComplementary.setIsDeleted(false);
+        invoiceEntryComplementary.setFkItemId(creditNoteEntry.getFkItemId());
+        invoiceEntryComplementary.setFkUnitId(creditNoteEntry.getFkUnitId());
+        invoiceEntryComplementary.setFkOriginalUnitId(creditNoteEntry.getFkOriginalUnitId());
+        invoiceEntryComplementary.setFkTaxRegionId(creditNoteEntry.getFkTaxRegionId());
+        invoiceEntryComplementary.setFkDpsAdjustmentTypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[0]);
+        invoiceEntryComplementary.setFkDpsAdjustmentSubtypeId(SDataConstantsSys.TRNS_STP_DPS_ADJ_NA_NA[1]);
+        invoiceEntryComplementary.setFkDpsEntryTypeId(SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT);
+        invoiceEntryComplementary.setFkItemRefId_n(creditNoteEntry.getFkItemRefId_n());
+        invoiceEntryComplementary.setFkCostCenterId_n(creditNoteEntry.getFkCostCenterId_n());
+        invoiceEntryComplementary.setFkUserNewId(client.getSession().getUser().getPkUserId());
+
+        /* XXX Sergio Flores, 2026-05-15: Revisar si tiene caso seguir preservando este bloque de código. Al parecer ya no sirve.
+        oDpsEntryComplementary.setDbmsFkItemGenericId(oDpsEntry.getDbmsFkItemGenericId());
+        oDpsEntryComplementary.setDbmsUnitSymbol(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.ITMU_UNIT, new int[] { oDpsEntryComplementary.getFkUnitId() }, SLibConstants.DESCRIPTION_CODE));
+        oDpsEntryComplementary.setDbmsOriginalUnitSymbol(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.ITMU_UNIT, new int[] { oDpsEntryComplementary.getFkOriginalUnitId() }, SLibConstants.DESCRIPTION_CODE));
+        oDpsEntryComplementary.setDbmsTaxRegion(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_REG, new int[] { oDpsEntryComplementary.getFkTaxRegionId() }));
+        oDpsEntryComplementary.setDbmsDpsAdjustmentType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_DPS_ADJ, new int[] { oDpsEntryComplementary.getFkDpsAdjustmentTypeId() }));
+        oDpsEntryComplementary.setDbmsDpsEntryType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_DPS_ETY, new int[] { oDpsEntryComplementary.getFkDpsEntryTypeId() }));
+        */
+
+        invoiceEntryComplementary.calculateTotal(client, creditNote.getDate(),
+                creditNote.getFkTaxIdentityEmisorTypeId(), creditNote.getFkTaxIdentityReceptorTypeId(),
+                creditNote.getIsDiscountDocPercentage(), creditNote.getDiscountDocPercentage(), creditNote.getExchangeRate());
+
+        SDataDpsDpsAdjustment adjustment = new SDataDpsDpsAdjustment();
+        adjustment.setPkDpsYearId(invoiceEntryComplementary.getPkYearId());
+        adjustment.setPkDpsDocId(invoiceEntryComplementary.getPkDocId());
+        adjustment.setPkDpsEntryId(invoiceEntryComplementary.getPkEntryId());
+        adjustment.setPkDpsAdjustmentYearId(creditNoteEntry.getPkYearId());
+        adjustment.setPkDpsAdjustmentDocId(creditNoteEntry.getPkDocId());
+        adjustment.setPkDpsAdjustmentEntryId(creditNoteEntry.getPkEntryId());
+        adjustment.setQuantity(0);
+        adjustment.setOriginalQuantity(0);
+        adjustment.setValue(creditNoteEntry.getTotal_r());
+        adjustment.setValueCy(creditNoteEntry.getTotalCy_r());
+        adjustment.setAuxDpsEntryComplementary(invoiceEntryComplementary);
+
+        creditNoteEntry.getDbmsDpsAdjustmentsAsAdjustment().clear();
+        creditNoteEntry.getDbmsDpsAdjustmentsAsAdjustment().add(adjustment);
     }
 }

@@ -20,6 +20,7 @@ public class SStockValuationConfiguration {
     int maxRecEntries;
     String textPurEntries;
     String textAssetEntries;
+    double diffPricePercent;
 
     public ArrayList<int[]> getIogTpmovsIn() {
         return iogTpmovsIn;
@@ -76,5 +77,12 @@ public class SStockValuationConfiguration {
     public void setTextAssetEntries(String textAssetEntries) {
         this.textAssetEntries = textAssetEntries;
     }
-    
+
+    public double getDiffPricePercent() {
+        return diffPricePercent;
+    }
+
+    public void setDiffPricePercent(double diffPricePercent) {
+        this.diffPricePercent = diffPricePercent;
+    }
 }

@@ -10,7 +10,7 @@ import sa.lib.grid.SGridRowCustom;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SRowItemPicker extends SGridRowCustom {
     

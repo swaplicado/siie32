@@ -5,6 +5,7 @@
 
 package erp.data;
 
+import erp.SClientUtils;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -14,6 +15,7 @@ import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.fin.db.SDbPayment;
 import erp.server.SQueryRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
@@ -636,10 +640,12 @@ public abstract class SDataReadTableRows {
         java.util.Date tDate = null;
         boolean bInventoriableNot = false;
         boolean bInventoriableOnly = false;
+        boolean bAdvancesOnly = false;
 
         if (params != null) {
             bInventoriableNot = params.get(SLibConstants.VALUE_INV_NOT) == null ? false : (Boolean) params.get(SLibConstants.VALUE_INV_NOT);
             bInventoriableOnly = params.get(SLibConstants.VALUE_INV_ONLY) == null ? false : (Boolean) params.get(SLibConstants.VALUE_INV_ONLY);
+            bAdvancesOnly = params.get(SLibConstants.VALUE_ADV_ONLY) == null ? false : (Boolean) params.get(SLibConstants.VALUE_ADV_ONLY);
         }
 
         switch (pnDataType) {
@@ -1216,8 +1222,9 @@ public abstract class SDataReadTableRows {
                         (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", NULL, '" + SLibUtils.DbmsDateFormatDate.format(tDate) + "') AS f_stock ") +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
-                        (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
-                        (!bInventoriableOnly ? "" : "AND i.b_inv = 1 ") +
+                        (!bInventoriableNot ? "" : "AND NOT i.b_inv ") +
+                        (!bInventoriableOnly ? "" : "AND i.b_inv ") +
+                        (!bAdvancesOnly ? "" : "AND i.b_pre_pay ") +
                         "INNER JOIN erp.itmu_brd AS b ON i.fid_brd = b.id_brd " +
                         "INNER JOIN erp.itmu_mfr AS m ON i.fid_mfr = m.id_mfr " +
                         "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
@@ -1920,6 +1927,26 @@ public abstract class SDataReadTableRows {
                 sSql += "ORDER BY id_ct_dps, id_cl_dps, id_tp_dps, tp_dps ";
                 break;
 
+            case SDataConstants.TRNS_STP_DPS_ADJ:
+                aoPkFields = new STableField[2];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_tp_dps_adj");
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_stp_dps_adj");
+
+                i = 0;
+                aoQueryFields = new STableField[1];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "stp_dps_adj");
+
+                sSql = "SELECT id_tp_dps_adj, id_stp_dps_adj, stp_dps_adj " +
+                        "FROM erp.trns_stp_dps_adj WHERE b_del = 0 ";
+                if (filterKey != null) {
+                    if (((int[]) filterKey).length >= 1) {
+                        sSql += " AND id_tp_dps_adj = " + ((int[]) filterKey)[0] + " ";
+                    }
+                }
+
+                sSql += "ORDER BY id_tp_dps_adj, id_stp_dps_adj, stp_dps_adj ";
+                break;
+
             case SDataConstants.TRNS_TP_IOG:
                 aoPkFields = new STableField[3];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_ct_iog");
@@ -2379,6 +2406,111 @@ public abstract class SDataReadTableRows {
                         "  d.num_ser, d.num, d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code " +
                         "HAVING " + (isPurchase ? "SUM(credit - debit) > 0 OR SUM(credit_cur - debit_cur) > 0 " : "SUM(debit - credit) > 0 OR SUM(debit_cur - credit_cur) > 0 ") +
                         "ORDER BY d.dt DESC, dt.code, f_num, cob.code, d.id_year, d.id_doc;";
+                break;
+                
+            case SDataConstants.TRNX_DPS_ADV_PAY_PEND_PAY:
+                aoPkFields = new STableField[2];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_doc");
+
+                i = 0;
+                aoQueryFields = new STableField[14];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "d.dt");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "dt.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "f_num");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.bp");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_r");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.exc_rate");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "c.cur_key");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cob.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_bal");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_bal_cur");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_pay_pend_cur");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "f_bal_net_cur");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "c.cur_key");
+                
+                try {
+                    sSql = "SELECT b.id_bp, b.bp, d.id_year, d.id_doc, d.dt, dt.code, " +
+                            "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
+                            "d.tot_r, d.exc_rate, d.tot_cur_r, c.cur_key, cob.code, " +
+                            "(d.tot_r - COALESCE(p.payed, 0)) AS f_bal, " +
+                            "(d.tot_cur_r - COALESCE(p.payed_cur, 0)) AS f_bal_cur, " +
+                            "COALESCE(p.payed_pend_cur, 0) AS f_pay_pend_cur, " +
+                            "(d.tot_cur_r - COALESCE(p.payed_cur, 0) - COALESCE(p.payed_pend_cur, 0)) AS f_bal_net_cur " +
+                        "FROM trn_dps AS d " +
+                        "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
+                        "INNER JOIN erp.bpsu_bp_ct AS bct ON d.fid_bp_r = bct.id_bp " +
+                        "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps " +
+                        "    AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                        "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
+                        "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
+                        "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
+                        "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb " +
+                        "    AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
+                        "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n " +
+                        "    AND d.id_doc = x.fid_dps_doc_n " +
+                        "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName(piClient) + ".trn_cfd AS cx " +
+                        "    ON x.id_cfd = cx.id_cfd " +
+                        "LEFT JOIN (" +
+                            "SELECT " +
+                                "pre.fk_doc_year_n, " +
+                                "pre.fk_doc_doc_n, " +
+                                "SUM(CASE WHEN pr.fk_st_pay IN (" + 
+                                                SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
+                                                SModSysConsts.FINS_ST_PAY_SUBR_P + 
+                                            ") " +
+                                     "THEN ety_pay ELSE 0 END) AS payed, " +
+                                "SUM(CASE WHEN pr.fk_st_pay IN (" + 
+                                                SModSysConsts.FINS_ST_PAY_SUBR + ", " + 
+                                                SModSysConsts.FINS_ST_PAY_SUBR_P + 
+                                            ") " +
+                                     "THEN des_pay_app_ety_cur ELSE 0 END) AS payed_cur, " +
+                                "SUM(CASE WHEN pr.fk_st_pay IN (" +
+                                    SModSysConsts.FINS_ST_PAY_NEW + ", " +
+                                    SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
+                                    SModSysConsts.FINS_ST_PAY_SCHED + ", " +
+                                    SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
+                                    SModSysConsts.FINS_ST_PAY_BLOC + ", " +
+                                    SModSysConsts.FINS_ST_PAY_BLOC_P +
+                                ") THEN ety_pay ELSE 0 END) AS payed_pend, " +          // agregado para f_bal_net_cur
+                                "SUM(CASE WHEN pr.fk_st_pay IN (" +
+                                    SModSysConsts.FINS_ST_PAY_NEW + ", " +
+                                    SModSysConsts.FINS_ST_PAY_IN_AUTH + ", " +
+                                    SModSysConsts.FINS_ST_PAY_SCHED + ", " +
+                                    SModSysConsts.FINS_ST_PAY_SCHED_P + ", " +
+                                    SModSysConsts.FINS_ST_PAY_BLOC + ", " +
+                                    SModSysConsts.FINS_ST_PAY_BLOC_P +
+                                ") THEN des_pay_app_ety_cur ELSE 0 END) AS payed_pend_cur " +
+                            "FROM fin_pay AS pr " +
+                            "INNER JOIN fin_pay_ety AS pre ON pr.id_pay = pre.id_pay " +
+                            "WHERE pr.b_del = 0 " +
+                            "AND pr.pay_tp = '" + SDbPayment.TYPE_REQUEST + "' " +
+                            "AND pr.pay_tp_op = " + SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY_INVOICED + " " +
+                            "GROUP BY pre.fk_doc_year_n, pre.fk_doc_doc_n " +
+                        ") AS p ON d.id_year = p.fk_doc_year_n AND d.id_doc = p.fk_doc_doc_n " +
+                        "WHERE d.b_del = 0 " +
+                        "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                        "AND EXISTS(SELECT 1 FROM trn_dps_ety AS tde " +
+                        "           WHERE tde.id_year = d.id_year " +
+                        "           AND tde.id_doc = d.id_doc " +
+                        "           AND tde.b_del = 0 " +
+                        "           AND tde.ops_type = 13 " +
+                        "           LIMIT 1) " +
+                        (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
+                        (((Object[]) filterKey).length != 5 ? ""
+                                : " AND d.fid_func_sub IN (" +
+                                  "SELECT fs.id_func_sub " +
+                                  "FROM cfgu_func_sub AS fs " +
+                                  "INNER JOIN cfgu_func AS f ON f.id_func = fs.fk_func " +
+                                  "INNER JOIN usr_usr_func_sub AS ufs ON ufs.id_func_sub = fs.id_func_sub " +
+                                  "AND ufs.id_usr = " + ((int) ((Object[]) filterKey)[4]) + " " +
+                                  "WHERE NOT fs.b_del AND NOT f.b_del) ") +
+                        "HAVING f_bal > 0;";
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SDataReadTableRows.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 break;
 
             case SDataConstants.TRNX_DPS_PEND_LINK:

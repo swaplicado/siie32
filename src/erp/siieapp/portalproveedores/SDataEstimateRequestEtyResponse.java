@@ -8,10 +8,19 @@ package erp.siieapp.portalproveedores;
 import java.util.ArrayList;
 
 /**
+ * Contenedor de respuesta para las partidas de una solicitud de cotización.
+ * <p>
+ * Agrupa la lista de partidas ({@link SEstimateRequestEtyData}) que se
+ * serializa como JSON y se envía al portal de proveedores.
+ * </p>
  *
  * @author César Orozco
  */
 public class SDataEstimateRequestEtyResponse {
+
+    /**
+     * Lista de partidas de la solicitud de cotización.
+     */
     ArrayList<SEstimateRequestEtyData> lEREData;
 
     public void setlEREData(ArrayList<SEstimateRequestEtyData> lEREData) {

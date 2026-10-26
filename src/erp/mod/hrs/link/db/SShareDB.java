@@ -1166,8 +1166,10 @@ public class SShareDB {
                 objResponse.setCode(RESPONSE_CONSUME);
                 objResponse.setMessage("La incidencia ya tiene al menos un consumo no se puede cancelar");
                 resultSet.previous();
-            } else {
-                consumos = "UPDATE hrs_abs SET b_clo = 1, "
+            }else{
+                
+                consumos = "UPDATE hrs_abs "
+                        + "SET b_clo = 1, "
                         + "ts_usr_clo = NOW(), "
                         + "ts_usr_upd = NOW() "
                         + "WHERE ext_req_id IN " + arregloAuxiliar + ";";

@@ -30,7 +30,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SDialogSearchCfdiByUuid extends JDialog implements ActionListener {
     

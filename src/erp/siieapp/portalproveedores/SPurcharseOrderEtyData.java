@@ -6,35 +6,121 @@
 package erp.siieapp.portalproveedores;
 
 /**
+ * Representa una partida de una orden de compra expuesta al portal de
+ * proveedores.
+ * <p>
+ * Contiene los importes en moneda local y en moneda extranjera, así como la
+ * información del artículo y las unidades de medida original y de compra. La
+ * cabecera de la orden se maneja en {@link SPurcharseOrdersData}.
+ * </p>
  *
  * @author swaplicado
  */
 public class SPurcharseOrderEtyData {
+
+    /**
+     * Año fiscal del documento al que pertenece la partida.
+     */
     int idYear;
+    /**
+     * ID del documento (orden de compra) al que pertenece la partida.
+     */
     int idDoc;
+    /**
+     * Número de partida dentro del documento.
+     */
     int idEty;
+    /**
+     * Clave del concepto de la partida.
+     */
     String conceptKey;
+    /**
+     * Descripción del concepto de la partida.
+     */
     String concept;
+    /**
+     * Referencia adicional de la partida.
+     */
     String ref;
+    /**
+     * Cantidad de la partida en la unidad de compra.
+     */
     float qty;
+    /**
+     * Precio unitario en moneda local.
+     */
     float priceUnit;
+    /**
+     * Subtotal en moneda local.
+     */
     double sTot;
+    /**
+     * Impuestos trasladados en moneda local.
+     */
     double taxCharged;
+    /**
+     * Impuestos retenidos en moneda local.
+     */
     double taxRetained;
+    /**
+     * Total en moneda local.
+     */
     double tot;
+    /**
+     * Precio unitario real en moneda local (considerando conversiones).
+     */
     double priceUReal;
+    /**
+     * Precio unitario en moneda extranjera.
+     */
     double priceUCur;
+    /**
+     * Subtotal en moneda extranjera.
+     */
     double sTotCur;
+    /**
+     * Impuestos trasladados en moneda extranjera.
+     */
     double taxChargedCur;
+    /**
+     * Impuestos retenidos en moneda extranjera.
+     */
     double taxRetainedCur;
+    /**
+     * Total en moneda extranjera.
+     */
     double totCur;
+    /**
+     * Precio unitario real en moneda extranjera.
+     */
     double priceURealCur;
+    /**
+     * ID del artículo.
+     */
     int idItem;
+    /**
+     * Nombre del artículo.
+     */
     String name;
+    /**
+     * Clave del artículo.
+     */
     String item;
+    /**
+     * ID de la unidad de medida de compra.
+     */
     int idUnit;
+    /**
+     * Nombre de la unidad de medida de compra.
+     */
     String unit;
+    /**
+     * ID de la unidad de medida original del artículo.
+     */
     int idOriginalUnit;
+    /**
+     * Nombre de la unidad de medida original del artículo.
+     */
     String originalUnit;
 
     public int getIdYear() {
@@ -244,6 +330,5 @@ public class SPurcharseOrderEtyData {
     public void setOriginalUnit(String originalUnit) {
         this.originalUnit = originalUnit;
     }
-    
-    
+
 }

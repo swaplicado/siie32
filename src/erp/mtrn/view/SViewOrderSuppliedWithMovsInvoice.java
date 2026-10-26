@@ -20,8 +20,6 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.data.STrnDpsUtilities;
 import erp.mtrn.form.SDialogDpsFinder;
-import erp.table.SFilterConstants;
-import erp.table.STabFilterFunctionalArea;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,7 +40,6 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
     private JButton mjbViewLinks;
     private erp.lib.table.STabFilterDatePeriod moFilterDatePeriod;
     private erp.mtrn.form.SDialogDpsFinder moDialogDpsFinder;
-    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
     public SViewOrderSuppliedWithMovsInvoice(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_SUPPLIED_ORDER_INVOICE, auxType01);
@@ -67,7 +64,6 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
         
         moFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moDialogDpsFinder = new SDialogDpsFinder((SClientInterface) miClient, SDataConstants.TRNX_DPS_PEND_LINK);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this);
         
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -82,7 +78,6 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
         addTaskBarUpperComponent(mjbViewNotes);
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterFunctionalArea);
             
         STableField[] aoKeyFields = new STableField[2];
         
@@ -249,18 +244,12 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
         String sqlBizPartner = "";
         String sqlOrderByDoc = "";
         String sqlDiogPeriod = "";
-        String sqlFunctArea= "";
         STableSetting setting = null;
         
         for (STableSetting mvTableSetting : mvTableSettings) {
             setting = (erp.lib.table.STableSetting) mvTableSetting;
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {               
                 sqlDiogPeriod += (sqlDiogPeriod.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
-            }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
-                if (!((String) setting.getSetting()).isEmpty()) {
-                    sqlFunctArea = " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
-                }
             }
         }
         
@@ -324,7 +313,7 @@ public class SViewOrderSuppliedWithMovsInvoice extends erp.lib.table.STableTab i
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
-                "WHERE " + sqlDiogPeriod + " AND d.b_close = 0 " + sqlFunctArea + " AND " +
+                "WHERE " + sqlDiogPeriod + " AND d.b_close = 0 AND " +
                 "d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND " +
                 "d.fid_ct_dps = " + (isViewForPurchases() ? SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[0]) + " AND " +
                 "d.fid_cl_dps = " + (isViewForPurchases() ?  SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1] : SDataConstantsSys.TRNU_TP_DPS_SAL_ORD[1]) + " AND " + 

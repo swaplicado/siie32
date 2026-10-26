@@ -16,12 +16,14 @@ import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.trn.db.SDbStockValuationAccounting;
 import erp.mod.trn.db.SDbStockValuationMvt;
 import erp.mod.trn.db.SMaterialRequestUtils;
 import erp.mod.trn.db.SStockValuationConfiguration;
+import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +38,7 @@ import sa.lib.gui.SGuiSession;
  * 
  * @author Edwin Carmona
  */
-public class SStockValuationRecordUtils {
+public abstract class SStockValuationRecordUtils {
     
     private static final int TYPE_PUR = 1; // Tipo de movimiento: gasto
     private static final int TYPE_INV = 2; // Tipo de movimiento: inventario
@@ -142,7 +144,7 @@ public class SStockValuationRecordUtils {
             nItemReference = 0;
             ArrayList<SFinAccountConfigEntry> lPurAccConfigs = new ArrayList<>();
             /**
-             * Si el consumo tiene asociada una requisición
+             * Si el consumo tiene asociada una partida de requisición
              */
             if (oConsumption.getAuxMaterialRequestEntryPk() != null) {
                 if (oConsumption.getAuxMaterialRequestEntryPk()[1] > 0) {
@@ -232,7 +234,9 @@ public class SStockValuationRecordUtils {
                 }
                 
                 // Se asigna el centro de costo del movimiento de almacén de salida:
-                nIdDiogEtyCc = oConsumption.getAuxFkCostCenter();
+                // 2026-08-13 Se cambia CC a 0 para no usar el del diog, sino el de la RM o DPS
+                // 2026-09-04 Se queda el CC del Diog por RM de resurtido.
+                nIdDiogEtyCc = 0;
 
                 for (SFinAccountConfigEntry oConfig : lPurAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
@@ -243,7 +247,7 @@ public class SStockValuationRecordUtils {
                         oAccount.read(new String[]{oConfig.getAccountId()}, session.getStatement());
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
-                    
+
                     if (nIdDiogEtyCc > 1) {
                         nIdCC = nIdDiogEtyCc;
                         sCc = SFinUtils.getCostCenterFormerIdXXX(session, nIdCC);
@@ -256,13 +260,29 @@ public class SStockValuationRecordUtils {
                             nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
                             lCC.put(oConfig.getCostCenterId(), nIdCC);
                         }
-                        
+
                         if (nIdCC == 0 || oConfig.getCostCenterId().isEmpty()) {
                             sCc = SDataUtilities.obtainCostCenterItem(session, oConsumption.getFkItemId());
                             if (sCc.isEmpty()) {
-                                throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                                if (lPurAccConfigs.size() == 1
+                                        && oConsumption.getAuxDpsCostCenterCode() != null
+                                        && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
+                                    if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
+                                        nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
+                                    }
+                                    else {
+                                        nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
+                                        lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
+                                    }
+                                    sCc = oConsumption.getAuxDpsCostCenterCode();
+                                }
+                                if (sCc.isEmpty()) {
+                                    throw new Exception("No se encontró centro de costo para el item " + oConsumption.getFkItemId());
+                                }
                             }
-                            nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                            else {
+                                nIdCC = SFinUtils.getCostCenterId(session, sCc);
+                            }
                         }
                         else {
                             sCc = oConfig.getCostCenterId();
@@ -353,6 +373,7 @@ public class SStockValuationRecordUtils {
                 if (Math.abs(quantityDifference) >= 0.001d && mainConfig != null) {
                     mainConfig.setAuxQuantity(SLibUtils.round(mainConfig.getAuxQuantity() + quantityDifference, 3));
                 }
+                String sWhsCc;
                 for (SFinAccountConfigEntry oConfig : vWhsAccConfigs) {
                     if (lAccounts.containsKey(oConfig.getAccountId())) {
                         oAccount = lAccounts.get(oConfig.getAccountId());
@@ -363,13 +384,30 @@ public class SStockValuationRecordUtils {
                         lAccounts.put(oConfig.getAccountId(), oAccount);
                     }
 
-                    if (lCC.containsKey(oConfig.getCostCenterId())) {
-                        nIdCC = lCC.get(oConfig.getCostCenterId());
+                    if (lPurAccConfigs.size() == 1 
+                            && vWhsAccConfigs.size() == 1 
+                            && oConsumption.getAuxDpsCostCenterCode() != null 
+                            && !oConsumption.getAuxDpsCostCenterCode().isEmpty()) {
+                        if (lCC.containsKey(oConsumption.getAuxDpsCostCenterCode())) {
+                            nIdCC = lCC.get(oConsumption.getAuxDpsCostCenterCode());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConsumption.getAuxDpsCostCenterCode());
+                            lCC.put(oConsumption.getAuxDpsCostCenterCode(), nIdCC);
+                        }
+                        sWhsCc = oConsumption.getAuxDpsCostCenterCode();
                     }
                     else {
-                        nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
-                        lCC.put(oConfig.getCostCenterId(), nIdCC);
+                        if (lCC.containsKey(oConfig.getCostCenterId())) {
+                            nIdCC = lCC.get(oConfig.getCostCenterId());
+                        }
+                        else {
+                            nIdCC = SFinUtils.getCostCenterId(session, oConfig.getCostCenterId());
+                            lCC.put(oConfig.getCostCenterId(), nIdCC);
+                        }
+                        sWhsCc = oConfig.getCostCenterId();
                     }
+
 
                     /**
                      * Partida de almacén (credit)
@@ -386,7 +424,7 @@ public class SStockValuationRecordUtils {
                             oCfg.getTextAssetEntries(),
                             oAccount,
                             nIdCC,
-                            oConfig.getCostCenterId(),
+                            sWhsCc,
                             sortPosition++,
                             new int[]{oConsumption.getFkDiogYearOutId_n(), oConsumption.getFkDiogDocOutId_n()},
                             nItemReference,
@@ -598,6 +636,75 @@ public class SStockValuationRecordUtils {
         }
         
         return oRecordEntry; 
+    }
+
+    /**
+     * Obtiene la naturaleza del documento de compra a partir de su PK.
+     * Si el documento es una orden de compra, se obtiene la naturaleza directamente del documento.
+     * Si el documento es una factura de compra, se obtiene la contabilidad.
+     * 
+     * @param session
+     * @param idDpsYear
+     * @param idDpsDoc
+     * @return
+     * @throws Exception
+     */
+    public static DocNature getDocumentNature(SGuiSession session, final int idDpsYear, final int idDpsDoc) throws Exception {
+        String sqlDoc = "SELECT td.fid_ct_dps, td.fid_cl_dps, td.fid_tp_dps, td.fid_dps_nat "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " td "
+                + "WHERE td.id_year = " + idDpsYear + " AND td.id_doc = " + idDpsDoc;
+        
+        DocNature natureDocAcc = new DocNature();
+        ResultSet resultSetDoc = session.getStatement().executeQuery(sqlDoc);
+        if (resultSetDoc.next()) {
+            natureDocAcc.nature = resultSetDoc.getInt("fid_dps_nat");
+            natureDocAcc.dpsNature = resultSetDoc.getInt("fid_dps_nat");
+            
+            if (resultSetDoc.getInt("fid_ct_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[0] &&
+                resultSetDoc.getInt("fid_cl_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[1] &&
+                resultSetDoc.getInt("fid_tp_dps") == SModSysConsts.TRNU_TP_DPS_PUR_ORD[2]) {
+                natureDocAcc.accNature = 0;
+                return natureDocAcc;
+            }
+        }
+
+        String sql = "SELECT DISTINCT "
+                + "fre.fid_acc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " fr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " fre ON fr.id_year = fre.id_year "
+                + "AND fr.id_per = fre.id_per "
+                + "AND fr.id_bkc = fre.id_bkc "
+                + "AND fr.id_tp_rec = fre.id_tp_rec "
+                + "AND fr.id_num = fre.id_num "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " td ON fre.fid_dps_year_n = td.id_year "
+                + "AND fre.fid_dps_doc_n = td.id_doc "
+                + "WHERE "
+                + "fr.b_del = 0 AND fre.b_del = 0 "
+                + "AND td.b_del = 0 "
+                + "AND td.fid_ct_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[0] + " "
+                + "AND td.fid_cl_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[1] + " "
+                + "AND td.fid_tp_dps = " + SModSysConsts.TRNU_TP_DPS_PUR_INV[2] + " "
+                + "AND fre.fid_acc LIKE '12%' "
+                + "AND td.id_year = " + idDpsYear + " "
+                + "AND td.id_doc = " + idDpsDoc + " ";
+
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        natureDocAcc.accNature = resultSet.next() ? SDataConstantsSys.TRNU_DPS_NAT_ASSET : SDataConstantsSys.TRNU_DPS_NAT_DEF;
+        natureDocAcc.nature = natureDocAcc.accNature;
+        
+        return natureDocAcc;
+    }
+    
+    public static class DocNature {
+        public int nature;
+        public int dpsNature;
+        public int accNature;
+
+        public DocNature() {
+            this.nature = 0;
+            this.dpsNature = 0;
+            this.accNature = 0;
+        }
     }
 
     /**

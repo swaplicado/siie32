@@ -61,6 +61,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -69,13 +70,14 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, César Orozco, Claudio Peña, Edwin Carmona, Sergio Flores, Rodigo Ayala
+ * @author Alfonso Flores, Juan Barajas, César Orozco, Edwin Carmona, Rodigo Ayala, Sergio Flores, Claudio Peña
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, KeyListener {
 
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
+    private boolean mbIsCopy;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private boolean mbWasInventoriable;
@@ -1210,7 +1212,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsReference.setText("Referencia obligatoria");
         jPanel39.add(jckIsReference);
 
-        jckIsPrepayment.setText("Es anticipo");
+        jckIsPrepayment.setText("Es anticipo para facturarse");
         jPanel39.add(jckIsPrepayment);
 
         jlMaterialType.setText("Familia de insumo:");
@@ -1704,12 +1706,14 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpDescription.setBorder(javax.swing.BorderFactory.createTitledBorder("Descripción extendida del ítem:"));
         jpDescription.setLayout(new java.awt.BorderLayout());
 
-        jPanel22.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 1));
 
         jLabel2.setText("Introduce la descripción extendida del ítem.");
+        jLabel2.setPreferredSize(new java.awt.Dimension(730, 14));
         jPanel22.add(jLabel2);
 
         jckItemDescriptionIsDeleted.setForeground(new java.awt.Color(204, 0, 0));
+        jckItemDescriptionIsDeleted.setText("Descripción extendida eliminada");
         jckItemDescriptionIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jckItemDescriptionIsDeleted.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jckItemDescriptionIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -3973,17 +3977,26 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         validation.setIsError(true);
                     }
                 }
-
                 if (!validation.getIsError()) {
-                    params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), moFieldItemKey.getString() };
-                    if (!moFieldItemKey.getString().isEmpty() && SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_KEY_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
-                        if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItemKey.getText() + "' ya existe, ¿desea conservalo? ") == JOptionPane.NO_OPTION) {
-                            validation.setComponent(jtfItemKey);
-                            validation.setTabbedPaneIndex(0);
-                            validation.setIsError(true);
+                    boolean validateKey = moItem == null || mbIsCopy;
+                    if (validateKey) {
+                        params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), moFieldItemKey.getString() };
+                        if (!moFieldItemKey.getString().isEmpty() && SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_KEY_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
+                            if (mbIsCopy) {
+                                miClient.showMsgBoxWarning("El valor del campo '" + jlItemKey.getText() + "' ya existe. No es posible guardar una copia con la misma clave.\nFavor de cambiar el valor '" + jlItemKey.getText() + "'");
+                                validation.setComponent(jtfItemKey);
+                                validation.setTabbedPaneIndex(0);
+                                validation.setIsError(true);
+                            }
+                            else {
+                                if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItemKey.getText() + "' ya existe, ¿desea conservarlo?") == JOptionPane.NO_OPTION) {
+                                    validation.setComponent(jtfItemKey);
+                                    validation.setTabbedPaneIndex(0);
+                                    validation.setIsError(true);
+                                }
+                            }
                         }
                     }
-
                     if (!validation.getIsError()) {
                         if (moFieldUnitsPackage.getDouble() != 0d && jcbFkItemPackageId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemPackageId_n.getText() + "'.");
@@ -4145,12 +4158,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     public int getFormStatus() {
         return mnFormStatus;
     }
-
+    
     @Override
     public int getFormResult() {
         return mnFormResult;
     }
-
+    
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         mbResetingForm = true;
@@ -4297,7 +4310,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         Platform.runLater(() -> {
             moHtmlEditor.setHtmlText(moItem.getCompItemDescription());
         });
-
+        
         mbResetingForm = false;
     }
 
@@ -4730,5 +4743,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public void keyReleased(KeyEvent e) {
         makeItemName();
+    }
+    
+    public void setIsCopy(final boolean isCopy) {
+        mbIsCopy = isCopy;
     }
 }

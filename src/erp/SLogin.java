@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
+import javax.swing.KeyStroke;
 import sa.lib.srv.SSrvCompany;
 
 /**
@@ -77,7 +78,7 @@ public class SLogin extends JDialog {
             }
         });
 
-        jpDialog.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de acceso:")));
+        jpDialog.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Credenciales de acceso:")));
         jpDialog.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
@@ -90,6 +91,11 @@ public class SLogin extends JDialog {
 
         jtfUserName.setText("user");
         jtfUserName.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfUserName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfUserNameActionPerformed(evt);
+            }
+        });
         jPanel2.add(jtfUserName);
 
         jPanel1.add(jPanel2);
@@ -102,6 +108,11 @@ public class SLogin extends JDialog {
 
         jpfUserPassword.setText("12345");
         jpfUserPassword.setPreferredSize(new java.awt.Dimension(150, 23));
+        jpfUserPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jpfUserPasswordActionPerformed(evt);
+            }
+        });
         jPanel3.add(jpfUserPassword);
 
         jPanel1.add(jPanel3);
@@ -155,8 +166,8 @@ public class SLogin extends JDialog {
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-488)/2, (screenSize.height-334)/2, 488, 334);
+        setSize(new java.awt.Dimension(488, 334));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
@@ -184,7 +195,27 @@ public class SLogin extends JDialog {
         SLibUtilities.requestComponentFocus(jtfUserName);
     }//GEN-LAST:event_formWindowOpened
 
+    private void jtfUserNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfUserNameActionPerformed
+        jpfUserPassword.requestFocusInWindow();
+    }//GEN-LAST:event_jtfUserNameActionPerformed
+
+    private void jpfUserPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpfUserPasswordActionPerformed
+        jltCompanies.requestFocusInWindow();
+    }//GEN-LAST:event_jpfUserPasswordActionPerformed
+
     private void initComponentsExtra() {
+        // let a pressed key ENTER on companies list move focus to OK button:
+        
+        AbstractAction actionCompaniesKeyEnter = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jbOk.requestFocusInWindow();
+            }
+        };
+        
+        jltCompanies.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterAction");
+        jltCompanies.getActionMap().put("enterAction", actionCompaniesKeyEnter);
+        
         AbstractAction actionOk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -33,7 +33,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Isabel Servín
+ * @author Sergio Flores, Claudio Peña, Isabel Servín, Sergio Flores
  */
 public abstract class SFiscalUtils {
 
@@ -2132,7 +2132,7 @@ public abstract class SFiscalUtils {
         
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2149,7 +2149,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2170,7 +2170,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2191,7 +2191,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2210,7 +2210,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));            
         }
@@ -2229,7 +2229,7 @@ public abstract class SFiscalUtils {
 
         element.getXmlAttributes().add(new SXmlAttribute("MontoTotal", DecimalFormatImporte.format(montoTotal)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2251,7 +2251,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2273,7 +2273,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2299,7 +2299,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2325,7 +2325,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2342,7 +2342,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2359,7 +2359,7 @@ public abstract class SFiscalUtils {
         element.getXmlAttributes().add(new SXmlAttribute("RFC", rfc));
         element.getXmlAttributes().add(new SXmlAttribute("Monto", DecimalFormatImporte.format(monto)));
 
-        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN_NAME) != 0) {
+        if (!moneda.isEmpty() && moneda.compareTo(SModSysConsts.FINS_FISCAL_CUR_MXN) != 0) {
             element.getXmlAttributes().add(new SXmlAttribute("Moneda", moneda));
             element.getXmlAttributes().add(new SXmlAttribute("TipCamb", DecimalFormatTipCamb.format(tipCamb)));
         }
@@ -2618,7 +2618,7 @@ public abstract class SFiscalUtils {
                         if (xmlMoneda.isEmpty() || xmlMoneda.compareTo(SUtilConsts.NON_APPLYING) == 0) {
                             if (tipoCambio != 0d && tipoCambio != 1d) {
                                 // Exchange rate provided but currency is not available, so USD is assumed:
-                                moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                             }
                             else {
                                 // Exchange rate not provided:
@@ -2630,10 +2630,11 @@ public abstract class SFiscalUtils {
                             moneda = "";
                             
                             switch (xmlMoneda) {
-                                case SModSysConsts.FINS_FISCAL_CUR_MXN_NAME:    // MXN
-                                case SModSysConsts.FINS_FISCAL_CUR_USD_NAME:    // USD
-                                case SModSysConsts.FINS_FISCAL_CUR_EUR_NAME:    // EUR
-                                case SModSysConsts.FINS_FISCAL_CUR_JPY_NAME:    // JPY
+                                case SModSysConsts.FINS_FISCAL_CUR_MXN:
+                                case SModSysConsts.FINS_FISCAL_CUR_USD:
+                                case SModSysConsts.FINS_FISCAL_CUR_EUR:
+                                case SModSysConsts.FINS_FISCAL_CUR_GBP:
+                                case SModSysConsts.FINS_FISCAL_CUR_JPY:
                                     // Currency identified:
                                     moneda = xmlMoneda;
                                     break;
@@ -2647,7 +2648,7 @@ public abstract class SFiscalUtils {
                                         case "NAC":
                                         case "PES":
                                         case "PSM":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_MXN_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_MXN;
                                             break;
                                         case "2":
                                         case "DLL":
@@ -2655,14 +2656,17 @@ public abstract class SFiscalUtils {
                                         case "DOL":
                                         case "DÓL":
                                         case "USA":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                                             break;
                                         case "3":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_EUR_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_EUR;
+                                            break;
+                                        case "4":
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_GBP;
                                             break;
                                         case "JAP":
                                         case "YEN":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_JPY_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_JPY;
                                             break;
                                         default:
                                     }
@@ -2671,7 +2675,7 @@ public abstract class SFiscalUtils {
                             if (moneda.isEmpty()) {
                                 if (tipoCambio != 0d && tipoCambio != 1d) {
                                     // Exchange rate provided but currency is not available:
-                                    moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                    moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                                 }
                             }
                         }
@@ -2972,7 +2976,7 @@ public abstract class SFiscalUtils {
                         if (xmlMoneda.isEmpty() || xmlMoneda.compareTo(SUtilConsts.NON_APPLYING) == 0) {
                             if (tipoCambio != 0d && tipoCambio != 1d) {
                                 // Exchange rate provided but currency is not available, so USD is assumed:
-                                moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                             }
                             else {
                                 // Exchange rate not provided:
@@ -2984,10 +2988,11 @@ public abstract class SFiscalUtils {
                             moneda = "";
                             
                             switch (xmlMoneda) {
-                                case SModSysConsts.FINS_FISCAL_CUR_MXN_NAME:    // MXN
-                                case SModSysConsts.FINS_FISCAL_CUR_USD_NAME:    // USD
-                                case SModSysConsts.FINS_FISCAL_CUR_EUR_NAME:    // EUR
-                                case SModSysConsts.FINS_FISCAL_CUR_JPY_NAME:    // JPY
+                                case SModSysConsts.FINS_FISCAL_CUR_MXN:
+                                case SModSysConsts.FINS_FISCAL_CUR_USD:
+                                case SModSysConsts.FINS_FISCAL_CUR_EUR:
+                                case SModSysConsts.FINS_FISCAL_CUR_GBP:
+                                case SModSysConsts.FINS_FISCAL_CUR_JPY:
                                     // Currency identified:
                                     moneda = xmlMoneda;
                                     break;
@@ -3001,7 +3006,7 @@ public abstract class SFiscalUtils {
                                         case "NAC":
                                         case "PES":
                                         case "PSM":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_MXN_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_MXN;
                                             break;
                                         case "2":
                                         case "DLL":
@@ -3009,14 +3014,17 @@ public abstract class SFiscalUtils {
                                         case "DOL":
                                         case "DÓL":
                                         case "USA":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                                             break;
                                         case "3":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_EUR_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_EUR;
+                                            break;
+                                        case "4":
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_GBP;
                                             break;
                                         case "JAP":
                                         case "YEN":
-                                            moneda = SModSysConsts.FINS_FISCAL_CUR_JPY_NAME;
+                                            moneda = SModSysConsts.FINS_FISCAL_CUR_JPY;
                                             break;
                                         default:
                                     }
@@ -3025,7 +3033,7 @@ public abstract class SFiscalUtils {
                             if (moneda.isEmpty()) {
                                 if (tipoCambio != 0d && tipoCambio != 1d) {
                                     // Exchange rate provided but currency is not available:
-                                    moneda = SModSysConsts.FINS_FISCAL_CUR_USD_NAME;
+                                    moneda = SModSysConsts.FINS_FISCAL_CUR_USD;
                                 }
                             }
                         }

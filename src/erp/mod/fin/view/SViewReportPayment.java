@@ -5,9 +5,9 @@
  */
 package erp.mod.fin.view;
 
-import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbSwapDataProcessing;
 import erp.mod.view.SViewFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Claudio Pela
+ * @author Claudio Peña, Sergio Flores
  */
 public class SViewReportPayment extends SGridPaneView implements ActionListener, ItemListener {
         
@@ -51,7 +51,7 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
     private boolean mbAppliesDateRequired;
     
     public SViewReportPayment(SGuiClient client, int subType, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_PAY_REP, subType, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FINX_PAY_REP, subType, title);
         initComponetsCustom();
     }
     
@@ -211,50 +211,59 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
         }
 
         msSql = "SELECT "
-            + "MIN(v.id_pay) AS " + SDbConsts.FIELD_ID + "1, "
-            + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
-            + "MIN(v.dt_req) AS FechaRequeridaPago, "
-            + "base.ety_tp, "
-            + "v.b_sys, v.b_del, v.fk_usr_ins, v.fk_usr_upd, "
-            + "v.fk_usr_ins AS f_usr_ins, v.fk_usr_upd AS f_usr_upd, "
-            + "CASE "
-            + "WHEN base.ety_tp = 'P' THEN 'Pago a documento' "
-            + "ELSE 'Anticipo' "
-            + "END AS tipoPago, "
-            + "ce.cur_key AS Moneda, "
-            + "SUM(base.monto) AS montoTotal, "
-            + "COUNT(DISTINCT v.id_pay) AS numeroPagos, "
-            + "CASE "
-            + "WHEN base.ety_tp = 'A' THEN 'ANTICIPO' "
-            + "ELSE ( "
-            + "SELECT e.concept "
-            + "FROM fin_pay v2 "
-            + "INNER JOIN fin_pay_ety ve2 ON v2.id_pay = ve2.id_pay "
-            + "LEFT JOIN trn_dps_ety e "
-            + "ON e.id_year = ve2.fk_doc_year_n AND e.id_doc = ve2.fk_doc_doc_n "
-            + "WHERE v2.fk_ben = v.fk_ben "
-            + "AND IFNULL(e.concept, '') <> '' "
-            + "GROUP BY ve2.fk_doc_year_n, ve2.fk_doc_doc_n "
-            + "ORDER BY SUM(ve2.des_pay_app_ety_cur) DESC "
-            + "LIMIT 1 ) "
-            + "END AS conceptoPrincipal, "
-            + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
-            + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
-            + "COALESCE(MAX(nat.code), 'S/DOC') AS nat "
-            + "FROM fin_pay AS v "
-            + "INNER JOIN ( "
-            + "SELECT id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n, "
-            + "SUM(des_pay_app_ety_cur) AS monto "
-            + "FROM fin_pay_ety "
-            + "GROUP BY id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n "
-            + ") AS base ON v.id_pay = base.id_pay "
-            + "INNER JOIN erp.bpsu_bp AS b ON v.fk_ben = b.id_bp "
-            + "INNER JOIN erp.cfgu_cur AS ce ON base.fk_ety_cur = ce.id_cur "
-            + "LEFT JOIN trn_dps AS d ON d.id_doc = base.fk_doc_doc_n AND d.id_year = base.fk_doc_year_n "
-            + "LEFT JOIN erp.TRNU_DPS_NAT nat ON d.fid_dps_nat = nat.id_dps_nat "
-            + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "GROUP BY b.bp "
-            + "ORDER BY b.bp";
+                + "MIN(v.id_pay) AS " + SDbConsts.FIELD_ID + "1, "
+                + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
+                + "MIN(v.dt_req) AS FechaRequeridaPago, "
+                + "base.ety_tp, "
+                + "v.b_sys, v.b_del, v.fk_usr_ins, v.fk_usr_upd, "
+                + "v.fk_usr_ins AS f_usr_ins, v.fk_usr_upd AS f_usr_upd, "
+                + "CASE "
+                + "WHEN base.ety_tp = 'P' THEN 'Pago a documento' "
+                + "ELSE 'Anticipo' "
+                + "END AS tipoPago, "
+                + "ce.cur_key AS Moneda, "
+                + "SUM(base.monto) AS montoTotal, "
+                + "COUNT(DISTINCT v.id_pay) AS numeroPagos, "
+                + "CASE "
+                + "WHEN base.ety_tp = 'A' THEN 'ANTICIPO' "
+                + "ELSE ( "
+                + "SELECT e.concept "
+                + "FROM fin_pay v2 "
+                + "INNER JOIN fin_pay_ety ve2 ON v2.id_pay = ve2.id_pay "
+                + "LEFT JOIN trn_dps_ety e "
+                + "ON e.id_year = ve2.fk_doc_year_n AND e.id_doc = ve2.fk_doc_doc_n "
+                + "WHERE v2.fk_ben = v.fk_ben "
+                + "AND IFNULL(e.concept, '') <> '' "
+                + "GROUP BY ve2.fk_doc_year_n, ve2.fk_doc_doc_n "
+                + "ORDER BY SUM(ve2.des_pay_app_ety_cur) DESC "
+                + "LIMIT 1 ) "
+                + "END AS conceptoPrincipal, "
+                + "GROUP_CONCAT(DISTINCT CONCAT(v.ser, IF(v.ser = '', '', '-'), v.num) "
+                + "ORDER BY v.ser, v.num SEPARATOR ', ') AS f_code, "
+                + "COALESCE(MAX(nat.code), 'S/DOC') AS nat, "
+                + "COALESCE("
+                + "CASE sw._prc_type "
+                + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_FREIGHT) + "' "
+                + "WHEN " + SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE + " THEN '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_RAW_MAT_PURCHASE) + "' "
+                + "ELSE '" + SDbSwapDataProcessing.ProcessingTypes.get(SDbSwapDataProcessing.PRC_TYPE_STANDARD) + "' END, NULL) AS _prc_type "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_PAY) + " AS v "
+                + "INNER JOIN ("
+                + "SELECT id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n, "
+                + "SUM(des_pay_app_ety_cur) AS monto "
+                + "FROM fin_pay_ety "
+                + "GROUP BY id_pay, ety_tp, fk_ety_cur, fk_doc_year_n, fk_doc_doc_n "
+                + ") AS base ON v.id_pay = base.id_pay "
+                + "INNER JOIN erp.bpsu_bp AS b ON v.fk_ben = b.id_bp "
+                + "INNER JOIN erp.cfgu_cur AS ce ON base.fk_ety_cur = ce.id_cur "
+                + "LEFT JOIN trn_dps AS d ON d.id_doc = base.fk_doc_doc_n AND d.id_year = base.fk_doc_year_n "
+                + "LEFT JOIN erp.trnu_dps_nat AS nat ON d.fid_dps_nat = nat.id_dps_nat "
+                + "LEFT JOIN ("
+                + "SELECT fk_dps_year_n, fk_dps_doc_n, MAX(prc_type) AS _prc_type "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_SWAP_DATA_PRC) + " "
+                + "GROUP BY fk_dps_year_n, fk_dps_doc_n) AS sw ON base.fk_doc_year_n = sw.fk_dps_year_n AND base.fk_doc_doc_n = sw.fk_dps_doc_n "
+                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + "GROUP BY b.bp "
+                + "ORDER BY b.bp";
     }
 
         
@@ -271,8 +280,8 @@ public class SViewReportPayment extends SGridPaneView implements ActionListener,
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "FechaRequeridaPago", "Fecha requerida pago", 70));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "conceptoPrincipal", "Concepto mayor", 500));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "nat", "Naturaleza doc", 100));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "_prc_type", "Tipo carga"));
        
-
         return gridColumnsViews;
     }
 

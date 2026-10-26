@@ -46,6 +46,7 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
     public static final javax.swing.ImageIcon moIconViewOkGreen = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_ok_green.png"));
     public static final javax.swing.ImageIcon moIconViewRejected = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_rejected.png"));
     public static final javax.swing.ImageIcon moIconViewSales = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_mod_sal.png"));
+    public static final javax.swing.ImageIcon moIconViewExclamation = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_excl.png"));
 
     public STableCellRendererIcon() {
         moLabel = new JLabel();
@@ -155,6 +156,9 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
                 break;
             case STableConstants.ICON_VIEW_SALES:
                 moLabel.setIcon(moIconViewSales);
+                break;
+            case STableConstants.ICON_VIEW_EXCL:
+                moLabel.setIcon(moIconViewExclamation);
                 break;
             default:
                 moLabel.setIcon(moIconNull);

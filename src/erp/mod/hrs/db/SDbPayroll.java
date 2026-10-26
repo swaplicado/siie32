@@ -921,4 +921,38 @@ public class SDbPayroll extends SDbRegistryUser {
             dummyPayroll.save(session);
         }
     }
+    
+    /**
+     * Get payroll description.
+     * @param session GUI session.
+     * @param payrollId ID of payroll.
+     * @return Payroll description.
+     * @throws Exception 
+     */
+    public static String getPayrollDescription(final SGuiSession session, final int payrollId) throws Exception {
+        String name = "";
+        
+        String sql = "SELECT p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.hint, p.nts, tp.name "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON tp.id_tp_pay = p.fk_tp_pay "
+                + "WHERE p.id_pay = " + payrollId + " ";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                String hint = resultSet.getString("p.hint");
+                String notes = resultSet.getString("p.nts");
+                
+                name += SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("p.per_year")) + "-" +
+                        SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("p.per")) + " " +
+                        resultSet.getString("tp.name") + " " +
+                        SLibUtils.DecimalFormatCalendarMonth.format(resultSet.getInt("p.num")) + " (" +
+                        SLibUtils.DateFormatDateShort.format(resultSet.getDate("p.dt_sta")) + "-" +
+                        SLibUtils.DateFormatDateShort.format(resultSet.getDate("p.dt_end")) + ")" +
+                        (hint.isEmpty() ? "" : ", " + hint) +
+                        (notes.isEmpty() ? "" : ", " + notes);
+            }
+        }
+        
+        return name;
+    }
 }

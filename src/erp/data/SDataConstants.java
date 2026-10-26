@@ -481,12 +481,14 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
-    public static final int TRN_DPS_DPS_ADJ = 207055; 
-    public static final int TRN_DPS_MAT_REQ = 207066;
+    public static final int TRN_DPS_DPS_ADJ = 207055;
+    public static final int TRN_DPS_DPS_MERGE = 207068;
+    public static final int TRN_DPS_MAT_REQ = 207067;
     public static final int TRN_DPS_IOG_CHG = 207056;
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
     public static final int TRN_DPS_CUSTOM_ACC_ETY = 207251;
+    public static final int TRN_DPS_DEST_CHG_LOG = 207261;
     public static final int TRN_SCA_TIC_DPS = 207291;
     public static final int TRN_SCA_TIC_DPS_ETY = 207292;
     public static final int TRN_INIT = 207361;
@@ -571,6 +573,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_PAYS = 207527;
     public static final int TRNX_DPS_SHIP_PEND_LINK = 207528;
     public static final int TRNX_DPS_PAY_PEND_PAY = 207529;
+    public static final int TRNX_DPS_ADV_PAY_PEND_PAY = 207530;
 
     public static final int TRNX_DPS_LINK_PEND = 207531;
     public static final int TRNX_DPS_LINK_PEND_ETY = 207532;
@@ -582,6 +585,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_LINKS_TRACE = 207537;
     public static final int TRNX_DPS_SUPPLY = 207538;
     public static final int TRNX_DPS_MAT_REQ_LINKS = 207539;
+    public static final int TRNX_CON_LINK_ETY = 207540;
 
     public static final int TRNX_DPS_SUPPLY_PEND = 207541;
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
@@ -590,6 +594,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SUPPLIED_ORDER = 207545; // order whit supplied movements
     public static final int TRNX_DPS_SUPPLIED_ORDER_INVOICE = 207546; // order whit supplied movements invoice
     public static final int TRNX_DPS_OUTPUTS_ORDER_INVOICE = 207547; // order whit supplied movements invoice outputs
+    public static final int TRNX_DPS_JOIN_ENTRIES = 207548; // order whit supplied movements invoice outputs
 
     public static final int TRNX_DPS_RETURN_PEND = 207551;
     public static final int TRNX_DPS_RETURN_PEND_ETY = 207552;
@@ -1060,6 +1065,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_DPS_REPL, "trn_dps_repl");
         TablesMap.put(TRN_DPS_DPS_SUPPLY, "trn_dps_dps_supply");
         TablesMap.put(TRN_DPS_DPS_ADJ, "trn_dps_dps_adj");
+        TablesMap.put(TRN_DPS_DPS_MERGE, "trn_dps_dps_merge");
         TablesMap.put(TRN_DPS_MAT_REQ, "trn_dps_mat_req");
         TablesMap.put(TRN_DPS_IOG_CHG, "trn_dps_iog_chg");
         TablesMap.put(TRN_DPS_IOG_WAR, "trn_dps_iog_war");

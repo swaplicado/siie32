@@ -14,12 +14,12 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mod.cfg.swap.SHttpConsts;
-import erp.mod.cfg.swap.SSwapConsts;
-import erp.mod.cfg.swap.SSwapUtils;
-import erp.mod.cfg.swap.SSyncType;
-import erp.mod.cfg.swap.utils.SExportUtils;
-import erp.mod.cfg.swap.utils.SResponses;
+import erp.swap.SHttpConsts;
+import erp.swap.SSwapConsts;
+import erp.swap.SSwapUtils;
+import erp.swap.SSyncType;
+import erp.swap.utils.SExportUtils;
+import erp.swap.utils.SResponses;
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,7 +29,7 @@ import sa.lib.grid.SGridUtils;
 
 /**
  *
- * @author Alfonso Flores, Adrián Avilés, Sergio Flores
+ * @author Alfonso Flores, Adrián Avilés, Sergio Flores, Claudio Peña
  */
 public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -130,17 +130,20 @@ public class SViewUserConfigurationTransaction extends erp.lib.table.STableTab i
 
     private void actionExportDataToSwapServices() {
         if (jbExportDataToSwapServices != null && jbExportDataToSwapServices.isEnabled()) {
-            try {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, true, SExportUtils.EXPORT_MODE_CONFIRM);
-                SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_USR, mnTabType);
-            }
-            catch (Exception e) {
-                SLibUtilities.printOutException(this, e);
-            }
-            finally {
-                miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
+            SExportUtils.showProcessDialog(miClient.getFrame(), "Procesando...", "Exportando usuarios...", () -> {
+                    try {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                        SResponses responses = SExportUtils.exportData(miClient.getSession(), SSyncType.USER, true, SExportUtils.EXPORT_MODE_CONFIRM);
+                        SExportUtils.processResponses(miClient.getSession(), responses, SDataConstants.GLOBAL_CAT_USR, mnTabType);
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.printOutException(this, e);
+                    }
+                    finally {
+                        miClient.getFrame().getRootPane().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+            );
         }
     }
 

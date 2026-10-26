@@ -20,9 +20,17 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín
+ * @author Juan Barajas, Isabel Servín, Sergio Flores
  */
 public class SDbMms extends SDbRegistryUser {
+    
+    public static final String TAG_NUM = "<num>";
+    public static final int FROM_1_EMP_USR_ARB_MMS = 1; // From (email remitente): del empleado o del usuario o el arbitrario (arb), o del MMS (usr)
+    public static final int FROM_2_USR_ARB_MMS = 2; // From (email remitente): del usuario o el arbitrario (arb), o del MMS (usr)
+    public static final int FROM_3_ARB_MMS = 3; // From (email remitente): el arbitrario (arb), o del MMS (usr)
+    public static final int FROM_4_MMS = 4; // From (email remitente): del MMS (usr) (same as default setting!)
+    public static final int FROM_0_DEF = 0; // From (email remitente): del MMS (usr) (default setting!)
+    public static final int CASE_5_SWAP_SERVICES_PUR_ORD = 5; // caso especial: exclusivo para pedidos de compras (OC) + SWAP Services, tomando remitente y destinatarios de la configuracion JSON del parámetro TRN_DPS_AUTH_USR_GRP
 
     protected int mnPkMmsId;
     protected String msHost;
@@ -128,7 +136,7 @@ public class SDbMms extends SDbRegistryUser {
         msRecipientCarbonCopy = "";
         msRecipientBlindCarbonCopy = "";
         msArbitraryEmail = "";
-        mnMmsCase = 0;
+        mnMmsCase = FROM_0_DEF; // From (email remitente): del MMS (usr) (default setting!)
         mbStartTls = false;
         mbAuth = false;
         mbDeleted = false;
@@ -173,7 +181,6 @@ public class SDbMms extends SDbRegistryUser {
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet;
         Statement statment = session.getDatabase().getConnection().createStatement();
-        SDataUser user;
         
         initRegistry();
         initQueryMembers();
@@ -207,28 +214,34 @@ public class SDbMms extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
+            SDataUser user;
+            SDataBizPartnerBranchContact contact = null;
+            
             switch (mnMmsCase) {
-                case 1:
+                case FROM_1_EMP_USR_ARB_MMS: // From (email remitente): del empleado o del usuario o el arbitrario (arb), o del MMS (usr)
                     user = new SDataUser();
                     user.read(new int [] { session.getUser().getPkUserId() }, statment);
-                    SDataBizPartnerBranchContact con = null;
                     if (user.getFkBizPartnerId_n() != 0) {
-                        con = SBpsUtils.getBizParterContact(session, user.getFkBizPartnerId_n());
+                        contact = SBpsUtils.getBizParterContact(session, user.getFkBizPartnerId_n()); // Email01: email personal; Email02: email institucional
                     }
-                    // El campo Email01 corresponde al email personal, el Email02 es el institucional
-                    msXtaMailReplyTo = con != null && !con.getEmail02().isEmpty() ? con.getEmail02() : user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Empleado o usuario o arbitrario o servicio
+                    msXtaMailReplyTo = contact != null && !contact.getEmail02().isEmpty() ? contact.getEmail02() : user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail();
                     break;
-                case 2:
+                    
+                case FROM_2_USR_ARB_MMS: // From (email remitente): del usuario o el arbitrario (arb), o del MMS (usr)
                     user = new SDataUser();
                     user.read(new int [] { session.getUser().getPkUserId() }, statment);
-                    msXtaMailReplyTo = user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail(); // Usuario o arbitrario o servicio
+                    msXtaMailReplyTo = user.getEmail().isEmpty() ? msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail : user.getEmail();
                     break;
-                case 3:
-                    msXtaMailReplyTo = msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail; // Arbitrario o servicio
+                    
+                case FROM_3_ARB_MMS: // From (email remitente): el arbitrario (arb), o del MMS (usr)
+                    msXtaMailReplyTo = msArbitraryEmail.isEmpty() ? msUser : msArbitraryEmail;
                     break;
-                case 4:
-                default:
-                    msXtaMailReplyTo = msUser; // Servicio
+                    
+                case FROM_4_MMS: // From (email remitente): del MMS (usr) (same as default setting!)
+                    // falls through!
+                    
+                default: // From (email remitente): del MMS (usr) (default setting!)
+                    msXtaMailReplyTo = msUser;
                     break;
             }
 

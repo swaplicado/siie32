@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 
 /**
  * Modificar el ítem y el centro de costo de un documento y de todos los documentos asociados a este, sin necesidad de editar cada documento de forma manual.
- * @author Isabel Servín
+ * @author Isabel Servín, Rodrigo Ayala
  */
 public final class SRowDpsEdit extends erp.lib.table.STableRow {
     
@@ -33,6 +33,7 @@ public final class SRowDpsEdit extends erp.lib.table.STableRow {
     private SDataCostCenter moCostCenterNew;
     private SDataItem moItemRefOld;
     private SDataItem moItemRefNew;
+    private String msNewNote;
     
     /**
      * 
@@ -76,16 +77,19 @@ public final class SRowDpsEdit extends erp.lib.table.STableRow {
     }
     
     public void setOriginalQuantityNew(final double d) { mdOriginalQuantityNew = d; }
-    public void setItemRefNew(final SDataItem o) { moItemRefNew = o; }
     public void setCostCenterNew(final SDataCostCenter o) { moCostCenterNew = o; }
     public void setDpsEntry(final SDataDpsEntry o) { moDpsEntry = o; } 
+    public void setItemRefNew(final SDataItem o) { moItemRefNew = o; }
+    public void setNewNote(final String s) { msNewNote = s; }
     
+    public double getOriginalQuantityOld() { return mdOriginalQuantityOld; }
     public double getOriginalQuantityNew() { return mdOriginalQuantityNew; }
     public SDataItem getItemRefOld() { return moItemRefOld; }
-    public SDataItem getItemRefNew() { return moItemRefNew; }
     public SDataCostCenter getCostCenterOld() { return moCostCenterOld; }
     public SDataCostCenter getCostCenterNew() { return moCostCenterNew; }
     public Object getDpsEntryPK() { return moDpsEntry.getPrimaryKey(); }
+    public SDataItem getItemRefNew() { return moItemRefNew; }
+    public String getNewNote() { return msNewNote; }
     
     @Override
     public void prepareTableRow() {
@@ -99,9 +103,9 @@ public final class SRowDpsEdit extends erp.lib.table.STableRow {
         mvValues.add(mdOriginalQuantityOld);
         mvValues.add(msUnit);
         mvValues.add(mdTotalOld);
-        mvValues.add(mdOriginalQuantityNew != 0 ? moAmountFormat.format(mdOriginalQuantityNew) : "");
+        mvValues.add(mdOriginalQuantityNew);
         mvValues.add(mdOriginalQuantityNew != 0 ? msUnit : "");
-        mvValues.add(mdOriginalQuantityNew != 0 ? moAmountFormat.format(moDpsEntry.getTotalCy_r()) : "");
+        mvValues.add(mdOriginalQuantityNew != 0 ? moDpsEntry.getTotalCy_r() : 0.0);
         mvValues.add(moCostCenterOld.getPkCostCenterIdXXX());
         mvValues.add(moCostCenterOld.getCostCenter());
         mvValues.add(moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX());
@@ -109,6 +113,7 @@ public final class SRowDpsEdit extends erp.lib.table.STableRow {
         mvValues.add(moItemRefOld != null ? moItemRefOld.getKey() : ""); //Código ítem anterior
         mvValues.add(moItemRefOld != null ? moItemRefOld.getItem() : ""); //Ítem anterior
         mvValues.add(moItemRefNew == null ? "" : moItemRefNew.getKey()); //Código ítem nuevo
-        mvValues.add(moItemRefNew == null ? "" : moItemRefNew.getItem()); //Ítem nuevo    
+        mvValues.add(moItemRefNew == null ? "" : moItemRefNew.getItem()); //Ítem nuevo
+        mvValues.add(msNewNote == null ? "" : msNewNote); //Nota nueva
     }
 }

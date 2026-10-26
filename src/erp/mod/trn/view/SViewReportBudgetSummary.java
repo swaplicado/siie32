@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SViewReportBudgetSummary extends SGridPaneView {
     

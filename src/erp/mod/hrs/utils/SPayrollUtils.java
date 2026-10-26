@@ -40,7 +40,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, César Orozco
  */
 public class SPayrollUtils {
     
@@ -204,11 +204,17 @@ public class SPayrollUtils {
                         return null;
                     }
 
-                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
-                    DateTime dateTime = new DateTime(dtDate);
-                    Date endDatePrevious = dateTime.plusDays(-7).toDate();
-                    Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
-                    dates[0] = dates1[0];
+                    if (SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 1) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
+                        DateTime dateTime = new DateTime(dtDate);
+                    }
+                    else if(SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 2) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, dtDate, weekLag);
+                        DateTime dateTime = new DateTime(dtDate);
+                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                        Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
+                        dates[0] = dates1[0];
+                    }
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(client, payType, yearPeriod, payrollNumber);
@@ -270,7 +276,7 @@ public class SPayrollUtils {
             comments = "";
             hasBonus = false;
             if (! row.isLostBonus()) {
-                hasBonus = SPayrollBonusUtils.hasBonus(tStartDate, tEndDate, row);
+                hasBonus = SPayrollBonusUtils.hasBonus(tStartDate, tEndDate, row, payType);
                 comments += hasBonus ? "" : "Con retardos o faltas.";
             }
             else {
@@ -282,6 +288,7 @@ public class SPayrollUtils {
             }
             
             comments += (row.isHasNoChecks() ? " Omitió checar." : "");
+            comments += (row.getPrematureOut() > 0 ? " Con salida anticipada." : "");
             oBonusAux.setHasBonus(hasBonus ? 1d : 0d);
             oBonusAux.setComments(comments);
             

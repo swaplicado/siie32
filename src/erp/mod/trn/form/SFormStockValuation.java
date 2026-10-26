@@ -17,10 +17,7 @@ import erp.mod.trn.utils.SStockValuationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,6 +69,9 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         jPanel21 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel22 = new javax.swing.JPanel();
+        jlDescription = new javax.swing.JLabel();
+        moTextDescription = new sa.lib.gui.bean.SBeanFieldText();
         jpAccountingRecord = new javax.swing.JPanel();
         jlRecord = new javax.swing.JLabel();
         jtfRecordDate = new javax.swing.JTextField();
@@ -101,6 +101,17 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         jPanel21.add(moDateDateEnd);
 
         jPanel23.add(jPanel21);
+
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDescription.setText("Descripción:");
+        jlDescription.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlDescription);
+
+        moTextDescription.setPreferredSize(new java.awt.Dimension(240, 23));
+        jPanel22.add(moTextDescription);
+
+        jPanel23.add(jPanel22);
 
         jpAccountingRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -158,10 +169,12 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbPickRecord;
     private javax.swing.JLabel jlDateEnd;
+    private javax.swing.JLabel jlDescription;
     private javax.swing.JLabel jlDummy3;
     private javax.swing.JLabel jlRecord;
     private javax.swing.JPanel jpAccountingRecord;
@@ -170,19 +183,22 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
     private javax.swing.JTextField jtfRecordDate;
     private javax.swing.JTextField jtfRecordNumber;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
+    private sa.lib.gui.bean.SBeanFieldText moTextDescription;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 250);
         
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd), true);
+        moTextDescription.setTextSettings(jlDescription.getText(), 255, 0);
         
         moFields.addField(moDateDateEnd);
-
-        moFields.setFormButton(jbSave);
+        moFields.addField(moTextDescription);
         
         moDialogRecordPicker = new SDialogRecordPicker((SClientInterface) miClient, SDataConstants.FINX_REC_USER);
         moCurrentRecord = null;
+        
+        moFields.setFormButton(jbSave);
         
         jbPickRecord.addActionListener(this);
     }
@@ -193,6 +209,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
     private void renderCurrentRecord() {
         if (moCurrentRecord == null) {
             jtfRecordDate.setText("");
+            jtfRecordBkc.setText("");
             jtfRecordBranch.setText("");
             jtfRecordNumber.setText("");
         }
@@ -279,6 +296,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             moRegistry.setDateEnd(miClient.getSession().getCurrentDate());
+            moTextDescription.setValue("");
             jtfRegistryKey.setText("");
             jtfRecordDate.setText("");
             jtfRecordBranch.setText("");
@@ -286,6 +304,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
             moCurrentRecord = null;
         }
         else {
+            moTextDescription.setValue(moRegistry.getDescription());
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
@@ -305,6 +324,7 @@ public class SFormStockValuation extends sa.lib.gui.bean.SBeanForm implements Ac
         if (registry.isRegistryNew()) {}
         
         registry.setDateEnd(moDateDateEnd.getValue());
+        registry.setDescription(moTextDescription.getValue());
         registry.setAuxRecordPk((Object[]) moCurrentRecord.getPrimaryKey());
 
         return registry;

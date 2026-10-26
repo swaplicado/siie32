@@ -36,7 +36,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín, Sergio Flores
+ * @author Juan Barajas, Uriel Castañeda, Edwin Carmona, Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public class SModuleItm extends SGuiModule {
 
@@ -248,7 +248,16 @@ public class SModuleItm extends SGuiModule {
         
         switch (type) {
             case SModConsts.ITMU_PRICE_COMM_LOG:
-                view = new SViewPriceCommercialLog(miClient, "Precios comerciales ítems");
+                switch (subtype) {
+                    case SModConsts.ITMX_PRICE_COMM_LOG_CURR:
+                        title = "Precios comerciales ítems (Vigentes)";
+                        break;
+                    case SModConsts.ITMX_PRICE_COMM_LOG_ALL:
+                        title = "Precios comerciales ítems (Todos)";
+                        break;
+                    default:
+                }
+                view = new SViewPriceCommercialLog(miClient, subtype, title);
                 break;
             case SModConsts.ITMU_ITEM_COMP:
                 view = new SViewItemComposition(miClient, "Config. ítems c/composición");

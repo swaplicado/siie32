@@ -5,10 +5,11 @@
  */
 package erp.mod.fin.db;
 
+import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataCurrency;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.cfg.swap.form.SDocumentUtils;
+import erp.swap.form.SDocumentUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -35,9 +36,6 @@ public class SDbPayment extends SDbRegistryUser {
     public static final int PRIORITY_NORMAL = 0;
     public static final int PRIORITY_URGENT = 1;
 
-    public static final String DESC_PRIORITY_NORMAL = "Normal";
-    public static final String DESC_PRIORITY_URGENT = "Urgente";
-    
     public static final int FIELD_STATUS_PAYMENT = FIELD_BASE + 1;
     
     public static final String ST_NEW = "NUEVO";
@@ -45,6 +43,9 @@ public class SDbPayment extends SDbRegistryUser {
     public static final String ST_REJC = "RECHAZADO";
     public static final String ST_SCHED = "AUTORIZADO";
     public static final String ST_BLOCK = "BLOQUEADO";
+    
+    public static final int NOTES_LENGTH = 256;
+    public static final int NOTES_AUTH_LENGTH = 512;
     
     protected int mnPkPaymentId;
     protected String msPaymentType;
@@ -71,6 +72,7 @@ public class SDbPayment extends SDbRegistryUser {
     /** Monto del pago en la moneda local del día de operación del pago. */
     protected double mdPayment;
     protected String msPaymentWay;
+    protected int mnPaymentOperationType;
     protected int mnPriority;
     protected String msNotes;
     protected String msNotesAuthorization;
@@ -164,10 +166,11 @@ public class SDbPayment extends SDbRegistryUser {
     public void setPaymentExchangeRate(double d) { mdPaymentExchangeRate = d; }
     public void setPayment(double d) { mdPayment = d; }
     public void setPaymentWay(String s) { msPaymentWay = s; }
+    public void setPaymentOperationType(int n) { mnPaymentOperationType = n; }
     public void setPriority(int n) { mnPriority = n; }
-    public void setNotes(String s) { msNotes = s; }
-    public void setNotesAuthorization(String s) { msNotesAuthorization = s; }
-    public void setNotesAuthorizationFlow(String s) { msNotesAuthorizationFlow = s; }
+    public void setNotes(String s) { msNotes = SLibUtils.textLeft(s, NOTES_LENGTH); }
+    public void setNotesAuthorization(String s) { msNotesAuthorization = SLibUtils.textLeft(s, NOTES_AUTH_LENGTH); }
+    public void setNotesAuthorizationFlow(String s) { msNotesAuthorizationFlow = SLibUtils.textLeft(s, NOTES_AUTH_LENGTH); }
     public void setReceiptPaymentRequired(boolean b) { mbReceiptPaymentRequired = b; }
     public void setRescheduled(boolean b) { mbRescheduled = b; }
     public void setExecutedManually(boolean b) { mbExecutedManually = b; }
@@ -208,6 +211,7 @@ public class SDbPayment extends SDbRegistryUser {
     public double getPaymentExchangeRate() { return mdPaymentExchangeRate; }
     public double getPayment() { return mdPayment; }
     public String getPaymentWay() { return msPaymentWay; }
+    public int getPaymentOperationType() { return mnPaymentOperationType; }
     public int getPriority() { return mnPriority; }
     public String getNotes() { return msNotes; }
     public String getNotesAuthorization() { return msNotesAuthorization; }
@@ -347,6 +351,7 @@ public class SDbPayment extends SDbRegistryUser {
         mdPaymentExchangeRate = 0;
         mdPayment = 0;
         msPaymentWay = "";
+        mnPaymentOperationType = SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS;
         mnPriority = PRIORITY_NORMAL;
         msNotes = "";
         msNotesAuthorization = "";
@@ -457,6 +462,7 @@ public class SDbPayment extends SDbRegistryUser {
             mdPaymentExchangeRate = resultSet.getDouble("pay_exc_rate");
             mdPayment = resultSet.getDouble("pay");
             msPaymentWay = resultSet.getString("pay_way");
+            mnPaymentOperationType = resultSet.getInt("pay_tp_op");
             mnPriority = resultSet.getInt("priority");
             msNotes = resultSet.getString("nts");
             msNotesAuthorization = resultSet.getString("nts_auth");
@@ -567,6 +573,7 @@ public class SDbPayment extends SDbRegistryUser {
                     mdPaymentExchangeRate + ", " + 
                     mdPayment + ", " + 
                     "'" + msPaymentWay + "', " + 
+                    ""+ mnPaymentOperationType + ", " +
                     mnPriority + ", " + 
                     "'" + msNotes + "', " + 
                     "'" + msNotesAuthorization + "', " + 
@@ -617,6 +624,7 @@ public class SDbPayment extends SDbRegistryUser {
                     "pay_exc_rate = " + mdPaymentExchangeRate + ", " +
                     "pay = " + mdPayment + ", " +
                     "pay_way = '" + msPaymentWay + "', " +
+                    "pay_tp_op = '" + mnPaymentOperationType + "', " +
                     "priority = " + mnPriority + ", " +
                     "nts = '" + msNotes + "', " +
                     "nts_auth = '" + msNotesAuthorization + "', " +

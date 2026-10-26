@@ -35,6 +35,7 @@ import erp.mod.hrs.db.SRowPayrollEmployee;
 import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.link.pub.SShareData;
 import erp.mod.hrs.link.utils.SPrepayroll;
+import erp.mod.hrs.link.utils.SPrepayrollError;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
 import erp.mod.hrs.utils.SEarnConfiguration;
 import erp.mod.hrs.utils.SPayrollBonusUtils;
@@ -89,7 +90,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Claudio Peña, Edwin Carmona, Sergio Flores, César Orozco
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -2267,6 +2268,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
             
             SGuiUtils.setCursorDefault(miClient);
+            
+            if (ppayroll.getProcessing_errors() != null && !ppayroll.getProcessing_errors().isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("La prenómina se cargó.\n\n");
+                sb.append("Los siguientes empleados presentaron errores durante el procesamiento:\n\n");
+
+                ppayroll.getProcessing_errors().forEach((error) -> {
+                    sb.append("• ")
+                    .append(error.getEmployee_name());
+                });
+
+                miClient.showMsgBoxInformation(sb.toString());
+            }
 
             // Vista previa de la importación
             SDialogTimeClockImport dialog = new SDialogTimeClockImport(miClient, "Importación de prenómina desde reloj checador");
@@ -2590,12 +2604,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         miClient.showMsgBoxError("No existe configuración para día de corte");
                         return;
                     }
-
-                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
-                    DateTime dateTime = new DateTime(moDateDateEnd.getValue());
-                    Date endDatePrevious = dateTime.plusDays(-7).toDate();
-                    Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
-                    dates[0] = dates1[0];
+                    if (SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 1) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                        DateTime dateTime = new DateTime(moDateDateEnd.getValue());
+                    }
+                    else if(SModSysConsts.HRSS_WEEKLY_BONUS_WEEKS == 2) {
+                        dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
+                        DateTime dateTime = new DateTime(moDateDateEnd.getValue());
+                        Date endDatePrevious = dateTime.plusDays(-7).toDate();
+                        Date[] dates1 = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, endDatePrevious, weekLag);
+                        dates[0] = dates1[0];
+                    }
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());

@@ -10,7 +10,7 @@ import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Isabel Servin
+ * @author Isabel Servín
  */
 public class SRowMaterialRequestItemSupply implements SGridRow, Serializable {
 
