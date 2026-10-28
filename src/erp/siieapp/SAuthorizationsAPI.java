@@ -275,7 +275,7 @@ public class SAuthorizationsAPI {
      * @param authornStatus estado de autorización (0 = calcular
      * automáticamente)
      */
-    private void updateDpsAuthStatus(Object pk, final int authAction, final int userId, final int authornStatus) {
+    public void updateDpsAuthStatus(Object pk, final int authAction, final int userId, final int authornStatus) {
         String sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " "
                 + "SET b_authorn = " + (authAction == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) + ", "
                 + "fid_st_dps_authorn = " + authAction + ", "

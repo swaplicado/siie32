@@ -8,14 +8,20 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.utils.SStockValuationEvidenceUtils;
 import erp.mod.trn.utils.SStockValuationVerify;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Cursor;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -83,7 +89,9 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
     private void actionVerifyValuation() {
         if (jbVerifyValuation.isEnabled()) {
             try {
-                String sErrors = SStockValuationVerify.verifyStockValuation(miClient.getSession());
+                SStockValuationVerify.VerificationResult result = SStockValuationVerify.verifyStockValuationWithEvidence(miClient.getSession());
+                saveVerificationEvidence(result);
+                String sErrors = result.getErrors();
                 if (!sErrors.isEmpty()) {
                     miClient.showMsgBoxError(sErrors);
                 }
@@ -97,6 +105,53 @@ public class SViewStockValuation extends SGridPaneView implements ActionListener
                 miClient.showMsgBoxError(ex.getMessage());
             }
         }
+    }
+
+    private void saveVerificationEvidence(SStockValuationVerify.VerificationResult result) {
+        jbVerifyValuation.setEnabled(false);
+        Cursor previousCursor = miClient.getFrame().getCursor();
+        miClient.getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        JOptionPane progressPane = new JOptionPane(
+                "Guardando la bitácora y los datos fuente de la verificación. "
+                + "La exportación puede tardar; la aplicación seguirá disponible.",
+                JOptionPane.INFORMATION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION);
+        JDialog progressDialog = progressPane.createDialog(miClient.getFrame(), "Evidencia de valuación");
+        progressDialog.setModal(false);
+        progressDialog.setVisible(true);
+
+        new SwingWorker<File[], Void>() {
+            @Override
+            protected File[] doInBackground() throws Exception {
+                return SStockValuationEvidenceUtils.save(miClient.getSession(), result);
+            }
+
+            @Override
+            protected void done() {
+                progressDialog.dispose();
+                miClient.getFrame().setCursor(previousCursor);
+                jbVerifyValuation.setEnabled(true);
+                try {
+                    File[] files = get();
+                    StringBuilder message = new StringBuilder("La evidencia de verificación se guardó en:\n");
+                    for (File file : files) {
+                        message.append(file.getAbsolutePath()).append('\n');
+                    }
+                    miClient.showMsgBoxInformation(message.toString());
+                }
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, "Se interrumpió el guardado de la evidencia de valuación.", ex);
+                    miClient.showMsgBoxError("Se interrumpió el guardado de la evidencia de valuación.");
+                }
+                catch (java.util.concurrent.ExecutionException ex) {
+                    Throwable cause = ex.getCause();
+                    Logger.getLogger(SViewStockValuation.class.getName()).log(Level.SEVERE, "No se pudo guardar la evidencia de valuación.", cause);
+                    miClient.showMsgBoxError("No se pudo guardar la evidencia de valuación:\n" + cause.getMessage());
+                }
+            }
+        }.execute();
     }
 
     private void actionShowWarnings() {

@@ -3,12 +3,12 @@ package erp.swap.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
-import erp.swap.SSwapConsts;
 import erp.mod.cfg.utils.SAuthDBUtils;
 import erp.mod.cfg.utils.SAuthorizationUtils;
 import erp.mtrn.data.SDataDps;
 import erp.siieapp.SAppLinkResponse;
 import erp.siieapp.SAuthorizationsAPI;
+import erp.swap.SSwapConsts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -126,7 +126,7 @@ public class SAuthzUtils {
             case SSwapConsts.AUTHZ_STATUS_OK:
                 // Autorización aprobada: actualizar si el estado local difiere
                 if (dpsData.getFkDpsAuthorizationStatusId() != SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN) {
-                    SAppLinkResponse oResponse =authApi.approbeResource(SAuthorizationUtils.AUTH_TYPE_DPS, pk, actorExternalId, notes, true);
+                    SAppLinkResponse oResponse = authApi.approbeResource(SAuthorizationUtils.AUTH_TYPE_DPS, pk, actorExternalId, notes, true);
                     if (oResponse.getCode() > 201) {
                         LOGGER.log(Level.WARNING, "Error al aprobar recurso en microservicio de autorizaciones: {0}", oResponse.getMessage());
                         return oResponse.getMessage();
@@ -235,6 +235,11 @@ public class SAuthzUtils {
     private static void resetAuthorizationStatus(SGuiSession session, SAuthorizationsAPI authApi, 
             Object pk) throws Exception {
         
+        SAuthorizationsAPI oApi = new SAuthorizationsAPI(session);
+        oApi.updateDpsAuthStatus(pk,
+                            SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA,
+                            session.getUser().getPkUserId(),
+                            0);
         // Verificar si el recurso tiene estado de autorización local
         if (SAuthorizationUtils.hasAuthornStatus(session, (int[]) pk)) {
             // Resetear a estado "Sin Definir" con usuario sistema (ID 0)
