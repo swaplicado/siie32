@@ -968,7 +968,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver3.ccp20.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
@@ -1320,7 +1320,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver4.ccp30.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
@@ -1679,7 +1679,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver4.ccp31.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);

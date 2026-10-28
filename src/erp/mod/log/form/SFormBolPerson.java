@@ -4,6 +4,7 @@
  */
 package erp.mod.log.form;
 
+import cfd.DCfdConsts;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -12,24 +13,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
+import sa.lib.gui.bean.SBeanFieldText;
 
 /**
  *
  * @author Isabel Servín, Sergio Flores
  */
-public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener, ActionListener {
+public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements ActionListener, ItemListener, FocusListener {
 
     private SDbBolPerson moRegistry;
     private SGuiClient moClient;
@@ -57,48 +61,48 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel21 = new javax.swing.JPanel();
-        jlCountry = new javax.swing.JLabel();
-        moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel22 = new javax.swing.JPanel();
-        jlZipCode = new javax.swing.JLabel();
-        moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
-        jbReloadZipComplements = new javax.swing.JButton();
-        jPanel23 = new javax.swing.JPanel();
-        jlLocality = new javax.swing.JLabel();
-        moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel24 = new javax.swing.JPanel();
-        jlState = new javax.swing.JLabel();
-        moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel26 = new javax.swing.JPanel();
+        jlPersonType = new javax.swing.JLabel();
+        moKeyPersonType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel25 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel26 = new javax.swing.JPanel();
-        jlPersonTp = new javax.swing.JLabel();
-        moKeyPersonTp = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel33 = new javax.swing.JPanel();
         jlDriverCarrier = new javax.swing.JLabel();
         moKeyDriverCarrier = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel21 = new javax.swing.JPanel();
+        jlCountry = new javax.swing.JLabel();
+        moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel27 = new javax.swing.JPanel();
         jlFiscalId = new javax.swing.JLabel();
         moTextFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel28 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jlFiscalFrgId = new javax.swing.JLabel();
         moTextFiscalFrgId = new sa.lib.gui.bean.SBeanFieldText();
         jPanel29 = new javax.swing.JPanel();
         jlDriverLicense = new javax.swing.JLabel();
         moTextDriverLicense = new sa.lib.gui.bean.SBeanFieldText();
+        jLabel2 = new javax.swing.JLabel();
         jlDriverLicenseExpiration_n = new javax.swing.JLabel();
         moDateDriverLicenseExpiration_n = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel30 = new javax.swing.JPanel();
         jlTelephone = new javax.swing.JLabel();
         moTextTelephone = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel28 = new javax.swing.JPanel();
+        jPanel24 = new javax.swing.JPanel();
+        jlState = new javax.swing.JLabel();
+        moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
+        moTextState = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel22 = new javax.swing.JPanel();
+        jlZipCode = new javax.swing.JLabel();
+        moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
+        jbReloadZipCodeInfo = new javax.swing.JButton();
         jPanel31 = new javax.swing.JPanel();
         jlStreet = new javax.swing.JLabel();
         moTextStreet = new sa.lib.gui.bean.SBeanFieldText();
         jPanel32 = new javax.swing.JPanel();
         jlNumberExt = new javax.swing.JLabel();
         moTextNumberExt = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel33 = new javax.swing.JPanel();
         jlNumberInt = new javax.swing.JLabel();
         moTextNumberInt = new sa.lib.gui.bean.SBeanFieldText();
         jPanel34 = new javax.swing.JPanel();
@@ -107,58 +111,25 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         jPanel35 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         moTextReference = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel23 = new javax.swing.JPanel();
+        jlLocality = new javax.swing.JLabel();
+        moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
-        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCountry.setText("País*:");
-        jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel21.add(jlCountry);
+        jlPersonType.setText("Tipo figura:*");
+        jlPersonType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlPersonType);
 
-        moKeyCountry.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel21.add(moKeyCountry);
+        moKeyPersonType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel26.add(moKeyPersonType);
 
-        jPanel2.add(jPanel21);
-
-        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlZipCode.setText("Código postal*:");
-        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel22.add(jlZipCode);
-        jPanel22.add(moTextZipCode);
-
-        jbReloadZipComplements.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
-        jbReloadZipComplements.setToolTipText("Importar localidad y estado");
-        jbReloadZipComplements.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel22.add(jbReloadZipComplements);
-
-        jPanel2.add(jPanel22);
-
-        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlLocality.setText("Localidad:");
-        jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel23.add(jlLocality);
-
-        moTextLocality.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel23.add(moTextLocality);
-
-        jPanel2.add(jPanel23);
-
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlState.setText("Estado*:");
-        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel24.add(jlState);
-
-        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel24.add(moKeyState);
-
-        jPanel2.add(jPanel24);
+        jPanel2.add(jPanel26);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -171,46 +142,49 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         jPanel2.add(jPanel25);
 
-        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPersonTp.setText("Tipo figura*:");
-        jlPersonTp.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel26.add(jlPersonTp);
-
-        moKeyPersonTp.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel26.add(moKeyPersonTp);
-
-        jlDriverCarrier.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDriverCarrier.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlDriverCarrier.setText("Transportista:");
         jlDriverCarrier.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel26.add(jlDriverCarrier);
+        jPanel33.add(jlDriverCarrier);
 
-        moKeyDriverCarrier.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel26.add(moKeyDriverCarrier);
+        moKeyDriverCarrier.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel33.add(moKeyDriverCarrier);
 
-        jPanel2.add(jPanel26);
+        jPanel2.add(jPanel33);
+
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCountry.setText("País:*");
+        jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel21.add(jlCountry);
+
+        moKeyCountry.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel21.add(moKeyCountry);
+
+        jPanel2.add(jPanel21);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFiscalId.setText("RFC*:");
+        jlFiscalId.setText("RFC:*");
         jlFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlFiscalId);
 
         moTextFiscalId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel27.add(moTextFiscalId);
 
-        jPanel2.add(jPanel27);
+        jLabel1.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel27.add(jLabel1);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFiscalFrgId.setText("ID fiscal:");
-        jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jlFiscalFrgId);
+        jlFiscalFrgId.setText("ID fiscal (extranjero):*");
+        jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel27.add(jlFiscalFrgId);
 
         moTextFiscalFrgId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(moTextFiscalFrgId);
+        jPanel27.add(moTextFiscalFrgId);
 
-        jPanel2.add(jPanel28);
+        jPanel2.add(jPanel27);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -221,7 +195,9 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moTextDriverLicense.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(moTextDriverLicense);
 
-        jlDriverLicenseExpiration_n.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel29.add(jLabel2);
+
         jlDriverLicenseExpiration_n.setText("Vencimiento licencia:");
         jlDriverLicenseExpiration_n.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel29.add(jlDriverLicenseExpiration_n);
@@ -240,6 +216,37 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         jPanel2.add(jPanel30);
 
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel2.add(jPanel28);
+
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlState.setText("Estado:*");
+        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel24.add(jlState);
+
+        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel24.add(moKeyState);
+
+        moTextState.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel24.add(moTextState);
+
+        jPanel2.add(jPanel24);
+
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlZipCode.setText("Código postal:*");
+        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlZipCode);
+        jPanel22.add(moTextZipCode);
+
+        jbReloadZipCodeInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_return.gif"))); // NOI18N
+        jbReloadZipCodeInfo.setToolTipText("Importar localidad y estado");
+        jbReloadZipCodeInfo.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel22.add(jbReloadZipCodeInfo);
+
+        jPanel2.add(jPanel22);
+
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlStreet.setText("Calle:");
@@ -253,21 +260,18 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNumberExt.setText("No. exterior");
+        jlNumberExt.setText("No. exterior:");
         jlNumberExt.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel32.add(jlNumberExt);
         jPanel32.add(moTextNumberExt);
 
+        jlNumberInt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlNumberInt.setText("No. interior:");
+        jlNumberInt.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel32.add(jlNumberInt);
+        jPanel32.add(moTextNumberInt);
+
         jPanel2.add(jPanel32);
-
-        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlNumberInt.setText("No. interior");
-        jlNumberInt.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel33.add(jlNumberInt);
-        jPanel33.add(moTextNumberInt);
-
-        jPanel2.add(jPanel33);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -291,12 +295,25 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         jPanel2.add(jPanel35);
 
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlLocality.setText("Localidad:");
+        jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel23.add(jlLocality);
+
+        moTextLocality.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel23.add(moTextLocality);
+
+        jPanel2.add(jPanel23);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
@@ -314,7 +331,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
-    private javax.swing.JButton jbReloadZipComplements;
+    private javax.swing.JButton jbReloadZipCodeInfo;
     private javax.swing.JLabel jlCountry;
     private javax.swing.JLabel jlDriverCarrier;
     private javax.swing.JLabel jlDriverLicense;
@@ -326,7 +343,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private javax.swing.JLabel jlNeighborhood;
     private javax.swing.JLabel jlNumberExt;
     private javax.swing.JLabel jlNumberInt;
-    private javax.swing.JLabel jlPersonTp;
+    private javax.swing.JLabel jlPersonType;
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlState;
     private javax.swing.JLabel jlStreet;
@@ -335,7 +352,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private sa.lib.gui.bean.SBeanFieldDate moDateDriverLicenseExpiration_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCountry;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDriverCarrier;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyPersonTp;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPersonType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyState;
     private sa.lib.gui.bean.SBeanFieldText moTextDriverLicense;
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalFrgId;
@@ -346,6 +363,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private sa.lib.gui.bean.SBeanFieldText moTextNumberExt;
     private sa.lib.gui.bean.SBeanFieldText moTextNumberInt;
     private sa.lib.gui.bean.SBeanFieldText moTextReference;
+    private sa.lib.gui.bean.SBeanFieldText moTextState;
     private sa.lib.gui.bean.SBeanFieldText moTextStreet;
     private sa.lib.gui.bean.SBeanFieldText moTextTelephone;
     private sa.lib.gui.bean.SBeanFieldText moTextZipCode;
@@ -354,62 +372,149 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
         
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 254);
-        moKeyPersonTp.setKeySettings(miClient, SGuiUtils.getLabelName(jlPersonTp), true);
-        moTextFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId.getText()), 25, 0);
-        moTextFiscalFrgId.setTextSettings(SGuiUtils.getLabelName(jlFiscalFrgId.getText()), 25, 0);
-        moTextDriverLicense.setTextSettings(SGuiUtils.getLabelName(jlDriverLicense.getText()), 16, 0);
-        moDateDriverLicenseExpiration_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDriverLicenseExpiration_n), false);
-        moTextTelephone.setTextSettings(SGuiUtils.getLabelName(jlTelephone.getText()), 20, 0);
-        moTextStreet.setTextSettings(SGuiUtils.getLabelName(jlNumberExt.getText()), 100, 0);
-        moTextNumberExt.setTextSettings(SGuiUtils.getLabelName(jlNumberExt.getText()), 25, 0);
-        moTextNumberInt.setTextSettings(SGuiUtils.getLabelName(jlNumberInt.getText()), 25, 0);
-        moTextNeighborhood.setTextSettings(SGuiUtils.getLabelName(jlNeighborhood.getText()), 100, 0);
-        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference.getText()), 50, 0);
-        moTextLocality.setTextSettings(SGuiUtils.getLabelName(jlLocality.getText()), 50, 0);
-        moKeyState.setKeySettings(miClient, SGuiUtils.getLabelName(jlState), true);
+        moKeyPersonType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPersonType), true);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 254);
+        moKeyDriverCarrier.setKeySettings(miClient, SGuiUtils.getLabelName(jlDriverCarrier), false);
         moKeyCountry.setKeySettings(miClient, SGuiUtils.getLabelName(jlCountry), true);
-        moTextZipCode.setTextSettings(SGuiUtils.getLabelName(jlZipCode.getText()), 12, 5);
+        moTextFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId), 25, DCfdConsts.RFC_GEN_NAC.length());
+        moTextFiscalFrgId.setTextSettings(SGuiUtils.getLabelName(jlFiscalFrgId), 25);
+        moTextDriverLicense.setTextSettings(SGuiUtils.getLabelName(jlDriverLicense), 16, 0);
+        moDateDriverLicenseExpiration_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDriverLicenseExpiration_n), false);
+        moTextTelephone.setTextSettings(SGuiUtils.getLabelName(jlTelephone), 20, 0);
+        moKeyState.setKeySettings(miClient, SGuiUtils.getLabelName(jlState), true);
+        moTextState.setTextSettings(SGuiUtils.getLabelName(jlState), 50);
+        moTextZipCode.setTextSettings(SGuiUtils.getLabelName(jlZipCode), 12, 5);
+        moTextStreet.setTextSettings(SGuiUtils.getLabelName(jlNumberExt), 100, 0);
+        moTextNumberExt.setTextSettings(SGuiUtils.getLabelName(jlNumberExt), 25, 0);
+        moTextNumberInt.setTextSettings(SGuiUtils.getLabelName(jlNumberInt), 25, 0);
+        moTextNeighborhood.setTextSettings(SGuiUtils.getLabelName(jlNeighborhood), 100, 0);
+        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference), 50, 0);
+        moTextLocality.setTextSettings(SGuiUtils.getLabelName(jlLocality), 50, 0);
         
+        moFields.addField(moKeyPersonType);
         moFields.addField(moTextName);
-        moFields.addField(moKeyPersonTp);
+        moFields.addField(moKeyDriverCarrier);
+        moFields.addField(moKeyCountry);
         moFields.addField(moTextFiscalId);
         moFields.addField(moTextFiscalFrgId);
         moFields.addField(moTextDriverLicense);
         moFields.addField(moDateDriverLicenseExpiration_n);
         moFields.addField(moTextTelephone);
+        moFields.addField(moKeyState);
+        moFields.addField(moTextState);
+        moFields.addField(moTextZipCode);
         moFields.addField(moTextStreet);
         moFields.addField(moTextNumberExt);
         moFields.addField(moTextNumberInt);
         moFields.addField(moTextNeighborhood);
         moFields.addField(moTextReference);
         moFields.addField(moTextLocality);
-        moFields.addField(moKeyState);
-        moFields.addField(moKeyCountry);
-        moFields.addField(moTextZipCode);
         
         moFields.setFormButton(jbSave);
-        
-        jbReloadZipComplements.addActionListener(this);
-        jbReloadZipComplements.setEnabled(true);
+    }
+    
+    public void actionPerformedReloadZipCodeInfo(boolean forceUpdate) {
+        if (moKeyCountry.getSelectedIndex() > 0 && miClient.getSession().getSessionCustom().isLocalCountry(moKeyCountry.getValue())) {
+            try {
+                String sql = "SELECT "
+                        + "sta.id_sta, loc.description "
+                        + "FROM "
+                        + "erp.locs_bol_zip_code AS zip "
+                        + "INNER JOIN erp.locu_sta AS sta ON zip.id_sta_code = sta.sta_code "
+                        + "LEFT OUTER JOIN erp.locs_bol_locality AS loc ON zip.locality_code = loc.id_locality_code AND zip.id_sta_code = loc.id_sta_code "
+                        + "WHERE "
+                        + "zip.id_zip_code = '" + moTextZipCode.getValue() + "' "
+                        + "AND NOT zip.b_del AND NOT loc.b_del;";
+                
+                try (ResultSet resultSet = moClient.getSession().getStatement().executeQuery(sql)) {
+                    if (resultSet.next()) {
+                        if (forceUpdate) {
+                            moKeyState.setValue(new int [] { resultSet.getInt("sta.id_sta") });
+                            moTextLocality.setValue(resultSet.getString("loc.description"));
+                        } 
+                        else {
+                           if (moKeyState.getSelectedIndex() <= 0) {
+                               moKeyState.setValue(new int [] { resultSet.getInt("sta.id_sta") });
+                           }
+                           if (moTextLocality.getValue().isEmpty()) {
+                               moTextLocality.setValue(resultSet.getString("loc.description"));
+                           }
+                        }
+                    }
+                    else if (forceUpdate) {
+                        moClient.showMsgBoxWarning("¡El código postal '" + moTextZipCode.getValue() + "' no existe!");
+                    }
+                }
+            }
+            catch (SQLException ex) {
+                SLibUtils.showException(this, ex);
+            }
+        }
+    }
+
+    private void itemStateChangedPersonType() {
+        if (moKeyPersonType.getSelectedIndex() <= 0) {
+            moKeyDriverCarrier.setEnabled(false);
+        }
+        else {
+            moKeyDriverCarrier.setEnabled(true);
+        }
+    }
+    
+    private void itemStateChangedCountry() {
+        if (moKeyCountry.getSelectedIndex() <= 0) {
+            moKeyState.setEnabled(false);
+            moKeyState.removeAllItems();
+            
+            moTextState.resetField();
+            moTextState.setEnabled(false);
+            
+            moTextFiscalId.setEnabled(false);
+            moTextFiscalFrgId.setEnabled(false);
+            jbReloadZipCodeInfo.setEnabled(false);
+        }
+        else {
+            miClient.getSession().populateCatalogue(moKeyState, SModConsts.LOCU_STA, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moKeyCountry.getValue()[0] }));
+            
+            if (moKeyState.getItemCount() > 1) {
+                // states available:
+                moKeyState.setEnabled(true);
+                moTextState.setEnabled(false);
+            }
+            else {
+                // states not available:
+                moKeyState.setEnabled(false);
+                moTextState.setEnabled(true);
+            }
+            
+            boolean isLocalCountry = miClient.getSession().getSessionCustom().isLocalCountry(moKeyCountry.getValue());
+            moTextFiscalId.setEnabled(isLocalCountry);
+            moTextFiscalFrgId.setEnabled(!isLocalCountry);
+            jbReloadZipCodeInfo.setEnabled(isLocalCountry);
+        }
     }
 
     @Override
     public void addAllListeners() {
+        jbReloadZipCodeInfo.addActionListener(this);
+        moKeyPersonType.addItemListener(this);
+        moKeyCountry.addItemListener(this);
         moTextZipCode.addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        jbReloadZipCodeInfo.removeActionListener(this);
+        moKeyPersonType.removeItemListener(this);
+        moKeyCountry.removeItemListener(this);
         moTextZipCode.removeFocusListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, 0, null);
-        miClient.getSession().populateCatalogue(moKeyState, SModConsts.LOCU_STA, 0, null);
-        miClient.getSession().populateCatalogue(moKeyPersonTp, SModConsts.LOGS_TP_BOL_PERSON, 0, null);
+        miClient.getSession().populateCatalogue(moKeyPersonType, SModConsts.LOGS_TP_BOL_PERSON, 0, null);
         miClient.getSession().populateCatalogue(moKeyDriverCarrier, SModConsts.BPSX_BP_ATT_CARR, 0, null);
+        miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, 0, null);
     }
 
     @Override
@@ -421,34 +526,37 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
         removeAllListeners();
         reloadCatalogues();
+        setFormEditable(true);
         
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
+            moRegistry.setFkCountryId_n(miClient.getSession().getSessionCustom().getLocalCountryKey()[0]);
             jtfRegistryKey.setText("");
-            moKeyCountry.setValue(new int [] { 251 }); // México
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-            moKeyCountry.setValue(new int [] { moRegistry.getFkCountryId_n() });
         }
         
+        moKeyPersonType.setValue(new int[] { moRegistry.getFkBolPersonTypeId() });
+        itemStateChangedPersonType();
         moTextName.setValue(moRegistry.getName());
-        moKeyPersonTp.setValue(new int[] { moRegistry.getFkBolPersonTypeId() });
+        moKeyDriverCarrier.setValue(new int[] { moRegistry.getXtaFkDriverCarrierId() });
+        moKeyCountry.setValue(new int [] { moRegistry.getFkCountryId_n() });
+        itemStateChangedCountry();
         moTextFiscalId.setValue(moRegistry.getFiscalId());
         moTextFiscalFrgId.setValue(moRegistry.getFiscalForeginId());
         moTextDriverLicense.setValue(moRegistry.getDriverLicense());
         moDateDriverLicenseExpiration_n.setValue(moRegistry.getDriverLicenseExpiration_n());
         moTextTelephone.setValue(moRegistry.getTelephone());
+        moKeyState.setValue(new int [] { moRegistry.getFkStateId_n() });
+        moTextState.setValue(moRegistry.getState());
+        moTextZipCode.setValue(moRegistry.getZipCode());
         moTextStreet.setValue(moRegistry.getStreet());
         moTextNumberExt.setValue(moRegistry.getStreetNumberExt());
         moTextNumberInt.setValue(moRegistry.getStreetNumberInt());
         moTextNeighborhood.setValue(moRegistry.getNeighborhood());
         moTextReference.setValue(moRegistry.getReference());
         moTextLocality.setValue(moRegistry.getLocality());
-        moKeyState.setValue(new int [] { moRegistry.getFkStateId_n() });
-        moTextZipCode.setValue(moRegistry.getZipCode());
-        
-        setFormEditable(true);
         
         if (moRegistry.isRegistryNew()) { }
         
@@ -458,12 +566,13 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbBolPerson registry = moRegistry.clone();
+        boolean isLocalCountry = miClient.getSession().getSessionCustom().isLocalCountry(moKeyCountry.getValue());
         
         if (registry.isRegistryNew()) {}
         
         registry.setName(moTextName.getValue());
-        registry.setFiscalId(moTextFiscalId.getValue());
-        registry.setFiscalForeginId(moTextFiscalFrgId.getValue());
+        registry.setFiscalId(isLocalCountry ? moTextFiscalId.getValue() : DCfdConsts.RFC_GEN_INT);
+        registry.setFiscalForeginId(!isLocalCountry ? moTextFiscalFrgId.getValue() : "");
         registry.setDriverLicense(moTextDriverLicense.getValue());
         registry.setDriverLicenseExpiration_n(moDateDriverLicenseExpiration_n.getValue());
         registry.setTelephone(moTextTelephone.getValue());
@@ -473,11 +582,13 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         registry.setNeighborhood(moTextNeighborhood.getValue());
         registry.setReference(moTextReference.getValue());
         registry.setLocality(moTextLocality.getValue());
-        registry.setState(moKeyState.getSelectedItem().getItem());
+        registry.setState(moTextState.isEnabled() ? moTextState.getValue() : "");
         registry.setZipCode(moTextZipCode.getValue());
-        registry.setFkBolPersonTypeId(moKeyPersonTp.getValue()[0]);
+        registry.setFkBolPersonTypeId(moKeyPersonType.getValue()[0]);
         registry.setFkCountryId_n(moKeyCountry.getValue()[0]);
-        registry.setFkStateId_n(moKeyState.getValue()[0]);
+        registry.setFkStateId_n(moKeyState.getSelectedIndex() <= 0 ? 0 : moKeyState.getValue()[0]);
+        
+        registry.setXtaFkDriverCarrierId(moKeyDriverCarrier.getSelectedIndex() <= 0 ? 0 : moKeyDriverCarrier.getValue()[0]);
         
         return registry;
     }
@@ -486,11 +597,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
         
-        if (moTextFiscalId.getValue().isEmpty() && moTextFiscalFrgId.getValue().isEmpty()) {
-            validation.setMessage("La figura debe tener un RFC ya sea nacional o extranjero."); 
-            validation.setComponent(moTextFiscalId);
-        }
-        else if (moKeyPersonTp.getValue()[0] == SModSysConsts.LOGS_TP_BOL_PERSON_DRI && moTextDriverLicense.getValue().isEmpty()) {
+        if (moKeyPersonType.getValue()[0] == SModSysConsts.LOGS_TP_BOL_PERSON_DRI && moTextDriverLicense.getValue().isEmpty()) {
             validation.setMessage("Los choferes deben tener un número de licencia.");
             validation.setComponent(moTextDriverLicense);
         }
@@ -503,43 +610,28 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         return validation;
     }
     
-    private boolean isCountryMex() {
-        boolean isMex = false;
-        if (moKeyCountry.getSelectedItem().getItem().equals("México")) {
-            isMex = true;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbReloadZipCodeInfo) {
+                actionPerformedReloadZipCodeInfo(true);           
+            }
         }
-        return isMex;
     }
 
-    public void getZipCodeComplements(boolean canFill) {
-        try {
-            String sql = "SELECT zip.id_sta_code, zip.locality_code, sta.id_sta, loc.description " +
-                    "FROM erp.locs_bol_zip_code AS zip  " +
-                    "INNER JOIN erp.locu_sta AS sta ON zip.id_sta_code = sta.sta_code " +
-                    "LEFT OUTER JOIN erp.locs_bol_locality AS loc ON zip.locality_code = loc.id_locality_code AND zip.id_sta_code = loc.id_sta_code " +
-                    "WHERE zip.id_zip_code = " + '"' + moTextZipCode.getValue() + '"' +
-                    "AND NOT zip.b_del AND NOT loc.b_del";
-            ResultSet resultSet = moClient.getSession().getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                if (canFill) {
-                    moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
-                    moTextLocality.setValue(resultSet.getString("description"));
-                } 
-                else {
-                   if (moTextLocality.getValue().isEmpty()) {
-                       moTextLocality.setValue(resultSet.getString("description"));
-                   }
-                   if (moKeyState.getValue().length == 0) {
-                       moKeyState.setValue(new int [] { resultSet.getInt("id_sta") });
-                   }
-                }
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyPersonType) {
+                itemStateChangedPersonType();
             }
-            else {
-                moClient.showMsgBoxWarning("Código postal no encontrado en el sistema");
+            else if (field == moKeyCountry) {
+                itemStateChangedCountry();
             }
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(SFormBolPerson.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -550,20 +642,11 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
     @Override
     public void focusLost(FocusEvent e) {
-        if (isCountryMex()) {
-            getZipCodeComplements(false);           
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof javax.swing.JButton) {
-            JButton button = (JButton) e.getSource();
+        if (e.getSource() instanceof SBeanFieldText) {
+            SBeanFieldText field = (SBeanFieldText) e.getSource();
             
-            if (button == jbReloadZipComplements) {
-                if (isCountryMex()) {
-                    getZipCodeComplements(true);           
-                }
+            if (field == moTextZipCode) {
+                actionPerformedReloadZipCodeInfo(false);           
             }
         }
     }

@@ -62,7 +62,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moTextPlate = new sa.lib.gui.bean.SBeanFieldText();
         jPanel25 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
-        moTextYear = new sa.lib.gui.bean.SBeanFieldText();
+        moYearYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
         jPanel26 = new javax.swing.JPanel();
         jlWei = new javax.swing.JLabel();
         moDecGrossWeight = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -82,14 +82,17 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         jPanel31 = new javax.swing.JPanel();
         jlInsurancePolicy = new javax.swing.JLabel();
         moTextInsurancePolicy = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel32 = new javax.swing.JPanel();
         jlInsurancePolicyExpiration = new javax.swing.JLabel();
         moDateInsurancePolicyExpiration_n = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel3 = new javax.swing.JPanel();
+        jlVehicleCarrier = new javax.swing.JLabel();
+        moKeyVehicleCarrier = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel32 = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -97,7 +100,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         jlVehicleType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jlVehicleType);
 
-        moKeyVehicleType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyVehicleType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel21.add(moKeyVehicleType);
 
         jPanel2.add(jPanel21);
@@ -117,14 +120,14 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel23.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel23.add(moTextName);
 
         jPanel2.add(jPanel23);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPlate.setText("Placa:*");
+        jlPlate.setText("Placas:*");
         jlPlate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlPlate);
         jPanel24.add(moTextPlate);
@@ -133,10 +136,10 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlYear.setText("Año:*");
+        jlYear.setText("Año (modelo):*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlYear);
-        jPanel25.add(moTextYear);
+        jPanel25.add(moYearYear);
 
         jPanel2.add(jPanel25);
 
@@ -177,7 +180,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNumberPermisson.setText("Número permiso:");
+        jlNumberPermisson.setText("No. permiso SCT:");
         jlNumberPermisson.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlNumberPermisson);
 
@@ -206,15 +209,27 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moTextInsurancePolicy.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel31.add(moTextInsurancePolicy);
 
+        jlInsurancePolicyExpiration.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlInsurancePolicyExpiration.setText("Vencimiento póliza:");
+        jlInsurancePolicyExpiration.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel31.add(jlInsurancePolicyExpiration);
+        jPanel31.add(moDateInsurancePolicyExpiration_n);
+
         jPanel2.add(jPanel31);
 
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlVehicleCarrier.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jlVehicleCarrier.setText("Transportista:");
+        jlVehicleCarrier.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlVehicleCarrier);
+
+        moKeyVehicleCarrier.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel3.add(moKeyVehicleCarrier);
+
+        jPanel2.add(jPanel3);
+
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlInsurancePolicyExpiration.setText("Vencimiento póliza:");
-        jlInsurancePolicyExpiration.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel32.add(jlInsurancePolicyExpiration);
-        jPanel32.add(moDateInsurancePolicyExpiration_n);
-
         jPanel2.add(jPanel32);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
@@ -234,6 +249,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
@@ -245,6 +261,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
     private javax.swing.JLabel jlNumberPermisson;
     private javax.swing.JLabel jlPermissonType;
     private javax.swing.JLabel jlPlate;
+    private javax.swing.JLabel jlVehicleCarrier;
     private javax.swing.JLabel jlVehicleConfiguration;
     private javax.swing.JLabel jlVehicleType;
     private javax.swing.JLabel jlWei;
@@ -254,6 +271,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
     private sa.lib.gui.bean.SBeanFieldDecimal moDecGrossWeight;
     private sa.lib.gui.bean.SBeanFieldKey moKeyInsurer;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPermissonSctType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyVehicleCarrier;
     private sa.lib.gui.bean.SBeanFieldKey moKeyVehicleConfiguration;
     private sa.lib.gui.bean.SBeanFieldKey moKeyVehicleType;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
@@ -261,7 +279,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     private sa.lib.gui.bean.SBeanFieldText moTextPermissonSctNumber;
     private sa.lib.gui.bean.SBeanFieldText moTextPlate;
-    private sa.lib.gui.bean.SBeanFieldText moTextYear;
+    private sa.lib.gui.bean.SBeanFieldCalendarYear moYearYear;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -271,20 +289,21 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
         moTextPlate.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextYear.setTextSettings(SGuiUtils.getLabelName(jlYear.getText()), 4, 4);
-        moDecGrossWeight.setDecimalSettings(SGuiUtils.getLabelName(jlWei), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moYearYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear));
+        moDecGrossWeight.setDecimalSettings(SGuiUtils.getLabelName(jlWei), SGuiConsts.GUI_TYPE_DEC_QTY, false);
         moKeyVehicleConfiguration.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehicleConfiguration.getText()), false);
         moKeyPermissonSctType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPermissonType.getText()), false);
         moTextPermissonSctNumber.setTextSettings(SGuiUtils.getLabelName(jlNumberPermisson.getText()), 50, 0);
         moKeyInsurer.setKeySettings(miClient, SGuiUtils.getLabelName(jlInsurer.getText()), false);
         moTextInsurancePolicy.setTextSettings(SGuiUtils.getLabelName(jlInsurancePolicy.getText()), 30, 0);
         moDateInsurancePolicyExpiration_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlInsurancePolicyExpiration), false);
+        moKeyVehicleCarrier.setKeySettings(miClient, SGuiUtils.getLabelName(jlVehicleCarrier), false);
 
         moFields.addField(moKeyVehicleType);
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
         moFields.addField(moTextPlate);
-        moFields.addField(moTextYear);
+        moFields.addField(moYearYear);
         moFields.addField(moDecGrossWeight);
         moFields.addField(moKeyVehicleConfiguration);
         moFields.addField(moKeyPermissonSctType);
@@ -292,6 +311,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moFields.addField(moKeyInsurer);
         moFields.addField(moTextInsurancePolicy);
         moFields.addField(moDateInsurancePolicyExpiration_n);
+        moFields.addField(moKeyVehicleCarrier);
         
         moFields.setFormButton(jbSave);
     }
@@ -315,6 +335,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         catalogs.populateComboBox(moKeyVehicleConfiguration, SDataConstantsSys.TRNS_CFD_CAT_BOL_MOTOR_CFG, miClient.getSession().getSystemDate());
         
         miClient.getSession().populateCatalogue(moKeyInsurer, SModConsts.LOG_INSURER, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyVehicleCarrier, SModConsts.BPSX_BP_ATT_CARR, 0, null);
     }
 
     @Override
@@ -326,21 +347,21 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
 
         removeAllListeners();
         reloadCatalogues();
+        setFormEditable(true);
         
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
-            moTextYear.setText(miClient.getSession().getCurrentYear() + "");
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
-            moTextYear.setValue(moRegistry.getVehicleYear() + "");
         }
         
         moKeyVehicleType.setValue(new int[] { moRegistry.getFkVehicleTypeId() });
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
         moTextPlate.setValue(moRegistry.getPlate());
+        moYearYear.setValue(moRegistry.getVehicleYear());
         SGuiUtils.locateItemByCode(moKeyVehicleConfiguration, moRegistry.getVehicleConfiguration());
         moDecGrossWeight.setValue(moRegistry.getGrossWeight());
         SGuiUtils.locateItemByCode(moKeyPermissonSctType, moRegistry.getPermissonSctType());
@@ -348,8 +369,7 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moKeyInsurer.setValue(new int [] { moRegistry.getFkInsurerId_n() });
         moTextInsurancePolicy.setValue(moRegistry.getInsurancePolicy());
         moDateInsurancePolicyExpiration_n.setValue(moRegistry.getInsurancePolicyExpiration_n());
-        
-        setFormEditable(true);
+        moKeyVehicleCarrier.setValue(new int[] { moRegistry.getXtaFkVehicleCarrierId() });
         
         if (moRegistry.isRegistryNew()) { }
         
@@ -366,14 +386,16 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
         moRegistry.setCode(moTextCode.getValue());
         moRegistry.setName(moTextName.getValue());
         moRegistry.setPlate(moTextPlate.getValue());
-        moRegistry.setVehicleYear(Integer.parseInt(moTextYear.getValue()));
+        moRegistry.setVehicleYear(moYearYear.getValue());
         moRegistry.setVehicleConfiguration(moKeyVehicleConfiguration.getSelectedItem().getCode());
         moRegistry.setGrossWeight(moDecGrossWeight.getValue());
         moRegistry.setPermissonSctType(moKeyPermissonSctType.getSelectedItem().getCode());
         moRegistry.setPermissonSctNumber(moTextPermissonSctNumber.getValue());
         moRegistry.setInsurancePolicy(moTextInsurancePolicy.getValue());
         moRegistry.setInsurancePolicyExpiration_n(moDateInsurancePolicyExpiration_n.getValue());
-        moRegistry.setFkInsurerId_n(moKeyInsurer.getValue().length == 0 ? 0 : moKeyInsurer.getValue()[0]);
+        moRegistry.setFkInsurerId_n(moKeyInsurer.getSelectedIndex() <= 0 ? 0 : moKeyInsurer.getValue()[0]);
+        
+        moRegistry.setXtaFkVehicleCarrierId(moKeyVehicleCarrier.getSelectedIndex() <= 0 ? 0 : moKeyVehicleCarrier.getValue()[0]);
         
         return registry;
     }
@@ -390,14 +412,6 @@ public class SFormVehicle extends sa.lib.gui.bean.SBeanForm {
             }
             
             if (validation.isValid()) {
-                try {
-                    Integer.parseInt(moTextYear.getValue());
-                }
-                catch (Exception e) {
-                    validation.setMessage("El valor del campo '" + moTextYear.getFieldName() + "' debe ser expresado como número.");
-                    validation.setComponent(moTextYear);
-                }
-                
                 if (validation.isValid()) {
                     if (moDateInsurancePolicyExpiration_n.getValue() != null && (moTextInsurancePolicy.getValue().isEmpty() || moKeyInsurer.getSelectedIndex() <= 0)) {
                         validation.setMessage("Si se especifica un valor para el campo '" + moDateInsurancePolicyExpiration_n.getFieldName() + "',\n"

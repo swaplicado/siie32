@@ -84,9 +84,9 @@ public class SViewVehicle extends SGridPaneView {
                 + "v.insurance_policy, "
                 + "v.insurance_exp_dt_n, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-                + "tp.code AS f_tp_code, "
-                + "ins.name AS insurer, "
-                + "v.fk_tp_veh, "
+                + "vt.name AS _type, "
+                + "ins.name AS _insurer, "
+                + "car.bp AS _carrier, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
                 + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -94,10 +94,12 @@ public class SViewVehicle extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_VEH) + " AS v "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tp ON v.fk_tp_veh = tp.id_tp_veh "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS vt ON vt.id_tp_veh = v.fk_tp_veh "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_INSURER) + " AS ins ON v.fk_insurer_n = ins.id_insurer "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_VEH_BP_CAR) + " AS vc ON vc.id_veh = v.id_veh AND NOT vc.b_del "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON car.id_bp = vc.id_car "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
                 + "ORDER BY v.name, v.code, v.id_veh ";
     }
@@ -106,20 +108,21 @@ public class SViewVehicle extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[17];
+        SGridColumnView[] columns = new SGridColumnView[18];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE);
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_tp_code", SGridConsts.COL_TITLE_CODE + " tipo");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.plate", "Placa");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "v.veh_year", "Año modelo");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.gross_weight", "Peso bruto");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_type", SGridConsts.COL_TITLE_TYPE);
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.plate", "Placas");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "v.veh_year", "Año (modelo)");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "v.gross_weight", "Peso bruto (ton)");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.veh_conf", "Configuración vehicular");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_tp", "Tipo de permiso SCT");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_num", "Número de permiso SCT");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "insurer", "Aseguradora");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_tp", "Tipo permiso SCT");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_num", "No. permiso SCT");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "_insurer", "Aseguradora");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.insurance_policy", "No. póliza seguro");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.insurance_exp_dt_n", "Vencimiento póliza");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "_carrier", "Transportista");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS);
@@ -135,6 +138,7 @@ public class SViewVehicle extends SGridPaneView {
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);        
         moSuscriptionsSet.add(SModConsts.LOGU_TP_VEH);
+        moSuscriptionsSet.add(SModConsts.LOG_VEH_BP_CAR);
         moSuscriptionsSet.add(SModConsts.LOG_INSURER);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }

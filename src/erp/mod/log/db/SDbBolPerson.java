@@ -120,6 +120,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     public SDataCountry getDataCountry() { return moDataCountry; }
     
     public void setXtaFkDriverCarrierId(int n) { mnXtaFkDriverCarrierId = n; }
+    
     public int getXtaFkDriverCarrierId() { return mnXtaFkDriverCarrierId; }
     
     @Override
@@ -236,6 +237,15 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
             
             msDbmsBolPersonTypeCode = (String) session.readField(SModConsts.LOGS_TP_BOL_PERSON, new int[] { mnFkBolPersonTypeId }, FIELD_CODE);
 
+            // Read driver's carrier:
+
+            msSql = "SELECT id_car FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
+            try (ResultSet resultSetCarrier = session.getStatement().executeQuery(msSql)) {
+                if (resultSetCarrier.next()) {
+                    mnXtaFkDriverCarrierId = resultSetCarrier.getInt("id_car");
+                }
+            }
+
             mbRegistryNew = false;
         }
         
@@ -251,15 +261,6 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         if (mnFkCountryId_n != 0) {
             moDataCountry = new SDataCountry();
             moDataCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
-        }
-        
-        // Read driver's carrier:
-        
-        msSql = "SELECT id_car FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
-        try (ResultSet resultSetCarrier = session.getStatement().executeQuery(msSql)) {
-            if (resultSetCarrier.next()) {
-                mnXtaFkDriverCarrierId = resultSetCarrier.getInt("id_car");
-            }
         }
         
         mnQueryResultId = SDbConsts.READ_OK;
@@ -336,41 +337,46 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         
         session.getStatement().execute(msSql);
         
-        // save driver's carrier:
+        // save driver's carrier
+        // REMEMBER: There should be at most one active registry at a time!
         
-        if (mnXtaFkDriverCarrierId == 0) {
-            // delete existing driver's carrier:
-            msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " SET b_del = 1 WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
-            session.getStatement().execute(msSql);
-        }
-        else {
-            // save driver's carrier:
+        // first, delete all active registries, except the required one:
+        msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " SET "
+                + "b_del = 1, "
+                + "fk_usr_upd = " + mnFkUserUpdateId + ", "
+                + "ts_usr_upd = " + "NOW()" + " "
+                + "WHERE NOT b_del "
+                + "AND id_driver = " + mnPkBolPersonId + " "
+                + "AND id_car <> " + mnXtaFkDriverCarrierId + ";";
+        session.getStatement().execute(msSql);
         
-            int currentDriverCarrierId = 0;
+        if (mnXtaFkDriverCarrierId != 0) {
+            // try to retrieve the required registry:
             
-            msSql = "SELECT id_car FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
-            try (ResultSet resultSetCarrier = session.getStatement().executeQuery(msSql)) {
-                if (resultSetCarrier.next()) {
-                    currentDriverCarrierId = resultSetCarrier.getInt("id_car");
+            boolean found = false;
+            boolean deleted = false;
+            
+            msSql = "SELECT b_del "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " "
+                    + "WHERE id_driver = " + mnPkBolPersonId + " "
+                    + "AND id_car = " + mnXtaFkDriverCarrierId + ";";
+            
+            try (ResultSet resultSet = session.getStatement().executeQuery(msSql)) {
+                if (resultSet.next()) {
+                    found = true;
+                    deleted = resultSet.getBoolean(1);
                 }
-                
-                if (currentDriverCarrierId != 0 && currentDriverCarrierId != mnXtaFkDriverCarrierId) {
-                    // delete existing driver's carrier:
-                    msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " SET b_del = 1 WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
-                    session.getStatement().execute(msSql);
-                }
-                
-                if (currentDriverCarrierId != mnXtaFkDriverCarrierId) {
-                    msSql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " VALUES (" +
-                            mnPkBolPersonId + ", " + 
-                            mnXtaFkDriverCarrierId + ", " + 
-                            (mbDeleted ? 1 : 0) + ", " + 
-                            mnFkUserInsertId + ", " + 
-                            mnFkUserUpdateId + ", " + 
-                            "NOW()" + ", " + 
-                            "NOW()" + ", " + 
-                            ")";
-                }
+            }
+            
+            if (!found) {
+                SDbDriverCarrier registry = new SDbDriverCarrier();
+                registry.setPkDriverId(mnPkBolPersonId);
+                registry.setPkCarrierId(mnXtaFkDriverCarrierId);
+                registry.save(session);
+            }
+            else if (deleted) {
+                SDbDriverCarrier registry = (SDbDriverCarrier) session.readRegistry(SModConsts.LOG_DRIVER_BP_CAR, new int[] { mnPkBolPersonId, mnXtaFkDriverCarrierId });
+                registry.delete(session); // reactivates the deleted registry!
             }
         }
         

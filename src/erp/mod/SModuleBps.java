@@ -157,10 +157,10 @@ public class SModuleBps extends SGuiModule {
                 break;
             case SModConsts.BPSX_BP_ATT_CARR:
                 settings = new SGuiCatalogueSettings("Transportista", 1);
-                sql = "SELECT bp.id_bp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp "
-                        + "WHERE bp.b_del = 0 AND bp.b_att_car = 1  "
-                        + "ORDER BY bp.bp, bp.id_bp ";
+                sql = "SELECT id_bp AS " + SDbConsts.FIELD_ID + "1, IF(bp = bp_comm, bp, CONCAT(bp, ' ', '(', bp_comm, ')')) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " "
+                        + "WHERE b_del = 0 AND b_att_car = 1 "
+                        + "ORDER BY bp, id_bp ";
                 break;
             case SModConsts.BPSX_BP_X_SAL_AGT:
                 settings = new SGuiCatalogueSettings("Agente de ventas", 1);

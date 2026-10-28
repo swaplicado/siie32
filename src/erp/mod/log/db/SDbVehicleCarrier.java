@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Sergio Flores
+ * @author Sergio Flores
  */
 public class SDbVehicleCarrier extends SDbRegistryUser {
 

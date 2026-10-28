@@ -22,13 +22,11 @@ public class SViewBolPerson extends SGridPaneView {
 
     public SViewBolPerson(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_BOL_PERSON, 0, title);
-        setRowButtonsEnabled(true, false, true, false, true);
-        
         initComponetsCustom();
     }
 
     private void initComponetsCustom() {
-        
+        setRowButtonsEnabled(true, true, true, false, true);
     }
 
     /*
@@ -57,7 +55,7 @@ public class SViewBolPerson extends SGridPaneView {
                 + "p.id_bol_person AS " + SDbConsts.FIELD_ID + "1, " 
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "p.name AS " + SDbConsts.FIELD_NAME + ", "
-                + "tp.name AS person_tp, "
+                + "tp.name AS _person_type, "
                 + "p.fiscal_id, "
                 + "p.fiscal_frg_id, "
                 + "p.driver_lic, "
@@ -74,6 +72,7 @@ public class SViewBolPerson extends SGridPaneView {
                 + "cty.cty, "
                 + "sta.sta, "
                 + "car.bp, "
+                + "COALESCE(sta.sta, p.state) AS _state, "
                 + "p.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
                 + "p.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
                 + "p.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
@@ -88,34 +87,33 @@ public class SViewBolPerson extends SGridPaneView {
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_CTY) + " AS cty ON cty.id_cty = p.fk_cty_n "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOCU_STA) + " AS sta ON sta.id_sta = p.fk_sta_n "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " AS drvcar ON drvcar.id_driver = p.id_bol_person AND NOT drvcar.b_del "
-                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON car.id_bp = drvcar.id_driver "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON car.id_bp = drvcar.id_car "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY p.name, p.id_bol_person ";
+                + "ORDER BY _person_type, p.name, p.id_bol_person;";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[23];
+        SGridColumnView[] columns = new SGridColumnView[22];
 
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_person_type", "Tipo figura");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Nombre");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "person_tp", "Tipo figura");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.fiscal_id", "RFC");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.fiscal_frg_id", "ID fiscal");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.driver_lic", "Licencia chofer");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.driver_lic_exp_dt_n", "Vencimiento licencia");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "car.bp", "Transportista");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.telephone", "Teléfono");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "car.bp", "Transportista");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "p.street", "Calle");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.street_num_ext", "No. exterior");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.street_num_int", "No. interior");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "p.neighborhood", "Colonia");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "p.reference", "Referencia");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "p.locality", "Localidad");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "p.state", "Estado");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "p.zip_code", "Código postal");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "sta.sta", "Estado");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_state", "Estado");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "cty.cty", "País");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
@@ -130,9 +128,7 @@ public class SViewBolPerson extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(SModConsts.LOG_BOL_PERSON);
-        moSuscriptionsSet.add(SModConsts.LOGS_TP_BOL_PERSON);
+        moSuscriptionsSet.add(SModConsts.LOG_DRIVER_BP_CAR);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
-
 }

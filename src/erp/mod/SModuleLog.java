@@ -52,6 +52,7 @@ import erp.mod.log.form.SFormVehicle;
 import erp.mod.log.form.SFormVehicleType;
 import erp.mod.log.view.SViewBillOfLading;
 import erp.mod.log.view.SViewBolPerson;
+import erp.mod.log.view.SViewDriverCarrier;
 import erp.mod.log.view.SViewFreightClass;
 import erp.mod.log.view.SViewFreightTariff;
 import erp.mod.log.view.SViewInsurer;
@@ -71,6 +72,7 @@ import erp.mod.log.view.SViewSpotCompanyBranchEntity;
 import erp.mod.log.view.SViewTankCar;
 import erp.mod.log.view.SViewTrailer;
 import erp.mod.log.view.SViewVehicle;
+import erp.mod.log.view.SViewVehicleCarrier;
 import erp.mod.log.view.SViewVehicleType;
 import erp.mtrn.data.SCfdUtils;
 import java.sql.ResultSet;
@@ -537,6 +539,9 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_VEH:
                 view = new SViewVehicle(miClient, "Vehículos");
                 break;
+            case SModConsts.LOG_VEH_BP_CAR:
+                view = new SViewVehicleCarrier(miClient, "Vehículos vs. transportistas");
+                break;
             case SModConsts.LOG_TRAILER:
                 view = new SViewTrailer(miClient, "Remolques");
                 break;
@@ -545,6 +550,9 @@ public class SModuleLog extends SGuiModule {
                 break;
             case SModConsts.LOG_BOL_PERSON:
                 view = new SViewBolPerson(miClient, "Figuras transporte");
+                break;
+            case SModConsts.LOG_DRIVER_BP_CAR:
+                view = new SViewDriverCarrier(miClient, "Choferes vs. transportistas");
                 break;
             case SModConsts.LOG_RATE:
                 view = new SViewRate(miClient, "Tarifas");
@@ -749,6 +757,7 @@ public class SModuleLog extends SGuiModule {
                 form = moFormInsurer;
                 break;
             case SModConsts.LOG_VEH:
+            case SModConsts.LOG_VEH_BP_CAR:
                 if (moFormVehicle == null) moFormVehicle = new SFormVehicle(miClient, "Vehículo");
                 form = moFormVehicle;
                 break;
@@ -761,6 +770,7 @@ public class SModuleLog extends SGuiModule {
                 form = moFormTankCar;
                 break;
             case SModConsts.LOG_BOL_PERSON:
+            case SModConsts.LOG_DRIVER_BP_CAR:
                 if (moFormBolPerson == null) moFormBolPerson = new SFormBolPerson(miClient, "Figura de transporte");
                 form = moFormBolPerson;
                 break;
