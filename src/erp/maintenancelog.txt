@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 311.0/ 2026-10-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de versión 2 de tarifas de fletes del módulo Logística.
+2) Estandarización general de clases existentes del módulo Logística.
+
+================================================================================
 SIIE 3.2 309.5/ 2026-10-27
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -8,13 +15,13 @@ Edwin Omar CARMONA FIGUEROA
 SIIE 3.2 309.4/ 2026-10-22
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
-1) Guardado de bitácora de verificación de valuación de consumos de materiales
+1) Guardado de bitácora de verificación de valuación de consumos de materiales.
 
 ================================================================================
 SIIE 3.2 309.3/ 2026-09-25
 Adrián Alejandro AVILÉS GÓMEZ
 --------------------------------------------------------------------------------
-1) Funcionalidad para contabilizar semanas de bodegas facturadas
+1) Funcionalidad para contabilizar semanas de bodegas facturadas.
 
 ================================================================================
 SIIE 3.2 309.2/ 2026-09-07
