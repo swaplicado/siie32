@@ -224,6 +224,13 @@ public class SModuleCfg extends SGuiModule {
                         "WHERE NOT b_del " + 
                         "ORDER BY cty, id_cty ";
                 break;
+            case SModConsts.LOCU_STA:
+                settings = new SGuiCatalogueSettings("Estado", 1);
+                sql = "SELECT id_sta AS " + SDbConsts.FIELD_ID + "1, sta AS " + SDbConsts.FIELD_ITEM + " " +
+                        "FROM " + SModConsts.TablesMap.get(type) + " " +
+                        "WHERE NOT b_del AND fid_cty = " + params.getKey()[0] + " " + 
+                        "ORDER BY sta, id_sta ";
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

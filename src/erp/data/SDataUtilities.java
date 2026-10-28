@@ -112,6 +112,12 @@ import erp.mitm.data.SProcUnitTypeVal;
 import erp.mitm.data.SProcUnitVal;
 import erp.mitm.data.SProcVarietyTypeVal;
 import erp.mitm.data.SProcVarietyVal;
+import erp.mloc.data.SDataBolCounty;
+import erp.mloc.data.SDataBolLocality;
+import erp.mloc.data.SDataBolNeighborhood;
+import erp.mloc.data.SDataBolZipCode;
+import erp.mloc.data.SDataCountry;
+import erp.mloc.data.SDataState;
 import erp.mloc.data.SProcCountryKeyVal;
 import erp.mloc.data.SProcCountyKeyVal;
 import erp.mloc.data.SProcLocalityKeyVal;
@@ -641,6 +647,25 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstants.CFGU_CUR:
                 registry = new SDataCurrency();
+                break;
+
+            case SDataConstants.LOCS_BOL_COUNTY:
+                registry = new SDataBolCounty();
+                break;
+            case SDataConstants.LOCS_BOL_LOCALITY:
+                registry = new SDataBolLocality();
+                break;
+            case SDataConstants.LOCS_BOL_ZIP_CODE:
+                registry = new SDataBolZipCode();
+                break;
+            case SDataConstants.LOCS_BOL_NEI_ZIP_CODE:
+                registry = new SDataBolNeighborhood();
+                break;
+            case SDataConstants.LOCU_CTY:
+                registry = new SDataCountry();
+                break;
+            case SDataConstants.LOCU_STA:
+                registry = new SDataState();
                 break;
 
             case SDataConstants.BPSU_BP:

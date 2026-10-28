@@ -5,7 +5,6 @@
 package erp.mod.log.view;
 
 import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,12 +18,12 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Néstor Ávalos, Isabel Servín
+ * @author Néstor Ávalos, Isabel Servín, Sergio Flores
  */
 public class SViewVehicle extends SGridPaneView {
 
     public SViewVehicle(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_VEH, SLibConstants.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_VEH, 0, title);
         setButtonsEnabledByPrivilege();
     }
     
@@ -83,6 +82,7 @@ public class SViewVehicle extends SGridPaneView {
                 + "v.perm_sct_tp, "
                 + "v.perm_sct_num, "
                 + "v.insurance_policy, "
+                + "v.insurance_exp_dt_n, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "tp.code AS f_tp_code, "
                 + "ins.name AS insurer, "
@@ -106,7 +106,7 @@ public class SViewVehicle extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-        SGridColumnView[] columns = new SGridColumnView[16];
+        SGridColumnView[] columns = new SGridColumnView[17];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE);
@@ -117,8 +117,9 @@ public class SViewVehicle extends SGridPaneView {
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.veh_conf", "Configuración vehicular");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_tp", "Tipo de permiso SCT");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.perm_sct_num", "Número de permiso SCT");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.insurance_policy", "Póliza de seguro");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "insurer", "Aseguradora");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "insurer", "Aseguradora");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.insurance_policy", "No. póliza seguro");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.insurance_exp_dt_n", "Vencimiento póliza");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS);

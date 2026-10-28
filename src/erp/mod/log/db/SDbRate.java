@@ -18,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Isabel Servín
+ * @author Néstor Ávalos, Isabel Servín, Sergio Flores
  */
 public class SDbRate extends SDbRegistryUser {
 
@@ -215,10 +215,6 @@ public class SDbRate extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -289,6 +285,7 @@ public class SDbRate extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

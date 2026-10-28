@@ -4,7 +4,6 @@
  */
 package erp.mod.log.view;
 
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +16,12 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewTrailer extends SGridPaneView {
 
     public SViewTrailer(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_TRAILER, 0, title);
         setRowButtonsEnabled(true, false, true, false, true);
         
         initComponetsCustom();
@@ -55,23 +54,23 @@ public class SViewTrailer extends SGridPaneView {
         }
 
         msSql = "SELECT " 
-            + "t.id_trailer AS " + SDbConsts.FIELD_ID + "1, " 
-            + "'' AS " + SDbConsts.FIELD_CODE + ", "
-            + "t.name AS " + SDbConsts.FIELD_NAME + ", "
-            + "t.plate, "
-            + "t.trailer_subtype, "
-            + "t.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
-            + "t.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
-            + "t.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
-            + "t.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", " 
-            + "t.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
-            + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-            + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_TRAILER) + " AS t " 
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON t.fk_usr_ins = ui.id_usr "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON t.fk_usr_upd = uu.id_usr "
-            + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "ORDER BY t.name ";
+                + "t.id_trailer AS " + SDbConsts.FIELD_ID + "1, " 
+                + "'' AS " + SDbConsts.FIELD_CODE + ", "
+                + "t.name AS " + SDbConsts.FIELD_NAME + ", "
+                + "t.plate, "
+                + "t.trailer_subtype, "
+                + "t.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
+                + "t.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
+                + "t.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
+                + "t.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", " 
+                + "t.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
+                + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_TRAILER) + " AS t " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON t.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON t.fk_usr_upd = uu.id_usr "
+                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + "ORDER BY t.name, t.id_trailer ";
     }
 
     @Override
@@ -80,9 +79,9 @@ public class SViewTrailer extends SGridPaneView {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = new SGridColumnView[8];
 
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Remolque");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "plate", "Placa");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_S, "trailer_subtype", "Subtipo remolque");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Remolque");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "plate", "Placa");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "trailer_subtype", "Subtipo remolque");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS);

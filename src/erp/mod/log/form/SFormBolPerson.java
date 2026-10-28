@@ -6,6 +6,7 @@ package erp.mod.log.form;
 
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.log.db.SDbBolPerson;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,9 +27,9 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
-public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener , ActionListener{
+public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusListener, ActionListener {
 
     private SDbBolPerson moRegistry;
     private SGuiClient moClient;
@@ -54,44 +55,47 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel23 = new javax.swing.JPanel();
-        jPanel38 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jlCountry = new javax.swing.JLabel();
         moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel39 = new javax.swing.JPanel();
+        jPanel22 = new javax.swing.JPanel();
         jlZipCode = new javax.swing.JLabel();
         moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
         jbReloadZipComplements = new javax.swing.JButton();
-        jPanel36 = new javax.swing.JPanel();
+        jPanel23 = new javax.swing.JPanel();
         jlLocality = new javax.swing.JLabel();
         moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel37 = new javax.swing.JPanel();
+        jPanel24 = new javax.swing.JPanel();
         jlState = new javax.swing.JLabel();
         moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel24 = new javax.swing.JPanel();
+        jPanel25 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel31 = new javax.swing.JPanel();
+        jPanel26 = new javax.swing.JPanel();
         jlPersonTp = new javax.swing.JLabel();
         moKeyPersonTp = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel25 = new javax.swing.JPanel();
+        jlDriverCarrier = new javax.swing.JLabel();
+        moKeyDriverCarrier = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel27 = new javax.swing.JPanel();
         jlFiscalId = new javax.swing.JLabel();
         moTextFiscalId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel32 = new javax.swing.JPanel();
+        jPanel28 = new javax.swing.JPanel();
         jlFiscalFrgId = new javax.swing.JLabel();
         moTextFiscalFrgId = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel27 = new javax.swing.JPanel();
-        jlDriverLic = new javax.swing.JLabel();
-        moTextDriverLic = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel26 = new javax.swing.JPanel();
+        jPanel29 = new javax.swing.JPanel();
+        jlDriverLicense = new javax.swing.JLabel();
+        moTextDriverLicense = new sa.lib.gui.bean.SBeanFieldText();
+        jlDriverLicenseExpiration_n = new javax.swing.JLabel();
+        moDateDriverLicenseExpiration_n = new sa.lib.gui.bean.SBeanFieldDate();
+        jPanel30 = new javax.swing.JPanel();
         jlTelephone = new javax.swing.JLabel();
         moTextTelephone = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel28 = new javax.swing.JPanel();
+        jPanel31 = new javax.swing.JPanel();
         jlStreet = new javax.swing.JLabel();
         moTextStreet = new sa.lib.gui.bean.SBeanFieldText();
-        jPanel30 = new javax.swing.JPanel();
+        jPanel32 = new javax.swing.JPanel();
         jlNumberExt = new javax.swing.JLabel();
         moTextNumberExt = new sa.lib.gui.bean.SBeanFieldText();
         jPanel33 = new javax.swing.JPanel();
@@ -107,132 +111,154 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel23.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
 
-        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCountry.setText("País*:");
         jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel38.add(jlCountry);
+        jPanel21.add(jlCountry);
 
         moKeyCountry.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel38.add(moKeyCountry);
+        jPanel21.add(moKeyCountry);
 
-        jPanel23.add(jPanel38);
+        jPanel2.add(jPanel21);
 
-        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlZipCode.setText("Código postal*:");
         jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel39.add(jlZipCode);
-        jPanel39.add(moTextZipCode);
+        jPanel22.add(jlZipCode);
+        jPanel22.add(moTextZipCode);
 
         jbReloadZipComplements.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
         jbReloadZipComplements.setToolTipText("Importar localidad y estado");
         jbReloadZipComplements.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel39.add(jbReloadZipComplements);
+        jPanel22.add(jbReloadZipComplements);
 
-        jPanel23.add(jPanel39);
+        jPanel2.add(jPanel22);
 
-        jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLocality.setText("Localidad:");
         jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel36.add(jlLocality);
+        jPanel23.add(jlLocality);
 
         moTextLocality.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel36.add(moTextLocality);
+        jPanel23.add(moTextLocality);
 
-        jPanel23.add(jPanel36);
-
-        jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlState.setText("Estado*:");
-        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel37.add(jlState);
-
-        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel37.add(moKeyState);
-
-        jPanel23.add(jPanel37);
+        jPanel2.add(jPanel23);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlName.setText("Nombre:*");
-        jlName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel24.add(jlName);
+        jlState.setText("Estado*:");
+        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel24.add(jlState);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel24.add(moTextName);
+        moKeyState.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel24.add(moKeyState);
 
-        jPanel23.add(jPanel24);
-
-        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPersonTp.setText("Tipo figura*:");
-        jlPersonTp.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel31.add(jlPersonTp);
-
-        moKeyPersonTp.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel31.add(moKeyPersonTp);
-
-        jPanel23.add(jPanel31);
+        jPanel2.add(jPanel24);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFiscalId.setText("RFC*:");
-        jlFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel25.add(jlFiscalId);
-        jPanel25.add(moTextFiscalId);
+        jlName.setText("Nombre:*");
+        jlName.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlName);
 
-        jPanel23.add(jPanel25);
+        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel25.add(moTextName);
 
-        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlFiscalFrgId.setText("RFC extranjero:");
-        jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel32.add(jlFiscalFrgId);
-        jPanel32.add(moTextFiscalFrgId);
-
-        jPanel23.add(jPanel32);
-
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDriverLic.setText("Licencia:");
-        jlDriverLic.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jlDriverLic);
-        jPanel27.add(moTextDriverLic);
-
-        jPanel23.add(jPanel27);
+        jPanel2.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTelephone.setText("Teléfono:");
-        jlTelephone.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel26.add(jlTelephone);
-        jPanel26.add(moTextTelephone);
+        jlPersonTp.setText("Tipo figura*:");
+        jlPersonTp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlPersonTp);
 
-        jPanel23.add(jPanel26);
+        moKeyPersonTp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel26.add(moKeyPersonTp);
+
+        jlDriverCarrier.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDriverCarrier.setText("Transportista:");
+        jlDriverCarrier.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel26.add(jlDriverCarrier);
+
+        moKeyDriverCarrier.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel26.add(moKeyDriverCarrier);
+
+        jPanel2.add(jPanel26);
+
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFiscalId.setText("RFC*:");
+        jlFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlFiscalId);
+
+        moTextFiscalId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel27.add(moTextFiscalId);
+
+        jPanel2.add(jPanel27);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlStreet.setText("Calle:");
-        jlStreet.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jlStreet);
+        jlFiscalFrgId.setText("ID fiscal:");
+        jlFiscalFrgId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel28.add(jlFiscalFrgId);
 
-        moTextStreet.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel28.add(moTextStreet);
+        moTextFiscalFrgId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel28.add(moTextFiscalFrgId);
 
-        jPanel23.add(jPanel28);
+        jPanel2.add(jPanel28);
+
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDriverLicense.setText("Licencia chofer:");
+        jlDriverLicense.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel29.add(jlDriverLicense);
+
+        moTextDriverLicense.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel29.add(moTextDriverLicense);
+
+        jlDriverLicenseExpiration_n.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlDriverLicenseExpiration_n.setText("Vencimiento licencia:");
+        jlDriverLicenseExpiration_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel29.add(jlDriverLicenseExpiration_n);
+        jPanel29.add(moDateDriverLicenseExpiration_n);
+
+        jPanel2.add(jPanel29);
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlTelephone.setText("Teléfono:");
+        jlTelephone.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel30.add(jlTelephone);
+
+        moTextTelephone.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel30.add(moTextTelephone);
+
+        jPanel2.add(jPanel30);
+
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlStreet.setText("Calle:");
+        jlStreet.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel31.add(jlStreet);
+
+        moTextStreet.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel31.add(moTextStreet);
+
+        jPanel2.add(jPanel31);
+
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jlNumberExt.setText("No. exterior");
         jlNumberExt.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel30.add(jlNumberExt);
-        jPanel30.add(moTextNumberExt);
+        jPanel32.add(jlNumberExt);
+        jPanel32.add(moTextNumberExt);
 
-        jPanel23.add(jPanel30);
+        jPanel2.add(jPanel32);
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -241,7 +267,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         jPanel33.add(jlNumberInt);
         jPanel33.add(moTextNumberInt);
 
-        jPanel23.add(jPanel33);
+        jPanel2.add(jPanel33);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -252,7 +278,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moTextNeighborhood.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel34.add(moTextNeighborhood);
 
-        jPanel23.add(jPanel34);
+        jPanel2.add(jPanel34);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -263,35 +289,36 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moTextReference.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel35.add(moTextReference);
 
-        jPanel23.add(jPanel35);
+        jPanel2.add(jPanel35);
 
-        jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
-    private javax.swing.JPanel jPanel36;
-    private javax.swing.JPanel jPanel37;
-    private javax.swing.JPanel jPanel38;
-    private javax.swing.JPanel jPanel39;
     private javax.swing.JButton jbReloadZipComplements;
     private javax.swing.JLabel jlCountry;
-    private javax.swing.JLabel jlDriverLic;
+    private javax.swing.JLabel jlDriverCarrier;
+    private javax.swing.JLabel jlDriverLicense;
+    private javax.swing.JLabel jlDriverLicenseExpiration_n;
     private javax.swing.JLabel jlFiscalFrgId;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlLocality;
@@ -305,10 +332,12 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private javax.swing.JLabel jlStreet;
     private javax.swing.JLabel jlTelephone;
     private javax.swing.JLabel jlZipCode;
+    private sa.lib.gui.bean.SBeanFieldDate moDateDriverLicenseExpiration_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCountry;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyDriverCarrier;
     private sa.lib.gui.bean.SBeanFieldKey moKeyPersonTp;
     private sa.lib.gui.bean.SBeanFieldKey moKeyState;
-    private sa.lib.gui.bean.SBeanFieldText moTextDriverLic;
+    private sa.lib.gui.bean.SBeanFieldText moTextDriverLicense;
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalFrgId;
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalId;
     private sa.lib.gui.bean.SBeanFieldText moTextLocality;
@@ -325,11 +354,12 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
         
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 254);
         moKeyPersonTp.setKeySettings(miClient, SGuiUtils.getLabelName(jlPersonTp), true);
         moTextFiscalId.setTextSettings(SGuiUtils.getLabelName(jlFiscalId.getText()), 25, 0);
         moTextFiscalFrgId.setTextSettings(SGuiUtils.getLabelName(jlFiscalFrgId.getText()), 25, 0);
-        moTextDriverLic.setTextSettings(SGuiUtils.getLabelName(jlDriverLic.getText()), 16, 0);
+        moTextDriverLicense.setTextSettings(SGuiUtils.getLabelName(jlDriverLicense.getText()), 16, 0);
+        moDateDriverLicenseExpiration_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDriverLicenseExpiration_n), false);
         moTextTelephone.setTextSettings(SGuiUtils.getLabelName(jlTelephone.getText()), 20, 0);
         moTextStreet.setTextSettings(SGuiUtils.getLabelName(jlNumberExt.getText()), 100, 0);
         moTextNumberExt.setTextSettings(SGuiUtils.getLabelName(jlNumberExt.getText()), 25, 0);
@@ -339,13 +369,14 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moTextLocality.setTextSettings(SGuiUtils.getLabelName(jlLocality.getText()), 50, 0);
         moKeyState.setKeySettings(miClient, SGuiUtils.getLabelName(jlState), true);
         moKeyCountry.setKeySettings(miClient, SGuiUtils.getLabelName(jlCountry), true);
-        moTextZipCode.setTextSettings(SGuiUtils.getLabelName(jlZipCode.getText()), 12, 1);
+        moTextZipCode.setTextSettings(SGuiUtils.getLabelName(jlZipCode.getText()), 12, 5);
         
         moFields.addField(moTextName);
         moFields.addField(moKeyPersonTp);
         moFields.addField(moTextFiscalId);
         moFields.addField(moTextFiscalFrgId);
-        moFields.addField(moTextDriverLic);
+        moFields.addField(moTextDriverLicense);
+        moFields.addField(moDateDriverLicenseExpiration_n);
         moFields.addField(moTextTelephone);
         moFields.addField(moTextStreet);
         moFields.addField(moTextNumberExt);
@@ -375,10 +406,10 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyPersonTp, SModConsts.LOGS_TP_BOL_PERSON, SLibConsts.UNDEFINED, null);        
-        miClient.getSession().populateCatalogue(moKeyState, SModConsts.LOCU_STA, SLibConsts.UNDEFINED, null);        
-        miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, SLibConsts.UNDEFINED, null);        
-        
+        miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, 0, null);
+        miClient.getSession().populateCatalogue(moKeyState, SModConsts.LOCU_STA, 0, null);
+        miClient.getSession().populateCatalogue(moKeyPersonTp, SModConsts.LOGS_TP_BOL_PERSON, 0, null);
+        miClient.getSession().populateCatalogue(moKeyDriverCarrier, SModConsts.BPSX_BP_ATT_CARR, 0, null);
     }
 
     @Override
@@ -405,7 +436,8 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         moKeyPersonTp.setValue(new int[] { moRegistry.getFkBolPersonTypeId() });
         moTextFiscalId.setValue(moRegistry.getFiscalId());
         moTextFiscalFrgId.setValue(moRegistry.getFiscalForeginId());
-        moTextDriverLic.setValue(moRegistry.getDriverLicense());
+        moTextDriverLicense.setValue(moRegistry.getDriverLicense());
+        moDateDriverLicenseExpiration_n.setValue(moRegistry.getDriverLicenseExpiration_n());
         moTextTelephone.setValue(moRegistry.getTelephone());
         moTextStreet.setValue(moRegistry.getStreet());
         moTextNumberExt.setValue(moRegistry.getStreetNumberExt());
@@ -432,7 +464,8 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         registry.setName(moTextName.getValue());
         registry.setFiscalId(moTextFiscalId.getValue());
         registry.setFiscalForeginId(moTextFiscalFrgId.getValue());
-        registry.setDriverLicense(moTextDriverLic.getValue());
+        registry.setDriverLicense(moTextDriverLicense.getValue());
+        registry.setDriverLicenseExpiration_n(moDateDriverLicenseExpiration_n.getValue());
         registry.setTelephone(moTextTelephone.getValue());
         registry.setStreet(moTextStreet.getValue());
         registry.setStreetNumberExt(moTextNumberExt.getValue());
@@ -455,9 +488,16 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
         
         if (moTextFiscalId.getValue().isEmpty() && moTextFiscalFrgId.getValue().isEmpty()) {
             validation.setMessage("La figura debe tener un RFC ya sea nacional o extranjero."); 
+            validation.setComponent(moTextFiscalId);
         }
-        if (moKeyPersonTp.getValue()[0] == 1 && moTextDriverLic.getValue().isEmpty()) {
+        else if (moKeyPersonTp.getValue()[0] == SModSysConsts.LOGS_TP_BOL_PERSON_DRI && moTextDriverLicense.getValue().isEmpty()) {
             validation.setMessage("Los choferes deben tener un número de licencia.");
+            validation.setComponent(moTextDriverLicense);
+        }
+        else if (moDateDriverLicenseExpiration_n.getValue() != null && moTextDriverLicense.getValue().isEmpty()) {
+            validation.setMessage("Si se especifica un valor para el campo '" + moDateDriverLicenseExpiration_n.getFieldName() + "',\n"
+                    + "también debe hacerwse para el campo '" + moTextDriverLicense.getFieldName() + "'.");
+            validation.setComponent(moTextDriverLicense);
         }
         
         return validation;
@@ -497,7 +537,8 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
             else {
                 moClient.showMsgBoxWarning("Código postal no encontrado en el sistema");
             }
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SFormBolPerson.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -518,6 +559,7 @@ public class SFormBolPerson extends sa.lib.gui.bean.SBeanForm implements FocusLi
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
+            
             if (button == jbReloadZipComplements) {
                 if (isCountryMex()) {
                     getZipCodeComplements(true);           

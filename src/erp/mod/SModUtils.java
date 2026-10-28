@@ -25,7 +25,7 @@ public class SModUtils implements SGuiModuleUtils {
     public int getModuleTypeByType(final int type) {
         int moduleType = SLibConsts.UNDEFINED;
 
-        if (type < SModConsts.USRS_TP_USR || type == SModConsts.LOCU_CTY) {
+        if (type < SModConsts.USRS_TP_USR || (type == SModConsts.LOCU_CTY || type == SModConsts.LOCU_STA)) {
             moduleType = SModConsts.MOD_CFG_N;
         }
         else if (type < SModConsts.LOCS_BOL_NEI_ZIP_CODE) {

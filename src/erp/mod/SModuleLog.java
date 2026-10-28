@@ -9,25 +9,38 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
 import erp.mod.log.db.SDbBillOfLading;
+import erp.mod.log.db.SDbBizPartnerBranchAddressNeighborhood;
 import erp.mod.log.db.SDbBolLocation;
 import erp.mod.log.db.SDbBolMerchandise;
 import erp.mod.log.db.SDbBolMerchandiseQuantity;
 import erp.mod.log.db.SDbBolPerson;
+import erp.mod.log.db.SDbBolTransportationMode;
+import erp.mod.log.db.SDbBolTransportationModeExtra;
+import erp.mod.log.db.SDbDriverCarrier;
+import erp.mod.log.db.SDbFreightClass;
+import erp.mod.log.db.SDbFreightTariff;
 import erp.mod.log.db.SDbInsurer;
 import erp.mod.log.db.SDbRate;
+import erp.mod.log.db.SDbService;
 import erp.mod.log.db.SDbShipment;
 import erp.mod.log.db.SDbShipmentDestiny;
+import erp.mod.log.db.SDbShipmentDestinyEntry;
+import erp.mod.log.db.SDbShipmentNotes;
 import erp.mod.log.db.SDbSpot;
 import erp.mod.log.db.SDbSpotCompanyBranch;
 import erp.mod.log.db.SDbSpotCompanyBranchEntity;
 import erp.mod.log.db.SDbTankCar;
 import erp.mod.log.db.SDbTrailer;
 import erp.mod.log.db.SDbVehicle;
+import erp.mod.log.db.SDbVehicleCarrier;
 import erp.mod.log.db.SDbVehicleType;
 import erp.mod.log.form.SFormBillOfLading;
 import erp.mod.log.form.SFormBolPerson;
+import erp.mod.log.form.SFormFreightClass;
+import erp.mod.log.form.SFormFreightTariff;
 import erp.mod.log.form.SFormInsurer;
 import erp.mod.log.form.SFormRate;
+import erp.mod.log.form.SFormService;
 import erp.mod.log.form.SFormShipment;
 import erp.mod.log.form.SFormShipmentDelivery;
 import erp.mod.log.form.SFormSpot;
@@ -39,8 +52,11 @@ import erp.mod.log.form.SFormVehicle;
 import erp.mod.log.form.SFormVehicleType;
 import erp.mod.log.view.SViewBillOfLading;
 import erp.mod.log.view.SViewBolPerson;
+import erp.mod.log.view.SViewFreightClass;
+import erp.mod.log.view.SViewFreightTariff;
 import erp.mod.log.view.SViewInsurer;
 import erp.mod.log.view.SViewRate;
+import erp.mod.log.view.SViewService;
 import erp.mod.log.view.SViewShipment;
 import erp.mod.log.view.SViewShipmentAuthorn;
 import erp.mod.log.view.SViewShipmentBill;
@@ -74,7 +90,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Néstor Ávalos, Isabel Servín
+ * @author Néstor Ávalos, Isabel Servín, Sergio Flores
  */
 public class SModuleLog extends SGuiModule {
 
@@ -82,16 +98,19 @@ public class SModuleLog extends SGuiModule {
     private SFormSpot moFormSpot;
     private SFormSpotCompanyBranch moFormSpotCompanyBranch;
     private SFormSpotCompanyBranchEntity moFormSpotCompanyBranchEntity;
-    private SFormRate moFormRate;
+    private SFormInsurer moFormInsurer;
     private SFormVehicle moFormVehicle;
     private SFormTrailer moFormTrailer;
+    private SFormTankCar moFormTankCar;
     private SFormBolPerson moFormBolPerson;
-    private SFormInsurer moFormInsurer;
+    private SFormRate moFormRate;
+    private SFormService moFormService;
+    private SFormFreightClass moFormFreightClass;
+    private SFormFreightTariff moFormFreightTariff;
     private SFormShipment moFormShipment;
     private SFormBillOfLading moFormBillOfLadingTypeT;
     private SFormBillOfLading moFormBillOfLadingTypeI;
     private SFormShipmentDelivery moFormShipmentDelivery;
-    private SFormTankCar moFormTankCar;
 
     private final SClientInterface miClient_xxx;
 
@@ -111,6 +130,16 @@ public class SModuleLog extends SGuiModule {
         SDbRegistry registry = null;
 
         switch (type) {
+            case SModConsts.LOGS_TP_SPOT:
+                registry = new SDbRegistrySysFly(type) {
+                    @Override
+                    public void initRegistry() { }
+                    @Override
+                    public String getSqlTable() { return SModConsts.TablesMap.get(type); }
+                    @Override
+                    public String getSqlWhere(int[] key) { return "WHERE id_tp_spot = " + key[0] + " "; }
+                };
+                break;
             case SModConsts.LOGS_TP_BOL_PERSON:
                 registry = new SDbRegistrySysFly(type) {
                     @Override
@@ -131,6 +160,16 @@ public class SModuleLog extends SGuiModule {
                     public String getSqlWhere(int[] key) { return "WHERE id_inc = " + key[0] + " "; }
                 };
                 break;
+            case SModConsts.LOGS_TP_SERVICE:
+                registry = new SDbRegistrySysFly(type) {
+                    @Override
+                    public void initRegistry() { }
+                    @Override
+                    public String getSqlTable() { return SModConsts.TablesMap.get(type); }
+                    @Override
+                    public String getSqlWhere(int[] key) { return "WHERE id_tp_service = " + key[0] + " "; }
+                };
+                break;
             case SModConsts.LOGU_TP_VEH:
                 registry = new SDbVehicleType();
                 break;
@@ -143,26 +182,67 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOGU_SPOT_COB_ENT:
                 registry = new SDbSpotCompanyBranchEntity();
                 break;
-            case SModConsts.LOG_RATE:
-                registry = new SDbRate();
-                break;
-            case SModConsts.LOG_VEH:
-                registry = new SDbVehicle();
-                break;
-            case SModConsts.LOG_TRAILER:
-                registry = new SDbTrailer();
-                break;
-            case SModConsts.LOG_BOL_PERSON:
-                registry = new SDbBolPerson();
-                break;
-            case SModConsts.LOG_SHIP:
-                registry = new SDbShipment();
+            case SModConsts.LOGU_BPB_ADD_NEI:
+                registry = new SDbBizPartnerBranchAddressNeighborhood();
                 break;
             case SModConsts.LOG_INSURER:
                 registry = new SDbInsurer();
                 break;
+            case SModConsts.LOG_VEH:
+                registry = new SDbVehicle();
+                break;
+            case SModConsts.LOG_VEH_BP_CAR:
+                registry = new SDbVehicleCarrier();
+                break;
+            case SModConsts.LOG_TRAILER:
+                registry = new SDbTrailer();
+                break;
+            case SModConsts.LOG_TANK_CAR:
+                registry = new SDbTankCar();
+                break;
+            case SModConsts.LOG_BOL_PERSON:
+                registry = new SDbBolPerson();
+                break;
+            case SModConsts.LOG_DRIVER_BP_CAR:
+                registry = new SDbDriverCarrier();
+                break;
+            case SModConsts.LOG_DRIVER_VEH:
+                throw new UnsupportedOperationException("Not supported yet.");
+            case SModConsts.LOG_DIST_LOCATION:
+                throw new UnsupportedOperationException("Not supported yet.");
+            case SModConsts.LOG_RATE:
+                registry = new SDbRate();
+                break;
+            case SModConsts.LOG_SERVICE:
+                registry = new SDbService();
+                break;
+            case SModConsts.LOG_FREIGHT_CLASS:
+                registry = new SDbFreightClass();
+                break;
+            case SModConsts.LOG_FREIGHT_TARIFF:
+                registry = new SDbFreightTariff();
+                break;
+            case SModConsts.LOG_SHIP:
+                registry = new SDbShipment();
+                break;
+            case SModConsts.LOG_SHIP_NTS:
+                registry = new SDbShipmentNotes();
+                break;
+            case SModConsts.LOG_SHIP_DEST:
+            case SModConsts.LOGX_SHIP_DLY:
+                registry = new SDbShipmentDestiny();
+                break;
+            case SModConsts.LOG_SHIP_DEST_ETY:
+                registry = new SDbShipmentDestinyEntry();
+                break;
             case SModConsts.LOG_BOL:
                 registry = new SDbBillOfLading();
+                break;
+            case SModConsts.LOG_BOL_TRANSP_MODE:
+                registry = new SDbBolTransportationMode();
+                break;
+            case SModConsts.LOG_BOL_TRANSP_MODE_EXTRA:
+                registry = new SDbBolTransportationModeExtra();
                 break;
             case SModConsts.LOG_BOL_LOCATION:
                 registry = new SDbBolLocation((SDbBillOfLading) params.getParamsMap().get(SModConsts.LOG_BOL));
@@ -172,13 +252,6 @@ public class SModuleLog extends SGuiModule {
                 break;
             case SModConsts.LOG_BOL_MERCH_QTY:
                 registry = new SDbBolMerchandiseQuantity();
-                break;
-            case SModConsts.LOG_SHIP_DEST:
-            case SModConsts.LOGX_SHIP_DLY:
-                registry = new SDbShipmentDestiny();
-                break;
-            case SModConsts.LOG_TANK_CAR:
-                registry = new SDbTankCar();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -198,7 +271,7 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_ship AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_TP_DLY:
@@ -206,7 +279,7 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_dly AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_TP_SPOT:
@@ -214,7 +287,7 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_spot AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_TP_MOT:
@@ -223,7 +296,7 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_mot AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " + (type == SModConsts.LOGX_TP_MOT_SHIP ? "AND id_tp_mot <> " + SModSysConsts.LOGS_TP_MOT_NA : "") + " "
+                        + "WHERE NOT b_del " + (type == SModConsts.LOGX_TP_MOT_SHIP ? "AND id_tp_mot <> " + SModSysConsts.LOGS_TP_MOT_NA : "") + " "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_TP_CAR:
@@ -231,7 +304,7 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_car AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " + (params != null ? "AND id_tp_car IN (" + params.getKey()[0] +  ", " + params.getKey()[1] + ")" : "") + " "
+                        + "WHERE NOT b_del " + (params != null ? "AND id_tp_car IN (" + params.getKey()[0] +  ", " + params.getKey()[1] + ")" : "") + " "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_TP_DOC_SHIP:
@@ -239,7 +312,14 @@ public class SModuleLog extends SGuiModule {
                 settings.setCodeApplying(true);
                 sql = "SELECT id_tp_doc_ship AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY sort, name ";
+                break;
+            case SModConsts.LOGS_TP_BOL_PERSON: 
+                settings = new SGuiCatalogueSettings("Tipo figura transporte", 1);
+                sql = "SELECT id_tp_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " 
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_INC:
@@ -248,67 +328,89 @@ public class SModuleLog extends SGuiModule {
                 sql = "SELECT id_inc AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + ", "
                         + "fid_tp_dly AS " + SDbConsts.FIELD_FK + "1 "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " + (params != null ? "AND fid_tp_dly = " + params.getKey()[0] : "") + " OR id_inc = " + SModSysConsts.LOGS_INC_NA + " "
+                        + "WHERE NOT b_del " + (params != null ? "AND fid_tp_dly = " + params.getKey()[0] : "") + " OR id_inc = " + SModSysConsts.LOGS_INC_NA + " "
                         + "ORDER BY sort, name ";
                 break;
-            case SModConsts.LOGS_TP_BOL_PERSON: 
-                settings = new SGuiCatalogueSettings("Tipo figura transporte", 1);
-                sql = "SELECT id_tp_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " " 
+            case SModConsts.LOGS_TP_SERVICE:
+                settings = new SGuiCatalogueSettings("Tipo servicio logística", 1);
+                settings.setCodeApplying(true);
+                sql = "SELECT id_tp_service AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY sort, name ";
+                break;
+            case SModConsts.LOGS_TP_SHIP_SIZE:
+                settings = new SGuiCatalogueSettings("Tipo carga", 1);
+                settings.setCodeApplying(true);
+                sql = "SELECT id_tp_ship_size AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGU_TP_VEH:
                 settings = new SGuiCatalogueSettings("Tipo vehículo", 1);
                 sql = "SELECT id_tp_veh AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
-                        + "ORDER BY name ";
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_tp_veh ";
                 break;
             case SModConsts.LOGU_SPOT:
-                /* Use of other parameters:
+                /* Use of GUI parameters:
+                 * params: Optional, can be null.
+                 * params.getType(): May contain flag that catalog is needed only for company branch's spots.
+                 * params.getSubtype(): May contain current company ID to filter only matching spots.
                  * params.getKey(): May contain more than one type of spot id.
                  */
-
-                String sKeysTypeSpot = "";
                 settings = new SGuiCatalogueSettings("Lugar", 1, 1);
                 settings.setCodeApplying(true);
 
-                if (params != null) {
-                    for (int key : params.getKey()) {
-                        sKeysTypeSpot += key + ",";
+                boolean isCobSpots = params != null && params.getType() == SModConsts.LOGU_SPOT_COB && params.getSubtype() != 0;
+                String spotTypes = "";
+                
+                if (params != null && params.getKey() != null) {
+                    for (int id : params.getKey()) {
+                        spotTypes += (spotTypes.isEmpty() ? "" : ", ") + id;
                     }
-                    sKeysTypeSpot = sKeysTypeSpot.isEmpty() ? "" : sKeysTypeSpot.substring(0, sKeysTypeSpot.length()-1);
                 }
 
-                sql = "SELECT id_spot AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " " +
-                        ", fk_tp_spot AS " + SDbConsts.FIELD_FK + "1 "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 " +
-                        (!sKeysTypeSpot.isEmpty() ? "AND fk_tp_spot IN (" +  sKeysTypeSpot + ")" : "") + " " +
-                        (subtype != SLibConsts.UNDEFINED ? "AND fk_tp_dly = " + subtype : "") + " "
-                        + "ORDER BY name ";
-                break;
-            case SModConsts.LOG_VEH:
-                settings = new SGuiCatalogueSettings("Vehículo", 1, 1);
-                sql = "SELECT id_veh AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", fk_tp_veh AS " + SDbConsts.FIELD_FK + "1 "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
-                        + "ORDER BY name ";
+                sql = "SELECT s.id_spot AS " + SDbConsts.FIELD_ID + "1, s.name AS " + SDbConsts.FIELD_ITEM + ", s.code AS " + SDbConsts.FIELD_CODE + ", "
+                        + "s.fk_tp_spot AS " + SDbConsts.FIELD_FK + "1 "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " AS s "
+                        + (!isCobSpots ? "" :
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT_COB) + " AS scob ON scob.fk_spot = s.id_spot AND NOT scob.b_del "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cob ON cob.id_bpb = scob.id_cob AND cob.fid_bp = " + params.getSubtype() + " ")
+                        + "WHERE NOT s.b_del " +
+                        (spotTypes.isEmpty() ? "" : "AND s.fk_tp_spot IN (" +  spotTypes + ")") + " " +
+                        (subtype == SLibConsts.UNDEFINED ? "" : "AND s.fk_tp_dly = " + subtype) + " "
+                        + "ORDER BY s.name, s.id_spot ";
                 break;
             case SModConsts.LOG_INSURER:
                 settings = new SGuiCatalogueSettings("Aseguradora", 1);
                 sql = "SELECT id_insurer AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
-                        + "ORDER BY name ";
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_insurer ";
+                break;
+            case SModConsts.LOG_VEH:
+                /* Use of GUI parameters:
+                 * params: Optional, can be null.
+                 * params.getType(): Optional, can be zero. Contains the desired vehicle type.
+                 * params.getKey(): Optional, can be null. Contain the carrier of the desired vehicles.
+                 */
+                settings = new SGuiCatalogueSettings("Vehículo", 1, 1);
+                sql = "SELECT v.id_veh AS " + SDbConsts.FIELD_ID + "1, v.name AS " + SDbConsts.FIELD_ITEM + ", v.fk_tp_veh AS " + SDbConsts.FIELD_FK + "1 "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " AS v "
+                        + (params == null || params.getKey() == null ? "" :
+                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_VEH_BP_CAR) + " AS vbp ON vbp.id_veh = v.id_veh AND vbp.id_car = " + params.getKey()[0] + " ")
+                        + "WHERE NOT v.b_del " + (params == null || params.getType() == 0 ? "" : "AND v.fk_tp_veh = " + params.getType() + " ")
+                        + "ORDER BY v.name, v.id_veh ";
                 break;
             case SModConsts.LOG_TRAILER:
                 settings = new SGuiCatalogueSettings("Remolque", 1);
                 sql = "SELECT id_trailer AS " + SDbConsts.FIELD_ID + "1, name AS "  + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
-                        + "ORDER BY name ";
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_trailer ";
                 break;
             case SModConsts.LOG_BOL_PERSON:
                 String title = "";
@@ -322,17 +424,16 @@ public class SModuleLog extends SGuiModule {
                 sql = "SELECT id_bol_person AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", fk_tp_bol_person AS " + SDbConsts.FIELD_FK + "1 "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
                         + "WHERE fk_tp_bol_person = " + subtype + " "
-                        + "AND b_del = 0 "
-                        + "ORDER BY name ";
+                        + "AND NOT b_del "
+                        + "ORDER BY name, id_bol_person ";
                 break;
             case SModConsts.LOGX_TP_VEH:
-                /* Use of other parameters:
+                /* Use of GUI parameters:
                  * params.getKey(): If is different of null will contain:
                  *      params.getKey()[0] = fk_src_spot
                  *      params.getKey()[1] = fk_des_spot
                  *      params.getKey()[2] = fk_car
                  */
-
                 settings = new SGuiCatalogueSettings("Tipo vehículo", 1, 1, SLibConsts.DATA_TYPE_BOOL);
                 sql = "SELECT tp.id_tp_veh AS " + SDbConsts.FIELD_ID + "1, CONCAT(tp.name, ' (', tp.code, ')', IF(r.b_con = 1, ' - CONSOLIDADO', '')) AS " + SDbConsts.FIELD_ITEM + ", "
                         + "r.id_rate AS " + SDbConsts.FIELD_FK + "1, r.b_con AS " + SDbConsts.FIELD_COMP + " "
@@ -341,13 +442,13 @@ public class SModuleLog extends SGuiModule {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS des ON r.fk_src_spot = des.id_spot "
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_RATE) + " AS r ON tp.id_tp_veh = r.fk_tp_veh_n "
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car_n = car.id_bp "
-                        + "WHERE r.b_del = 0 " + (params == null ? "" : "AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND "
+                        + "WHERE NOT r.b_del " + (params == null ? "" : "AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND "
                         + "r.fk_car_n = " + params.getKey()[2]) + " "
                         + "GROUP BY tp.id_tp_veh, r.b_con "
-                        + "ORDER BY tp.name ";
+                        + "ORDER BY tp.name, tp.id_tp_veh ";
                 break;
             case SModConsts.LOGX_RATE:
-                /* Use of other parameters:
+                /* Use of GUI parameters:
                  * params.getKey(): If is different of null will contain:
                  *      params.getKey()[0] = fk_src_spot
                  *      params.getKey()[1] = fk_des_spot
@@ -373,9 +474,10 @@ public class SModuleLog extends SGuiModule {
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS des ON r.fk_src_spot = des.id_spot "
                                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car_n = car.id_bp "
                                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tp ON r.fk_tp_veh_n = tp.id_tp_veh "
-                                + "WHERE r.b_del = 0 "
+                                + "WHERE NOT r.b_del "
                                 + (params == null ? "" : " AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND ")
-                                + where + "GROUP BY r.id_rate, r.fk_cur " + "ORDER BY r.rate ";
+                                + where + "GROUP BY r.id_rate, r.fk_cur "
+                                + "ORDER BY r.rate ";
                         ResultSet resultSet =  miClient.getSession().getStatement().executeQuery(sql);
                         if (resultSet.next()) {
                             break;
@@ -385,7 +487,20 @@ public class SModuleLog extends SGuiModule {
                 catch (Exception e){
                     miClient.showMsgBoxError(e.getMessage());
                 }
-                
+                break;
+            case SModConsts.LOG_SERVICE:
+                settings = new SGuiCatalogueSettings("Servicio logística", 1);
+                sql = "SELECT id_service AS " + SDbConsts.FIELD_ID + "1, name AS "  + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_service ";
+                break;
+            case SModConsts.LOG_FREIGHT_CLASS:
+                settings = new SGuiCatalogueSettings("Clase flete", 1);
+                sql = "SELECT id_freight_class AS " + SDbConsts.FIELD_ID + "1, name AS "  + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_freight_class ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -416,8 +531,8 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOGU_SPOT_COB_ENT:
                 view = new SViewSpotCompanyBranchEntity(miClient, "Lugares entidades sucursales");
                 break;
-            case SModConsts.LOG_RATE:
-                view = new SViewRate(miClient, "Tarifas");
+            case SModConsts.LOG_INSURER:
+                view = new SViewInsurer(miClient, "Aseguradoras");
                 break;
             case SModConsts.LOG_VEH:
                 view = new SViewVehicle(miClient, "Vehículos");
@@ -425,28 +540,36 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOG_TRAILER:
                 view = new SViewTrailer(miClient, "Remolques");
                 break;
+            case SModConsts.LOG_TANK_CAR:
+                view = new SViewTankCar(miClient, "Carrotanques");
+                break;
             case SModConsts.LOG_BOL_PERSON:
                 view = new SViewBolPerson(miClient, "Figuras transporte");
+                break;
+            case SModConsts.LOG_RATE:
+                view = new SViewRate(miClient, "Tarifas");
+                break;
+            case SModConsts.LOG_SERVICE:
+                view = new SViewService(miClient, "Servicios logística");
+                break;
+            case SModConsts.LOG_FREIGHT_CLASS:
+                view = new SViewFreightClass(miClient, "Clases flete");
+                break;
+            case SModConsts.LOG_FREIGHT_TARIFF:
+                view = new SViewFreightTariff(miClient, "Tarifas fletes");
                 break;
             case SModConsts.LOG_SHIP:
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
                         title += "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title += "";
                         break;
+                    default:        
                 }
-
                 view = new SViewShipment(miClient, type, subtype, "Embarques " + title, params);
-
                 break;
-                
-            case SModConsts.LOG_INSURER:
-                view = new SViewInsurer(miClient, "Aseguradoras");
-                break;
-                
             case SModConsts.LOG_BOL:
                 switch (subtype) {
                     case SDataConstantsSys.TRNS_TP_CFD_BOL:
@@ -455,104 +578,87 @@ public class SModuleLog extends SGuiModule {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                         view = new SViewBillOfLading(miClient, subtype, "Carta porte facturas");
                         break;
+                    default:        
                 }
                 break;
-                
-            case SModConsts.LOG_TANK_CAR:
-                view = new SViewTankCar(miClient, "Carrotanques");
-                break;
-                
             case SModConsts.LOGX_SHIP_AUTH:
                 switch (subtype) {
                     case SModSysConsts.TRNS_ST_DPS_AUTHORN_AUTHORN:
                         title = "autorizados ";
                         break;
-
                     case SModSysConsts.TRNS_ST_DPS_AUTHORN_PENDING:
                         title = "x autorizar ";
                         break;
-
                     case SModSysConsts.TRNS_ST_DPS_AUTHORN_REJECT:
                         title = "rechazados ";
                         break;
+                    default:        
                 }
-
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
                         title += "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title += "";
                         break;
+                    default:        
                 }
-
                 view = new SViewShipmentAuthorn(miClient, type, subtype, "Embarques " + title, params);
-
                 break;
             case SModConsts.LOGX_SHIP_DPS:
                 title = "Facturas ventas ";
-
                 switch (subtype) {
                     case SModConsts.VIEW_ST_PEND:
                         title += "x embarcar ";
                         break;
-
                     case SModConsts.VIEW_ST_DONE:
                         title += "embarcadas ";
                         break;
+                    default:        
                 }
-
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
                         title += "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title += "";
                         break;
+                    default:        
                 }
-
                 view = new SViewShipmentDps(miClient, type, subtype, title, params);
                 break;
-
             case SModConsts.LOGX_SHIP_DPS_ADJ:
                 title = "NC ventas ";
-
                 switch (subtype) {
                     case SModConsts.VIEW_ST_PEND:
                         title += "x embarcar ";
                         break;
-
                     case SModConsts.VIEW_ST_DONE:
                         title += "embarcadas ";
                         break;
+                    default:        
                 }
-
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
                         title += "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title += "";
                         break;
+                    default:        
                 }
-
                 view = new SViewShipmentDpsAdjustment(miClient, type, subtype, title, params);
                 break;
-
             case SModConsts.LOGX_SHIP_DIOG:
                 switch (params.getType()) {
                     case SModConsts.VIEW_SC_DET:
                         title = "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title = "";
                         break;
+                    default:        
                 }
-
                 switch (subtype) {
                     case SModConsts.VIEW_ST_PEND:
                         view = new SViewShipmentDiog(miClient, type, subtype, "Docs inventarios x embarcar " + title, params);
@@ -560,6 +666,7 @@ public class SModuleLog extends SGuiModule {
                     case SModConsts.VIEW_ST_DONE:
                         view = new SViewShipmentDiog(miClient, type, subtype, "Docs. inventarios embarcados " + title, params);
                         break;
+                    default:        
                 }
                 break;
             case SModConsts.LOGX_SHIP_DLY:
@@ -567,12 +674,11 @@ public class SModuleLog extends SGuiModule {
                     case SModConsts.VIEW_SC_DET:
                         title = "(detalle)";
                         break;
-
                     case SModConsts.VIEW_SC_SUM:
                         title = "";
                         break;
+                    default:        
                 }
-
                 switch (subtype) {
                     case SModConsts.VIEW_ST_PEND:
                         view = new SViewShipmentDelivery(miClient, type, subtype, "Embarques x entregar " + title, params);
@@ -580,6 +686,7 @@ public class SModuleLog extends SGuiModule {
                     case SModConsts.VIEW_ST_DONE:
                         view = new SViewShipmentDelivery(miClient, type, subtype, "Embarques entregados " + title, params);
                         break;
+                    default:        
                 }
                 break;
             case SModConsts.LOGX_SHIP_BOL:
@@ -590,9 +697,9 @@ public class SModuleLog extends SGuiModule {
                     case SModConsts.VIEW_ST_DONE:
                         view = new SViewShipmentBill(miClient, miClient_xxx, type, subtype, "Embarques facturados" + title, params);
                         break;
+                    default:        
                 }
                 break;
-
             case SModConsts.LOGX_SHIP_DPS_SAL:
                 switch (subtype) {
                     case SModConsts.VIEW_ST_PEND:
@@ -601,6 +708,7 @@ public class SModuleLog extends SGuiModule {
                     case SModConsts.VIEW_ST_DONE:
                         view = new SViewShipmentDpsCost(miClient, type, subtype, "Embarques vs facs vtas facturadas" + title, params);
                         break;
+                    default:        
                 }
                 break;
             default:
@@ -636,9 +744,9 @@ public class SModuleLog extends SGuiModule {
                 if (moFormSpotCompanyBranchEntity == null) moFormSpotCompanyBranchEntity = new SFormSpotCompanyBranchEntity(miClient, "Lugar de la entidad de la empresa");
                 form = moFormSpotCompanyBranchEntity;
                 break;
-            case SModConsts.LOG_RATE:
-                if (moFormRate == null) moFormRate = new SFormRate(miClient, "Tarifa");
-                form = moFormRate;
+            case SModConsts.LOG_INSURER:
+                if (moFormInsurer == null) moFormInsurer = new SFormInsurer(miClient, "Aseguradora");
+                form = moFormInsurer;
                 break;
             case SModConsts.LOG_VEH:
                 if (moFormVehicle == null) moFormVehicle = new SFormVehicle(miClient, "Vehículo");
@@ -648,13 +756,29 @@ public class SModuleLog extends SGuiModule {
                 if (moFormTrailer == null) moFormTrailer = new SFormTrailer(miClient, "Remolque");
                 form = moFormTrailer;
                 break;
+            case SModConsts.LOG_TANK_CAR:
+                if (moFormTankCar == null) moFormTankCar = new SFormTankCar(miClient, "Carrotanque");
+                form = moFormTankCar;
+                break;
             case SModConsts.LOG_BOL_PERSON:
-                if (moFormBolPerson == null) moFormBolPerson = new SFormBolPerson(miClient, "Figura transporte");
+                if (moFormBolPerson == null) moFormBolPerson = new SFormBolPerson(miClient, "Figura de transporte");
                 form = moFormBolPerson;
                 break;
-            case SModConsts.LOG_INSURER:
-                if (moFormInsurer == null) moFormInsurer = new SFormInsurer(miClient, "Aseguradora");
-                form = moFormInsurer;
+            case SModConsts.LOG_RATE:
+                if (moFormRate == null) moFormRate = new SFormRate(miClient, "Tarifa");
+                form = moFormRate;
+                break;
+            case SModConsts.LOG_SERVICE:
+                if (moFormService == null) moFormService = new SFormService(miClient, "Servicio de logística");
+                form = moFormService;
+                break;
+            case SModConsts.LOG_FREIGHT_CLASS:
+                if (moFormFreightClass == null) moFormFreightClass = new SFormFreightClass(miClient, "Clase de flete");
+                form = moFormFreightClass;
+                break;
+            case SModConsts.LOG_FREIGHT_TARIFF:
+                if (moFormFreightTariff == null) moFormFreightTariff = new SFormFreightTariff(miClient, "Tarifa de flete");
+                form = moFormFreightTariff;
                 break;
             case SModConsts.LOG_SHIP:
                 if (moFormShipment == null) moFormShipment = new SFormShipment(miClient, miClient_xxx, "Embarque");
@@ -671,10 +795,6 @@ public class SModuleLog extends SGuiModule {
                         form = moFormBillOfLadingTypeI;
                     default:        
                 }
-                break;
-            case SModConsts.LOG_TANK_CAR:
-                if (moFormTankCar == null) moFormTankCar = new SFormTankCar(miClient, "Carrotanque");
-                form = moFormTankCar;
                 break;
             case SModConsts.LOGX_SHIP_DLY:
                 if (moFormShipmentDelivery == null) moFormShipmentDelivery = new SFormShipmentDelivery(miClient, "Asignación fecha de entrega real");

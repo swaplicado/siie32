@@ -884,8 +884,10 @@ public abstract class SModSysConsts {
     public static final int LOGS_TP_SHIP_SHI = 1;
     public static final int LOGS_TP_SHIP_REC = 2;
 
-    public static final int LOGS_TP_DLY_DOM = 1;
-    public static final int LOGS_TP_DLY_INT = 2;
+    public static final int LOGS_TP_DLY_NA = 1; // not applicable
+    public static final int LOGS_TP_DLY_LOC = 2; // local
+    public static final int LOGS_TP_DLY_DOM = 3; // domestic
+    public static final int LOGS_TP_DLY_INT = 4; // international
 
     public static final int LOGS_TP_SPOT_PLA = 1;
     public static final int LOGS_TP_SPOT_POR = 2;
@@ -896,6 +898,7 @@ public abstract class SModSysConsts {
     public static final int LOGS_TP_MOT_AIR = 3;
     public static final int LOGS_TP_MOT_SEA = 4;
     public static final int LOGS_TP_MOT_MUL = 5;
+    public static final int LOGS_TP_MOT_RAIL = 6;
 
     public static final int LOGS_TP_CAR_NA = 1;
     public static final int LOGS_TP_CAR_OWN = 2;
@@ -905,6 +908,11 @@ public abstract class SModSysConsts {
 
     public static final int LOGS_TP_DOC_SHIP_DPS = 1;
     public static final int LOGS_TP_DOC_SHIP_IOG = 2;
+
+    public static final int LOGS_TP_BOL_PERSON_DRI = 1; // Driver
+    public static final int LOGS_TP_BOL_PERSON_OWN = 2; // Owner
+    public static final int LOGS_TP_BOL_PERSON_LES = 3; // Lessee
+    public static final int LOGS_TP_BOL_PERSON_NOT = 4; // Notified
 
     public static final int LOGS_INC_NA = 1;
     public static final int LOGS_INC_EXW = 2;
@@ -925,11 +933,30 @@ public abstract class SModSysConsts {
     public static final int LOGS_INC_DPU = 25;
     public static final int LOGS_INC_LAB = 101;
     
-    public static final int LOGS_TP_BOL_PERSON_DRI = 1; // Driver
-    public static final int LOGS_TP_BOL_PERSON_OWN = 2; // Owner
-    public static final int LOGS_TP_BOL_PERSON_LES = 3; // Lessee
-    public static final int LOGS_TP_BOL_PERSON_NOT = 4; // Notified
+    public static final int LOGS_TP_SERVICE_FREI = 1; // freight
+    public static final int LOGS_TP_SERVICE_DLVY = 2; // delivery
+    public static final int LOGS_TP_SERVICE_RETN = 3; // return
+    public static final int LOGS_TP_SERVICE_PICK = 6; // pickup
+    public static final int LOGS_TP_SERVICE_TOLL = 9; // toll
+    public static final int LOGS_TP_SERVICE_HAND = 11; // handling
+    public static final int LOGS_TP_SERVICE_FULL = 12; // fullfillment
+    public static final int LOGS_TP_SERVICE_PARK = 16; // parking
+    public static final int LOGS_TP_SERVICE_TRAN_STOP = 21; // transit stop
+    public static final int LOGS_TP_SERVICE_TRAN_STOP_STOR = 25; // transit stop storage
+    public static final int LOGS_TP_SERVICE_WARE = 26; // warehousing
+    public static final int LOGS_TP_SERVICE_FREI_FRWD = 31; // freight forwarding
+    public static final int LOGS_TP_SERVICE_CUST = 36; // customs brokerage
+    public static final int LOGS_TP_SERVICE_INSU = 41; // cargo insurance
+    public static final int LOGS_TP_SERVICE_GRAT = 81; // gratuity
+    public static final int LOGS_TP_SERVICE_OTHE = 99; // other
 
+    public static final int LOGS_TP_SHIP_SIZE_NA = 1; // Not applicable
+    public static final int LOGS_TP_SHIP_SIZE_PC = 2; // Parcel/courier services
+    public static final int LOGS_TP_SHIP_SIZE_LTL = 6; // Less Than Truckload
+    public static final int LOGS_TP_SHIP_SIZE_FTL = 7; // Full Truckload
+    public static final int LOGS_TP_SHIP_SIZE_LCL = 11; // Less-than-full Container Load
+    public static final int LOGS_TP_SHIP_SIZE_FCL = 12; // Full Container Load
+    
     public static final int FIELD_MONTH_JANUARY = 1;
     public static final int FIELD_MONTH_FEBRUARY = 2;
     public static final int FIELD_MONTH_MARCH = 3;

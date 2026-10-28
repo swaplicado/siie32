@@ -11,13 +11,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Isabel Servín
+ * @author Néstor Ávalos, Isabel Servín, Sergio Flores
  */
 public class SDbVehicle extends SDbRegistryUser implements Serializable {
 
@@ -31,6 +32,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     protected String msPermissonSctType;
     protected String msPermissonSctNumber;
     protected String msInsurancePolicy;
+    protected Date mtInsurancePolicyExpiration_n;
     //protected boolean mbDeleted;
     protected int mnFkVehicleTypeId;
     protected int mnFkInsurerId_n;
@@ -57,6 +59,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     public void setPermissonSctType(String s) { msPermissonSctType = s; }
     public void setPermissonSctNumber(String s) { msPermissonSctNumber = s; }
     public void setInsurancePolicy(String s) { msInsurancePolicy = s; }
+    public void setInsurancePolicyExpiration_n(Date t) { mtInsurancePolicyExpiration_n = t; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkVehicleTypeId(int n) { mnFkVehicleTypeId = n; }
     public void setFkInsurerId_n(int n) { mnFkInsurerId_n = n; }
@@ -75,6 +78,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
     public String getPermissonSctType() { return msPermissonSctType; }
     public String getPermissonSctNumber() { return msPermissonSctNumber; }
     public String getInsurancePolicy() { return msInsurancePolicy; }
+    public Date getInsurancePolicyExpiration_n() { return mtInsurancePolicyExpiration_n; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkVehicleTypeId() { return mnFkVehicleTypeId; }
     public int getFkInsurerId_n() { return mnFkInsurerId_n; }
@@ -111,6 +115,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         msPermissonSctType = "";
         msPermissonSctNumber = "";
         msInsurancePolicy = "";
+        mtInsurancePolicyExpiration_n = null;
         mbDeleted = false;
         mnFkVehicleTypeId = 0;
         mnFkInsurerId_n = 0;
@@ -176,6 +181,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
             msPermissonSctType = resultSet.getString("perm_sct_tp");
             msPermissonSctNumber = resultSet.getString("perm_sct_num");
             msInsurancePolicy = resultSet.getString("insurance_policy");
+            mtInsurancePolicyExpiration_n = resultSet.getDate("insurance_exp_dt_n");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkVehicleTypeId = resultSet.getInt("fk_tp_veh");
             mnFkInsurerId_n = resultSet.getInt("fk_insurer_n");
@@ -197,10 +203,6 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -217,6 +219,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
                     "'" + msPermissonSctType + "', " + 
                     "'" + msPermissonSctNumber + "', " + 
                     "'" + msInsurancePolicy + "', " + 
+                    (mtInsurancePolicyExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtInsurancePolicyExpiration_n) + "'") + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkVehicleTypeId + ", " +
                     (mnFkInsurerId_n == 0 ? "NULL, " : mnFkInsurerId_n + ", ") + 
@@ -240,6 +243,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
                     "perm_sct_tp = '" + msPermissonSctType + "', " +
                     "perm_sct_num = '" + msPermissonSctNumber + "', " +
                     "insurance_policy = '" + msInsurancePolicy + "', " +
+                    "insurance_exp_dt_n = " + (mtInsurancePolicyExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtInsurancePolicyExpiration_n) + "'") + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_veh = " + mnFkVehicleTypeId + ", " +
                     "fk_insurer_n = " + (mnFkInsurerId_n == 0 ? "NULL, " : mnFkInsurerId_n + ", ") +
@@ -269,6 +273,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         registry.setPermissonSctType(this.getPermissonSctType());
         registry.setPermissonSctNumber(this.getPermissonSctNumber());
         registry.setInsurancePolicy(this.getInsurancePolicy());
+        registry.setInsurancePolicyExpiration_n(this.getInsurancePolicyExpiration_n());
         registry.setDeleted(this.isDeleted());
         registry.setFkVehicleTypeId(this.getFkVehicleTypeId());
         registry.setFkInsurerId_n(this.getFkInsurerId_n());
@@ -277,6 +282,7 @@ public class SDbVehicle extends SDbRegistryUser implements Serializable {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

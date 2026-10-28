@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbInsurer extends SDbRegistryUser implements Serializable {
     
@@ -136,10 +136,6 @@ public class SDbInsurer extends SDbRegistryUser implements Serializable {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-        
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -186,6 +182,7 @@ public class SDbInsurer extends SDbRegistryUser implements Serializable {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
     

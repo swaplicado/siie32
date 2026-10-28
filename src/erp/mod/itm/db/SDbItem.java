@@ -20,6 +20,8 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbItem extends SDbRegistryUser {
+    
+    public static final int FIELD_UNIT = SDbRegistry.FIELD_BASE + 1;
 
     public SDbItem() {
         super(SModConsts.ITMU_ITEM);
@@ -92,6 +94,9 @@ public class SDbItem extends SDbRegistryUser {
             case SDbRegistry.FIELD_NAME:
                 msSql += "item ";
                 break;
+            case FIELD_UNIT:
+                msSql += "fid_unit ";
+                break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -107,6 +112,9 @@ public class SDbItem extends SDbRegistryUser {
                 case SDbRegistry.FIELD_CODE:
                 case SDbRegistry.FIELD_NAME:
                     value = resultSet.getString(1);
+                    break;
+                case FIELD_UNIT:
+                    value = resultSet.getInt(1);
                     break;
                 default:
             }

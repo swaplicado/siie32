@@ -4,7 +4,6 @@
  */
 package erp.mod.log.view;
 
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +16,12 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SViewInsurer extends SGridPaneView {
 
     public SViewInsurer(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_INSURER, SLibConstants.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_INSURER, 0, title);
         setRowButtonsEnabled(true, false, true, false, true);
         
         initComponetsCustom();
@@ -55,21 +54,21 @@ public class SViewInsurer extends SGridPaneView {
         }
 
         msSql = "SELECT " 
-            + "i.id_insurer AS " + SDbConsts.FIELD_ID + "1, " 
-            + "'' AS " + SDbConsts.FIELD_CODE + ", "
-            + "i.name AS " + SDbConsts.FIELD_NAME + ", "
-            + "i.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
-            + "i.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
-            + "i.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
-            + "i.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", " 
-            + "i.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
-            + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-            + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_INSURER) + " AS i " 
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON i.fk_usr_ins = ui.id_usr "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON i.fk_usr_upd = uu.id_usr "
-            + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "ORDER BY i.name ";
+                + "i.id_insurer AS " + SDbConsts.FIELD_ID + "1, "
+                + "'' AS " + SDbConsts.FIELD_CODE + ", "
+                + "i.name AS " + SDbConsts.FIELD_NAME + ", "
+                + "i.b_del AS " + SDbConsts.FIELD_IS_DEL + ", " 
+                + "i.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", " 
+                + "i.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", " 
+                + "i.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", " 
+                + "i.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", " 
+                + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_INSURER) + " AS i " 
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON i.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON i.fk_usr_upd = uu.id_usr "
+                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + "ORDER BY i.name, i.id_insurer ";
     }
 
     @Override
@@ -78,7 +77,7 @@ public class SViewInsurer extends SGridPaneView {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = new SGridColumnView[6];
 
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, "Aseguradora");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, SDbConsts.FIELD_NAME, "Aseguradora");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME);
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS);
@@ -92,8 +91,6 @@ public class SViewInsurer extends SGridPaneView {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
-        moSuscriptionsSet.add(SModConsts.LOG_INSURER);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
-
 }

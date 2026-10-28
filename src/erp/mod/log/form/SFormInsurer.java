@@ -4,7 +4,6 @@
  */
 package erp.mod.log.form;
 
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.log.db.SDbInsurer;
 import sa.lib.SLibConsts;
@@ -17,19 +16,19 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SFormInsurer extends sa.lib.gui.bean.SBeanForm {
 
     private SDbInsurer moRegistry;
 
     /**
-     * Creates new form SFormVehicleType
+     * Creates new form SFormInsurer
      * @param client
      * @param title
      */
     public SFormInsurer(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOG_INSURER, SLibConstants.UNDEFINED, title);
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOG_INSURER, 0, title);
         initComponents();
         initComponentsCustom();
     }
@@ -43,39 +42,37 @@ public class SFormInsurer extends sa.lib.gui.bean.SBeanForm {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jPanel23 = new javax.swing.JPanel();
-        jPanel24 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel23.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel24.add(jlName);
+        jPanel21.add(jlName);
 
         moTextName.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel24.add(moTextName);
+        jPanel21.add(moTextName);
 
-        jPanel23.add(jPanel24);
+        jPanel2.add(jPanel21);
 
-        jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel21;
     private javax.swing.JLabel jlName;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables

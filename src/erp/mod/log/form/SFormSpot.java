@@ -4,27 +4,66 @@
  */
 package erp.mod.log.form;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mcfg.data.SDataParamsErp;
+import erp.mloc.data.SDataBolCounty;
+import erp.mloc.data.SDataBolLocality;
+import erp.mloc.data.SDataBolNeighborhood;
+import erp.mloc.data.SDataBolZipCode;
+import erp.mloc.data.SDataState;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
+import erp.mod.loc.form.SPickerNeighborhood;
 import erp.mod.log.db.SDbSpot;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiField;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldBoolean;
+import sa.lib.gui.bean.SBeanFieldKey;
+import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
-public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
-
+public class SFormSpot extends sa.lib.gui.bean.SBeanForm implements ActionListener, ItemListener {
+    
+    private static final int IDX_ZIP_ID = 0;
+    private static final int IDX_STA_ID = 1;
+    
     private SDbSpot moRegistry;
+    private boolean mbUpdatingFields;
+    
+    private SPickerNeighborhood moPickerNeighborhood;
+    /** Key index 0: zip code; index 1: state ID. */
+    private int[] manZipCodeStateKey;
+    private SDataBolNeighborhood moBolNeighborhood;
+    private SDataState moAuxState;
+    private SDataBolZipCode moAuxBolZipCode;
+    private SDataBolCounty moAuxBolCounty;
+    private SDataBolLocality moAuxBolLocality;
+    private SDataParamsErp moParamsErp;
 
     /**
      * Creates new form SFormSpot
+     * @param client
+     * @param title
      */
     public SFormSpot(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOGU_SPOT, SLibConstants.UNDEFINED, title);
@@ -41,57 +80,97 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
+        bgZipCodeType = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
-        jPanel23 = new javax.swing.JPanel();
-        jPanel25 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jlDeliveryType = new javax.swing.JLabel();
         moKeyDeliveryType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel21 = new javax.swing.JPanel();
+        jPanel22 = new javax.swing.JPanel();
         jlSpotType = new javax.swing.JLabel();
         moKeySpotType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel22 = new javax.swing.JPanel();
+        jPanel23 = new javax.swing.JPanel();
         jlCode = new javax.swing.JLabel();
         moTextCode = new sa.lib.gui.bean.SBeanFieldText();
         jPanel24 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel25 = new javax.swing.JPanel();
+        moBoolGeneric = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel31 = new javax.swing.JPanel();
+        jPanel311 = new javax.swing.JPanel();
+        moBoolCaptureAddress = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel312 = new javax.swing.JPanel();
+        jlCountry = new javax.swing.JLabel();
+        moKeyCountry = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel313 = new javax.swing.JPanel();
+        jlState = new javax.swing.JLabel();
+        moKeyState = new sa.lib.gui.bean.SBeanFieldKey();
+        moTextState = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel314 = new javax.swing.JPanel();
+        jlZipCodeType = new javax.swing.JLabel();
+        moRadZipCodeByHand = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadZipCodeByCatalog = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel315 = new javax.swing.JPanel();
+        jlZipCode = new javax.swing.JLabel();
+        moTextZipCode = new sa.lib.gui.bean.SBeanFieldText();
+        jbPickZipCode = new javax.swing.JButton();
+        jtfZipCode = new javax.swing.JTextField();
+        jtfNeighborhoodCode = new javax.swing.JTextField();
+        jtfNeighborhoodName = new javax.swing.JTextField();
+        jPanel316 = new javax.swing.JPanel();
+        jlDistrict = new javax.swing.JLabel();
+        moTextDistrict = new sa.lib.gui.bean.SBeanFieldText();
+        jtfDistrictCode = new javax.swing.JTextField();
+        jPanel317 = new javax.swing.JPanel();
+        jlLocality = new javax.swing.JLabel();
+        moTextLocality = new sa.lib.gui.bean.SBeanFieldText();
+        jtfLocalityCode = new javax.swing.JTextField();
+        jPanel318 = new javax.swing.JPanel();
+        jlCounty = new javax.swing.JLabel();
+        moTextCounty = new sa.lib.gui.bean.SBeanFieldText();
+        jtfCountyCode = new javax.swing.JTextField();
+        jPanel319 = new javax.swing.JPanel();
+        jlReference = new javax.swing.JLabel();
+        moTextReference = new sa.lib.gui.bean.SBeanFieldText();
+        jlRefernceHint = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel23.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
-
-        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDeliveryType.setText("Tipo entrega:*");
-        jlDeliveryType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel25.add(jlDeliveryType);
-
-        moKeyDeliveryType.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel25.add(moKeyDeliveryType);
-
-        jPanel23.add(jPanel25);
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSpotType.setText("Tipo lugar:*");
-        jlSpotType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel21.add(jlSpotType);
+        jlDeliveryType.setText("Tipo entrega:*");
+        jlDeliveryType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel21.add(jlDeliveryType);
 
-        moKeySpotType.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel21.add(moKeySpotType);
+        moKeyDeliveryType.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel21.add(moKeyDeliveryType);
 
-        jPanel23.add(jPanel21);
+        jPanel2.add(jPanel21);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlSpotType.setText("Tipo lugar:*");
+        jlSpotType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlSpotType);
+
+        moKeySpotType.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel22.add(moKeySpotType);
+
+        jPanel2.add(jPanel22);
+
+        jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel22.add(jlCode);
-        jPanel22.add(moTextCode);
+        jPanel23.add(jlCode);
+        jPanel23.add(moTextCode);
 
-        jPanel23.add(jPanel22);
+        jPanel2.add(jPanel23);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -99,64 +178,570 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlName);
 
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel24.add(moTextName);
 
-        jPanel23.add(jPanel24);
+        jPanel2.add(jPanel24);
 
-        jPanel1.add(jPanel23, java.awt.BorderLayout.NORTH);
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolGeneric.setText("Genérico");
+        moBoolGeneric.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel25.add(moBoolGeneric);
+
+        jPanel2.add(jPanel25);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Domicilio:"));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jPanel31.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
+
+        jPanel311.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolCaptureAddress.setText("Capturar domicilio");
+        moBoolCaptureAddress.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel311.add(moBoolCaptureAddress);
+
+        jPanel31.add(jPanel311);
+
+        jPanel312.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCountry.setText("País:");
+        jlCountry.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel312.add(jlCountry);
+
+        moKeyCountry.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel312.add(moKeyCountry);
+
+        jPanel31.add(jPanel312);
+
+        jPanel313.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlState.setText("Estado:");
+        jlState.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel313.add(jlState);
+
+        moKeyState.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel313.add(moKeyState);
+
+        moTextState.setToolTipText("Estado");
+        moTextState.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel313.add(moTextState);
+
+        jPanel31.add(jPanel313);
+
+        jPanel314.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlZipCodeType.setText("Tipo código postal:");
+        jlZipCodeType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel314.add(jlZipCodeType);
+
+        bgZipCodeType.add(moRadZipCodeByHand);
+        moRadZipCodeByHand.setText("Manual");
+        jPanel314.add(moRadZipCodeByHand);
+
+        bgZipCodeType.add(moRadZipCodeByCatalog);
+        moRadZipCodeByCatalog.setText("Catálogo SAT");
+        moRadZipCodeByCatalog.setPreferredSize(new java.awt.Dimension(145, 23));
+        jPanel314.add(moRadZipCodeByCatalog);
+
+        jPanel31.add(jPanel314);
+
+        jPanel315.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlZipCode.setText("Código postal:");
+        jlZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel315.add(jlZipCode);
+        jPanel315.add(moTextZipCode);
+
+        jbPickZipCode.setText("Buscar...");
+        jbPickZipCode.setToolTipText("Buscar código postal...");
+        jbPickZipCode.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel315.add(jbPickZipCode);
+
+        jtfZipCode.setEditable(false);
+        jtfZipCode.setToolTipText("Código postal");
+        jtfZipCode.setFocusable(false);
+        jtfZipCode.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel315.add(jtfZipCode);
+
+        jtfNeighborhoodCode.setEditable(false);
+        jtfNeighborhoodCode.setToolTipText("Colonia SAT");
+        jtfNeighborhoodCode.setFocusable(false);
+        jtfNeighborhoodCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel315.add(jtfNeighborhoodCode);
+
+        jtfNeighborhoodName.setEditable(false);
+        jtfNeighborhoodName.setToolTipText("Nombre asentamiento");
+        jtfNeighborhoodName.setFocusable(false);
+        jtfNeighborhoodName.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel315.add(jtfNeighborhoodName);
+
+        jPanel31.add(jPanel315);
+
+        jPanel316.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDistrict.setText("Colonia:");
+        jlDistrict.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel316.add(jlDistrict);
+
+        moTextDistrict.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel316.add(moTextDistrict);
+
+        jtfDistrictCode.setEditable(false);
+        jtfDistrictCode.setToolTipText("Colonia SAT");
+        jtfDistrictCode.setFocusable(false);
+        jtfDistrictCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel316.add(jtfDistrictCode);
+
+        jPanel31.add(jPanel316);
+
+        jPanel317.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlLocality.setText("Localidad:");
+        jlLocality.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel317.add(jlLocality);
+
+        moTextLocality.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel317.add(moTextLocality);
+
+        jtfLocalityCode.setEditable(false);
+        jtfLocalityCode.setToolTipText("Localidad SAT");
+        jtfLocalityCode.setFocusable(false);
+        jtfLocalityCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel317.add(jtfLocalityCode);
+
+        jPanel31.add(jPanel317);
+
+        jPanel318.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCounty.setText("Municipio:");
+        jlCounty.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel318.add(jlCounty);
+
+        moTextCounty.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel318.add(moTextCounty);
+
+        jtfCountyCode.setEditable(false);
+        jtfCountyCode.setToolTipText("Municipio SAT");
+        jtfCountyCode.setFocusable(false);
+        jtfCountyCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel318.add(jtfCountyCode);
+
+        jPanel31.add(jPanel318);
+
+        jPanel319.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlReference.setText("Referencia:");
+        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel319.add(jlReference);
+
+        moTextReference.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel319.add(moTextReference);
+
+        jlRefernceHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlRefernceHint.setText("(Descripción geográfica adicional para ubicar el domicilio, p. ej., coordenadas GPS)");
+        jlRefernceHint.setPreferredSize(new java.awt.Dimension(410, 23));
+        jPanel319.add(jlRefernceHint);
+
+        jPanel31.add(jPanel319);
+
+        jPanel3.add(jPanel31, java.awt.BorderLayout.NORTH);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgZipCodeType;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel311;
+    private javax.swing.JPanel jPanel312;
+    private javax.swing.JPanel jPanel313;
+    private javax.swing.JPanel jPanel314;
+    private javax.swing.JPanel jPanel315;
+    private javax.swing.JPanel jPanel316;
+    private javax.swing.JPanel jPanel317;
+    private javax.swing.JPanel jPanel318;
+    private javax.swing.JPanel jPanel319;
+    private javax.swing.JButton jbPickZipCode;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlCountry;
+    private javax.swing.JLabel jlCounty;
     private javax.swing.JLabel jlDeliveryType;
+    private javax.swing.JLabel jlDistrict;
+    private javax.swing.JLabel jlLocality;
     private javax.swing.JLabel jlName;
+    private javax.swing.JLabel jlReference;
+    private javax.swing.JLabel jlRefernceHint;
     private javax.swing.JLabel jlSpotType;
+    private javax.swing.JLabel jlState;
+    private javax.swing.JLabel jlZipCode;
+    private javax.swing.JLabel jlZipCodeType;
+    private javax.swing.JTextField jtfCountyCode;
+    private javax.swing.JTextField jtfDistrictCode;
+    private javax.swing.JTextField jtfLocalityCode;
+    private javax.swing.JTextField jtfNeighborhoodCode;
+    private javax.swing.JTextField jtfNeighborhoodName;
+    private javax.swing.JTextField jtfZipCode;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolCaptureAddress;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolGeneric;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyCountry;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeliveryType;
     private sa.lib.gui.bean.SBeanFieldKey moKeySpotType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyState;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadZipCodeByCatalog;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadZipCodeByHand;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
+    private sa.lib.gui.bean.SBeanFieldText moTextCounty;
+    private sa.lib.gui.bean.SBeanFieldText moTextDistrict;
+    private sa.lib.gui.bean.SBeanFieldText moTextLocality;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
+    private sa.lib.gui.bean.SBeanFieldText moTextReference;
+    private sa.lib.gui.bean.SBeanFieldText moTextState;
+    private sa.lib.gui.bean.SBeanFieldText moTextZipCode;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
+        SGuiUtils.setWindowBounds(this, 800, 500);
+        
+        moParamsErp = (SDataParamsErp) miClient.getSession().getConfigSystem();
 
         moKeyDeliveryType.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeliveryType.getText()), true);
         moKeySpotType.setKeySettings(miClient, SGuiUtils.getLabelName(jlSpotType.getText()), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moBoolGeneric.setBooleanSettings(moBoolGeneric.getText(), false);
+        moBoolCaptureAddress.setBooleanSettings(moBoolCaptureAddress.getText(), false);
+        moKeyCountry.setKeySettings(miClient, SGuiUtils.getLabelName(jlCountry), true);
+        moKeyState.setKeySettings(miClient, SGuiUtils.getLabelName(jlState), true);
+        moTextState.setTextSettings(SGuiUtils.getLabelName(jlState), 50);
+        moRadZipCodeByHand.setBooleanSettings(moRadZipCodeByHand.getText(), false);
+        moRadZipCodeByCatalog.setBooleanSettings(moRadZipCodeByCatalog.getText(), false);
+        moTextZipCode.setTextSettings(SGuiUtils.getLabelName(jlZipCode), 15, 5);
+        moTextDistrict.setTextSettings(SGuiUtils.getLabelName(jlDistrict), 100, 0);
+        moTextLocality.setTextSettings(SGuiUtils.getLabelName(jlLocality), 50, 0);
+        moTextCounty.setTextSettings(SGuiUtils.getLabelName(jlCounty), 50);
+        moTextReference.setTextSettings(SGuiUtils.getLabelName(jlReference), 50, 0);
 
         moFields.addField(moKeyDeliveryType);
         moFields.addField(moKeySpotType);
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
+        moFields.addField(moBoolGeneric);
+        moFields.addField(moBoolCaptureAddress);
+        moFields.addField(moKeyCountry);
+        moFields.addField(moKeyState);
+        moFields.addField(moTextState);
+        moFields.addField(moRadZipCodeByHand);
+        moFields.addField(moRadZipCodeByCatalog);
+        moFields.addField(moTextZipCode);
+        moFields.addField(moTextDistrict);
+        moFields.addField(moTextLocality);
+        moFields.addField(moTextCounty);
+        moFields.addField(moTextReference);
 
         moFields.setFormButton(jbSave);
+    }
+    
+    /**
+     * Show zip code, state and neighborhood info.
+     * Members manZipCodeStateKey and moBolNeighborhood should be already set.
+     */
+    private void showZipCodeStateNeighborhood() {
+        SGuiField[] fields = new SGuiField[] {
+            moTextZipCode,
+            moTextDistrict,
+            moTextLocality,
+            moTextCounty
+        };
+        
+        JTextField[] textFields = new JTextField[] {
+            jtfZipCode,
+            jtfNeighborhoodCode,
+            jtfNeighborhoodName,
+            jtfDistrictCode,
+            jtfLocalityCode,
+            jtfCountyCode
+        };
+
+        try {
+            if (manZipCodeStateKey == null) {
+                moAuxState = null;
+                moAuxBolZipCode = null;
+                moAuxBolCounty = null;
+                moAuxBolLocality = null;
+
+                for (SGuiField field : fields) {
+                    field.resetField();
+                }
+                
+                moBolNeighborhood = null;
+
+                for (JTextField textField : textFields) {
+                    textField.setText("");
+                }
+            }
+            else {
+                String zipCodeId = SPickerNeighborhood.ZipCodeFormat.format(manZipCodeStateKey[IDX_ZIP_ID]);
+                
+                moAuxState = (SDataState) SDataUtilities.readRegistry((SClientInterface) miClient,
+                        SDataConstants.LOCU_STA, new int[] { manZipCodeStateKey[IDX_STA_ID] }, SLibConstants.EXEC_MODE_SILENT);
+                moAuxBolZipCode = (SDataBolZipCode) SDataUtilities.readRegistry((SClientInterface) miClient,
+                        SDataConstants.LOCS_BOL_ZIP_CODE, new String[] { zipCodeId, moAuxState.getStateCode() }, SLibConstants.EXEC_MODE_SILENT);
+                moAuxBolCounty = (SDataBolCounty) SDataUtilities.readRegistry((SClientInterface) miClient,
+                        SDataConstants.LOCS_BOL_COUNTY, new String[] { moAuxBolZipCode.getCountyCode(), moAuxState.getStateCode() }, SLibConstants.EXEC_MODE_SILENT);
+                moAuxBolLocality = (SDataBolLocality) SDataUtilities.readRegistry((SClientInterface) miClient,
+                        SDataConstants.LOCS_BOL_LOCALITY, new String[] { moAuxBolZipCode.getLocalityCode(), moAuxState.getStateCode() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                moTextZipCode.setValue(zipCodeId);
+                //moTextDistrict.setValue(...);
+                //jtfDistrictCode.setText(...);
+                moTextLocality.setValue(moAuxBolLocality.getDescription());
+                jtfLocalityCode.setText(moAuxBolLocality.getPkLocalityCode());
+                moTextCounty.setValue(moAuxBolCounty.getDescription());
+                jtfCountyCode.setText(moAuxBolCounty.getPkCountyCode());
+                        
+                if (moBolNeighborhood == null) {
+                    jtfZipCode.setText("");
+                    jtfNeighborhoodCode.setText("");
+                    jtfNeighborhoodName.setText("");
+                    
+                    moTextDistrict.resetField();
+                    jtfDistrictCode.setText("");
+                }
+                else {
+                    jtfZipCode.setText(moBolNeighborhood.getZipCode());
+                    jtfNeighborhoodCode.setText(moBolNeighborhood.getNeighborhoodCode());
+                    jtfNeighborhoodName.setText(moBolNeighborhood.getDescription());
+
+                    jtfZipCode.setCaretPosition(0);
+                    jtfNeighborhoodCode.setCaretPosition(0);
+                    jtfNeighborhoodName.setCaretPosition(0);
+                    
+                    moTextDistrict.setValue(moBolNeighborhood.getDescription());
+                    jtfDistrictCode.setText(moBolNeighborhood.getNeighborhoodCode());
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+    
+    private void actionPerformedPickZipCode() {
+        if (moKeyCountry.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + moKeyCountry.getFieldName() + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + "'" + miClient.getSession().getSessionCustom().getLocalCountry() + "'.");
+            moKeyCountry.requestFocusInWindow();
+        }
+        else {
+            if (moPickerNeighborhood == null) {
+                moPickerNeighborhood = new SPickerNeighborhood(miClient);
+            }
+            
+            /*
+            Zip Code ID can be zero, it is a valid zip code ID ('00000').
+            State ID cannot be zero as a valid ID.
+            Neighborhood ID can be zero, it is optional.
+            */
+            
+            int zipCodeId = SLibUtils.parseInt(moTextZipCode.getText());
+            int stateId = moKeyState.getSelectedIndex() <= 0 ? 0 : moKeyState.getValue()[0];
+            int neighborhoodId = moBolNeighborhood == null ? 0 : moBolNeighborhood.getPkNeighborhoodZipCodeId();
+            
+            SPickerNeighborhood.Option option = null;
+            
+            if (!(zipCodeId == 0 && stateId == 0)) {
+                option = new SPickerNeighborhood.Option(zipCodeId, stateId, neighborhoodId);
+            }
+
+            moPickerNeighborhood.setValue(SDataConstants.LOCS_BOL_NEI_ZIP_CODE, option);
+            moPickerNeighborhood.setFormVisible(true);
+
+            if (moPickerNeighborhood.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                manZipCodeStateKey = null;
+                moBolNeighborhood = null;
+                
+                option = (SPickerNeighborhood.Option) moPickerNeighborhood.getValue(SDataConstants.LOCS_BOL_NEI_ZIP_CODE);
+                
+                if (option != null) {
+                    if (!(option.ZipCodeId == 0 && option.StateId == 0)) {
+                        manZipCodeStateKey = new int[] { option.ZipCodeId, option.StateId };
+                        
+                        if (option.NeighborhoodId != 0) {
+                            moBolNeighborhood = (SDataBolNeighborhood) SDataUtilities.readRegistry((SClientInterface) miClient,
+                                    SDataConstants.LOCS_BOL_NEI_ZIP_CODE, new int[] { option.NeighborhoodId }, SLibConstants.EXEC_MODE_SILENT);
+                        }
+                    }
+                }
+
+                showZipCodeStateNeighborhood();
+            }
+        }
+    }
+    
+    private void itemStateChangedGeneric(final boolean settingRegistry) {
+        try {
+            mbUpdatingFields = true;
+            
+            if (moBoolGeneric.isSelected()) {
+                moBoolCaptureAddress.setEnabled(false);
+                
+                moBoolCaptureAddress.setValue(false);
+            }
+            else {
+                moBoolCaptureAddress.setEnabled(true);
+            }
+            
+            if (!settingRegistry) {
+                itemStateChangedCaptureAddress(settingRegistry);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            mbUpdatingFields = false;
+        }
+    }
+    
+    private void itemStateChangedCaptureAddress(final boolean settingRegistry) {
+        try {
+            mbUpdatingFields = true;
+
+            if (moBoolCaptureAddress.isSelected()) {
+                moKeyCountry.setEnabled(true);
+                
+                if (!settingRegistry) {
+                    if (moKeyCountry.getSelectedIndex() <= 0) {
+                        moKeyCountry.setValue(new int[] { moParamsErp.getFkCountryId() });
+                    }
+                    itemStateChangedCountry();
+                }
+                
+                moRadZipCodeByHand.setEnabled(true);
+                moRadZipCodeByCatalog.setEnabled(true);
+                
+                if (!settingRegistry) {
+                    itemStateChangedZipCodeType();
+                }
+            }
+            else {
+                JComponent[] components = new JComponent[] {
+                    moKeyCountry,
+                    moKeyState,
+                    moTextState,
+                    moRadZipCodeByHand,
+                    moRadZipCodeByCatalog,
+                    jbPickZipCode,
+                    moTextZipCode,
+                    moTextDistrict,
+                    moTextLocality,
+                    moTextCounty,
+                    moTextReference
+                };
+                
+                for (JComponent component : components) {
+                    component.setEnabled(false);
+                }
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        finally {
+            mbUpdatingFields = false;
+        }
+    }
+    
+    private void itemStateChangedCountry() {
+        if (moKeyCountry.getSelectedIndex() <= 0) {
+            moKeyState.setEnabled(false);
+            moKeyState.removeAllItems();
+            
+            moTextState.resetField();
+            moTextState.setEnabled(false);
+        }
+        else {
+            miClient.getSession().populateCatalogue(moKeyState, SModConsts.LOCU_STA, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moKeyCountry.getValue()[0] }));
+            
+            if (moKeyState.getItemCount() > 1) {
+                // states available:
+                moKeyState.setEnabled(moBoolCaptureAddress.isSelected());
+                moTextState.setEnabled(false);
+            }
+            else {
+                // states not available:
+                moKeyState.setEnabled(false);
+                moTextState.setEnabled(moBoolCaptureAddress.isSelected());
+            }
+        }
+    }
+
+    private void itemStateChangedZipCodeType() {
+        SGuiField[] fields = new SGuiField[] {
+            moTextZipCode,
+            moTextDistrict,
+            moTextLocality,
+            moTextCounty
+        };
+        
+        if (moRadZipCodeByHand.isSelected()) {
+            jbPickZipCode.setEnabled(false);
+            
+            for (SGuiField field : fields) {
+                field.setEnabled(moBoolCaptureAddress.isSelected());
+            }
+        }
+        else {
+            jbPickZipCode.setEnabled(moBoolCaptureAddress.isSelected());
+            
+            for (SGuiField field : fields) {
+                field.setEnabled(false);
+            }
+        }
+        
+        moTextReference.setEnabled(moBoolCaptureAddress.isSelected());
     }
 
     @Override
     public void addAllListeners() {
-
+        jbPickZipCode.addActionListener(this);
+        
+        moBoolGeneric.addItemListener(this);
+        moBoolCaptureAddress.addItemListener(this);
+        moKeyCountry.addItemListener(this);
+        moRadZipCodeByHand.addItemListener(this);
+        moRadZipCodeByCatalog.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-
+        jbPickZipCode.removeActionListener(this);
+        
+        moBoolGeneric.removeItemListener(this);
+        moBoolCaptureAddress.removeItemListener(this);
+        moKeyCountry.removeItemListener(this);
+        moRadZipCodeByHand.removeItemListener(this);
+        moRadZipCodeByCatalog.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyDeliveryType, SModConsts.LOGS_TP_DLY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeySpotType, SModConsts.LOGS_TP_SPOT, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyCountry, SModConsts.LOCU_CTY, SLibConsts.UNDEFINED, null);
     }
 
     @Override
@@ -168,6 +753,7 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
 
         removeAllListeners();
         reloadCatalogues();
+        setFormEditable(true);
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
@@ -177,13 +763,103 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
+        // clear capture address field:
+        
+        moBoolCaptureAddress.setValue(false);
+        
+        // set registry:
+        
         moKeyDeliveryType.setValue(new int[] { moRegistry.getFkDeliveryTypeId() });
         moKeySpotType.setValue(new int[] { moRegistry.getFkSpotTypeId() });
         moTextCode.setValue(moRegistry.getCode());
         moTextName.setValue(moRegistry.getName());
+        
+        moBoolGeneric.setValue(moRegistry.isGeneric()); // just after moBoolGeneric.setValue()!
+        itemStateChangedGeneric(true);
+        
+        moBoolCaptureAddress.setValue(moRegistry.getFkCountryId_n() != 0); // just before moBoolGeneric.setValue()!
+        itemStateChangedCaptureAddress(true);
+        
+        manZipCodeStateKey = null;
+        moBolNeighborhood = null;
 
-        setFormEditable(true);
+        if (moBoolCaptureAddress.isSelected()) {
+            moKeyCountry.setValue(new int[] { moRegistry.getFkCountryId_n() });
+            itemStateChangedCountry();
+            moKeyState.setValue(new int[] { moRegistry.getFkStateId_n() });
+            moTextState.setValue(moRegistry.getState());
 
+            int zipCodeId = SLibUtils.parseInt(moRegistry.getZipCode());
+            int stateId = moRegistry.getFkStateId_n();
+            int neighborhoodId = moRegistry.getFkNeighborhoodZipCodeId_n();
+            
+            if (!(zipCodeId == 0 && stateId == 0)) {
+                // check if zip code and state code is a valid BOL catalog option:
+                
+                String stateCode = SDataState.getStateCodeById((SClientInterface) miClient, stateId);
+                boolean exists = SDataBolZipCode.exists((SClientInterface) miClient, SPickerNeighborhood.ZipCodeFormat.format(zipCodeId), stateCode, true);
+                
+                if (exists) {
+                    manZipCodeStateKey = new int[] { zipCodeId, stateId };
+                }
+            }
+            
+            if (manZipCodeStateKey != null && (neighborhoodId != 0 || (!moRegistry.getCountyCode().isEmpty() && !moRegistry.getLocalityCode().isEmpty()))) {
+                // info by catalog:
+                
+                moRadZipCodeByCatalog.setValue(true);
+                itemStateChangedZipCodeType();
+                
+                if (neighborhoodId != 0) {
+                    // neighborhood can exist only within a valid BOL catalog option of zip code and state code:
+                    moBolNeighborhood = (SDataBolNeighborhood) SDataUtilities.readRegistry((SClientInterface) miClient, 
+                            SDataConstants.LOCS_BOL_NEI_ZIP_CODE, new int[] { neighborhoodId }, SLibConstants.EXEC_MODE_SILENT);
+                }
+                
+                // show info by catalog:
+                showZipCodeStateNeighborhood();
+            }
+            else {
+                // reset, is not needed anymore:
+                manZipCodeStateKey = null;
+                
+                // info by hand:
+                
+                moRadZipCodeByHand.setValue(true); // manual
+                itemStateChangedZipCodeType();
+                
+                // clear fields:
+                showZipCodeStateNeighborhood();
+                
+                // show info by hand of fields:
+                moTextZipCode.setValue(moRegistry.getZipCode());
+                moTextDistrict.setValue(moRegistry.getDistrict());
+                jtfDistrictCode.setText("");
+                moTextLocality.setValue(moRegistry.getLocality());
+                jtfLocalityCode.setText("");
+                moTextCounty.setValue(moRegistry.getCounty());
+                jtfCountyCode.setText("");
+                
+                // show info by hand of other fieles:
+                moTextReference.setValue(moRegistry.getReference());
+            }
+        }
+        else {
+            moKeyCountry.resetField();
+            itemStateChangedCountry();
+            moKeyState.resetField();
+            moTextState.resetField();
+
+            moRadZipCodeByHand.setValue(true);
+            itemStateChangedZipCodeType();
+            
+            // clear fields:
+            showZipCodeStateNeighborhood();
+            
+            // clear other fields:
+            moTextReference.resetField();
+        }
+        
         if (moRegistry.isRegistryNew()) { }
 
         addAllListeners();
@@ -195,10 +871,40 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
 
         if (registry.isRegistryNew()) {}
 
-        moRegistry.setFkDeliveryTypeId(moKeyDeliveryType.getValue()[0]);
-        moRegistry.setFkSpotTypeId(moKeySpotType.getValue()[0]);
         moRegistry.setCode(moTextCode.getValue());
         moRegistry.setName(moTextName.getValue());
+        
+        moRegistry.setFkSpotTypeId(moKeySpotType.getValue()[0]);
+        moRegistry.setFkDeliveryTypeId(moKeyDeliveryType.getValue()[0]);
+        
+        moRegistry.setGeneric(moBoolGeneric.isSelected());
+        
+        if (moBoolGeneric.isSelected() || !moBoolCaptureAddress.isSelected()) {
+            moRegistry.setDistrict("");
+            moRegistry.setReference("");
+            moRegistry.setLocalityCode("");
+            moRegistry.setLocality("");
+            moRegistry.setCountyCode("");
+            moRegistry.setCounty("");
+            moRegistry.setState("");
+            moRegistry.setZipCode("");
+            moRegistry.setFkCountryId_n(0);
+            moRegistry.setFkStateId_n(0);
+            moRegistry.setFkNeighborhoodZipCodeId_n(0);
+        }
+        else {
+            moRegistry.setDistrict(moTextDistrict.getValue());
+            moRegistry.setReference(moTextReference.getValue());
+            moRegistry.setLocalityCode(moRadZipCodeByCatalog.isSelected() ? jtfLocalityCode.getText() : "");
+            moRegistry.setLocality(moTextLocality.getValue());
+            moRegistry.setCountyCode(moRadZipCodeByCatalog.isSelected() ? jtfCountyCode.getText() : "");
+            moRegistry.setCounty(moTextCounty.getValue());
+            moRegistry.setState(moTextState.isEnabled() ? moTextState.getValue() : "");
+            moRegistry.setZipCode(moTextZipCode.getValue());
+            moRegistry.setFkCountryId_n(moKeyCountry.getSelectedIndex() <= 0 ? 0 : moKeyCountry.getValue()[0]);
+            moRegistry.setFkStateId_n(moKeyState.getSelectedIndex() <= 0 ? 0 : moKeyState.getValue()[0]);
+            moRegistry.setFkNeighborhoodZipCodeId_n(moBolNeighborhood == null ? 0 : moBolNeighborhood.getPkNeighborhoodZipCodeId());
+        }
 
         return registry;
     }
@@ -206,7 +912,80 @@ public class SFormSpot extends sa.lib.gui.bean.SBeanForm {
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            if (moBoolGeneric.isSelected() && moKeyDeliveryType.getValue()[0] == SModSysConsts.LOGS_TP_DLY_NA) {
+                validation.setMessage("Si el campo '" + moBoolGeneric.getFieldName() + "' está seleccionado, " + SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moKeyDeliveryType.getFieldName() + "'.");
+                validation.setComponent(moKeyDeliveryType);
+            }
+            else if (moRadZipCodeByCatalog.isSelected() && manZipCodeStateKey == null) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlZipCode) + "'.\n"
+                        + "Hay que buscar un valor para '" + SGuiUtils.getLabelName(jlZipCodeType) + "': '" + moRadZipCodeByCatalog.getText() + "'.");
+                validation.setComponent(jbPickZipCode);
+            }
+            else if (moRadZipCodeByCatalog.isSelected() && moKeyCountry.getValue()[0] != moParamsErp.getFkCountryId()) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moKeyCountry.getFieldName() + "'.\n"
+                        + "El valor seleccionado debe ser '" + miClient.getSession().getSessionCustom().getLocalCountry() + "'.");
+                validation.setComponent(moKeyCountry);
+            }
+            else if (manZipCodeStateKey != null && manZipCodeStateKey[IDX_STA_ID] != moKeyState.getValue()[0]) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moKeyState.getFieldName() + "'.\n"
+                        + "El valor seleccionado "
+                        + (moAuxState != null ?
+                                "debe ser '" + moAuxState.getState() + "'." :
+                                (moBolNeighborhood != null ?
+                                        "debe corresponder al código postal '" + moBolNeighborhood.getZipCode() + "'." :
+                                        "debe corresponder al código postal.")));
+                validation.setComponent(moKeyState);
+            }
+            else if (manZipCodeStateKey != null && manZipCodeStateKey[IDX_ZIP_ID] != SLibUtils.parseInt(moTextZipCode.getValue())) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + moTextZipCode.getFieldName() + "'.\n"
+                        + "El valor capturad debe set '" + manZipCodeStateKey[IDX_ZIP_ID] + "'.");
+                validation.setComponent(moTextZipCode);
+            }
+        }
 
         return validation;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbPickZipCode) {
+                actionPerformedPickZipCode();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (!mbUpdatingFields) {
+            if (e.getSource() instanceof SBeanFieldBoolean) {
+                SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
+
+                if (field == moBoolGeneric) {
+                    itemStateChangedGeneric(false);
+                }
+                else if (field == moBoolCaptureAddress) {
+                    itemStateChangedCaptureAddress(false);
+                }
+            }
+            else if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+                SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+
+                if (field == moKeyCountry) {
+                    itemStateChangedCountry();
+                }
+            }
+            else if (e.getSource() instanceof SBeanFieldRadio && e.getStateChange() == ItemEvent.SELECTED) {
+                SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
+
+                if (field == moRadZipCodeByHand || field == moRadZipCodeByCatalog) {
+                    itemStateChangedZipCodeType();
+                }
+            }
+        }
     }
 }

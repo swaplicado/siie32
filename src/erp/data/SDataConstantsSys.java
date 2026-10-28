@@ -157,6 +157,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_SUP_CHAIN_SETTINGS = "SUP_CHAIN_SETTINGS";
     public static final String CFG_PARAM_GCS_CONFIG = "GCS_CONFIG"; // Google Cloud Credentials
     public static final String CFG_PARAM_GCS_CREDENTIALS = "GCS_CREDENTIALS"; // Google Cloud Credentials
+    public static final String CFG_PARAM_LOG_CONFIG = "LOG_CONFIG";
     public static final String CFG_PARAM_HUMAND_CONFIG = "HUMAND_CONFIG";
     public static final String CFG_PARAM_DOC_MONGO_URI = "DOC_MONGO_URI";
     public static final String CFG_PARAM_DOC_COM_REF = "DOC_COM_REF";

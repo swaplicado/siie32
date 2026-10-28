@@ -13,13 +13,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbBolPerson extends SDbRegistryUser implements Serializable {
 
@@ -28,6 +29,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     protected String msFiscalId;
     protected String msFiscalForeginId;
     protected String msDriverLicense;
+    protected Date mtDriverLicenseExpiration_n;
     protected String msTelephone;
     protected String msStreet;
     protected String msStreetNumberExt;
@@ -53,6 +55,8 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     protected erp.mloc.data.SDataState moDataState;
     protected erp.mloc.data.SDataCountry moDataCountry;
     
+    protected int mnXtaFkDriverCarrierId;
+    
     public SDbBolPerson() {
         super(SModConsts.LOG_BOL_PERSON);
     }
@@ -62,6 +66,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     public void setFiscalId(String s) { msFiscalId = s; }
     public void setFiscalForeginId(String s) { msFiscalForeginId = s; }
     public void setDriverLicense(String s) { msDriverLicense = s; }
+    public void setDriverLicenseExpiration_n(Date t) { mtDriverLicenseExpiration_n = t; }
     public void setTelephone(String s) { msTelephone = s; }
     public void setStreet(String s) { msStreet = s; }
     public void setStreetNumberExt(String s) { msStreetNumberExt = s; }
@@ -85,6 +90,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     public String getFiscalId() { return msFiscalId; }
     public String getFiscalForeginId() { return msFiscalForeginId; }
     public String getDriverLicense() { return msDriverLicense; }
+    public Date getDriverLicenseExpiration_n() { return mtDriverLicenseExpiration_n; }
     public String getTelephone() { return msTelephone; }
     public String getStreet() { return msStreet; }
     public String getStreetNumberExt() { return msStreetNumberExt; }
@@ -105,13 +111,16 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     
     public void setDbmsBolPersonTypeCode(String s) { msDbmsBolPersonTypeCode = s; }
     
+    public String getDbmsBolPersonTypeCode() { return msDbmsBolPersonTypeCode; }
+    
     public void setDataState(SDataState o) { moDataState = o; }
     public void setDataCountry(SDataCountry o) { moDataCountry = o; }
     
-    public String getDbmsBolPersonTypeCode() { return msDbmsBolPersonTypeCode; }
-    
     public SDataState getDataState() { return moDataState; }
     public SDataCountry getDataCountry() { return moDataCountry; }
+    
+    public void setXtaFkDriverCarrierId(int n) { mnXtaFkDriverCarrierId = n; }
+    public int getXtaFkDriverCarrierId() { return mnXtaFkDriverCarrierId; }
     
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -132,6 +141,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         msFiscalId = "";
         msFiscalForeginId = "";
         msDriverLicense = "";
+        mtDriverLicenseExpiration_n = null;
         msTelephone = "";
         msStreet = "";
         msStreetNumberExt = "";
@@ -154,6 +164,8 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         
         moDataState = null;
         moDataCountry = null;
+        
+        mnXtaFkDriverCarrierId = 0;
     }
 
     @Override
@@ -203,6 +215,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
             msFiscalId = resultSet.getString("fiscal_id");
             msFiscalForeginId = resultSet.getString("fiscal_frg_id");
             msDriverLicense = resultSet.getString("driver_lic");
+            mtDriverLicenseExpiration_n = resultSet.getDate("driver_lic_exp_dt_n");
             msTelephone = resultSet.getString("telephone");
             msStreet = resultSet.getString("street");
             msStreetNumberExt = resultSet.getString("street_num_ext");
@@ -240,6 +253,15 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
             moDataCountry.read(new int[] { mnFkCountryId_n }, session.getStatement());
         }
         
+        // Read driver's carrier:
+        
+        msSql = "SELECT id_car FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
+        try (ResultSet resultSetCarrier = session.getStatement().executeQuery(msSql)) {
+            if (resultSetCarrier.next()) {
+                mnXtaFkDriverCarrierId = resultSetCarrier.getInt("id_car");
+            }
+        }
+        
         mnQueryResultId = SDbConsts.READ_OK;
     }
 
@@ -247,10 +269,6 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-        
-        if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
         
         msDbmsBolPersonTypeCode = (String) session.readField(SModConsts.LOGS_TP_BOL_PERSON, new int[] { mnFkBolPersonTypeId }, FIELD_CODE);
         
@@ -260,61 +278,103 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
             
-            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" + 
-                mnPkBolPersonId + ", " + 
-                "'" + msName + "', " + 
-                "'" + msFiscalId + "', " + 
-                "'" + msFiscalForeginId + "', " + 
-                "'" + msDriverLicense + "', " + 
-                "'" + msTelephone + "', " + 
-                "'" + msStreet + "', " + 
-                "'" + msStreetNumberExt + "', " + 
-                "'" + msStreetNumberInt + "', " + 
-                "'" + msNeighborhood + "', " + 
-                "'" + msReference + "', " + 
-                "'" + msLocality + "', " + 
-                "'" + msState + "', " + 
-                "'" + msZipCode + "', " + 
-                (mbDeleted ? 1 : 0) + ", " + 
-                mnFkBolPersonTypeId + ", " + 
-                (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") + 
-                (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
-                mnFkUserInsertId + ", " + 
-                mnFkUserUpdateId + ", " + 
-                "NOW()" + ", " + 
-                "NOW()" + " " + 
-                ")";
+            msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
+                    mnPkBolPersonId + ", " + 
+                    "'" + msName + "', " + 
+                    "'" + msFiscalId + "', " + 
+                    "'" + msFiscalForeginId + "', " + 
+                    "'" + msDriverLicense + "', " + 
+                    (mtDriverLicenseExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtDriverLicenseExpiration_n) + "'") + ", " + 
+                    "'" + msTelephone + "', " + 
+                    "'" + msStreet + "', " + 
+                    "'" + msStreetNumberExt + "', " + 
+                    "'" + msStreetNumberInt + "', " + 
+                    "'" + msNeighborhood + "', " + 
+                    "'" + msReference + "', " + 
+                    "'" + msLocality + "', " + 
+                    "'" + msState + "', " + 
+                    "'" + msZipCode + "', " + 
+                    (mbDeleted ? 1 : 0) + ", " + 
+                    mnFkBolPersonTypeId + ", " + 
+                    (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") + 
+                    (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
+                    mnFkUserInsertId + ", " + 
+                    mnFkUserUpdateId + ", " + 
+                    "NOW()" + ", " + 
+                    "NOW()" + " " + 
+                    ")";
         }
         else {
             mnFkUserUpdateId = session.getUser().getPkUserId();
             
-            msSql = "UPDATE " + getSqlTable() + " SET " + 
-                //"id_bol_person = " + mnPkBolPersonId + ", " +
-                "name = '" + msName + "', " +
-                "fiscal_id = '" + msFiscalId + "', " +
-                "fiscal_frg_id = '" + msFiscalForeginId + "', " +
-                "driver_lic = '" + msDriverLicense + "', " +
-                "telephone = '" + msTelephone + "', " +
-                "street = '" + msStreet + "', " +
-                "street_num_ext = '" + msStreetNumberExt + "', " +
-                "street_num_int = '" + msStreetNumberInt + "', " +
-                "neighborhood = '" + msNeighborhood + "', " +
-                "reference = '" + msReference + "', " +
-                "locality = '" + msLocality + "', " +
-                "state = '" + msState + "', " +
-                "zip_code = '" + msZipCode + "', " +
-                "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                "fk_tp_bol_person = " + mnFkBolPersonTypeId + ", " +
-                "fk_cty_n = " + (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") +
-                "fk_sta_n = " + (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
-                //"fk_usr_ins = " + mnFkUserInsertId + ", " +
-                "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                //"ts_usr_ins = " + "NOW()" + ", " +
-                "ts_usr_upd = " + "NOW()" + " " +
-                getSqlWhere();
+            msSql = "UPDATE " + getSqlTable() + " SET " +
+                    //"id_bol_person = " + mnPkBolPersonId + ", " +
+                    "name = '" + msName + "', " +
+                    "fiscal_id = '" + msFiscalId + "', " +
+                    "fiscal_frg_id = '" + msFiscalForeginId + "', " +
+                    "driver_lic = '" + msDriverLicense + "', " +
+                    "driver_lic_exp_dt_n = " + (mtDriverLicenseExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtDriverLicenseExpiration_n) + "'") + ", " + 
+                    "telephone = '" + msTelephone + "', " +
+                    "street = '" + msStreet + "', " +
+                    "street_num_ext = '" + msStreetNumberExt + "', " +
+                    "street_num_int = '" + msStreetNumberInt + "', " +
+                    "neighborhood = '" + msNeighborhood + "', " +
+                    "reference = '" + msReference + "', " +
+                    "locality = '" + msLocality + "', " +
+                    "state = '" + msState + "', " +
+                    "zip_code = '" + msZipCode + "', " +
+                    "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    "fk_tp_bol_person = " + mnFkBolPersonTypeId + ", " +
+                    "fk_cty_n = " + (mnFkCountryId_n == 0 ? "NULL, " : mnFkCountryId_n + ", ") +
+                    "fk_sta_n = " + (mnFkStateId_n == 0 ? "NULL, " : mnFkStateId_n + ", ") +
+                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    "fk_usr_upd = " + mnFkUserUpdateId + ", " +
+                    //"ts_usr_ins = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
+                    getSqlWhere();
         }
         
         session.getStatement().execute(msSql);
+        
+        // save driver's carrier:
+        
+        if (mnXtaFkDriverCarrierId == 0) {
+            // delete existing driver's carrier:
+            msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " SET b_del = 1 WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
+            session.getStatement().execute(msSql);
+        }
+        else {
+            // save driver's carrier:
+        
+            int currentDriverCarrierId = 0;
+            
+            msSql = "SELECT id_car FROM " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
+            try (ResultSet resultSetCarrier = session.getStatement().executeQuery(msSql)) {
+                if (resultSetCarrier.next()) {
+                    currentDriverCarrierId = resultSetCarrier.getInt("id_car");
+                }
+                
+                if (currentDriverCarrierId != 0 && currentDriverCarrierId != mnXtaFkDriverCarrierId) {
+                    // delete existing driver's carrier:
+                    msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " SET b_del = 1 WHERE id_driver = " + mnPkBolPersonId + " AND NOT b_del;";
+                    session.getStatement().execute(msSql);
+                }
+                
+                if (currentDriverCarrierId != mnXtaFkDriverCarrierId) {
+                    msSql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.LOG_DRIVER_BP_CAR) + " VALUES (" +
+                            mnPkBolPersonId + ", " + 
+                            mnXtaFkDriverCarrierId + ", " + 
+                            (mbDeleted ? 1 : 0) + ", " + 
+                            mnFkUserInsertId + ", " + 
+                            mnFkUserUpdateId + ", " + 
+                            "NOW()" + ", " + 
+                            "NOW()" + ", " + 
+                            ")";
+                }
+            }
+        }
+        
+        // complete registry saving:
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -329,6 +389,7 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         registry.setFiscalId(this.getFiscalId());
         registry.setFiscalForeginId(this.getFiscalForeginId());
         registry.setDriverLicense(this.getDriverLicense());
+        registry.setDriverLicenseExpiration_n(this.getDriverLicenseExpiration_n());
         registry.setTelephone(this.getTelephone());
         registry.setStreet(this.getStreet());
         registry.setStreetNumberExt(this.getStreetNumberExt());
@@ -351,7 +412,10 @@ public class SDbBolPerson extends SDbRegistryUser implements Serializable {
         
         registry.setDataState(this.getDataState()); // el clon comparte este registro que es de sólo lectura
         registry.setDataCountry(this.getDataCountry()); // el clon comparte este registro que es de sólo lectura
+        
+        registry.setXtaFkDriverCarrierId(this.getXtaFkDriverCarrierId());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }
