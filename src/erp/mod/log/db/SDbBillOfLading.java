@@ -37,7 +37,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40, Serializable {
     
@@ -511,10 +511,6 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-        
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             msBillOfLadingUuid = "CCC" + java.util.UUID.randomUUID().toString().substring(3).toUpperCase();
@@ -695,6 +691,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         registry.setAuxDbmsDataEmisor(this.getAuxDbmsDataEmisor()); // el clon comparte este registro que es de sólo lectura
         registry.setAuxDbmsDataEmisorSucursal(this.getAuxDbmsDataEmisorSucursal()); // el clon comparte este registro que es de sólo lectura
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
     
@@ -971,7 +968,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver3.ccp20.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
@@ -1323,7 +1320,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver4.ccp30.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
@@ -1682,7 +1679,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
         // Seguros: 
         
         cfd.ver4.ccp31.DElementSeguros seguros = autotransporte.getEltSeguros();
-        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getXtaInsurerName());
+        seguros.getAttAseguraRespCivil().setString(moBolTransportationMode.getDataVehicle().getDbmsInsurerName());
         seguros.getAttPolizaRespCivil().setString(moBolTransportationMode.getDataVehicle().getInsurancePolicy());
         seguros.getAttAseguraMedAmbiente().setString(moDataEnvironmentalInsurer.getName());
         seguros.getAttPolizaMedAmbiente().setString(msEnvironmentalInsurerPolicy);
@@ -2028,6 +2025,7 @@ public class SDbBillOfLading extends SDbRegistryUser implements erp.cfd.SCfdXmlC
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.3 & 4.0
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
+        
         for (SDbBolMerchandise merch : maBolMerchandises) {
             SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_BOL);
             concepto.setClaveProdServ(merch.getXtaItemClaveProdServ());

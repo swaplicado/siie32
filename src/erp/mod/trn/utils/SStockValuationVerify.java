@@ -6,14 +6,29 @@
 package erp.mod.trn.utils;
 
 
+import erp.SFileUtilities;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationKardex;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -75,19 +90,229 @@ public abstract class SStockValuationVerify {
      * @throws SQLException si ocurre un error al ejecutar alguna consulta
      */
     public static String verifyStockValuation(SGuiSession oSession) throws SQLException {
-        return verifyStkInMovements(oSession)
-                + verifyStkOutMovements(oSession)
-                + verifyAssetAccounting(oSession)
-                + verifyOrdersByDpsNature(oSession)
-                + verifyOrdersWithAssetItems(oSession)
-                + verifyStockValuationQtyConsumptions(oSession)
-                + verifyStockValuationCostConsumptions(oSession)
-                + verifyPurchaseInvoiceWithZero(oSession)
-                + verifyOrdersWithoutInvoiceWithZero(oSession)
-                + verifyKardexEntriesWithoutMvt(oSession)
-                + verifyKardexOutsWithoutMvt(oSession)
-                + verifyNegativeKardexRemaining(oSession)
-                + verifyOrphanKardexAdjusts(oSession);
+        return verifyStockValuationWithEvidence(oSession).getErrors();
+    }
+
+    /**
+     * Ejecuta todas las verificaciones y conserva el resultado de cada una
+     * para generar una bitácora en Excel.
+     *
+     * @param oSession sesión activa de base de datos
+     * @return resultado detallado de la verificación
+     * @throws SQLException si ocurre un error al ejecutar alguna consulta
+     */
+    public static VerificationResult verifyStockValuationWithEvidence(SGuiSession oSession) throws SQLException {
+        VerificationResult result = new VerificationResult(
+                new Date(),
+                oSession.getUser().getName(),
+                Integer.toString(oSession.getConfigCompany().getCompanyId()));
+
+        addCheck(result, "Movimientos de entrada al almacén", oSession, SStockValuationVerify::verifyStkInMovements);
+        addCheck(result, "Movimientos de salida del almacén", oSession, SStockValuationVerify::verifyStkOutMovements);
+        addCheck(result, "Contabilización de activos fijos", oSession, SStockValuationVerify::verifyAssetAccounting);
+        addCheck(result, "Órdenes de compra por naturaleza", oSession, SStockValuationVerify::verifyOrdersByDpsNature);
+        addCheck(result, "Órdenes de compra con artículos de activo fijo", oSession, SStockValuationVerify::verifyOrdersWithAssetItems);
+        addCheck(result, "Cantidad de consumos de valuación", oSession, SStockValuationVerify::verifyStockValuationQtyConsumptions);
+        addCheck(result, "Costo de consumos de valuación", oSession, SStockValuationVerify::verifyStockValuationCostConsumptions);
+        addCheck(result, "Facturas de compra con costo cero", oSession, SStockValuationVerify::verifyPurchaseInvoiceWithZero);
+        addCheck(result, "Órdenes sin factura con costo cero", oSession, SStockValuationVerify::verifyOrdersWithoutInvoiceWithZero);
+        addCheck(result, "Entradas de kardex sin movimiento de valuación", oSession, SStockValuationVerify::verifyKardexEntriesWithoutMvt);
+        addCheck(result, "Salidas de kardex sin movimiento de valuación", oSession, SStockValuationVerify::verifyKardexOutsWithoutMvt);
+        addCheck(result, "Remanente negativo de kardex", oSession, SStockValuationVerify::verifyNegativeKardexRemaining);
+        addCheck(result, "Ajustes de kardex huérfanos", oSession, SStockValuationVerify::verifyOrphanKardexAdjusts);
+
+        result.finish(new Date());
+        return result;
+    }
+
+    private static void addCheck(VerificationResult result, String name, SGuiSession session, StockValuationCheck check) throws SQLException {
+        String errors = check.execute(session);
+        result.addCheck(name, errors);
+    }
+
+    @FunctionalInterface
+    private interface StockValuationCheck {
+        String execute(SGuiSession session) throws SQLException;
+    }
+
+    /**
+     * Resultado de una ejecución de verificaciones, utilizable para mostrar
+     * los errores actuales o exportar una bitácora Excel.
+     */
+    public static final class VerificationResult {
+        private final Date startedAt;
+        private final String userName;
+        private final String companyId;
+        private Date finishedAt;
+        private final List<VerificationCheckResult> checks;
+        private final StringBuilder errors;
+
+        private VerificationResult(Date startedAt, String userName, String companyId) {
+            this.startedAt = startedAt;
+            this.userName = userName;
+            this.companyId = companyId;
+            this.checks = new ArrayList<>();
+            this.errors = new StringBuilder();
+        }
+
+        private void addCheck(String name, String checkErrors) {
+            checks.add(new VerificationCheckResult(name, checkErrors));
+            errors.append(checkErrors);
+        }
+
+        private void finish(Date finishedAt) {
+            this.finishedAt = finishedAt;
+        }
+
+        public String getErrors() {
+            return errors.toString();
+        }
+
+        public Date getStartedAt() {
+            return new Date(startedAt.getTime());
+        }
+
+        public Date getFinishedAt() {
+            return new Date(finishedAt.getTime());
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getCompanyId() {
+            return companyId;
+        }
+
+        public void writeTo(File file) throws IOException {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            writeSummary(workbook);
+            writeFindings(workbook);
+            try (FileOutputStream output = new FileOutputStream(file)) {
+                workbook.write(output);
+            }
+        }
+
+        private void writeSummary(XSSFWorkbook workbook) {
+            Sheet sheet = workbook.createSheet("Resumen");
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Row title = sheet.createRow(0);
+            title.createCell(0).setCellValue("Bitácora de verificación de valuación de inventarios");
+            title.getCell(0).setCellStyle(headerStyle);
+
+            writeSummaryValue(sheet, 2, "Inicio de ejecución", dateFormat.format(startedAt));
+            writeSummaryValue(sheet, 3, "Fin de ejecución", dateFormat.format(finishedAt));
+            writeSummaryValue(sheet, 4, "Usuario", userName);
+            writeSummaryValue(sheet, 5, "Empresa (ID)", companyId);
+            writeSummaryValue(sheet, 6, "Resultado general", hasFindings() ? "CON HALLAZGOS" : "PASÓ");
+            writeSummaryValue(sheet, 7, "Periodo de movimientos evaluado desde", SINCE_DATE);
+            writeSummaryValue(sheet, 8, "Tolerancia de remanente negativo", Double.toString(TOLERANCE_KARDEX_REMAINING));
+            writeSummaryValue(sheet, 9, "Validaciones ejecutadas", Integer.toString(checks.size()));
+            writeSummaryValue(sheet, 10, "Validaciones sin hallazgos", Integer.toString(getPassedCheckCount()));
+            writeSummaryValue(sheet, 11, "Validaciones con hallazgos", Integer.toString(checks.size() - getPassedCheckCount()));
+            writeSummaryValue(sheet, 13, "Alcance", "Resultado de las consultas de verificación ejecutadas secuencialmente; no es una copia completa ni un bloqueo transaccional de la base de datos.");
+
+            Row header = sheet.createRow(15);
+            writeCell(header, 0, "Validación", headerStyle);
+            writeCell(header, 1, "Resultado", headerStyle);
+            for (int index = 0; index < checks.size(); index++) {
+                VerificationCheckResult check = checks.get(index);
+                Row row = sheet.createRow(index + 16);
+                row.createCell(0).setCellValue(check.name);
+                row.createCell(1).setCellValue(check.hasFindings() ? "CON HALLAZGOS" : "SIN HALLAZGOS");
+            }
+
+            sheet.setColumnWidth(0, 15000);
+            sheet.setColumnWidth(1, 6000);
+        }
+
+        private void writeFindings(XSSFWorkbook workbook) {
+            Sheet sheet = workbook.createSheet("Hallazgos");
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            Row header = sheet.createRow(0);
+            writeCell(header, 0, "Validación", headerStyle);
+            writeCell(header, 1, "Detalle", headerStyle);
+
+            int rowIndex = 1;
+            for (VerificationCheckResult check : checks) {
+                if (check.hasFindings()) {
+                    String[] lines = check.errors.split("\\r?\\n");
+                    for (String line : lines) {
+                        if (!line.trim().isEmpty()) {
+                            Row row = sheet.createRow(rowIndex++);
+                            row.createCell(0).setCellValue(check.name);
+                            row.createCell(1).setCellValue(line);
+                        }
+                    }
+                }
+            }
+            if (rowIndex == 1) {
+                Row row = sheet.createRow(1);
+                row.createCell(0).setCellValue("Todas las validaciones");
+                row.createCell(1).setCellValue("No se encontraron hallazgos.");
+            }
+
+            sheet.setColumnWidth(0, 15000);
+            sheet.setColumnWidth(1, 18000);
+        }
+
+        private boolean hasFindings() {
+            for (VerificationCheckResult check : checks) {
+                if (check.hasFindings()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private int getPassedCheckCount() {
+            int count = 0;
+            for (VerificationCheckResult check : checks) {
+                if (!check.hasFindings()) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private static void writeSummaryValue(Sheet sheet, int rowIndex, String label, String value) {
+            Row row = sheet.createRow(rowIndex);
+            row.createCell(0).setCellValue(label);
+            row.createCell(1).setCellValue(value);
+        }
+
+        private static void writeCell(Row row, int columnIndex, String value, CellStyle style) {
+            Cell cell = row.createCell(columnIndex);
+            cell.setCellValue(value);
+            cell.setCellStyle(style);
+        }
+
+        private static CellStyle createHeaderStyle(XSSFWorkbook workbook) {
+            Font font = workbook.createFont();
+            font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            font.setColor(IndexedColors.WHITE.getIndex());
+            CellStyle style = workbook.createCellStyle();
+            style.setFont(font);
+            style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+            style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+            return style;
+        }
+    }
+
+    private static final class VerificationCheckResult {
+        private final String name;
+        private final String errors;
+
+        private VerificationCheckResult(String name, String errors) {
+            this.name = name;
+            this.errors = errors == null ? "" : errors;
+        }
+
+        private boolean hasFindings() {
+            return !errors.trim().isEmpty();
+        }
     }
 
     /**

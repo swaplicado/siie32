@@ -5,6 +5,7 @@
 
 package erp.mloc.data;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -213,5 +214,45 @@ public class SDataState extends erp.lib.data.SDataRegistry implements java.io.Se
     @Override
     public java.util.Date getLastDbUpdate() {
         return mtUserEditTs;
+    }
+    
+    /**
+     * Get state ID by its code. Only active registries are considered.
+     * @param client
+     * @param code
+     * @return
+     * @throws Exception 
+     */
+    public static int getStateIdByCode(final SClientInterface client, final String code) throws Exception {
+        int stateId = 0;
+        String sql = "SELECT id_sta FROM erp.locu_sta WHERE NOT b_del AND sta_code = '" + code + "';";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                stateId = resultSet.getInt(1);
+            }
+        }
+        
+        return stateId;
+    }
+    
+    /**
+     * Get state code by its ID. Only active registries are considered.
+     * @param client
+     * @param id
+     * @return
+     * @throws Exception 
+     */
+    public static String getStateCodeById(final SClientInterface client, final int id) throws Exception {
+        String stateCode = "";
+        String sql = "SELECT sta_code FROM erp.locu_sta WHERE NOT b_del AND id_sta = " + id + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                stateCode = resultSet.getString(1);
+            }
+        }
+        
+        return stateCode;
     }
 }

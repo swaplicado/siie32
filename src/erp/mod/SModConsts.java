@@ -720,6 +720,8 @@ public abstract class SModConsts {
     public static final int LOGS_TP_DOC_SHIP = 2041006;
     public static final int LOGS_TP_BOL_PERSON = 2041008;
     public static final int LOGS_INC = 2041007;
+    public static final int LOGS_TP_SERVICE = 2041051;
+    public static final int LOGS_TP_SHIP_SIZE = 2041053;
 
     public static final int LOGU_TP_VEH = 2042001;
     public static final int LOGU_BPB_ADD_NEI = 2042005;
@@ -729,12 +731,17 @@ public abstract class SModConsts {
 
     public static final int LOG_INSURER = 2043011;
     public static final int LOG_VEH = 2043001;
+    public static final int LOG_VEH_BP_CAR = 2043031;
     public static final int LOG_TRAILER = 2043012;
     public static final int LOG_TANK_CAR = 2043091;
     public static final int LOG_BOL_PERSON = 2043013;
+    public static final int LOG_DRIVER_BP_CAR = 2043033;
     public static final int LOG_DRIVER_VEH = 2043014;
     public static final int LOG_DIST_LOCATION = 2043015;
     public static final int LOG_RATE = 2043002;
+    public static final int LOG_SERVICE = 2043051;
+    public static final int LOG_FREIGHT_CLASS = 2043053;
+    public static final int LOG_FREIGHT_TARIFF = 2043056;
     public static final int LOG_SHIP = 2043003;
     public static final int LOG_SHIP_NTS = 2043004;
     public static final int LOG_SHIP_DEST = 2043005;
@@ -1524,6 +1531,8 @@ public abstract class SModConsts {
         TablesMap.put(LOGS_TP_DOC_SHIP, "erp.logs_tp_doc_ship");
         TablesMap.put(LOGS_TP_BOL_PERSON, "erp.logs_tp_bol_person");
         TablesMap.put(LOGS_INC, "erp.logs_inc");
+        TablesMap.put(LOGS_TP_SERVICE, "erp.logs_tp_service");
+        TablesMap.put(LOGS_TP_SHIP_SIZE, "erp.logs_tp_ship_size");
 
         TablesMap.put(LOGU_TP_VEH, "erp.logu_tp_veh");
         TablesMap.put(LOGU_BPB_ADD_NEI, "erp.logu_bpb_add_nei");
@@ -1533,12 +1542,17 @@ public abstract class SModConsts {
 
         TablesMap.put(LOG_INSURER, "log_insurer");
         TablesMap.put(LOG_VEH, "log_veh");
+        TablesMap.put(LOG_VEH_BP_CAR, "log_veh_bp_car");
         TablesMap.put(LOG_TRAILER, "log_trailer");
         TablesMap.put(LOG_TANK_CAR, "log_tank_car");
         TablesMap.put(LOG_BOL_PERSON, "log_bol_person");
+        TablesMap.put(LOG_DRIVER_BP_CAR, "log_driver_bp_car");
         TablesMap.put(LOG_DRIVER_VEH, "log_driver_veh");
         TablesMap.put(LOG_DIST_LOCATION, "log_dist_location");
         TablesMap.put(LOG_RATE, "log_rate");
+        TablesMap.put(LOG_SERVICE, "log_service");
+        TablesMap.put(LOG_FREIGHT_CLASS, "log_freight_class");
+        TablesMap.put(LOG_FREIGHT_TARIFF, "log_freight_tariff");
         TablesMap.put(LOG_SHIP, "log_ship");
         TablesMap.put(LOG_SHIP_NTS, "log_ship_nts");
         TablesMap.put(LOG_SHIP_DEST, "log_ship_dest");

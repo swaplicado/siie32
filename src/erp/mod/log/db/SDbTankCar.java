@@ -138,10 +138,6 @@ public class SDbTankCar extends SDbRegistryUser {
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
         if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-        
-        if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
@@ -187,6 +183,7 @@ public class SDbTankCar extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

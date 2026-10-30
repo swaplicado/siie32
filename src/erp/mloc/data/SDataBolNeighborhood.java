@@ -15,11 +15,11 @@ import java.util.Date;
 
 /**
  *
- * @author Isabel Servín
+ * @author Isabel Servín, Sergio Flores
  */
 public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    protected int mnPkNeighborhoodZipCode;
+    protected int mnPkNeighborhoodZipCodeId;
     protected String msNeighborhoodCode;
     protected String msZipCode;
     protected String msDescription;
@@ -32,7 +32,7 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
         reset();
     }
     
-    public void setPkNeighborhoodZipCode(int n) { mnPkNeighborhoodZipCode = n; }
+    public void setPkNeighborhoodZipCodeId(int n) { mnPkNeighborhoodZipCodeId = n; }
     public void setNeighborhoodCode(String s) { msNeighborhoodCode = s; }
     public void setZipCode(String s) { msZipCode = s; }
     public void setDescription(String s) { msDescription = s; }
@@ -40,7 +40,7 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
     public void setFkUserId(int n) { mnFkUserId = n; }
     public void setTsUser(Date t) { mtTsUser = t; }
 
-    public int getPkNeighborhoodZipCode() { return mnPkNeighborhoodZipCode; }
+    public int getPkNeighborhoodZipCodeId() { return mnPkNeighborhoodZipCodeId; }
     public String getNeighborhoodCode() { return msNeighborhoodCode; }
     public String getZipCode() { return msZipCode; }
     public String getDescription() { return msDescription; }
@@ -50,19 +50,19 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
 
     @Override
     public void setPrimaryKey(Object pk) {
-        mnPkNeighborhoodZipCode = ((int[]) pk)[0];
+        mnPkNeighborhoodZipCodeId = ((int[]) pk)[0];
     }
 
     @Override
     public Object getPrimaryKey() {
-        return new int[] { mnPkNeighborhoodZipCode };
+        return new int[] { mnPkNeighborhoodZipCodeId };
     }
 
     @Override
     public void reset() {
         super.resetRegistry();
         
-        mnPkNeighborhoodZipCode = 0;
+        mnPkNeighborhoodZipCodeId = 0;
         msNeighborhoodCode = "";
         msZipCode = "";
         msDescription = "";
@@ -87,7 +87,7 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkNeighborhoodZipCode = resultSet.getInt("id_nei_zip_code");
+                mnPkNeighborhoodZipCodeId = resultSet.getInt("id_nei_zip_code");
                 msNeighborhoodCode = resultSet.getString("nei_code");
                 msZipCode = resultSet.getString("zip_code");
                 msDescription = resultSet.getString("description");
@@ -115,7 +115,7 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
         
         try {
             if(mbIsRegistryNew) {
-                sql = "SELECT COUNT(*) from erp.locs_bol_nei_zip_code WHERE id_nei_zip_code = " + mnPkNeighborhoodZipCode;
+                sql = "SELECT COUNT(*) from erp.locs_bol_nei_zip_code WHERE id_nei_zip_code = " + mnPkNeighborhoodZipCodeId;
                 resultSet = connection.createStatement().executeQuery(sql);
                 
                 if (resultSet.next()) {
@@ -125,7 +125,7 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
             
             if (mbIsRegistryNew) {
                 sql = "INSERT INTO erp.locs_bol_nei_zip_code VALUES(" +
-                        mnPkNeighborhoodZipCode + ", " + 
+                        mnPkNeighborhoodZipCodeId + ", " + 
                         "'" + msNeighborhoodCode + "', " + 
                         "'" + msZipCode + "', " + 
                         "'" + msDescription + "', " + 
@@ -136,14 +136,14 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
             }
             else {
                 sql = "UPDATE erp.locs_bol_nei_zip_code SET " +
-//                       "id_nei_zip_code = " + mnPkNeighborhoodZipCode + ", " +
+                        //"id_nei_zip_code = " + mnPkNeighborhoodZipCode + ", " +
                         "nei_code = '" + msNeighborhoodCode + "', " +
                         "zip_code = '" + msZipCode + "', " +
                         "description = '" + msDescription + "', " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "fid_usr = " + mnFkUserId + ", " +
-//                        "ts_usr = " + "NOW()" + " " +
-                        "WHERE id_nei_zip_code = " + mnPkNeighborhoodZipCode;
+                        //"ts_usr = " + "NOW()" + " " +
+                        "WHERE id_nei_zip_code = " + mnPkNeighborhoodZipCodeId;
             }
             
             connection.createStatement().execute(sql);
@@ -162,6 +162,4 @@ public class SDataBolNeighborhood extends erp.lib.data.SDataRegistry implements 
     public Date getLastDbUpdate() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
 }

@@ -5,7 +5,6 @@
 package erp.mod.log.view;
 
 import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,12 +18,12 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín
+ * @author Juan Barajas, Isabel Servín, Sergio Flores
  */
 public class SViewVehicleType extends SGridPaneView {
 
     public SViewVehicleType(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOGU_TP_VEH, SLibConstants.UNDEFINED, title);
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOGU_TP_VEH, 0, title);
         setButtonsEnabledByPrivilege();
     }
     
@@ -95,7 +94,7 @@ public class SViewVehicleType extends SGridPaneView {
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = new SGridColumnView[9];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME);

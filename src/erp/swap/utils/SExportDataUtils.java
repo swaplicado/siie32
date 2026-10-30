@@ -1744,18 +1744,34 @@ public abstract class SExportDataUtils {
     /**
      * Consulta las referencias de pedidos de compras de todas las empresas
      * configuradas para SWAP Services, y las prepara para la exportación.
+     * Si se indican ambos identificadores, exporta el documento sin aplicar
+     * los filtros de sincronización, autorización, enlace, estado y datos fiscales.
      *
      * @param session Sesión de usuario.
+     * @param idYear Año del documento; con ambos identificadores en cero se exportan todas las referencias.
+     * @param idDoc Identificador del documento; con ambos identificadores en cero se exportan todas las referencias.
      * @return Lista de referencias de pedidos de compras exportables.
      * @throws SQLException Si ocurre un error en la consulta.
      */
-    private static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExport(final SGuiSession session) throws SQLException, Exception {
+    private static ArrayList<SExportData> getListOfRefsOfPurchaseOrderToExport(final SGuiSession session, final int idYear, final int idDoc) throws SQLException, Exception {
         ArrayList<SExportData> references = new ArrayList<>();
+        boolean specificDocument = idYear > 0 && idDoc > 0;
 
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             // extraer referencias de pedidos de compras de las bases de datos de todas las empresas configuradas para SWAP Services:
 
-            HashMap<Integer, String> databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            HashMap<Integer, String> databasesMap;
+            if (specificDocument) {
+                databasesMap = new HashMap<>();
+                Integer companyId = session.getConfigCompany().getCompanyId();
+                String database = session.getDatabase().getDbName();
+                if (database != null) {
+                    databasesMap.put(companyId, database);
+                }
+            }
+            else {
+                databasesMap = SExportUtils.getSwapCompaniesDatabasesMap(session);
+            }
 
             // iterar sobre las bases de datos de todas las empresas configuradas para SWAP Services:
             for (Integer companyId : databasesMap.keySet()) {
@@ -1827,7 +1843,7 @@ public abstract class SExportDataUtils {
                         + "        COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0) AS _qty_linked, "
                         + "        (de.qty <= COALESCE(SUM(IF(xde.b_del OR xd.b_del OR xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 0.0, dds.qty)), 0.0)) AS _is_linked "
                         + "    FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d "
-                        + "    INNER JOIN ("
+                        + (specificDocument ? "" : "    INNER JOIN ("
                         + "        SELECT num_ser, num, MAX(id_year) AS max_id_year, MAX(id_doc) AS max_id_doc "
                         + "        FROM " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS)
                         + "        WHERE fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0]
@@ -1838,8 +1854,9 @@ public abstract class SExportDataUtils {
                         + "        ON  last_version.num_ser     = d.num_ser "
                         + "        AND last_version.num         = d.num "
                         + "        AND last_version.max_id_year = d.id_year "
-                        + "        AND last_version.max_id_doc  = d.id_doc "
-                        + "    INNER JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
+                        + "        AND last_version.max_id_doc  = d.id_doc ")
+                        + (specificDocument ? "    LEFT JOIN " : "    INNER JOIN ")
+                        + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de "
                         + "        ON  de.id_year = d.id_year AND de.id_doc = d.id_doc "
                         + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_SUPPLY) + " AS dds "
                         + "        ON  dds.id_src_year = de.id_year AND dds.id_src_doc = de.id_doc AND dds.id_src_ety = de.id_ety "
@@ -1847,10 +1864,12 @@ public abstract class SExportDataUtils {
                         + "        ON  xde.id_year = dds.id_des_year AND xde.id_doc = dds.id_des_doc AND xde.id_ety = dds.id_des_ety "
                         + "    LEFT JOIN " + database + "." + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS xd "
                         + "        ON  xd.id_year = xde.id_year AND xd.id_doc = xde.id_doc "
-                        + "    WHERE NOT de.b_del "
+                        + (specificDocument ? "    WHERE (de.id_ety IS NULL OR NOT de.b_del) " : "    WHERE NOT de.b_del ")
                         + "      AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[0]
                         + "      AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_ORD[1]
-                        + "      AND d.id_year >= " + (session.getSystemYear() - 1)
+                        + (specificDocument
+                                ? "      AND d.id_year = " + idYear + " AND d.id_doc = " + idDoc + " "
+                                : "      AND d.id_year >= " + (session.getSystemYear() - 1) + " ")
                         + "    GROUP BY "
                         + "        d.num_ser, d.num, d.dt, d.id_year, d.id_doc, d.acc_tag, "
                         + "        d.b_authorn, d.b_link, d.b_del, d.fid_st_dps, d.fid_tp_pay, "
@@ -1895,7 +1914,9 @@ public abstract class SExportDataUtils {
                         + "      AND sle.response_code IN ('200', '201') "
                         + ") AS synced "
                         + "    ON synced.reference_id = " + referenceIdConcat + " "
-                        + "WHERE ("
+                        + (specificDocument
+                                ? "WHERE t.id_year = " + idYear + " AND t.id_doc = " + idDoc + " "
+                                : "WHERE ("
                         + "    (    NOT t.b_del "
                         + "     AND t.fid_st_dps <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "
                         + "     AND t.b_authorn "
@@ -1914,7 +1935,7 @@ public abstract class SExportDataUtils {
                         + "       b.fiscal_id = '' "
                         + "    OR b.fiscal_id = '" + DCfdConsts.RFC_GEN_NAC + "' "
                         + "    OR (b.fiscal_id = '" + DCfdConsts.RFC_GEN_INT + "' AND b.fiscal_frg_id = '') "
-                        + ") "
+                        + ") ")
                         + "GROUP BY "
                         + "    t.id_year, t.id_doc, "
                         + "    t.num_ser, t.num, t.dt, "
@@ -1924,7 +1945,7 @@ public abstract class SExportDataUtils {
                         + "    t.fid_func_sub, fs.name, "
                         + "    t.fid_bp_r, b.bp, "
                         + "    dcfd.cfd_use "
-                        + "HAVING SUM(t._is_linked) < COUNT(*) "
+                        + (specificDocument ? "" : "HAVING SUM(t._is_linked) < COUNT(*) ")
                         + "ORDER BY "
                         + "    t.num_ser, "
                         + "    LPAD(t.num, " + SSwapConsts.LEN_UUID + ", '0'), "
@@ -1986,6 +2007,7 @@ public abstract class SExportDataUtils {
                     reference.owner_id = resultSet.getInt("fid_usr_new");
                     reference.is_deleted = resultSet.getBoolean("b_del")
                             || resultSet.getInt("fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_ANNULED
+                            || resultSet.getInt("fid_st_dps") == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT
                             || !resultSet.getBoolean("b_authorn")
                             || resultSet.getBoolean("b_link");
                     reference.auth_comments = resultSet.getString("authz_nts");
@@ -3042,7 +3064,7 @@ public abstract class SExportDataUtils {
                     data = getListOfRefsOfPurchaseOrderToExportAeth(session);
                 }
                 else {
-                    data = getListOfRefsOfPurchaseOrderToExport(session);
+                    data = getListOfRefsOfPurchaseOrderToExport(session, 0, 0);
                 }
                 break;
 

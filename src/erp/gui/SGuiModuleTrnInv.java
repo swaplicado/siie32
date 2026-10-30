@@ -1446,6 +1446,14 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     viewClass = erp.mod.trn.view.SViewStockValuationDetail.class;
                     title = "Valuación de inventario a detalle";
                     break;
+                case SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND:
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " x surtir sin fact.";
+                    break;
+                case SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY:
+                    viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
+                    title = dpsCategory + " x surtir sin fact. (detalle)";
+                    break;
                 case SDataConstants.TRNX_DPS_SUPPLY_PEND:
                     viewClass = erp.mtrn.view.SViewDpsStockSupply.class;
                     title = dpsCategory + " x surtir";
@@ -1799,10 +1807,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRN_STK_CFG_DNS);
             }
             else if (item == jmiDpsPurOrderSupplyPend) {
-                showView(SDataConstants.TRNX_DPS_SUPPLY_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+                showView(SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiDpsPurOrderSupplyPendEty) {
-                showView(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
+                showView(SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);
             }
             else if (item == jmiDpsPurOrderSupplied) {
                 showView(SDataConstants.TRNX_DPS_SUPPLIED, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0], SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[1]);

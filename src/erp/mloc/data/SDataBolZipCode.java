@@ -5,6 +5,7 @@
  */
 package erp.mloc.data;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -199,4 +200,19 @@ public class SDataBolZipCode extends erp.lib.data.SDataRegistry implements java.
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    public static boolean exists(final SClientInterface client, String zipCodeId, String stateCodeId, boolean onlyActive) throws Exception {
+        boolean exists = false;
+        String sql = "SELECT COUNT(*) "
+                + "FROM erp.locs_bol_zip_code "
+                + "WHERE id_zip_code = '" + zipCodeId + "' AND id_sta_code = '" + stateCodeId + "' "
+                + (onlyActive ? "AND NOT b_del " : "") + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                exists = resultSet.getInt(1) > 0;
+            }
+        }
+        
+        return exists;
+    }
 }

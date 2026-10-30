@@ -1024,10 +1024,6 @@ public class SDbShipment extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
-        if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
-
         // Save purchase order if apply:
 
         if (miClient_xxx.getSessionXXX().getParamsCompany().getIsLogisticsOrderAutomatic()) {
@@ -1229,7 +1225,6 @@ public class SDbShipment extends SDbRegistryUser {
 
     @Override
     public boolean canDelete(SGuiSession session) throws SQLException, Exception {
-
         validateShipmentDestinyEntries(session);
 
         if (msQueryResult.isEmpty()) {
@@ -1240,12 +1235,11 @@ public class SDbShipment extends SDbRegistryUser {
             msQueryResult = "El embarque está autorizado, no puede ser eliminado.";
         }
 
-        return msQueryResult.isEmpty() ? true : false;
+        return msQueryResult.isEmpty();
     }
 
     @Override
     public boolean canSave(SGuiSession session) throws SQLException, Exception {
-
         if (miClient_xxx != null && miClient_xxx.getSessionXXX().getParamsCompany().getIsLogisticsOrderAutomatic() &&
                 mnFkCarrierTypeId == SModSysConsts.LOGS_TP_CAR_CAR &&
                 mnFkIncotermId != SModSysConsts.LOGS_INC_EXW) {
@@ -1396,6 +1390,7 @@ public class SDbShipment extends SDbRegistryUser {
         registry.setDpsOrder(this.getDpsOrder());
         registry.setDpsOrderEntry(this.getDpsOrderEntry());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 

@@ -6,6 +6,7 @@
 package erp.mod.trn.utils;
 
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbStockValuationMvt;
@@ -407,7 +408,11 @@ public abstract class SStockValuationAdjustsUtils {
                 totalValue = SLibUtils.round(oDiogEty.getValue() + totalValue, 8);
             }
             oDiog.setValue_r(totalValue);
-            oDiog.save(session.getStatement().getConnection());
+            if (oDiog.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new SQLException("No se pudo guardar el documento de ajuste de inventario "
+                        + "[" + oDiog.getPkYearId() + ", " + oDiog.getPkDocId() + "]. "
+                        + "No se registrará el ajuste de valuación porque el documento no existe.");
+            }
             lDiogs.add(oDiog);
         }
 

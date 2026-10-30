@@ -11,20 +11,40 @@ import erp.form.SFormOptionPicker;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.log.db.SLogConsts;
 import erp.mod.log.form.SDialogRepRate;
 import erp.mod.trn.form.SDialogSearchCfdiByUuid;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Sergio Flores
  */
 public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
+
+    private javax.swing.JMenu jmCatalog;
+    private javax.swing.JMenuItem jmiCatalogSpot;
+    private javax.swing.JMenuItem jmiCatalogSpotCompanyBranch;
+    private javax.swing.JMenuItem jmiCatalogSpotCompanyBranchEntity;
+    private javax.swing.JMenuItem jmiCatalogInsurer;
+    private javax.swing.JMenuItem jmiCatalogVehicle;
+    private javax.swing.JMenuItem jmiCatalogVehicleCarrier;
+    private javax.swing.JMenuItem jmiCatalogVehicleType;
+    private javax.swing.JMenuItem jmiCatalogTrailer;
+    private javax.swing.JMenuItem jmiCatalogTankCar;
+    private javax.swing.JMenuItem jmiCatalogBolPerson;
+    private javax.swing.JMenuItem jmiCatalogDriverCarrier;
+    private javax.swing.JMenuItem jmiCatalogFreightTariff;
+    private javax.swing.JMenuItem jmiCatalogService;
+    private javax.swing.JMenuItem jmiCatalogFreightClass;
+    private javax.swing.JMenuItem jmiCatalogRate;
 
     private javax.swing.JMenu jmShipment;
     private javax.swing.JMenuItem jmiShipment;
@@ -66,18 +86,6 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiShipmentDiogPending;
     private javax.swing.JMenuItem jmiShipmentDiogPendingDetail;
 
-    private javax.swing.JMenu jmCatalogue;
-    private javax.swing.JMenuItem jmiCatalogueSpot;
-    private javax.swing.JMenuItem jmiCatalogueSpotCompanyBranch;
-    private javax.swing.JMenuItem jmiCatalogueSpotCompanyBranchEntity;
-    private javax.swing.JMenuItem jmiCatalogueVehicleType;
-    private javax.swing.JMenuItem jmiCatalogueVehicle;
-    private javax.swing.JMenuItem jmiCatalogueTrailer;
-    private javax.swing.JMenuItem jmiCatalogueBolPerson;
-    private javax.swing.JMenuItem jmiCatalogueInsurer;
-    private javax.swing.JMenuItem jmiCatalogueRate;
-    private javax.swing.JMenuItem jmiCatalogueTankCar;
-
     private javax.swing.JMenu jmReports;
     private javax.swing.JMenuItem jmiRepRate;
 
@@ -93,9 +101,22 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     }
 
     private void initComponents() {
-        boolean hasRightMisc;
-        boolean hasRightReports;
-        boolean hasRightRate;
+        jmCatalog = new JMenu("Catálogos");
+        jmiCatalogSpot = new JMenuItem("Lugares");
+        jmiCatalogSpotCompanyBranch = new JMenuItem("Lugares de sucursales de la empresa");
+        jmiCatalogSpotCompanyBranchEntity = new JMenuItem("Lugares de entidades de sucursales");
+        jmiCatalogInsurer = new JMenuItem("Aseguradoras");
+        jmiCatalogVehicle = new JMenuItem("Vehículos");
+        jmiCatalogVehicleCarrier = new JMenuItem("Vehículos vs. transportistas");
+        jmiCatalogVehicleType = new JMenuItem("Tipos de vehículo");
+        jmiCatalogTrailer = new JMenuItem("Remolques");
+        jmiCatalogTankCar = new JMenuItem("Carrotanques");
+        jmiCatalogBolPerson = new JMenuItem("Figuras de transporte");
+        jmiCatalogDriverCarrier = new JMenuItem("Choferes vs. transportistas");
+        jmiCatalogFreightTariff = new JMenuItem("Tarifas de fletes");
+        jmiCatalogService = new JMenuItem("Servicios de logística");
+        jmiCatalogFreightClass = new JMenuItem("Clases de flete");
+        jmiCatalogRate = new JMenuItem("Tarifas");
 
         jmShipment = new JMenu("Embarques");
         jmiShipment = new JMenuItem("Embarques");
@@ -137,21 +158,28 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentBolInvoice = new JMenuItem("Carta porte facturas");
         jmiUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
 
-        jmCatalogue = new JMenu("Catálogos");
-        jmiCatalogueSpot = new JMenuItem("Lugares");
-        jmiCatalogueSpotCompanyBranch = new JMenuItem("Lugares de sucursales de la empresa");
-        jmiCatalogueSpotCompanyBranchEntity = new JMenuItem("Lugares de entidades de sucursales");
-        jmiCatalogueVehicleType = new JMenuItem("Tipos de vehículo");
-        jmiCatalogueVehicle = new JMenuItem("Vehículos");
-        jmiCatalogueTrailer = new JMenuItem("Remolques");
-        jmiCatalogueBolPerson = new JMenuItem("Figuras de transporte");
-        jmiCatalogueInsurer = new JMenuItem("Aseguradoras");
-        jmiCatalogueRate = new JMenuItem("Tarifas");
-        jmiCatalogueTankCar = new JMenuItem("Carrotanques");
-
         jmReports = new JMenu("Reportes");
         jmiRepRate = new JMenuItem("Listado de tarifas...");
 
+        jmCatalog.add(jmiCatalogSpot);
+        jmCatalog.add(jmiCatalogSpotCompanyBranch);
+        jmCatalog.add(jmiCatalogSpotCompanyBranchEntity);
+        jmCatalog.addSeparator();
+        jmCatalog.add(jmiCatalogInsurer);
+        jmCatalog.add(jmiCatalogVehicle);
+        jmCatalog.add(jmiCatalogVehicleCarrier);
+        jmCatalog.add(jmiCatalogVehicleType);
+        jmCatalog.add(jmiCatalogTrailer);
+        jmCatalog.add(jmiCatalogTankCar);
+        jmCatalog.addSeparator();
+        jmCatalog.add(jmiCatalogBolPerson);
+        jmCatalog.add(jmiCatalogDriverCarrier);
+        jmCatalog.addSeparator();
+        jmCatalog.add(jmiCatalogFreightTariff);
+        jmCatalog.add(jmiCatalogService);
+        jmCatalog.add(jmiCatalogFreightClass);
+        jmCatalog.add(jmiCatalogRate);
+        
         jmShipment.add(jmiShipment);
         jmShipment.add(jmiShipmentDetail);
         jmShipment.addSeparator();
@@ -201,19 +229,23 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmShipmentDiog.add(jmiShipmentDiog);
         jmShipmentDiog.add(jmiShipmentDiogDetail);
 
-        jmCatalogue.add(jmiCatalogueSpot);
-        jmCatalogue.add(jmiCatalogueSpotCompanyBranch);
-        jmCatalogue.add(jmiCatalogueSpotCompanyBranchEntity);
-        jmCatalogue.add(jmiCatalogueVehicleType);
-        jmCatalogue.add(jmiCatalogueVehicle);
-        jmCatalogue.add(jmiCatalogueTrailer);
-        jmCatalogue.add(jmiCatalogueBolPerson);
-        jmCatalogue.add(jmiCatalogueInsurer);
-        jmCatalogue.add(jmiCatalogueRate);
-        jmShipmentDiog.addSeparator();
-        jmCatalogue.add(jmiCatalogueTankCar);
-        
         jmReports.add(jmiRepRate);
+
+        jmiCatalogSpot.addActionListener(this);
+        jmiCatalogSpotCompanyBranch.addActionListener(this);
+        jmiCatalogSpotCompanyBranchEntity.addActionListener(this);
+        jmiCatalogInsurer.addActionListener(this);
+        jmiCatalogVehicle.addActionListener(this);
+        jmiCatalogVehicleCarrier.addActionListener(this);
+        jmiCatalogVehicleType.addActionListener(this);
+        jmiCatalogTrailer.addActionListener(this);
+        jmiCatalogTankCar.addActionListener(this);
+        jmiCatalogBolPerson.addActionListener(this);
+        jmiCatalogDriverCarrier.addActionListener(this);
+        jmiCatalogFreightTariff.addActionListener(this);
+        jmiCatalogService.addActionListener(this);
+        jmiCatalogFreightClass.addActionListener(this);
+        jmiCatalogRate.addActionListener(this);
 
         jmiShipment.addActionListener(this);
         jmiShipmentDetail.addActionListener(this);
@@ -247,17 +279,6 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentBolInvoice.addActionListener(this);
         jmiUuidSearch.addActionListener(this);
 
-        jmiCatalogueSpot.addActionListener(this);
-        jmiCatalogueSpotCompanyBranch.addActionListener(this);
-        jmiCatalogueSpotCompanyBranchEntity.addActionListener(this);
-        jmiCatalogueVehicleType.addActionListener(this);
-        jmiCatalogueVehicle.addActionListener(this);
-        jmiCatalogueTrailer.addActionListener(this);
-        jmiCatalogueBolPerson.addActionListener(this);
-        jmiCatalogueInsurer.addActionListener(this);
-        jmiCatalogueRate.addActionListener(this);
-        jmiCatalogueTankCar.addActionListener(this);
-
         jmiRepRate.addActionListener(this);
         
         moPickerModeOfTransportationType = null;
@@ -266,27 +287,50 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         moPickerVehicle = null;
         moPickerVehicleType = null;
 
-        hasRightMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_MISC).HasRight;
-        hasRightRate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_RATE).HasRight;
-        hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_REP).HasRight;
+        String logConfig = "";
+        boolean tariffVer1 = false;
+        boolean tariffVer2 = false;
+        
+        try {
+            logConfig = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_LOG_CONFIG);
+            if (logConfig.contains("" + SLogConsts.TARIFF_V1)) {
+                tariffVer1 = true;
+            }
+            else if (logConfig.contains("" + SLogConsts.TARIFF_V2)) {
+                tariffVer2 = true;
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+        
+        boolean hasRightMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_MISC).HasRight;
+        boolean hasRightRate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_RATE).HasRight;
+        boolean hasRightRateMan = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_RATE).Level >= SUtilConsts.LEV_MANAGER;
+        boolean hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_REP).HasRight;
 
-        jmCatalogue.setEnabled(hasRightMisc || hasRightRate);
+        jmCatalog.setEnabled(hasRightMisc || hasRightRate);
         jmShipment.setEnabled(hasRightMisc);
         jmShipmentSales.setEnabled(hasRightMisc);
         jmShipmentAdjustment.setEnabled(hasRightMisc);
         jmShipmentDiog.setEnabled(hasRightMisc);
         jmReports.setEnabled(hasRightReports);
         
-        jmiCatalogueSpot.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueSpotCompanyBranch.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueSpotCompanyBranchEntity.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueVehicleType.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueVehicle.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueTrailer.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueBolPerson.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueInsurer.setEnabled(hasRightMisc || hasRightRate);
-        jmiCatalogueRate.setEnabled(hasRightRate);
-        jmiCatalogueTankCar.setEnabled(true);
+        jmiCatalogSpot.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogSpotCompanyBranch.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogSpotCompanyBranchEntity.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogInsurer.setEnabled(hasRightMisc);
+        jmiCatalogVehicle.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogVehicleCarrier.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogVehicleType.setEnabled(hasRightRateMan);
+        jmiCatalogTrailer.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogTankCar.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogBolPerson.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogDriverCarrier.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogFreightTariff.setEnabled(tariffVer2 && hasRightRate);
+        jmiCatalogService.setEnabled(tariffVer2 && hasRightRateMan);
+        jmiCatalogFreightClass.setEnabled(tariffVer2 && hasRightRateMan);
+        jmiCatalogRate.setEnabled(tariffVer1 && hasRightRate);
         
         jmiRepRate.setEnabled(hasRightRate);
     }
@@ -369,7 +413,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmCatalogue, jmShipment, jmShipmentSales, jmShipmentAdjustment, jmShipmentDiog, jmReports };
+        return new JMenu[] { jmCatalog, jmShipment, jmShipmentSales, jmShipmentAdjustment, jmShipmentDiog, jmReports };
     }
 
     @Override
@@ -382,35 +426,50 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
-            if (item == jmiCatalogueSpot) {
+            if (item == jmiCatalogSpot) {
                 miClient.getSession().showView(SModConsts.LOGU_SPOT, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueSpotCompanyBranch) {
+            else if (item == jmiCatalogSpotCompanyBranch) {
                 miClient.getSession().showView(SModConsts.LOGU_SPOT_COB, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueSpotCompanyBranchEntity) {
+            else if (item == jmiCatalogSpotCompanyBranchEntity) {
                 miClient.getSession().showView(SModConsts.LOGU_SPOT_COB_ENT, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueVehicleType) {
-                miClient.getSession().showView(SModConsts.LOGU_TP_VEH, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiCatalogueVehicle) {
-                miClient.getSession().showView(SModConsts.LOG_VEH, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiCatalogueTrailer) {
-                miClient.getSession().showView(SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiCatalogueBolPerson) {
-                miClient.getSession().showView(SModConsts.LOG_BOL_PERSON, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiCatalogueInsurer) {
+            else if (item == jmiCatalogInsurer) {
                 miClient.getSession().showView(SModConsts.LOG_INSURER, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueRate) {
-                miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
+            else if (item == jmiCatalogVehicleType) {
+                miClient.getSession().showView(SModConsts.LOGU_TP_VEH, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueTankCar) {
+            else if (item == jmiCatalogVehicle) {
+                miClient.getSession().showView(SModConsts.LOG_VEH, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogVehicleCarrier) {
+                miClient.getSession().showView(SModConsts.LOG_VEH_BP_CAR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogTrailer) {
+                miClient.getSession().showView(SModConsts.LOG_TRAILER, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogTankCar) {
                 miClient.getSession().showView(SModConsts.LOG_TANK_CAR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogBolPerson) {
+                miClient.getSession().showView(SModConsts.LOG_BOL_PERSON, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogDriverCarrier) {
+                miClient.getSession().showView(SModConsts.LOG_DRIVER_BP_CAR, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogFreightTariff) {
+                miClient.getSession().showView(SModConsts.LOG_FREIGHT_TARIFF, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogService) {
+                miClient.getSession().showView(SModConsts.LOG_SERVICE, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogFreightClass) {
+                miClient.getSession().showView(SModConsts.LOG_FREIGHT_CLASS, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogRate) {
+                miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiShipment) {
                 miClient.getSession().showView(SModConsts.LOG_SHIP, SLibConstants.UNDEFINED, new SGuiParams(SModConsts.VIEW_SC_SUM));

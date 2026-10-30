@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormSpotCompanyBranchEntity extends sa.lib.gui.bean.SBeanForm {
 
@@ -70,7 +70,7 @@ public class SFormSpotCompanyBranchEntity extends sa.lib.gui.bean.SBeanForm {
         jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jlCompanyBranch);
 
-        moKeyCompanyBranch.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyCompanyBranch.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel21.add(moKeyCompanyBranch);
 
         jPanel23.add(jPanel21);
@@ -82,7 +82,7 @@ public class SFormSpotCompanyBranchEntity extends sa.lib.gui.bean.SBeanForm {
         jlCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel31.add(jlCompanyBranchEntity);
 
-        moKeyCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyCompanyBranchEntity.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel31.add(moKeyCompanyBranchEntity);
 
         jPanel23.add(jPanel31);
@@ -93,7 +93,7 @@ public class SFormSpotCompanyBranchEntity extends sa.lib.gui.bean.SBeanForm {
         jlSpot.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jlSpot);
 
-        moKeySpot.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeySpot.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel22.add(moKeySpot);
 
         jPanel23.add(jPanel22);
@@ -119,8 +119,8 @@ public class SFormSpotCompanyBranchEntity extends sa.lib.gui.bean.SBeanForm {
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 400, 250);
-
+        SGuiUtils.setWindowBounds(this, 480, 300);
+        
         moFieldKeyEntityGroup = new SGuiFieldKeyGroup(miClient);
 
         moKeyCompanyBranch.setKeySettings(miClient, SGuiUtils.getLabelName(jlCompanyBranch.getText()), true);

@@ -75,11 +75,15 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
     }
 
     private boolean isViewForDocuments() {
-        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND || mnTabType == SDataConstants.TRNX_DPS_SUPPLIED;
+        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLIED;
     }
 
     private boolean isViewForDocumentEntries() {
-        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY || mnTabType == SDataConstants.TRNX_DPS_SUPPLIED_ETY;
+        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLIED_ETY;
     }
 
     private boolean isViewForPurchases() {
@@ -87,7 +91,15 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
     }
 
     private boolean isViewForSupply() {
-        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND || mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY;
+        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY;
+    }
+
+    private boolean isViewWithoutLinkedInvoice() {
+        return mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND ||
+                mnTabType == SDataConstants.TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY;
     }
 
     private void initComponents() {
@@ -466,6 +478,17 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
             }
         }
 
+        if (isViewForPurchases() && isViewWithoutLinkedInvoice()) {
+            sqlFilter += (sqlFilter.isEmpty() ? "" : "AND ") +
+                    "NOT EXISTS (SELECT 1 " +
+                    "FROM trn_dps_dps_supply AS dpss " +
+                    "INNER JOIN trn_dps AS fac_oc ON dpss.id_des_year = fac_oc.id_year AND dpss.id_des_doc = fac_oc.id_doc AND " +
+                    "fac_oc.b_del = 0 AND " +
+                    "fac_oc.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND " +
+                    "fac_oc.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " " +
+                    "WHERE dpss.id_src_year = d.id_year AND dpss.id_src_doc = d.id_doc) ";
+        }
+
         if (isViewForPurchases()) {
             // Purchases & suppliers:
 
@@ -533,9 +556,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "dt.code AS f_dt_code, cb.code AS f_cb_code, b.id_bp, b.bp, bc.bp_key, bb.bpb, " +
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol AS f_unit, uo.symbol AS f_orig_unit, ";
-        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL ) {
-                // Si la vista es para pedidos de compra, fac_oc.id_year será nulo si no tiene factura relacionada
-                msSql += "COALESCE(fac_oc.id_year, 0) AS f_has_doc, ";
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] &&
+                mbWithoutFunctionalArea && !isViewWithoutLinkedInvoice()) {
+            // Si la vista es para pedidos de compra, fac_oc.id_year será nulo si no tiene factura relacionada
+            msSql += "COALESCE(fac_oc.id_year, 0) AS f_has_doc, ";
         }
         msSql += "de.qty AS f_qty, " +
                 "de.orig_qty AS f_orig_qty, " +
@@ -575,17 +599,18 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                 "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit ";
-                if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL) {
-                msSql += "LEFT JOIN trn_dps_dps_supply AS dpss ON "
-                            + "de.id_year = dpss.id_src_year AND "
-                            + "de.id_doc = dpss.id_src_doc AND "
-                            + "de.id_ety = dpss.id_src_ety "
+        if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] &&
+                mbWithoutFunctionalArea && !isViewWithoutLinkedInvoice()) {
+            msSql += "LEFT JOIN trn_dps_dps_supply AS dpss ON "
+                    + "de.id_year = dpss.id_src_year AND "
+                    + "de.id_doc = dpss.id_src_doc AND "
+                    + "de.id_ety = dpss.id_src_ety "
                     + "LEFT JOIN trn_dps AS fac_oc ON "
-                            + "dpss.id_des_year = fac_oc.id_year AND "
-                            + "dpss.id_des_doc = fac_oc.id_doc AND "
-                            + "fac_oc.b_del = 0 AND "
-                            + "fac_oc.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND "
-                            + "fac_oc.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " ";
+                    + "dpss.id_des_year = fac_oc.id_year AND "
+                    + "dpss.id_des_doc = fac_oc.id_doc AND "
+                    + "fac_oc.b_del = 0 AND "
+                    + "fac_oc.fid_ct_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[0] + " AND "
+                    + "fac_oc.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + " ";
         }
         msSql += "GROUP BY de.id_year, de.id_doc, de.id_ety, " +
                 "d.dt, d.num_ser, d.num, d.num_ref, d.tot_r, d.tot_cur_r, d.b_close, d.ts_close, uc.usr, c.cur_key, " +
@@ -593,9 +618,10 @@ public class SViewDpsStockSupply extends erp.lib.table.STableTab implements java
                 "de.fid_item, de.fid_unit, de.fid_orig_unit, i.item_key, i.item, u.symbol, uo.symbol, " +
                 "de.qty, de.orig_qty ";
 
-        if (mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND || mnTabType == SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY) {
+        if (isViewForSupply()) {
             msSql += "HAVING (f_orig_qty - f_adj_orig_qty - f_sup_orig_qty) <> 0 AND d.b_close = 0 ";
-            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] && mnRealTabTypeAux02 == SModConsts.TRNX_MAT_FUN_ARE_ALL) {
+            if (mnTabTypeAux01 == SDataConstantsSys.TRNS_CL_DPS_PUR_ORD[0] &&
+                    mbWithoutFunctionalArea && !isViewWithoutLinkedInvoice()) {
                 msSql += "AND f_has_doc = 0 ";
             }
         }
