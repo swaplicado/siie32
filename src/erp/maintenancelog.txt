@@ -1,5 +1,44 @@
 ================================================================================
 SIIE 3.2 311.1/ 2026-10-30
+Rodrigo Abel AYALA VÁZQUEZ
+--------------------------------------------------------------------------------
+1) Modificación y corrección de botones para modificar partidas de Facturas y Pedidos.
+2) En botón de Modificar Contabilización de la Factura se agregó: 
+   Validación y propagación de cambios si tiene Notas de Credito (NC) asociadas.
+   Generación de bitácora.
+   Restricciones si es anticipo, si no es Tipo de Operación 11 (Operación) o 12 (Op. con aplicación anticipo facturado), Tipo de Detalle 2 (Ordinarios), no tiene valor monetario o cantidad.
+   Impedimento de modificación si la contabilidad de la factura está cerrada.
+   Deshabilitación del botón en vista de NC.
+3) En botón de Modificar Ítem o Concepto de la factura se agregó:
+   Refactorización del método para crear bitácora.
+   Fix de ítem de referencia anterior en la bitácora.
+   Fix en modificación de la contabilidad si se modificó el ítem de referencia.
+   Fix del mensaje de confirmación de propagación de cambios a documentos asociados.
+   Edición del díalogo de captura con checbox para habilitar el campo de modificación.
+   Propagación de cambios a todos los documentos origen y destino (Desde NC hasta Cotizaciones/Contratos/Requisiciones) cuando se modifique el ítem referencia y todos los docs. compartan la misma unidad del ítem.
+   Propagación de cambios a sólo a documentos origen, cuando no se modifique el ítem referencia.
+   Restricción de modificación si la contabilidad de la factura o alguno de sus documentos asociados está cerrada.
+   Restricción de modificación de ítem referencia sí alguno de los docs. asociados tiene diferente unidad.
+4) En botón de Cambiar Cantidad, Centro de Costo (CC), Ítem de Referencia y Notas de las partidas:
+   Se reconfiguró la propagación de cambio de CC en la Requisición asociada si no tiene CC (no se modifica), 
+   si tiene un Centro o Subcentro de consumo no configurado para el nuevo CC pide confirmación y deja la inconsistencia en la requisición.
+   Fix del mensaje de confirmación de propagación de cambios a documentos asociados.
+   Restricción del alcance en la propagación de cambios en pedidos asociados, al momento de actualizar, para que no actualicen sus facturas.
+   Restricción de modificación si la contabilidad de alguno de sus documentos asociados está cerrada.
+   Validación de existencia de ítem de referencia a eliminar.
+   Validación de que el ítem principal requiera o no un ítem de referencia.
+5) Deshabilitación de botón Modificar Ítem en todos los documentos, en todas las vistas.
+6) Agregado de un ícono con tooltip del CC dentro del form de Requisiciones para casos en que quede una inconsistencia en el CC y el usuario no tenga el área funcional correspondiente.
+7) Fix de limpieza del campo de CC cuando se crea una Requisición nueva.
+8) Añadido de selector de unidad de conversión al diálogo de vinculación de documento de compras-ventas.
+9) Mejora de vista de existencias por almacén al insertar dos nuevos filtros para ítems rezagados y obsoletos, además de columnas para la última compra del ítem y el último movimiento de almacén.
+10) Corrección de redondeo de impuestos base e importe del pago de documentos relacionados al CFDI.
+11) Modificación del cálculo de la Antiguedad en el recibo de nóminas semanales cuando el empleado no tiene más de una semana trabajando.
+12) Eliminación de verificación de Link-up en el parámetro de Swap-Avo al exportar empleado y proveedores a Aguacate.
+13) Fix de subvista de requisiciones rechazadas, al no tener usuario Admin no unía la tabla de trn_mat_req_auth.
+
+================================================================================
+SIIE 3.2 311.1/ 2026-10-30
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Ajuste en vista de Pedidos de compras por surtir sin factura.
