@@ -28,6 +28,7 @@ import erp.mtrn.data.STrnCfdRelatedDocs;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -35,7 +36,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Isabel Servín
+ * @author Juan Barajas, Sergio Flores, Isabel Servín, Rodrigo Ayala
  * 
  * Maintenance Log:
  * 2016-07-11, Sergio Flores:
@@ -317,7 +318,11 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
         return separacionIndemnizacion;
     }
     
-    private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerReceiptConcept concept) {
+    private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerReceiptConcept concept) throws Exception {
+        if (concept.getXtaIncapacidadClave() == null || concept.getXtaIncapacidadClave().isEmpty()) {
+            throw new Exception("Falta indicar el 'Tipo de Incapacidad' para el concepto: " + concept.getConcepto());
+        }
+        
         cfd.ver3.nom12.DElementIncapacidad incapacidad =  new cfd.ver3.nom12.DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
@@ -560,7 +565,21 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33, SCfdXmlC
 
                 receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
                 receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
-                receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
+                
+                // Cálculo de días transcurridos entre la fecha de inicio de relación laboral y la fecha final de pago:
+                
+                long diasTranscurridos = SLibTimeUtils.getDaysDiff(mtFechaFinalPago, mtFechaInicioRelLaboral) + 1; // + 1 para incluir el día de ingreso
+
+                if (diasTranscurridos < SLibTimeConsts.WEEK_DAYS) {
+                    receptor.getAttAntiguedad().setString("P" + (diasTranscurridos < 1 ? 1 : diasTranscurridos) + "D");
+                }
+                else {
+                    long semanas = diasTranscurridos / SLibTimeConsts.WEEK_DAYS;
+                    receptor.getAttAntiguedad().setString("P" + semanas + "W");
+                }
+                
+                /* XXX 20/10/2026 Rodrigo Ayala - Comentado porque la antiguedad siempre viene en semanas y el PAC no permite semanas < P1W */
+                //receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
                 receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
                 receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
                 receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);

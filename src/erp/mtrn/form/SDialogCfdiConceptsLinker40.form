@@ -135,9 +135,9 @@
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlProdServ">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="C. ProdServ:"/>
+                            <Property name="text" type="java.lang.String" value="Cve. ProdServ:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[75, 23]"/>
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -145,15 +145,15 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Unidad:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[90, 23]"/>
+                              <Dimension value="[70, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlUnitSat">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="C. Unidad:"/>
+                            <Property name="text" type="java.lang.String" value="Cve. Unidad:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[65, 23]"/>
+                              <Dimension value="[75, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -190,7 +190,7 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[75, 23]"/>
+                              <Dimension value="[85, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -199,7 +199,7 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[90, 23]"/>
+                              <Dimension value="[70, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -209,7 +209,7 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[65, 23]"/>
+                              <Dimension value="[75, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -226,7 +226,7 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value=" Cantidad:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[100, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -234,23 +234,59 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value=" Factor de conversi&#xf3;n:*"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[120, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlConvFactorUnit">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Unidad de converis&#xf3;n:"/>
+                            <Property name="toolTipText" type="java.lang.String" value=""/>
+                            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[110, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlInfo1">
+                          <Properties>
+                            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                              <Image iconType="3" name="/erp/img/icon_view_info.png"/>
+                            </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Seleccione la unidad de medida en la que el &lt;b&gt;proveedor factur&#xf3;&lt;/b&gt;.&lt;br&gt;                   El sistema calcular&#xe1; &lt;b&gt;autom&#xe1;ticamente&lt;/b&gt; el factor de conversi&#xf3;n&lt;br&gt;&lt;/html&gt;"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[18, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlCantidadEquivalente">
                           <Properties>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
                             <Property name="text" type="java.lang.String" value="Cantidad equivalente:"/>
+                            <Property name="toolTipText" type="java.lang.String" value=""/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[117, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlInfo2">
+                          <Properties>
+                            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                              <Image iconType="3" name="/erp/img/icon_view_info.png"/>
+                            </Property>
+                            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Cantidad calculada para que se ajuste a la &lt;b&gt;Unidad de la OC&lt;/b&gt;.&lt;/html&gt;&quot;"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[15, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jlPrecioCfdi">
                           <Properties>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
                             <Property name="text" type="java.lang.String" value="Precio unitario del CFDI $:"/>
+                            <Property name="inheritsPopupMenu" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[165, 23]"/>
+                              <Dimension value="[155, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -269,7 +305,7 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[100, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -277,7 +313,35 @@
                           <Properties>
                             <Property name="horizontalAlignment" type="int" value="4"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[120, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbUnidadEquivalente">
+                          <Properties>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="4">
+                                <StringItem index="0" value="Item 1"/>
+                                <StringItem index="1" value="Item 2"/>
+                                <StringItem index="2" value="Item 3"/>
+                                <StringItem index="3" value="Item 4"/>
+                              </StringArray>
+                            </Property>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[115, 23]"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
+                        </Component>
+                        <Component class="javax.swing.JButton" name="jbEquivalentUnitId">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="..."/>
+                            <Property name="toolTipText" type="java.lang.String" value="Seleccionar unidad"/>
+                            <Property name="focusable" type="boolean" value="false"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[23, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -287,7 +351,15 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[125, 23]"/>
+                              <Dimension value="[120, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlUnitCantEquiv">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="x &lt;&gt;"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[30, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -297,7 +369,7 @@
                             <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusable" type="boolean" value="false"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[165, 23]"/>
+                              <Dimension value="[145, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -308,7 +380,7 @@
                             </Property>
                             <Property name="toolTipText" type="java.lang.String" value="La cantidad a vincular se multiplica por el factor de conversi&#xf3;n"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[20, 23]"/>
+                              <Dimension value="[15, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -375,7 +447,15 @@
                                 <Property name="enabled" type="boolean" value="false"/>
                                 <Property name="focusable" type="boolean" value="false"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[165, 23]"/>
+                                  <Dimension value="[155, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlUnitEtyPrice">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="x &lt;&gt;"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[34, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

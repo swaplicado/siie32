@@ -7,7 +7,7 @@ package erp.lib;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SLibConstants {
 
@@ -254,6 +254,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_ERR_GUI_PER_DATE = "La fecha no pertenece al período.";
     public static final java.lang.String MSG_ERR_GUI_PER_DATE_REC = "La fecha no pertenece al período de la póliza contable.";
     public static final java.lang.String MSG_ERR_GUI_PER_CLOSE = "El período está cerrado.";
+    public static final java.lang.String MSG_ERR_GUI_PER_CLOSE_ASOC_DOCS = "El período de los siguientes documentos vinculados está cerrado:";
     public static final java.lang.String MSG_ERR_GUI_BAL_CASH = "El efectivo disponible es insuficiente.";
     public static final java.lang.String MSG_ERR_GUI_BAL_STOCK = "Las mercancías en existencia son insuficientes.";
     public static final java.lang.String MSG_ERR_GUI_REG_ALREADY_DELETE = "El registro ya está eliminado.";

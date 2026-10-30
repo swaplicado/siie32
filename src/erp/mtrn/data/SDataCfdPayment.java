@@ -6,6 +6,7 @@
 
 package erp.mtrn.data;
 
+import cfd.DAttributeTypeImporte6d;
 import cfd.DCfdConsts;
 import cfd.DCfdUtils;
 import cfd.DElement;
@@ -57,7 +58,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * Database registry of CFDI of Payments.
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Rodrigo Ayala
  */
 public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi33, erp.cfd.SCfdXmlCfdi40 {
     
@@ -1295,10 +1296,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     }
                     else if (payTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
                         DElementTrasladoP trasP = new DElementTrasladoP();
+                        trasP.getAttBaseP().setDecimals(DAttributeTypeImporte6d.DECS); // Fuerza formato de 6 decimales (0.000000)
                         trasP.getAttBaseP().setDouble(payTax.getBase());
                         trasP.getAttImpuestoP().setString("00" + payTax.getFkCfdTaxId());
                         trasP.getAttTipoFactorP().setString(payTax.getFactorCode().equals("E") ? "Exento" : "Tasa");
                         trasP.getAttTasaOCuotaP().setDouble(payTax.getRate());
+                        trasP.getAttImporteP().setDecimals(DAttributeTypeImporte6d.DECS); // Fuerza formato de 6 decimales (0.000000)
                         trasP.getAttImporteP().setDouble(payTax.getTax());
                         if (payTax.getFactorCode().equals("E")) {
                             trasP.getAttTasaOCuotaP().setCanBeZero(false);

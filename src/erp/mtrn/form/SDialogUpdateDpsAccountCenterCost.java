@@ -7,6 +7,7 @@ package erp.mtrn.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
@@ -23,6 +24,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -31,10 +33,10 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Daniel López, Isabel Servín, Sergio Flores
+ * @author Juan Barajas, Daniel López, Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
-public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
-
+public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
+    
     private erp.client.SClientInterface miClient;
     private int mnFormResult;
     private int mnFormStatus; 
@@ -48,6 +50,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
 
     private SDataAccount moAccountNew;
     private SDataCostCenter moCostCenterNew;
+    
+    private String msInvoiceCurrentAccount;
 
     /** Creates new form SDialogUpdateDpsAccountCenterCost
      * @param client 
@@ -158,7 +162,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         jPanel2.add(jpPanelAccountsOld);
 
         jpPanelAccountsNew.setBorder(javax.swing.BorderFactory.createTitledBorder("Contabilización nueva:"));
-        jpPanelAccountsNew.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+        jpPanelAccountsNew.setLayout(new java.awt.GridLayout(2, 2, 0, 1));
         jpPanelAccountsNew.add(moAccountPanelNew);
         jpPanelAccountsNew.add(moCostCenterPanelNew);
 
@@ -222,6 +226,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         moAccountPanelNew.setRetrieveDataAccounts(true);
         moCostCenterPanelNew.setRetrieveDataCostCenters(true);
         
+        addFocusListenerToAccountPanel(moAccountPanelNew);
+        
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
 
@@ -254,6 +260,7 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     }
     
     private void renderAccount(String accountId) {
+        msInvoiceCurrentAccount = accountId;
         SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { accountId }, SLibConstants.EXEC_MODE_SILENT);
         SAccount acc = new SAccount(account, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskAccount());
         moAccountPanelOld.setSelectedAccount(acc);
@@ -263,8 +270,14 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
     }
     
     private void renderCostCenter(String costCenterId) {
-        SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { costCenterId }, SLibConstants.EXEC_MODE_SILENT);
-        SAccount account = new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter());
+        SDataCostCenter costCenter = null;
+        
+        // Validamos que el ID no sea nulo ni esté vacío antes de buscarlo en la BD
+        if (costCenterId != null && !costCenterId.isEmpty()) {
+            costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_CC, new Object[] { costCenterId }, SLibConstants.EXEC_MODE_SILENT);
+        }
+        
+        SAccount account = costCenter != null ? new SAccount(costCenter, ((SDataParamsCompany) miClient.getSession().getConfigCompany()).getMaskCostCenter()) : null;
         moCostCenterPanelOld.setSelectedAccount(account);
         moCostCenterPanelOld.setPanelEditable(false);
 
@@ -284,17 +297,143 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         }
         else {
             try {
-                if (miClient.showMsgBoxConfirm("¿Esta seguro que desea modificar la contabilización actual de la partida?") == JOptionPane.OK_OPTION) {
-                    mnFormResult = SLibConstants.FORM_RESULT_OK;
-                    
-                    //Parameters added: original quantity and subtotal to use as filter in the query:
-                    SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(),
-                            (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()), moDpsEntry.getOriginalQuantity(), moDpsEntry.getSubtotal_r(), mnRegistryType);
+                boolean updateNcAccount = false;
+                java.util.List<Object[]> ncList = getAssociatedCreditNotesData();
+                
+                // Preparación de información para mensajes para usuarios:
+                String docNumber = "<b>Factura:</b> " + moDps.getNumber();
+                String docDate = "<b>Fecha:</b> " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moDps.getDate());
+                String docEty = "<b>Partida:</b> " + moDpsEntry.getPkEntryId();
+                String docEtyContext = docEty + " de la " + docNumber + " con " + docDate;
+                
+                if (ncList.isEmpty()) {
+                    // Si no hay Notas de Crédito asociadas, continuamos normal:
+                    if (miClient.showMsgBoxConfirm("<html>¿Está seguro que desea modificar la contabilización actual de la partida?</html>") != JOptionPane.OK_OPTION) {
+                        return;
+                    }
                 }
+                else {
+                    // Evaluamos si las cuentas de la Factura y la NC son iguales o distintas
+                    String invoiceCurrentAcc = msInvoiceCurrentAccount;
+                    boolean allAccountsSame = true;
+                    
+                    String ncAcc = "";
+                    for (Object[] ncData : ncList) {
+                        ncAcc = (String) ncData[1];
+                        if (!ncAcc.equals(invoiceCurrentAcc)) {
+                            allAccountsSame = false;
+                            break;
+                        }
+                    }
+                    
+                    SDataAccount originalAcc = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { invoiceCurrentAcc }, SLibConstants.EXEC_MODE_SILENT);
+                    String originalAccName = originalAcc != null ? ("<b>" + originalAcc.getPkAccountIdXXX() + " - " + originalAcc.getAccount() + "</b>") : invoiceCurrentAcc;
+
+                    if (!allAccountsSame) {
+                        String diffNcHtmlList = "<ul>";
+                        boolean isCcRequiredBlock = false;
+                        String blockingErrorMsg = "";
+
+                        for (Object[] ncData : ncList) {
+                            String accId = (String) ncData[1];
+                            if (!accId.equals(invoiceCurrentAcc)) {
+                                int[] key = (int[]) ncData[0];
+                                SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] { key[0], key[1] }, SLibConstants.EXEC_MODE_SILENT);
+                                SDataAccount acc = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { accId }, SLibConstants.EXEC_MODE_SILENT);
+                                
+                                String num = dps != null ? dps.getNumber() : "S/F";
+                                String date = dps != null ? miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDate()) : "";
+                                String accName = acc != null ? (acc.getPkAccountIdXXX() + " - " + acc.getAccount()) : accId;
+                                
+                                diffNcHtmlList += "<li><b>NC:</b> " + num + " (<b>Fecha:</b> " + date + ")<br><b>Cuenta:</b> " + accName + "</li>";
+                                
+                                // Si se eliminó el CC revisamos si las cuentas contables de las NC requieren CC:
+                                if (moCostCenterNew == null && acc != null) {
+                                    SDataAccount ledgerAcc = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { acc.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
+                                    if (ledgerAcc != null && ledgerAcc.getIsRequiredCostCenter()) {
+                                        isCcRequiredBlock = true;
+                                        blockingErrorMsg = "<html>No se puede cambiar la cuenta contable de la " + docEtyContext + ".<br><br>" +
+                                            "La Nota de Crédito asociada con folio <b>" + num + "</b> y fecha <b>" + date + "</b><br>tiene una cuenta contable (<b>" + accName + "</b>) distinta a la de la factura.<br><br>" +
+                                            "Como esta cuenta <b>requiere</b> un Centro de Costo, debe elegir una cuenta contable que <b>sí</b> lo requiera para mantener la consistencia.</html>";
+                                    }
+                                }
+                            }
+                        }
+                        diffNcHtmlList += "</ul>";
+
+                        // Si alguna de las cuentas detectó inconsistencia, lanzamos el error de inmediato y abortamos:
+                        if (isCcRequiredBlock) {
+                            miClient.showMsgBoxWarning(blockingErrorMsg);
+                            return;
+                        }
+
+                        // Si no hubo bloqueo, avisamos normalmente que no se cambiará la cuenta en las NC:
+                        String msg = "<html>La Cuenta Contable (" + originalAccName + ") de la " + docEtyContext + "<br>" +
+                                     "es diferente a la de sus Notas de Crédito (NC) asociadas:" +
+                                     diffNcHtmlList + "<br>" +
+                                     "Los cambios no afectarán la Cuenta Contable de dichas NC solo su Centro de Costo.<br><br>" +
+                                     "¿Desea continuar con la modificación?</html>";
+
+                        if (miClient.showMsgBoxConfirm(msg) != JOptionPane.OK_OPTION) {
+                            return;
+                        }
+                        updateNcAccount = false;
+                    }
+                    else {
+                        // Si todas las Ctas. Cont. son iguales preguntamos si quiere modificarlas en cascada.
+                        String msg = "<html>El renglón contable de la " + docEtyContext + "<br>" +
+                                     "tiene la misma cuenta contable (" + originalAccName + ") que en todas sus Notas de Crédito asociadas.<br><br>" +
+                                     "¿Desea igualmente actualizar la Cuenta Contable de la(s) Nota(s) de Crédito asociada(s)?<br>" +
+                                     "<i>(Si elige 'No', la NC conservará su cuenta y solo se le actualizará su Centro de Costo).</i></html>";
+
+                        int opt = JOptionPane.showConfirmDialog(this, msg, "Modificar Cuenta en Nota de Crédito", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                        if (opt == JOptionPane.CANCEL_OPTION || opt == JOptionPane.CLOSED_OPTION) {
+                            return;
+                        }
+                        updateNcAccount = (opt == JOptionPane.YES_OPTION);
+                    }
+                    
+                    // Si no se va a actualizar la cuenta contable en NC, validamos si deja el CC vacío.
+                    if (!updateNcAccount && moCostCenterNew == null && allAccountsSame) {
+                        
+                        for (Object[] ncData : ncList) {
+                            ncAcc = (String) ncData[1];
+                            int[] ncKey = (int[]) ncData[0];
+                            
+                            SDataAccount acc = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { ncAcc }, SLibConstants.EXEC_MODE_SILENT);
+                            if (acc != null) {
+                                SDataAccount ledgerAcc = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { acc.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
+                                
+                                if (ledgerAcc != null && ledgerAcc.getIsRequiredCostCenter()) {
+                                    
+                                    SDataDps ncDps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] { ncKey[0], ncKey[1] }, SLibConstants.EXEC_MODE_SILENT);
+                                    String ncNumAndDate = "";
+                                    if (ncDps != null) {
+                                        ncNumAndDate = "<b>" + ncDps.getNumber() + "</b> y fecha <b>" + miClient.getSessionXXX().getFormatters().getDateFormat().format(ncDps.getDate()) + "</b>";
+                                    }
+
+                                    miClient.showMsgBoxWarning("<html>No se puede modificar la contabilización de la " + docEtyContext + ".<br><br>" +
+                                            "La Nota de Crédito asociada con folio " + ncNumAndDate + " conservará su cuenta contable actual (<b>" + acc.getPkAccountIdXXX() + " - " + acc.getAccount() + "</b>)," +
+                                            "<br>la cual <b>requiere</b> un Centro de Costo.<br><br>" +
+                                            "Debe elegir una cuenta contable que también requiera Centro de Costo, o elegir <b>'Sí'</b> a actualizar la cuenta en la NC para mantener la consistencia.</html>");
+                                    return; 
+                                }
+                            }
+                        }
+                    }
+                }
+
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
+
+                //Parameters added: original quantity and subtotal to use as filter in the query:
+                SFinUtilities.updateAccountCostCenterForDpsEntry(miClient, (int[]) moDpsEntry.getPrimaryKey(), moAccountNew.getPkAccountIdXXX(),
+                            (moCostCenterNew == null ? "" : moCostCenterNew.getPkCostCenterIdXXX()), moDpsEntry.getOriginalQuantity(), moDpsEntry.getSubtotal_r(), mnRegistryType, updateNcAccount);
+                
                 this.setVisible(false);
             }
             catch (Exception e) {
-                SLibUtilities.renderException(this, e); //print out exception was changed to render Exception, to show message to user
+                SLibUtilities.renderException(this, e); 
             }
         }
     }
@@ -303,7 +442,45 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
+    
+    /**
+     * Obtiene la lista de llaves de NCs asociadas y sus cuentas contables actuales.
+     * Retorna una lista de Object[]: [int[] ncKey, String accountNC]
+     */
+    private java.util.List<Object[]> getAssociatedCreditNotesData() {
+        java.util.List<Object[]> list = new java.util.ArrayList<>();
+        
+        if (mnRegistryType != SDataConstantsSys.TRNX_TP_DPS_DOC) {
+            return list;
+        }
 
+        try {
+            int[] entryKey = (int[]) moDpsEntry.getPrimaryKey();
+            String sql = "SELECT a.id_adj_year, a.id_adj_doc, a.id_adj_ety " +
+                         "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_ADJ) + " AS a " +
+                         "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS d ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
+                         "WHERE a.id_dps_year = " + entryKey[0] + " AND a.id_dps_doc = " + entryKey[1] + " AND a.id_dps_ety = " + entryKey[2] + " " +
+                         "AND d.b_del = 0 AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_ADJ + ";";
+
+            java.sql.ResultSet rs = miClient.getSession().getStatement().executeQuery(sql);
+            java.util.List<int[]> keysTemp = new java.util.ArrayList<>();
+            while (rs.next()) {
+                keysTemp.add(new int[] { rs.getInt(1), rs.getInt(2), rs.getInt(3) });
+            }
+            rs.close();
+            
+            for (int[] ncKey : keysTemp) {
+                String ncAcc = SFinUtilities.getAccountForDpsEntry(miClient, ncKey);
+                list.add(new Object[] { ncKey, ncAcc });
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return list;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -387,7 +564,8 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                 SDataAccount ledgerAccount = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { moAccountNew.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_VERBOSE);
                 
                 if (ledgerAccount.getIsRequiredCostCenter() && moCostCenterNew == null) {
-                    validation.setMessage("La cuenta contable ('" + moAccountNew.getAccount() + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
+                    String htmlMsg = "<html>La <b>cuenta contable</b> ('" + moAccountNew.getAccount() + "') tiene un inconveniente:<br>Requiere centro de costos y no está definido.</html>";
+                    validation.setMessage(htmlMsg);
                     validation.setComponent(moCostCenterPanelNew.getTextNumberFirst());
                 }
             }
@@ -403,6 +581,22 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                     validation.setMessage(message);
                     validation.setComponent(moCostCenterPanelNew.getTextNumberFirst());
                 }
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            // Extraemos el código de la cuenta exactamente como se ve en pantalla
+            String oldAccCode = moAccountPanelOld.composeAccountStd();
+            String newAccCode = moAccountPanelNew.composeAccountStd();
+            
+            String oldCcCode = moCostCenterPanelOld.composeAccountStd();
+            String newCcCode = moCostCenterPanelNew.composeAccountStd();
+            
+            // Si el texto de la Cuenta Contable y el Centro de Costo son idénticos a los originales
+            if (oldAccCode.equals(newAccCode) && oldCcCode.equals(newCcCode)) {
+                validation.setIsError(true);
+                validation.setMessage("<html>No se detectó ninguna modificación en la <b>Cuenta Contable</b> ni en el <b>Centro de Costo</b>.</html>");
+                validation.setComponent(moAccountPanelNew.getTextNumberFirst());
             }
         }
 
@@ -451,8 +645,15 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
                 renderItem();
                 break;
             case SDataConstants.FIN_ACC:
-                renderAccount(((String[]) value)[0]);
-                renderCostCenter(((String[]) value)[1]);
+                String[] accCc = (String[]) value;
+                if (accCc != null) {
+                    renderAccount(accCc.length > 0 ? accCc[0] : null);
+                    renderCostCenter(accCc.length > 1 ? accCc[1] : null);
+                }
+                else{
+                    renderAccount(((String[]) value)[0]);
+                    renderCostCenter(((String[]) value)[1]);
+                }
                 break;
             default:
         }
@@ -482,6 +683,79 @@ public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog imple
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (javax.swing.SwingUtilities.isDescendingFrom(e.getComponent(), moAccountPanelNew)) {
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    evaluateCostCenterRule();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                java.awt.Component focusOwner =
+                        java.awt.KeyboardFocusManager
+                                .getCurrentKeyboardFocusManager()
+                                .getFocusOwner();
+
+                if (focusOwner == null ||
+                        !javax.swing.SwingUtilities.isDescendingFrom(focusOwner, moAccountPanelNew)) {
+                    evaluateCostCenterRule();
+                }
+            }
+        });
+    }
+    
+    private void evaluateCostCenterRule() {
+        try {
+            SDataAccount accountNew = moAccountPanelNew.getSelectedDataAccount();
+            
+            if (accountNew != null) {
+                SDataAccount ledgerAccount = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC, new Object[] { accountNew.getDbmsPkLedgerAccountIdXXX() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                if (ledgerAccount != null) {
+                    if (!ledgerAccount.getIsRequiredCostCenter()) {
+                        // No requiere CC. Limpia y Bloquea:
+                        moCostCenterPanelNew.initPanel();
+                        moCostCenterPanelNew.setPanelEditable(false);
+                        
+                        String toolTipMsg = "La cuenta contable actual no requiere Centro de Costos.";
+                        moCostCenterPanelNew.setToolTipText(toolTipMsg);
+                        moCostCenterPanelNew.getTextNumberFirst().setToolTipText(toolTipMsg);
+                    } else {
+                        // Sí requiere CC. Aseguramos que esté habilitado y refrescamos visualmente:
+                        moCostCenterPanelNew.setPanelEditable(true);
+                        moCostCenterPanelNew.setToolTipText(null);
+                        moCostCenterPanelNew.getTextNumberFirst().setToolTipText(null);
+                        moCostCenterPanelNew.revalidate();
+                        moCostCenterPanelNew.repaint();
+                    }
+                }
+            } else {
+                // Respaldo por si borran la cuenta por completo
+                moCostCenterPanelNew.setPanelEditable(true);
+            }
+        } catch (Exception ex) {
+            SLibUtilities.printOutException(this, ex);
+        }
+    }
+    
+    private void addFocusListenerToAccountPanel(java.awt.Container container) {
+        for (java.awt.Component c : container.getComponents()) {
+            c.addFocusListener(this);
+            if (c instanceof java.awt.Container) {
+                addFocusListenerToAccountPanel((java.awt.Container) c);
             }
         }
     }

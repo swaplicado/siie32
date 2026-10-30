@@ -19,7 +19,7 @@ import sa.lib.srv.SLock;
  */
 public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     
-    // Creamos un objeto DTO ligero para viajar por la red y transferir  sin causar MarshalException
+    // Creamos un objeto DTO ligero para viajar por la red y transferir sin causar MarshalException
     public static class MatReqEtyData implements java.io.Serializable {
         public int idMatReq;
         public int idEty;
@@ -31,7 +31,11 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
     // Objeto DTO para la bitacora de cambios
     public static class HistLog implements java.io.Serializable {
         public SDataDpsEntry entry;
+        public int itemRefOld;
         public int itemRefNew;
+        public String costCenterOld;
+        public String costCenterNew;
+        public boolean isNoteEdited;
         public ArrayList<int[]> allDocs;
     }
     
@@ -156,7 +160,7 @@ public class SDataDpsEntryEdit extends erp.lib.data.SDataRegistry {
             
             if (moHistLogs != null && !moHistLogs.isEmpty()) {
                 for (HistLog log : moHistLogs) {
-                    erp.mtrn.data.STrnUtilities.insertDpsEtyHist(connection, mnUserEditId, log.entry, "", "", log.itemRefNew, log.allDocs); 
+                    STrnUtilities.insertHistForDpsEdit(connection, mnUserEditId, log.entry, log.itemRefOld, log.itemRefNew, log.costCenterOld, log.costCenterNew, log.isNoteEdited, log.allDocs); 
                 }
             }
             

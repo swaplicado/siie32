@@ -6,6 +6,7 @@
 
 package erp.mtrn.data.cfd;
 
+import cfd.DAttributeTypeImporte6d;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -44,7 +45,7 @@ import sa.lib.gui.SGuiSession;
 /**
  * GUI data structure for input of an individual payment for CFDI of Payments.
  * Represents the XML element pago20:Pago, child of the CFDI complement's root element pago20:Pagos.
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Rodrigo Ayala
  */
 public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     
@@ -836,14 +837,15 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             }
         }
         
+        // Redondeo de impuestos a 6 decimales:
         for (SDataReceiptPaymentPayTax payTax : ReceiptPaymentPayTaxes) {
             BigDecimal bd = new BigDecimal(String.valueOf(payTax.getBase()));
-            BigDecimal rounded = bd.setScale(2,RoundingMode.HALF_UP);
+            BigDecimal rounded = bd.setScale(DAttributeTypeImporte6d.DECS, RoundingMode.HALF_UP);
             payTax.setBase(rounded.doubleValue());
             
             bd = new BigDecimal(String.valueOf(payTax.getTax()));
-            rounded = bd.setScale(2,RoundingMode.HALF_UP);
-            payTax.setTax(rounded.doubleValue());
+            rounded = bd.setScale(DAttributeTypeImporte6d.DECS, RoundingMode.HALF_UP);
+            payTax.setTax(rounded.doubleValue());  
         }
         
         /*

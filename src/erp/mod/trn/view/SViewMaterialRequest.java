@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona, Claudio Peña
+ * @author Isabel Servín, Edwin Carmona, Claudio Peña, Rodrigo Ayala
  */
 public class SViewMaterialRequest extends SGridPaneView implements ActionListener {
 
@@ -850,7 +850,12 @@ public class SViewMaterialRequest extends SGridPaneView implements ActionListene
             }
             // Verificar si el subtipo de la cuadrícula es TRNX_MAT_REQ_REV
             if (mnGridSubtype == SModSysConsts.TRNX_MAT_REQ_REV) {
-                needAuthJoin = false;
+                //needAuthJoin = false;
+                // Solo lo apagamos si no veníamos de un modo de autorización que ya lo encendió
+                if (mnGridMode != SModSysConsts.TRNX_MAT_REQ_AUTHO && mnGridMode != SModSysConsts.TRNX_MAT_REQ_AUTHO_RECH) {
+                    needAuthJoin = false;
+                }
+                
                 // Verificar si el usuario no tiene privilegios de administrador de requisitos de material
                 if (!hasMatReqAdmorRight) {
                     needAuthJoin = true;

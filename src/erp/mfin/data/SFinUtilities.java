@@ -7,6 +7,7 @@ package erp.mfin.data;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
@@ -19,6 +20,7 @@ import erp.mod.fin.db.SLayoutBankPaymentText;
 import erp.mod.fin.db.SLayoutBankRow;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
+import erp.mtrn.data.STrnUtilities;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import sa.lib.SLibTimeUtils;
@@ -44,7 +47,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Daniel López, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Daniel López, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SFinUtilities {
     
@@ -1473,41 +1476,108 @@ public abstract class SFinUtilities {
         return true;
     }
     
+    /**
+     * Evalúa si una partida de documento comercial (DPS Entry) cumple con las reglas 
+     * de negocio financieras para permitir la modificación de su cuenta contable o centro de costo.
+     * 
+     * @param client Iterfaz del cliente
+     * @param dpsEntryPk Llave primaria de la partida (id_year, id_doc, id_ety)
+     * @throws Exception Con el mensaje del motivo del rechazo.
+     */
+    public static void validateDpsEntryAccountingModification(final SClientInterface client, int[] dpsEntryPk) throws Exception {
+        SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        if (entry.getIsPrepayment()) {
+            throw new Exception("No se puede modificar la contabilización.\n" + 
+                                "La partida seleccionada es un Anticipo.");
+        }
+        
+        // Filtrar por el tipo de operación, solo se permiten 11 (Operaciones) y 12 (Operaciones con aplicación de anticipo):
+        int opsType = entry.getOperationsType();
+        if (opsType != SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS && opsType != SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY) {
+            throw new Exception("No se puede modificar la contabilización.\n" +
+                                "El tipo de operación de la partida es: " + SDataConstantsSys.OperationsTypesOpsMap.get(opsType) + "\n" +
+                                "Solo se admite la modificación en operaciones de tipo: " + 
+                                 SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS) + " ó " +
+                                 SDataConstantsSys.OperationsTypesOpsMap.get(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY));
+        }
+        
+        // No permitir tipos de detalle Virtual (3) o Sistema (1), solo Ordinario  (2):
+        int entryType = entry.getFkDpsEntryTypeId();
+        if (entryType == SDataConstantsSys.TRNS_TP_DPS_ETY_SYS || entryType == SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT) {
+            String tipoDesc = (entryType == SDataConstantsSys.TRNS_TP_DPS_ETY_SYS) ? "Sistema" : "Virtual";
+            throw new Exception("No se puede modificar la contabilización.\n" +
+                                "La partida es de tipo '" + tipoDesc + "'.\n" +
+                                "Solo se permite la modificación en partidas de tipo 'Ordinario'.");
+        }
+        
+        // No permitir partidas sin valor monetario o cantidad:
+        if (entry.getSubtotal_r() == 0 || entry.getQuantity() == 0) {
+            throw new Exception("No se puede modificar la contabilización.\n" +
+                                "La partida tiene cantidad 0 o subtotal $0.00.");
+        }
+    }
+    
     public static boolean isCreditNote(final SClientInterface client, int[] dpsEntryPk)throws Exception {
         ResultSet resultSet = null;
         String sql = "";
         
         sql = "SELECT * FROM trn_dps AS dps " +
                 "WHERE dps.id_year = " + dpsEntryPk[0] + " AND dps.id_doc = " + dpsEntryPk[1] + " AND " +
-                "dps.fid_ct_dps in (1,2) AND dps.fid_cl_dps = 5 AND dps.fid_tp_dps = 1;" ;
+                "dps.fid_ct_dps in (" + SDataConstantsSys.TRNS_CT_DPS_PUR + "," + SDataConstantsSys.TRNS_CT_DPS_SAL + ") " +
+                "AND dps.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_ADJ + " AND dps.fid_tp_dps = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + ";" ;
         
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
-        if(resultSet.next()){
-            throw new Exception("La nota de credito no se puede modificar");
-        } else  {
-            return true;
-        }
+        return resultSet.next(); // retorna true si es NC, false si no
         
+    }
+    
+    public static boolean hasLinkedCreditNotes(final SClientInterface client, int[] dpsEntryPk) throws Exception {
+        ResultSet resultSet;
+        
+        String sql = "SELECT a.id_adj_year " +
+                "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_ADJ) + " AS a " +
+                "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS d " +
+                "ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
+                "WHERE a.id_dps_year = " + dpsEntryPk[0] + " AND a.id_dps_doc = " + dpsEntryPk[1] + 
+                " AND d.b_del = 0 AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_ADJ;
+        
+        // Si es a nivel de partida:
+        if (dpsEntryPk.length >= 3 && dpsEntryPk[2] > 0) {
+            sql += " AND a.id_dps_ety = " + dpsEntryPk[2];
+        }
+
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        return resultSet.next();
     }
     
     public static String getAccountForDpsEntry(final SClientInterface client, int[] dpsEntryPk) throws Exception {
         ResultSet resultSet = null;
         String account = "";
         String sql = "";
+        String sqlItemFilter = "";
         SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
         
-        isCreditNote(client, dpsEntryPk);
+        if (entry.getFkItemRefId_n() == 0) {
+            sqlItemFilter = " AND re.fid_item_n = " + entry.getFkItemId() + " AND re.fid_item_aux_n IS NULL";
+        }
+        else {
+            // Si el doc tiene ítem de ref. lo buscamos como el ítem principal en la contabilidad y el ítem principal del doc como el ítem auxiliar. (Se cruzan):
+            sqlItemFilter = " AND re.fid_item_n = " + entry.getFkItemRefId_n() + " AND re.fid_item_aux_n = " + entry.getFkItemId();
+        }
         
         sql = "SELECT fid_acc " +
-                "FROM trn_dps_rec AS dr " +
-                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId();
+                "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_REC) + " AS dr " +
+                "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.FIN_REC) + " AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.FIN_REC_ETY) + " AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + 
+                " AND re.b_del = 0 AND r.b_del = 0" + sqlItemFilter;
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
         if(!resultSet.next()){
-            throw new Exception("La nota de credito no se puede modificar");
+            throw new Exception("No se encontró el registro contable para esta partida.");
         }
         resultSet.beforeFirst();
         
@@ -1522,24 +1592,40 @@ public abstract class SFinUtilities {
         ResultSet resultSet = null;
         String costCenter = "";
         String sql = "";
+        String sqlItemFilter = "";
         SDataDpsEntry entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
-        double unitBaseEquiv = 1;
+        /*double unitBaseEquiv = 1; // se quitó porque hay polizas que no heredan la cantidad del documento origen (teoría: las que tienen itemRef)
         
         sql = "SELECT unit_base_equiv AS unitBaseEquiv FROM erp.itmu_unit WHERE id_unit = " + entry.getFkOriginalUnitId();
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
         if (resultSet.next()) {
             unitBaseEquiv = Double.parseDouble(resultSet.getString("unitBaseEquiv"));
+        }*/
+        
+        if (entry.getFkItemRefId_n() == 0) {
+            sqlItemFilter = " AND re.fid_item_n = " + entry.getFkItemId() + " AND re.fid_item_aux_n IS NULL";
+        }
+        // Si el doc tiene ítem de ref. lo buscamos como el ítem principal en la contabilidad y el ítem principal del doc como el ítem auxiliar. (Se cruzan):
+        else {
+            sqlItemFilter = " AND re.fid_item_n = " + entry.getFkItemRefId_n() + " AND re.fid_item_aux_n = " + entry.getFkItemId();
         }
         
         sql = "SELECT IF(fid_cc_n IS NULL, '', fid_cc_n) AS _cc " +
-                "FROM trn_dps_rec AS dr " +
-                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-                "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId() + " AND " +
-                "re.units = " + (entry.getQuantity() / unitBaseEquiv) + " AND (re.credit = " + entry.getSubtotal_r() + " OR re.debit = " + entry.getSubtotal_r() + ") " ;
+                "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_REC) + " AS dr " +
+                "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.FIN_REC) + " AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.FIN_REC_ETY) + " AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + 
+                " AND re.b_del = 0 AND r.b_del = 0" + sqlItemFilter + " AND " +
+                //"re.units = " + (entry.getQuantity() / unitBaseEquiv) + " AND " +// se quitó porque hay polizas que no heredan la cantidad del documento origen (teoría: las que tienen itemRef)
+                "(re.credit = " + entry.getSubtotal_r() + " OR re.debit = " + entry.getSubtotal_r() + ") ";
         resultSet = client.getSession().getStatement().executeQuery(sql);
         
+        if (!resultSet.next()) {
+            throw new Exception("No se encontró el Centro de Costo contable.");
+        }
+        
+        resultSet.beforeFirst();
         while (resultSet.next()) {
             costCenter = resultSet.getString("_cc");
         }
@@ -1547,91 +1633,264 @@ public abstract class SFinUtilities {
         return costCenter;
     }
     
-    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, final int[] dpsEntryKey, final String account, final String costCenter, final double originalQuantity, final double subTotal, int registryType) throws Exception {
+    /**
+     * Deduce y obtiene la llave primaria y datos extra del renglón contable (fin_rec_ety) 
+     * que corresponde a una partida de documento (trn_dps_ety), usando un algoritmo posicional.
+     * 
+     * @return Object[] { id_year, id_per, id_bkc, id_tp_rec, id_num, id_ety, fid_acc, fid_cc_n }
+     */
+    public static Object[] getAccountingEntryKeyForDpsEntry(SClientInterface client, SDataDps dps, SDataDpsEntry dpsEty) throws Exception {
+        int count = 0; 
+        int position = 0;
         
-        /* Debido a que no es posible determinar con precisión cuál es el movimiento contable generado por la partida deseada del docto.,
-         * se infiere cuál es aquél por el ID de los renglones contables generados por el docto.
+        // Datos del documento con formato para mensaje:
+        String docTypeName = SDataReadDescriptions.getCatalogueDescription(client, erp.data.SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey());
+        if (docTypeName == null || docTypeName.trim().isEmpty()) {
+            docTypeName = "Documento";
+        }
+        String folio = dps.getNumberSeries() != null && !dps.getNumberSeries().trim().isEmpty() 
+            ? dps.getNumberSeries() + "-" + dps.getNumber() 
+            : dps.getNumber();
+            
+        String docInfo = docTypeName + " " + folio;
+
+        // Deducir posición de la partida
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (!entry.getIsDeleted() && 
+                entry.getFkItemId() == dpsEty.getFkItemId() && 
+                entry.getFkItemRefId_n() == dpsEty.getFkItemRefId_n() && 
+                SLibUtils.compareAmount(entry.getSubtotal_r(), dpsEty.getSubtotal_r())) {
+
+                count++;
+                if (SLibUtils.compareKeys(entry.getPrimaryKey(), dpsEty.getPrimaryKey())) {
+                    position = count;
+                }
+            }
+        }
+
+        if (count == 0 || position == 0) {
+            throw new Exception("No se pudo determinar la posición de la partida seleccionada dentro del documento (" + docInfo + ").\n\n" +
+                                "- Partidas similares encontradas en el documento: " + count + "\n" +
+                                "- Posición de la partida actual: " + position + ".");
+        }
+
+        String sqlItemFilter = (dpsEty.getFkItemRefId_n() == 0) ?
+                "AND re.fid_item_n = " + dpsEty.getFkItemId() + " AND re.fid_item_aux_n IS NULL" :
+                "AND re.fid_item_n = " + dpsEty.getFkItemRefId_n() + " AND re.fid_item_aux_n = " + dpsEty.getFkItemId();
+
+        String whereSql = "";
+        int[] dpsKey = (int[]) dps.getPrimaryKey();
+
+        if (dps.getFkDpsClassId() == SDataConstantsSys.TRNS_CL_DPS_ADJ) {
+            whereSql = "WHERE re.fid_dps_adj_year_n = " + dpsKey[0] + " AND re.fid_dps_adj_doc_n = " + dpsKey[1] + " ";
+        } else {
+            whereSql = "WHERE re.fid_dps_year_n = " + dpsKey[0] + " AND re.fid_dps_doc_n = " + dpsKey[1] + " " +
+                       "AND re.fid_dps_adj_year_n IS NULL AND re.fid_dps_adj_doc_n IS NULL ";
+        }
+
+        whereSql += sqlItemFilter + " AND (re.credit = " + dpsEty.getSubtotal_r() + " OR re.debit = " + dpsEty.getSubtotal_r() + ") AND NOT r.b_del AND NOT re.b_del;";
+
+        String sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.fid_acc, re.fid_cc_n " +
+                     "FROM fin_rec AS r " +
+                     "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
+                     whereSql;
+
+        java.sql.ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        java.util.List<Object[]> entriesRec = new java.util.ArrayList<>();
+
+        while (resultSet.next()) {
+            entriesRec.add(new Object[] { 
+                resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), 
+                resultSet.getInt(5), resultSet.getInt(6), resultSet.getString(7), resultSet.getString(8)
+            });
+        }
+        resultSet.close();
+
+        if (entriesRec.isEmpty()) {
+            throw new Exception("No se puede actualizar la contabilidad de la partida.\n" +
+                                "No se encontraron renglones contables en la contabilidad del documento.\n" +
+                                "- Partidas similares encontradas en el documento (" + docInfo + "): " + count + ".");
+        } else if (count != entriesRec.size()) {
+            throw new Exception("No se puede actualizar la contabilidad de la partida.\n" +
+                                "Existe una discrepancia de captura entre el documento y su contabilidad.\n" +
+                                "- Partidas similares encontradas en el documento (" + docInfo + "): " + count + "\n" + 
+                                "- Renglones compatibles encontrados en la póliza: " + entriesRec.size() + ".");
+        }
+
+        return entriesRec.get(position - 1);
+    }
+    
+    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, final int[] dpsEntryKey, final String account, final String costCenter, final double originalQuantity, final double subTotal, int registryType, boolean updateNcAccount) throws Exception {
+        
+        /* 
+         * Como no existe un vínculo directo (ID) entre el renglón de la póliza y la partida de la factura,
+         * es imposible saber de forma directa qué apunte contable le corresponde a la partida seleccionada.
+         * Por ello, el renglón correcto se deduce calculando su "posición" (orden de aparición) 
+         * entre las partidas que tienen el mismo ítem y el mismo importe.
          */
         
         SDataDpsEntry dpsEntry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryKey, SLibConstants.EXEC_MODE_VERBOSE);
         
         if (dpsEntry == null || dpsEntry.getIsDeleted()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nLa partida del documento deseada"
-                    + (dpsEntry.getIsDeleted() ? " está eliminada" : "") + ".");
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nLa partida del documento"
+                    + (dpsEntry.getIsDeleted() ? " está eliminada" : "") + " no fue encontrada.");
         }
         
-        int count = 0; // número de partidas similares del docto. a la partida deseada del docto.
-        int position = 0; // posición de la partida deseada del docto. entre las partidas similares del docto.
+        int count = 0; // número de partidas similares del documneto de la partida deseada.
+        int position = 0; // posición de la partida deseada dentro del documento.
         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsEntryKey, SLibConstants.EXEC_MODE_VERBOSE);
         
         for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
             if (!entry.getIsDeleted()) {
                 if (entry.getFkItemId() == dpsEntry.getFkItemId() && entry.getFkItemRefId_n() == dpsEntry.getFkItemRefId_n() && 
-                        (int) entry.getOriginalQuantity() * 100000000 == (int) dpsEntry.getOriginalQuantity() * 100000000 && SLibUtils.compareAmount(entry.getSubtotal_r(), dpsEntry.getSubtotal_r())) {
+                        //(int) entry.getOriginalQuantity() * 100000000 == (int) dpsEntry.getOriginalQuantity() * 100000000 && // Quitamos cantidad para pólizas que no heredaron el item de la factura 
+                        SLibUtils.compareAmount(entry.getSubtotal_r(), dpsEntry.getSubtotal_r())) {
                     count++;
 
+                    // Entre las partidas similares dentro del documento buscamos nuestra partida deseada:
                     if (SLibUtils.compareKeys(entry.getPrimaryKey(), dpsEntry.getPrimaryKey())) {
-                        position = count;
+                        position = count; // obtenemos su posición
                     }
                 }
             }
         }
         
         if (count == 0 || position == 0) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nEl número de partidas similares del docto. (= " + count + ") "
-                    + "y/o la posición de la partida deseada del docto. entre las partidas similares del docto (= " + position + ").");
+            throw new Exception("No se pudo determinar la posición de la partida seleccionada dentro del documento.\n\n" +
+                                "- Partidas similares encontradas en el documento: " + count + "\n" +
+                                "- Posición de la partida actual: " + position + ".");
         }
+        
+        // Hacemos cruce de ítems si la partida tiene ítem de referencia:
+        
+        String sqlItemFilter = (dpsEntry.getFkItemRefId_n() == 0) ?
+                " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND re.fid_item_aux_n IS NULL " :
+                " AND re.fid_item_n = " + dpsEntry.getFkItemRefId_n() + " AND re.fid_item_aux_n = " + dpsEntry.getFkItemId() + " ";
         
         String whereSql = "";
         switch(registryType){
             case SDataConstantsSys.TRNX_TP_DPS_DOC:
-                whereSql = "WHERE re.fid_dps_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
-                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+                // Buscamos la póliza del Documento de compras original:
+                whereSql = "WHERE re.fid_dps_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_doc_n = " + dpsEntryKey[1] + " " +
+                           "AND re.fid_dps_adj_year_n IS NULL AND re.fid_dps_adj_doc_n IS NULL" + 
+                           sqlItemFilter +
+                           " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
                 break;
             case SDataConstantsSys.TRNX_TP_DPS_ADJ:
-                whereSql = "WHERE re.fid_dps_adj_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_adj_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
-                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+                // Buscamos la póliza de la Nota de Crédito:
+                whereSql = "WHERE re.fid_dps_adj_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_adj_doc_n = " + dpsEntryKey[1] + 
+                           sqlItemFilter +
+                           " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
                 break;
             default: 
                 break;
         }
         
-        // contar renglones similares al renglón de documento deseado:
+        // Contar renglones similares al renglón de documento deseado:
         
-        String sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+        String sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.fid_acc " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
                 whereSql;
+        
         ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
         
         ArrayList<Object[]> entries = new ArrayList<>();
         
         while (resultSet.next()) {
-            entries.add(new Object[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6) });
+            entries.add(new Object[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), 
+                resultSet.getInt(5), resultSet.getInt(6), resultSet.getString(7)
+            });
         }
         
-        if (entries.isEmpty() || count != entries.size()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nEl número de renglones contables generados por el docto. (" + entries.size() + ") compatibles con la partida deseada del docto"
-                    + (count != entries.size() ? ". vs.\nel número de partidas similares del docto. (" + count + ")" : "") + ".");
+        if (entries.isEmpty()) {
+            throw new Exception("No se puede actualizar la contabilidad de la partida.\n" +
+                                "No se encontraron renglones contables similares en la contabilidad.\n" +
+                                "- Partidas similares encontradas en el documento: " + count + ".");
+        }
+        else if (count != entries.size()) {
+            throw new Exception("No se puede actualizar la contabilidad de la partida.\n" +
+                                "Existe una discrepancia de captura entre el documento y su contabilidad." +
+                                "- Partidas similares encontradas en el documento: " + count + 
+                                "- Renglones contables compatibles con la partida deseada del documento: " + entries.size() + ".");
         }
         
         Object[] entryKey = entries.get(position - 1); // el renglón contable que con mucha certeza es el correspondiente al de la partida deseada del docto.
         
         int accountPk = SFinUtils.getAccountId(client.getSession(), account);
         int costCenterPk = SFinUtils.getCostCenterId(client.getSession(), costCenter);
-
+        
+        // Metemos el documento a la lista que se mandará a la bitácora:
+        
+        String accOld = (String) entryKey[6];
+        List<int[]> relatedDocs = new ArrayList<>();
+        
+        relatedDocs.add(new int[] {dpsEntryKey[0], dpsEntryKey[1], dpsEntryKey[2], dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId()});
+        
+        // Actualización en cascada para notas de crédito asociadas:
+        
+        if (registryType == SDataConstantsSys.TRNX_TP_DPS_DOC) {
+            // Buscamos las notas de crédito asociadas:
+            String sqlNC = "SELECT a.id_adj_year, a.id_adj_doc, a.id_adj_ety, e.qty, e.stot_r " +
+                           "FROM " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_DPS_ADJ) + " AS a " +
+                           "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS) + " AS d ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
+                           "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY) + " AS e ON a.id_adj_year = e.id_year AND a.id_adj_doc = e.id_doc AND a.id_adj_ety = e.id_ety " +
+                           "WHERE a.id_dps_year = " + dpsEntryKey[0] + " AND a.id_dps_doc = " + dpsEntryKey[1] + " AND a.id_dps_ety = " + dpsEntryKey[2] + " " +
+                           "AND d.b_del = 0 AND e.b_del = 0 AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_CL_DPS_ADJ + ";";
+            
+            sqlNC += "";
+            
+            ResultSet rsNC = client.getSession().getStatement().executeQuery(sqlNC);
+            
+            ArrayList<Object[]> ncList = new ArrayList<>();
+            while (rsNC.next()){
+                ncList.add(new Object[] {
+                    rsNC.getInt("id_adj_year"), 
+                    rsNC.getInt("id_adj_doc"), 
+                    rsNC.getInt("id_adj_ety"), 
+                    rsNC.getDouble("qty"), 
+                    rsNC.getDouble("stot_r")
+                });
+            }
+            
+            rsNC.close();
+            
+            // Recorremos las notas de crédito asociadas guardadas:
+            for (Object[] ncData : ncList) {
+                int ncYear = (int) ncData[0];
+                int ncDoc = (int) ncData[1];
+                int ncEty = (int) ncData[2];
+                double ncQty = (double) ncData[3];
+                double ncSubTotal = (double) ncData[4];
+                
+                // Si el usuario aceptó cambiar la NC, mandamos la cuenta nueva; si es false, rescatamos la cuenta que ya tenía la NC:
+                String targetAccount = updateNcAccount ? account : SFinUtilities.getAccountForDpsEntry(client, new int[] { ncYear, ncDoc, ncEty });
+                
+                // Le pasamos la NC asociada al mismo método recursivamente:
+                updateAccountCostCenterForDpsEntry(client, new int[] { ncYear, ncDoc, ncEty }, targetAccount, costCenter, ncQty, ncSubTotal, SDataConstantsSys.TRNX_TP_DPS_ADJ, false);
+            }
+        }
+        
+        // Actualizar el documento:
+        
          sql = "UPDATE fin_rec_ety " +
                 "SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " +
-                (costCenter == null || costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
+                (costCenter == null || costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = NULL" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
                 "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
                 "WHERE id_year = " + entryKey[0] + " AND id_per = " + entryKey[1] + " AND id_bkc = " + entryKey[2] + " AND id_tp_rec = '" + entryKey[3] + "' AND id_num = " + entryKey[4] + " AND id_ety = " + entryKey[5] + ";";
         client.getSession().getStatement().execute(sql);
-
+        
         sql = "UPDATE trn_dps_ety " +
                 "SET " + (costCenter == null || costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") + ", " +
                 "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", " + "ts_edit = NOW() " +
                 "WHERE id_year = " + dpsEntryKey[0] + " AND id_doc = " + dpsEntryKey[1] + " AND id_ety = " + dpsEntryKey[2] + ";";
         client.getSession().getStatement().execute(sql);
+        
+        // Guardar los cambios en la bitácora:
+                
+        STrnUtilities.insertHistForAccounting(client.getSession().getStatement().getConnection(), client.getSession().getUser().getPkUserId(), 
+            dpsEntry, accOld, account, costCenter, relatedDocs
+        );
         
         return true;
     }

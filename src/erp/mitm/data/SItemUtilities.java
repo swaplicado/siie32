@@ -7,7 +7,9 @@ package erp.mitm.data;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.lib.form.SFormComponentItem;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mtrn.data.STrnDpsUtilities;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín, Edwin Carmona, Sergio Flores
+ * @author Isabel Servín, Edwin Carmona, Sergio Flores, Rodrigo Ayala
  */
 public abstract class SItemUtilities {
     
@@ -85,6 +87,43 @@ public abstract class SItemUtilities {
         }
         
         return id;
+    }
+    
+    /**
+     * Obtiene las unidades de medida equivalentes con su factor de conversión para una unidad base según su tipo de unidad (itmu_tp_unit).
+     * @param client Cliente GUI
+     * @param idUnitBase ID de la unidad base
+     * @return Vector con los items para llenar el ComboBox
+     */
+    public static java.util.Vector<SFormComponentItem> getUnitEquivalences(final erp.client.SClientInterface client, final int idUnitBase) {
+        java.util.Vector<SFormComponentItem> items = new java.util.Vector<>();
+        // Asiganmos el valor por default:
+        SFormComponentItem defaultItem = new SFormComponentItem(new int[] { idUnitBase }, "Unidad origen");
+        defaultItem.setComplement(1.0);
+        items.add(defaultItem);
+
+        try {
+            String sql = "SELECT u.id_unit AS id_unit_equiv, u.unit, u.symbol, " +
+                         "IF(u.unit_base_equiv = 0, 0, (1.00000000 / (u_base.unit_base_equiv / u.unit_base_equiv))) AS equiv " +
+                         "FROM " + SDataConstants.TablesMap.get(SDataConstants.ITMU_UNIT) + " AS u_base " +
+                         "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.ITMU_TP_UNIT) + " AS tu ON u_base.fid_tp_unit = tu.id_tp_unit " +
+                         "INNER JOIN " + SDataConstants.TablesMap.get(SDataConstants.ITMU_UNIT) + " AS u ON tu.id_tp_unit = u.fid_tp_unit " +
+                         "WHERE u_base.id_unit = " + idUnitBase + " " +
+                         "AND u.id_unit <> " + idUnitBase + " " +
+                         "AND u_base.b_del = 0 AND u.b_del = 0 AND tu.b_del = 0 " +
+                         "ORDER BY u.symbol;";
+            
+            java.sql.ResultSet rs = client.getSession().getStatement().executeQuery(sql);
+            while (rs.next()) {
+                SFormComponentItem item = new SFormComponentItem(new int[] { rs.getInt("id_unit_equiv") }, rs.getString("unit") + " (" + rs.getString("symbol") + ")");
+                item.setComplement(rs.getDouble("equiv")); // Factor oculto
+                items.add(item);
+            }
+        } catch (java.sql.SQLException e) {
+            sa.lib.SLibUtils.printException(STrnDpsUtilities.class.getName(), e);
+        }
+        
+        return items;
     }
     
     public static ArrayList<SDataUnitEquivalence> getUnitEquivalencesRows(final SClientInterface client, final int unitId) {

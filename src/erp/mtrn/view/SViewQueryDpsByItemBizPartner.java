@@ -7,6 +7,7 @@ package erp.mtrn.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDatePeriodRange;
@@ -16,6 +17,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mfin.data.SFinUtilities;
 import erp.mitm.form.SPanelFilterItem;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogUpdateAllDpsItem;
 import erp.mtrn.form.SDialogUpdateDpsAccountCenterCost;
 import erp.mtrn.form.SDialogUpdateDpsItemRefConcept;
@@ -30,7 +32,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Isabel Servín, Claudio Peña, Sergio Flores, Rodrigo Ayala
  */
 public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -107,6 +109,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         jbChangeItemDocAll.setPreferredSize(new Dimension(23, 23));
         jbChangeItemDocAll.addActionListener(this);
         jbChangeItemDocAll.setToolTipText("Modificar ítem en todos los documentos (órdenes de servicios)");
+        
+        jbAccountCostCenter.setEnabled(!mbIsDpsAdj); // apagamos el botón de contabilidad en NC
+        jbChangeItemDocAll.setEnabled(false); // apagamos el botón de ítem en todas las vistas
         
         if (isViewForPurchase()) {
             levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
@@ -237,14 +242,40 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             }
             else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
                 try {
+                    int[] dpsEntryPk = (int []) moTablePane.getSelectedTableRow().getPrimaryKey();
                     int gui = isViewForPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+                    SDataDps dps = (erp.mtrn.data.SDataDps) erp.data.SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { dpsEntryPk[0], dpsEntryPk[1] }, SLibConstants.EXEC_MODE_SILENT);
+                    
+                    // Validar periodo contable:
+                    if (dps != null && !SDataUtilities.isPeriodOpen(miClient, dps.getDate())) {
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE + " (" + dps.getDate().toString() + ")");
+                        return;
+                    }
+                    
+                    SFinUtilities.validateDpsEntryAccountingModification(miClient, dpsEntryPk);
+                    
+                    boolean isNC = SFinUtilities.isCreditNote(miClient, dpsEntryPk);
+                    boolean hasNC = SFinUtilities.hasLinkedCreditNotes(miClient, dpsEntryPk);
+                    
+                    if (isNC || hasNC) {
+                        if (miClient.showMsgBoxConfirm(
+                                "Este documento tiene nota(s) de crédito asociada(s). \n" +
+                                "Las modificaciones afectarán también la contabilidad de dicho(s) documento(s). \n\n" +
+                                "¿Desea continuar con la modificación?") != javax.swing.JOptionPane.YES_NO_OPTION) {
+                            return;
+                        };
+                    }
+                    
 
-                    account = SFinUtilities.getAccountForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    costCenter = SFinUtilities.getCostCenterForDpsEntry(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    account = SFinUtilities.getAccountForDpsEntry(miClient, dpsEntryPk);
+                    costCenter = SFinUtilities.getCostCenterForDpsEntry(miClient, dpsEntryPk);
+
+                    account = account != null ? account : "";
+                    costCenter = costCenter != null ? costCenter : "";
 
                     moDialogUpdateDpsAccountCostCenter.formReset();
-                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
-                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
+                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS, new int[] { dpsEntryPk[0], dpsEntryPk[1] });
+                    moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.TRN_DPS_ETY, dpsEntryPk);
                     moDialogUpdateDpsAccountCostCenter.setValue(SDataConstants.FIN_ACC, new String[] { account, costCenter }); 
                     moDialogUpdateDpsAccountCostCenter.setRegistryType(mnRegistryType);
                     moDialogUpdateDpsAccountCostCenter.setFormVisible(true);
@@ -259,6 +290,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             }
         }
     }
+    
         // solo para ordenes de compra
         private void actionChangeItemConcept() {
         if (jbChangeItemConcept.isEnabled()) {
@@ -267,10 +299,18 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             }
             else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
                 try {
+                    int[] dpsEntryPk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                     int gui = isViewForPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { dpsEntryPk[0], dpsEntryPk[1] }, SLibConstants.EXEC_MODE_SILENT);
+                    
+                    // Validar periodo contable:
+                    if (dps != null && !SDataUtilities.isPeriodOpen(miClient, dps.getDate())) {
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE + " (" + dps.getDate().toString() + ")");
+                        return;
+                    }
 
                     moDialogUpdateDpsItemRefConcept.formReset();
-                    moDialogUpdateDpsItemRefConcept.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
+                    moDialogUpdateDpsItemRefConcept.setValue(SDataConstants.TRN_DPS, new int[] { dpsEntryPk[0], dpsEntryPk[1] });
                     moDialogUpdateDpsItemRefConcept.setValue(SDataConstants.TRN_DPS_ETY, moTablePane.getSelectedTableRow().getPrimaryKey());
                     moDialogUpdateDpsItemRefConcept.setRegistryType(mnRegistryType);
                     moDialogUpdateDpsItemRefConcept.setFormVisible(true);

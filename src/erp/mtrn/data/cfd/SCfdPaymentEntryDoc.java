@@ -6,6 +6,7 @@
 
 package erp.mtrn.data.cfd;
 
+import cfd.DAttributeTypeImporte6d;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SThinDps;
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ import sa.lib.SLibUtils;
 /**
  * GUI data structure for input of an individual document payment of a payment for CFDI of Payments.
  * Represents the XML element pago20:DoctoRelacionado, child of the element pago20:Pago.
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Rodrigo Ayala
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
@@ -76,10 +77,12 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
     public void calculatePayPaymentDocTaxesBase(double pay) {
         int mnRate0 = 0;
+        
         for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
             if (docTax.getRate() != 0) { 
-                docTax.setBase(SLibUtils.roundAmount(docTax.getTax()/docTax.getRate()));
-                docTax.setTax(SLibUtils.roundAmount(docTax.getBase()*docTax.getRate())); // Se vuelve a calcular el importe para evitar errores de variación
+                docTax.setBase(SLibUtils.round(docTax.getTax() / docTax.getRate(), DAttributeTypeImporte6d.DECS));
+                docTax.setTax(SLibUtils.round(docTax.getBase() * docTax.getRate(), DAttributeTypeImporte6d.DECS)); // Se vuelve a calcular el importe para evitar errores de variación
+                
                 if (docTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) { // -
                     pay -= docTax.getBase() + docTax.getTax();
                 }
@@ -91,10 +94,13 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
                 mnRate0++;
             }
         }
-        pay /= mnRate0;
-        for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
-            if (docTax.getRate() == 0) { 
-                docTax.setBase(SLibUtils.roundAmount(pay));
+        
+        if (mnRate0 > 0) {
+            pay /= mnRate0;
+            for (SDataReceiptPaymentPayDocTax docTax : ReceiptPaymentPayDocTaxes) {
+                if (docTax.getRate() == 0) { 
+                    docTax.setBase(SLibUtils.round(pay, DAttributeTypeImporte6d.DECS));
+                }
             }
         }
     }

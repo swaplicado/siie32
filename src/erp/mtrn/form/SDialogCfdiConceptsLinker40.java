@@ -25,6 +25,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mitm.data.SDataItem;
+import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsLink;
@@ -53,7 +54,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Isabel Servín, Sergio Flores, Claudio Peña 
+ * @author Isabel Servín, Sergio Flores, Claudio Peña, Rodrigo Ayala 
  */
 public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener, javax.swing.event.CellEditorListener {
 
@@ -84,6 +85,7 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
     private boolean mbFirstTime;
     private erp.lib.form.SFormField moFieldConvFact;
     private erp.lib.form.SFormField moFieldAdjustmentSubtype;
+    private erp.lib.form.SFormField moFieldFkEquivalentUnitId;
     private erp.lib.table.STablePaneGrid moTableDpsSourceEntries;
 
     private erp.mtrn.data.SDataDps moParamDpsToLink;
@@ -139,12 +141,18 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jPanel6 = new javax.swing.JPanel();
         jlCantidad = new javax.swing.JLabel();
         jlConvFactor = new javax.swing.JLabel();
+        jlConvFactorUnit = new javax.swing.JLabel();
+        jlInfo1 = new javax.swing.JLabel();
         jlCantidadEquivalente = new javax.swing.JLabel();
+        jlInfo2 = new javax.swing.JLabel();
         jlPrecioCfdi = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jtfCantidad = new javax.swing.JTextField();
         jtfConvFactor = new javax.swing.JTextField();
+        jcbUnidadEquivalente = new javax.swing.JComboBox<SFormComponentItem>();
+        jbEquivalentUnitId = new javax.swing.JButton();
         jtfCantidadEquivalente = new javax.swing.JTextField();
+        jlUnitCantEquiv = new javax.swing.JLabel();
         jtfPrecioCfdi = new javax.swing.JTextField();
         jlInfo = new javax.swing.JLabel();
         jpDpsToLinkEntry = new javax.swing.JPanel();
@@ -153,6 +161,7 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jlEntryPrice = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jtfEntryPrice = new javax.swing.JTextField();
+        jlUnitEtyPrice = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jlAdjustmentSubtype = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -203,16 +212,16 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jlDescripcion.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel4.add(jlDescripcion);
 
-        jlProdServ.setText("C. ProdServ:");
-        jlProdServ.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlProdServ.setText("Cve. ProdServ:");
+        jlProdServ.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel4.add(jlProdServ);
 
         jlUnidad.setText("Unidad:");
-        jlUnidad.setPreferredSize(new java.awt.Dimension(90, 23));
+        jlUnidad.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel4.add(jlUnidad);
 
-        jlUnitSat.setText("C. Unidad:");
-        jlUnitSat.setPreferredSize(new java.awt.Dimension(65, 23));
+        jlUnitSat.setText("Cve. Unidad:");
+        jlUnitSat.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jlUnitSat);
 
         jpCfdiConceptData.add(jPanel4);
@@ -232,18 +241,18 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jtfProdServ.setToolTipText("Clave ProdServ");
         jtfProdServ.setEnabled(false);
         jtfProdServ.setFocusable(false);
-        jtfProdServ.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfProdServ.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel5.add(jtfProdServ);
 
         jtfUnidad.setEnabled(false);
         jtfUnidad.setFocusable(false);
-        jtfUnidad.setPreferredSize(new java.awt.Dimension(90, 23));
+        jtfUnidad.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel5.add(jtfUnidad);
 
         jtfUnidadSat.setToolTipText("Clave Unidad");
         jtfUnidadSat.setEnabled(false);
         jtfUnidadSat.setFocusable(false);
-        jtfUnidadSat.setPreferredSize(new java.awt.Dimension(65, 23));
+        jtfUnidadSat.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jtfUnidadSat);
 
         jpCfdiConceptData.add(jPanel5);
@@ -251,19 +260,39 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCantidad.setText(" Cantidad:");
-        jlCantidad.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCantidad.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCantidad);
 
         jlConvFactor.setText(" Factor de conversión:*");
-        jlConvFactor.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlConvFactor.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel6.add(jlConvFactor);
 
+        jlConvFactorUnit.setText("Unidad de converisón:");
+        jlConvFactorUnit.setToolTipText("");
+        jlConvFactorUnit.setName(""); // NOI18N
+        jlConvFactorUnit.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel6.add(jlConvFactorUnit);
+
+        jlInfo1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
+        jlInfo1.setToolTipText("<html>Seleccione la unidad de medida en la que el <b>proveedor facturó</b>.<br>                   El sistema calculará <b>automáticamente</b> el factor de conversión<br></html>");
+        jlInfo1.setPreferredSize(new java.awt.Dimension(18, 23));
+        jPanel6.add(jlInfo1);
+
+        jlCantidadEquivalente.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlCantidadEquivalente.setText("Cantidad equivalente:");
-        jlCantidadEquivalente.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlCantidadEquivalente.setToolTipText("");
+        jlCantidadEquivalente.setPreferredSize(new java.awt.Dimension(117, 23));
         jPanel6.add(jlCantidadEquivalente);
 
+        jlInfo2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
+        jlInfo2.setToolTipText("<html>Cantidad calculada para que se ajuste a la <b>Unidad de la OC</b>.</html>\"");
+        jlInfo2.setPreferredSize(new java.awt.Dimension(15, 23));
+        jPanel6.add(jlInfo2);
+
+        jlPrecioCfdi.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlPrecioCfdi.setText("Precio unitario del CFDI $:");
-        jlPrecioCfdi.setPreferredSize(new java.awt.Dimension(165, 23));
+        jlPrecioCfdi.setInheritsPopupMenu(false);
+        jlPrecioCfdi.setPreferredSize(new java.awt.Dimension(155, 23));
         jPanel6.add(jlPrecioCfdi);
 
         jpCfdiConceptData.add(jPanel6);
@@ -273,28 +302,42 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jtfCantidad.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfCantidad.setEnabled(false);
         jtfCantidad.setFocusable(false);
-        jtfCantidad.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfCantidad.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jtfCantidad);
 
         jtfConvFactor.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jtfConvFactor.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfConvFactor.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel7.add(jtfConvFactor);
+
+        jcbUnidadEquivalente.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbUnidadEquivalente.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel7.add(jcbUnidadEquivalente);
+
+        jbEquivalentUnitId.setText("...");
+        jbEquivalentUnitId.setToolTipText("Seleccionar unidad");
+        jbEquivalentUnitId.setFocusable(false);
+        jbEquivalentUnitId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbEquivalentUnitId);
 
         jtfCantidadEquivalente.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfCantidadEquivalente.setEnabled(false);
         jtfCantidadEquivalente.setFocusable(false);
-        jtfCantidadEquivalente.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfCantidadEquivalente.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel7.add(jtfCantidadEquivalente);
+
+        jlUnitCantEquiv.setText("x <>");
+        jlUnitCantEquiv.setPreferredSize(new java.awt.Dimension(30, 23));
+        jPanel7.add(jlUnitCantEquiv);
 
         jtfPrecioCfdi.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfPrecioCfdi.setEnabled(false);
         jtfPrecioCfdi.setFocusable(false);
-        jtfPrecioCfdi.setPreferredSize(new java.awt.Dimension(165, 23));
+        jtfPrecioCfdi.setPreferredSize(new java.awt.Dimension(145, 23));
         jPanel7.add(jtfPrecioCfdi);
 
         jlInfo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_info.png"))); // NOI18N
         jlInfo.setToolTipText("La cantidad a vincular se multiplica por el factor de conversión");
-        jlInfo.setPreferredSize(new java.awt.Dimension(20, 23));
+        jlInfo.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel7.add(jlInfo);
 
         jpCfdiConceptData.add(jPanel7);
@@ -319,8 +362,12 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         jtfEntryPrice.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfEntryPrice.setEnabled(false);
         jtfEntryPrice.setFocusable(false);
-        jtfEntryPrice.setPreferredSize(new java.awt.Dimension(165, 23));
+        jtfEntryPrice.setPreferredSize(new java.awt.Dimension(155, 23));
         jPanel2.add(jtfEntryPrice);
+
+        jlUnitEtyPrice.setText("x <>");
+        jlUnitEtyPrice.setPreferredSize(new java.awt.Dimension(34, 23));
+        jPanel2.add(jlUnitEtyPrice);
 
         jpDpsToLinkEntry1.add(jPanel2);
 
@@ -397,6 +444,8 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         moFieldConvFact = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfConvFactor, jlConvFactor);
         moFieldConvFact.setDecimalFormat(SLibUtils.DecimalFormatValue8D);
         moFieldAdjustmentSubtype = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbAdjustmentSubtype, jlAdjustmentSubtype);
+        // Enlazamos el tipo de dato con el checkbox para que se actulicen juntos:
+        moFieldFkEquivalentUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbUnidadEquivalente, jlUnidad);
 
         mvFields = new Vector<>();
         mvFields.add(moFieldConvFact);
@@ -479,6 +528,29 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         
         jbSelectAll.addActionListener(this);
         jbDeselectAll.addActionListener(this);
+        
+        // Evento del ComboBox de unidades equivalentes, ya sea manualmente o indirectamente desde el OptionPicker
+        jcbUnidadEquivalente.addItemListener(new java.awt.event.ItemListener() {
+            @Override
+            public void itemStateChanged(java.awt.event.ItemEvent e) {
+                if (e.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+                    if (jcbUnidadEquivalente.getSelectedIndex() > -1) {
+                        Object selected = jcbUnidadEquivalente.getSelectedItem();
+                        // Revisamos que la opción sea un componente ítem válido:
+                        if (selected instanceof SFormComponentItem) {
+                            SFormComponentItem item = (SFormComponentItem) selected;
+                            if (item != null && item.getComplement() != null) {
+                                // Actualizamos  el factor de conversión y recalculamos la Cantidad Eq. y el Precio:
+                                moFieldConvFact.setDouble((Double) item.getComplement());
+                                updateFields();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        jbEquivalentUnitId.addActionListener(this);
     }
 
     private void windowActivated() {
@@ -578,9 +650,36 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
     }
     
     private void updateFields() {
-        jtfCantidadEquivalente.setText(SLibUtils.DecimalFormatValue4D.format(Double.parseDouble(jtfCantidad.getText()) * Double.parseDouble(jtfConvFactor.getText()))); 
-        moRowCfdiImport.setConvFactor(Double.parseDouble(jtfConvFactor.getText()));
-        jtfPrecioCfdi.setText(SLibUtils.DecimalFormatValue8D.format(moRowCfdiImport.getPriceUnitary()));
+        try {
+            String strCantidad = jtfCantidad.getText().replace(",", "");
+            String strConvFactor = jtfConvFactor.getText().replace(",", "");
+            
+            double cantidad = strCantidad.isEmpty() ? 0.0 : Double.parseDouble(strCantidad);
+            double convFactor = strConvFactor.isEmpty() ? 1.0 : Double.parseDouble(strConvFactor);
+            
+            jtfCantidadEquivalente.setText(SLibUtils.DecimalFormatValue4D.format(cantidad * convFactor)); 
+            if (moRowCfdiImport != null) {
+                moRowCfdiImport.setConvFactor(convFactor);
+                jtfPrecioCfdi.setText(SLibUtils.DecimalFormatValue8D.format(moRowCfdiImport.getPriceUnitary()));
+            }
+        } catch (NumberFormatException e) {
+            // Evita que truene si hay algún texto temporalmente vacío
+            // SLibUtils.showException(e, e);
+        }
+    }
+    
+    private void populateEqualUnits(int unitBase) {
+        jcbUnidadEquivalente.removeAllItems();
+        
+        java.util.Vector<SFormComponentItem> equivalences = SItemUtilities.getUnitEquivalences(miClient, unitBase);
+        
+        if (!equivalences.isEmpty()) {
+            equivalences.get(0).setItem("Unidad OC");
+        }
+                
+        for (SFormComponentItem item : equivalences) {
+            jcbUnidadEquivalente.addItem(item);
+        }
     }
 
     private boolean validateQuantitiesToLink() {
@@ -813,6 +912,15 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
         
         return SLibUtils.roundAmount(amount + taxCharged - taxRetained);
     }
+    
+    private void actionPickUnitEquivalente() {
+        // Obtener el tipo de unidad del XML y mandarlo como filtro al picker:
+        if (moRowCfdiImport != null && moRowCfdiImport.getItem() != null) {
+            int unitTypeId = moRowCfdiImport.getItem().getDbmsDataItemGeneric().getFkUnitTypeId(); 
+
+            miClient.pickOption(SDataConstants.ITMU_UNIT, moFieldFkEquivalentUnitId, new int[] { unitTypeId });
+        }
+    }
 
     private void actionSelectAll() {
         if (validateAllRowsLinks()) {
@@ -892,21 +1000,28 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDeselectAll;
+    private javax.swing.JButton jbEquivalentUnitId;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbSelectAll;
     private javax.swing.JComboBox<SFormComponentItem> jcbAdjustmentSubtype;
+    private javax.swing.JComboBox<SFormComponentItem> jcbUnidadEquivalente;
     private javax.swing.JLabel jlAdjustmentSubtype;
     private javax.swing.JLabel jlCantidad;
     private javax.swing.JLabel jlCantidadEquivalente;
     private javax.swing.JLabel jlConvFactor;
+    private javax.swing.JLabel jlConvFactorUnit;
     private javax.swing.JLabel jlDescripcion;
     private javax.swing.JLabel jlEntryPrice;
     private javax.swing.JLabel jlInfo;
+    private javax.swing.JLabel jlInfo1;
+    private javax.swing.JLabel jlInfo2;
     private javax.swing.JLabel jlNoIdentificacion;
     private javax.swing.JLabel jlPanelDps;
     private javax.swing.JLabel jlPrecioCfdi;
     private javax.swing.JLabel jlProdServ;
     private javax.swing.JLabel jlUnidad;
+    private javax.swing.JLabel jlUnitCantEquiv;
+    private javax.swing.JLabel jlUnitEtyPrice;
     private javax.swing.JLabel jlUnitSat;
     private javax.swing.JPanel jpCfdiConcept;
     private javax.swing.JPanel jpCfdiConceptData;
@@ -988,10 +1103,13 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
             }
             
             if (!validation.getIsError() && !isFormTypeLinkAsService()) {
+                boolean hasQuantityLinked = false;
+                
                 for (int i = 0; i < moTableDpsSourceEntries.getTableGuiRowCount(); i++) {
                     SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTableDpsSourceEntries.getTableRow(i);
                     
                     if (entryDpsDpsLink.getQuantityToLink() > 0) {
+                        hasQuantityLinked = true;
                         SDataDpsEntry dpsEntry = moParamDpsToLink.getDbmsDpsEntry(entryDpsDpsLink.getDpsEntryKey());
                         if (!SLibUtils.compareAmount(dpsEntry.getOriginalPriceUnitaryCy(), moRowCfdiImport.getPriceUnitary())) {
                             if (miClient.showMsgBoxConfirm("El precio del concepto del CFDI $" + SLibUtils.getDecimalFormatAmountUnitary().format(moRowCfdiImport.getPriceUnitary()) + " "
@@ -1016,6 +1134,11 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
                             }
                         }
                     }
+                }
+                // Si no se vinculó nada:
+                if (!validation.getIsError() && !hasQuantityLinked) {
+                    validation.setMessage("No se ha vinculado ninguna partida del pedido: " + moParamDpsToLink.getNumberSeries() + " - "+ moParamDpsToLink.getNumber() + ".");
+                    validation.setComponent(moTableDpsSourceEntries.getTable());
                 }
             }
 
@@ -1115,6 +1238,17 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
                 moParamDpsToLink = (SDataDps) value;
                 moPanelDps.setDps(moParamDpsToLink, null);
                 updateEntryBalances();
+                
+                if (!moParamDpsToLink.getDbmsDpsEntries().isEmpty()) {
+                    int unitBase = moParamDpsToLink.getDbmsDpsEntries().get(0).getFkOriginalUnitId();
+                    populateEqualUnits(moParamDpsToLink.getDbmsDpsEntries().get(0).getFkOriginalUnitId());
+                    
+                    String ocUnit = moParamDpsToLink.getDbmsDpsEntries().get(0).getDbmsOriginalUnitSymbol();
+                    //jlCantidadEquivalente.setText("Cantidad equiv. [" + ocUnit + "]:");
+                    //jlEntryPrice.setText("Precio unitario de la " + msDocumentCode + " [" + ocUnit + "] $:");
+                    jlUnitEtyPrice.setText("x " + ocUnit);
+                    jlUnitCantEquiv.setText(ocUnit);
+                }
                 break;
                 
             case VALUE_IN_DPS_TO_LINK_ENTRIES:
@@ -1252,7 +1386,10 @@ public class SDialogCfdiConceptsLinker40 extends javax.swing.JDialog implements 
             } 
             else if (button == jbDeselectAll) {
                 actionDeselectAll();
-            } 
+            }
+            else if (button == jbEquivalentUnitId) {
+                actionPickUnitEquivalente();
+            }
         }
     }
     

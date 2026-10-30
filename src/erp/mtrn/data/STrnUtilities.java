@@ -29,6 +29,7 @@ import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mbps.data.SDataEmployee;
 import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import static erp.mfin.data.SFinUtilities.getAccountingEntryKeyForDpsEntry;
 import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mitm.data.SDataItem;
@@ -45,6 +46,7 @@ import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.mod.itm.db.SDbItemDescription;
+import erp.mtrn.form.SDialogUpdateDpsItemRefConcept;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.redis.SLockUtils;
@@ -4554,7 +4556,8 @@ public abstract class STrnUtilities {
             }
             
     }
-    
+    /* XXX - Rodrigo Ayala 21/10/2026 - Comentado porque esta versión antigua que crea un statement nuevo cada vez que se ejecuta. */
+    /*
     public static int numberHistDpsEty(SClientInterface miClient, int pkYearId, int pkDocId, int pkDpsEty) throws SQLException {
         ResultSet resultSet;
         Statement statement = null;
@@ -4576,29 +4579,154 @@ public abstract class STrnUtilities {
             
         return etyHis + 1;
         
+    }*/
+    
+    /**
+     * Obtiene el siguiente número de versión (id_hist) para una partida específica.
+     * Reutiliza un Statement existente para evitar fugas de memoria y sobrecarga a la BD.
+     */
+    public static int numberHistDpsEty(Statement statement, int pkYearId, int pkDocId, int pkDpsEty) throws SQLException {
+        String tableName = SDataConstants.TablesMap.get(SDataConstants.TRN_DPS_ETY_HIST);
+        
+        String sql = "SELECT COALESCE(MAX(id_hist), 0) + 1 FROM " + tableName + " "
+                   + "WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + pkDpsEty + ";";
+                   
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 1;
+    }
+
+    /**
+     * Sobrecarga de compatibilidad para llamadas aisladas.
+     */
+    public static int numberHistDpsEty(SClientInterface miClient, int pkYearId, int pkDocId, int pkDpsEty) throws SQLException {
+        try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement()) {
+            return numberHistDpsEty(statement, pkYearId, pkDocId, pkDpsEty);
+        }
     }
     
-    // Método de compatibilidad para Facturas
-    public static void insertDpsEtyHist(SClientInterface miClient, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
-            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
+    /**
+     * Wrapper de bitácora para Cambio de Contabilización.
+     * Deduce automáticamente si cambió la Cuenta contable, el CC o ambos y crea la bitácora.
+     */
+    public static void insertHistForAccounting(Connection connection, int usrId, SDataDpsEntry moDpsEntry, String accOld, String accNew, String ccNew, java.util.List<int[]> allRelatedDocs) throws SQLException {
+        String changeType = "";
+        String ccOld = moDpsEntry.getFkCostCenterId_n();
         
-        Connection connection = miClient.getSession().getStatement().getConnection();
-        int usrId = miClient.getSession().getUser().getPkUserId();
+        if (accOld == null ? accNew != null : !accOld.equals(accNew)) {
+            changeType += "CTA";
+        }
         
-        insertDpsEtyHist(connection, usrId, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allRelatedDocs);
+        if (ccOld == null ? ccNew != null : !ccOld.equals(ccNew)) {
+            changeType += (changeType.isEmpty() ? "CC" : ",CC");
+        }
+        
+        // Si hubo algún cambio, generamos la bitácora:
+        if (!changeType.isEmpty()) {
+            executeHistInsert(connection, usrId, moDpsEntry, changeType, null, null, 0, accOld, accNew, ccNew, allRelatedDocs);
+        }
     }
     
-    // Método Core y transaccional para Pedidos
-    public static void insertDpsEtyHist(Connection connection, int usrId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew,
-            int itemRef, java.util.List<int[]> allRelatedDocs) throws SQLException {
+    /**
+     * Wrapper de bitácora para Cambio de Concepto o Ítem de Referencia (Facturas y NC).
+     * Deduce dinámicamente si cambió la clave, el concepto, la referencia o una combinación y crea la bitácora.
+     */
+    public static void insertHistForConceptAndRef(Connection connection, int usrId, SDataDpsEntry moDpsEntry, 
+            String conceptKeyNew, String conceptNew, int itemRefNew, 
+            java.util.List<int[]> allRelatedDocs) throws SQLException {
+        
+        String changeType = "";
+        int finalItemRef = (itemRefNew >= 0) ? itemRefNew : moDpsEntry.getFkItemRefId_n(); // si es -1, no cambió
+        
+        if (conceptKeyNew != null && !conceptKeyNew.isEmpty() && !conceptKeyNew.equals(moDpsEntry.getConceptKey())) {
+            changeType += "KEY";
+        }
+        
+        if (conceptNew != null && !conceptNew.isEmpty() && !conceptNew.equals(moDpsEntry.getConcept())) {
+            changeType += (changeType.isEmpty() ? "CON" : ",CON");
+        }
+        
+        if (moDpsEntry.getFkItemRefId_n() != finalItemRef) { // se permite eliminar el ItemRef
+            changeType += (changeType.isEmpty() ? "REF" : ",REF");
+        }
+        
+        // Si hubo algún cambio, generamos la bitácora:
+        if (!changeType.isEmpty()) {
+            executeHistInsert(connection, usrId, moDpsEntry, changeType, conceptKeyNew, conceptNew, itemRefNew, null, null, null, allRelatedDocs);
+        }
+    }
+    
+    public static void insertHistForDpsEdit(Connection connection, int usrId, SDataDpsEntry moDpsEntry,
+            int itemRefOld ,int itemRefNew, String ccOld, String ccNew, boolean isNoteEdited, java.util.List<int[]> allRelatedDocs) throws SQLException{
+        
+        String changeType = "";
+        
+        if (itemRefOld != itemRefNew) { // se permite eliminar el ItemRef
+            changeType += "REF";
+        }
+        
+        String safeCcOld = ccOld == null ? "" : ccOld;
+        String safeCcNew = ccNew == null ? "" : ccNew;
+        
+        if (!safeCcOld.equals(safeCcNew)) {
+            changeType += (changeType.isEmpty() ? "CC" : ",CC");
+        }
+        
+        if (isNoteEdited) {
+            changeType += (changeType.isEmpty() ? "NTS" : ",NTS");
+        }
+        
+        // Si hubo algún cambio, generamos la bitácora:
+        
+        if (!changeType.isEmpty()) {
+            // Reespaldamos los valores nuevos (en FormDpsEdit la partida ya tiene los valores nuevos cuando se crea la bitácora):
+            int backupItemRefNew = moDpsEntry.getFkItemRefId_n();
+            String backupCcNew = moDpsEntry.getFkCostCenterId_n();
+            
+            // Le ponemos a la partida sus valores anteriores:
+            moDpsEntry.setFkItemRefId_n(itemRefOld);
+            moDpsEntry.setFkCostCenterId_n(ccOld);
+            
+            executeHistInsert(connection, usrId, moDpsEntry, changeType, null, null, itemRefNew, null, null, ccNew, allRelatedDocs);
+            
+            // Restauramos sus valores nuevos del backup:
+            moDpsEntry.setFkItemRefId_n(backupItemRefNew);
+            moDpsEntry.setFkCostCenterId_n(backupCcNew);
+        }
+    }
+    
+    /**
+     * Método core de bitácora: Centraliza la inserción a tabla de historial de cambios en partidas de documentos.
+     */
+    private static void executeHistInsert(Connection connection, int usrId, SDataDpsEntry moDpsEntry, String changeType, 
+            String conceptKeyNew, String conceptNew, int itemRefNew,
+            String accOld, String accNew, String ccNew,
+            java.util.List<int[]> allRelatedDocs) throws SQLException {
         
         try (Statement statement = connection.createStatement()) {
             
-            String valItemRefOld = (moDpsEntry.getDbmsFkItemGenericId() > 0) ? String.valueOf(moDpsEntry.getDbmsFkItemGenericId()) : "NULL";
-            String valItemRefNew = (itemRef > 0) ? String.valueOf(itemRef) : "NULL";
+            // Creamos una lista de los tipos de modificaciones que se hicieron:
+            java.util.List<String> changes = java.util.Arrays.asList(changeType.split(","));
             
-            String finalConceptKey = conceptKeyNew.isEmpty() ? moDpsEntry.getConceptKey() : conceptKeyNew;
-            String finalConcept = conceptNew.isEmpty() ? moDpsEntry.getConcept() : conceptNew;
+            // Obtenemos todos los valores de los que hubo cambio:
+            
+            String valConceptKeyOld = changes.contains("KEY") ? ((moDpsEntry.getConceptKey() == null || moDpsEntry.getConceptKey().isEmpty()) ? "''" : "'" + moDpsEntry.getConceptKey() + "'") : "''";
+            String valConceptKeyNew = changes.contains("KEY") ? ((conceptKeyNew == null || conceptKeyNew.isEmpty()) ? "''" : "'" + conceptKeyNew + "'") : "''";
+            
+            String valConceptOld = changes.contains("CON") ? ((moDpsEntry.getConcept() == null || moDpsEntry.getConcept().isEmpty()) ? "''" : "'" + moDpsEntry.getConcept() + "'") : "''";
+            String valConceptNew = changes.contains("CON") ? ((conceptNew == null || conceptNew.isEmpty()) ? "''" : "'" + conceptNew + "'") : "''";
+            
+            String valItemRefOld = changes.contains("REF") ? ((moDpsEntry.getFkItemRefId_n() > 0) ? String.valueOf(moDpsEntry.getFkItemRefId_n()) : "NULL") : "NULL";
+            String valItemRefNew = changes.contains("REF") ? ((itemRefNew > 0) ? String.valueOf(itemRefNew) : "NULL") : "NULL";
+            
+            String valAccOld = changes.contains("CTA") ? ((accOld == null || accOld.isEmpty()) ? "NULL" : "'" + accOld + "'") : "NULL";
+            String valAccNew = changes.contains("CTA") ? ((accNew == null || accNew.isEmpty()) ? "NULL" : "'" + accNew + "'") : "NULL";
+            
+            String valCcOld = changes.contains("CC") ? ((moDpsEntry.getFkCostCenterId_n() == null || moDpsEntry.getFkCostCenterId_n().isEmpty()) ? "NULL" : "'" + moDpsEntry.getFkCostCenterId_n() + "'") : "NULL";
+            String valCcNew = changes.contains("CC") ? ((ccNew == null || ccNew.isEmpty()) ? "NULL" : "'" + ccNew + "'") : "NULL";
             
             for (int[] docKey : allRelatedDocs) {
                 int pkYearId = docKey[0];
@@ -4608,18 +4736,28 @@ public abstract class STrnUtilities {
                 int clDps = docKey[4];
                 int tpDps = docKey[5];
                 
-                int histEty = 1;
-                try (ResultSet rs = statement.executeQuery("SELECT COALESCE(MAX(id_hist), 0) + 1 FROM trn_dps_ety_hist WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + pkEtyId)) {
-                    if (rs.next()) histEty = rs.getInt(1);
-                }
+                int histEty = numberHistDpsEty(statement, pkYearId, pkDocId, pkEtyId); // último log de la bitácora
                 
-                String sql = "INSERT INTO trn_dps_ety_hist (id_year, id_doc, id_ety, id_hist, concept_key_old, concept_key_new, concept_old, concept_new, fid_item_ref_old_n, fid_item_ref_new_n, "
-                        + "fid_item_old, fid_item_new, fid_ct_dps, fid_cl_dps, fid_tp_dps, fid_usr_edit, ts_edit) "
-                        + "VALUES (" + pkYearId + ", " + pkDocId + ", " + pkEtyId + ", " + histEty + ", "
-                        + "'" + moDpsEntry.getConceptKey() + "', '" + finalConceptKey + "', "
-                        + "'" + moDpsEntry.getConcept() + "', '" + finalConcept + "', "
+                String sql = "INSERT INTO trn_dps_ety_hist ("
+                        + "id_year, id_doc, id_ety, id_hist, "
+                        + "change_type, "
+                        + "concept_key_old, concept_key_new, "
+                        + "concept_old, concept_new, "
+                        + "fid_item_ref_old_n, fid_item_ref_new_n, "
+                        + "fid_item_old_n, fid_item_new_n, "
+                        + "fid_acc_old_n, fid_acc_new_n, "
+                        + "fid_cc_old_n, fid_cc_new_n, "
+                        + "fid_ct_dps, fid_cl_dps, fid_tp_dps, "
+                        + "fid_usr_edit, ts_edit) "
+                        + "VALUES (" 
+                        + pkYearId + ", " + pkDocId + ", " + pkEtyId + ", " + histEty + ", "
+                        + "'" + changeType + "', "
+                        + valConceptKeyOld + ", " + valConceptKeyNew + ", "
+                        + valConceptOld + ", " + valConceptNew + ", "
                         + valItemRefOld + ", " + valItemRefNew + ", "
                         + "'" + moDpsEntry.getFkItemId() + "', '" + moDpsEntry.getFkItemId() + "', "
+                        + valAccOld + ", " + valAccNew + ", "
+                        + valCcOld + ", " + valCcNew + ", "
                         + ctDps + ", " + clDps + ", " + tpDps + ", "
                         + usrId + ", NOW());";
                         
@@ -4631,7 +4769,7 @@ public abstract class STrnUtilities {
     public static void insertDpsEtyHistItem(SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew, int dpsDoc [][]) throws SQLException {
         Statement statement = null;
         String sql = "";
-        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId()); //Truena porque se usa este mismo para todos los docs relacionados
+        int histEty = numberHistDpsEty(miClient, pkYearId, pkDocId, moDpsEntry.getPkEntryId());
         
         statement = miClient.getSession().getStatement().getConnection().createStatement();
         
@@ -4663,151 +4801,124 @@ public abstract class STrnUtilities {
 
     }
 
-    public static void updateItemRefInvoice(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, String conceptKeyNew, String conceptNew, int itemRef) throws SQLException {
+    public static void updateItemRefInvoice(
+        Connection connection, 
+        SClientInterface miClient, 
+        int pkYearId, 
+        int pkDocId, 
+        SDataDpsEntry moDpsEntry, 
+        String conceptKeyNew, 
+        String conceptNew, 
+        int itemRef, 
+        java.util.ArrayList<SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto> affectedEtyList) throws SQLException {
         
+        int userId = miClient.getSession().getUser().getPkUserId();
         String mySql = "";
-        
+
         if (!conceptKeyNew.isEmpty()) {
             mySql += "concept_key = '" + conceptKeyNew + "' ";
         }
         if (!conceptNew.isEmpty()) {
             mySql += (mySql.isEmpty() ? "" : ", ") + "concept = '" + conceptNew + "' ";
         }        
-        if (itemRef > 0) {
-            mySql += (mySql.isEmpty() ? "" : ", ") + "fid_item_ref_n = " + itemRef + " ";
+        if (itemRef >= 0) {
+            mySql += (mySql.isEmpty() ? "" : ", ") + "fid_item_ref_n = " + (itemRef == 0 ? "NULL" : itemRef) + " ";
         }
-        
+
         if (mySql.isEmpty()) {
             return; 
         }
-        
-        java.util.List<int[]> sourceDoc = new java.util.ArrayList<>();
-        java.util.List<int[]> sourceReq = new java.util.ArrayList<>();
-        java.util.List<int[]> adjDocs = new java.util.ArrayList<>();
-        java.util.List<int[]> allDocsToLog = new java.util.ArrayList<>(); // Lista de documentos para la bitácora
-        int itemRefOld = moDpsEntry.getFkItemRefId_n();
 
+        mySql += ", fid_usr_edit = " + userId + ", ts_edit = NOW() ";
+
+        java.util.List<int[]> allDocsToLog = new java.util.ArrayList<>(); // Lista de documentos DPS para bitácora
+
+        // Construimos la lista de documentos a actualziar:
+        
+        int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
+        allDocsToLog.add(new int[] { pkYearId, pkDocId, moDpsEntry.getPkEntryId(), moDpsDoc[0][0], moDpsDoc[0][1], moDpsDoc[0][2] });
+
+        for (SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto dto : affectedEtyList) {
+            if (dto.getTargetType() == SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto.TargetType.DPS) {
+                int[] dpsTypeKey = dto.getDpsTypeKey();
+                allDocsToLog.add(new int[] { dto.getPkYearId(), dto.getPkDocId(), dto.getPkEtyId(), dpsTypeKey[0], dpsTypeKey[1], dpsTypeKey[2] });
+            }
+        }
+
+        // Actualización de la contabilidad:
+        if (itemRef >= 0) {
+            for (int[] docLog : allDocsToLog) {
+                int year = docLog[0];
+                int docId = docLog[1];
+                int etyId = docLog[2];
+                int[] dpsClassKey = new int[] { docLog[3], docLog[4] }; // [fid_ct_dps, fid_cl_dps]
+
+                boolean isInvoiceOrNc = SLibUtilities.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC) || // Factura Ventas
+                                        SLibUtilities.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ) || // NC Ventas
+                                        SLibUtilities.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC) || // Factura Compras
+                                        SLibUtilities.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ);   // NC Compras
+
+                // Si no es Factura o NC no actualizamos su contabilidad:
+                if (!isInvoiceOrNc) {
+                    continue;
+                }
+
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { year, docId }, SLibConstants.EXEC_MODE_SILENT);
+                SDataDpsEntry dpsEty = (SDataDpsEntry) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS_ETY, new int[] { year, docId, etyId }, SLibConstants.EXEC_MODE_SILENT);
+
+                if (dps == null || dpsEty == null || dpsEty.getIsDeleted()) continue;
+
+                try {
+                    // Algoritmo de Deducción de Posición:
+                    Object[] recKey = getAccountingEntryKeyForDpsEntry(miClient, dps, dpsEty);
+
+                    String sqlUpdateRec = "UPDATE fin_rec_ety " +
+                                          "SET fid_item_n = " + itemRef + ", fid_item_aux_n = " + dpsEty.getFkItemId() + ", " +
+                                          "fid_usr_edit = " + userId + ", ts_edit = NOW() " +
+                                          "WHERE id_year = " + recKey[0] + " AND id_per = " + recKey[1] + " AND id_bkc = " + recKey[2] + " " +
+                                          "AND id_tp_rec = '" + recKey[3] + "' AND id_num = " + recKey[4] + " AND id_ety = " + recKey[5] + ";";
+
+                    try (Statement stmtUpdate = connection.createStatement()) {
+                        stmtUpdate.executeUpdate(sqlUpdateRec);
+                    }
+                } catch (Exception e) {
+                    throw new SQLException(e.getMessage(), e); 
+                }
+            }
+        }
+
+        // Actualización de documentos:
         try (Statement statement = miClient.getSession().getStatement().getConnection().createStatement()) {
-            
-            int[][] moDpsDoc = getDpsTpDps(miClient, pkYearId, pkDocId);
-            allDocsToLog.add(new int[] { pkYearId, pkDocId, moDpsEntry.getPkEntryId(), moDpsDoc[0][0], moDpsDoc[0][1], moDpsDoc[0][2] });
-            
-            // Factura:
-            
+
+            // Documento principal (Factura o NC):
             String sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + pkYearId + " AND id_doc = " + pkDocId + " AND id_ety = " + moDpsEntry.getPkEntryId() + ";";
             statement.executeUpdate(sql);
 
-            // Orden de C/V padres:
-            
-            sql = "SELECT DISTINCT id_src_year, id_src_doc, id_src_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " + //DISTINCT para entregas fraccionadas (Dos DPS mismas Facturas)
-                  "FROM trn_dps_dps_supply AS s " +
-                  "INNER JOIN trn_dps AS d ON s.id_src_year = d.id_year AND s.id_src_doc = d.id_doc " +
-                  "WHERE s.id_des_year = " + pkYearId + " AND s.id_des_doc = " + pkDocId + " AND s.id_des_ety = " + moDpsEntry.getPkEntryId() + ";";
-            
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
-                if (resultSet.next()) {
-                    int[] srcData = new int[] { resultSet.getInt("id_src_year"), resultSet.getInt("id_src_doc"), resultSet.getInt("id_src_ety") };
-                    sourceDoc.add(srcData);
-                    allDocsToLog.add(new int[] { srcData[0], srcData[1], srcData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
-                }
-            }
-            
-            // Requisiciones:
-            
-            sql = "SELECT fid_mat_req, fid_mat_req_ety FROM trn_dps_mat_req " + 
-                  "WHERE fid_dps_year = " + pkYearId + " AND fid_dps_doc = " + pkDocId + " AND fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
-            
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
-                if (resultSet.next()) {
-                    sourceReq.add(new int[] { resultSet.getInt("fid_mat_req"), resultSet.getInt("fid_mat_req_ety") });
-                }
-            }
-            
-            // Notas de credito hijos (todos los asociados):
-            
-            sql = "SELECT DISTINCT a.id_adj_year, a.id_adj_doc, a.id_adj_ety, d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps " +
-                  "FROM trn_dps_dps_adj AS a " +
-                  "INNER JOIN trn_dps AS d ON a.id_adj_year = d.id_year AND a.id_adj_doc = d.id_doc " +
-                  "WHERE a.id_dps_year = " + pkYearId + " AND a.id_dps_doc = " + pkDocId + " AND a.id_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
-            
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
-                while (resultSet.next()) {
-                    int[] adjData = new int[] { resultSet.getInt("id_adj_year"), resultSet.getInt("id_adj_doc"), resultSet.getInt("id_adj_ety") };
-                    adjDocs.add(adjData);
-                    allDocsToLog.add(new int[] { adjData[0], adjData[1], adjData[2], resultSet.getInt("fid_ct_dps"), resultSet.getInt("fid_cl_dps"), resultSet.getInt("fid_tp_dps") });
-                }
-            }
-            
-            // Procesamos ordenes:
-            
-            if (!sourceDoc.isEmpty()) {
-                for (int[] srcKey : sourceDoc) {
-                    sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + srcKey[0] + " AND id_doc = " + srcKey[1] + " AND id_ety = " + srcKey[2] + ";";
+            // Procesar los documentos asociados en la lista affectedEtyList (NC, OC, contratos, cotizaciones, requisiciones):
+            for (SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto dto : affectedEtyList) {
+                if (dto.getTargetType() == SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto.TargetType.DPS) {
+                    // Actualizar partidas de documentos DPS vinculados:
+                    sql = "UPDATE trn_dps_ety SET " + mySql + 
+                          " WHERE id_year = " + dto.getPkYearId() + 
+                          " AND id_doc = " + dto.getPkDocId() + 
+                          " AND id_ety = " + dto.getPkEtyId() + ";";
                     statement.executeUpdate(sql);
-                    
-                    // Si se modificó referencia de ítem se actualiza en requisicion abuelo:
-                    if (itemRef > 0) {
-                        sql = "UPDATE trn_mat_req_ety AS mre " +
-                              "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
-                              "SET mre.fk_item_ref_n = " + itemRef + " " +
-                              "WHERE mr.fid_dps_year = " + srcKey[0] + " AND mr.fid_dps_doc = " + srcKey[1] + " AND mr.fid_dps_ety = " + srcKey[2] + ";";
+                }
+                else if (dto.getTargetType() == SDialogUpdateDpsItemRefConcept.SDpsAffectedDocumentDto.TargetType.MAT_REQUEST) {
+                    // Si se modificó el ítem referencia, se actualiza la partida de la Requisición:
+                    if (itemRef >= 0) {
+                        sql = "UPDATE trn_mat_req_ety " +
+                              "SET fk_item_ref_n = " + (itemRef == 0 ? "NULL" : itemRef) + " " +
+                              "WHERE id_mat_req = " + dto.getPkYearId() + " AND id_ety = " + dto.getPkEtyId() + ";";
                         statement.executeUpdate(sql);
                     }
                 }
             }
-            else if (!sourceReq.isEmpty()) {
-                
-                // Actualizar Requisición directa de la Factura:
-                if (itemRef > 0) { 
-                    sql = "UPDATE trn_mat_req_ety AS mre " +
-                          "INNER JOIN trn_dps_mat_req AS mr ON mre.id_mat_req = mr.fid_mat_req AND mre.id_ety = mr.fid_mat_req_ety " +
-                          "SET mre.fk_item_ref_n = " + itemRef + " " +
-                          "WHERE mr.fid_dps_year = " + pkYearId + " AND mr.fid_dps_doc = " + pkDocId + " AND mr.fid_dps_ety = " + moDpsEntry.getPkEntryId() + ";";
-                    statement.executeUpdate(sql);
-                }
-            }
-            
-            // Procesamos notas de credito:
-            
-            for (int[] adjKey : adjDocs) {
-                sql = "UPDATE trn_dps_ety SET " + mySql + " WHERE id_year = " + adjKey[0] + " AND id_doc = " + adjKey[1] + " AND id_ety = " + adjKey[2] + ";";
-                statement.executeUpdate(sql);
-            }
         }
-        
-        insertDpsEtyHist(miClient, moDpsEntry, conceptKeyNew, conceptNew, itemRef, allDocsToLog); //registro en bitácora
-        
-        // Actualización de contabilización de Factura y NC:
-        
-        if (itemRefOld > 0 && itemRef > 0) {
-            try (Statement statement = connection.createStatement()){
-                int userId = miClient.getSession().getUser().getPkUserId();
-                
-                String sqlRecEty = "UPDATE fin_rec_ety " +
-                                   "SET fid_item_n = " + itemRef + ", " + 
-                                   "fid_usr_edit = " + userId + ", " +
-                                   "ts_edit = NOW() " +
-                                   "WHERE fid_dps_year_n = " + pkYearId + " " +
-                                   "AND fid_dps_doc_n = " + pkDocId + " " +
-                                   "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
-                                   "AND b_del = 0;";
-                
-                statement.executeUpdate(sqlRecEty);
 
-                for (int[] adjKey : adjDocs) {
-                    sqlRecEty = "UPDATE fin_rec_ety " +
-                                "SET fid_item_n = " + itemRef + ", " +
-                                "fid_usr_edit = " + userId + ", " +
-                                "ts_edit = NOW() " +
-                                "WHERE fid_dps_year_n = " + adjKey[0] + " " +
-                                "AND fid_dps_doc_n = " + adjKey[1] + " " +
-                                "AND fid_item_n IS NOT NULL " + //partida donde ya tiene un ítem ref
-                                "AND b_del = 0;";
-                    statement.executeUpdate(sqlRecEty);
-                }
-            }
-        }
-    }    
+        // Regsitro en la bitácora:
+        insertHistForConceptAndRef(connection, miClient.getSession().getUser().getPkUserId(), moDpsEntry, conceptKeyNew, conceptNew, itemRef, allDocsToLog);
+    }
 
     public static void updateDpsItemAll(Connection connection, SClientInterface miClient, int pkYearId, int pkDocId, SDataDpsEntry moDpsEntry, int itemNew) throws SQLException {
         Statement statement = null;

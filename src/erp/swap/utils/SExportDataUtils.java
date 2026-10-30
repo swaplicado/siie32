@@ -64,7 +64,7 @@ import sa.lib.mail.SMailUtils;
  * estructuras JSON usando Jackson, facilitando la integración y exportación de
  * información con otros sistemas.
  *
- * @author Sergio Flores, César Orozco, Rodrigo Ayala, Edwin Carmona
+ * @author Sergio Flores, César Orozco, Edwin Carmona,  Rodrigo Ayala
  */
 public abstract class SExportDataUtils {
 
@@ -2694,10 +2694,6 @@ public abstract class SExportDataUtils {
     private static String[] getSwapAvoConfig(SGuiSession session) throws Exception {
         String jsonAvo = SCfgUtils.getParamValue(session.getStatement(), SDataConstantsSys.CFG_PARAM_SWAP_AVO); 
         JsonNode configAvo = new ObjectMapper().readTree(jsonAvo);
-
-        if (configAvo.path("link-up").asInt(0) == 0) {
-            return null; // Retorna null si está apagado
-        }
 
         String empDep = "", supArea = "", cdrIds = "", dbrIds = "";
         if (configAvo.path("emp_departments").isArray()) {

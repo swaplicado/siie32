@@ -90,6 +90,8 @@ public final class SRowDpsEdit extends erp.lib.table.STableRow {
     public Object getDpsEntryPK() { return moDpsEntry.getPrimaryKey(); }
     public SDataItem getItemRefNew() { return moItemRefNew; }
     public String getNewNote() { return msNewNote; }
+    public int getFkItemId() { return moDpsEntry.getFkItemId(); }
+    public SDataDpsEntry getDpsEntry() { return moDpsEntry; }
     
     @Override
     public void prepareTableRow() {

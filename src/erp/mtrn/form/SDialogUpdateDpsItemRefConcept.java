@@ -7,6 +7,7 @@ package erp.mtrn.form;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -49,8 +50,8 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     private erp.lib.form.SFormField moFieldConceptKey;
     private erp.lib.form.SFormField moFieldConcept;
 
-    
     private erp.lib.form.SFormField moFieldPkItemId;
+    
     /** Creates new form SDialogUpdateDpsAccountCenterCost
      * @param client 
     */
@@ -59,6 +60,56 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         miClient = client;
         initComponents();
         initComponentsExtra();
+    }
+    
+    public static class SDpsAffectedDocumentDto {
+        // Enum para identificar la tabla origen de la partida:
+        public enum TargetType {
+            DPS, // aplica para trn_dps_ety (Facturas, Pedidos, Cotizaciones, Contratos, NC)
+            MAT_REQUEST // aplica para trn_mat_req_ety (Requisiciones)
+        }
+
+        private int pkYearId;
+        private int pkDocId; // id_doc para DPS, id_mat_req para Requisiciones
+        private int pkEtyId; // id_ety
+        private TargetType targetType;
+
+        private int[] dpsTypeKey;
+        private String folio;
+        private java.util.Date date;
+        private int unitId; // Unidad de la partida
+        private int origUnitId; // Unidad original de la partida
+        private int depth; // Profundidad del doc asociado
+
+        public SDpsAffectedDocumentDto(int pkYearId, int pkDocId, int pkEtyId, TargetType targetType, 
+                                     int[] dpsTypeKey, String folio, java.util.Date date, int unitId, int origUnitId) {
+            this.pkYearId = pkYearId;
+            this.pkDocId = pkDocId;
+            this.pkEtyId = pkEtyId;
+            this.targetType = targetType;
+            this.dpsTypeKey = dpsTypeKey;
+            this.folio = folio;
+            this.date = date;
+            this.unitId = unitId;
+            this.origUnitId = origUnitId;
+            this.depth = 0;
+        }
+
+        public int getPkYearId() { return pkYearId; }
+        public int getPkDocId() { return pkDocId; }
+        public int getPkEtyId() { return pkEtyId; }
+        public TargetType getTargetType() { return targetType; }
+        public int[] getDpsTypeKey() { return dpsTypeKey; }
+        public String getFolio() { return folio; }
+        public java.util.Date getDate() { return date; }
+        public int getUnitId() { return unitId; }
+        public int getOrigUnitId() { return origUnitId; }
+        public int getDepth() { return depth; }
+        public void setDepth(int depth) { this.depth = depth; }
+
+        public int[] getPrimaryKey() {
+            return new int[] { pkYearId, pkDocId, pkEtyId };
+        }
     }
 
     /** This method is called from within the constructor to
@@ -85,22 +136,23 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jlIConceptfKeyOld = new javax.swing.JLabel();
         jtfConceptfKeyOld = new javax.swing.JTextField();
         jlDummy3 = new javax.swing.JLabel();
-        jlConceptfKeyNew = new javax.swing.JLabel();
+        jcbEditKey = new javax.swing.JCheckBox();
         jtfConceptKeyNew = new javax.swing.JTextField();
         jPanel50 = new javax.swing.JPanel();
         jlItemConceptOld = new javax.swing.JLabel();
         jtfItemConceptOld = new javax.swing.JTextField();
         jlDummy2 = new javax.swing.JLabel();
-        jlItemConceptNew = new javax.swing.JLabel();
+        jcbEditConcept = new javax.swing.JCheckBox();
         jtfItemConceptNew = new javax.swing.JTextField();
         jPanel51 = new javax.swing.JPanel();
         jlItemRefOld = new javax.swing.JLabel();
         jtfItemRefOld = new javax.swing.JTextField();
         jlDummy1 = new javax.swing.JLabel();
-        jlItemRefNew = new javax.swing.JLabel();
+        jcbEditItemRef = new javax.swing.JCheckBox();
         jcbFkItemId = new javax.swing.JComboBox();
         jbFkItemId = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
+        jbEditHelp = new javax.swing.JButton();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
 
@@ -164,7 +216,7 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jPanel49.setPreferredSize(new java.awt.Dimension(108, 23));
         jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlIConceptfKeyOld.setText("Clave actual:");
+        jlIConceptfKeyOld.setText("Clave concepto actual:");
         jlIConceptfKeyOld.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel49.add(jlIConceptfKeyOld);
 
@@ -177,9 +229,9 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jlDummy3.setPreferredSize(new java.awt.Dimension(5, 23));
         jPanel49.add(jlDummy3);
 
-        jlConceptfKeyNew.setText("Clave nueva:");
-        jlConceptfKeyNew.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel49.add(jlConceptfKeyNew);
+        jcbEditKey.setText("Modificar clave concepto");
+        jcbEditKey.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel49.add(jcbEditKey);
 
         jtfConceptKeyNew.setEditable(false);
         jtfConceptKeyNew.setFocusable(false);
@@ -204,9 +256,9 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jlDummy2.setPreferredSize(new java.awt.Dimension(5, 23));
         jPanel50.add(jlDummy2);
 
-        jlItemConceptNew.setText("Concepto nuevo:");
-        jlItemConceptNew.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel50.add(jlItemConceptNew);
+        jcbEditConcept.setText("Modificar concepto");
+        jcbEditConcept.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel50.add(jcbEditConcept);
 
         jtfItemConceptNew.setEditable(false);
         jtfItemConceptNew.setFocusable(false);
@@ -231,9 +283,9 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jlDummy1.setPreferredSize(new java.awt.Dimension(5, 23));
         jPanel51.add(jlDummy1);
 
-        jlItemRefNew.setText("Ítem referencia nuevo:");
-        jlItemRefNew.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel51.add(jlItemRefNew);
+        jcbEditItemRef.setText("Modificar ítem referencia");
+        jcbEditItemRef.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel51.add(jcbEditItemRef);
 
         jcbFkItemId.setMaximumRowCount(16);
         jcbFkItemId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -257,6 +309,12 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
         jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
+        jbEditHelp.setText("?");
+        jbEditHelp.setToolTipText("Reglas");
+        jbEditHelp.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbEditHelp.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpControls.add(jbEditHelp);
+
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -279,13 +337,45 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
+        setTitle("Modificación de concepto e ítem referencia");
         mvFields = new java.util.Vector<>();
         
-        moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlItemRefNew);
+        //Checboxes:
+        jcbEditKey.addItemListener(this);
+        jcbEditConcept.addItemListener(this);
+        jcbEditItemRef.addItemListener(this);
+        
+        //Tooltip con las reglas para Modificar Clave Concepto
+        jcbEditKey.setToolTipText(
+            "<html><b>Presione para modificar la clave.</b><br>" +
+            "• Actualiza la clave en esta partida y se propagan los cambios <u>hacia atrás</u> (documentos origen).<br>" +
+            "• No valida que las unidades en todos los docs. asociados concuerden.</html>"
+        );
+
+        //Tooltip con las reglas para Modificar Concepto
+        jcbEditConcept.setToolTipText(
+            "<html><b>Presione para modificar el concepto</b><br>" +
+            "• Actualiza el concepto en esta partida y se propagan los cambios <u>hacia atrás</u> (documentos origen).<br>" +
+            "• No valida que las unidades en todos los docs. asociados concuerden.</html>"
+        );
+
+        //Tooltip con las reglas para Modificar Ítem de Referencia
+        /*if (jcbEditItemRef.isEnabled()) {
+            jcbEditItemRef.setToolTipText(
+                "<html><b>Presione para modificar el ítem de referencia</b><br>" +
+                "• Actualiza el ítem referencia en esta partida y busca en <u>TODOS los docs. asociados</u> (documentos origen y destino).<br>" +
+                "• Actualiza el ítem en la <b>contabilidad</b> de esta partida.<br>" +
+                "• <b>Restricción:</b> Todos los documentos vinculados deben compartir las mismas unidades.</html>"
+            );
+        }
+        else {
+            jcbEditItemRef.setToolTipText("<html><b>El ítem no requiere ítem de referencia.</b><br></html>");
+        }*/
+        moFieldPkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jcbEditItemRef);
         moFieldPkItemId.setPickerButton(jbFkItemId);
-        moFieldConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConceptKeyNew, jlConceptfKeyNew);
+        moFieldConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConceptKeyNew, jcbEditKey);
         moFieldConceptKey.setLengthMax(35);
-        moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItemConceptNew, jlItemConceptNew);
+        moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfItemConceptNew, jcbEditConcept);
         moFieldConcept.setLengthMax(CONCEPT_LENGTH_MAX);
          
         try {
@@ -307,6 +397,7 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jpDps.remove(jlPanelDps);
         jpDps.add(moPanelDps, BorderLayout.NORTH);
         
+        jbEditHelp.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         jbFkItemId.addActionListener(this);
@@ -341,6 +432,42 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         jtfConceptfKeyOld.setText(moDpsEntry.getConceptKey());
         jtfItemConceptOld.setText(moDpsEntry.getConcept());
         jtfItemRefOld.setText(moDpsEntry.getDbmsItemRef_n());
+        
+        // Estado inicial de los Checkboxes y campos de modificación.
+        jcbEditKey.setSelected(false);
+        jtfConceptKeyNew.setEnabled(false);
+        jtfConceptKeyNew.setText(moDpsEntry.getConceptKey());
+        
+        jcbEditConcept.setSelected(false);
+        jtfItemConceptNew.setEnabled(false);
+        jtfItemConceptNew.setText(moDpsEntry.getConcept());
+        
+        jcbEditItemRef.setSelected(false);
+        jcbEditItemRef.setEnabled(false);
+        jcbFkItemId.setEnabled(false);
+        jbFkItemId.setEnabled(false);
+        SFormUtilities.locateComboBoxItem(jcbFkItemId, new int[] { moDpsEntry.getFkItemRefId_n() });
+        
+        jbEditHelp.setEnabled(true);
+        
+        // Habilitar Item Ref automáticamente si es requerido:
+        try {
+            if (STrnUtilities.requieredItemGen(miClient, moDpsEntry.getFkItemId())) {
+                jcbEditItemRef.setEnabled(true);
+                jcbEditItemRef.setToolTipText(
+                    "<html><b>Presione para modificar el ítem de referencia</b><br>" +
+                    "• Actualiza el ítem referencia en esta partida y busca en <u>TODOS los docs. asociados</u> (documentos origen y destino).<br>" +
+                    "• Actualiza el ítem en la <b>contabilidad</b> de esta partida.<br>" +
+                    "• <b>Restricción:</b> Todos los documentos vinculados deben compartir las mismas unidades.</html>"
+                );
+                
+            }
+            else {
+                jcbEditItemRef.setToolTipText("<html><b>El ítem no requiere ítem de referencia.</b><br></html>");
+            }
+        } catch (Exception e) {
+            SLibUtilities.printOutException(this, e);
+        }
     }
 
 
@@ -358,26 +485,96 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         else {
             try {
                 if (miClient.showMsgBoxConfirm("¿Esta seguro que desea modificar los valores actuales de la partida? \n Esta función es solo para órdenes de compra.") == JOptionPane.OK_OPTION) {
-                    if (!aceptDocumentsParentsChanges() || !acceptStockValuationChanges()) {
-                        return;
-                    }
-                    
                     if(!isServiceOrder(miClient, moDps.getFkSourceYearId_n(), moDps.getFkSourceDocId_n())) {
-                        if (((!jtfConceptKeyNew.getText().isEmpty()) || (!jtfItemConceptNew.getText().isEmpty()) || jcbFkItemId.getSelectedIndex() > 0)) {
-                            String conceptKeyNew = moFieldConceptKey.getString();
-                            String conceptNew = moFieldConcept.getString();
-                            int itemRef = (Integer) (moFieldPkItemId.getKeyAsIntArray())[0];
+                        // Validamos si algún checkbox fue seleccionado:
+                        if (jcbEditKey.isSelected() || jcbEditConcept.isSelected() || jcbEditItemRef.isSelected()) {
+                            if (jcbEditKey.isSelected() && moFieldConceptKey.getString().trim().isEmpty()) {
+                                miClient.showMsgBoxWarning("La clave no puede quedar vacía.\nIngrese una nueva clave o desmarque la casilla 'Modificar clave'.");
+                                jtfConceptKeyNew.requestFocus();
+                                return;
+                            }
+                            
+                            if (jcbEditConcept.isSelected() && moFieldConcept.getString().trim().isEmpty()) {
+                                miClient.showMsgBoxWarning("El concepto no puede quedar vacío.\nIngrese un nuevo concepto o desmarque la casilla 'Modificar concepto'.");
+                                jtfItemConceptNew.requestFocus();
+                                return;
+                            }
+                            java.util.ArrayList<SDpsAffectedDocumentDto> affectedEtyList; // lista con los documentos asociados
+                            
+                            // Si se modificó el itef ref buscar el árbol completo
+                            if (jcbEditItemRef.isSelected()) {
+                                affectedEtyList = getAllAffectedEntriesAssociaded();
+                                
+                                int rootUnitId = moDpsEntry.getFkUnitId();
+                                int rootOrigUnitId = moDpsEntry.getFkOriginalUnitId();
+
+                                // Validar que todos los documentos asociados tengan la misma unidad
+                                for (SDpsAffectedDocumentDto dto : affectedEtyList) {
+                                    if (dto.getTargetType() == SDpsAffectedDocumentDto.TargetType.DPS) {
+                                        if (dto.getUnitId() != rootUnitId || dto.getOrigUnitId() != rootOrigUnitId) {
+                                            String docType = getDocTypeName(dto.getDpsTypeKey());
+                                            String fecha = miClient.getSessionXXX().getFormatters().getDateFormat().format(dto.getDate());
+                                            miClient.showMsgBoxWarning(
+                                                "<html>" +
+                                                "No es posible modificar la partida.<br><br>" +
+                                                "El documento vinculado (<b>" + docType + "</b> folio <b>" + dto.getFolio() + "</b> #<b>" + dto.getPkEtyId() + "</b> fecha <b>" + fecha + "</b>) cuenta con una unidad diferente.<br>" +
+                                                "Para evitar inconsistencias en el sistema, todos los documentos asociados deben compartir exactamente la misma unidad." +
+                                                "</html>"
+                                            );
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            // Si solo se modificó Clave o Concepto solo buscar Docs asociados hacia arriba:
+                            else { 
+                                affectedEtyList = getAscendingAffectedEntries();
+                            }
+                            
+                            // Validar periodos contables abiertos en todos los documentos asociados
+                            String closedPeriodsMsg = getClosedPeriodsDocs(affectedEtyList);
+                            if (closedPeriodsMsg != null){
+                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE_ASOC_DOCS + "\n\n" + closedPeriodsMsg);
+                                return;
+                            }
+                            
+                            if (!aceptDocumentsParentsChanges(affectedEtyList) || !acceptStockValuationChanges()) {
+                                return;
+                            }
+
+                            // Clave y Concepto. Si está seleccionado, tomar el nuevo valor. Si no, mandamos vacío para no actualizar:
+                            String conceptKeyNew = jcbEditKey.isSelected() ? moFieldConceptKey.getString() : "";
+                            String conceptNew = jcbEditConcept.isSelected() ? moFieldConcept.getString() : "";
+                            
+                            // Ítem de referencia. Si está seleccionado:
+                            int itemRef = -1;
+                            if (jcbEditItemRef.isSelected()) {
+                                if (jcbFkItemId.getSelectedIndex() > 0) {
+                                    itemRef = (Integer) (moFieldPkItemId.getKeyAsIntArray())[0];
+                                }
+                                else {
+                                    itemRef = 0;
+                                }
+                            }
                                     
                             if ((STrnUtilities.requieredItemGen(miClient, moDpsEntry.getFkItemId()) && itemRef <= 0 )) {
                                 miClient.showMsgBoxWarning("El ítem '" + moDpsEntry.getDbmsItem() + "' requiere un ítem de refencia." );
                                 return;
                             }
                             else {
-                                STrnUtilities.updateItemRefInvoice(miClient.getSession().getStatement().getConnection(), miClient, moDps.getPkYearId(), moDps.getPkDocId(), moDpsEntry ,conceptKeyNew, conceptNew, itemRef);
+                                STrnUtilities.updateItemRefInvoice(miClient.getSession().getStatement().getConnection(), 
+                                    miClient, 
+                                    moDps.getPkYearId(), 
+                                    moDps.getPkDocId(), 
+                                    moDpsEntry, 
+                                    conceptKeyNew, 
+                                    conceptNew, 
+                                    itemRef,
+                                    affectedEtyList);
                             }  
                         }
                         else {
-                            miClient.showMsgBoxInformation("No se modificó ningún campo para el reglón." );
+                            miClient.showMsgBoxInformation("No se seleccionó ningún campo para modificar el reglón." );
                             return;
                         }
                         mnFormResult = SLibConstants.FORM_RESULT_OK;
@@ -401,6 +598,348 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
+    
+    private void actionEditHelp() {
+        String msg = "<html><div style='font-family: sans-serif; width: 350px; padding: 5px;'>" +
+            "<b>Reglas generales de modificación de partidas:</b><br><br>" +
+
+            "<b>1. Modificar Clave o Concepto:</b><br>" +
+            "• Actualiza el valor en esta partida y se propaga <u>hacia atrás</u> (documentos de origen).<br>" +
+            "• No valida concordancia de unidades.<br><br>" +
+
+            "<b>2. Modificar Ítem de Referencia:</b><br>" +
+            "• Busca y actualiza en <u>todos los documentos asociados</u> (origen y destino).<br>" +
+            "• Modifica el ítem en la contabilidad de la partida.<br>" +
+            "• <b>Restricción:</b> Exige que todos los documentos vinculados compartan exactamente las mismas unidades (de lo contrario, no permite la modificación).<br><br>" +
+            
+            "<b>3. Todos los documentos asociados deben tener el periodo contable abierto.</b><br>" +
+            "</div></html>";
+
+        miClient.showMsgBoxInformation(msg);
+    }
+
+    
+    /**
+     * Obtención de documentos asociados 
+     * @return lista de objetos SDpsAffectedDocumentDto con todos los documentos asociados
+     */
+    private java.util.ArrayList<SDpsAffectedDocumentDto> getAllAffectedEntriesAssociaded() {
+        java.util.ArrayList<SDpsAffectedDocumentDto> list = new java.util.ArrayList<>();
+        java.util.Queue<String> queue = new java.util.LinkedList<>();
+        java.util.HashSet<String> visited = new java.util.HashSet<>();
+        java.util.HashMap<String, Integer> nodeDepths = new java.util.HashMap<>(); // Mapa para la profundidad
+
+        int[] startKey = (int[]) moDpsEntry.getPrimaryKey();
+        String startNode = "DPS_" + startKey[0] + "_" + startKey[1] + "_" + startKey[2];
+        queue.add(startNode);
+        visited.add(startNode);
+        nodeDepths.put(startNode, 0);
+
+        try {
+            java.sql.Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
+
+            while (!queue.isEmpty()) {
+                String current = queue.poll();
+                String[] parts = current.split("_");
+                String type = parts[0];
+                int y = Integer.parseInt(parts[1]);
+                int d = Integer.parseInt(parts[2]);
+                int e = Integer.parseInt(parts[3]);
+
+                if (type.equals("DPS")) {
+                    String sql = 
+                        // 1. Supply - Source
+                        "SELECT s.id_src_year AS y, s.id_src_doc AS d, s.id_src_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date, " +
+                        "ety.fid_unit AS unit_id, ety.fid_orig_unit AS orig_unit_id " +
+                        "FROM trn_dps_dps_supply AS s " +
+                        "INNER JOIN trn_dps AS dps ON s.id_src_year = dps.id_year AND s.id_src_doc = dps.id_doc " +
+                        "INNER JOIN trn_dps_ety AS ety ON s.id_src_year = ety.id_year AND s.id_src_doc = ety.id_doc AND s.id_src_ety = ety.id_ety " +
+                        "WHERE s.id_des_year = " + y + " AND s.id_des_doc = " + d + " AND s.id_des_ety = " + e + " " +
+                        "UNION " +
+                        // 2. Supply - Destination
+                        "SELECT s.id_des_year AS y, s.id_des_doc AS d, s.id_des_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date, " +
+                        "ety.fid_unit AS unit_id, ety.fid_orig_unit AS orig_unit_id " +
+                        "FROM trn_dps_dps_supply AS s " +
+                        "INNER JOIN trn_dps AS dps ON s.id_des_year = dps.id_year AND s.id_des_doc = dps.id_doc " +
+                        "INNER JOIN trn_dps_ety AS ety ON s.id_des_year = ety.id_year AND s.id_des_doc = ety.id_doc AND s.id_des_ety = ety.id_ety " +
+                        "WHERE s.id_src_year = " + y + " AND s.id_src_doc = " + d + " AND s.id_src_ety = " + e + " " +
+                        "UNION " +
+                        // 3. Adjustment - Dps
+                        "SELECT a.id_dps_year AS y, a.id_dps_doc AS d, a.id_dps_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date, " +
+                        "ety.fid_unit AS unit_id, ety.fid_orig_unit AS orig_unit_id " +
+                        "FROM trn_dps_dps_adj AS a " +
+                        "INNER JOIN trn_dps AS dps ON a.id_dps_year = dps.id_year AND a.id_dps_doc = dps.id_doc " +
+                        "INNER JOIN trn_dps_ety AS ety ON a.id_dps_year = ety.id_year AND a.id_dps_doc = ety.id_doc AND a.id_dps_ety = ety.id_ety " +
+                        "WHERE a.id_adj_year = " + y + " AND a.id_adj_doc = " + d + " AND a.id_adj_ety = " + e + " " +
+                        "UNION " +
+                        // 4. Adjustment - Adj
+                        "SELECT a.id_adj_year AS y, a.id_adj_doc AS d, a.id_adj_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date, " +
+                        "ety.fid_unit AS unit_id, ety.fid_orig_unit AS orig_unit_id " +
+                        "FROM trn_dps_dps_adj AS a " +
+                        "INNER JOIN trn_dps AS dps ON a.id_adj_year = dps.id_year AND a.id_adj_doc = dps.id_doc " +
+                        "INNER JOIN trn_dps_ety AS ety ON a.id_adj_year = ety.id_year AND a.id_adj_doc = ety.id_doc AND a.id_adj_ety = ety.id_ety " +
+                        "WHERE a.id_dps_year = " + y + " AND a.id_dps_doc = " + d + " AND a.id_dps_ety = " + e + " " +
+                        "UNION " +
+                        // 5. Requisitions
+                        "SELECT mrq.fid_mat_req AS y, 0 AS d, mrq.fid_mat_req_ety AS e, 'REQ' AS type, " +
+                        "0 AS fid_ct_dps, 0 AS fid_cl_dps, 0 AS fid_tp_dps, mr.num AS folio, mr.dt AS doc_date, " +
+                        "0 AS unit_id, 0 AS orig_unit_id " +
+                        "FROM trn_dps_mat_req AS mrq " +
+                        "INNER JOIN trn_mat_req AS mr ON mrq.fid_mat_req = mr.id_mat_req " +
+                        "WHERE mrq.fid_dps_year = " + y + " AND mrq.fid_dps_doc = " + d + " AND mrq.fid_dps_ety = " + e;
+
+                    java.sql.ResultSet rs = statement.executeQuery(sql);
+                    while (rs.next()) {
+                        String neighborType = rs.getString("type");
+                        int ny = rs.getInt("y");
+                        int nd = rs.getInt("d");
+                        int ne = rs.getInt("e");
+                        String neighborNode = neighborType + "_" + ny + "_" + nd + "_" + ne;
+
+                        if (!visited.contains(neighborNode)) {
+                            visited.add(neighborNode);
+                            queue.add(neighborNode);
+                                                        
+                            SDpsAffectedDocumentDto.TargetType targetEnum = neighborType.equals("REQ") ? 
+                                SDpsAffectedDocumentDto.TargetType.MAT_REQUEST : SDpsAffectedDocumentDto.TargetType.DPS;
+
+                            int[] dpsTypeKey = new int[] { rs.getInt("fid_ct_dps"), rs.getInt("fid_cl_dps"), rs.getInt("fid_tp_dps") };
+
+                            list.add(new SDpsAffectedDocumentDto(
+                                ny, nd, ne, targetEnum,
+                                dpsTypeKey, rs.getString("folio"), rs.getDate("doc_date"),
+                                rs.getInt("unit_id"), rs.getInt("orig_unit_id")
+                            ));
+                        }
+                    }
+                    rs.close();
+                }
+            }
+            statement.close();
+        } catch (Exception e) {
+            erp.lib.SLibUtilities.printOutException(this, e);
+        }
+        return list;
+    }
+    
+    /**
+     * Obtención de documentos asociados únicamente hacia arriba (padres y antecesores)
+     * @return lista de objetos SDpsAffectedDocumentDto con los documentos ascendentes
+     */
+    private java.util.ArrayList<SDpsAffectedDocumentDto> getAscendingAffectedEntries() {
+        java.util.ArrayList<SDpsAffectedDocumentDto> list = new java.util.ArrayList<>();
+        java.util.Queue<String> queue = new java.util.LinkedList<>();
+        java.util.HashSet<String> visited = new java.util.HashSet<>();
+
+        int[] startKey = (int[]) moDpsEntry.getPrimaryKey();
+        String startNode = "DPS_" + startKey[0] + "_" + startKey[1] + "_" + startKey[2];
+        queue.add(startNode);
+        visited.add(startNode);
+
+        try {
+            java.sql.Statement statement = miClient.getSession().getStatement().getConnection().createStatement();
+
+            while (!queue.isEmpty()) {
+                String current = queue.poll();
+                String[] parts = current.split("_");
+                String type = parts[0];
+                int y = Integer.parseInt(parts[1]);
+                int d = Integer.parseInt(parts[2]);
+                int e = Integer.parseInt(parts[3]);
+
+                if (type.equals("DPS")) {
+                    String sql = 
+                        // 1. Supply (Destino a Origen): Surtido hacia arriba (Factura -> Pedido, Pedido -> Cotización)
+                        "SELECT s.id_src_year AS y, s.id_src_doc AS d, s.id_src_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date " +
+                        "FROM trn_dps_dps_supply AS s " +
+                        "INNER JOIN trn_dps AS dps ON s.id_src_year = dps.id_year AND s.id_src_doc = dps.id_doc " +
+                        "WHERE s.id_des_year = " + y + " AND s.id_des_doc = " + d + " AND s.id_des_ety = " + e + " " +
+                        "UNION " +
+                        // 2. Adjustment (Ajuste a Documento): Nota de Crédito hacia su Factura
+                        "SELECT a.id_dps_year AS y, a.id_dps_doc AS d, a.id_dps_ety AS e, 'DPS' AS type, " +
+                        "dps.fid_ct_dps, dps.fid_cl_dps, dps.fid_tp_dps, CONCAT(dps.num_ser, IF(length(dps.num_ser) > 0, '-', ''), dps.num) AS folio, dps.dt AS doc_date " +
+                        "FROM trn_dps_dps_adj AS a " +
+                        "INNER JOIN trn_dps AS dps ON a.id_dps_year = dps.id_year AND a.id_dps_doc = dps.id_doc " +
+                        "WHERE a.id_adj_year = " + y + " AND a.id_adj_doc = " + d + " AND a.id_adj_ety = " + e + " " +
+                        "UNION " +
+                        // 3. Requisitions (DPS a Requisición): Documento hacia su Requisición de origen
+                        "SELECT mrq.fid_mat_req AS y, 0 AS d, mrq.fid_mat_req_ety AS e, 'REQ' AS type, " +
+                        "0 AS fid_ct_dps, 0 AS fid_cl_dps, 0 AS fid_tp_dps, mr.num AS folio, mr.dt AS doc_date " +
+                        "FROM trn_dps_mat_req AS mrq " +
+                        "INNER JOIN trn_mat_req AS mr ON mrq.fid_mat_req = mr.id_mat_req " +
+                        "WHERE mrq.fid_dps_year = " + y + " AND mrq.fid_dps_doc = " + d + " AND mrq.fid_dps_ety = " + e;
+
+                    java.sql.ResultSet rs = statement.executeQuery(sql);
+                    while (rs.next()) {
+                        String neighborType = rs.getString("type");
+                        int ny = rs.getInt("y");
+                        int nd = rs.getInt("d");
+                        int ne = rs.getInt("e");
+                        String neighborNode = neighborType + "_" + ny + "_" + nd + "_" + ne;
+
+                        if (!visited.contains(neighborNode)) {
+                            visited.add(neighborNode);
+                            queue.add(neighborNode);
+
+                            SDpsAffectedDocumentDto.TargetType targetEnum = neighborType.equals("REQ") ? 
+                                SDpsAffectedDocumentDto.TargetType.MAT_REQUEST : SDpsAffectedDocumentDto.TargetType.DPS;
+
+                            int[] dpsTypeKey = new int[] { rs.getInt("fid_ct_dps"), rs.getInt("fid_cl_dps"), rs.getInt("fid_tp_dps") };
+
+                            // Como no requerimos unidades en este flujo, se pasan ceros
+                            list.add(new SDpsAffectedDocumentDto(
+                                ny, nd, ne, targetEnum,
+                                dpsTypeKey, rs.getString("folio"), rs.getDate("doc_date"),
+                                0, 0
+                            ));
+                        }
+                    }
+                    rs.close();
+                }
+            }
+            statement.close();
+        } catch (Exception e) {
+            erp.lib.SLibUtilities.printOutException(this, e);
+        }
+        return list;
+    }
+    
+    private String getDocTypeName(int[] dpsTypeKey) {
+        String typeName = SDataReadDescriptions.getCatalogueDescription(miClient, erp.data.SDataConstants.TRNU_TP_DPS, dpsTypeKey);
+
+        if (typeName == null || typeName.trim().isEmpty()) {
+            return "Documento";
+        }
+
+        return typeName; 
+    }
+    
+    private boolean aceptDocumentsParentsChanges(java.util.ArrayList<SDpsAffectedDocumentDto> lineageList) {
+        String associatedDocsMsg = getAssociatedEntriesMessage(lineageList);
+        boolean isItemRefModified = jcbEditItemRef.isSelected() && jcbFkItemId.getSelectedIndex() > 0;
+
+        if (!associatedDocsMsg.isEmpty() || isItemRefModified) {
+            Object messageContent;
+
+            if (!associatedDocsMsg.isEmpty()) {
+                javax.swing.JEditorPane editorPane = new javax.swing.JEditorPane();
+                editorPane.setContentType("text/html");
+                editorPane.setEditable(false);
+                editorPane.setBackground(new javax.swing.JPanel().getBackground());
+                
+                // Si hay documentos asociados:
+                editorPane.setText("<html>La partida tiene los siguientes documentos vinculados que serán modificados:<br><br>" +
+                                   associatedDocsMsg +
+                                   "<br><b>¿Desea continuar con los cambios?</b></html>");
+                
+                javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(editorPane);
+                scrollPane.setPreferredSize(new java.awt.Dimension(550, 300));
+                scrollPane.setBorder(null);
+                
+                messageContent = scrollPane;
+            }
+            else {
+                // No hay documentos vinculados, pero el cambio de ítem de referencia afecta la contabilidad del documento seleccionado:
+                String docType = getDocTypeName(new int[] {moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId()});
+                String folio = moDps.getNumberSeries().isEmpty() ? moDps.getNumber() : moDps.getNumberSeries() + "-" + moDps.getNumber();
+                messageContent = "<html>La partida no cuenta con documentos vinculados, pero <b>se modificará el ítem en la contabilidad del documento " + docType + " Folio " + folio + ".</b><br><br>" +
+                                 "¿Desea continuar con los cambios?</html>";
+            }
+
+            int option = javax.swing.JOptionPane.showConfirmDialog(
+                    this,
+                    messageContent,
+                    "Confirmar actualización en documentos vinculados",
+                    javax.swing.JOptionPane.OK_CANCEL_OPTION,
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+
+            return option == javax.swing.JOptionPane.OK_OPTION;
+        }
+
+        return true;
+    }
+    
+    private String getAssociatedEntriesMessage(java.util.ArrayList<SDpsAffectedDocumentDto> lineageList) {
+        StringBuilder message = new StringBuilder();
+        int rootEty = moDpsEntry.getPkEntryId();
+        boolean isItemRefModified = jcbEditItemRef.isSelected() && jcbFkItemId.getSelectedIndex() > 0;
+
+        for (SDpsAffectedDocumentDto dto : lineageList) {
+            String fecha = "";
+            if (dto.getDate() != null) {
+                fecha = miClient.getSessionXXX().getFormatters().getDateFormat().format(dto.getDate());
+            }
+
+            if (dto.getTargetType() == SDpsAffectedDocumentDto.TargetType.MAT_REQUEST) {
+                if (isItemRefModified) {
+                    message.append("Partida #").append(rootEty)
+                           .append(" -> <b>REQUISICIÓN.</b> ")
+                           .append(" Folio <b>").append(dto.getFolio()).append("</b>")
+                           .append(" fecha <b>").append(fecha).append("</b>")
+                           .append(" partida #<b>").append(dto.getPkEtyId()).append("</b>")
+                           .append("<br>");
+                }
+            } 
+            else {
+                String docType = getDocTypeName(dto.getDpsTypeKey());
+                message.append("Partida #").append(rootEty)
+                       .append(" -> <b>").append(docType).append("</b>")
+                       .append(" Folio <b>").append(dto.getFolio()).append("</b>")
+                       .append(" fecha <b>").append(fecha).append("</b>")
+                       .append(" partida #<b>").append(dto.getPkEtyId()).append("</b>")
+                       .append("<br>");
+            }
+        }
+        if (isItemRefModified && !message.toString().trim().isEmpty()) {
+            message.append("<br><i> También se modificará el ítem en la contabilidad de las facturas y notas de crédito asociadas.<i><br>");
+        }
+
+        /*if (message.length() > 0) {
+            return "<html>" + message.toString() + "</html>";
+        }*/
+        
+        if (message.length() > 0) {
+            return message.toString();
+        }
+        return "";
+    }
+    
+    private String getClosedPeriodsDocs(java.util.ArrayList<SDpsAffectedDocumentDto> lineageList) {
+        StringBuilder closedDocs = new StringBuilder();
+        java.util.HashSet<String> checkedDocs = new java.util.HashSet<>();
+        
+        if (lineageList != null) {
+            for (SDpsAffectedDocumentDto dto : lineageList) {
+                String docKey = dto.getTargetType() + "_" + dto.getPkYearId() + "_" + dto.getPkDocId();
+                if (!checkedDocs.contains(docKey)) {
+                    checkedDocs.add(docKey);
+
+                    if (dto.getDate() != null && !SDataUtilities.isPeriodOpen(miClient, dto.getDate())) {
+                        if (dto.getTargetType() == SDpsAffectedDocumentDto.TargetType.MAT_REQUEST) {
+                            String fechaReq = miClient.getSessionXXX().getFormatters().getDateFormat().format(dto.getDate());
+                            closedDocs.append("- Requisición (").append(dto.getFolio()).append(") ").append(fechaReq).append("\n");
+                        }
+                        else {
+                            String docType = getDocTypeName(dto.getDpsTypeKey());
+                            String fechaDoc = miClient.getSessionXXX().getFormatters().getDateFormat().format(dto.getDate());
+                            closedDocs.append("- ").append(docType).append(" (").append(dto.getFolio()).append(") ").append(fechaDoc).append("\n");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (closedDocs.length() == 0) {
+            return null;
+        }
+
+        return closedDocs.toString();
+    }
 
     private boolean acceptStockValuationChanges() {
         try {
@@ -418,7 +957,7 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
                 int option = JOptionPane.showConfirmDialog(
                         this,
                         "La partida tiene " + count + " valuación(es) de inventario asociada(s).\n\n"
-                        + "¿Desea continuar con los cambios?",
+                        + "¿Desea continuar con los cambios? (No se afectarán las valuaciones)",
                         "Confirmar cambios con valuaciones",
                         JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.WARNING_MESSAGE
@@ -435,146 +974,6 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         return true;
     }
     
-    private boolean aceptDocumentsParentsChanges(){
-        String affectedEntries = getModifiedEntriesWithParents();
-        
-        if (!affectedEntries.isEmpty()) {
-            int option = JOptionPane.showConfirmDialog(
-                    this,
-                    "La partida tiene documentos vinculados que también se verán afectados:\n\n"
-                        + affectedEntries
-                        + "\n ¿Desea continuar con los cambios?",
-                    "Confirmar cambios",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE);
-            
-            return option == JOptionPane.OK_OPTION;
-        }
-        
-        return true;
-    }
-
-    private String getModifiedEntriesWithParents() {
-        StringBuilder message = new StringBuilder();
-
-        try {
-            int[] entryKey = (int[]) moDpsEntry.getPrimaryKey();
-
-            String sql = "SELECT "
-                    + "d.fid_ct_dps AS rel_ct_dps, "
-                    + "d.fid_cl_dps AS rel_cl_dps, "
-                    + "d.fid_tp_dps AS rel_tp_dps, "
-                    + "CONCAT(d.num_ser, '-', d.num) AS rel_folio, "
-                    + "s.id_src_ety AS rel_ety, "
-                    + "0 AS is_mat_req "
-                    + "FROM trn_dps_dps_supply AS s "
-                    + "INNER JOIN trn_dps AS d ON "
-                    + "s.id_src_year = d.id_year "
-                    + "AND s.id_src_doc = d.id_doc "
-                    + "WHERE s.id_des_year = " + entryKey[0] + " "
-                    + "AND s.id_des_doc = " + entryKey[1] + " "
-                    + "AND s.id_des_ety = " + entryKey[2] + " "
-
-                    + "UNION ALL "
-
-                    + "SELECT "
-                    + "0 AS rel_ct_dps, "
-                    + "0 AS rel_cl_dps, "
-                    + "0 AS rel_tp_dps, " 
-                    + "mr.num AS rel_folio, "
-                    + "mrq.fid_mat_req_ety AS rel_ety, "
-                    + "1 AS is_mat_req "
-                    + "FROM trn_dps_mat_req AS mrq "
-                    + "INNER JOIN trn_mat_req AS mr ON "
-                    + "mrq.fid_mat_req = mr.id_mat_req "
-                    + "WHERE mrq.fid_dps_year = " + entryKey[0] + " "
-                    + "AND mrq.fid_dps_doc = " + entryKey[1] + " "
-                    + "AND mrq.fid_dps_ety = " + entryKey[2] + " "
-            
-                    + "UNION ALL "
-                    
-                    + "SELECT "
-                    + "d.fid_ct_dps AS rel_ct_dps, "
-                    + "d.fid_cl_dps AS rel_cl_dps, "
-                    + "d.fid_tp_dps AS rel_tp_dps, "
-                    + "CONCAT(d.num_ser, '-', d.num) AS rel_folio, "
-                    + "a.id_adj_ety AS rel_ety, "
-                    + "0 AS is_mat_req "
-                    + "FROM trn_dps_dps_adj AS a "
-                    + "INNER JOIN trn_dps AS d ON "
-                    + "a.id_adj_year = d.id_year "
-                    + "AND a.id_adj_doc = d.id_doc "
-                    + "WHERE a.id_dps_year = " + entryKey[0] + " "
-                    + "AND a.id_dps_doc = " + entryKey[1] + " "
-                    + "AND a.id_dps_ety = " + entryKey[2];
-                    
-            java.sql.ResultSet rs = miClient.getSession().getStatement().executeQuery(sql);
-
-            while (rs.next()) {
-                String docType;
-
-                if (rs.getBoolean("is_mat_req")) {
-                    docType = "Requisición";
-                }
-                else {
-                    switch (rs.getInt("rel_cl_dps")) {
-                        case SDataConstantsSys.TRNS_CL_DPS_EST:
-                            docType = "Cotización";
-                            break;
-
-                        case SDataConstantsSys.TRNS_CL_DPS_ORD:
-                            docType = "Pedido";
-                            break;
-
-                        case SDataConstantsSys.TRNS_CL_DPS_DOC:
-                            int tpDps = rs.getInt("rel_tp_dps");
-                            
-                            if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) {
-                                docType = "Factura";
-                            } 
-                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REM[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REM[2]) {
-                                docType = "Remisión";
-                            } 
-                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_REC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_REC[2]) {
-                                docType = "Nota Venta";
-                            } 
-                            else if (tpDps == SDataConstantsSys.TRNU_TP_DPS_PUR_TIC[2] || tpDps == SDataConstantsSys.TRNU_TP_DPS_SAL_TIC[2]) {
-                                docType = "Ticket";
-                            } 
-                            else {
-                                docType = "Documento"; // Fallback por si acaso
-                            }
-                            break;
-                        
-                        case SDataConstantsSys.TRNS_CL_DPS_ADJ:
-                            docType = "Ajuste / NC";
-                            break;
-
-                        default:
-                            docType = "Documento";
-                    }
-                }
-                
-                message.append("Partida #")
-                        .append(entryKey[2])
-                        .append(" ← ")
-                        .append(docType)
-                        .append(" ")
-                        .append(rs.getString("rel_folio"))
-                        .append(" (partida #")
-                        .append(rs.getInt("rel_ety"))
-                        .append(")\n");
-            }
-
-            rs.close();
-        }
-        catch (Exception e) {
-            SLibUtilities.printOutException(this, e);
-        }
-
-        return message.toString();
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel48;
@@ -582,19 +981,20 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
     private javax.swing.JPanel jPanel50;
     private javax.swing.JPanel jPanel51;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbEditHelp;
     private javax.swing.JButton jbFkItemId;
     private javax.swing.JButton jbOk;
+    private javax.swing.JCheckBox jcbEditConcept;
+    private javax.swing.JCheckBox jcbEditItemRef;
+    private javax.swing.JCheckBox jcbEditKey;
     private javax.swing.JComboBox jcbFkItemId;
-    private javax.swing.JLabel jlConceptfKeyNew;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlDummy3;
     private javax.swing.JLabel jlIConceptfKeyOld;
     private javax.swing.JLabel jlItem;
-    private javax.swing.JLabel jlItemConceptNew;
     private javax.swing.JLabel jlItemConceptOld;
-    private javax.swing.JLabel jlItemRefNew;
     private javax.swing.JLabel jlItemRefOld;
     private javax.swing.JLabel jlOriginalQuantity;
     private javax.swing.JLabel jlPanelDps;
@@ -656,9 +1056,9 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
         }
 
         if (!validation.getIsError()) {
-            if (jcbFkItemId.getSelectedIndex() > 0) {
+            if (jcbFkItemId.isEnabled() && jcbFkItemId.getSelectedIndex() > 0) {
                 if ((int) moFieldPkItemId.getKeyAsIntArray()[0] == moDpsEntry.getFkItemRefId_n()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlItemRefNew.getText() + "'.");
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jcbEditItemRef.getText() + "'.");
                     validation.setComponent(jcbFkItemId);
                     validation.setIsError(true);
                 }
@@ -752,12 +1152,46 @@ public class SDialogUpdateDpsItemRefConcept extends javax.swing.JDialog implemen
             else if (button == jbFkItemId) {
                 actionFkItemId();
             }
+            else if (button == jbEditHelp) {
+                actionEditHelp();
+            }
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
+        if (e.getSource() instanceof javax.swing.JCheckBox) {
+            javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) e.getSource();
+            
+            if (checkBox == jcbEditKey) {
+                jtfConceptKeyNew.setEnabled(jcbEditKey.isSelected());
+                if (jcbEditKey.isSelected()) {
+                    jtfConceptKeyNew.setText("");
+                    jtfConceptKeyNew.requestFocus();
+                } else {
+                    jtfConceptKeyNew.setText(moDpsEntry.getConceptKey());
+                }
+            }
+            else if (checkBox == jcbEditConcept) {
+                jtfItemConceptNew.setEnabled(jcbEditConcept.isSelected());
+                if (jcbEditConcept.isSelected()) {
+                    jtfItemConceptNew.setText("");
+                    jtfItemConceptNew.requestFocus();
+                } else {
+                    jtfItemConceptNew.setText(moDpsEntry.getConcept());
+                }
+            }
+            else if (checkBox == jcbEditItemRef) {
+                jcbFkItemId.setEnabled(jcbEditItemRef.isSelected());
+                jbFkItemId.setEnabled(jcbEditItemRef.isSelected());
+                if (jcbEditItemRef.isSelected()) {
+                    jcbFkItemId.requestFocus();
+                } else {
+                    SFormUtilities.locateComboBoxItem(jcbFkItemId, new int[] { moDpsEntry.getFkItemRefId_n() });
+                }
+            }
+        }
+        else if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
             JComboBox comboBox = (JComboBox)  e.getSource();
         }
     }    

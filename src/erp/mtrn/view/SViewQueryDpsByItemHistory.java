@@ -5,8 +5,10 @@
 
 package erp.mtrn.view;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
@@ -17,6 +19,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogUpdateDpsItemRefConcept;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterFunctionalArea;
@@ -192,10 +195,10 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
         STableField[] aoKeyFields = new STableField[3];
         
         if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
-            maoTableColumns = new STableColumn[28];
+            maoTableColumns = new STableColumn[33];
         }
         else {
-            maoTableColumns = new STableColumn[34];
+            maoTableColumns = new STableColumn[39];
         }
         
         i = 0;
@@ -222,6 +225,12 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
             maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal proveedor", 75);
         }
         maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "ety.sort_pos", "# Partida", STableConstants.WIDTH_NUM_TINYINT);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.change_type", "Tipo modificación", STableConstants.WIDTH_VALUE);
+        
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.fid_acc_old_n", "Cta. contable anterior", STableConstants.WIDTH_ACCOUNT_ID);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.fid_acc_new_n", "Cta. contable nueva", STableConstants.WIDTH_ACCOUNT_ID);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.fid_cc_old_n", "CC anterior", STableConstants.WIDTH_ACCOUNT_ID);
+        maoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "his.fid_cc_new_n", "CC nuevo", STableConstants.WIDTH_ACCOUNT_ID);
         
         if (mnTabTypeAux02 == SDataConstantsSys.TRNX_TP_DPS_ORD) {
             maoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_qty_old", "Cantidad anterior", STableConstants.WIDTH_QUANTITY);
@@ -289,7 +298,15 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
             }
             else if (!moTablePane.getSelectedTableRow().getIsSummary()) {
                 try {
+                    int[] dpsEntryPk = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                     int gui = isViewForPurchase() ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
+                    SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] { dpsEntryPk[0], dpsEntryPk[1] }, SLibConstants.EXEC_MODE_SILENT);
+
+                    // Validar periodo contable:
+                    if (dps != null && !SDataUtilities.isPeriodOpen((SClientInterface) miClient, dps.getDate())) {
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE + " (" + dps.getDate().toString() + ")");
+                        return;
+                    }
 
                     moDialogUpdateDpsItemRefConcept.formReset();
                     moDialogUpdateDpsItemRefConcept.setValue(SDataConstants.TRN_DPS, new int[] { ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0], ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[1] });
@@ -385,14 +402,24 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
         }
         
         String logSubquery = 
-                "(SELECT h.id_year, h.id_doc, h.id_ety, h.concept_key_old, h.concept_key_new, h.concept_old, h.concept_new, " +
-                "h.fid_item_ref_old_n, h.fid_item_ref_new_n, 0.0 AS qty_old, 0.0 AS qty_new, " +
-                "'Referencia' AS _log_type, h.fid_usr_edit AS _usr_id, h.ts_edit " +
+                "(SELECT h.id_year, h.id_doc, h.id_ety, " +
+                "h.change_type, " +
+                "h.concept_key_old, h.concept_key_new, h.concept_old, h.concept_new, " +
+                "h.fid_item_ref_old_n, h.fid_item_ref_new_n, " +
+                "h.fid_acc_old_n, h.fid_acc_new_n, " +
+                "h.fid_cc_old_n, h.fid_cc_new_n, " +
+                "0.0 AS qty_old, 0.0 AS qty_new, " +
+                "h.fid_usr_edit AS _usr_id, h.ts_edit " +
                 "FROM trn_dps_ety_hist AS h " +
                 "UNION ALL " +
-                "SELECT q.id_year, q.id_doc, q.id_ety, '' AS concept_key_old, '' AS concept_key_new, '' AS concept_old, '' AS concept_new, " +
-                "NULL AS fid_item_ref_old_n, NULL AS fid_item_ref_new_n, q.orig_qty_old AS qty_old, q.orig_qty_new AS qty_new, " +
-                "'Cantidad' AS _log_type, q.fid_usr_new AS _usr_id, q.ts_new " +
+                "SELECT q.id_year, q.id_doc, q.id_ety, " +
+                "'CANT' AS change_type, " + // inyección directa para la cantidad
+                "'' AS concept_key_old, '' AS concept_key_new, '' AS concept_old, '' AS concept_new, " +
+                "NULL AS fid_item_ref_old_n, NULL AS fid_item_ref_new_n, " +
+                "NULL AS fid_acc_old_n, NULL AS fid_acc_new_n, " +
+                "NULL AS fid_cc_old_n, NULL AS fid_cc_new_n, " +
+                "q.orig_qty_old AS qty_old, q.orig_qty_new AS qty_new, " +
+                "q.fid_usr_new AS _usr_id, q.ts_new " +
                 "FROM trn_dps_ety_qty_chg AS q WHERE q.b_del = 0) ";
         
         msSql = "SELECT " +
@@ -405,6 +432,12 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
                 "bpb.bpb, " +
                 "ety.sort_pos, " +
 
+                "his.change_type, " +
+                
+                "his.fid_acc_old_n, " +
+                "his.fid_acc_new_n, " +
+                "his.fid_cc_old_n, " +
+                "his.fid_cc_new_n, " +
                 "his.concept_key_old, " +
                 "his.concept_key_new, " +
                 "his.concept_old, " +
@@ -418,7 +451,6 @@ public class SViewQueryDpsByItemHistory extends erp.lib.table.STableTab implemen
                 "his.fid_item_ref_new_n, " +
                 "his.qty_old AS _qty_old, " +
                 "his.qty_new AS _qty_new, " +
-                "his._log_type, " +
 
                 "@factor := IF(dps.fid_cl_dps = " + getCreditNoteClassId() + ", -1.0, 1.0) AS _factor, " +
 

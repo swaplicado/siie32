@@ -287,6 +287,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         jbEtyNotes = new javax.swing.JButton();
         jlCostCenterEty = new javax.swing.JLabel();
         moKeyCostCenterEty = new sa.lib.gui.bean.SBeanFieldKey();
+        jlWarningCc = new javax.swing.JLabel();
         jpButtons = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -746,6 +747,12 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyCostCenterEty.setPreferredSize(new java.awt.Dimension(215, 23));
         jPanel48.add(moKeyCostCenterEty);
 
+        jlWarningCc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlWarningCc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png"))); // NOI18N
+        jlWarningCc.setToolTipText("");
+        jlWarningCc.setPreferredSize(new java.awt.Dimension(20, 23));
+        jPanel48.add(jlWarningCc);
+
         jpItem.add(jPanel48);
 
         jpEtyCapture.add(jpItem, java.awt.BorderLayout.CENTER);
@@ -1008,6 +1015,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
     private javax.swing.JLabel jlUnitPriceSist;
     private javax.swing.JLabel jlUnitPriceUsr;
     private javax.swing.JLabel jlUsrReq;
+    private javax.swing.JLabel jlWarningCc;
     private javax.swing.JLabel jlspace;
     private javax.swing.JPanel jpButtons;
     private javax.swing.JPanel jpCaptureArea;
@@ -1490,6 +1498,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         moKeyItemRefEty.setSelectedIndex(0);
         moItemRefEty = null;
         jlDirectPurchaseItem.setIcon(null);
+        jlWarningCc.setIcon(null);
     }
     
     private void enableEntryControls(boolean enable) {
@@ -1654,6 +1663,44 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             else {
                 jlDirectPurchaseItem.setIcon(null);
             }
+            
+            // Validacion de inconsistencia en el CC:
+
+            if (jlWarningCc != null) {
+                jlWarningCc.setVisible(false);
+                jlWarningCc.setToolTipText(null);
+            }
+            
+            if (ety.getFkCostCenterId_n() > 0 && ety.getFkSubentMatConsumptionEntityId_n() > 0) {
+                ArrayList<SDbMaterialCostCenterGroup> ccg;
+                try {
+                    ccg = erp.mod.trn.db.SMaterialRequestUtils.getCostCenterGroupByUser(miClient.getSession(), 
+                            new int[] { ety.getFkSubentMatConsumptionEntityId_n(), ety.getFkSubentMatConsumptionSubentityId_n() },
+                            ety.getFkCostCenterId_n()
+                    );
+                    
+                    // Si hay inconsistencia:
+                    if (ccg == null || ccg.isEmpty()) {
+                        String dbCcCode = "";
+                        String dbCcName = "";
+                        String sqlCc = "SELECT id_cc, cc FROM " + SModConsts.TablesMap.get(SModConsts.FIN_CC) + " WHERE pk_cc = " + ety.getFkCostCenterId_n();
+                        
+                        try (ResultSet resultSetCc = miClient.getSession().getStatement().executeQuery(sqlCc)){
+                            if (resultSetCc.next()) {
+                                dbCcCode = resultSetCc.getString("id_cc");
+                                dbCcName = resultSetCc.getString("cc");
+                            }
+                        }
+                        
+                        jlWarningCc.setToolTipText("Centro de costo de la partida: " + dbCcCode + " - " + dbCcName);
+                        jlWarningCc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_warn.png")));
+                        jlWarningCc.setVisible(true);
+                    }
+                    
+                } catch (Exception e) {
+                    SLibUtilities.printOutException(this, e);
+                }
+            }
         }
         else {
             moItemEty = null;
@@ -1672,6 +1719,10 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moDecTotalEty.setValue(0.0);
             moIntConsDays.setValue(0);
             moKeyConsEntEty.setSelectedIndex(0);
+            // Limpiar CC si la lista aún existe
+            if (moKeyCostCenterEty.getItemCount() > 0) {
+                moKeyCostCenterEty.setSelectedIndex(0);
+            }
             moDateReqEty.setValue(null);
             moDateDeliveryEty.setValue(null);
             moKeyPriEty.setSelectedIndex(0);
@@ -1681,6 +1732,8 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
             moKeyItemRefEty.setSelectedIndex(0);
             moTextItemRefEty.setText("");
             jlDirectPurchaseItem.setIcon(null);
+            jlWarningCc.setIcon(null);
+            jlWarningCc.setToolTipText(null);
         }
         isCapturingData = false;
         updateItemDescButton();
@@ -2777,6 +2830,7 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         }
         
         jlDirectPurchaseItem.setIcon(null);
+        jlWarningCc.setIcon(null);
         addAllListeners();
         populateMatReqEntries();
         enableEntryControls(false);
@@ -2856,17 +2910,29 @@ public class SFormMaterialRequest extends sa.lib.gui.bean.SBeanForm implements S
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (!SLibUtils.compareAmount(moDecAsign.getValue(), 1.0)) {
-                validation.setMessage("La suma de los porcentajes de los centros de costo es " + moDecAsign.getValue() * 100 + "% y deberia ser igual al 100%");
+            int ccRows = moGridMatReqCC.getModel().getRowCount();
+            
+            if (ccRows <= 0) {
+                validation.setMessage("Debe agregar al menos un centro de costo en la cabecera de la requisición.");
+            }
+            else if (!SLibUtils.compareAmount(moDecAsign.getValue(), 1.0)) {
+                double asignPct = moDecAsign.getValue() * 100;
+                
+                if (moDecAsign.getValue() < 1.0) {
+                    validation.setMessage("La suma de los centros de costo en la cabecera es del " 
+                            + SLibUtils.getDecimalFormatAmount().format(asignPct) + "%.\n"
+                            + "Falta asignar el " + SLibUtils.getDecimalFormatAmount().format(100.0 - asignPct) + "% para completar el 100%.");
+                }
+                else {
+                    validation.setMessage("La suma de los centros de costo en la cabecera es del " 
+                            + SLibUtils.getDecimalFormatAmount().format(asignPct) + "%.\n"
+                            + "Excede el 100% por " + SLibUtils.getDecimalFormatAmount().format(asignPct - 100.0) + "%.");
+                }
             }
         }
         
         if (validation.isValid() && maMatReqEntries.size() <= 0) { 
             validation.setMessage("Debe agregar al menos un ítem para solicitar.");
-        }
-        
-        if (validation.isValid() && moGridMatReqCC.getModel().getRowCount() <= 0) { 
-            validation.setMessage("Debe indicar al menos un centro de costo.");
         }
         
         if (getFormSubtype() == SModConsts.TRNX_MAT_REQ_STK_SUP) {

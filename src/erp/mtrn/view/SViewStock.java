@@ -12,7 +12,6 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.table.STabFilterDate;
 import erp.lib.table.STabFilterDeleted;
-import erp.lib.table.STableCellRendererIcon;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
@@ -26,21 +25,22 @@ import java.awt.event.ItemEvent;
 import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña, Isabel Servín, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Alfredo Perez, Claudio Peña, Isabel Servín, Sergio Flores, Rodrigo Ayala
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     public static final String TXT_DEC_INC = "Ver más decimales";
     public static final String TXT_DEC_DEC = "Ver menos decimales";
+    public static final int YEARS_UNTIL_LAGGING = 3; // Años máximos para considerarse rezagado
+    public static final int YEARS_UNTIL_OBSOLETE = 3; // Años mínimos para considerarse obsoleto
+    
     
     private int mnColIn;
     private int mnColOut;
@@ -51,11 +51,15 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     private javax.swing.JButton jbCardex;
     private javax.swing.JButton jbSegregations;
     private javax.swing.JToggleButton jtbDecimals;
-    private javax.swing.JCheckBox moCheckAllStockConfigs;
-    private javax.swing.JLabel moLabelAllStockConfigsHint;
+    private javax.swing.JButton jbStockConfigsHelp;
+    private javax.swing.JButton jbIconsStockHelp;
     private erp.lib.table.STabFilterDate moTabFilterDate;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
+    private javax.swing.JComboBox<String> moComboStockConfigs;
+    private String[] msStockConfigTooltips; // Arreglo para guardar los tooltips del combo
+    private javax.swing.JCheckBox moCheckLaggingItems;
+    private javax.swing.JCheckBox moCheckObsoleteItems;
     private erp.mtrn.form.SDialogStockCardex moDialogStockCardex;
     private erp.mtrn.form.SDialogStockSegregations moDialogStockSegregations;
 
@@ -85,7 +89,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moDialogStockCardex = new SDialogStockCardex(miClient);
         moDialogStockSegregations = new SDialogStockSegregations(miClient);
-
+  
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
@@ -122,20 +126,44 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         if (showingStockConfigs()) {
             addTaskBarUpperSeparator();
             
-            moLabelAllStockConfigsHint = new JLabel(STableCellRendererIcon.moIconInfo, SwingConstants.LEFT);
-            moLabelAllStockConfigsHint.setEnabled(false);
-            moLabelAllStockConfigsHint.setPreferredSize(new Dimension(15, 23));
-            moLabelAllStockConfigsHint.setToolTipText("Máximos y mínimos de ítems sin movimientos en el año mostrado");
-            addTaskBarUpperComponent(moLabelAllStockConfigsHint);
+            jbIconsStockHelp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_view_info.png")));
+            jbIconsStockHelp.setPreferredSize(new Dimension(23, 23));
+            jbIconsStockHelp.setToolTipText("Ver descripción de los íconos de 'Nivel existencias'");
+            jbIconsStockHelp.addActionListener(this);
+            addTaskBarUpperComponent(jbIconsStockHelp);
             
-            moCheckAllStockConfigs = new JCheckBox("Todos los máximos y mínimos");
-            moCheckAllStockConfigs.setEnabled(false);
-            moCheckAllStockConfigs.setSelected(false);
-            moCheckAllStockConfigs.setPreferredSize(new Dimension(200, 23));
-            moCheckAllStockConfigs.addItemListener(this);
-            addTaskBarUpperComponent(moCheckAllStockConfigs);
-        }
+            addTaskBarUpperSeparator();
         
+            jbStockConfigsHelp = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query.gif")));
+            jbStockConfigsHelp.setEnabled(false);
+            jbStockConfigsHelp.setPreferredSize(new Dimension(23, 23));
+            jbStockConfigsHelp.setToolTipText("<html>Para habilitar el selector de filtros, primero desactive<br>el botón de <b>'Filtrar ítems sin existencias'</b>.</html>");
+            jbStockConfigsHelp.addActionListener(this);
+            addTaskBarUpperComponent(jbStockConfigsHelp);
+            
+            
+            // Instanciamos el menú con las 4 opciones posibles:
+            moComboStockConfigs = new JComboBox<>(new String[] {
+                "- Predeterminado -",          // Índice 0 (Sin filtro)
+                "Todos los máximos y mínimos",    // Índice 1
+                "Inventario rezagado",            // Índice 2 - Inventario inmovilizado, Baja rotación, Inventario rezagado
+                "Inventario obsoleto"             // Índice 3 - Inventario obsoleto
+            });
+            
+            msStockConfigTooltips = new String[] {
+                "Muestra los ítems según el filtro estándar de la vista.", // Índice 0
+                "Máximos y mínimos de ítems sin movimientos en el año mostrado.", // Índice 1
+                "Ítems sin movimientos en el año mostrado y con actividad en los " + YEARS_UNTIL_LAGGING + " años previos.", // Índice 2
+                "Ítems sin movimientos en el año mostrado ni en los " + YEARS_UNTIL_OBSOLETE + " años previos." // Índice 3
+            };
+            
+            moComboStockConfigs.setEnabled(false);
+            moComboStockConfigs.setPreferredSize(new Dimension(150, 23));
+            moComboStockConfigs.setToolTipText(msStockConfigTooltips[0]); // Tooltip inicial
+            moComboStockConfigs.addItemListener(this);
+            addTaskBarUpperComponent(moComboStockConfigs);
+        }
+
         int key = 0;
         
         switch (mnTabTypeAux01) {
@@ -154,7 +182,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[key++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_cob");
                 aoKeyFields[key++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_wh");
 
-                aoTableColumns = new STableColumn[15];
+                aoTableColumns = new STableColumn[19];
                 break;
                                 
             case SDataConstants.TRNX_STK_STK_LOT:
@@ -204,10 +232,10 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         int col = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", 100);
-            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 250);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", STableConstants.WIDTH_ITEM_3X);
         }
         else {
-            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", 250);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item", "Ítem", STableConstants.WIDTH_ITEM_3X);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "item_key", "Clave ítem", 100);
         }
         
@@ -236,21 +264,21 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         }
 
         mnColIn = col;
-        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         mnColOut = col;
-        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         mnColStk = col;
-        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk", "Existencias", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         
         if (showingSegregations()) {
             mnColSeg = col;
-            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk_seg", "Segregadas", STableConstants.WIDTH_QUANTITY_2X);
+            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk_seg", "Segregadas", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             mnColAvl = col;
-            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk_ava", "Disponibles", STableConstants.WIDTH_QUANTITY_2X);
+            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_stk_ava", "Disponibles", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         else {
@@ -277,7 +305,17 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             
             setIsSummaryApplying(true);
         }
- 
+        
+        // Columnas última compra y último movimiento:
+        if (showingStockConfigs()) {
+            if (showingStockConfigs()) {
+                aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "_dt_last_pur", "Última compra", STableConstants.WIDTH_DATE);
+                aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_days_last_pur", "Días desde última compra hasta hoy", STableConstants.WIDTH_NUM_INTEGER);
+                aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "_dt_last_mov", "Último movimiento", STableConstants.WIDTH_DATE);
+                aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_days_last_mov", "Días desde último movimiento hasta hoy.", STableConstants.WIDTH_NUM_INTEGER);
+            }
+        }
+        
         for (int i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
@@ -351,12 +389,25 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     }
     
     private void enableAllStockConfigs(final boolean enable) {
-        moLabelAllStockConfigsHint.setEnabled(enable);
+        jbStockConfigsHelp.setEnabled(enable);
+        moComboStockConfigs.setEnabled(enable);
         
-        moCheckAllStockConfigs.setEnabled(enable);
-        moCheckAllStockConfigs.setSelected(false); // allways deselect check box!
+        // Cambio dinámico de Tooltip:
+        if (enable) {
+            jbStockConfigsHelp.setToolTipText("Ver descripción de los filtros de configuraciones de máximos y mínimos.");
+        } else {
+            jbStockConfigsHelp.setToolTipText("<html>Para habilitar el selector de filtros, primero desactive<br>el botón de <b>'Filtrar ítems sin existencias'</b>.</html>");
+        }
+        
+        // Restablecer el combobox:
+        if (!enable && moComboStockConfigs.getSelectedIndex() != 0) {
+            mbProcessingView = true; 
+            moComboStockConfigs.setSelectedIndex(0); 
+            moComboStockConfigs.setToolTipText(msStockConfigTooltips[0]); // Regresamos también el tooltip a predeterminado
+            mbProcessingView = false; 
+        }
     }
-
+    
     /**
      * Must be public to be accesible from actions map.
      */
@@ -392,6 +443,86 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             }
         }
     }
+    
+    private void actionStockConfigsHelp() {
+        if (jbStockConfigsHelp.isEnabled()) {
+            String msg = "<html><div style='font-family: sans-serif; width: 360px; padding: 5px;'>" +
+                    "<b>Filtros de configuraciones de máximos y mínimos:</b><br><br>" +
+                    "<b>1. Predeterminado:</b><br>" +
+                    "• " + msStockConfigTooltips[0] + "<br><br>" +
+                    "<b>2. Todos los máximos y mínimos:</b><br>" +
+                    "• " + msStockConfigTooltips[1] + "<br><br>" +
+                    "<b>3. Inventario rezagado:</b><br>" +
+                    "• " + msStockConfigTooltips[2] + "<br><br>" +
+                    "<b>4. Inventario obsoleto:</b><br>" +
+                    "• " + msStockConfigTooltips[3] +
+                    "</div></html>";
+
+            miClient.showMsgBoxInformation(msg);
+        }
+    }
+    
+    private void actionIconsStockHelp() {
+        if (jbIconsStockHelp.isEnabled()) {
+            javax.swing.JPanel panel = new javax.swing.JPanel();
+            panel.setLayout(new javax.swing.BoxLayout(panel, javax.swing.BoxLayout.Y_AXIS));
+            panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            panel.add(new javax.swing.JLabel("<html><b>Significado de los íconos de la columna 'Nivel existencias':</b></html>"));
+            panel.add(javax.swing.Box.createVerticalStrut(12));
+
+            addStockIconDescription(panel,
+                    STableConstants.ICON_VIEW_LIG_RED,
+                    "Bajo mínimo",
+                    "Disponibles menores o iguales al mínimo configurado.");
+
+            addStockIconDescription(panel,
+                    STableConstants.ICON_VIEW_LIG_YEL,
+                    "Punto de reorden",
+                    "Disponibles mayores al mínimo y menores o iguales al punto de reorden.");
+
+            addStockIconDescription(panel,
+                    STableConstants.ICON_VIEW_LIG_GRE,
+                    "Nivel óptimo",
+                    "Disponibles mayores al punto de reorden y menores o iguales al máximo.");
+
+            addStockIconDescription(panel,
+                    STableConstants.ICON_WARN,
+                    "Sobreinventario",
+                    "Disponibles mayores al máximo configurado.");
+
+            addStockIconDescription(panel,
+                    STableConstants.ICON_VIEW_EXCL,
+                    "Sin movimientos en el año",
+                    "Configuración de máximo y mínimo de un ítem que no registra movimientos en el año mostrado.");
+
+            javax.swing.JOptionPane.showMessageDialog(this, panel, "Íconos de nivel de existencias", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    private javax.swing.Icon getStockLevelIcon(int iconId) {
+        javax.swing.table.TableCellRenderer renderer = miClient.getSessionXXX().getFormatters().getTableCellRendererIcon();
+        javax.swing.JTable table = new javax.swing.JTable(1, 1);
+
+        java.awt.Component component = renderer.getTableCellRendererComponent(table, iconId, false, false, 0, 0);
+
+        if (component instanceof javax.swing.JLabel) {
+            return ((javax.swing.JLabel) component).getIcon();
+        }
+
+        return null;
+    }
+    
+    private void addStockIconDescription(javax.swing.JPanel panel, int iconId, String title, String description) {
+        javax.swing.JLabel label = new javax.swing.JLabel(
+                "<html><b>" + title + ":</b> " + description + "</html>");
+
+        label.setIcon(getStockLevelIcon(iconId));
+        label.setIconTextGap(10);
+        label.setBorder(javax.swing.BorderFactory.createEmptyBorder(
+                3, 0, 3, 0));
+
+        panel.add(label);
+    }
 
     private void actionDecimals() {
         String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
@@ -416,20 +547,6 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         actionRefresh(STableConstants.REFRESH_MODE_RELOAD);
     }
     
-    private void itemStateChangedAllStockConfigs() {
-        try {
-            mbProcessingView = true;
-            
-            actionReload();
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
-        }
-        finally {
-            mbProcessingView = false;
-        }
-    }
-
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
@@ -455,7 +572,11 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
         int year = 0;
+        boolean isAllConfigs = showingStockConfigs() && moComboStockConfigs.getSelectedIndex() == 1;
+        boolean isLaggingItems = showingStockConfigs() && moComboStockConfigs.getSelectedIndex() == 2; // filtro de rezagados: sin movimientos en el año mostrado pero con actividad en los 3 anteriores
+        boolean isObsoleteItems = showingStockConfigs() && moComboStockConfigs.getSelectedIndex() == 3; // Sin mov. en año actual ni en 3 años previos
         String mainSqlWhere = "";
+        String sqlWhereWarehouse = "";
         String mainSqlHaving = "";
         String segregSqlWhere = "";
         String segregSqlJoinOn = "";
@@ -474,7 +595,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 if (showingStockConfigs()) {
                     boolean enable = setting.getStatus() == STableConstants.STATUS_OFF;
                     
-                    if (enable != moCheckAllStockConfigs.isEnabled()) {
+                    if (enable != moComboStockConfigs.isEnabled()) {
                         enableAllStockConfigs(enable);
                     }
                 }
@@ -489,6 +610,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 if (key != null) {
                     if (key[0] != SLibConstants.UNDEFINED) {
                         mainSqlWhere += (mainSqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + key[0] + " ";
+                        sqlWhereWarehouse += "AND sc.id_cob = " + key[0] + " "; // filtrar tambien en la config del alamcen
                         
                         if (showingSegregations()) {
                             segregSqlWhere += (segregSqlWhere.isEmpty() ? "" : "AND ") + "sgwe.id_cob = " + key[0] + " ";
@@ -498,6 +620,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                     }
                     if (key[1] != SLibConstants.UNDEFINED) {
                         mainSqlWhere += (mainSqlWhere.isEmpty() ? "" : "AND ") + "s.id_wh = " + key[1] + " ";
+                        sqlWhereWarehouse += "AND sc.id_wh = " + key[1] + " "; // filtrar tambien en la config del alamcen
                         
                         if (showingSegregations()) {
                             segregSqlWhere += (segregSqlWhere.isEmpty() ? "" : "AND ") + "sgwe.id_whs = " + key[1] + " ";
@@ -517,6 +640,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         
         String tableSegr = "";
         String tablePrice = "";
+        String tableLastDates = "";
         String exprStockStd = "SUM(s.mov_in - s.mov_out)";
         String exprStockAvl = exprStockStd;
         
@@ -552,19 +676,37 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                     "ORDER BY pc3.id_item, pc3.id_unit)";
         }
         
+        if (showingStockConfigs()) {
+            tableLastDates = "(" +
+                    "SELECT id_item, id_unit, id_cob, id_wh, " +
+                    // Fecha mas reciente cuando el movimiento fue una ENTRADA CPA. (1,1,1):
+                    "MAX(CASE WHEN fid_ct_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR[0] + 
+                    " AND fid_cl_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR[1] + 
+                    " AND fid_tp_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_PUR_PUR[2] + " THEN dt ELSE NULL END) AS _dt_last_pur, " + // si no tiene registro (1,1,1) regresa null
+                    // Fecha más reciente de movimiento de almacén, exceptuando ENTRADA INVENTARIO INI. (1,3,1):
+                    "MAX(CASE WHEN NOT (fid_ct_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[0] + 
+                    " AND fid_cl_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[1] + 
+                    " AND fid_tp_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[2] + ") THEN dt ELSE NULL END) AS _dt_last_mov " +
+                    "FROM trn_stk " +
+                    "WHERE b_del = 0 " +
+                    "GROUP BY id_item, id_unit, id_cob, id_wh)";
+        }
+        
         String sqlUnionStockConfigs = "";
         String sqlOrderBy = "";
         
-        if (showingStockConfigs() && moCheckAllStockConfigs.isSelected()) {
-            // warehouses and segregations are being shown as well...
+        if (isAllConfigs || isLaggingItems || isObsoleteItems) {
+            // warehouses and segregations and slow movements are being shown as well...
             
             sqlUnionStockConfigs = "\nUNION\n" +
                     "SELECT sc.id_item, sc.id_unit, " +
                     "sc.id_cob, sc.id_wh, cob.code AS _cob_code, ent.code AS _ent_code, " +
                     "sc.qty_min, sc.rop, sc.qty_max, " +
                     "0.0 AS _stk_seg, " +
+                    "t_dates._dt_last_pur, IF(t_dates._dt_last_pur IS NULL, -1, DATEDIFF(NOW(), t_dates._dt_last_pur)) AS _days_last_pur, " +
+                    "t_dates._dt_last_mov, IF(t_dates._dt_last_mov IS NULL, -1, DATEDIFF(NOW(), t_dates._dt_last_mov)) AS _days_last_mov, " +
                     "i.item_key, i.item, i.part_num, u.symbol, " +
-                    STableConstants.ICON_INFO + " AS _ico, " +
+                    STableConstants.ICON_VIEW_EXCL + " AS _ico, " +
                     "0.0 AS _mov_i, 0.0 AS _mov_o, 0.0 AS _stk, 0.0 AS _stk_ava" +
                     "\n" +
                     "FROM trn_stk_cfg AS sc " +
@@ -572,13 +714,31 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                     "INNER JOIN erp.itmu_unit AS u ON sc.id_unit = u.id_unit " +
                     "INNER JOIN erp.bpsu_bpb AS cob ON sc.id_cob = cob.id_bpb " +
                     "INNER JOIN erp.cfgu_cob_ent AS ent ON sc.id_cob = ent.id_cob AND sc.id_wh = ent.id_ent " +
+                    "LEFT JOIN " + tableLastDates + " AS t_dates ON sc.id_item = t_dates.id_item AND sc.id_unit = t_dates.id_unit AND sc.id_cob = t_dates.id_cob AND sc.id_wh = t_dates.id_wh " +
                     "\n" +
                     "WHERE NOT sc.b_del AND NOT i.b_del AND NOT u.b_del AND NOT cob.b_del AND NOT ent.b_del " +
+                    sqlWhereWarehouse + // filtramos la configuracion por el almacén seleccionado
                     "AND NOT EXISTS (" +
-                        "SELECT DISTINCT s.id_item, s.id_unit, s.id_cob, s.id_wh " +
+                        //"SELECT DISTINCT s.id_item, s.id_unit, s.id_cob, s.id_wh " +
+                        "SELECT 1 " +
                         "FROM trn_stk AS s " +
                         "WHERE s.id_item = sc.id_item AND s.id_unit = sc.id_unit AND s.id_cob = sc.id_cob AND s.id_wh = sc.id_wh AND " +
                         "NOT s.b_del " + (mainSqlWhere.isEmpty() ? "" : "AND " + mainSqlWhere) + ") ";
+            
+            // Si se activa filtro de rezagados, agregamos la validación de los 3 años hacia atrás:
+            if (isLaggingItems) {
+                sqlUnionStockConfigs += "AND EXISTS (" +
+                        "SELECT 1 FROM trn_stk AS s2 " +
+                        "WHERE s2.id_item = sc.id_item AND s2.id_unit = sc.id_unit AND s2.id_cob = sc.id_cob AND s2.id_wh = sc.id_wh " +
+                        "AND NOT s2.b_del AND s2.id_year BETWEEN " + (year - YEARS_UNTIL_LAGGING) + " AND " + (year - 1) + ") ";
+            }
+            // Filtro obsoletos, no tuvieron movimiento tampoco en los 3 años previos
+            else if (isObsoleteItems) {
+                sqlUnionStockConfigs += "AND NOT EXISTS (" +
+                        "SELECT 1 FROM trn_stk AS s2 " +
+                        "WHERE s2.id_item = sc.id_item AND s2.id_unit = sc.id_unit AND s2.id_cob = sc.id_cob AND s2.id_wh = sc.id_wh " +
+                        "AND NOT s2.b_del AND s2.id_year BETWEEN " + (year - YEARS_UNTIL_OBSOLETE) + " AND " + (year - 1) + ") ";
+            }
             
             // ORDER BY for UNION query:
             
@@ -604,6 +764,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showingWarehouses() ? "" : "s.id_cob, s.id_wh, cob.code AS _cob_code, ent.code AS _ent_code, ") +
                 (!showingStockConfigs()? "" : "sc.qty_min, sc.rop, sc.qty_max, ") +
                 (!showingSegregations()? "" : "tsg._stk_seg, ") +
+                (!showingStockConfigs()? "" : "t_dates._dt_last_pur, IF(t_dates._dt_last_pur IS NULL, -1, DATEDIFF(NOW(), t_dates._dt_last_pur)) AS _days_last_pur, " +
+                  "t_dates._dt_last_mov, IF(t_dates._dt_last_mov IS NULL, -1, DATEDIFF(NOW(), t_dates._dt_last_mov)) AS _days_last_mov, ") +
                 (!showingValueCommercial() ? "" : "tpc.price, ") +
                 "i.item_key, i.item, i.part_num, u.symbol, " +
                 (!showingStockConfigs()? "" : "CASE " +
@@ -625,21 +787,26 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showingWarehouses() ? "" : "INNER JOIN erp.bpsu_bpb AS cob ON s.id_cob = cob.id_bpb INNER JOIN erp.cfgu_cob_ent AS ent ON s.id_cob = ent.id_cob AND s.id_wh = ent.id_ent ") +
                 (!showingStockConfigs()? "" : "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = i.id_item AND sc.id_unit = u.id_unit AND sc.id_cob = cob.id_bpb AND sc.id_wh = ent.id_ent ") +
                 (!showingSegregations()? "" : "LEFT JOIN " + tableSegr + " AS tsg ON i.id_item = tsg.fid_item AND u.id_unit = tsg.fid_unit " + (segregSqlJoinOn.isEmpty() ? "" : "AND " + segregSqlJoinOn)) +
+                (!showingStockConfigs()? "" : "LEFT JOIN " + tableLastDates + " AS t_dates ON sc.id_item = t_dates.id_item AND sc.id_unit = t_dates.id_unit AND sc.id_cob = t_dates.id_cob AND sc.id_wh = t_dates.id_wh ") +
                 (!showingValueCommercial() ? "" : "LEFT JOIN " + tablePrice + " AS tpc ON i.id_item = tpc.id_item AND u.id_unit = tpc.id_unit ") +
                 "\n" +
                 "WHERE NOT s.b_del " + (mainSqlWhere.isEmpty() ? "" : "AND " + mainSqlWhere) +
+                (isLaggingItems || isObsoleteItems ? " AND 1 = 2 " : "") +
                 "\n" +
                 "GROUP BY s.id_item, s.id_unit, " +
                 (!showingStockLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
                 (!showingWarehouses() ? "" : "s.id_cob, s.id_wh, cob.code, ent.code, ") +
                 (!showingStockConfigs()? "" : "sc.qty_min, sc.rop, sc.qty_max, ") +
                 (!showingSegregations()? "" : "tsg._stk_seg, ") +
+                (!showingStockConfigs()? "" : "t_dates._dt_last_pur, t_dates._dt_last_mov, ") +
                 (!showingValueCommercial() ? "" : "tpc.price, ") +
                 "i.item_key, i.item, i.part_num, u.symbol " +
                 (mainSqlHaving.isEmpty() ? "" : "\n" + mainSqlHaving) +
                 sqlUnionStockConfigs + // when needed a complementary query will be added
                 "\n" +
                 sqlOrderBy;
+        
+        msSql += "";
     }
     
     @Override
@@ -655,6 +822,12 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             else if (button == jbSegregations) {
                 actionSegregations();
             }
+            else if (button == jbStockConfigsHelp) {
+                actionStockConfigsHelp();
+            }
+            else if (button == jbIconsStockHelp) {
+                actionIconsStockHelp();
+            }
         }        
        else if (e.getSource() instanceof javax.swing.JToggleButton) {
             JToggleButton toggleButton = (JToggleButton) e.getSource();
@@ -667,12 +840,27 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof JCheckBox && !mbProcessingView) {
-            JCheckBox checkBox = (JCheckBox) e.getSource();
-            
-            if (checkBox == moCheckAllStockConfigs && moCheckAllStockConfigs.isEnabled()) { // prevent refreshing when check box is disabled!
-                itemStateChangedAllStockConfigs();
+        // En un JComboBox el evento salta dos veces, solo nos interesa cuando se SELECCIONA un ítem:
+        if (e.getSource() instanceof JComboBox && !mbProcessingView) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                JComboBox comboBox = (JComboBox) e.getSource();
+                
+                if (comboBox == moComboStockConfigs) {
+                    try {
+                        mbProcessingView = true;
+                        moComboStockConfigs.setToolTipText(msStockConfigTooltips[moComboStockConfigs.getSelectedIndex()]);
+                        actionReload(); // Recarga la tabla con el nuevo filtro elegido
+                    }
+                    catch (Exception ex) {
+                        SLibUtilities.renderException(this, ex);
+                    }
+                    finally {
+                        mbProcessingView = false;
+                    }
+                }
             }
         }
+        
+        // (Mantén el bloque instanceof JCheckBox si tuvieras otros checkboxes en la vista que no hayamos tocado)
     }
 }
