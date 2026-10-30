@@ -589,6 +589,8 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DPS_SUPPLY_PEND = 207541;
     public static final int TRNX_DPS_SUPPLY_PEND_ETY = 207542;
+    public static final int TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND = 207549;
+    public static final int TRNX_DPS_SUPPLY_WITHOUT_LINK_PEND_ETY = 207550;
     public static final int TRNX_DPS_SUPPLIED = 207543;
     public static final int TRNX_DPS_SUPPLIED_ETY = 207544;
     public static final int TRNX_DPS_SUPPLIED_ORDER = 207545; // order whit supplied movements
