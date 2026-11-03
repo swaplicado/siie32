@@ -330,6 +330,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightBizPartnerBlocking = false;
         boolean hasRightInventoryIn = false;
         boolean hasRightInventoryOut = false;
+        boolean hasRightAccPend = false;
         boolean hasRightReports = false;
         boolean hasRightItemConfig = false;
         boolean hasRightCreditConfig = false;
@@ -1013,6 +1014,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DIOG_IN).HasRight;
         hasRightInventoryOut = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_PUR).HasRight ||
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DIOG_OUT).HasRight;
+        hasRightAccPend = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_ACC_PEND).HasRight;
         hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_REP).HasRight;
         hasRightScaleCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_SCA_CFG).HasRight;
         hasRightItemConfig =
@@ -1128,24 +1130,24 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiScaItMap.setEnabled(hasRightScaleCfg);
         jmiScaItDetMap.setEnabled(hasRightScaleCfg);
         
-        jmAccPend.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightReports);
+        jmAccPend.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend || hasRightReports);
         jmiAccPend.setEnabled(hasRightDocTransaction || hasRightReports);
-        jmiAccPaymentRequests.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsInAuth.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsRejc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsSched.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsSchedReport.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsInTreas.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsInTreasDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsExec.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsExecDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsToRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsToRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsBloc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsCanc.setEnabled(hasRightDocOrder || hasRightDocTransaction);
-        jmiAccPaymentsAll.setEnabled(hasRightDocOrder || hasRightDocTransaction);
+        jmiAccPaymentRequests.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsInAuth.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsRejc.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsSched.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsSchedReport.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsInTreas.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsInTreasDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsExec.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsExecDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsToRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsToRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsRcpt.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsRcptDetail.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsBloc.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsCanc.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
+        jmiAccPaymentsAll.setEnabled(hasRightDocOrder || hasRightDocTransaction || hasRightAccPend);
 
         jmRep.setEnabled(hasRightReports);
         jmiRepAccDpsAccTag.setEnabled(hasConfAccTag);

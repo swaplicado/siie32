@@ -234,8 +234,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
-    private javax.swing.JSeparator jsFinAccRec;
-    private javax.swing.JMenu jmFinAccRec;
+    private javax.swing.JSeparator jsFinAccPay;
+    private javax.swing.JMenu jmFinAccPay;
     private javax.swing.JMenuItem jmiAccRecPaymentRequests;
     private javax.swing.JMenuItem jmiAccRecPaymentsInAuth;
     private javax.swing.JMenuItem jmiAccRecPaymentsRejc;
@@ -640,8 +640,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinDpsExchangeRateDiff = new JMenuItem("Diferencias cambiarias de cuentas liquidadas en moneda extranjera");
         jmiFinCashCheck = new JMenuItem("Cheques");
         jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
-        jsFinAccRec = new JPopupMenu.Separator();
-        jmFinAccRec = new JMenu("CXP");
+        jsFinAccPay = new JPopupMenu.Separator();
+        jmFinAccPay = new JMenu("CXP");
         jmiAccRecPaymentRequests = new JMenuItem("Solicitudes de pago");
         jmiAccRecPaymentsInAuth = new JMenuItem("Solicitudes de pago en autorización");
         jmiAccRecPaymentsRejc = new JMenuItem("Solicitudes de pago rechazadas");
@@ -677,31 +677,31 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinCfdiMassiveValidationSal = new JMenuItem("Validación masiva de estatus de CFDI emitidos...");
         jmiFinUuidSearch = new JMenuItem("Busqueda de CFDI por UUID...");
         
-        jmFinAccRec.add(jmiAccRecPaymentRequests);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsInAuth);
-        jmFinAccRec.add(jmiAccRecPaymentsRejc);
-        jmFinAccRec.add(jmiAccRecPaymentsSched);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsSchedReport);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsInTreas);
-        jmFinAccRec.add(jmiAccRecPaymentsInTreasDetail);
-        jmFinAccRec.add(jmiAccRecPaymentsExec);
-        jmFinAccRec.add(jmiAccRecPaymentsExecDetail);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsToRcpt);
-        jmFinAccRec.add(jmiAccRecPaymentsToRcptDetail);
-        jmFinAccRec.add(jmiAccRecPaymentsRcpt);
-        jmFinAccRec.add(jmiAccRecPaymentsRcptDetail);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsBloc);
-        jmFinAccRec.add(jmiAccRecPaymentsCanc);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiAccRecPaymentsAll);
-        jmFinAccRec.addSeparator();
-        jmFinAccRec.add(jmiFinImportProformas);
-        jmFinAccRec.add(jmiFinImportCRP);
+        jmFinAccPay.add(jmiAccRecPaymentRequests);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsInAuth);
+        jmFinAccPay.add(jmiAccRecPaymentsRejc);
+        jmFinAccPay.add(jmiAccRecPaymentsSched);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsSchedReport);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsInTreas);
+        jmFinAccPay.add(jmiAccRecPaymentsInTreasDetail);
+        jmFinAccPay.add(jmiAccRecPaymentsExec);
+        jmFinAccPay.add(jmiAccRecPaymentsExecDetail);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsToRcpt);
+        jmFinAccPay.add(jmiAccRecPaymentsToRcptDetail);
+        jmFinAccPay.add(jmiAccRecPaymentsRcpt);
+        jmFinAccPay.add(jmiAccRecPaymentsRcptDetail);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsBloc);
+        jmFinAccPay.add(jmiAccRecPaymentsCanc);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiAccRecPaymentsAll);
+        jmFinAccPay.addSeparator();
+        jmFinAccPay.add(jmiFinImportProformas);
+        jmFinAccPay.add(jmiFinImportCRP);
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.add(jmiFinBankNbDay);
@@ -711,8 +711,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCashCheck);
         jmFin.add(jmiFinCashCounterReceipt);
-        jmFin.add(jsFinAccRec); // separator
-        jmFin.add(jmFinAccRec); // accounts receivable
+        jmFin.add(jsFinAccPay); // separator
+        jmFin.add(jmFinAccPay); // accounts receivable
         jmFin.add(jsFinCash); // separator
         jmFin.add(jmiFinLayoutBank);
         jmFin.add(jmiFinLayoutBankPending);
@@ -1309,7 +1309,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinBankNbDay.setEnabled(hasRightExcRate);
         jmiFinCashCheck.setEnabled(hasRightMoveAccCash);
         jmiFinCashCounterReceipt.setEnabled(hasRightCounterRcpt);
-        jmFinAccRec.setEnabled(hasRightMoveAccCash);
+        jmFinAccPay.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBank.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankPending.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDone.setEnabled(hasRightMoveAccCash);
