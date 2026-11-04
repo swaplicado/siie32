@@ -115,13 +115,11 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
     
     private void initComponetsCustom() {
         Right oRight = ((SClientInterface) miClient).getSessionXXX().getUser().hasRight((SClientInterface) miClient, SDataConstantsSys.PRV_PUR_ACC_PEND);
+        boolean isReader = oRight.Level <= SUtilConsts.LEV_READ;
         
-        if (mnGridSubtype == SLibConsts.UNDEFINED) {
+        if (!isReader && mnGridSubtype == SLibConsts.UNDEFINED) {
             // payments management:
             setRowButtonsEnabled(true, false, true, false, true);
-            jtbFilterDeleted.setEnabled(true);
-        }
-        else if (mnGridSubtype == SModSysConsts.FINX_ALL_PAYMENTS) {
             jtbFilterDeleted.setEnabled(true);
         }
         else {
@@ -228,6 +226,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     jbPaymentBlock.setEnabled(true);
                     jbPaymentUnblock.setEnabled(true);
                     jbPaymentCancel.setEnabled(true);
+                    // falls through...
 
                 case SUtilConsts.LEV_AUTHOR:
                 case SUtilConsts.LEV_CAPTURE:
@@ -235,6 +234,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     jbAuthWebStartAuth.setEnabled(true);
                     jbAuthWebDownloadSupportFiles.setEnabled(true);
                     jbAuthWebClearSupportFiles.setEnabled(true);
+                    // falls through...
 
                 case SUtilConsts.LEV_READ:
                     jbDocShowCfdiXml.setEnabled(true);
@@ -243,7 +243,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                     jbDocGetDocPdf.setEnabled(true);
                     jbAuthWebViewAuthLog.setEnabled(true);
                     jbAuthWebViewAuthComments.setEnabled(true);
-                    jbExportDataToSwapServices.setEnabled(true);
+                    jbExportDataToSwapServices.setEnabled(!isReader);
                     break;
             
                 default:
@@ -347,8 +347,7 @@ public class SViewPayment extends SGridPaneView implements ActionListener, ItemL
                 throw new UnsupportedOperationException(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
         
-        moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, 
-                                                                "Comentarios de autorización en app web");
+        moDialogAuthComments = new SDialogDocumentAuthornComments((SGuiClient) miClient, "Comentarios de autorización en app web");
     }
     
     private int[] getDocKeyOfSelectedPayment() throws Exception {
