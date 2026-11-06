@@ -6,7 +6,6 @@
 package erp.mod.trn.utils;
 
 
-import erp.SFileUtilities;
 import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -14,6 +13,7 @@ import erp.mod.trn.db.SDbStockValuationKardex;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -38,7 +38,8 @@ import sa.lib.gui.SGuiSession;
  * Contiene verificaciones que detectan inconsistencias entre los movimientos de
  * almacén (trn_stk) y sus registros en la valuación (trn_stk_val_mvt), así como
  * movimientos cuya factura o artículo corresponde a activo fijo, y consumos que
- * rebasan la cantidad de entrada registrada.
+ * rebasan la cantidad de entrada registrada. También compara los costos del
+ * kardex con los precios de los documentos de compra asociados.
  * </p>
  *
  * @author Edwin Carmona
@@ -50,6 +51,16 @@ public abstract class SStockValuationVerify {
      * valuación.
      */
     public static final String SINCE_DATE = "2026-07-01";
+
+    /**
+     * Fecha de inicio para comparar los costos del kardex con los documentos.
+     */
+    public static final String KARDEX_DOCUMENT_COST_SINCE_DATE = "2026-08-01";
+    
+    /**
+     * Fecha de inicio para comparar los costos del kardex con los documentos.
+     */
+    public static final int KARDEX_DOCUMENT_COST_MAX_DIFF_PERC = 20;
     
     /**
      * Tolerancia (en unidades de costo) permitida para el remanente negativo
@@ -120,6 +131,7 @@ public abstract class SStockValuationVerify {
         addCheck(result, "Salidas de kardex sin movimiento de valuación", oSession, SStockValuationVerify::verifyKardexOutsWithoutMvt);
         addCheck(result, "Remanente negativo de kardex", oSession, SStockValuationVerify::verifyNegativeKardexRemaining);
         addCheck(result, "Ajustes de kardex huérfanos", oSession, SStockValuationVerify::verifyOrphanKardexAdjusts);
+        addCheck(result, "Costo de kardex contra documento de compra", oSession, SStockValuationVerify::verifyKardexDocumentCosts);
 
         result.finish(new Date());
         return result;
@@ -212,6 +224,7 @@ public abstract class SStockValuationVerify {
             writeSummaryValue(sheet, 9, "Validaciones ejecutadas", Integer.toString(checks.size()));
             writeSummaryValue(sheet, 10, "Validaciones sin hallazgos", Integer.toString(getPassedCheckCount()));
             writeSummaryValue(sheet, 11, "Validaciones con hallazgos", Integer.toString(checks.size() - getPassedCheckCount()));
+            writeSummaryValue(sheet, 12, "Comparación de costos de kardex desde", KARDEX_DOCUMENT_COST_SINCE_DATE);
             writeSummaryValue(sheet, 13, "Alcance", "Resultado de las consultas de verificación ejecutadas secuencialmente; no es una copia completa ni un bloqueo transaccional de la base de datos.");
 
             Row header = sheet.createRow(15);
@@ -313,6 +326,59 @@ public abstract class SStockValuationVerify {
         private boolean hasFindings() {
             return !errors.trim().isEmpty();
         }
+    }
+
+    /**
+     * Detecta diferencias mayores al 20 % entre el costo unitario del kardex y
+     * el precio real del documento de naturaleza predeterminada, así como
+     * costos positivos en documentos de naturaleza activo.
+     *
+     * @param oSession sesión activa de base de datos
+     * @return errores encontrados o cadena vacía
+     * @throws SQLException si ocurre un error al ejecutar la consulta
+     */
+    private static String verifyKardexDocumentCosts(SGuiSession oSession) throws SQLException {
+        Logger.getLogger(SStockValuationVerify.class.getName()).info("Verificando costos de kardex contra documentos de compra...");
+        StringBuilder errors = new StringBuilder();
+        String nature = "trn_get_dps_nat(" + SModSysConsts.TRNS_CT_DPS_PUR + ", d.id_year, d.id_doc)";
+        String percentage = "(ABS(k.cost_u - de.price_u_real_r) * 100 / NULLIF(de.price_u_real_r, 0))";
+        String sql = "SELECT k.id_stk_val_kardex, k.dt_mov, de.id_year, de.id_doc, de.id_ety, "
+                + "k.cost_u, k.cost_u_cur, " + nature + " AS dps_nat, "
+                + "de.price_u_real_r, de.price_u_real_cur_r, "
+                + "ABS(k.cost_u - de.price_u_real_r) AS cost_diff, "
+                + "ABS(k.cost_u_cur - de.price_u_real_cur_r) AS cost_diff_cur, "
+                + percentage + " AS perc "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_STK_VAL_KARDEX) + " k "
+                + "INNER JOIN trn_dps_ety de ON k.fk_dps_year_in_main_n = de.id_year "
+                + "AND k.fk_dps_doc_in_main_n = de.id_doc AND k.fk_dps_ety_in_main_n = de.id_ety "
+                + "INNER JOIN trn_dps d ON k.fk_dps_year_in_main_n = d.id_year "
+                + "AND k.fk_dps_doc_in_main_n = d.id_doc "
+                + "WHERE k.b_del = 0 AND k.dt_mov >= '" + KARDEX_DOCUMENT_COST_SINCE_DATE + "' "
+                + "AND ((ABS(k.cost_u - de.price_u_real_r) > 0 AND " + percentage + " > " + KARDEX_DOCUMENT_COST_MAX_DIFF_PERC + " "
+                + "AND " + nature + " = " + SDataConstantsSys.TRNU_DPS_NAT_DEF + ") "
+                + "OR (" + nature + " = " + SDataConstantsSys.TRNU_DPS_NAT_ASSET + " AND k.cost_u > 0)) "
+                + "ORDER BY k.dt_mov, k.id_stk_val_kardex;";
+        ResultSet rs = oSession.getStatement().executeQuery(sql);
+        while (rs.next()) {
+            BigDecimal percent = rs.getBigDecimal("perc");
+            errors.append("Kardex ID ").append(rs.getInt("id_stk_val_kardex"))
+                    .append(" | fecha: ").append(rs.getDate("dt_mov"))
+                    .append(" | documento [").append(rs.getInt("id_year")).append(", ")
+                    .append(rs.getInt("id_doc")).append(", ").append(rs.getInt("id_ety")).append("]")
+                    .append(" | naturaleza: ").append(rs.getInt("dps_nat"))
+                    .append(" | costo: ").append(rs.getBigDecimal("cost_u"))
+                    .append(" | precio: ").append(rs.getBigDecimal("price_u_real_r"))
+                    .append(" | diferencia: ").append(rs.getBigDecimal("cost_diff"))
+                    .append(" | porcentaje: ").append(percent == null ? "no definido" : percent + " %")
+                    .append(" | costo moneda: ").append(rs.getBigDecimal("cost_u_cur"))
+                    .append(" | precio moneda: ").append(rs.getBigDecimal("price_u_real_cur_r"))
+                    .append(" | diferencia moneda: ").append(rs.getBigDecimal("cost_diff_cur"))
+                    .append("\n");
+        }
+        if (errors.length() > 0) {
+            Logger.getLogger(SStockValuationVerify.class.getName()).severe(errors.toString());
+        }
+        return errors.toString();
     }
 
     /**
